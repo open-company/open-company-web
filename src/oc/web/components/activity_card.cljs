@@ -9,10 +9,11 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.activity :as am]
             [oc.web.lib.activity-utils :as au]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.mixins.activity :as am]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
@@ -30,7 +31,7 @@
         [:div.activity-card-title
           "This topic’s a little sparse. "
           [:button.mlb-reset
-            {:on-click #(when-not (responsive/is-table-or-mobile?)
+            {:on-click #(when-not (responsive/is-tablet-or-mobile?)
                           (dis/dispatch! [:entry-edit topic]))}
             "Add an update?"]]])])
 
@@ -128,9 +129,9 @@
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
-          (when (or (utils/link-for (:links activity-data) "partial-update")
-                    (utils/link-for (:links activity-data) "delete")
-                    (not (responsive/is-table-or-mobile?)))
+          (when (and (not (responsive/is-tablet-or-mobile?))
+                     (or (utils/link-for (:links activity-data) "partial-update")
+                         (utils/link-for (:links activity-data) "delete")))
             (let [all-boards (filter
                               #(not= (:slug %) utils/default-drafts-board-slug)
                               (:boards (drv/react s :org-data)))]
@@ -179,7 +180,7 @@
             (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
               [:div.activity-tag.on-gray
                 {:class (when is-all-posts "double-tag")
-                 :on-click #(when-not (responsive/is-table-or-mobile?)
+                 :on-click #(when-not (responsive/is-tablet-or-mobile?)
                              (router/nav!
                               (oc-urls/board-filter-by-topic
                                (router/current-org-slug)
@@ -221,7 +222,7 @@
           [:div.activity-share-thoughts
             "Share your thoughts"])
         (when (and (utils/link-for (:links activity-data) "partial-update")
-                   (not (responsive/is-table-or-mobile?)))
+                   (not (responsive/is-tablet-or-mobile?)))
           [:button.mlb-reset.post-edit
             {:title "Edit"
              :data-toggle "tooltip"
