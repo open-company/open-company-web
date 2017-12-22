@@ -30,7 +30,8 @@
                 board-data
                 show-login-overlay
                 mobile-navigation-sidebar
-                mobile-menu-open]
+                mobile-menu-open
+                orgs-dropdown-visible]
          :as navbar-data} (drv/react s :navbar-data)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
@@ -39,6 +40,7 @@
                                                         (pos?
                                                          (:count
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
+                                :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
                                                      (not (:read-only org-data)))
                                 :jwt (jwt/jwt)})}
@@ -50,14 +52,18 @@
                      mobile-navigation-sidebar))
           [:div.nav.navbar-nav.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}]]
+              {:on-click #(do
+                            (dis/dispatch! [:input [:mobile-menu-open] false])
+                            (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
           [:div.nav.navbar-nav.navbar-center
             (orgs-dropdown)]
           [:ul.nav.navbar-nav.navbar-right
             [:li
               (if (responsive/is-mobile-size?)
                 [:button.btn-reset.mobile-menu.group
-                  {:on-click #(dis/dispatch! [:mobile-menu-toggle])}
+                  {:on-click #(do
+                               (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                               (dis/dispatch! [:mobile-menu-toggle]))}
                   (user-avatar-image current-user-data)]
                 (if (jwt/jwt)
                   [:div.group

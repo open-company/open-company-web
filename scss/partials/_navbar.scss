@@ -28,6 +28,10 @@ nav.oc-navbar {
   border-bottom: 1px solid $carrot_light_gray_7;
   box-shadow: 0px 2px 6px 0px rgba($carrot_light_gray_7, 0.5);
 
+  &.showing-orgs-dropdown {
+    overflow: visible;
+  }
+
   @include mobile(){
     &.show-login-overlay {
       height: 100vh !important;
@@ -42,6 +46,10 @@ nav.oc-navbar {
     transition: 230ms;
     overflow: hidden;
     height: 100vh;
+
+    &.showing-orgs-dropdown {
+      overflow: visible;
+    }
 
     &:not(.mobile-menu-open) {
       height: #{$mobile_navbar_height}px;

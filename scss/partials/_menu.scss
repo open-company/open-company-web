@@ -51,7 +51,6 @@ div.menu {
     left: 0px;
     width: 100%;
     height: calc(100vh - 64px);
-    opacity: 0;
     border: none;
     border-top: 1px solid rgba(78,90,107,0.1);
     border-bottom: 1px solid rgba(78,90,107,0.1);
@@ -60,8 +59,11 @@ div.menu {
     display: block;
     text-align: right;
     background-color: white;
+    display: none;
+    opacity: 0;
 
     &.mobile-menu-open {
+      display: block;
       opacity: 1;
     }
   }

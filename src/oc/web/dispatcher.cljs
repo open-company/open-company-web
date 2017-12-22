@@ -100,6 +100,7 @@
    :org-settings        [[:base] (fn [base] (:org-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
+   :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -249,7 +250,8 @@
                             (let [navbar-data (select-keys base [:mobile-menu-open
                                                                  :show-login-overlay
                                                                  :mobile-navigation-sidebar
-                                                                 :current-user-data])]
+                                                                 :current-user-data
+                                                                 :orgs-dropdown-visible])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
