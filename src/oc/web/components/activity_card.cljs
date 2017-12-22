@@ -87,7 +87,8 @@
                           s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))
-        share-link (utils/link-for (:links activity-data) "share")]
+        share-link (utils/link-for (:links activity-data) "share")
+        edit-link (utils/link-for (:links activity-data) "partial-update")]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :dropdown-active (or @(::more-dropdown s)
@@ -150,13 +151,25 @@
                   [:div.activity-more-dropdown-menu
                     [:div.triangle]
                     [:ul.activity-card-more-menu
+                      (when edit-link
+                        [:li
+                          {:on-click #(do
+                                        (utils/remove-tooltips)
+                                        (reset! (::more-dropdown s) false)
+                                        (dis/dispatch!
+                                         [:activity-modal-fade-in
+                                          (:board-slug activity-data)
+                                          (:uuid activity-data)
+                                          (:type activity-data)
+                                          true]))}
+                          "Edit"])
                       (when share-link
                         [:li
                           {:on-click #(do
                                         (reset! (::more-dropdown s) false)
                                         (dis/dispatch! [:activity-share-show activity-data]))}
                           "Share"])
-                      (when (and (utils/link-for (:links activity-data) "partial-update")
+                      (when (and edit-link
                                  (> (count all-boards) 1))
                         [:li
                           {:on-click #(do
