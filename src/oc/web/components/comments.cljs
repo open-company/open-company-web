@@ -69,6 +69,13 @@
   (reset! (::editing? s) true)
   (utils/after 600 #(utils/to-end-of-content-editable (rum/ref-node s "comment-body"))))
 
+(defn cancel-edit
+  [e s c]
+  (.stopPropagation e)
+  (let [comment-field (rum/ref-node s "comment-body")]
+    (set! (.-innerHTML comment-field) (utils/emojify @(::initial-body s) true))
+    (reset! (::editing? s) false)))
+
 (rum/defcs comment-row < rum/static
                          rum/reactive
                          (rum/local false ::editing?)
@@ -102,8 +109,7 @@
         can-delete? (utils/link-for (:links c) "delete")
         can-edit? (and (not is-emoji-comment?)
                        (utils/link-for (:links c) "partial-update"))
-        editable (and (not (responsive/is-tablet-or-mobile?))
-                      (or can-delete? can-edit?))
+        editable (or can-delete? can-edit?)
         should-show-comment-reaction? (and (not is-emoji-comment?)
                                            (or (not can-edit?)
                                                (and can-edit?
@@ -126,14 +132,12 @@
                              (.blur (rum/ref-node s "comment-body"))
                              (.preventDefault e))
                            (when (= "Escape" (.-key e))
-                              (.stopPropagation e)
-                              (let [comment-field (rum/ref-node s "comment-body")]
-                                (set! (.-innerHTML comment-field) (utils/emojify @(::initial-body s) true))
-                                (reset! (::editing? s) false))))
+                             (cancel-edit e s c)))
              :on-blur #(edit-finished % s c)
              :ref "comment-body"
              :class (utils/class-set {:editable can-edit?
-                                      :is-owner is-owner?})
+                                      :is-owner is-owner?
+                                      :editing @(::editing? s)})
              :content-editable @(::editing? s)
              :dangerouslySetInnerHTML (utils/emojify (:body c))}]]
         (when (or should-show-comment-reaction?
@@ -141,9 +145,19 @@
           [:div.comment-footer-container.group
             (when should-show-comment-reaction?
               (comment-reactions/comment-reactions c))
+            (when (and (responsive/is-tablet-or-mobile?)
+                       @(::editing? s))
+              [:div.save-cancel-edit-buttons
+                [:button.mlb-reset.mlb-link-green
+                  {:on-click #(edit-finished % s c)}
+                  "Save"]
+                [:button.mlb-reset.mlb-link-black
+                  {:on-click #(cancel-edit % s c)}
+                  "Cancel"]])
             (when editable
               [:div.edit-delete-button
-                {:ref "comment-edit-delete"}
+                {:ref "comment-edit-delete"
+                 :class (when @(::editing? s) "editing")}
                 [:button.mlb-reset.more-button
                   {:on-click #(reset! (::show-more-dropdown s) (not @(::show-more-dropdown s)))
                    :title "More"
@@ -316,6 +330,8 @@
           {:class (utils/class-set {:add-comment-focus add-comment-focus
                                     :empty (zero? (count sorted-comments))})}
           [:div.vertical-line]
+          (when is-mobile?
+            (add-comment activity-data))
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
              {:ref "comments-internal-scroll"
