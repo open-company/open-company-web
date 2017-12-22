@@ -75,6 +75,10 @@
   @include mlb-link($carrot_orange);
 }
 
+.mlb-link-green {
+  @include mlb-link($carrot_green);
+}
+
 .btn-reset {
   cursor: pointer;
   outline: none;
