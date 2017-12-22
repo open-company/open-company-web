@@ -67,6 +67,10 @@ div.activity-card {
       top: 50%;
       margin-top: -80px;
 
+      @include mobile() {
+        display: none;
+      }
+
       img {
         width: 168px;
         height: 120px;

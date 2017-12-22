@@ -379,9 +379,7 @@
           (when is-mobile?
             [:div.activity-modal-mobile-header
               [:button.mlb-reset.mobile-modal-close-bt
-                {:on-click #(close-clicked s)}]
-              [:div.mobile-modal-title
-                {:dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]])
+                {:on-click #(close-clicked s)}]])
           [:div.activity-modal-header.group
             [:div.activity-modal-header-left
               (user-avatar-image (first (:author activity-data)))
