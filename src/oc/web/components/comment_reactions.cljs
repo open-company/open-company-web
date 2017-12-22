@@ -22,8 +22,7 @@
           is-loading (utils/in? reactions-loading (:reaction reaction-data))
           reacted (:reacted reaction-data)
           is-mobile? (responsive/is-tablet-or-mobile?)
-          read-only-reaction (or is-mobile?
-                                 (read-only? item-data))
+          read-only-reaction (read-only? item-data)
           r (if is-loading
               (merge reaction-data {:count (if reacted
                                             (dec (:count reaction-data))
