@@ -178,7 +178,8 @@
                        (jwt/get-key :user-id)))
           show-nux (and (not (:show-login-overlay @dis/app-state))
                         (jwt/jwt)
-                        (some #(= % nux-cookie) (vals router/nux-cookie-values)))
+                        (or (some #(= % nux-cookie) (vals router/nux-cookie-values))
+                            (contains? query-params :show-nux-again-please)))
           loading (or (and ;; if is board page
                            (not (contains? query-params :ap))
                            ;; if the board data are not present
