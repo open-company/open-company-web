@@ -20,10 +20,11 @@ function OCStaticMailchimpApiSubmit(e, form, success, fail){
 }
 
 function OCStaticGetCookie(name) {
+  // Give a cookie name return its value
   var value = "; " + document.cookie;
   var parts = value.split("; " + name + "=");
   if (parts.length == 2)
-    return parts.pop().split(";").shift();
+    return decodeURI(parts.pop().split(";").shift());
 }
 
 function OCStaticCookieName(name){
