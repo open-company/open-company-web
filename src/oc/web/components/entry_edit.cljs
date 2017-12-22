@@ -356,6 +356,8 @@
             (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
                         post-button-offset (.offset post-button)]
               (carrot-tip {:step :2
+                           :circle-offset {:top -90
+                                           :left -550}
                            :x (- (aget post-button-offset "left") 522)
                            :y (- (aget post-button-offset "top") 20)
                            :title "Here’s a sample post"

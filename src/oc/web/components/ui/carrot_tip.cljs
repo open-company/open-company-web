@@ -2,6 +2,26 @@
   (:require [rum.core :as rum]
             [oc.web.lib.utils :as utils]))
 
+(defn second-step-oval [width height px py]
+  (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+        offset-x px
+        offset-y py
+        second-line (str "M" (+ 1071.3683 offset-x) "," (+ 218.965915 offset-y) "\n")
+        nth-line-3 (str "C" (+ 1117.20129 offset-x) "," (+ 246.53226 offset-y)
+                        " " (+ 1175.09029 offset-x) "," (+ 232.488897 offset-y)
+                        " " (+ 1210.99409 offset-x) "," (+ 195.095574 offset-y) "\n")
+        nth-line-4 (str "C" (+ 1245.68139 offset-x) "," (+ 159.057381 offset-y)
+                        " " (+ 1230.25612 offset-x) "," (+ 91.3314095 offset-y)
+                        " " (+ 1170.63164 offset-x) "," (+ 53.7640728 offset-y) "\n")
+        nth-line-5 (str "C" (+ 1109.46966 offset-x) "," (+ 18.7555776 offset-y)
+                        " " (+ 1042.43005 offset-x) "," (+ 36.9302954 offset-y)
+                        " " (+ 1026.89431 offset-x) "," (+ 84.4772704 offset-y) "\n")
+        nth-line-6 (str "C" (+ 1010.73378 offset-x) "," (+ 133.733542 offset-y)
+                        " " (+ 1025.51147 offset-x) "," (+ 191.439458 offset-y)
+                        " " (+ 1071.36836 offset-x) "," (+ 218.965915 offset-y)
+                        " Z ")]
+    (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)))
+
 (defn third-step-oval [width height px py]
   (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
         offset-x px
@@ -84,7 +104,7 @@
 
 (defn is-step-with-oval
   [step]
-  (some #{step} [:3 :4 :5 :6]))
+  (some #{step} [:2 :3 :4 :5 :6]))
 
 (defn carrot-tip-inner
   [{:keys [x y width height ;; container data
@@ -155,6 +175,12 @@
               [:g
                 [:path
                   {:d (cond
+                       (= :2 step)
+                       (second-step-oval
+                        (.-innerWidth js/window)
+                        (.-innerHeight js/window)
+                        (+ x (:left circle-offset))
+                        (+ y (:top circle-offset)))
                        (= :3 step)
                        (third-step-oval
                         (.-innerWidth js/window)

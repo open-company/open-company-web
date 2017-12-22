@@ -202,7 +202,7 @@
                                (when (or (>= (count (.. e -target -innerText)) 50)
                                         (= (.-key e) "Enter"))
                                 (utils/event-stop e)))
-               :placeholder "All-hands, Announcements, CEO, Marketing, Sales, Who We Are"
+               :placeholder "Announcements, Strategy, Who We Are, Marketing, Sales"
                :dangerouslySetInnerHTML (utils/emojify @(::initial-board-name s))}]]
           [:div.board-edit-divider]
           (when show-slack-channels?

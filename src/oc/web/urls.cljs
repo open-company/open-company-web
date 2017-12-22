@@ -12,8 +12,6 @@
 
 (def about "/about")
 
-(def features "/features")
-
 (def slack "/slack")
 
 (def blog "https://blog.carrot.io")

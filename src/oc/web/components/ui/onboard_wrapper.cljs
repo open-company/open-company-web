@@ -1,7 +1,7 @@
 (ns oc.web.components.ui.onboard-wrapper
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [cuerdas.core :as s]
+            [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -14,6 +14,9 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image default-avatar-url)]
             [goog.dom :as gdom]
             [goog.object :as gobj]))
+
+(defn- clean-org-name [org-name]
+  (string/trim org-name [\space \newline]))
 
 (defn- delay-focus-field-with-ref
   "Given a Rum state and a ref, async focus the filed if it exists."
@@ -201,7 +204,10 @@
                          (drv/drv :teams-data)
                          (drv/drv :org-editing)
                          (rum/local false ::saving)
-                         {:did-mount (fn [s]
+                         {:will-mount (fn [s]
+                           (dis/dispatch! [:input [:org-editing :name] ""])
+                           s)
+                          :did-mount (fn [s]
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
@@ -284,17 +290,25 @@
             [:div.add-picture-link-subtitle
               "A transparent background PNG works best"]]
           [:div.field-label
-            "Team name"]
+            "Team name"
+            (when (:error org-editing)
+              [:span.error "Must be at least 3 characters"])]
           [:input.field
             {:type "text"
              :ref "org-name"
+             :class (when (:error org-editing) "error")
              :value (:name org-editing)
-             :on-change #(dis/dispatch! [:input [:org-editing :name] (.. % -target -value)])}]
+             :on-change #(dis/dispatch! [:input [:org-editing]
+                          (merge org-editing {:error nil :name (.. % -target -value)})])}]
           [:button.continue
-            {:disabled (empty? (:name org-editing))
-             :on-click #(do
-                         ;; Create org and show setup screen
-                         (dis/dispatch! [:org-create]))}
+            {:class (when (<= (count (clean-org-name (:name org-editing))) 3) "disabled")
+             :on-click #(let [org-name (clean-org-name (:name org-editing))]
+                          (dis/dispatch! [:input [:org-editing :name] org-name])
+                          (if (and (seq org-name)
+                                   (> (count org-name) 3))
+                           ;; Create org and show setup screen
+                           (dis/dispatch! [:org-create])
+                           (dis/dispatch! [:input [:org-editing :error] true])))}
             "All set!"]]]]))
 
 (rum/defcs invitee-lander < rum/reactive

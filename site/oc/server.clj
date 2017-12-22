@@ -16,9 +16,6 @@
 (defn about []
   (res/resource-response "/about.html" {:root "public"}))
 
-(defn features []
-  (res/resource-response "/features.html" {:root "public"}))
-
 (defn privacy []
   (res/resource-response "/privacy.html" {:root "public"}))
 
@@ -47,7 +44,6 @@
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/about" [] (about))
-  (GET "/features" [] (features))
   (GET "/privacy" [] (privacy))
   (GET "/terms" [] (terms))
   (GET "/" [] (index))

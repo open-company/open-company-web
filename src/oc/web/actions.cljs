@@ -74,7 +74,6 @@
                  (not (utils/in? (:route @router/path) "user-profile"))
                  (not (utils/in? (:route @router/path) "email-verification"))
                  (not (utils/in? (:route @router/path) "about"))
-                 (not (utils/in? (:route @router/path) "features"))
                  (not (utils/in? (:route @router/path) "slack"))
                  (not (utils/in? (:route @router/path) "email-wall"))
                  (not (utils/in? (:route @router/path) "sign-up"))
@@ -370,6 +369,7 @@
         current-route (:route @router/path)]
     (when (and (not (utils/in? current-route "login"))
                (not (utils/in? current-route "sign-up"))
+               (not (utils/in? current-route "slack"))
                (not (utils/in? current-route "about"))
                (not (utils/in? current-route "home"))
                (not (cook/get-cookie :login-redirect)))
@@ -943,7 +943,11 @@
           comments-data (get-in db comments-key)
           comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
       (if comment-idx
-        (let [new-comments-data (assoc comments-data comment-idx comment-data)]
+        (let [old-comment-data (get comments-data comment-idx)
+              new-comment-data (if (contains? comment-data :reactions)
+                                 comment-data
+                                 (assoc comment-data :reactions (:reactions old-comment-data)))
+              new-comments-data (assoc comments-data comment-idx new-comment-data)]
           (assoc-in db comments-key new-comments-data))
         db))))
 

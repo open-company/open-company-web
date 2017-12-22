@@ -708,10 +708,7 @@
       (interaction-http (method-for-link comment-link) (relative-href comment-link)
         {:headers (headers-for-link comment-link)
          :json-params json-data}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch!
-           [:comment-save/finish
-            {:sucess success}]))))))
+        (fn [_])))))
 
 (defn toggle-reaction
   [item-data reaction-data reacting?]

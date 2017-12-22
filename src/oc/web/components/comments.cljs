@@ -2,6 +2,7 @@
   (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as string]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -40,15 +41,15 @@
         cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
         cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
         final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
-    final-text))
+    (.trim final-text)))
 
 (defn edit-finished
   [e s c]
   (let [new-comment (rum/ref-node s "comment-body")
         comment-text (add-comment-content new-comment)]
-    (when-not (= comment-text (:body c))
-      (reset! (::editing? s) false)
-      (dis/dispatch! [:comment-save c comment-text]))))
+    (reset! (::editing? s) false)
+    (set! (.-innerHTML new-comment) comment-text)
+    (dis/dispatch! [:comment-save c comment-text])))
 
 (defn is-emoji
   [body]
@@ -120,7 +121,8 @@
         [:div.comment-body-container
           [:p.comment-body.group
            {:on-key-down (fn [e]
-                           (when (and (= "Enter" (.-key e)) (not (.-shiftKey e)))
+                           (when (and (= "Enter" (.-key e))
+                                      (not (.-shiftKey e)))
                              (.blur (rum/ref-node s "comment-body"))
                              (.preventDefault e))
                            (when (= "Escape" (.-key e))
