@@ -6,9 +6,9 @@
             [oc.web.lib.responsive :as responsive]))
 
 (def mobile-image-size
- {:width 360
-  :height 322
-  :ratio (/ 360 322)})
+ {:width 250
+  :height 211
+  :ratio (/ 250 211)})
 
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :board-data)
@@ -25,14 +25,20 @@
               {:on-click #(dis/dispatch! [:entry-edit {:board-slug (:slug board-data) :board-name (:name board-data)}])}
               "Add one?"])])
       [:img.empty-board-image
-        {:src (utils/cdn (str "/img/ML/" (when mobile? "mobile_") "empty_board.svg"))
+        {:src (utils/cdn (if mobile?
+                           "/img/ML/mobile_empty_board.png"
+                           "/img/ML/empty_board.svg"))
+         :srcSet (when mobile?
+                    (str (utils/cdn "/img/ML/mobile_empty_board@2x.png") "  2x"))
          :style {:width (str (if mobile? (- ww 24 24) 416) "px")
                  :height (str (if mobile? (* (- ww 24 24) (:ratio mobile-image-size)) 424) "px")
                  :max-width (str (if mobile? (:width mobile-image-size) 416) "px")
                  :max-height (str (if mobile? (:height mobile-image-size) 424) "px")}}]
       (when mobile?
         [:div.empty-board-footer
-          "Shoot, looks like there aren’t any posts in Design yet...."])
-      (when mobile?
+          {:dangerouslySetInnerHTML (utils/emojify (str "Shoot, looks like there aren’t any posts in " (:name board-data) " yet...."))}])
+      (when false ;; mobile?
         [:button.mlb-reset.empty-board-create-first-post
-          "Create the first post"])]))
+          [:div.empty-board-first-post-container
+            [:div.empty-board-first-post-pencil]
+            "Create the first post"]])]))
