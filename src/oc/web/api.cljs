@@ -25,6 +25,8 @@
 
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
+(def ^:private search-endpoint ls/search-server-domain)
+
 (defun- relative-href
   "Given a link map or a link string return the relative href."
 
@@ -157,6 +159,8 @@
 (def ^:private pay-http (partial req pay-endpoint))
 
 (def ^:private interaction-http (partial req interaction-endpoint))
+
+(def ^:private search-http (partial req search-endpoint))
 
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
@@ -893,6 +897,20 @@
          {:headers (headers-for-link remove-link)}
          (fn [{:keys [status success body]}]
            (dispatcher/dispatch! [:private-board-kick-out-self/finish success])))))))
+
+(defn query
+  [org-uuid search-query callback]
+  (when search-query
+    (let [search-link {:href (str "/search/?q=" search-query "&org=" org-uuid)
+                       :content-type (content-type "search")
+                       :method "GET" :rel ""}]
+      (search-http (method-for-link search-link) (relative-href search-link)
+                   {:headers (headers-for-link search-link)}
+                   (fn [{:keys [status success body]}]
+                     (callback {:success success
+                                :error (when-not success body)
+                                :body (when (seq body) (json->cljs body))}))))))
+
 
 (defn force-jwt-refresh []
   (when (j/jwt)

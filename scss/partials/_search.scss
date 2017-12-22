@@ -1,0 +1,24 @@
+
+div.search-box {
+  width: 200px;
+  border-radius: 4px;
+  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+
+  div.search {
+    &:empty:before {
+      content: attr(placeholder);
+      color: rgba($carrot_light_gray_3, 0.4);
+      cursor: text;
+    }
+  }
+}
+
+div.search-results.inactive {
+  display: none;
+}
+
+div.search-result {
+  background-color: $carrot_light_gray_9;
+  border-radius: 4px;
+  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+}
