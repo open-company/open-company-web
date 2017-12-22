@@ -70,13 +70,14 @@
       [:div.login-overlay-cta.group
         [:div.sign-in-cta "Sign In"]]
       ;; Slack button
-      [:button.mlb-reset.signup-with-slack
+      [:button.mlb-reset.signin-with-slack
         {:on-click #(do
                      (.preventDefault %)
                      (when (:auth-settings @dis/app-state)
                        (dis/dispatch! [:login-with-slack])))}
-        "Sign In with "
-        [:div.slack-blue-icon]]
+        [:div.signin-with-slack-content
+          "Sign In with "
+          [:div.slack-blue-icon]]]
       ;; Or with email
       [:div.or-with-email
         [:div.or-with-email-line]
