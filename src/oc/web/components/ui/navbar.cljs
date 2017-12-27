@@ -7,7 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.menu :refer (menu)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
@@ -25,7 +25,14 @@
                                       (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
                                   s)}
   [s disabled-user-menu]
-  (let [{:keys [show-login-overlay mobile-menu-open org-data board-data] :as navbar-data} (drv/react s :navbar-data)]
+  (let [{:keys [current-user-data
+                org-data
+                board-data
+                show-login-overlay
+                mobile-navigation-sidebar
+                mobile-menu-open
+                orgs-dropdown-visible]
+         :as navbar-data} (drv/react s :navbar-data)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -33,6 +40,7 @@
                                                         (pos?
                                                          (:count
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
+                                :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
                                                      (not (:read-only org-data)))
                                 :jwt (jwt/jwt)})}
@@ -40,14 +48,23 @@
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
+          (when (and (responsive/is-mobile-size?)
+                     mobile-navigation-sidebar))
+          [:div.nav.navbar-nav.navbar-left
+            [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+              {:on-click #(do
+                            (dis/dispatch! [:input [:mobile-menu-open] false])
+                            (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
           [:div.nav.navbar-nav.navbar-center
             (orgs-dropdown)]
           [:ul.nav.navbar-nav.navbar-right
             [:li
               (if (responsive/is-mobile-size?)
                 [:button.btn-reset.mobile-menu.group
-                  {:on-click #(dis/dispatch! [:mobile-menu-toggle])}
-                  [:div.vertical-ellipses]]
+                  {:on-click #(do
+                               (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                               (dis/dispatch! [:mobile-menu-toggle]))}
+                  (user-avatar-image current-user-data)]
                 (if (jwt/jwt)
                   [:div.group
                     [:div.dropdown.right
@@ -63,4 +80,5 @@
                   (login-button)))]]]]
       (when (responsive/is-mobile-size?)
         ;; Render the menu here only on mobile so it can expand the navbar
-        (menu {:mobile-menu-open mobile-menu-open}))]))
+        (menu))
+      ]))

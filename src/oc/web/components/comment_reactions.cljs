@@ -2,10 +2,10 @@
   (:require-macros [dommy.core :refer (sel1)]
                    [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [oc.web.components.reactions :as reactions]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.jwt :as jwt]
+            [oc.web.components.reactions :as reactions]
             [cljsjs.web-animations]))
 
 (defn- read-only?

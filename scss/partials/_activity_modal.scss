@@ -72,6 +72,12 @@ div.activity-modal-container {
     position: relative;
     margin: 0px auto;
 
+    @include mobile() {
+      width: 100%;
+      min-height: initial;
+      margin-top: 123px;
+    }
+
     div.activity-modal {
       width: 1001px;
       margin: 0px 0px 0px 28px;
@@ -81,12 +87,66 @@ div.activity-modal-container {
       border-radius: 4px;
       background-color: white;
 
+      @include mobile() {
+        width: 100%;
+        margin: 0px;
+        box-shadow: none;
+        border-radius: 0px;
+      }
+
+      div.activity-modal-mobile-header {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          position: fixed;
+          top: 0px;
+          height: 64px;
+          background-color: $carrot_light_gray_7;
+          left: 0px;
+          width: 100%;
+          padding: 12px 18px;
+          text-align: center;
+          position: relativel
+        }
+
+        button.mobile-modal-close-bt {
+          @include image-2x("/img/ML/mobile_modal_close");
+          width: 24px;
+          height: 24px;
+          background-repeat: no-repeat;
+          background-size: 14px 14px;
+          background-position: 5px 5px;
+          position: absolute;
+          top: 20px;
+          left: 18px;
+        }
+
+        div.mobile-modal-title {
+          @include avenir_H();
+          font-size: 22px;
+          color: $carrot_dark_gray;
+          margin-top: 4px;
+        }
+
+      }
+
       div.activity-modal-header{
         padding: 16px 24px 0px 24px;
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         background-color: $carrot_light_gray_2;
         height: 72px;
+
+        @include mobile() {
+          height: 59px;
+          position: fixed;
+          top: 64px;
+          left: 0px;
+          width: 100%;
+          border-radius: 0px;
+          padding: 14px 17px;
+        }
 
         div.activity-modal-header-left {
           float: left;
@@ -234,6 +294,12 @@ div.activity-modal-container {
         flex-direction: row;
         align-items: stretch;
 
+        @include mobile() {
+          display: block;
+          align-items: initial;
+          flex-direction: unset;
+        }
+
         div.activity-left-column {
           flex-grow: 0;
           flex-shrink: 0;
@@ -244,8 +310,16 @@ div.activity-modal-container {
           border-top-left-radius: 8px;
           border-bottom-left-radius: 8px;
 
+          @include mobile() {
+            width: 100%;
+            min-height: initial;
+            border-radius: 0px;
+            height: calc(100vh - 123px);
+          }
+
           div.activity-left-column-content {
-              height: 100%;
+            height: 100%;
+
             div.activity-modal-content {
               padding: 0 50px;
               float: none;
@@ -253,6 +327,11 @@ div.activity-modal-container {
               height: calc(100% - 82px);
               position: relative;
               overflow-y: auto;
+
+              @include mobile() {
+                padding: 0px 24px;
+                height: 100%;
+              }
 
 
               div.activity-modal-content-title {
@@ -460,6 +539,10 @@ div.activity-modal-container {
           max-height: calc(100vh - 72px);
           min-height: 378px;
           position: relative;
+
+          @include mobile() {
+            display: none;
+          }
 
           div.activity-right-column-content {
             padding: 0px;

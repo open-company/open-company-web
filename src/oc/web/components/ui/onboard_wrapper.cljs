@@ -53,8 +53,9 @@
                        (.preventDefault %)
                        (when (:auth-settings @dis/app-state)
                          (dis/dispatch! [:login-with-slack])))}
-          "Sign Up with "
-          [:div.slack-blue-icon]]
+          [:div.signup-with-slack-content
+            "Sign Up with "
+            [:div.slack-blue-icon]]]
         [:div.or-with-email
           [:div.or-with-email-line]
           [:div.or-with-email-copy

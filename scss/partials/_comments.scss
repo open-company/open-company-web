@@ -6,6 +6,11 @@ div.comments {
   position: relative;
   height: 100%;
 
+  @include mobile() {
+    margin: 32px auto 80px;
+    height: auto;
+  }
+
   &.loading div.small-loading {
     margin-left: 24px;
   }
@@ -17,6 +22,10 @@ div.comments {
     position: absolute;
     top: 0px;
     left: 16px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.top-gradient {
@@ -31,6 +40,10 @@ div.comments {
     background: -ms-linear-gradient(top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
     background: linear-gradient(to bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$gradient_base_color}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+
+    @include mobile() {
+      display: none;
+    }
 
     &.top-left {
       top: 0px;
@@ -60,6 +73,10 @@ div.comments {
     background: -ms-linear-gradient(top,  rgba($carrot_light_gray_2, 1) 0%,rgba($carrot_light_gray_2,0) 100%); /* IE10+ */
     background: linear-gradient(to bottom,  rgba($carrot_light_gray_2, 1) 0%,rgba($carrot_light_gray_2,0) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$carrot_light_gray_2}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.bottom-gradient {
@@ -74,6 +91,10 @@ div.comments {
     background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
     background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
+
+    @include mobile() {
+      display: none;
+    }
 
     &.bottom-left {
       bottom: 0px;
@@ -103,6 +124,10 @@ div.comments {
     background: -ms-linear-gradient(bottom,  rgba($carrot_light_gray_2, 1) 0%,rgba($carrot_light_gray_2,0) 100%); /* IE10+ */
     background: linear-gradient(to top,  rgba($carrot_light_gray_2, 1) 0%,rgba($carrot_light_gray_2,0) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$carrot_light_gray_2}',GradientType=0 ); /* IE6-9 */
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.comments-internal {
@@ -116,8 +141,19 @@ div.comments {
     right: 0;
     top: 0;
 
+    @include mobile() {
+      position: unset;
+      margin-right: 0px;
+      min-height: initial;
+      height: auto;
+    }
+
     &.add-comment-focus {
       height: calc(100% - 188px);
+
+      @include mobile() {
+        height: auto;
+      }
     }
 
     div.comments-internal-scroll {
@@ -125,6 +161,12 @@ div.comments {
       overflow-y: auto;
       height: 100%;
       padding: 16px 10px 0px 0px;
+
+      @include mobile() {
+        padding: 0px;
+        overflow-y: visible;
+        height: auto;
+      }
     }
 
     &.empty {
@@ -137,6 +179,10 @@ div.comments {
         padding: calc(50% - 62px) 10px 0px;
         height: 100%;
         margin-left: 33px;
+
+        @include mobile() {
+          display: none;
+        }
 
         div.no-comments-placeholder {
           width: 110px;
@@ -247,8 +293,12 @@ div.comments {
             }
 
             &.editable {
-              &[contentEditable=true] {
+              &.editing {
                 outline: $oc_gray_5 auto 3px;
+
+                @include mobile() {
+                  border: 1px solid rgba($carrot_light_gray_9, 1);
+                }
               }
             }
 
@@ -263,10 +313,30 @@ div.comments {
           width: 100%;
           margin-top: 4px;
 
+          div.save-cancel-edit-buttons {
+            display: none;
+
+            @include mobile() {
+              display: block;
+
+              button {
+                height: 20px;
+                float: right;
+                margin-left: 8px;
+              }
+            }
+          }
+
           div.edit-delete-button {
             float: right;
             margin-right: 8px;
             position: relative;
+
+            @include mobile(){
+              &.editing {
+                display: none;
+              }
+            }
 
             button.more-button {
               width: 18px;
@@ -277,6 +347,10 @@ div.comments {
               background-repeat: no-repeat;
               opacity: 0;
               border: none;
+
+              @include mobile() {
+                opacity: 1;
+              }
 
               &.more-dd-expanded {
                 opacity: 1;
@@ -311,6 +385,10 @@ div.comments {
       padding: 20px 24px 18px #{$comment_avatar_size + 8}px;
       position: relative;
 
+      @include mobile() {
+        padding: 0px;
+      }
+
       div.add-comment-label {
         height: 14px;
         @include avenir_H();
@@ -329,6 +407,10 @@ div.comments {
         top: 0px;
         left: 16px;
         z-index: 1;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.add-comment-box {
@@ -343,10 +425,19 @@ div.comments {
         width: 100%;
         padding: 10px 12px;
 
+        @include mobile(){
+          margin-bottom: 16px;
+          box-shadow: none;
+        }
+
         div.emoji-picker {
           position: absolute;
           right: 16px;
           top: 7px;
+
+          @include mobile() {
+            display: none;
+          }
 
           button.emoji-button {
             width: 32px;

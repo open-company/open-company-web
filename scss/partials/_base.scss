@@ -83,10 +83,6 @@ div.fullscreen-page {
   background-color: white;
   width: 100%;
   min-height: 100vh;
-
-  &.with-small-footer {
-    min-height: calc(100vh - #{$footer_small_height}px);
-  }
 }
 
 .no-scroll {

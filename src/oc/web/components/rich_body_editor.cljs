@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [cljsjs.medium-editor]
@@ -240,6 +241,7 @@
 
 (defn- setup-editor [s]
   (let [options (first (:rum/args s))
+        mobile-editor (responsive/is-tablet-or-mobile?)
         show-subtitle (:show-h2 options)
         media-config (:media-config options)
         body-el (rum/ref-node s "body")
@@ -250,11 +252,14 @@
         buttons (if show-subtitle
                   ["bold" "italic" "h2" "unorderedlist" "anchor"]
                   ["bold" "italic" "unorderedlist" "anchor"])
-        options {:toolbar #js {:buttons (clj->js buttons)}
+        extensions (if mobile-editor
+                      #js {"autolist" (js/AutoList.)}
+                      #js {"autolist" (js/AutoList.)
+                           "media-picker" media-picker-ext})
+        options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                  :buttonLabels "fontawesome"
-                 :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
-                 :extensions #js {"autolist" (js/AutoList.)
-                                  "media-picker" media-picker-ext}
+                 :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
+                 :extensions extensions
                  :autoLink true
                  :anchor #js {:customClassOption nil
                               :customClassOptionText "Button"

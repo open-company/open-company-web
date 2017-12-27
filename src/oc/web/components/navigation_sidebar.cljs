@@ -13,12 +13,16 @@
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
 
+(defn close-navigation-sidebar []
+  (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
 
 (defn anchor-nav! [e url]
   (utils/event-stop e)
-  (router/nav! url))
+  (router/nav! url)
+  (close-navigation-sidebar))
 
 (defn new?
   "
@@ -51,6 +55,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :change-data)
+                                (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::resize-listener)
@@ -84,6 +89,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         change-data (drv/react s :change-data)
+        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filterv #(not= (:slug %) utils/default-drafts-board-slug) all-boards)
@@ -110,8 +116,14 @@
                           (when show-invite-people
                            footer-button-height)))]
     [:div.left-navigation-sidebar.group
+      {:class (when mobile-navigation-sidebar "show-mobile-boards-menu")}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
+        [:div.left-navigation-sidebar-mobile-header.group
+          [:button.mlb-reset.close-mobile-menu
+            {:on-click #(close-navigation-sidebar)}]
+          [:div.mobile-header-title
+            "Boards"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
@@ -132,7 +144,9 @@
                 "BOARDS"]
               (when show-create-new-board
                 [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-                  {:on-click #(dis/dispatch! [:board-edit nil])
+                  {:on-click #(do
+                               (dis/dispatch! [:board-edit nil])
+                               (close-navigation-sidebar))
                    :title "Create a new board"
                    :id "add-board-button"
                    :data-placement "top"
@@ -160,7 +174,8 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (new? change-data board)})
+                    {:class (utils/class-set {:new (new? change-data board)
+                                              :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])
             (when show-drafts
@@ -180,7 +195,7 @@
                     {:class (utils/class-set {:public-board (= (:access drafts-board) "public")
                                               :private-board (= (:access drafts-board) "private")
                                               :team-board (= (:access drafts-board) "team")})}
-                    [:div.internal
+                    [:div.internal.has-icon
                       {:key (str "board-list-" (name (:slug drafts-board)) "-internal")
                        :dangerouslySetInnerHTML
                         (utils/emojify
@@ -191,10 +206,14 @@
         {:style {:position (if is-tall-enough? "absolute" "relative")}}
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
-            {:on-click #(dis/dispatch! [:org-settings-show :invite])}
+            {:on-click #(do
+                          (dis/dispatch! [:org-settings-show :invite])
+                          (close-navigation-sidebar))}
             [:div.invite-people-icon]
             [:span "Add teammates"]])
         [:button.mlb-reset.about-carrot-btn
-          {:on-click #(dis/dispatch! [:whats-new-modal-show])}
+          {:on-click #(do
+                        (dis/dispatch! [:whats-new-modal-show])
+                        (close-navigation-sidebar))}
           [:div.about-carrot-icon]
           [:span "About Carrot"]]]]))

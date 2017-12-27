@@ -58,6 +58,7 @@ div.login-overlay-container {
       top: 0px;
       overflow: auto;
       box-shadow: none;
+      padding: 40px 16px;
     }
 
     a.red {
@@ -77,25 +78,33 @@ div.login-overlay-container {
       }
     }
 
-    button.signup-with-slack {
+    button.signin-with-slack {
       width: 340px;
       height: 48px;
       margin-top: 52px;
       background-color: rgba($carrot_text_blue, 0.1);
       border-radius: 100px;
-      padding: 14px 72px;
-      @include avenir_H();
-      font-size: 18px;
-      color: $carrot_text_blue;
-      text-align: left;
+      text-align: center;
 
-      div.slack-blue-icon {
-        width: 70px;
-        height: 21px;
-        @include image-2x("/img/ML/slack_blue_icon");
-        background-repeat: no-repeat;
-        background-size: 70px 21px;
-        float: right;
+      div.signin-with-slack-content {
+        @include avenir_H();
+        font-size: 18px;
+        color: $carrot_text_blue;
+        width: 180px;
+        margin: 4px auto 0px;
+
+        div.slack-blue-icon {
+          width: 70px;
+          height: 21px;
+          @include image-2x("/img/ML/slack_blue_icon");
+          background-repeat: no-repeat;
+          background-size: 70px 21px;
+          float: right;
+        }
+      }
+
+      @include mobile() {
+        width: 100%;
       }
     }
 
@@ -113,6 +122,10 @@ div.login-overlay-container {
         top: 9px;
         left: 0px;
         display: block;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.or-with-email-copy {
@@ -126,6 +139,11 @@ div.login-overlay-container {
         margin: 0 auto;
         width: 196px;
         background-color: white;
+
+        @include mobile() {
+          left: unset;
+          position: relative;
+        }
       }
     }
 

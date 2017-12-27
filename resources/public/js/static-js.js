@@ -104,6 +104,8 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("#site-header-signup-item").attr("href", "/sign-up");
     // Top right corner login button
     $("#site-header-login-item").attr("href", "/login");
+    // Mobile menu login button
+    $("button#site-mobile-menu-login").attr("onClick", "window.location = \"/login\"");
     // If in 404 page show error message for not logged in users
     $("div.error-page.not-found-page p.logged-in").show();
   }

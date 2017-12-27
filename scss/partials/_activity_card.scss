@@ -7,33 +7,40 @@ div.activity-card {
   margin: 12px;
   position: relative;
 
+  @include mobile() {
+    width: 100%;
+    margin: 12px 0px;
+  }
+
   &:hover, &.dropdown-active {
-    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
+    @include big_web() {
+      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
 
-    div.activity-card-head.entry-card {
-      background-color: $carrot_light_gray_5;
-    }
-
-    div.activity-card-head div.activity-card-head-right {
-      div.activity-tag {
-        background-color: $carrot_light_gray_6;
+      div.activity-card-head.entry-card {
+        background-color: $carrot_light_gray_5;
       }
 
-      div.more-button {
-        button.more-ellipsis {
-          opacity: 0.8;
+      div.activity-card-head div.activity-card-head-right {
+        div.activity-tag {
+          background-color: $carrot_light_gray_6;
+        }
+
+        div.more-button {
+          button.more-ellipsis {
+            opacity: 0.8;
+          }
         }
       }
-    }
 
-    div.activity-card-footer {
-      button.post-edit {
-        opacity: 0.8;
-      }
+      div.activity-card-footer {
+        button.post-edit {
+          opacity: 0.8;
+        }
 
-      div.activity-share {
-        button.activity-share-bt {
-          opacity: 1;
+        div.activity-share {
+          button.activity-share-bt {
+            opacity: 1;
+          }
         }
       }
     }
@@ -59,6 +66,10 @@ div.activity-card {
       position: relative;
       top: 50%;
       margin-top: -80px;
+
+      @include mobile() {
+        display: none;
+      }
 
       img {
         width: 168px;
@@ -226,8 +237,14 @@ div.activity-card {
           background-repeat: no-repeat;
           opacity: 0;
 
-          &:hover {
+          @include mobile() {
             opacity: 1;
+          }
+
+          @include big_web() {
+            &:hover {
+              opacity: 1;
+            }
           }
         }
 
@@ -283,8 +300,10 @@ div.activity-card {
               cursor: pointer;
               background-color: transparent;
 
-              &:hover {
-                background-color: rgba($carrot_light_gray_4, 0.2);
+              @include big_web() {
+                &:hover {
+                  background-color: rgba($carrot_light_gray_4, 0.2);
+                }
               }
             }
           }
@@ -464,8 +483,10 @@ div.activity-card {
             cursor: pointer;
             background-color: transparent;
 
-            &:hover {
-              background-color: rgba($carrot_light_gray_4, 0.2);
+            @include big_web() {
+              &:hover {
+                background-color: rgba($carrot_light_gray_4, 0.2);
+              }
             }
           }
         }
@@ -484,8 +505,14 @@ div.activity-card {
       background-repeat: no-repeat;
       opacity: 0;
 
-      &:hover {
+      @include mobile() {
         opacity: 1;
+      }
+
+      @include big_web() {
+        &:hover {
+          opacity: 1;
+        }
       }
     }
   }

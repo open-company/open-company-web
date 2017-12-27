@@ -13,6 +13,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -126,27 +127,29 @@
     (body-on-change state)))
 
 (defn- real-start-editing [state & [focus]]
-  (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
-  (utils/after 100 #(setup-headline state))
-  (reset! (::autosave-timer state)
-   (utils/every 5000
-    #(autosave)))
-  (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
-  (when focus
-    (utils/after 1000
-      #(cond
-         (= focus :body)
-         (let [body-el (sel1 [:div.rich-body-editor])
-               scrolling-el (sel1 [:div.activity-modal-content])]
-           (utils/to-end-of-content-editable body-el)
-           (utils/scroll-to-bottom scrolling-el))
-         (= focus :headline)
-         (when-let [headline-el (rum/ref-node state "edit-headline")]
-           (utils/to-end-of-content-editable headline-el))))))
+  (when-not (responsive/is-tablet-or-mobile?)
+    (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
+    (utils/after 100 #(setup-headline state))
+    (reset! (::autosave-timer state)
+     (utils/every 5000
+      #(autosave)))
+    (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
+    (when focus
+      (utils/after 1000
+        #(cond
+           (= focus :body)
+           (let [body-el (sel1 [:div.rich-body-editor])
+                 scrolling-el (sel1 [:div.activity-modal-content])]
+             (utils/to-end-of-content-editable body-el)
+             (utils/scroll-to-bottom scrolling-el))
+           (= focus :headline)
+           (when-let [headline-el (rum/ref-node state "edit-headline")]
+             (utils/to-end-of-content-editable headline-el)))))))
 
 (defn- start-editing? [state & [focus]]
   (let [activity-data (first (:rum/args state))]
-    (when (and (utils/link-for (:links activity-data) "partial-update")
+    (when (and (not (responsive/is-tablet-or-mobile?))
+               (utils/link-for (:links activity-data) "partial-update")
                (not @(::showing-dropdown state))
                (not @(::move-activity state))
                (not (.contains (.-classList (.-activeElement js/document)) "add-comment")))
@@ -154,7 +157,6 @@
 
 (defn- stop-editing [state]
   (save-on-exit? state)
-  ; (reset! (::editing state) false)
   (toggle-save-on-exit state false)
   (reset! (::edited-data-loaded state) false)
   (js/clearInterval @(::autosave-timer state))
@@ -345,11 +347,13 @@
                                       (reset! (::entry-saving s) false)))))
                               s)}
   [s activity-data]
-  (let [show-comments? (utils/link-for (:links activity-data) "comments")
-        fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
+  (let [fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
         wh (.-innerHeight js/window)
         modal-data (drv/react s :modal-data)
-        editing (:modal-editing modal-data)]
+        editing (:modal-editing modal-data)
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        show-comments? (and (not is-mobile?)
+                            (utils/link-for (:links activity-data) "comments"))]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -362,8 +366,9 @@
                              (not (utils/event-inside? % (sel1 [:button.carrot-modal-close]))))
                     (close-clicked s))}
       [:div.modal-wrapper
-        {:style {:margin-top (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px")}}
-        (when-not (:activity-share modal-data)
+        {:style {:margin-top (when-not is-mobile? (str (max 0 (/ (- wh fixed-activity-modal-height) 2)) "px"))}}
+        (when (and (not is-mobile?)
+                   (not (:activity-share modal-data)))
           [:button.carrot-modal-close.mlb-reset
             {:on-click #(if editing
                           (dismiss-editing? s true)
@@ -371,6 +376,10 @@
         [:div.activity-modal.group
           {:ref "activity-modal"
            :class (str "activity-modal-" (:uuid activity-data))}
+          (when is-mobile?
+            [:div.activity-modal-mobile-header
+              [:button.mlb-reset.mobile-modal-close-bt
+                {:on-click #(close-clicked s)}]])
           [:div.activity-modal-header.group
             [:div.activity-modal-header-left
               (user-avatar-image (first (:author activity-data)))
@@ -383,8 +392,9 @@
                    :title (utils/activity-date-tooltip activity-data)}
                   (utils/time-since (:published-at activity-data))]]]
             [:div.activity-modal-header-right
-              (when (or (utils/link-for (:links activity-data) "partial-update")
-                        (utils/link-for (:links activity-data) "delete"))
+              (when (and (not is-mobile?)
+                         (or (utils/link-for (:links activity-data) "partial-update")
+                             (utils/link-for (:links activity-data) "delete")))
                 (let [all-boards (filter
                                   #(not= (:slug %) utils/default-drafts-board-slug)
                                   (:boards (:org-data modal-data)))]
@@ -421,7 +431,8 @@
                                       :boards-list all-boards
                                       :dismiss-cb #(reset! (::move-activity s) false)
                                       :on-change #(close-clicked s nil)}))]))
-              (activity-attachments activity-data false)
+              (when-not is-mobile?
+                (activity-attachments activity-data false))
               (if editing
                 (topics-dropdown
                  (distinct (:entry-edit-topics modal-data))
@@ -471,41 +482,48 @@
                     [:div.activity-modal-content-body
                       {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                        :on-click #(start-editing? s :body)
-                       :class (when (empty? (:headline activity-data)) "no-headline")}]])
-                (if editing
-                  [:div.activity-modal-footer.group
-                    {:class (when @(::show-bottom-border s) "scrolling-content")}
-                    (when-not (js/isIE)
-                      (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                                     :container-selector "div.activity-modal-content"}))
-                    [:div.activity-modal-footer-right
-                      [:button.mlb-reset.mlb-link-black.cancel-edit
-                        {:on-click #(dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))}
-                        "Cancel"]
-                      [:button.mlb-reset.mlb-default.save-edit
-                        {:on-click #(save-editing? s)
-                         :disabled (or (not (:has-changes (:modal-editing-data modal-data)))
-                                       (not (seq (:headline (:modal-editing-data modal-data)))))}
-                        (when (:loading (:modal-editing-data modal-data))
-                          (small-loading))
-                        "Save"]]]
-                  [:div.activity-modal-footer.group
-                    {:class (when @(::show-bottom-border s) "scrolling-content")}
-                    (reactions activity-data)
-                    [:div.activity-modal-footer-right
-                      (when (utils/link-for (:links activity-data) "partial-update")
-                        [:button.mlb-reset.post-edit
-                          {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                                    (not @(::showing-dropdown s)))})
-                           :on-click (fn [e]
-                                       (utils/remove-tooltips)
-                                       (real-start-editing s :headline))}
-                          "Edit"])
-                      (when (utils/link-for (:links activity-data) "share")
-                        [:div.activity-modal-share
-                          [:button.mlb-reset.share-button
-                            {:on-click #(dis/dispatch! [:activity-share-show activity-data])}
-                            "Share"]])]])]]
+                       :class (when (empty? (:headline activity-data)) "no-headline")}]
+                    (when is-mobile?
+                      (reactions activity-data))
+                    (when is-mobile?
+                      (comments activity-data))])
+                (when-not is-mobile?
+                  (if editing
+                    [:div.activity-modal-footer.group
+                      {:class (when @(::show-bottom-border s) "scrolling-content")}
+                      (when-not (js/isIE)
+                        (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                                       :container-selector "div.activity-modal-content"}))
+                      [:div.activity-modal-footer-right
+                        [:button.mlb-reset.mlb-link-black.cancel-edit
+                          {:on-click #(dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))}
+                          "Cancel"]
+                        [:button.mlb-reset.mlb-default.save-edit
+                          {:on-click #(save-editing? s)
+                           :disabled (or (not (:has-changes (:modal-editing-data modal-data)))
+                                         (not (seq (:headline (:modal-editing-data modal-data)))))}
+                          (when (:loading (:modal-editing-data modal-data))
+                            (small-loading))
+                          "Save"]]]
+                    [:div.activity-modal-footer.group
+                      {:class (when @(::show-bottom-border s) "scrolling-content")}
+                      (reactions activity-data)
+                      [:div.activity-modal-footer-right
+                        (when (and (not is-mobile?)
+                                   (utils/link-for (:links activity-data) "partial-update"))
+                          [:button.mlb-reset.post-edit
+                            {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
+                                                                      (not @(::showing-dropdown s)))})
+                             :on-click (fn [e]
+                                         (utils/remove-tooltips)
+                                         (real-start-editing s :headline))}
+                            "Edit"])
+                        (when (and (not is-mobile?)
+                                   (utils/link-for (:links activity-data) "share"))
+                          [:div.activity-modal-share
+                            [:button.mlb-reset.share-button
+                              {:on-click #(dis/dispatch! [:activity-share-show activity-data])}
+                              "Share"]])]]))]]
             ;; Right column
             (when show-comments?
               [:div.activity-right-column

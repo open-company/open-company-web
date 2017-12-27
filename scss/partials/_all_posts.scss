@@ -2,9 +2,19 @@ div.all-posts {
   width: 895px;
   margin-left: 16px;
 
+  @include mobile() {
+    width: 100%;
+    margin-left: 0px;
+  }
+
   div.all-posts-cards {
     float: left;
     width: 617px;
+
+    @include mobile() {
+      width: 100%;
+      float: unset;
+    }
 
     div.loading-updates {
       width: 100%;
@@ -29,6 +39,10 @@ div.all-posts {
         background-color: $oc_gray_8;
         text-align: center;
 
+        @include mobile() {
+          width: 100%;
+        }
+
         div.oc-loading {
           margin: 100px auto;
           height: 170px;
@@ -45,6 +59,10 @@ div.all-posts {
           font-size: 16px;
           @include avenir_M();
           text-align: center;
+
+          @include mobile() {
+            width: 100%;
+          }
         }
       }
 
@@ -52,6 +70,10 @@ div.all-posts {
         width: 617px;
         max-height: initial;
         margin: 0px 0px 20px 0px;
+
+        @include mobile() {
+          width: 100%;
+        }
 
         div.activity-card-content {
 
@@ -81,6 +103,10 @@ div.all-posts {
     float: right;
     width: 224px;
     position: relative;
+
+    @include mobile() {
+      display: none;
+    }
 
     div.all-posts-nav-inner {
       position: fixed;

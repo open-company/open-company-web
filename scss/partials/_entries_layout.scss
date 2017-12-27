@@ -2,6 +2,10 @@ div.entries-layout {
   div.entry-cards-container {
     max-width: #{$board_container_width}px;
 
+    @include mobile() {
+      width: 100%;
+    }
+
     &.by-topic {
       width: 100%;
       margin-top: 30px;
@@ -71,6 +75,11 @@ div.entries-layout {
 
     div.entries-cards-container-row {
       display: flex;
+
+      @include mobile() {
+        display: block;
+        width: 100%;
+      }
 
       div.entry-card {
         flex: 1;

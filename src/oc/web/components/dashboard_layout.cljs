@@ -44,7 +44,8 @@
   (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
     (when (pos? (.-length entry-floating))
       (let [scroll-top (document-scroll-top)
-            opacity (if @(::show-floating-boards-dropdown s)
+            opacity (if (or @(::show-floating-boards-dropdown s)
+                            (responsive/is-tablet-or-mobile?))
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
@@ -183,14 +184,16 @@
         org-data (dis/org-data)
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        board-container-style {:marginLeft (str
-                                            (max
-                                             sidebar-width
-                                             (+
-                                              (/
-                                               (- @(::ww s) responsive/board-container-width sidebar-width)
-                                               2)
-                                              sidebar-width)) "px")}
+        board-container-style {:marginLeft (if is-mobile-size?
+                                             "0px"
+                                             (str (max
+                                                   sidebar-width
+                                                   (+
+                                                    (/
+                                                     (- @(::ww s) responsive/board-container-width sidebar-width)
+                                                     2)
+                                                   sidebar-width))
+                                             "px"))}
         entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
@@ -201,12 +204,11 @@
           (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
-          (when-not is-mobile-size?
-            (navigation-sidebar))
+          (navigation-sidebar)
           [:div.board-container.group
             {:style board-container-style}
             ;; Board name row: board name, settings button and say something button
-            [:div.group
+            [:div.board-name-container.group
               ;; Board name and settings button
               [:div.board-name
                 (when (router/current-board-slug)
@@ -219,38 +221,37 @@
                            (not is-all-posts)
                            (not (:read-only board-data)))
                   [:button.mlb-reset.board-settings-bt
-                    {:data-toggle "tooltip"
+                    {:data-toggle (when-not is-mobile-size? "tooltip")
                      :data-placement "top"
                      :data-container "body"
                      :title (str (:name board-data) " settings")
-                     :on-click #(dis/dispatch! [:board-edit board-data])}])]
-              (when (= (:access board-data) "private")
-                [:div.private-board
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-                           "Only visible to you"
-                           "Only visible to invited team members")}
-                  "Private"])
-              (when (= (:access board-data) "public")
-                [:div.public-board
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Visible to the world, including search engines"}
-                  "Public"])
+                     :on-click #(dis/dispatch! [:board-edit board-data])}])
+                (when (= (:access board-data) "private")
+                  [:div.private-board
+                    {:data-toggle "tooltip"
+                     :data-placement "top"
+                     :data-container "body"
+                     :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+                             "Only visible to you"
+                             "Only visible to invited team members")}
+                    "Private"])
+                (when (= (:access board-data) "public")
+                  [:div.public-board
+                    {:data-toggle "tooltip"
+                     :data-placement "top"
+                     :data-container "body"
+                     :title "Visible to the world, including search engines"}
+                    "Public"])]
               ;; Add entry button
-              (when (and (not is-all-posts)
-                         (not (:read-only org-data))
-                         (not (responsive/is-tablet-or-mobile?))
+              (when (and (not (:read-only org-data))
                          (or (utils/link-for (:links board-data) "create")
-                             is-drafts-board))
+                             is-drafts-board
+                             is-all-posts))
                 [:div.new-post-top-dropdown-container.group
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
-                                (if is-drafts-board
+                                (if (or is-drafts-board is-all-posts)
                                   (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}
@@ -292,31 +293,38 @@
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; All Posts
-              is-all-posts
+              (and is-all-posts
+                   (or (and is-mobile-size?
+                            (not current-activity-id))
+                       (not is-mobile-size?)))
               (rum/with-key
                (all-posts all-posts-data)
                (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
               ;; Empty board
-              (and (not is-mobile-size?)
-                   (not current-activity-id)
+              (and (not current-activity-id)
                    empty-board?)
               (empty-board)
               ;; Layout boards activities
               :else
               (cond
                 ;; Drafts
-                is-drafts-board
+                (and is-drafts-board
+                     (or (and is-mobile-size?
+                              (not current-activity-id))
+                         (not is-mobile-size?)))
                 (drafts-layout board-data)
                 ;; Entries
-                :else
+                (or (and is-mobile-size?
+                         (not current-activity-id))
+                    (not is-mobile-size?))
                 (entries-layout board-data board-filters)))
             ;; Add entry floating button
-            (when (and (not is-all-posts)
-                       (not (:read-only org-data))
-                       (not (responsive/is-tablet-or-mobile?))
+            (when (and (not (:read-only org-data))
                        (or (utils/link-for (:links board-data) "create")
-                           is-drafts-board))
-              (let [opacity (if @(::show-floating-boards-dropdown s)
+                           is-drafts-board
+                           is-all-posts))
+              (let [opacity (if (or @(::show-floating-boards-dropdown s)
+                                    (responsive/is-tablet-or-mobile?))
                               1
                               (calc-opacity (document-scroll-top)))]
                 [:div.new-post-floating-dropdown-container.group
@@ -327,11 +335,12 @@
                     {:class (when @(::show-floating-boards-dropdown s) "active")
                      :data-placement "left"
                      :data-container "body"
-                     :data-toggle "tooltip"
+                     :data-toggle (when-not is-mobile-size? "tooltip")
                      :title "Start a new post"
                      :on-click (fn [_]
                                 (utils/remove-tooltips)
-                                (if is-drafts-board
+                                (if (or is-drafts-board
+                                        is-all-posts)
                                   (reset!
                                    (::show-floating-boards-dropdown s)
                                    (not @(::show-floating-boards-dropdown s)))

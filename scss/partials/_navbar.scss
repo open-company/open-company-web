@@ -28,6 +28,10 @@ nav.oc-navbar {
   border-bottom: 1px solid $carrot_light_gray_7;
   box-shadow: 0px 2px 6px 0px rgba($carrot_light_gray_7, 0.5);
 
+  &.showing-orgs-dropdown {
+    overflow: visible;
+  }
+
   @include mobile(){
     &.show-login-overlay {
       height: 100vh !important;
@@ -41,6 +45,11 @@ nav.oc-navbar {
   @include mobile(){
     transition: 230ms;
     overflow: hidden;
+    height: 100vh;
+
+    &.showing-orgs-dropdown {
+      overflow: visible;
+    }
 
     &:not(.mobile-menu-open) {
       height: #{$mobile_navbar_height}px;
@@ -92,16 +101,52 @@ nav.oc-navbar {
         @include avenir_H();
         font-size: 26px;
 
+        @include mobile() {
+          width: 256px;
+          height: 32px;
+          margin-left: -128px;
+          top: 0px;
+        }
+
         button.orgs-dropdown div.org-avatar {
           height: 40px;
-          @include org-avatar(40);
+
+          @include big_web() {
+            @include org-avatar(40);
+          }
+
+          @include mobile() {
+            height: 32px;
+            @include org-avatar(32);
+          }
         }
+      }
+    }
+
+    div.navbar-left {
+      float: left;
+      margin-left: 16px;
+      margin-top: 11px;
+      width: 24px;
+      height: 24px;
+
+      button.mobile-navigation-sidebar-ham-bt {
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/mobile_navigation_sidebar_ham.svg");
+        background-repeat: no-repeat;
+        background-size: 18px 14px;
+        background-position: 3px 5px;
       }
     }
 
     ul.navbar-right {
       float: right;
       margin-right: 30px;
+
+      @include mobile() {
+        margin-right: 0px;
+      }
 
       div.alerts {
         float: right;
@@ -156,20 +201,11 @@ nav.oc-navbar {
 
       button.mobile-menu {
         font-size: 24px;
-        padding: 3px 20px 3px 20px;
+        padding: 0px;
         margin-top: 0px;
-        border-radius: 4px;
+        margin-right: 16px;
 
-        &:active {
-          background-color: rgba(78,90,107,0.3);
-        }
-
-        div.vertical-ellipses {
-          background: $oc_gray_5;
-          width: 8px;
-          height: 24px;
-          -webkit-mask: cdnUrl("/img/vert-ellipsis.svg") center / contain no-repeat;
-        }
+        @include user-profile(32);
       }
     }
   }

@@ -23,6 +23,14 @@ div.alert-modal-container {
     min-height: 147px;
     position: relative;
 
+    @include mobile() {
+      width: 100%;
+
+      button.carrot-modal-close {
+        display: none;
+      }
+    }
+
     div.alert-modal {
       width: 337px;
       margin: 0px 0px 0px 28px;
@@ -33,6 +41,11 @@ div.alert-modal-container {
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
       padding: 24px;
       text-align: center;
+
+      @include mobile() {
+        width: calc(100% - 48px);
+        margin: 0px 24px;
+      }
 
       &.has-buttons {
         min-height: 197px;

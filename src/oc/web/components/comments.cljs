@@ -9,6 +9,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.comment-reactions :as comment-reactions]
@@ -69,6 +70,13 @@
   (reset! (::editing? s) true)
   (utils/after 600 #(utils/to-end-of-content-editable (rum/ref-node s "comment-body"))))
 
+(defn cancel-edit
+  [e s c]
+  (.stopPropagation e)
+  (let [comment-field (rum/ref-node s "comment-body")]
+    (set! (.-innerHTML comment-field) (utils/emojify @(::initial-body s) true))
+    (reset! (::editing? s) false)))
+
 (rum/defcs comment-row < rum/static
                          rum/reactive
                          (rum/local false ::editing?)
@@ -126,14 +134,12 @@
                              (.blur (rum/ref-node s "comment-body"))
                              (.preventDefault e))
                            (when (= "Escape" (.-key e))
-                              (.stopPropagation e)
-                              (let [comment-field (rum/ref-node s "comment-body")]
-                                (set! (.-innerHTML comment-field) (utils/emojify @(::initial-body s) true))
-                                (reset! (::editing? s) false))))
+                             (cancel-edit e s c)))
              :on-blur #(edit-finished % s c)
              :ref "comment-body"
              :class (utils/class-set {:editable can-edit?
-                                      :is-owner is-owner?})
+                                      :is-owner is-owner?
+                                      :editing @(::editing? s)})
              :content-editable @(::editing? s)
              :dangerouslySetInnerHTML (utils/emojify (:body c))}]]
         (when (or should-show-comment-reaction?
@@ -141,9 +147,19 @@
           [:div.comment-footer-container.group
             (when should-show-comment-reaction?
               (comment-reactions/comment-reactions c))
+            (when (and (responsive/is-tablet-or-mobile?)
+                       @(::editing? s))
+              [:div.save-cancel-edit-buttons
+                [:button.mlb-reset.mlb-link-green
+                  {:on-click #(edit-finished % s c)}
+                  "Save"]
+                [:button.mlb-reset.mlb-link-black
+                  {:on-click #(cancel-edit % s c)}
+                  "Cancel"]])
             (when editable
               [:div.edit-delete-button
-                {:ref "comment-edit-delete"}
+                {:ref "comment-edit-delete"
+                 :class (when @(::editing? s) "editing")}
                 [:button.mlb-reset.more-button
                   {:on-click #(reset! (::show-more-dropdown s) (not @(::show-more-dropdown s)))
                    :title "More"
@@ -297,7 +313,11 @@
                             (utils/after 230 #(scroll-to-bottom s true))))
                         s)}
   [s activity-data]
-  (let [sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        plain-sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
+        sorted-comments (if is-mobile?
+                          (reverse plain-sorted-comments)
+                          plain-sorted-comments)
         add-comment-focus (drv/react s :add-comment-focus)
         show-loading (show-loading? s)]
     (if show-loading
@@ -312,6 +332,8 @@
           {:class (utils/class-set {:add-comment-focus add-comment-focus
                                     :empty (zero? (count sorted-comments))})}
           [:div.vertical-line]
+          (when is-mobile?
+            (add-comment activity-data))
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
              {:ref "comments-internal-scroll"
@@ -332,4 +354,5 @@
             [:div.comments-internal-empty
               [:div.no-comments-placeholder]
               [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]])
-          (add-comment activity-data)]])))
+          (when-not is-mobile?
+            (add-comment activity-data))]])))

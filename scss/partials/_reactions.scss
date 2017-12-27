@@ -2,6 +2,10 @@ div.reactions {
   height: 25px;
   float: left;
 
+  @include mobile() {
+    float: unset;
+  }
+
   div.reactions-list {
 
     button.reaction-btn {
