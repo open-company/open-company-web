@@ -5,7 +5,6 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.components.reactions :as reactions]
             [cljsjs.web-animations]))
 
@@ -21,7 +20,6 @@
           reaction-data (last reactions-data)
           is-loading (utils/in? reactions-loading (:reaction reaction-data))
           reacted (:reacted reaction-data)
-          is-mobile? (responsive/is-tablet-or-mobile?)
           read-only-reaction (read-only? item-data)
           r (if is-loading
               (merge reaction-data {:count (if reacted
