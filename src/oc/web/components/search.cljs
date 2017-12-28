@@ -3,27 +3,33 @@
             [taoensso.timbre :as timbre]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.activity-utils :as au]
             [oc.web.urls :as oc-urls]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.search :as search]
             [oc.web.stores.search :as store]))
 
 (rum/defcs entry-display < rum/static
+  {:after-render (fn [s]
+                   (let [body-el (rum/ref-node s "body")]
+                     (au/truncate-body body-el)))}
   [s data]
   (let [result (:_source data)
-        title (:headline result)]
+        title (:headline result)
+        author (first (:author-name result))]
     [:div.search-result
      [:div.author
       (user-avatar-image {:user-id (first (:author-id result))
-                          :name (first (:author-name result))
+                          :name author
                           :avatar-url (first (:author-url result))} false)
-      [:span (:author-name result)]]
-     [:div
-      [:span title]
+      [:span author]]
+     [:div.content
+      [:div title]
       (let [body-without-preview (utils/body-without-preview (:body result))
             activity-url (oc-urls/entry (:board-slug result) (:uuid result))
             emojied-body (utils/emojify body-without-preview)]
-        [:div {:dangerouslySetInnerHTML  emojied-body}])
+        [:p {:ref "body"
+             :dangerouslySetInnerHTML  emojied-body}])
       ]]))
 
 (rum/defcs board-display < rum/static
