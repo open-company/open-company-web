@@ -20,24 +20,11 @@ function OCStaticMailchimpApiSubmit(e, form, success, fail){
 }
 
 function OCStaticGetCookie(name) {
-    var dc = document.cookie;
-    var prefix = name + "=";
-    var begin = dc.indexOf("; " + prefix);
-    if (begin == -1) {
-        begin = dc.indexOf(prefix);
-        if (begin != 0) return null;
-    }
-    else
-    {
-        begin += 2;
-        var end = document.cookie.indexOf(";", begin);
-        if (end == -1) {
-        end = dc.length;
-        }
-    }
-    // because unescape has been deprecated, replaced with decodeURI
-    //return unescape(dc.substring(begin + prefix.length, end));
-    return decodeURI(dc.substring(begin + prefix.length, end));
+  // Give a cookie name return its value
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2)
+    return decodeURI(parts.pop().split(";").shift());
 }
 
 function OCStaticCookieName(name){
@@ -117,6 +104,8 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("#site-header-signup-item").attr("href", "/sign-up");
     // Top right corner login button
     $("#site-header-login-item").attr("href", "/login");
+    // Mobile menu login button
+    $("button#site-mobile-menu-login").attr("onClick", "window.location = \"/login\"");
     // If in 404 page show error message for not logged in users
     $("div.error-page.not-found-page p.logged-in").show();
   }

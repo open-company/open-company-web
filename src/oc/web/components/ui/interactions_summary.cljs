@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn get-max-count-reaction [reactions]
@@ -25,7 +26,7 @@
           (if (:reacted max-reaction)
             (if (> (:count max-reaction) 1)
               (str "You and +" (dec (:count max-reaction)))
-              (str "You reacted to this"))
+              (str "You reacted" (when-not (responsive/is-mobile-size?) " to this")))
             (str "+" (:count max-reaction)))]])))
 
 (rum/defcs comments-summary < rum/static

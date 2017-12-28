@@ -2,17 +2,18 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [cuerdas.core :as s]
+            [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.activity :as am]
             [oc.web.lib.activity-utils :as au]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.mixins.activity :as am]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
@@ -30,7 +31,8 @@
         [:div.activity-card-title
           "This topic’s a little sparse. "
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:entry-edit topic])}
+            {:on-click #(when-not (responsive/is-tablet-or-mobile?)
+                          (dis/dispatch! [:entry-edit topic]))}
             "Add an update?"]]])])
 
 (defn- delete-clicked [e activity-data]
@@ -85,7 +87,8 @@
                           s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))
-        share-link (utils/link-for (:links activity-data) "share")]
+        share-link (utils/link-for (:links activity-data) "share")
+        edit-link (utils/link-for (:links activity-data) "partial-update")]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :dropdown-active (or @(::more-dropdown s)
@@ -127,9 +130,12 @@
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
-          (when (or (utils/link-for (:links activity-data) "partial-update")
-                    (utils/link-for (:links activity-data) "delete"))
-            (let [all-boards (filter #(not= (:slug %) "drafts") (:boards (drv/react s :org-data)))]
+          (when (and (not (responsive/is-tablet-or-mobile?))
+                     (or (utils/link-for (:links activity-data) "partial-update")
+                         (utils/link-for (:links activity-data) "delete")))
+            (let [all-boards (filter
+                              #(not= (:slug %) utils/default-drafts-board-slug)
+                              (:boards (drv/react s :org-data)))]
               [:div.more-button
                 [:button.mlb-reset.more-ellipsis
                   {:type "button"
@@ -145,13 +151,25 @@
                   [:div.activity-more-dropdown-menu
                     [:div.triangle]
                     [:ul.activity-card-more-menu
+                      (when edit-link
+                        [:li
+                          {:on-click #(do
+                                        (utils/remove-tooltips)
+                                        (reset! (::more-dropdown s) false)
+                                        (dis/dispatch!
+                                         [:activity-modal-fade-in
+                                          (:board-slug activity-data)
+                                          (:uuid activity-data)
+                                          (:type activity-data)
+                                          true]))}
+                          "Edit"])
                       (when share-link
                         [:li
                           {:on-click #(do
                                         (reset! (::more-dropdown s) false)
                                         (dis/dispatch! [:activity-share-show activity-data]))}
                           "Share"])
-                      (when (and (utils/link-for (:links activity-data) "partial-update")
+                      (when (and edit-link
                                  (> (count all-boards) 1))
                         [:li
                           {:on-click #(do
@@ -172,14 +190,15 @@
           (activity-attachments activity-data true)
           ; Topic tag button
           (when (:topic-slug activity-data)
-            (let [topic-name (or (:topic-name activity-data) (s/upper (:topic-slug activity-data)))]
+            (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
               [:div.activity-tag.on-gray
                 {:class (when is-all-posts "double-tag")
-                 :on-click #(router/nav!
-                             (oc-urls/board-filter-by-topic
-                              (router/current-org-slug)
-                              (:board-slug activity-data)
-                              (:topic-slug activity-data)))}
+                 :on-click #(when-not (responsive/is-tablet-or-mobile?)
+                             (router/nav!
+                              (oc-urls/board-filter-by-topic
+                               (router/current-org-slug)
+                               (:board-slug activity-data)
+                               (:topic-slug activity-data))))}
                 topic-name]))
           (when is-all-posts
             [:div.activity-tag.board-tag.on-gray
@@ -215,7 +234,8 @@
         (when share-thoughts
           [:div.activity-share-thoughts
             "Share your thoughts"])
-        (when (utils/link-for (:links activity-data) "partial-update")
+        (when (and (utils/link-for (:links activity-data) "partial-update")
+                   (not (responsive/is-tablet-or-mobile?)))
           [:button.mlb-reset.post-edit
             {:title "Edit"
              :data-toggle "tooltip"

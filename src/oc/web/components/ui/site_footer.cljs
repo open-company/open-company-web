@@ -65,19 +65,7 @@
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
           [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
-
-        ; [:div.column.column-tour
-        ;   {:class (when (= @(::expanded s) :tour) "expanded")}
-        ;   [:div.column-title
-        ;     {:on-click #(when (responsive/is-mobile-size?)
-        ;                   (if (= @(::expanded s) :tour)
-        ;                     (reset! (::expanded s) nil)
-        ;                     (reset! (::expanded s) :tour)))}
-        ;     "TOUR"]
-        ;   [:div.column-item [:a {:href oc-urls/home} "Home"]]
-        ;   [:div.column-item [:a {:href oc-urls/features} "Features"]]]
-          ]
+          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]]
 
       [:div.left-column
         [:img.logo

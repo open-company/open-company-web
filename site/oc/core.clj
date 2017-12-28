@@ -194,7 +194,6 @@
                 (case page
                   :index   (pages/index options)
                   :about   (pages/about options)
-                  :features (pages/features options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)

@@ -31,6 +31,10 @@ div.org-settings {
     position: relative;
     border-radius: 4px;
 
+    @include mobile() {
+      width: 100%;
+    }
+
     & > div {
       padding: 0 32px;
     }
@@ -253,6 +257,10 @@ div.org-settings-tabs {
       text-decoration: none;
       outline: none;
 
+      @include mobile() {
+        font-size: 14px;
+      }
+
       &:active, &:hover, &:focus {
         text-decoration: none;
       }
@@ -270,6 +278,10 @@ div.org-settings-tabs {
         @include avenir_H();
         font-size: 16px;
         color: $carrot_text_blue;
+
+        @include mobile() {
+          font-size: 14px;
+        }
       }
     }
   }

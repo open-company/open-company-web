@@ -27,7 +27,6 @@
             [oc.web.components.about :refer (about)]
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
-            [oc.web.components.features :refer (features)]
             [oc.web.components.slack :refer (slack)]
             [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.org-settings :refer (org-settings)]
@@ -178,7 +177,8 @@
                        (jwt/get-key :user-id)))
           show-nux (and (not (:show-login-overlay @dis/app-state))
                         (jwt/jwt)
-                        (some #(= % nux-cookie) (vals router/nux-cookie-values)))
+                        (or (some #(= % nux-cookie) (vals router/nux-cookie-values))
+                            (contains? query-params :show-nux-again-please)))
           loading (or (and ;; if is board page
                            (not (contains? query-params :ap))
                            ;; if the board data are not present
@@ -320,11 +320,7 @@
       (timbre/info "Routing about-route" urls/about)
       (simple-handler about "about" target params))
 
-    (defroute features-route urls/features {:as params}
-      (timbre/info "Routing features-route" urls/features)
-      (simple-handler features "features" target params))
-
-    (defroute features-route urls/slack {:as params}
+    (defroute slack-route urls/slack {:as params}
       (timbre/info "Routing slack-route" urls/slack)
       (simple-handler slack "slack" target params))
 
@@ -509,7 +505,7 @@
                                  email-wall-slash-route
                                  ;; Marketing site components
                                  about-route
-                                 features-route
+                                 slack-route
                                  pricing-route
                                  logout-route
                                  org-create-route

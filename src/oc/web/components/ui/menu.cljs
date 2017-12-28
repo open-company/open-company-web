@@ -53,26 +53,8 @@
   (.preventDefault e)
   (router/nav! (oc-urls/boards)))
 
-(def nav-height 69)
-(def menu-item-height 38)
-
-(defn setup-mobile-nav-height [mobile-menu-open]
-  (when (responsive/is-mobile-size?)
-    (let [nav-item (sel1 [:nav])
-          menu-items-count (count (sel [:div.menu :div.oc-menu-item]))
-          final-nav-height (str (+ nav-height
-                                   (when mobile-menu-open (+ (* menu-item-height menu-items-count) 14)))
-                                "px")]
-      (dommy/set-style! nav-item :height final-nav-height))))
-
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
-                  {:did-mount (fn [s]
-                                (setup-mobile-nav-height (:mobile-menu-open @(drv/get-ref s :navbar-data)))
-                                s)
-                   :did-update (fn [s]
-                                 (setup-mobile-nav-height (:mobile-menu-open @(drv/get-ref s :navbar-data)))
-                                 s)}
   [s]
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         is-admin? (jwt/is-admin? (:team-id org-data))
@@ -98,11 +80,13 @@
         [:div.oc-menu-item
           [:a {:href (oc-urls/org-settings) :on-click team-settings-click} "Team Settings"]])
       (when (and (router/current-org-slug)
-                 is-admin?)
+                 is-admin?
+                 (not (responsive/is-mobile-size?)))
         [:div.oc-menu-item
           [:a {:href (oc-urls/org-settings-team) :on-click um-click} "Manage Members"]])
       (when (and (router/current-org-slug)
-                 is-admin?)
+                 is-admin?
+                 (not (responsive/is-mobile-size?)))
         [:div.oc-menu-item.divider-item
           [:a {:href (oc-urls/org-settings-invite) :on-click invite-click} "Invite People"]])
       ; (when (and (router/current-org-slug)
@@ -114,7 +98,8 @@
       ;                is-author?))
       ;   [:div.oc-menu-item.divider-item
       ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Archive"]])
-      (when (jwt/jwt)
+      (when (and (jwt/jwt)
+                 (not (responsive/is-mobile-size?)))
         [:div.oc-menu-item.divider-item
           [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
       (if (jwt/jwt)

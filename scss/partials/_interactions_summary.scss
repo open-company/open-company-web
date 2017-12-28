@@ -9,6 +9,10 @@ div.is-reactions{
   @include avenir_H();
   font-size: 12px;
 
+  @include mobile() {
+    margin-right: 8px;
+  }
+
   &.reacted {
     background-color: $carrot_light_yellow;
     color: $carrot_yellow;

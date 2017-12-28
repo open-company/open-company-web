@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [cljsjs.web-animations]
             [cljsjs.react]
@@ -66,7 +67,9 @@
   (let [reactions-data (vec (:reactions entry-data))
         reactions-loading (:reactions-loading entry-data)
         react-link (utils/link-for (:links entry-data) "react")
-        should-show-picker? (and react-link
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        should-show-picker? (and (not is-mobile?)
+                                 react-link
                                  (< (count reactions-data) default-reaction-number))]
     ;; If there are reactions to render or there is at least the link to add a reaction from the picker
     (when (or (seq reactions-data)

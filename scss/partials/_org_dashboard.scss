@@ -30,40 +30,23 @@ div.org-dashboard {
         min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}
       }
 
+      @include mobile() {
+        margin: 0px;
+      }
+
       div.empty-dashboard {
         min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 30px);
         padding: 80px 20px;
         margin-top: -20px;
 
+        @include mobile() {
+          margin: -20px 24px 0px;
+        }
+
         h3.empty-dashboard-title {
           @include avenir_H();
           font-size: 16px;
           line-height: 1.5;
-        }
-      }
-
-      div.sharing-board-container {
-        background-color: transparent;
-
-        &:first-child {
-          padding-top: 80px;
-        }
-
-        div.topic-list {
-          padding-top: 0px;
-
-          div.topics-column-container {
-            padding: 20px;
-          }
-        }
-
-        h3.board-title {
-          background-color: transparent;
-          color: $oc_gray_5;
-          font-size: 18px;
-          @include avenir_H();
-          line-height: 1.5;
-          margin-left: 200px;
         }
       }
     }
@@ -82,10 +65,10 @@ div.org-dashboard {
   }
 }
 
-body.small-footer {
+body {
   div.org-dashboard {
     div.page {
-      min-height: calc(100vh - #{$footer_small_height}px);
+      min-height: 100vh;
     }
   }
 }
@@ -110,6 +93,6 @@ div.org-dashboard div.topic-list{
     padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
   }
   @include mobile(){
-    min-height: calc(100vh - #{$footer_small_height}px);
+    min-height: calc(100vh - #{$mobile_navbar_height}px);
   }
 }

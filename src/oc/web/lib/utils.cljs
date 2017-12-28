@@ -641,6 +641,9 @@
 (defn after [ms fn]
   (js/setTimeout fn ms))
 
+(defn every [ms fn]
+  (js/setInterval fn ms))
+
 (defn unicode-emojis [txt]
   (js/emojione.shortnameToUnicode txt))
 
@@ -1154,7 +1157,8 @@
 
 (defn get-default-board [org-data]
   (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (= last-board-slug "all-posts")
+    (if (and (= last-board-slug "all-posts")
+             (link-for (:links org-data) "activity"))
       {:slug "all-posts"}
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
@@ -1203,3 +1207,20 @@
     (if (s/starts-with? storage-url "http")
       (nth parts 4)
       (nth parts 2))))
+
+(def default-drafts-board-name "Drafts")
+
+(def default-drafts-board-slug "drafts")
+
+(def default-draft-status "draft")
+
+(def default-drafts-board
+  {:uuid "0000-0000-0000"
+   :created-at "2000-01-01T00:00:00.000Z"
+   :updated-at "2000-01-01T00:00:00.000Z"
+   :slug default-drafts-board-slug
+   :name default-drafts-board-name
+   :entries []
+   :fixed-items {}
+   :access "private"
+   :read-only true})
