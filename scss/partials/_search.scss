@@ -23,6 +23,9 @@ div.search-result {
   border: 1px solid rgba($carrot_light_gray_1, 0.5);
 
   div.author {
+    font-size: 14px;
+    @include avenir_H();
+    text-align: center;
     background-color: $carrot_light_gray_9;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -37,6 +40,11 @@ div.search-result {
   }
 
   div.content {
+    div.title {
+      font-size: 14px;
+      color: black;
+      @include avenir_H();
+    }
     overflow: hidden;
     background-color: white;
   }

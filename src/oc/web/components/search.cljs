@@ -24,7 +24,7 @@
                           :avatar-url (first (:author-url result))} false)
       [:span author]]
      [:div.content
-      [:div title]
+      [:div.title title]
       (let [body-without-preview (utils/body-without-preview (:body result))
             activity-url (oc-urls/entry (:board-slug result) (:uuid result))
             emojied-body (utils/emojify body-without-preview)]
@@ -36,7 +36,7 @@
   [s data]
   (let [board (:_source data)]
     [:div.search-result
-     [:div
+     [:div.content
       [:span (:name board)]
       ]
      ]))
