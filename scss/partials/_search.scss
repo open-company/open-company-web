@@ -21,4 +21,11 @@ div.search-result {
   background-color: $carrot_light_gray_9;
   border-radius: 4px;
   border: 1px solid rgba($carrot_light_gray_1, 0.5);
+
+  @mixin activity-author($avatar_size: 32){
+    div.user-avatar-img-container {
+      float: left;
+      margin-right: 16px;
+    }
+  }
 }
