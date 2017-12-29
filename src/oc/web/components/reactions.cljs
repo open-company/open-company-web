@@ -82,10 +82,16 @@
                         is-loading (utils/in? reactions-loading (:reaction reaction-data))
                         reacted (:reacted reaction-data)
                         reaction-authors (:authors reaction-data)
-                        reaction-start (if (> 1 (count reaction-authors)) "Reactions" "Reaction")
+                        multiple-reaction-authors? (> (count reaction-authors) 1)
+                        attribution-start (if multiple-reaction-authors? "Reactions" "Reaction")
+                        attribution-end (if multiple-reaction-authors?
+                                          (str (clojure.string/join ", " (butlast reaction-authors))
+                                               " and "
+                                               (last reaction-authors))
+                                          (first reaction-authors))
                         reaction-attribution (if (empty? reaction-authors)
-                          ""
-                          (str reaction-start " by " (clojure.string/join "," reaction-authors)))
+                                                ""
+                                                (str attribution-start " by " attribution-end))
                         read-only-reaction (not (utils/link-for
                                                  (:links reaction-data)
                                                  "react"
@@ -103,7 +109,7 @@
                                           :can-react (not read-only-reaction)
                                           :has-reactions (pos? (:count r))})
                  :title reaction-attribution
-                 :data-placement (if (empty? reaction-authors) "none" "top")
+                 :data-placement "top"
                  :data-container "body"
                  :data-toggle "tooltip"
                  :on-click (fn [e]
