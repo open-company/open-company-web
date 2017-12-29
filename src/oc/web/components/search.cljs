@@ -1,7 +1,10 @@
 (ns oc.web.components.search
   (:require [rum.core :as rum]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [org.martinklepsch.derivatives :as drv]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.activity-utils :as au]
             [oc.web.urls :as oc-urls]
@@ -10,13 +13,17 @@
             [oc.web.stores.search :as store]))
 
 (rum/defcs entry-display < rum/static
+  (rum/local nil ::activity-url)
   {:after-render (fn [s]
                    (let [body-el (rum/ref-node s "body")]
-                     (au/truncate-body body-el)))}
+                     (au/truncate-body body-el)))
+   :on-click #(search/result-clicked @(::activity-url %))}
   [s data]
   (let [result (:_source data)
         title (:headline result)
         author (first (:author-name result))]
+    (reset! (::activity-url s)
+            (oc-urls/entry (:board-slug result) (:uuid result)))
     [:div.search-result
      [:div.author
       (user-avatar-image {:user-id (first (:author-id result))
@@ -26,7 +33,6 @@
      [:div.content
       [:div.title title]
       (let [body-without-preview (utils/body-without-preview (:body result))
-            activity-url (oc-urls/entry (:board-slug result) (:uuid result))
             emojied-body (utils/emojify body-without-preview)]
         [:p {:ref "body"
              :dangerouslySetInnerHTML  emojied-body}])
@@ -42,8 +48,27 @@
      ]))
 
 (rum/defcs search-box < (drv/drv store/search-key)
-  rum/reactive
-  rum/static
+                         rum/reactive
+                         rum/static
+                         (rum/local nil ::window-click)
+                         {:will-mount (fn [s]
+                           (reset! (::window-click s)
+                             (events/listen
+                              js/window
+                              EventType/CLICK
+                              (fn [e]
+                                (timbre/debug e)
+                                (when (not
+                                       (utils/event-inside? e
+                                         (sel1 [:div.search-box])))
+                                  (let [node (rum/ref-node s "results")]
+                                    (.add (.-classList node) "inactive"))))))
+                           s)
+                          :will-unmount (fn [s]
+                            (when @(::window-click s)
+                              (events/unlistenByKey @(::window-click s))
+                              (reset! (::window-click s) nil))
+                            s)}
   [s]
   (let [search-results (drv/react s store/search-key)]
     [:div.search-box
@@ -51,8 +76,6 @@
       {:content-editable true
        :ref "search-input"
        :placeholder "Search..."
-       :on-blur #(let [node (rum/ref-node s "results")]
-                   (.add (.-classList node) "inactive"))
        :on-key-up #(search/query (.-innerHTML (rum/ref-node s "search-input")))
        }]
      [:div.search-results {:ref "results"
