@@ -17,35 +17,42 @@ div.search-results.inactive {
   display: none;
 }
 
-div.search-result {
-  background-color: white;
-  border-radius: 4px;
-  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+div.search-results {
 
-  div.author {
-    font-size: 14px;
-    @include avenir_H();
-    text-align: center;
+  div.header {
     background-color: $carrot_light_gray_9;
-    padding-top: 10px;
-    padding-bottom: 10px;
-
-    div.user-avatar-img-container {
-      float: left;
-      margin-right: 16px;
-      img {
-        width: 23px;
-      }
+    width: 300px;
+    border-radius: 4px;
+    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    span.count {
+      float: right;
+      margin-right: 20px;
     }
   }
 
-  div.content {
-    div.title {
-      font-size: 14px;
-      color: black;
-      @include avenir_H();
-    }
-    overflow: hidden;
+  div.search-result {
+    width: 300px;
     background-color: white;
+    border-radius: 4px;
+    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+
+    div.author {
+      @include avenir_H();
+      background-color: $carrot_light_gray_9;
+      padding-top: 10px;
+      padding-bottom: 4px;
+
+      @include activity-author();
+
+      div.name {
+        font-size: 11px;
+      }
+
+      div.title {
+        font-size: 14px;
+        margin: 0px 50px;
+        overflow: hidden;
+      }
+    }
   }
 }

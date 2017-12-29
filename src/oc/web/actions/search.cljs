@@ -1,6 +1,8 @@
 (ns oc.web.actions.search
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
+            [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]
             [oc.web.api :as api]))
 
 (defn query-finished
@@ -20,7 +22,4 @@
     (api/query (:uuid (dispatcher/org-data)) search-query query-finished)
     (reset)))
 
-(defn result-clicked
-  [url]
-  (timbre/debug url)
-  )
+(defn result-clicked [url] (utils/after 10 (router/nav! url)))

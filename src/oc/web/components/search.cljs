@@ -6,36 +6,37 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.activity-utils :as au]
             [oc.web.urls :as oc-urls]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.search :as search]
             [oc.web.stores.search :as store]))
 
 (rum/defcs entry-display < rum/static
-  (rum/local nil ::activity-url)
-  {:after-render (fn [s]
-                   (let [body-el (rum/ref-node s "body")]
-                     (au/truncate-body body-el)))
-   :on-click #(search/result-clicked @(::activity-url %))}
+
   [s data]
   (let [result (:_source data)
-        title (:headline result)
-        author (first (:author-name result))]
-    (reset! (::activity-url s)
-            (oc-urls/entry (:board-slug result) (:uuid result)))
+        title (utils/emojify (:headline result))
+        author (first (:author-name result))
+        activity-url (oc-urls/entry (:board-slug result) (:uuid result))]
     [:div.search-result
+     {:on-click (fn [s]
+                  (search/result-clicked activity-url)
+                  s)}
      [:div.author
       (user-avatar-image {:user-id (first (:author-id result))
                           :name author
                           :avatar-url (first (:author-url result))} false)
-      [:span author]]
-     [:div.content
-      [:div.title title]
-      (let [body-without-preview (utils/body-without-preview (:body result))
-            emojied-body (utils/emojify body-without-preview)]
-        [:p {:ref "body"
-             :dangerouslySetInnerHTML  emojied-body}])
+      [:div.name author]
+      [:div.time-since
+       (let [t (or (:published-at result) (:created-at result))]
+         [:time
+          {:date-time t
+           :data-toggle "tooltip"
+           :data-placement "top"
+           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+           :title (utils/activity-date-tooltip result)}
+          (utils/time-since t)])]
+      [:div.title {:dangerouslySetInnerHTML title}]
       ]]))
 
 (rum/defcs board-display < rum/static
@@ -57,12 +58,12 @@
                               js/window
                               EventType/CLICK
                               (fn [e]
-                                (timbre/debug e)
                                 (when (not
                                        (utils/event-inside? e
                                          (sel1 [:div.search-box])))
                                   (let [node (rum/ref-node s "results")]
-                                    (.add (.-classList node) "inactive"))))))
+                                    (.add (.-classList node) "inactive")))
+                                e)))
                            s)
                           :will-unmount (fn [s]
                             (when @(::window-click s)
@@ -80,6 +81,9 @@
        }]
      [:div.search-results {:ref "results"
                            :class (when (empty? search-results) "inactive")}
+      [:div.header
+       [:span "Posts"]
+       [:span.count (str "(" (count search-results) ")")]]
       (for [sr search-results]
         (let [key (str "result-" (:uuid (:_source sr)))]
           (case (:type (:_source sr))
