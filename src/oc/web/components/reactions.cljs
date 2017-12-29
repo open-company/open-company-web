@@ -81,6 +81,11 @@
                   :let [reaction-data (get reactions-data idx)
                         is-loading (utils/in? reactions-loading (:reaction reaction-data))
                         reacted (:reacted reaction-data)
+                        reaction-authors (:authors reaction-data)
+                        reaction-start (if (> 1 (count reaction-authors)) "Reactions" "Reaction")
+                        reaction-attribution (if (empty? reaction-authors)
+                          ""
+                          (str reaction-start " by " (clojure.string/join "," reaction-authors)))
                         read-only-reaction (not (utils/link-for
                                                  (:links reaction-data)
                                                  "react"
@@ -91,11 +96,16 @@
                                                           (inc (:count reaction-data)))
                                                   :reacted (not reacted)})
                             reaction-data)]]
+
               [:button.reaction-btn.btn-reset
                 {:key (str "reaction-" (:uuid entry-data) "-" idx)
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
                                           :has-reactions (pos? (:count r))})
+                 :title reaction-attribution
+                 :data-placement (if (empty? reaction-authors) "none" "top")
+                 :data-container "body"
+                 :data-toggle "tooltip"
                  :on-click (fn [e]
                              (when (and (not is-loading) (not read-only-reaction))
                                (when (and (not (:reacted r))
