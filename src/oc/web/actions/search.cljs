@@ -10,16 +10,17 @@
   (dispatcher/dispatch! [:search-query/finish result]))
 
 (defn reset []
-  (dispatcher/dispatch! [:search-query/finish {:success true
-                                               :error false
-                                               :body []}]))
+  (dispatcher/dispatch! [:search-inactive]))
+
+(defn active []
+  (dispatcher/dispatch! [:search-active]))
 
 (defn query
   "Use the search service to query for results."
   [search-query]
   (timbre/debug search-query)
-  (if (> (count search-query) 1)
-    (api/query (:uuid (dispatcher/org-data)) search-query query-finished)
-    (reset)))
+  (when (pos? (count search-query))
+    (api/query (:uuid (dispatcher/org-data)) search-query query-finished)))
+
 
 (defn result-clicked [url] (utils/after 10 (router/nav! url)))

@@ -49,37 +49,41 @@
      ]))
 
 (rum/defcs search-box < (drv/drv store/search-key)
-                         rum/reactive
-                         rum/static
-                         (rum/local nil ::window-click)
-                         {:will-mount (fn [s]
-                           (reset! (::window-click s)
-                             (events/listen
-                              js/window
-                              EventType/CLICK
-                              (fn [e]
-                                (when (not
-                                       (utils/event-inside? e
-                                         (sel1 [:div.search-box])))
-                                  (search/reset))
-                                e)))
-                           s)
-                          :will-unmount (fn [s]
-                            (when @(::window-click s)
-                              (events/unlistenByKey @(::window-click s))
-                              (reset! (::window-click s) nil))
-                            s)}
+                        (drv/drv store/search-active?)
+                        rum/reactive
+                        rum/static
+                        (rum/local nil ::window-click)
+                        {:will-mount (fn [s]
+                          (reset! (::window-click s)
+                            (events/listen
+                             js/window
+                             EventType/CLICK
+                             (fn [e]
+                               (when (not
+                                      (utils/event-inside? e
+                                        (sel1 [:div.search-box])))
+                                 (search/reset))
+                               e)))
+                          s)
+                         :will-unmount (fn [s]
+                           (when @(::window-click s)
+                             (events/unlistenByKey @(::window-click s))
+                             (reset! (::window-click s) nil))
+                           s)}
   [s]
-  (let [search-results (drv/react s store/search-key)]
+  (let [search-results (drv/react s store/search-key)
+        search-active? (drv/react s store/search-active?)]
     [:div.search-box
      [:div.search
       {:content-editable true
        :ref "search-input"
        :placeholder "Search..."
+       :on-focus #(do (search/active)
+                      (search/query (.-innerHTML (rum/ref-node s "search-input"))))
        :on-key-up #(search/query (.-innerHTML (rum/ref-node s "search-input")))
        }]
      [:div.search-results {:ref "results"
-                           :class (when (empty? search-results) "inactive")}
+                           :class (when (not search-active?) "inactive")}
       [:div.header
        [:span "Posts"]
        [:span.count (str "(" (count search-results) ")")]]

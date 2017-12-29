@@ -3,6 +3,7 @@
             [oc.web.dispatcher :as dispatcher]))
 
 (defonce search-key :search-results)
+(defonce search-active? :search-active)
 
 (defn search-results []
   (get-in @dispatcher/app-state search-key))
@@ -23,3 +24,13 @@
     (if success
       (assoc db search-key (cleanup-uuid results))
       db)))
+
+(defmethod dispatcher/action :search-active
+  [db [_]]
+  (assoc db search-active? true))
+
+(defmethod dispatcher/action :search-inactive
+  [db [_]]
+  (-> db
+   (assoc search-active? false)
+   (assoc search-key [])))

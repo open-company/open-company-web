@@ -276,6 +276,7 @@
                               (:media-input base))]
    :add-comment-focus     [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish    [[:base] (fn [base] (:comment-add-finish base))]
+   :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]})
 
 
