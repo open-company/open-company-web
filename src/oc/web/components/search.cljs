@@ -61,8 +61,7 @@
                                 (when (not
                                        (utils/event-inside? e
                                          (sel1 [:div.search-box])))
-                                  (let [node (rum/ref-node s "results")]
-                                    (.add (.-classList node) "inactive")))
+                                  (search/reset))
                                 e)))
                            s)
                           :will-unmount (fn [s]
