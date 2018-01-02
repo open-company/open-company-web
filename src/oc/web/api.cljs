@@ -793,10 +793,14 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:activity-delete/finish]))))))
 
-(defn get-all-posts [org-data & [activity-link year month]]
+(defn get-all-posts [org-data & [activity-link {:keys [year month from]}]]
   (when org-data
-    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))]
-      (storage-http (method-for-link all-posts-link) (relative-href all-posts-link)
+    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))
+          href (relative-href all-posts-link)
+          final-href (if from
+                       (str href "?start=" from "&direction=around")
+                       href)]
+      (storage-http (method-for-link all-posts-link) final-href
         {:headers (headers-for-link all-posts-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch!

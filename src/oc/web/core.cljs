@@ -145,7 +145,8 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         entry (:entry (:params params))
-        query-params (:query-params params)]
+        query-params (:query-params params)
+        has-at-param (contains? query-params :at)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
@@ -161,7 +162,7 @@
       :board board
       :activity entry
       :query-params query-params
-      :from-all-posts (contains? query-params :ap)})
+      :from-all-posts (or has-at-param (contains? query-params :ap))})
     (when board-sort-or-filter
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
@@ -194,6 +195,7 @@
                            :main))
           next-app-state {:nux (when show-nux :1)
                           :loading loading
+                          :ap-initial-at (when has-at-param (:at query-params))
                           :org-settings org-settings
                           :nux-loading (cook/get-cookie :nux)
                           :nux-end nil}]

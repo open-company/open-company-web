@@ -57,9 +57,11 @@
               (and (router/current-board-slug)
                        ;; But the data are not loaded yet
                    (or (and (not= (router/current-board-slug) "all-posts")
+                            (not (:ap-initial-at data))
                             (not board-data))
                        ;; Or the all-posts data
-                       (and (= (router/current-board-slug) "all-posts")
+                       (and (or (= (router/current-board-slug) "all-posts")
+                                (:ap-initial-at data))
                             (not all-posts-data))))
               ;; First ever user nux, not enough time
               (and (:nux-loading data)

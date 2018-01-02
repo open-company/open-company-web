@@ -111,10 +111,10 @@
 
     (cond
       ;; If it's all posts page, loads all posts for the current org
-      (and (router/current-board-slug)
-           (= (router/current-board-slug) "all-posts"))
+      (or (= (router/current-board-slug) "all-posts")
+          (:ap-initial-at db))
       (if (utils/link-for (:links org-data) "activity")
-        (api/get-all-posts org-data)
+        (api/get-all-posts org-data (utils/link-for (:links org-data) "activity") {:from (:ap-initial-at db)})
         (do
           ;; Remove the last board cookie to avoid falling in the all-posts 404 again
           (cook/remove-cookie! (router/last-board-cookie (:slug org-data)))
@@ -1505,7 +1505,7 @@
 
 (defmethod dispatcher/action :all-posts-calendar
   [db [_ {:keys [link year month]}]]
-  (api/get-all-posts (dispatcher/org-data) link year month)
+  (api/get-all-posts (dispatcher/org-data) link {:year year :month month})
   db)
 
 (defmethod dispatcher/action :all-posts-get/finish
