@@ -19,8 +19,11 @@
   "Use the search service to query for results."
   [search-query]
   (timbre/debug search-query)
-  (when (pos? (count search-query))
-    (api/query (:uuid (dispatcher/org-data)) search-query query-finished)))
+  (if (> (count search-query) 1)
+    (do
+      (active)
+      (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
+    (reset)))
 
 
 (defn result-clicked [url] (utils/after 10 (router/nav! url)))

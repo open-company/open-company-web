@@ -78,8 +78,8 @@
         {:content-editable true
          :ref "search-input"
          :placeholder "Search..."
-         :on-focus #(do (search/active)
-                        (search/query (.-innerHTML (rum/ref-node s "search-input"))))
+         :on-focus #(let [search-query (.-innerHTML (rum/ref-node s "search-input"))]
+                      (search/query search-query))
          :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
          :on-key-up #(search/query
                       (.-innerHTML (rum/ref-node s "search-input")))
