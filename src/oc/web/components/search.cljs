@@ -84,21 +84,19 @@
          :on-key-up #(search/query
                       (.-innerHTML (rum/ref-node s "search-input")))
          }]
-     (if (pos? (count search-results))
-       [:div.search-results {:ref "results"
-                             :class (when (not search-active?) "inactive")}
+      [:div.search-results {:ref "results"
+                            :class (when (not search-active?) "inactive")}
+       (when (pos? (count search-results))
          [:div.header
-           [:span "Results"]
-           [:span.count (str "(" (count search-results) ")")]]
-        (for [sr search-results]
-          (let [key (str "result-" (:uuid (:_source sr)))]
-            (case (:type (:_source sr))
-              "entry" (rum/with-key (entry-display sr) key)
-              "board" (rum/with-key (board-display sr) key))))
-        ]
-       [:div.search-results {:ref "results"
-                             :class (when (not search-active?) "inactive")}
+          [:span "Results"]
+          [:span.count (str "(" (count search-results) ")")]])
+        (if (pos? (count search-results))
+          (for [sr search-results]
+            (let [key (str "result-" (:uuid (:_source sr)))]
+              (case (:type (:_source sr))
+                "entry" (rum/with-key (entry-display sr) key)
+                "board" (rum/with-key (board-display sr) key))))
          [:div.empty-result
-          [:img {:src (utils/cdn "/img/empty-search-results-spy-glass.png")}]
-          [:div.message "No matching results"]]
-        ])]))
+            [:img {:src (utils/cdn "/img/empty-search-results-spy-glass.png")}]
+            [:div.message "No matching results"]]
+        )]]))
