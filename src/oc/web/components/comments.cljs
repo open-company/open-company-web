@@ -19,6 +19,96 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn setup-medium-editor [comment-node]
+  (let [config {:toolbar false
+                :anchorPreview false
+                :extensions #js []
+                :autoLink true
+                :anchor false
+                :paste #js {:forcePlainText true}
+                :placeholder #js {:text "Share your thoughts..."
+                                  :hideOnClick true}
+               :keyboardCommands #js {:commands #js [
+                                  #js {
+                                    :command false
+                                    :key "B"
+                                    :meta true
+                                    :shift false
+                                    :alt false
+                                  }
+                                  #js {
+                                    :command false
+                                    :key "I"
+                                    :meta true
+                                    :shift false
+                                    :alt false
+                                  }
+                                  #js {
+                                    :command false
+                                    :key "U"
+                                    :meta true
+                                    :shift false
+                                    :alt false
+                                  }]}}]
+    (new js/MediumEditor comment-node (clj->js config))))
+
+(defn stop-editing [s]
+  (let [medium-editor @(::medium-editor s)]
+    (.destroy medium-editor)
+    (when @(::esc-key-listener s)
+      (events/unlistenByKey @(::esc-key-listener s))
+      (reset! (::esc-key-listener s) nil))
+    (reset! (::medium-editor s) nil)
+    (reset! (::editing? s) false)
+    (dis/dispatch! [:input [:comment-edit] nil])))
+
+(defn cancel-edit
+  [e s c]
+  (.stopPropagation e)
+  (let [comment-field (rum/ref-node s "comment-body")]
+    (set! (.-innerHTML comment-field) (utils/emojify @(::initial-body s) true))
+    (stop-editing s)))
+
+(defn add-comment-content [add-comment-div]
+  (let [inner-html (.-innerHTML add-comment-div)
+        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
+        replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
+        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
+        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
+        final-text (.html (.html (js/$ "<div/>") cleaned-text-1))]
+    (.trim final-text)))
+
+(defn edit-finished
+  [e s c]
+  (let [new-comment (rum/ref-node s "comment-body")
+        comment-text (add-comment-content new-comment)]
+    (stop-editing s)
+    (set! (.-innerHTML new-comment) comment-text)
+    (dis/dispatch! [:comment-save c comment-text])))
+
+(defn start-editing [s]
+  (dis/dispatch! [:input [:comment-edit] (:uuid (first (:rum/args s)))])
+  (let [comment-node (rum/ref-node s "comment-body")
+        medium-editor (setup-medium-editor comment-node)]
+    (.subscribe medium-editor
+     "editableBlur"
+     (fn [e editable]
+       (edit-finished e s (first (:rum/args s)))))
+    (reset! (::esc-key-listener s)
+     (events/listen
+      js/window
+      EventType/KEYDOWN
+      (fn [e]
+        (when (and (= "Enter" (.-key e))
+                   (not (.-shiftKey e)))
+          (.blur (rum/ref-node s "comment-body"))
+          (.preventDefault e))
+        (when (= "Escape" (.-key e))
+          (cancel-edit e s (first (:rum/args s)))))))
+    (reset! (::medium-editor s) medium-editor)
+    (reset! (::editing? s) true)
+    (utils/after 600 #(utils/to-end-of-content-editable (rum/ref-node s "comment-body")))))
+
 (defn delete-clicked [s]
   (let [comment-data (first (:rum/args s))]
     (let [alert-data {:icon "/img/ML/trash.svg"
@@ -27,30 +117,13 @@
                       :link-button-title "No"
                       :link-button-cb #(do
                                          (dis/dispatch! [:alert-modal-hide])
-                                         (reset! (::editing? s) false))
+                                         (stop-editing s))
                       :solid-button-title "Yes"
                       :solid-button-cb #(let [activity-uuid (router/current-activity-id)]
                                          (dis/dispatch! [:comment-delete activity-uuid comment-data])
                                          (dis/dispatch! [:alert-modal-hide]))
                       }]
       (dis/dispatch! [:alert-modal-show alert-data]))))
-
-(defn add-comment-content [add-comment-div]
-  (let [inner-html (.-innerHTML add-comment-div)
-        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
-        replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
-        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
-        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
-        final-text (.text (.html (js/$ "<div/>") cleaned-text-1))]
-    (.trim final-text)))
-
-(defn edit-finished
-  [e s c]
-  (let [new-comment (rum/ref-node s "comment-body")
-        comment-text (add-comment-content new-comment)]
-    (reset! (::editing? s) false)
-    (set! (.-innerHTML new-comment) comment-text)
-    (dis/dispatch! [:comment-save c comment-text])))
 
 (defn is-emoji
   [body]
@@ -65,24 +138,14 @@
          (.match body r)
          (not (.match body (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g"))))))
 
-(defn edit-clicked
-  [s]
-  (reset! (::editing? s) true)
-  (utils/after 600 #(utils/to-end-of-content-editable (rum/ref-node s "comment-body"))))
-
-(defn cancel-edit
-  [e s c]
-  (.stopPropagation e)
-  (let [comment-field (rum/ref-node s "comment-body")]
-    (set! (.-innerHTML comment-field) (utils/emojify @(::initial-body s) true))
-    (reset! (::editing? s) false)))
-
 (rum/defcs comment-row < rum/static
                          rum/reactive
                          (rum/local false ::editing?)
+                         (rum/local false ::medium-editor)
                          (rum/local nil ::window-click)
                          (rum/local false ::show-more-dropdown)
                          (rum/local false ::initial-body)
+                         (rum/local nil ::esc-key-listener)
                          {:did-mount (fn [s]
                             (reset! (::window-click s)
                              (events/listen
@@ -92,7 +155,7 @@
                                 (when (and @(::editing? s)
                                        (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete")))
                                        (not (utils/event-inside? e (rum/ref-node s "comment-body"))))
-                                  (reset! (::editing? s) false))
+                                  (stop-editing s))
                                 (when (and @(::show-more-dropdown s)
                                            (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete"))))
                                   (reset! (::show-more-dropdown s) false)))))
@@ -128,20 +191,12 @@
             (utils/time-since (:created-at c))]]
         [:div.comment-body-container
           [:p.comment-body.group
-           {:on-key-down (fn [e]
-                           (when (and (= "Enter" (.-key e))
-                                      (not (.-shiftKey e)))
-                             (.blur (rum/ref-node s "comment-body"))
-                             (.preventDefault e))
-                           (when (= "Escape" (.-key e))
-                             (cancel-edit e s c)))
-             :on-blur #(edit-finished % s c)
-             :ref "comment-body"
-             :class (utils/class-set {:editable can-edit?
-                                      :is-owner is-owner?
-                                      :editing @(::editing? s)})
-             :content-editable @(::editing? s)
-             :dangerouslySetInnerHTML (utils/emojify (:body c))}]]
+           {:ref "comment-body"
+            :class (utils/class-set {:editable can-edit?
+                                     :is-owner is-owner?
+                                     :editing @(::editing? s)})
+            :content-editable @(::editing? s)
+            :dangerouslySetInnerHTML (utils/emojify (:body c))}]]
         (when (or should-show-comment-reaction?
                   editable)
           [:div.comment-footer-container.group
@@ -174,7 +229,7 @@
                                                 (reset! (::show-more-dropdown s) false)
                                                 (cond
                                                   (= (:value item) "edit")
-                                                  (edit-clicked s)
+                                                  (start-editing s)
                                                   (= (:value item) "delete")
                                                   (delete-clicked s)))})))])])]]))
 
@@ -194,10 +249,46 @@
                          ;; Locals
                          (rum/local true ::add-button-disabled)
                          (rum/local false ::show-buttons)
+                         (rum/local false ::medium-editor)
+                         (rum/local nil ::esc-key-listener)
                          {:did-mount (fn [s]
-                                       (utils/after 2500 #(js/emojiAutocomplete))
-                                       (dis/dispatch! [:input [:add-comment-focus] false])
-                                       s)}
+                           (utils/after 2500 #(js/emojiAutocomplete))
+                           (dis/dispatch! [:input [:add-comment-focus] false])
+                           (let [add-comment-node (rum/ref-node s "add-comment")
+                                 medium-editor (setup-medium-editor add-comment-node)]
+                             (reset! (::medium-editor s) medium-editor)
+                             (.subscribe medium-editor
+                              "editableInput"
+                              #(enable-add-comment? s))
+                             (.subscribe medium-editor
+                              "focus"
+                              (fn [_ _]
+                                (enable-add-comment? s)
+                                (dis/dispatch! [:input [:add-comment-focus] true])
+                                (reset! (::show-buttons s) true)))
+                             (.subscribe medium-editor
+                              "editableBlur"
+                              (fn [_ _]
+                                (enable-add-comment? s)
+                                (when (zero? (count (.-innerText add-comment-node)))
+                                  (dis/dispatch! [:input [:add-comment-focus] false])
+                                  (reset! (::show-buttons s) false))))
+                             (reset! (::esc-key-listener s)
+                               (events/listen
+                                js/window
+                                EventType/KEYDOWN
+                                #(when (and (= (.-key %) "Escape")
+                                            (= (.-activeElement js/document) add-comment-node))
+                                   (.blur add-comment-node)))))
+                           s)
+                          :will-unmount (fn [s]
+                           (when @(::medium-editor s)
+                             (.destroy @(::medium-editor s))
+                             (reset! (::medium-editor s) nil))
+                           (when @(::esc-key-listener s)
+                             (events/unlistenByKey @(::esc-key-listener s))
+                             (reset! (::esc-key-listener s) nil))
+                           s)}
   [s activity-data]
   (let [current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box-container
@@ -208,25 +299,6 @@
          [:div.add-comment.emoji-autocomplete.emojiable
            {:ref "add-comment"
             :content-editable true
-            :on-key-down #(let [add-comment-node (rum/ref-node s "add-comment")]
-                            (when (and (= "Escape" (.-key %))
-                                     (= (.-activeElement js/document) add-comment-node))
-                              (.stopPropagation %)
-                              (.blur add-comment-node)))
-            :on-key-up #(enable-add-comment? s)
-            :on-focus #(do
-                         (enable-add-comment? s)
-                         (dis/dispatch! [:input [:add-comment-focus] true])
-                         (reset! (::show-buttons s) true))
-            :on-blur #(do
-                        (enable-add-comment? s)
-                        (when (empty? (.-innerHTML (rum/ref-node s "add-comment")))
-                          (reset! (::show-buttons s) false)
-                          (dis/dispatch! [:input [:add-comment-focus] false])))
-            :on-paste #(do
-                         (js/OnPaste_StripFormatting (rum/ref-node s "add-comment") %)
-                         (enable-add-comment? s))
-            :placeholder "Share your thoughts..."
             :class (utils/class-set {:show-buttons @(::show-buttons s)})}]
         (when @(::show-buttons s)
           [:div.add-comment-footer.group
