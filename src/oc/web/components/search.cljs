@@ -74,22 +74,31 @@
   (let [search-results (drv/react s store/search-key)
         search-active? (drv/react s store/search-active?)]
     [:div.search-box
-     [:div.search
-      {:content-editable true
-       :ref "search-input"
-       :placeholder "Search..."
-       :on-focus #(do (search/active)
-                      (search/query (.-innerHTML (rum/ref-node s "search-input"))))
-       :on-key-up #(search/query (.-innerHTML (rum/ref-node s "search-input")))
-       }]
-     [:div.search-results {:ref "results"
-                           :class (when (not search-active?) "inactive")}
-      [:div.header
-       [:span "Posts"]
-       [:span.count (str "(" (count search-results) ")")]]
-      (for [sr search-results]
-        (let [key (str "result-" (:uuid (:_source sr)))]
-          (case (:type (:_source sr))
-            "entry" (rum/with-key (entry-display sr) key)
-            "board" (rum/with-key (board-display sr) key))))
-      ]]))
+      [:div.search
+        {:content-editable true
+         :ref "search-input"
+         :placeholder "Search..."
+         :on-focus #(do (search/active)
+                        (search/query (.-innerHTML (rum/ref-node s "search-input"))))
+         :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
+         :on-key-up #(search/query
+                      (.-innerHTML (rum/ref-node s "search-input")))
+         }]
+     (if (pos? (count search-results))
+       [:div.search-results {:ref "results"
+                             :class (when (not search-active?) "inactive")}
+         [:div.header
+           [:span "Results"]
+           [:span.count (str "(" (count search-results) ")")]]
+        (for [sr search-results]
+          (let [key (str "result-" (:uuid (:_source sr)))]
+            (case (:type (:_source sr))
+              "entry" (rum/with-key (entry-display sr) key)
+              "board" (rum/with-key (board-display sr) key))))
+        ]
+       [:div.search-results {:ref "results"
+                             :class (when (not search-active?) "inactive")}
+         [:div.empty-result
+          [:img {:src (utils/cdn "/img/empty-search-results-spy-glass.png")}]
+          [:div.message "No matching results"]]
+        ])]))
