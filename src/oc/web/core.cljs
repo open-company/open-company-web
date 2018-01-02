@@ -62,14 +62,17 @@
   (let [target (sel1 [:div#oc-loading])]
     (drv-root #(om/component (loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))})) target)))
 
-(defn rewrite-url []
+(defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
-        rewrite-to (str (.-pathname l) (.-hash l))]
+        rewrite-to (str (.-pathname l) (.-hash l))
+        with-search (if (seq keep-params)
+                      (str rewrite-to "?" (clojure.string/join "&" (map #(str (name %) "=" (get query-params %)) keep-params)))
+                      rewrite-to)]
     ;; Push state only if the query string has parameters or the history will have duplicates.
     (when (seq (.-search l))
-      (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to))))
+      (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
 
-(defn pre-routing [query-params & [should-rewrite-url]]
+(defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Setup timbre log level
   (when (:log-level query-params)
     (logging/config-log-level! (:log-level query-params)))
@@ -85,7 +88,7 @@
     (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
   (check-get-params query-params)
   (when should-rewrite-url
-    (rewrite-url))
+    (rewrite-url rewrite-params))
   (inject-loading))
 
 (defn post-routing []
@@ -151,7 +154,7 @@
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
-    (pre-routing query-params true)
+    (pre-routing query-params true {:query-params query-params :keep-params [:at]})
     ;; save the route
     (router/set-route!
      (vec
