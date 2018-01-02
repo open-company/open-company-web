@@ -281,12 +281,17 @@ div.comments {
             @include avenir_M();
             font-size: 13px;
             color: rgba(78,90,107,0.8);
-            white-space: pre-line;
+            white-space: pre-wrap;
             word-wrap: break-word;
             padding: 13px 16px;
             background-color: $carrot_light_gray_9;
             border-radius: 6px;
             margin: 0px;
+            width: 252px;
+
+            @include mobile() {
+              width: 100%;
+            }
 
             &.is-owner {
               background-color: $carrot_light_yellow;
@@ -384,9 +389,11 @@ div.comments {
     div.add-comment-box-container {
       padding: 20px 24px 18px #{$comment_avatar_size + 8}px;
       position: relative;
+      width: 316px;
 
       @include mobile() {
         padding: 0px;
+        width: 100%;
       }
 
       div.add-comment-label {
@@ -472,7 +479,7 @@ div.comments {
 
           div.add-comment {
             resize: none;
-            width: 100%;
+            width: 218px;
             border: none;
             outline: none;
             @include avenir_M();
@@ -483,6 +490,13 @@ div.comments {
             margin: 2px 0px;
             overflow-y: auto;
             overflow-x: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding-right: 16px;
+
+            @include mobile() {
+              width: 100%;
+            }
 
             &.show-buttons {
               height: 58px;
