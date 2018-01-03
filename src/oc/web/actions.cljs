@@ -1499,8 +1499,8 @@
 
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
-  (when (utils/link-for (:links (dispatcher/org-data db)) "activity")
-    (api/get-all-posts (dispatcher/org-data db)))
+  (when-let [activity-link (utils/link-for (:links (dispatcher/org-data db)) "activity")]
+    (api/get-all-posts (dispatcher/org-data db) activity-link {:from (:ap-initial-at db)}))
   db)
 
 (defmethod dispatcher/action :all-posts-calendar
