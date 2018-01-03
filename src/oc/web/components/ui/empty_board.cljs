@@ -35,8 +35,9 @@
                  :max-width (str (if mobile? (:width mobile-image-size) 416) "px")
                  :max-height (str (if mobile? (:height mobile-image-size) 424) "px")}}]
       (when mobile?
-        [:div.empty-board-footer
-          {:dangerouslySetInnerHTML (utils/emojify (str "Shoot, looks like there aren’t any posts in " (:name board-data) " yet...."))}])
+        (let [empty-board-copy (str "Shoot, looks like there aren’t any posts in " (:name board-data) " yet....")]
+          [:div.empty-board-footer
+            {:dangerouslySetInnerHTML (utils/emojify empty-board-copy)}]))
       (when false ;; mobile?
         [:button.mlb-reset.empty-board-create-first-post
           [:div.empty-board-first-post-container
