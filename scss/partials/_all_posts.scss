@@ -30,11 +30,11 @@ div.all-posts {
 
       div.activities-overlay {
         position: fixed;
-        top: 82px;
+        top: 62px;
         left: 50%;
         z-index: 1;
-        height: calc(100vh - 82px);
-        width: 667px;
+        height: calc(100vh - 62px);
+        width: 767px;
         margin-left: -400px;
         background-color: $oc_gray_8;
         text-align: center;
@@ -45,7 +45,7 @@ div.all-posts {
 
         div.oc-loading {
           margin: 100px auto;
-          height: 170px;
+          height: calc();
           div.oc-loading-inner {
             top: 110px;
           }
