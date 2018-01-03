@@ -484,6 +484,7 @@ div.comments {
             margin: 2px 0px;
             overflow-y: auto;
             overflow-x: hidden;
+            height: 20px;
             min-height: initial;
 
             &.show-buttons {

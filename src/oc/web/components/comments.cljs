@@ -249,28 +249,27 @@
                          (rum/local false ::show-buttons)
                          (rum/local false ::medium-editor)
                          (rum/local nil ::esc-key-listener)
+                         (rum/local nil ::focus-listener)
+                         (rum/local nil ::blur-listener)
                          {:did-mount (fn [s]
                            (utils/after 2500 #(js/emojiAutocomplete))
                            (dis/dispatch! [:input [:add-comment-focus] false])
                            (let [add-comment-node (rum/ref-node s "add-comment")
                                  medium-editor (setup-medium-editor add-comment-node)]
                              (reset! (::medium-editor s) medium-editor)
-                             (.subscribe medium-editor
-                              "editableInput"
-                              #(enable-add-comment? s))
-                             (.subscribe medium-editor
-                              "focus"
-                              (fn [_ _]
+                             (reset! (::focus-listener s)
+                              (events/listen add-comment-node EventType/FOCUS
+                               (fn [e]
                                 (enable-add-comment? s)
                                 (dis/dispatch! [:input [:add-comment-focus] true])
-                                (reset! (::show-buttons s) true)))
-                             (.subscribe medium-editor
-                              "editableBlur"
-                              (fn [_ _]
+                                (reset! (::show-buttons s) true))))
+                             (reset! (::blur-listener s)
+                              (events/listen add-comment-node EventType/BLUR
+                               (fn [e]
                                 (enable-add-comment? s)
                                 (when (zero? (count (.-innerText add-comment-node)))
                                   (dis/dispatch! [:input [:add-comment-focus] false])
-                                  (reset! (::show-buttons s) false))))
+                                  (reset! (::show-buttons s) false)))))
                              (reset! (::esc-key-listener s)
                                (events/listen
                                 js/window
@@ -286,6 +285,12 @@
                            (when @(::esc-key-listener s)
                              (events/unlistenByKey @(::esc-key-listener s))
                              (reset! (::esc-key-listener s) nil))
+                           (when @(::focus-listener s)
+                             (events/unlistenByKey @(::focus-listener s))
+                             (reset! (::focus-listener s) nil))
+                           (when @(::blur-listener s)
+                             (events/unlistenByKey @(::blur-listener s))
+                             (reset! (::blur-listener s) nil))
                            s)}
   [s activity-data]
   (let [current-user-data (drv/react s :current-user-data)]
