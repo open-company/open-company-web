@@ -65,8 +65,12 @@
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
         rewrite-to (str (.-pathname l) (.-hash l))
-        with-search (if (seq keep-params)
-                      (str rewrite-to "?" (clojure.string/join "&" (map #(str (name %) "=" (get query-params %)) keep-params)))
+        search-values (when (seq keep-params)
+                        (map #(when (get query-params %)
+                               (str (name %) "=" (get query-params %))) keep-params))
+        with-search (when search-values
+                      (str rewrite-to "?"
+                        (clojure.string/join "&" search-values))
                       rewrite-to)]
     ;; Push state only if the query string has parameters or the history will have duplicates.
     (when (seq (.-search l))
