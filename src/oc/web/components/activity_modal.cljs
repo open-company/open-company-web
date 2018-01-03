@@ -130,9 +130,7 @@
   (when-not (responsive/is-tablet-or-mobile?)
     (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
     (utils/after 100 #(setup-headline state))
-    (reset! (::autosave-timer state)
-     (utils/every 5000
-      #(autosave)))
+    (reset! (::autosave-timer state) (utils/every 5000 autosave))
     (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
     (when focus
       (utils/after 1000
