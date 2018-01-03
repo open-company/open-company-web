@@ -65,8 +65,9 @@
 (defn cancel-edit
   [e s c]
   (.stopPropagation e)
-  (let [comment-field (rum/ref-node s "comment-body")]
-    (set! (.-innerHTML comment-field) (utils/emojify @(::initial-body s) true))
+  (let [comment-field (rum/ref-node s "comment-body")
+        comment-data (first (:rum/args s))]
+    (set! (.-innerHTML comment-field) (utils/emojify (:body comment-data) true))
     (stop-editing s)))
 
 (defn add-comment-content [add-comment-div]
@@ -144,7 +145,6 @@
                          (rum/local false ::medium-editor)
                          (rum/local nil ::window-click)
                          (rum/local false ::show-more-dropdown)
-                         (rum/local false ::initial-body)
                          (rum/local nil ::esc-key-listener)
                          {:did-mount (fn [s]
                             (reset! (::window-click s)
@@ -159,8 +159,6 @@
                                 (when (and @(::show-more-dropdown s)
                                            (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete"))))
                                   (reset! (::show-more-dropdown s) false)))))
-                            (let [comment-data (first (:rum/args s))]
-                              (reset! (::initial-body s) (:body comment-data)))
                             s)
                           :will-unmount (fn [s]
                             (events/unlistenByKey
