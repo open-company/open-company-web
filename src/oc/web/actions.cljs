@@ -1509,7 +1509,7 @@
   db)
 
 (defmethod dispatcher/action :all-posts-get/finish
-  [db [_ {:keys [org year month body]}]]
+  [db [_ {:keys [org year month from body]}]]
   (if body
     (let [all-posts-key (dispatcher/all-posts-key org)
           fixed-all-posts (utils/fix-all-posts (:collection body))
@@ -1521,6 +1521,10 @@
                                 (assoc :rand (rand 1000)))]
       (when (and (not year) (not month))
         (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
+      (when (and from
+                 (router/current-activity-id)
+                 (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))
+        (router/redirect-404!))
       (assoc-in db all-posts-key with-calendar-data))
     db))
 

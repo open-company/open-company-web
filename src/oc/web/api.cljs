@@ -808,6 +808,7 @@
             {:org (:slug org-data)
              :year year
              :month month
+             :from from
              :body (when success (json->cljs body))}]))))))
 
 (defn load-more-all-posts [more-link direction]
