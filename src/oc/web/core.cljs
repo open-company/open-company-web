@@ -66,9 +66,10 @@
   (let [l (.-location js/window)
         rewrite-to (str (.-pathname l) (.-hash l))
         search-values (when (seq keep-params)
-                        (map #(when (get query-params %)
-                               (str (name %) "=" (get query-params %))) keep-params))
-        with-search (when search-values
+                        (remove nil?
+                         (map #(when (get query-params %)
+                                 (str (name %) "=" (get query-params %))) keep-params)))
+        with-search (if (pos? (count search-values))
                       (str rewrite-to "?"
                         (clojure.string/join "&" search-values))
                       rewrite-to)]
