@@ -131,12 +131,17 @@ nav.oc-navbar {
       height: 24px;
 
       button.mobile-navigation-sidebar-ham-bt {
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/mobile_navigation_sidebar_ham.svg");
-        background-repeat: no-repeat;
-        background-size: 18px 14px;
-        background-position: 3px 5px;
+        display: none;
+
+        @include mobile() {
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/mobile_navigation_sidebar_ham.svg");
+          background-repeat: no-repeat;
+          background-size: 18px 14px;
+          background-position: 3px 5px;
+          display: block;
+        }
       }
     }
 
