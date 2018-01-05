@@ -257,6 +257,9 @@
                            (let [add-comment-node (rum/ref-node s "add-comment")
                                  medium-editor (setup-medium-editor add-comment-node)]
                              (reset! (::medium-editor s) medium-editor)
+                             (.subscribe medium-editor
+                              "editableInput"
+                              #(enable-add-comment? s))
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
                                (fn [e]
@@ -280,6 +283,10 @@
                            s)
                           :will-unmount (fn [s]
                            (when @(::medium-editor s)
+                             (.unsubscribe
+                              @(::medium-editor s)
+                              "editableInput"
+                              #(enable-add-comment? s))
                              (.destroy @(::medium-editor s))
                              (reset! (::medium-editor s) nil))
                            (when @(::esc-key-listener s)
