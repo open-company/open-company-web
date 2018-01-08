@@ -37,12 +37,6 @@
                   (> published-at too-old)
                   (or (> published-at seen-at)
                       (nil? seen-at)))]
-    (timbre/debug "New'ness in board test for:" (:uuid entry)
-                  "in-team?:" in-team?
-                  "user-id / author-id:" user-id author-id
-                  "created:" published-at
-                  "seen:" seen-at
-                  "new?:" new?)
     new?))
 
 (defn is-share-thoughts? [entry changes]
