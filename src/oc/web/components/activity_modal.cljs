@@ -27,10 +27,10 @@
 ;; Unsaved edits handling
 
 (defn autosave []
-  (let [body-el (sel1 [:div.rich-body-editor])
-        cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerHTML body-el)))]
-    (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body])))
+  (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (let [cleaned-body (when body-el
+                        (utils/clean-body-html (.-innerHTML body-el)))]
+      (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body]))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
@@ -95,10 +95,11 @@
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
-  (when-let [headline (sel1 [:div.activity-modal-content-headline])]
-    (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
-      (dis/dispatch! [:input [:modal-editing-data :headline] emojied-headline])
-      (dis/dispatch! [:input [:modal-editing-data :has-changes] true]))))
+  (utils/after 10
+    #(when-let [headline (sel1 [:div.activity-modal-content-headline])]
+      (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+        (dis/dispatch! [:input [:modal-editing-data :headline] emojied-headline])
+        (dis/dispatch! [:input [:modal-editing-data :has-changes] true])))))
 
 (defn- setup-headline [state]
   (when-let [headline-el  (rum/ref-node state "edit-headline")]
@@ -130,9 +131,7 @@
   (when-not (responsive/is-tablet-or-mobile?)
     (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
     (utils/after 100 #(setup-headline state))
-    (reset! (::autosave-timer state)
-     (utils/every 5000
-      #(autosave)))
+    (reset! (::autosave-timer state) (utils/every 5000 autosave))
     (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
     (when focus
       (utils/after 1000
@@ -182,6 +181,7 @@
 (defn- dismiss-editing? [state dismiss-modal?]
   (let [modal-data @(drv/get-ref state :modal-data)
         dismiss-fn (fn []
+                     (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
                      (stop-editing state)
                      (when (or dismiss-modal?)
                        (close-clicked state)))]
@@ -205,7 +205,6 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
-                                            (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
                                             (dis/dispatch! [:alert-modal-hide])
                                             (dismiss-fn))
                         }]
@@ -272,12 +271,17 @@
                                (events/listen
                                 js/window
                                 EventType/KEYDOWN
-                                #(when (= (.-key %) "Escape")
-                                   (let [modal-data @(drv/get-ref s :modal-data)]
-                                     (if (and (:modal-editing modal-data)
-                                              (not @(::uploading-media s)))
-                                       (dismiss-editing? s true)
-                                       (close-clicked s))))))
+                                #(let [modal-data @(drv/get-ref s :modal-data)
+                                       add-comment-focus (:add-comment-focus modal-data)
+                                       comment-edit (:comment-edit modal-data)]
+                                   (when (and (= (.-key %) "Escape")
+                                              (not add-comment-focus)
+                                              (not comment-edit))
+                                     (let [modal-data @(drv/get-ref s :modal-data)]
+                                       (if (and (:modal-editing modal-data)
+                                                (not @(::uploading-media s)))
+                                         (dismiss-editing? s true)
+                                         (close-clicked s)))))))
                               (setup-editing-data s)
                               s)
                              :did-mount (fn [s]
@@ -323,6 +327,9 @@
                                 (reset! (::window-resize-listener s) nil))
                               (set! (.-onbeforeunload js/window) nil)
                               s)
+                             :will-update (fn [s]
+                              (setup-editing-data s)
+                              s)
                              :did-remount (fn [_ s]
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (let [save-on-exit (:entry-save-on-exit modal-data)]
@@ -333,6 +340,9 @@
                                       "Do you want to save before leaving?")
                                     nil)))
                                 (setup-editing-data s)
+                                (when (and (:modal-editing modal-data)
+                                           (nil? @(::autosave-timer s)))
+                                  (utils/after 1000 #(real-start-editing s :headline)))
                                 (when (and (:modal-editing modal-data)
                                            @(::entry-saving s))
                                   (let [entry-edit (:modal-editing-data modal-data)

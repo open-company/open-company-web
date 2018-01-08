@@ -959,7 +959,7 @@
   [db item-uuid reaction-data]
   (let [board-key (dispatcher/current-board-key)
         board-data (get-in db board-key)
-        entry-data (get (get board-data :fixed-items) item-uuid)
+        entry-data (get-in board-data [:fixed-items item-uuid])
         old-reactions-loading (or (:reactions-loading entry-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
@@ -1018,11 +1018,14 @@
         (assoc-in db entry-key updated-entry-data))
       (let [reaction (first (keys reaction-data))
             next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
-            reactions-data (:reactions entry-data)
+            reactions-data (or (:reactions entry-data) [])
             reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
+            fixed-reaction-idx (if (and reaction-idx (>= reaction-idx 0))
+                                 reaction-idx
+                                 (count reactions-data))
             updated-entry-data (-> entry-data
                                    (assoc :reactions-loading next-reactions-loading)
-                                   (assoc-in [:reactions reaction-idx] next-reaction-data))]
+                                   (assoc-in [:reactions fixed-reaction-idx] next-reaction-data))]
         (assoc-in db entry-key updated-entry-data)))))
 
 (defn- handle-reaction-to-comment-finish
@@ -1246,14 +1249,15 @@
        (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
 
 (defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ board-slug activity-uuid activity-type editing]]
+  [db [_ board-slug activity-uuid editing]]
   (utils/after 10
    #(let [from-all-posts (= (router/current-board-slug) "all-posts")
           activity-url (oc-urls/entry board-slug activity-uuid)]
       (router/nav! (str activity-url (when from-all-posts "?ap")))))
   (when editing
-    (let [board-data (dispatcher/board-data)
-          activity-data (get (:fixed-items board-data) activity-uuid)]
+    (let [board-key (dispatcher/current-board-key)
+          board-data (get-in db board-key)
+          activity-data (get-in board-data [:fixed-items activity-uuid])]
       (utils/after 100 #(activity-load-cached-item activity-data))))
   (-> db
     (assoc :activity-modal-fade-in activity-uuid)
@@ -1341,11 +1345,8 @@
     (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
-  [db [_ {:keys [activity-data edit-key]}]]
-  (let [board-slug (if (= (:status activity-data) utils/default-draft-status)
-                     utils/default-drafts-board-slug
-                     (:board-slug activity-data))
-        is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
+  [db [_ {:keys [activity-data board-slug edit-key]}]]
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
@@ -1353,9 +1354,10 @@
     ; Remove saved cached item
     (remove-cached-item (-> db edit-key :uuid))
     ; Add the new activity into the board
-    (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
+    (let [board-key (dispatcher/current-board-key)
           board-data (or (get-in db board-key) utils/default-drafts-board)
-          fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+          activity-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) board-slug))
+          fixed-activity-data (utils/fix-entry activity-data activity-board-data (:topics activity-board-data))
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
           next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
           with-edited-key (if edit-key
@@ -1757,29 +1759,16 @@
   (when (and emoji
              (utils/link-for (:links activity-data) "react"))
     (api/react-from-picker activity-data emoji))
-  db)
+   (handle-reaction-to-entry db (:uuid activity-data) {:reaction emoji :count 1 :reacted true :links [] :authors []}))
 
 (defmethod dispatcher/action :react-from-picker/finish
-  [db [_ {:keys [status activity-data reaction-data]}]]
+  [db [_ {:keys [status activity-data reaction reaction-data]}]]
   (api/get-entry activity-data)
   (if (and (>= status 200)
            (< status 300))
-    ;; Update the reactions in the app-state if the api call succeeded
     (let [reaction-key (first (keys reaction-data))
-          reaction (name reaction-key)
-          reaction-data (get reaction-data reaction-key)
-          org-slug (router/current-org-slug)
-          board-slug (:board-slug activity-data)
-          activity-uuid (:uuid activity-data)
-          activity-key (dispatcher/activity-key org-slug board-slug activity-uuid)
-          activity-from-db (get-in db activity-key)
-          reaction-idx (utils/index-of (:reactions activity-from-db) #(= (:reaction %) reaction))
-          new-reaction-data (assoc reaction-data :reaction reaction)
-          old-reactions (or (:reactions activity-from-db) [])
-          updated-reactions (if reaction-idx
-                              (assoc old-reactions reaction-idx new-reaction-data)
-                              (assoc old-reactions (count (:reactions activity-from-db)) new-reaction-data))]
-      (assoc-in db (vec (conj activity-key :reactions)) updated-reactions))
+          reaction (name reaction-key)]
+      (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
     ;; Wait for the entry refresh if it didn't
     db))
 
@@ -1827,8 +1816,8 @@
         cache-key (get-entry-cache-key (:uuid entry-editing))]
     (uc/set-item cache-key entry-map
      (fn [err]
-        (when-not err
-          (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
+       (when-not err
+         (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
     db))
 
 (defmethod dispatcher/action :private-board-user-add

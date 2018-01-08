@@ -41,11 +41,6 @@
         new? (and in-team?
                   (or (and change-at nav-at (> change-at nav-at))
                       (and change-at (not nav-at))))]
-    (timbre/debug "New'ness in nav. test for:" (:slug board)
-                  "in-team?:" in-team?
-                  "change:" change-at
-                  "nav:" nav-at
-                  "new?:" new?)
     new?))
 
 (def sidebar-top-margin 122)

@@ -40,8 +40,8 @@
             [:div.onboard-overlay-step-description
               (if first-ever-user?
                 (str
-                 "Carrot posts make your announcements, updates and "
-                 "plans visible and engaging.")
+                 "Team announcements, updates and plans should never "
+                 "get lost in the noise!")
                 (str
                  "Carrot posts make announcements, updates and plans"
                  " visible and engaging."))]
