@@ -287,6 +287,7 @@ div.comments {
             background-color: $carrot_light_gray_9;
             border-radius: 6px;
             margin: 0px;
+            min-height: initial;
             width: 252px;
 
             @include mobile() {
@@ -490,6 +491,8 @@ div.comments {
             margin: 2px 0px;
             overflow-y: auto;
             overflow-x: hidden;
+            height: 20px;
+            min-height: initial;
             white-space: pre-wrap;
             word-wrap: break-word;
             padding-right: 16px;
@@ -506,12 +509,13 @@ div.comments {
               @include emoji-size(13);
             }
 
-            &:empty:before {
+            &:after {
               @include avenir_M();
               font-size: 14px;
               content: attr(placeholder);
               color: rgba($carrot_light_gray_3, 0.4);
               cursor: text;
+              font-style: none;
             }
           }
 

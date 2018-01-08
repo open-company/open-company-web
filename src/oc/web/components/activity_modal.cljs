@@ -271,12 +271,17 @@
                                (events/listen
                                 js/window
                                 EventType/KEYDOWN
-                                #(when (= (.-key %) "Escape")
-                                   (let [modal-data @(drv/get-ref s :modal-data)]
-                                     (if (and (:modal-editing modal-data)
-                                              (not @(::uploading-media s)))
-                                       (dismiss-editing? s true)
-                                       (close-clicked s))))))
+                                #(let [modal-data @(drv/get-ref s :modal-data)
+                                       add-comment-focus (:add-comment-focus modal-data)
+                                       comment-edit (:comment-edit modal-data)]
+                                   (when (and (= (.-key %) "Escape")
+                                              (not add-comment-focus)
+                                              (not comment-edit))
+                                     (let [modal-data @(drv/get-ref s :modal-data)]
+                                       (if (and (:modal-editing modal-data)
+                                                (not @(::uploading-media s)))
+                                         (dismiss-editing? s true)
+                                         (close-clicked s)))))))
                               (setup-editing-data s)
                               s)
                              :did-mount (fn [s]

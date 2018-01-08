@@ -101,6 +101,9 @@
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
+   :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
+   :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
+   :comment-edit        [[:base] (fn [base] (:comment-edit base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -234,8 +237,8 @@
                                 (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
-   :modal-data          [[:base :org-data :entry-edit-topics :activity-share]
-                          (fn [base org-data entry-edit-topics activity-share]
+   :modal-data          [[:base :org-data :entry-edit-topics :activity-share :add-comment-focus :comment-edit]
+                          (fn [base org-data entry-edit-topics activity-share add-comment-focus comment-edit]
                             {:org-data org-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
                              :board-filters (:board-filters base)
@@ -244,7 +247,9 @@
                              :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
                              :entry-edit-topics entry-edit-topics
                              :activity-share activity-share
-                             :entry-save-on-exit (:entry-save-on-exit base)})]
+                             :entry-save-on-exit (:entry-save-on-exit base)
+                             :add-comment-focus add-comment-focus
+                             :comment-edit comment-edit})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
@@ -268,9 +273,7 @@
                                :error (:collect-pswd-error base)})]
    :media-input           [[:base]
                             (fn [base]
-                              (:media-input base))]
-   :add-comment-focus     [[:base] (fn [base] (:add-comment-focus base))]
-   :comment-add-finish    [[:base] (fn [base] (:comment-add-finish base))]})
+                              (:media-input base))]})
 
 ;; Action Loop =================================================================
 
