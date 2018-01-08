@@ -110,8 +110,7 @@
                       (dis/dispatch!
                        [:activity-modal-fade-in
                         (:board-slug activity-data)
-                        (:uuid activity-data)
-                        (:type activity-data)]))))}
+                        (:uuid activity-data)]))))}
       ; Card header
       [:div.activity-card-head.group
         {:class "entry-card"}
@@ -160,7 +159,6 @@
                                          [:activity-modal-fade-in
                                           (:board-slug activity-data)
                                           (:uuid activity-data)
-                                          (:type activity-data)
                                           true]))}
                           "Edit"])
                       (when share-link
@@ -250,5 +248,4 @@
                           [:activity-modal-fade-in
                            (:board-slug activity-data)
                            (:uuid activity-data)
-                           (:type activity-data)
                            true]))}])]]))

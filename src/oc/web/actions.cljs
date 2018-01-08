@@ -1246,14 +1246,15 @@
        (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
 
 (defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ board-slug activity-uuid activity-type editing]]
+  [db [_ board-slug activity-uuid editing]]
   (utils/after 10
    #(let [from-all-posts (= (router/current-board-slug) "all-posts")
           activity-url (oc-urls/entry board-slug activity-uuid)]
       (router/nav! (str activity-url (when from-all-posts "?ap")))))
   (when editing
-    (let [board-data (dispatcher/board-data)
-          activity-data (get (:fixed-items board-data) activity-uuid)]
+    (let [board-key (dispatcher/current-board-key)
+          board-data (get-in db board-key)
+          activity-data (get-in board-data [:fixed-items activity-uuid])]
       (utils/after 100 #(activity-load-cached-item activity-data))))
   (-> db
     (assoc :activity-modal-fade-in activity-uuid)
@@ -1341,11 +1342,8 @@
     (assoc-in db [:entry-editing :loading] true)))
 
 (defmethod dispatcher/action :entry-save/finish
-  [db [_ {:keys [activity-data edit-key]}]]
-  (let [board-slug (if (= (:status activity-data) utils/default-draft-status)
-                     utils/default-drafts-board-slug
-                     (:board-slug activity-data))
-        is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
+  [db [_ {:keys [activity-data board-slug edit-key]}]]
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
@@ -1353,9 +1351,10 @@
     ; Remove saved cached item
     (remove-cached-item (-> db edit-key :uuid))
     ; Add the new activity into the board
-    (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
+    (let [board-key (dispatcher/current-board-key)
           board-data (or (get-in db board-key) utils/default-drafts-board)
-          fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+          activity-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) board-slug))
+          fixed-activity-data (utils/fix-entry activity-data activity-board-data (:topics activity-board-data))
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
           next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
           with-edited-key (if edit-key
@@ -1823,8 +1822,8 @@
         cache-key (get-entry-cache-key (:uuid entry-editing))]
     (uc/set-item cache-key entry-map
      (fn [err]
-        (when-not err
-          (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
+       (when-not err
+         (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
     db))
 
 (defmethod dispatcher/action :private-board-user-add
