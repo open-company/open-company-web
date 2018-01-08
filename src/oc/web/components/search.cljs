@@ -62,7 +62,7 @@
                                (when (not
                                       (utils/event-inside? e
                                         (sel1 [:div.search-box])))
-                                 (search/reset))
+                                 (search/inactive))
                                e)))
                           s)
                          :will-unmount (fn [s]

@@ -10,6 +10,9 @@
   (dispatcher/dispatch! [:search-query/finish result]))
 
 (defn reset []
+  (dispatcher/dispatch! [:search-reset]))
+
+(defn inactive []
   (dispatcher/dispatch! [:search-inactive]))
 
 (defn active []
