@@ -959,7 +959,7 @@
   [db item-uuid reaction-data]
   (let [board-key (dispatcher/current-board-key)
         board-data (get-in db board-key)
-        entry-data (get (get board-data :fixed-items) item-uuid)
+        entry-data (get-in board-data [:fixed-items item-uuid])
         old-reactions-loading (or (:reactions-loading entry-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-entry-data (assoc entry-data :reactions-loading next-reactions-loading)
@@ -1018,11 +1018,14 @@
         (assoc-in db entry-key updated-entry-data))
       (let [reaction (first (keys reaction-data))
             next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
-            reactions-data (:reactions entry-data)
+            reactions-data (or (:reactions entry-data) [])
             reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
+            fixed-reaction-idx (if (and reaction-idx (>= reaction-idx 0))
+                                 reaction-idx
+                                 (count reactions-data))
             updated-entry-data (-> entry-data
                                    (assoc :reactions-loading next-reactions-loading)
-                                   (assoc-in [:reactions reaction-idx] next-reaction-data))]
+                                   (assoc-in [:reactions fixed-reaction-idx] next-reaction-data))]
         (assoc-in db entry-key updated-entry-data)))))
 
 (defn- handle-reaction-to-comment-finish
@@ -1753,29 +1756,16 @@
   (when (and emoji
              (utils/link-for (:links activity-data) "react"))
     (api/react-from-picker activity-data emoji))
-  db)
+   (handle-reaction-to-entry db (:uuid activity-data) {:reaction emoji :count 1 :reacted true :links [] :authors []}))
 
 (defmethod dispatcher/action :react-from-picker/finish
-  [db [_ {:keys [status activity-data reaction-data]}]]
+  [db [_ {:keys [status activity-data reaction reaction-data]}]]
   (api/get-entry activity-data)
   (if (and (>= status 200)
            (< status 300))
-    ;; Update the reactions in the app-state if the api call succeeded
     (let [reaction-key (first (keys reaction-data))
-          reaction (name reaction-key)
-          reaction-data (get reaction-data reaction-key)
-          org-slug (router/current-org-slug)
-          board-slug (:board-slug activity-data)
-          activity-uuid (:uuid activity-data)
-          activity-key (dispatcher/activity-key org-slug board-slug activity-uuid)
-          activity-from-db (get-in db activity-key)
-          reaction-idx (utils/index-of (:reactions activity-from-db) #(= (:reaction %) reaction))
-          new-reaction-data (assoc reaction-data :reaction reaction)
-          old-reactions (or (:reactions activity-from-db) [])
-          updated-reactions (if reaction-idx
-                              (assoc old-reactions reaction-idx new-reaction-data)
-                              (assoc old-reactions (count (:reactions activity-from-db)) new-reaction-data))]
-      (assoc-in db (vec (conj activity-key :reactions)) updated-reactions))
+          reaction (name reaction-key)]
+      (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
     ;; Wait for the entry refresh if it didn't
     db))
 
