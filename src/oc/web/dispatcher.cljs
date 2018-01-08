@@ -71,7 +71,7 @@
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
         ;; if we are coming from all-posts
-        (if (:from-all-posts @router/path)
+        (if (or (:from-all-posts @router/path) (= board-slug "all-posts"))
           ;; We need to update the entry in all-posts data, not in the board data
           (all-posts-key org-slug)
           (board-data-key org-slug board-slug))))

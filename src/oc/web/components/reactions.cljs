@@ -108,6 +108,9 @@
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
                                           :has-reactions (pos? (:count r))})
+                 :on-mouse-leave #(this-as this
+                                   (utils/remove-tooltips)
+                                   (.tooltip (js/$ this)))
                  :title reaction-attribution
                  :data-placement "top"
                  :data-container "body"

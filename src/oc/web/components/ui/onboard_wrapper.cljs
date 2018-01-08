@@ -200,6 +200,36 @@
                           (dis/dispatch! [:user-profile-save]))}
             "That’s me"]]]]))
 
+(defn- setup-team-data
+  ""
+  [s]
+  (let [org-editing @(drv/get-ref s :org-editing)
+        teams-data @(drv/get-ref s :teams-data)
+        teams-load @(drv/get-ref s :teams-load)]
+    (when (and (zero? (count (:name org-editing)))
+               (zero? (count (:logo-url org-editing)))
+               (seq teams-data))
+      (let [first-team (select-keys
+                        (first teams-data)
+                        [:name :logo-url :logo-width :logo-height])]
+        (dis/dispatch!
+         [:input
+          [:org-editing]
+          first-team])
+        (when-not (:logo-height first-team)
+          (let [img (gdom/createDom "img")]
+            (set! (.-onload img)
+             #(do
+               (dis/dispatch!
+                [:input
+                 [:org-editing]
+                 (merge @(drv/get-ref s :org-editing)
+                  {:logo-width (.-width img)
+                   :logo-height (.-height img)})])
+               (gdom/removeNode img)))
+            (gdom/append (.-body js/document) img)
+            (set! (.-src img) (:logo-url first-team))))))))
+
 (rum/defcs lander-team < rum/reactive
                          (drv/drv :teams-load)
                          (drv/drv :teams-data)
@@ -209,11 +239,11 @@
                            (dis/dispatch! [:input [:org-editing :name] ""])
                            s)
                           :did-mount (fn [s]
+                           (setup-team-data s)
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
-                           (let [org-editing @(drv/get-ref s :org-editing)
-                                 teams-data @(drv/get-ref s :teams-data)
+                           (let [teams-data @(drv/get-ref s :teams-data)
                                  teams-load @(drv/get-ref s :teams-load)]
                              ;; Load the list of teams if it's not already
                              (when (and (empty? teams-data)
@@ -221,29 +251,7 @@
                                         (not (:teams-data-requested teams-load)))
                                (dis/dispatch! [:teams-get]))
                              ;; If the team is loaded setup the form
-                             (when (and (nil? (:name org-editing))
-                                        (nil? (:logo-url org-editing))
-                                        (seq teams-data))
-                               (let [first-team (select-keys
-                                                 (first teams-data)
-                                                 [:name :logo-url :logo-width :logo-height])]
-                                 (dis/dispatch!
-                                  [:input
-                                   [:org-editing]
-                                   first-team])
-                                 (when-not (:logo-height first-team)
-                                   (let [img (gdom/createDom "img")]
-                                     (set! (.-onload img)
-                                      #(do
-                                        (dis/dispatch!
-                                         [:input
-                                          [:org-editing]
-                                          (merge @(drv/get-ref s :org-editing)
-                                           {:logo-width (.-width img)
-                                            :logo-height (.-height img)})])
-                                        (gdom/removeNode img)))
-                                     (gdom/append (.-body js/document) img)
-                                     (set! (.-src img) (:logo-url first-team)))))))
+                             (setup-team-data s))
                            s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
@@ -302,11 +310,11 @@
              :on-change #(dis/dispatch! [:input [:org-editing]
                           (merge org-editing {:error nil :name (.. % -target -value)})])}]
           [:button.continue
-            {:class (when (<= (count (clean-org-name (:name org-editing))) 3) "disabled")
+            {:class (when (< (count (clean-org-name (:name org-editing))) 3) "disabled")
              :on-click #(let [org-name (clean-org-name (:name org-editing))]
                           (dis/dispatch! [:input [:org-editing :name] org-name])
                           (if (and (seq org-name)
-                                   (> (count org-name) 3))
+                                   (> (count org-name) 2))
                            ;; Create org and show setup screen
                            (dis/dispatch! [:org-create])
                            (dis/dispatch! [:input [:org-editing :error] true])))}

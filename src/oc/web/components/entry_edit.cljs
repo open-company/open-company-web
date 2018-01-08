@@ -203,9 +203,7 @@
                             js/window
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
-                          (reset! (::autosave-timer s)
-                           (utils/every 5000
-                            #(autosave)))
+                          (reset! (::autosave-timer s) (utils/every 5000 autosave))
                           s)
                          :before-render (fn [s] (calc-entry-edit-modal-height s) s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
