@@ -86,8 +86,9 @@
   (let [new-comment (rum/ref-node s "comment-body")
         comment-text (add-comment-content new-comment)]
     (stop-editing s)
-    (set! (.-innerHTML new-comment) comment-text)
-    (dis/dispatch! [:comment-save c comment-text])))
+    (when (pos? (count comment-text))
+      (set! (.-innerHTML new-comment) comment-text)
+      (dis/dispatch! [:comment-save c comment-text]))))
 
 (defn start-editing [s]
   (dis/dispatch! [:input [:comment-edit] (:uuid (first (:rum/args s)))])
