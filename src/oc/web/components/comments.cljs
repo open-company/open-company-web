@@ -76,8 +76,10 @@
         replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
         cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
         cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
-        final-text (.html (.html (js/$ "<div/>") cleaned-text-1))]
-    (.trim final-text)))
+        final-node (.html (js/$ "<div/>") cleaned-text-1)
+        final-text (.trim (.text final-node))]
+    (when (pos? (count final-text))
+      (.trim (.html final-node)))))
 
 (defn edit-finished
   [e s c]
