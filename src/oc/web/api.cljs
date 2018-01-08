@@ -94,11 +94,11 @@
   (go
    (if-let [refresh-url (j/get-key :refresh-url)]
      (let [res (<! (refresh-jwt refresh-url))]
+       (timbre/debug "jwt-refresh" res)
        (if (:success res)
-         (timbre/debug "jwt-refresh" res)
          (update-jwt-cookie! (:body res))
-         (oc.web.actions.user/logout))
-     (oc.web.actions.user/logout)))))
+         (oc.web.actions.user/logout)))
+     (oc.web.actions.user/logout))))
 
 (defn- method-name [method]
   (cond
