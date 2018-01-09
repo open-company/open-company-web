@@ -501,7 +501,8 @@
                   (if editing
                     [:div.activity-modal-footer.group
                       {:class (when @(::show-bottom-border s) "scrolling-content")}
-                      (when-not (js/isIE)
+                      (when (and (not (js/isIE))
+                                 (not is-mobile?))
                         (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                                        :container-selector "div.activity-modal-content"}))
                       [:div.activity-modal-footer-right
