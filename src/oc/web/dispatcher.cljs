@@ -273,7 +273,10 @@
                                :error (:collect-pswd-error base)})]
    :media-input           [[:base]
                             (fn [base]
-                              (:media-input base))]})
+                              (:media-input base))]
+   :search-active         [[:base] (fn [base] (:search-active base))]
+   :search-results        [[:base] (fn [base] (:search-results base))]})
+
 
 ;; Action Loop =================================================================
 
