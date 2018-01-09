@@ -26,7 +26,8 @@
 (defn refresh-board-data []
   (when-not (router/current-activity-id)
     (utils/after 100 (fn []
-     (when (not= (router/current-board-slug) "all-posts")
+     (if (= (router/current-board-slug) "all-posts")
+       (dis/dispatch! [:all-posts-get])
        (let [board-data (dis/board-data)
              fixed-board-data (or
                                 board-data
