@@ -10,7 +10,8 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.search :refer (search-box)]))
 
 (defn- share-new-tooltip [team-id]
   (if (jwt/team-has-bot? team-id)
@@ -48,13 +49,15 @@
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
-          (when (and (responsive/is-mobile-size?)
-                     mobile-navigation-sidebar))
-          [:div.nav.navbar-nav.navbar-left
-            [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:on-click #(do
-                            (dis/dispatch! [:input [:mobile-menu-open] false])
-                            (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
+          (if (and (responsive/is-mobile-size?)
+                   mobile-navigation-sidebar)
+            [:div.nav.navbar-nav.navbar-left
+              [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+               {:on-click #(do
+                             (dis/dispatch! [:input [:mobile-menu-open] false])
+                             (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
+            [:div.nav.navbar-nav.navbar-left
+             (search-box)])
           [:div.nav.navbar-nav.navbar-center
             (orgs-dropdown)]
           [:ul.nav.navbar-nav.navbar-right

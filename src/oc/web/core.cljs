@@ -10,6 +10,7 @@
             [oc.web.rum-utils :as ru]
             [oc.web.actions]
             [oc.web.stores.user]
+            [oc.web.stores.search]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]

@@ -16,7 +16,7 @@
             [goog.object :as gobj]))
 
 (defn- clean-org-name [org-name]
-  (string/trim org-name [\space \newline]))
+  (string/trim org-name))
 
 (defn- delay-focus-field-with-ref
   "Given a Rum state and a ref, async focus the filed if it exists."
