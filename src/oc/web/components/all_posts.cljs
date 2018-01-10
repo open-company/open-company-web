@@ -289,7 +289,6 @@
                     (and (:loading-more all-posts-data)
                          (not @(:first-render-done s)))
                     @(::scroll-to-entry s)
-                    (router/current-activity-id)
                     (= @(::last-direction s) :up))
             [:div.activities-overlay
               (loading {:loading true})
