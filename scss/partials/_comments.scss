@@ -499,10 +499,16 @@ div.comments {
 
             @include mobile() {
               width: 100%;
+              resize: vertical;
+              height: auto;
             }
 
             &.show-buttons {
               height: 58px;
+
+              @include mobile() {
+                height: auto;
+              }
             }
 
             .emojione {
