@@ -51,11 +51,10 @@
         [:div.oc-navbar-header-container.group
           (if (responsive/is-mobile-size?)
             [:div.nav.navbar-nav.navbar-left
-              (when mobile-navigation-sidebar
-                [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-                  {:on-click #(do
-                                (dis/dispatch! [:input [:mobile-menu-open] false])
-                                (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}])]
+              [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+                {:on-click #(do
+                              (dis/dispatch! [:input [:mobile-menu-open] false])
+                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
             [:div.nav.navbar-nav.navbar-left
              (search-box)])
           [:div.nav.navbar-nav.navbar-center
