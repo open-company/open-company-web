@@ -20,7 +20,7 @@
 
 (defmethod dispatcher/action :search-query/finish
   [db [_ {:keys [success error body]}]]
-  (let [results (vec (sort-by (fn [i] (:created-at i)) (:hits body)))]
+  (let [results (vec (sort-by :created-at (:hits body)))]
     (if success
       (assoc db search-key (cleanup-uuid results))
       db)))
