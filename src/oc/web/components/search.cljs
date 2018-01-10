@@ -26,7 +26,7 @@
       (user-avatar-image {:user-id (first (:author-id result))
                           :name author
                           :avatar-url (first (:author-url result))} false)
-      [:div.name author]
+      [:div.title {:dangerouslySetInnerHTML title}]
       [:div.time-since
        (let [t (or (:published-at result) (:created-at result))]
          [:time
@@ -36,7 +36,6 @@
            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
            :title (utils/activity-date-tooltip result)}
           (utils/time-since t)])]
-      [:div.title {:dangerouslySetInnerHTML title}]
       ]]))
 
 (rum/defcs board-display < rum/static
@@ -53,6 +52,7 @@
                         rum/reactive
                         rum/static
                         (rum/local nil ::window-click)
+                        (rum/local false ::search-clicked?)
                         {:will-mount (fn [s]
                           (reset! (::window-click s)
                             (events/listen
@@ -62,7 +62,9 @@
                                (when (not
                                       (utils/event-inside? e
                                         (sel1 [:div.search-box])))
-                                 (search/inactive))
+                                 (do
+                                   (reset! (::search-clicked? s) false)
+                                   (search/inactive)))
                                e)))
                           s)
                          :will-unmount (fn [s]
@@ -73,30 +75,37 @@
   [s]
   (let [search-results (drv/react s store/search-key)
         search-active? (drv/react s store/search-active?)]
-    [:div.search-box
+    [:div.search-box {:class (when @(::search-clicked? s) "active")}
+      [:button.search-close {:class (when (not @(::search-clicked? s))
+                                      "inactive")
+                             :on-click (fn [e]
+                                         (reset! (::search-clicked? s) false)
+                                         (search/inactive))}]
+      [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")}]
       [:div.search
         {:content-editable true
          :ref "search-input"
-         :placeholder "Search..."
+         :placeholder "Search"
+         :on-click #(reset! (::search-clicked? s) true)
          :on-focus #(let [search-query (.-innerHTML (rum/ref-node s "search-input"))]
                       (search/query search-query))
          :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
          :on-key-up #(search/query
                       (.-innerHTML (rum/ref-node s "search-input")))
          }]
+      [:div.triangle {:class (when (not search-active?) "inactive")}]
       [:div.search-results {:ref "results"
                             :class (when (not search-active?) "inactive")}
-       (when (pos? (count search-results))
-         [:div.header
-          [:span "Results"]
-          [:span.count (str "(" (count search-results) ")")]])
+        [:div.header
+          [:span "SEARCH RESULTS"]
+          (when (pos? (count search-results))
+            [:span.count (str "(" (count search-results) ")")])]
         (if (pos? (count search-results))
           (for [sr search-results]
             (let [key (str "result-" (:uuid (:_source sr)))]
               (case (:type (:_source sr))
                 "entry" (rum/with-key (entry-display sr) key)
                 "board" (rum/with-key (board-display sr) key))))
-         [:div.empty-result
-            [:img {:src (utils/cdn "/img/empty-search-results-spy-glass.png")}]
-            [:div.message "No matching results"]]
+          [:div.empty-result
+            [:div.message "No matching results..."]]
         )]]))

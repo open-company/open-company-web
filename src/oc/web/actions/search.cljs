@@ -5,6 +5,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.api :as api]))
 
+(def old-search (atom ""))
+
 (defn query-finished
   [result]
   (dispatcher/dispatch! [:search-query/finish result]))
@@ -21,9 +23,9 @@
 (defn query
   "Use the search service to query for results."
   [search-query]
-  (timbre/debug search-query)
   (if (> (count search-query) 1)
-    (do
+    (when (not= @old-search search-query)
+      (reset! old-search search-query)
       (active)
       (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
     (reset)))

@@ -1,14 +1,43 @@
 
 div.search-box {
   width: 200px;
-  border-radius: 4px;
-  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+
+  img.spyglass {
+    display: inline;
+    margin: 0px 0px 5px 30px;
+  }
 
   div.search {
+    display: inline-block;
+    margin: 5px 5px 0px 10px;
+    outline: none;
+
     &:empty:before {
       content: attr(placeholder);
       color: rgba($carrot_light_gray_3, 0.4);
       cursor: text;
+    }
+  }
+
+  button.search-close {
+    width: 15px;
+    height: 15px;
+    background-image: cdnUrl("/img/ML/black_close.svg");
+    background-size: 15px;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    opacity: 0.7;
+    border: none;
+    margin: 0px 10px 0px 0px;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    &.inactive {
+      background-image: none;
+      border: none;
+      outline: none;
     }
   }
 }
@@ -17,30 +46,49 @@ div.search-results.inactive {
   display: none;
 }
 
+div.triangle {
+  position: absolute;
+  top: 84px;
+  left: 121px;
+  background-color: white;
+  border-top: 1px solid rgba(177,184,192,0.50);
+  border-left: 1px solid rgba(177,184,192,0.50);
+  transform: rotate(45deg);
+  width: 12px;
+  height: 12px;
+
+  &.inactive {
+    display: none;
+  }
+}
+
 div.search-results {
 
+  border-radius: 5px;
+  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+  margin: 41px 0px 0px 55px;
+  width: 450px;
+  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+
   div.header {
-    background-color: $carrot_light_gray_9;
-    width: 300px;
-    border-radius: 4px;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    background-color: white;
+    font-size: 13px;
+    padding: 15px 0px 0px 15px;
+
     span.count {
-      float: right;
-      margin-right: 20px;
+      margin-left: 5px;
     }
   }
 
   div.search-result {
-    width: 300px;
+    width: 100%;
     background-color: white;
-    border-radius: 4px;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    font-size: 14px;
 
     div.author {
       @include avenir_H();
-      background-color: $carrot_light_gray_9;
-      padding-top: 10px;
-      padding-bottom: 4px;
+
+      padding: 10px 20px 5px 20px;
 
       @include activity-author();
 
@@ -49,17 +97,21 @@ div.search-results {
       }
 
       div.title {
-        font-size: 14px;
-        margin: 0px 50px;
         overflow: hidden;
+      }
+
+      &:hover {
+        background-color: rgba($carrot_text_blue, 0.3);
+        font-color: $carrot_text_blue;
       }
     }
   }
+
   div.empty-result {
-    width: 300px;
+    width: 100%;
     background-color: white;
-    border-radius: 4px;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    padding: 15px;
+    font-size: 14px;
 
     img {
       margin: auto;
@@ -68,7 +120,7 @@ div.search-results {
 
     div.message {
       margin: auto;
-      width: 50%;
+      width: 100%;
     }
   }
 }
