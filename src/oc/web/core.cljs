@@ -9,6 +9,7 @@
             [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
             [oc.web.actions]
+            [oc.web.stores.user]
             [oc.web.stores.search]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
@@ -90,7 +91,25 @@
   (inject-loading))
 
 (defn post-routing []
-  (utils/after 10 #(dis/dispatch! [:initial-loads])))
+  (utils/after 10 (fn []
+    (let [force-refresh (or (utils/in? (:route @router/path) "org")
+                            (utils/in? (:route @router/path) "login"))
+          latest-entry-point (if (or force-refresh
+                                     (nil? (:latest-entry-point @dis/app-state)))
+                               0
+                               (:latest-entry-point @dis/app-state))
+          latest-auth-settings (if (or force-refresh
+                                       (nil? (:latest-auth-settings @dis/app-state)))
+                                 0
+                                 (:latest-auth-settings @dis/app-state))
+          now (.getTime (js/Date.))
+          reload-time (* 60 60 1000)]
+      (when (or (> (- now latest-entry-point) reload-time)
+                (and (router/current-org-slug)
+                     (nil? (dis/org-data))))
+        (api/get-entry-point))
+      (when (> (- now latest-auth-settings) reload-time)
+        (api/get-auth-settings))))))
 
 ;; home
 (defn home-handler [target params]
@@ -572,7 +591,7 @@
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Persist JWT in App State
-  (dis/dispatch! [:jwt (jwt/get-contents)])
+  (oc.web.actions.user/update-jwt (jwt/get-contents))
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ; mount the error banner

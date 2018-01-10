@@ -33,11 +33,6 @@
   (timbre/info "Full event: " (pr-str payload))
   db)
 
-(defmethod dispatcher/action :logout [db _]
-  (cook/remove-cookie! :jwt)
-  (router/redirect! "/")
-  (dissoc db :jwt :latest-entry-point :latest-auth-settings))
-
 (defmethod dispatcher/action :entry-point
   [db [_ {:keys [success collection]}]]
   (let [next-db (assoc db :latest-entry-point (.getTime (js/Date.)))]
@@ -324,18 +319,6 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
-;; Store JWT in App DB so it can be easily accessed in actions etc.
-
-(defmethod dispatcher/action :jwt
-  [db [_ jwt-data]]
-  (let [next-db (if (cook/get-cookie :show-login-overlay)
-                  (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
-                  db)]
-    (when (and (cook/get-cookie :show-login-overlay)
-               (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
-               (not= (cook/get-cookie :show-login-overlay) "collect-password"))
-      (cook/remove-cookie! :show-login-overlay))
-    (assoc next-db :jwt (jwt/get-contents))))
 
 ;; Stripe Payment related actions
 
@@ -344,41 +327,6 @@
   (if uuid
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
-
-(defmethod dispatcher/action :login-overlay-show
- [db [_ show-login-overlay]]
- (cond
-    (= show-login-overlay :login-with-email)
-    (-> db
-      (assoc :show-login-overlay show-login-overlay)
-      (assoc :login-with-email {:email "" :pswd ""})
-      (dissoc :login-with-email-error))
-    (= show-login-overlay :signup-with-email)
-    (-> db
-      (assoc :show-login-overlay show-login-overlay)
-      (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""})
-      (dissoc :signup-with-email-error))
-    :else
-    (assoc db :show-login-overlay show-login-overlay)))
-
-(defmethod dispatcher/action :login-with-slack
-  [db [_]]
-  (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})
-        auth-url-with-redirect (utils/slack-link-with-state
-                                (:href auth-url)
-                                nil
-                                "open-company-auth" oc-urls/slack-lander-check)
-        current-route (:route @router/path)]
-    (when (and (not (utils/in? current-route "login"))
-               (not (utils/in? current-route "sign-up"))
-               (not (utils/in? current-route "slack"))
-               (not (utils/in? current-route "about"))
-               (not (utils/in? current-route "home"))
-               (not (cook/get-cookie :login-redirect)))
-        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    (router/redirect! auth-url-with-redirect))
-  (dissoc db :latest-auth-settings :latest-entry-point))
 
 (defmethod dispatcher/action :bot-auth
   [db [_]]
@@ -391,26 +339,6 @@
         fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (router/get-token))]
     (router/redirect! fixed-auth-url))
   db)
-
-(defmethod dispatcher/action :login-with-email
-  [db [_]]
-  (api/auth-with-email (:email (:login-with-email db)) (:pswd (:login-with-email db)))
-  (dissoc db :login-with-email-error :latest-auth-settings :latest-entry-point))
-
-(defmethod dispatcher/action :login-with-email/failed
-  [db [_ error]]
-  (assoc db :login-with-email-error error))
-
-(defmethod dispatcher/action :login-with-email/success
-  [db [_ jwt]]
-  (if (empty? jwt)
-    (do
-      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
-      db)
-    (do
-      (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-entry-point)
-      (dissoc db :show-login-overlay))))
 
 (defmethod dispatcher/action :auth-with-token
   [db [ _ token-type]]
@@ -1636,22 +1564,6 @@
         new-status-data (merge old-status-data clean-status-data)]
     (timbre/debug "Change status data:" new-status-data)
     (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))
-
-(defmethod dispatcher/action :initial-loads
-  [db [_]]
-  (let [force-refresh (or (utils/in? (:route @router/path) "org")
-                          (utils/in? (:route @router/path) "login"))
-        latest-entry-point (if (or force-refresh (nil? (:latest-entry-point db))) 0 (:latest-entry-point db))
-        latest-auth-settings (if (or force-refresh (nil? (:latest-auth-settings db))) 0 (:latest-auth-settings db))
-        now (.getTime (js/Date.))
-        reload-time (* 60 60 1000)]
-    (when (or (> (- now latest-entry-point) reload-time)
-              (and (router/current-org-slug)
-                   (nil? (dispatcher/org-data db (router/current-org-slug)))))
-      (api/get-entry-point))
-    (when (> (- now latest-auth-settings) reload-time)
-      (api/get-auth-settings)))
-  db)
 
 (defmethod dispatcher/action :nux-end
   [db [_]]

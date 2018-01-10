@@ -18,7 +18,7 @@
         {:on-click #(do
                      (.preventDefault %)
                      (when (:auth-settings @dis/app-state)
-                       (dis/dispatch! [:login-with-slack])))}
+                       (oc.web.actions.user/login-with-slack)))}
         "Sign in with"
         [:div.slack-white-icon]]
       [:div.signin-with-slack-description

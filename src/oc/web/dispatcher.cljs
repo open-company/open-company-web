@@ -332,7 +332,7 @@
     (get-in data (calendar-key org-slug))))
 
 (defn change-data
-  "Get chancge data."
+  "Get change data."
   ([]
     (change-data @app-state))
   ([data]
