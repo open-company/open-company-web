@@ -50,13 +50,12 @@
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
-          (if (and (responsive/is-mobile-size?)
-                   mobile-navigation-sidebar)
+          (if (responsive/is-mobile-size?)
             [:div.nav.navbar-nav.navbar-left
               [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-               {:on-click #(do
-                             (dis/dispatch! [:input [:mobile-menu-open] false])
-                             (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
+                {:on-click #(do
+                              (dis/dispatch! [:input [:mobile-menu-open] false])
+                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
             [:div.nav.navbar-nav.navbar-left
              (when ls/search-enabled? (search-box))])
           [:div.nav.navbar-nav.navbar-center
