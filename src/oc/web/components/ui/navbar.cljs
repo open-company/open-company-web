@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.navbar
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.local_settings :as ls]
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.lib.jwt :as jwt]
@@ -57,7 +58,7 @@
                              (dis/dispatch! [:input [:mobile-menu-open] false])
                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
             [:div.nav.navbar-nav.navbar-left
-             (search-box)])
+             (when ls/search-enabled? (search-box))])
           [:div.nav.navbar-nav.navbar-center
             (orgs-dropdown)]
           [:ul.nav.navbar-nav.navbar-right
