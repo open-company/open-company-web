@@ -42,7 +42,8 @@
 
   (render-state [_ {:keys [columns-num card-width] :as state}]
     (let [org-data (dis/org-data data)
-          all-posts-data (dis/all-posts-data data)]
+          all-posts-data (dis/all-posts-data data)
+          board-data (dis/board-data data)]
       ;; Show loading if
       (if (or ;; the org data are not loaded yet
               (not org-data)
