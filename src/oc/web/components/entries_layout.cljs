@@ -5,11 +5,12 @@
             [cljs-time.core :as time]
             [cljs-time.format :as f]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.urls :as oc-urls]
             [taoensso.timbre :as timbre]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.activity-card :refer (activity-card activity-card-empty)]))
 
@@ -71,7 +72,8 @@
     (let [change-data (drv/react s :change-data)
           board-uuid (:uuid board-data)
           changes (get change-data board-uuid)
-          share-thoughts-uuid (find-share-thoughts-uuid board-data changes)]
+          share-thoughts-uuid (find-share-thoughts-uuid board-data changes)
+          is-mobile? (responsive/is-mobile-size?)]
       ;; Determine what sort of layout this is
       (cond
         ;; :by-topic
@@ -165,7 +167,8 @@
                     ; If the total entries are 3 add a placeholder to avoid taking the full width
                     (when (= (count entries-group) 3)
                       [:div.entry-card.entry-card-placeholder])])])
-            (when (pos? (count entries))
+            (when (and (pos? (count entries))
+                       is-mobile?)
               (all-caught-up))])
         ;; by specific topic
         (string? layout-type)
@@ -204,7 +207,8 @@
                     ; If there is only one entry in this row, but it's not the first add the placheolder
                     (when (= (count entries) 1)
                       [:div.entry-card.entry-card-placeholder]))]))
-            (when (pos? (count sorted-entries))
+            (when (and (pos? (count sorted-entries))
+                       is-mobile?)
               (all-caught-up))])
         ;; :latest layout
         :else
@@ -234,5 +238,6 @@
                   ; div to avoid having the first cover the full width
                   (when (= (count entries) 1)
                     [:div.entry-card.entry-card-placeholder])]))
-            (when (pos? (count entries))
+            (when (and (pos? (count entries))
+                       is-mobile?)
               (all-caught-up))])))])

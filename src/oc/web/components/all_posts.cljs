@@ -301,7 +301,8 @@
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
-        (when @(::show-all-caught-up-message s)
+        (when (and @(::show-all-caught-up-message s)
+                   (responsive/is-mobile-size?))
           (all-caught-up))]
       [:div.all-posts-nav
         ; [:div.all-posts-nav-inner
