@@ -53,14 +53,9 @@
                    (pos? (count (:boards org-data))))
               ;; Board specified
               (and (router/current-board-slug)
-                       ;; But the data are not loaded yet
-                   (or (and (not= (router/current-board-slug) "all-posts")
-                            (not (:ap-initial-at data))
-                            (not board-data))
-                       ;; Or the all-posts data
-                       (and (or (= (router/current-board-slug) "all-posts")
-                                (:ap-initial-at data))
-                            (not all-posts-data))))
+                   ;; But no board/all-posts data yet
+                   (not board-data)
+                   (not all-posts-data))
               ;; First ever user nux, not enough time
               (and (:nux-loading data)
                    (not (:nux-end data))))
