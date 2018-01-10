@@ -109,6 +109,8 @@
       (or (= (router/current-board-slug) "all-posts")
           (:ap-initial-at db))
       (if (utils/link-for (:links org-data) "activity")
+        ;; Load all posts only if not coming from a digest url
+        ;; in that case do not load since we already have the results we need
         (api/get-all-posts org-data (utils/link-for (:links org-data) "activity") {:from (:ap-initial-at db)})
         (do
           ;; Remove the last board cookie to avoid falling in the all-posts 404 again
@@ -1426,6 +1428,12 @@
 (defmethod dispatcher/action :board-edit/dismiss
   [db [_]]
   (dissoc db :board-editing))
+
+(defmethod dispatcher/action :all-posts-reset
+ [db [_]]
+ (let [org (router/current-org-slug)
+       all-posts-key (dispatcher/all-posts-key org)]
+  (assoc-in db all-posts-key nil)))
 
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
