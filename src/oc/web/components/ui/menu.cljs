@@ -6,14 +6,10 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as user-actions]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]))
-
-(defn logout-click [e]
-  (utils/event-stop e)
-  (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
-  (dis/dispatch! [:logout]))
 
 (defn boards-click [e]
   (utils/event-stop e)
@@ -46,7 +42,7 @@
 (defn sign-in-sign-up-click [e]
   (dis/dispatch! [:mobile-menu-toggle])
   (.preventDefault e)
-  (dis/dispatch! [:login-overlay-show :login-with-slack]))
+  (user-actions/show-login :login-with-slack))
 
 (defn list-boards-click [e]
   (dis/dispatch! [:mobile-menu-toggle])
@@ -104,6 +100,6 @@
           [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
       (if (jwt/jwt)
         [:div.oc-menu-item
-          [:a.sign-out {:href oc-urls/logout :on-click logout-click} "Sign Out"]]
+          [:a.sign-out {:href oc-urls/logout :on-click user-actions/logout-click} "Sign Out"]]
         [:div.oc-menu-item
           [:a {:href "" :on-click sign-in-sign-up-click} "Sign In / Sign Up"]])]))

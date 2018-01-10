@@ -41,10 +41,7 @@
     (refresh-board-data))
 
   (render-state [_ {:keys [columns-num card-width] :as state}]
-    (let [org-slug (keyword (router/current-org-slug))
-          org-data (dis/org-data data)
-          board-slug (keyword (router/current-board-slug))
-          board-data (dis/board-data data)
+    (let [org-data (dis/org-data data)
           all-posts-data (dis/all-posts-data data)]
       ;; Show loading if
       (if (or ;; the org data are not loaded yet
