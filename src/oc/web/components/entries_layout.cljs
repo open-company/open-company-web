@@ -10,6 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.urls :as oc-urls]
             [taoensso.timbre :as timbre]
+            [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.activity-card :refer (activity-card activity-card-empty)]))
 
 (defn new?
@@ -227,4 +228,5 @@
 
                   ; div to avoid having the first cover the full width
                   (when (= (count entries) 1)
-                    [:div.entry-card.entry-card-placeholder])]))])))])
+                    [:div.entry-card.entry-card-placeholder])]))
+            (all-caught-up)])))])
