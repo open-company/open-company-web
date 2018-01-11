@@ -34,11 +34,11 @@
 ;; Login
 
 (defn login-with-email-finish
-  [success body status]
+  [user-email success body status]
   (if success
     (do
       (if (empty? body)
-        (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email @dis/app-state)))))
+        (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
           (cook/set-cookie! :jwt body (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
           (api/get-entry-point)))
@@ -50,12 +50,11 @@
      (dis/dispatch! [:login-with-email/failed 500]))))
 
 (defn login-with-email [email pswd]
-  (api/auth-with-email email pswd login-with-email-finish)
+  (api/auth-with-email email pswd (partial login-with-email-finish email))
   (dis/dispatch! [:login-with-email]))
 
-(defn login-with-slack []
+(defn login-with-slack [auth-url]
   (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:auth-settings @dis/app-state)) "authenticate" "GET" {:auth-source "slack"})
         auth-url-with-redirect (utils/slack-link-with-state
                                  (:href auth-url)
                                  nil
@@ -76,32 +75,28 @@
 
 ;; Auth
 
-(defn bot-auth []
+(defn bot-auth [org-data team-data user-data]
   (let [current (router/get-token)
-        org-data (dis/org-data db)
-        team-id (:team-id org-data)
-        team-data (dis/team-data team-id)
         auth-link (utils/link-for (:links team-data) "bot")
-        user-data (:current-user-data db)
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (router/get-token))]
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:id team-data) (router/get-token))]
     (router/redirect! fixed-auth-url)))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))
 
-(defn auth-with-token-success [jwt]
+(defn auth-with-token-success [token-type jwt]
   (api/get-entry-point)
   (api/get-auth-settings)
-  (when (= (:auth-with-token-type @dis/app-state) :password-reset)
+  (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))
 
 (defn auth-with-token-callback
-  [success status body]
+  [token-type success status body]
   (if success
     (do
       (update-jwt body)
-      (auth-with-token-success body))
+      (auth-with-token-success token-type body))
     (cond
       (= status 401)
       (auth-with-token-failed 401)
@@ -109,7 +104,7 @@
       (auth-with-token-failed 500))))
 
 (defn auth-with-token [token-type]
-  (api/auth-with-token (:token (:query-params @router/path)) auth-with-token-callback)
+  (api/auth-with-token (:token (:query-params @router/path)) (partial auth-with-token-callback token-type))
   (dis/dispatch! [:auth-with-token token-type]))
 
 ;; Signup
@@ -118,10 +113,10 @@
   (dis/dispatch! [:signup-with-email/failed status]))
 
 (defn signup-with-email-success
-  [status jwt]
+  [user-email status jwt]
   (cond
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
-    (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email @dis/app-state)))))
+    (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
     (= status 200) ;; Valid login, not signup, redirect to home
     (if (or
           (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
@@ -144,22 +139,22 @@
       (dis/dispatch! [:signup-with-email/success]))))
 
 (defn signup-with-email-callback
-  [success body status]
+  [user-email success body status]
   (if success
-    (signup-with-email-success status body)
+    (signup-with-email-success user-email status body)
     (signup-with-email-failed status)))
 
-(defn signup-with-email []
+(defn signup-with-email [signup-data]
   (api/signup-with-email
-   (or (:firstname (:signup-with-email @dis/app-state)) "")
-   (or (:lastname (:signup-with-email @dis/app-state)) "")
-   (:email (:signup-with-email @dis/app-state))
-   (:pswd (:signup-with-email @dis/app-state))
-   signup-with-email-callback)
+   (or (:firstname signup-data) "")
+   (or (:lastname signup-data) "")
+   (:email signup-data)
+   (:pswd signup-data)
+   (partial signup-with-email-callback (:email signup-data)))
   (dis/dispatch! [:signup-with-email]))
 
-(defn signup-with-email-data [signup-data]
-  (dis/dispatch! [:input [:signup-with-email] signup-data]))
+(defn signup-with-email-reset-errors []
+  (dis/dispatch! [:input [:signup-with-email] {}]))
 
 ;; Debug
 

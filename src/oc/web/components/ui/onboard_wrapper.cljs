@@ -30,18 +30,17 @@
 (rum/defcs lander < rum/static
                     rum/reactive
                     (drv/drv user-store/signup-with-email)
+                    (drv/drv :auth-settings)
                     (rum/local false ::email-error)
                     (rum/local false ::password-error)
+                    (rum/local "" ::email)
+                    (rum/local "" ::pswd)
                     {:will-mount (fn [s]
-                      (let [signup-with-email @(drv/get-ref s user-store/signup-with-email)]
-                        (when-not (contains? signup-with-email :email)
-                          (user-actions/signup-with-email-data {:email ""
-                                                                :pswd ""
-                                                                :first-name ""
-                                                                :last-name ""})))
+                      (user-actions/signup-with-email-reset-errors)
                       s)}
   [s]
-  (let [signup-with-email (drv/react s user-store/signup-with-email)]
+  (let [signup-with-email (drv/react s user-store/signup-with-email)
+        auth-settings (drv/react s :auth-settings)]
     [:div.onboard-lander.lander
       [:div.main-cta
         [:div.title.main-lander
@@ -50,8 +49,9 @@
         [:button.mlb-reset.signup-with-slack
           {:on-click #(do
                        (.preventDefault %)
-                       (when (:auth-settings @dis/app-state)
-                         (oc.web.actions.user/login-with-slack)))}
+                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                             {:auth-source "slack"})]
+                         (user-actions/login-with-slack auth-link)))}
           [:div.signup-with-slack-content
             "Sign Up with "
             [:div.slack-blue-icon]]]
@@ -73,11 +73,11 @@
             {:type "email"
              :class (when (= (:error signup-with-email) 409) "error")
              :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
-             :value (:email signup-with-email)
+             :value @(::email s)
              :on-change #(let [v (.. % -target -value)]
                            (reset! (::password-error s) false)
                            (reset! (::email-error s) false)
-                           (user-actions/signup-with-email-data (assoc signup-with-email :email v)))}]
+                           (reset! (::email s) v))}]
           [:div.field-label
             "Password"
             (when @(::password-error s)
@@ -86,12 +86,12 @@
           [:input.field
             {:type "password"
              :pattern ".{8,}"
-             :value (:pswd signup-with-email)
+             :value @(::pswd s)
              :placeholder "Minimum 8 characters"
              :on-change #(let [v (.. % -target -value)]
                            (reset! (::password-error s) false)
                            (reset! (::email-error s) false)
-                           (user-actions/signup-with-email-data (assoc signup-with-email :pswd v)))}]
+                           (reset! (::pswd s) v))}]
           [:div.field-description
             "By signing up you are agreeing to our "
             [:a
@@ -103,17 +103,17 @@
               "privacy policy"]
             "."]
           [:button.continue
-            {:class (when (or (not (utils/valid-email? (:email signup-with-email)))
-                              (<= (count (:pswd signup-with-email)) 7))
+            {:class (when (or (not (utils/valid-email? @(::email s)))
+                              (<= (count @(::pswd s)) 7))
                       "disabled")
-             :on-click #(if (or (not (utils/valid-email? (:email signup-with-email)))
-                                (<= (count (:pswd signup-with-email)) 7))
+             :on-click #(if (or (not (utils/valid-email? @(::email s)))
+                                (<= (count @(::pswd s)) 7))
                           (do
-                            (when (not (utils/valid-email? (:email signup-with-email)))
+                            (when (not (utils/valid-email? @(::email s)))
                               (reset! (::email-error s) true))
-                            (when (<= (count (:pswd signup-with-email)) 7)
+                            (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))
-                          (user-actions/signup-with-email))}
+                          (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
             "Continue"]]
         [:div.footer-link
           "Already have an account?"

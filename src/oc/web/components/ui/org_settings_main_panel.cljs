@@ -47,6 +47,7 @@
 (rum/defcs org-settings-main-panel
   < rum/reactive
     (rum/local false ::saving)
+    (drv/drv :org-data)
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
     (drv/drv :current-user-data)
@@ -158,7 +159,7 @@
                   (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
                     (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
                       [:button.org-settings-list-item-btn.btn-reset
-                        {:on-click #(user-actions/bot-auth)
+                        {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
                          :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
                          :data-toggle "tooltip"
                          :data-placement "top"
