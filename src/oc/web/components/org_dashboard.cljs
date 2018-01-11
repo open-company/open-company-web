@@ -57,15 +57,14 @@
               ;; First ever user nux, not enough time
               (and (:nux-loading data)
                    (not (:nux-end data))))
-        (dom/div {:class (utils/class-set {:org-dashboard true
-                                           :main-scroll true})}
+        (dom/div {:class "org-dashboard"}
           (loading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
-                                           :main-scroll true
-                                           :no-scroll (router/current-activity-id)})}
+                                           :no-scroll (and (not (responsive/is-mobile-size?))
+                                                           (router/current-activity-id))})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
             (some #{(:nux data)} [:1 :7])
@@ -110,11 +109,10 @@
           (when (and (:media-input data)
                      (:media-chart (:media-input data)))
             (media-chart-modal))
-          (dom/div {:class "page"}
-            ;; Navbar
-            (when-not (and (responsive/is-tablet-or-mobile?)
+          (when-not (and (responsive/is-tablet-or-mobile?)
                            (router/current-activity-id))
-              (navbar))
-            (dom/div {:class "dashboard-container"}
-              (dom/div {:class "topic-list"}
-                (dashboard-layout)))))))))
+            (dom/div {:class "page"}
+              (navbar)
+              (dom/div {:class "dashboard-container"}
+                (dom/div {:class "topic-list"}
+                  (dashboard-layout))))))))))
