@@ -89,7 +89,6 @@
   (method refresh-url (complete-params headers))))
 
 (defn- update-jwt-cookie! [jwt]
-  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
   (oc.web.actions.user/update-jwt jwt))
 
 (defn- jwt-refresh [success-cb error-cb]
@@ -392,8 +391,8 @@
            (if (= status 422)
               (dispatcher/dispatch! [:user-profile-update/failed])
              (when success
-                (utils/after 1000 oc.web.actions.user/jwt-refresh)
-                (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
+               (utils/after 1000 oc.web.actions.user/jwt-refresh)
+               (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn collect-name-password [firstname lastname pswd]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]

@@ -23,9 +23,13 @@
 
 ;; JWT
 
+(defn update-jwt-cookie [jwt]
+  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+
 (defn update-jwt [jwt]
   (timbre/info jwt)
   (when jwt
+    (update-jwt-cookie jwt)
     (utils/after 1 #(dis/dispatch! [:jwt jwt]))))
 
 (defn jwt-refresh []
@@ -42,7 +46,7 @@
       (if (empty? body)
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
-          (cook/set-cookie! :jwt body (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+          (update-jwt-cookie body)
           (api/get-entry-point)))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
@@ -131,7 +135,7 @@
         (dis/dispatch! [:input [:email-lander-check-team-redirect] true])))
     :else ;; Valid signup let's collect user data
     (do
-      (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+      (update-jwt-cookie jwt)
       (cook/set-cookie!
        (router/show-nux-cookie (jwt/user-id))
        (:new-user router/nux-cookie-values)
