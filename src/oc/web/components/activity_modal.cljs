@@ -256,7 +256,8 @@
                             (rum/local false ::edited-data-loaded)
                             (rum/local nil ::autosave-timer)
                             ;; Mixins
-                            mixins/no-scroll-mixin
+                            (when-not (responsive/is-mobile-size?)
+                              mixins/no-scroll-mixin)
                             mixins/first-render-mixin
 
                             {:before-render (fn [s]
