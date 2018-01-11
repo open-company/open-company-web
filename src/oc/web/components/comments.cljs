@@ -243,6 +243,11 @@
     (when (not= next-add-bt-disabled @(::add-button-disabled s))
       (reset! (::add-button-disabled s) next-add-bt-disabled))))
 
+(defn editable-input-change [s editable event]
+  (utils/after 10
+    #(dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))]))
+  (enable-add-comment? s))
+
 (rum/defcs add-comment < rum/reactive
                          rum/static
                          ;; Mixins
@@ -264,20 +269,24 @@
                              (reset! (::medium-editor s) medium-editor)
                              (.subscribe medium-editor
                               "editableInput"
-                              #(enable-add-comment? s))
+                              (partial editable-input-change s))
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
                                (fn [e]
-                                (enable-add-comment? s)
-                                (dis/dispatch! [:input [:add-comment-focus] true])
-                                (reset! (::show-buttons s) true))))
+                                 (enable-add-comment? s)
+                                 (dis/dispatch! [:input [:add-comment-focus] true])
+                                 (reset! (::show-buttons s) true)
+                                 (utils/after 10
+                                  #(dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))])))))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
                                (fn [e]
-                                (enable-add-comment? s)
-                                (when (zero? (count (.-innerText add-comment-node)))
-                                  (dis/dispatch! [:input [:add-comment-focus] false])
-                                  (reset! (::show-buttons s) false)))))
+                                 (enable-add-comment? s)
+                                 (when (zero? (count (.-innerText add-comment-node)))
+                                   (dis/dispatch! [:input [:add-comment-focus] false])
+                                   (reset! (::show-buttons s) false))
+                                 (utils/after 10
+                                  #(dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))])))))
                              (reset! (::esc-key-listener s)
                                (events/listen
                                 js/window
@@ -285,13 +294,14 @@
                                 #(when (and (= (.-key %) "Escape")
                                             (= (.-activeElement js/document) add-comment-node))
                                    (.blur add-comment-node)))))
+                            (dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))])
                            s)
                           :will-unmount (fn [s]
                            (when @(::medium-editor s)
                              (.unsubscribe
                               @(::medium-editor s)
                               "editableInput"
-                              #(enable-add-comment? s))
+                              (partial editable-input-change s))
                              (.destroy @(::medium-editor s))
                              (reset! (::medium-editor s) nil))
                            (when @(::esc-key-listener s)
@@ -370,6 +380,7 @@
 (rum/defcs comments < (drv/drv :activity-comments-data)
                       (drv/drv :comment-add-finish)
                       (drv/drv :add-comment-focus)
+                      (drv/drv :add-comment-height)
                       rum/reactive
                       rum/static
                       (rum/local false ::comments-requested)
@@ -402,10 +413,7 @@
                         s)}
   [s activity-data]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
-        plain-sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
-        sorted-comments (if is-mobile?
-                          (reverse plain-sorted-comments)
-                          plain-sorted-comments)
+        sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
         add-comment-focus (drv/react s :add-comment-focus)
         show-loading (show-loading? s)]
     (if show-loading
@@ -418,10 +426,10 @@
         [:div.top-gradient.top-right]
         [:div.comments-internal
           {:class (utils/class-set {:add-comment-focus add-comment-focus
-                                    :empty (zero? (count sorted-comments))})}
+                                    :empty (zero? (count sorted-comments))})
+           :style (when is-mobile?
+                    {:padding-bottom (str (drv/react s :add-comment-height) "px")})}
           [:div.vertical-line]
-          (when is-mobile?
-            (add-comment activity-data))
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
              {:ref "comments-internal-scroll"
@@ -442,5 +450,4 @@
             [:div.comments-internal-empty
               [:div.no-comments-placeholder]
               [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]])
-          (when-not is-mobile?
-            (add-comment activity-data))]])))
+          (add-comment activity-data)]])))

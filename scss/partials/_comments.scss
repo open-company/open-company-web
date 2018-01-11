@@ -7,7 +7,7 @@ div.comments {
   height: 100%;
 
   @include mobile() {
-    margin: 32px auto 80px;
+    margin: 32px auto;
     height: auto;
   }
 
@@ -394,7 +394,9 @@ div.comments {
 
       @include mobile() {
         padding: 0px;
-        width: 100%;
+        width: calc(100% - 64px);
+        position: fixed;
+        bottom: 0px;
       }
 
       div.add-comment-label {
@@ -404,6 +406,10 @@ div.comments {
         line-height: 14px;
         margin-bottom: 8px;
         color: $carrot_light_gray_3;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       &:before {
