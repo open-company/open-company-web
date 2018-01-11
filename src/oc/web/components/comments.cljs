@@ -243,9 +243,12 @@
     (when (not= next-add-bt-disabled @(::add-button-disabled s))
       (reset! (::add-button-disabled s) next-add-bt-disabled))))
 
+(defn- save-add-comment-height
+  [s]
+  (dis/dispatch! [:input [:add-comment-height] (+ (.height (js/$ (rum/dom-node s))) 16)]))
+
 (defn editable-input-change [s editable event]
-  (utils/after 10
-    #(dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))]))
+  (utils/after 10 save-add-comment-height)
   (enable-add-comment? s))
 
 (rum/defcs add-comment < rum/reactive
@@ -276,8 +279,7 @@
                                  (enable-add-comment? s)
                                  (dis/dispatch! [:input [:add-comment-focus] true])
                                  (reset! (::show-buttons s) true)
-                                 (utils/after 10
-                                  #(dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))])))))
+                                 (utils/after 10 save-add-comment-height))))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
                                (fn [e]
@@ -285,8 +287,7 @@
                                  (when (zero? (count (.-innerText add-comment-node)))
                                    (dis/dispatch! [:input [:add-comment-focus] false])
                                    (reset! (::show-buttons s) false))
-                                 (utils/after 10
-                                  #(dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))])))))
+                                 (utils/after 10 save-add-comment-height))))
                              (reset! (::esc-key-listener s)
                                (events/listen
                                 js/window
@@ -294,7 +295,7 @@
                                 #(when (and (= (.-key %) "Escape")
                                             (= (.-activeElement js/document) add-comment-node))
                                    (.blur add-comment-node)))))
-                            (dis/dispatch! [:input [:add-comment-height] (.height (js/$ (rum/dom-node s)))])
+                            (save-add-comment-height s)
                            s)
                           :will-unmount (fn [s]
                            (when @(::medium-editor s)

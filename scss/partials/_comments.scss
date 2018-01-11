@@ -395,9 +395,9 @@ div.comments {
       width: 316px;
 
       @include mobile() {
-        padding: 0px;
-        width: calc(100% - 64px);
-        position: fixed;
+        padding: 16px 0px 0px;
+        width: 100%;
+        position: absolute;
         bottom: 0px;
       }
 
