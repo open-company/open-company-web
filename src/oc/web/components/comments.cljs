@@ -74,12 +74,12 @@
   (let [inner-html (.-innerHTML add-comment-div)
         with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
         replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
-        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
-        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
+        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "")
+        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "\n")
         final-node (.html (js/$ "<div/>") cleaned-text-1)
         final-text (.trim (.text final-node))]
     (when (pos? (count final-text))
-      (.trim (.html final-node)))))
+      (string/trim (.html final-node)))))
 
 (defn edit-finished
   [e s c]
@@ -193,7 +193,7 @@
           [:div.comment-timestamp
             (utils/time-since (:created-at c))]]
         [:div.comment-body-container
-          [:p.comment-body.group
+          [:div.comment-body.group
            {:ref "comment-body"
             :class (utils/class-set {:editable can-edit?
                                      :is-owner is-owner?
@@ -333,7 +333,7 @@
                               (reset! (::show-buttons s) false)
                               (dis/dispatch! [:input [:add-comment-focus] false])
                               (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
-                              (set! (.-innerHTML add-comment-div) ""))
+                              (set! (.-innerHTML add-comment-div) "<p><br/></p>"))
                  :disabled @(::add-button-disabled s)}
                 "Add"]]])]
        (when (and (not (js/isIE))

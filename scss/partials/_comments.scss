@@ -258,7 +258,7 @@ div.comments {
         &.single-emoji {
           div.comment-body-container {
             height: 50px;
-            p.comment-body {
+            div.comment-body {
               background-color: transparent;
               font-size: 50px;
               padding: 0px;
@@ -277,7 +277,7 @@ div.comments {
         div.comment-body-container {
           margin-top: 4px;
 
-          p.comment-body {
+          div.comment-body {
             @include avenir_M();
             font-size: 13px;
             color: rgba(78,90,107,0.8);
