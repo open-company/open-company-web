@@ -29,7 +29,9 @@
     (utils/after 1 #(dis/dispatch! [:jwt jwt]))))
 
 (defn jwt-refresh []
-  (api/jwt-refresh update-jwt logout))
+  (api/jwt-refresh (fn[jbody]
+                     (cook/set-cookie! :jwt jbody (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+                     update-jwt(jbody)) logout))
 
 ;; Login
 
