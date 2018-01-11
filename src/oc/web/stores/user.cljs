@@ -74,18 +74,6 @@
 
 ;; Auth actions
 
-(defmethod dispatcher/action :bot-auth
-  [db [_]]
-  (let [current (router/get-token)
-        org-data (dispatcher/org-data db)
-        team-id (:team-id org-data)
-        team-data (dispatcher/team-data team-id)
-        auth-link (utils/link-for (:links team-data) "bot")
-        user-data (:current-user-data db)
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (router/get-token))]
-    (router/redirect! fixed-auth-url))
-  db)
-
 (defmethod dispatcher/action :auth-with-token
   [db [ _ token-type]]
   (-> db

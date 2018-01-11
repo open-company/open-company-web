@@ -77,7 +77,14 @@
 ;; Auth
 
 (defn bot-auth []
-  (dis/dispatch! [:bot-auth]))
+  (let [current (router/get-token)
+        org-data (dis/org-data db)
+        team-id (:team-id org-data)
+        team-data (dis/team-data team-id)
+        auth-link (utils/link-for (:links team-data) "bot")
+        user-data (:current-user-data db)
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (router/get-token))]
+    (router/redirect! fixed-auth-url)))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))
@@ -151,8 +158,8 @@
    signup-with-email-callback)
   (dis/dispatch! [:signup-with-email]))
 
-(defn signup-with-email-data [signup-with-email-data]
-  (dis/dispatch! [:input [:signup-with-email] signup-with-email-data]))
+(defn signup-with-email-data [signup-data]
+  (dis/dispatch! [:input [:signup-with-email] signup-data]))
 
 ;; Debug
 
