@@ -28,18 +28,18 @@
      (.focus field))))
 
 (rum/defcs lander < rum/static
-                          rum/reactive
-                          (drv/drv user-store/signup-with-email)
-                          (rum/local false ::email-error)
-                          (rum/local false ::password-error)
-                          {:will-mount (fn [s]
-                            (let [signup-with-email @(drv/get-ref s user-store/signup-with-email)]
-                              (when-not (contains? signup-with-email :email)
-                                (user-actions/signup-with-email-data {:email ""
-                                                                      :pswd ""
-                                                                      :first-name ""
-                                                                      :last-name ""})))
-                            s)}
+                    rum/reactive
+                    (drv/drv user-store/signup-with-email)
+                    (rum/local false ::email-error)
+                    (rum/local false ::password-error)
+                    {:will-mount (fn [s]
+                      (let [signup-with-email @(drv/get-ref s user-store/signup-with-email)]
+                        (when-not (contains? signup-with-email :email)
+                          (user-actions/signup-with-email-data {:email ""
+                                                                :pswd ""
+                                                                :first-name ""
+                                                                :last-name ""})))
+                      s)}
   [s]
   (let [signup-with-email (drv/react s user-store/signup-with-email)]
     [:div.onboard-lander.lander
