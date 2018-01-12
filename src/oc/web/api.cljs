@@ -137,15 +137,14 @@
         (when (and (j/jwt)
                    (= status 401))
           (router/redirect! oc-urls/logout))
-        ; report all 5xx to sentry
+        ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
-                  (and (>= status 500) (<= status 599))
+                  (and (>= status 500) (<= status 599)))
+          (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
+        ; report all 5xx to sentry
+        (when (or (and (>= status 500) (<= status 599))
                   (= status 400)
                   (= status 422))
-          ; If it was a 5xx or a 0 show a banner for network issues
-          (when (or (zero? status)
-                    (and (>= status 500) (<= status 599)))
-            (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
           (let [report {:response response
                         :path path
                         :method (method-name method)
