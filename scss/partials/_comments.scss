@@ -397,8 +397,7 @@ div.comments {
       @include mobile() {
         padding: 16px 0px 0px;
         width: 100%;
-        position: absolute;
-        bottom: 0px;
+        position: relative;
       }
 
       div.add-comment-label {

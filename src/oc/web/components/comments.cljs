@@ -243,12 +243,7 @@
     (when (not= next-add-bt-disabled @(::add-button-disabled s))
       (reset! (::add-button-disabled s) next-add-bt-disabled))))
 
-(defn- save-add-comment-height
-  [s]
-  (dis/dispatch! [:input [:add-comment-height] (+ (.height (js/$ (rum/dom-node s))) 16)]))
-
 (defn editable-input-change [s editable event]
-  (utils/after 10 save-add-comment-height)
   (enable-add-comment? s))
 
 (rum/defcs add-comment < rum/reactive
@@ -278,16 +273,14 @@
                                (fn [e]
                                  (enable-add-comment? s)
                                  (dis/dispatch! [:input [:add-comment-focus] true])
-                                 (reset! (::show-buttons s) true)
-                                 (utils/after 10 save-add-comment-height))))
+                                 (reset! (::show-buttons s) true))))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
                                (fn [e]
                                  (enable-add-comment? s)
                                  (when (zero? (count (.-innerText add-comment-node)))
                                    (dis/dispatch! [:input [:add-comment-focus] false])
-                                   (reset! (::show-buttons s) false))
-                                 (utils/after 10 save-add-comment-height))))
+                                   (reset! (::show-buttons s) false)))))
                              (reset! (::esc-key-listener s)
                                (events/listen
                                 js/window
@@ -295,7 +288,6 @@
                                 #(when (and (= (.-key %) "Escape")
                                             (= (.-activeElement js/document) add-comment-node))
                                    (.blur add-comment-node)))))
-                            (save-add-comment-height s)
                            s)
                           :will-unmount (fn [s]
                            (when @(::medium-editor s)
@@ -361,7 +353,9 @@
     (when (and comments-internal-scroll
                (or force-scroll
                    @(::scroll-bottom-after-render s)))
-      (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll)))))
+      (if (responsive/is-mobile-size?)
+        (set! (.-scrollTop (.-body js/document)) (.-scrollHeight (.-body js/document)))
+        (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll))))))
 
 (defn load-comments-if-needed [s]
   (let [activity-data (first (:rum/args s))]
@@ -381,7 +375,6 @@
 (rum/defcs comments < (drv/drv :activity-comments-data)
                       (drv/drv :comment-add-finish)
                       (drv/drv :add-comment-focus)
-                      (drv/drv :add-comment-height)
                       rum/reactive
                       rum/static
                       (rum/local false ::comments-requested)
@@ -397,7 +390,8 @@
                        :did-remount (fn [o s]
                         (load-comments-if-needed s)
                         (when @(drv/get-ref s :comment-add-finish)
-                          (reset! (::scroll-bottom-after-render s) true))
+                          (reset! (::scroll-bottom-after-render s) true)
+                          (utils/after 500 #(scroll-to-bottom s true)))
                         (let [add-comment-focus @(drv/get-ref s :add-comment-focus)
                               scrolled-on-add-focus (::scrolled-on-add-focus s)]
                           (when (and (not @scrolled-on-add-focus)
@@ -427,9 +421,7 @@
         [:div.top-gradient.top-right]
         [:div.comments-internal
           {:class (utils/class-set {:add-comment-focus add-comment-focus
-                                    :empty (zero? (count sorted-comments))})
-           :style (when is-mobile?
-                    {:padding-bottom (str (drv/react s :add-comment-height) "px")})}
+                                    :empty (zero? (count sorted-comments))})}
           [:div.vertical-line]
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
