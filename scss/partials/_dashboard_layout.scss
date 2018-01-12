@@ -165,10 +165,6 @@ div.dashboard-layout {
           position: relative;
           float: right;
 
-          @include mobile() {
-            display: none;
-          }
-
           button.add-to-board-top-button {
             width: 143px;
             height: 42px;
@@ -251,11 +247,6 @@ div.dashboard-layout {
         z-index: 1000;
         box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
         opacity: 1;
-
-        // Remove to show settings button on mobile
-        @include mobile() {
-          display: none;
-        }
 
         &:hover, &.active {
           background-color: #FF7C6C;
