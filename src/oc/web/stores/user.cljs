@@ -19,17 +19,13 @@
 
 ;; Store JWT in App DB so it can be easily accessed in actions etc.
 (defmethod dispatcher/action :jwt
-  [db [_ jwt-data]]
-  (timbre/debug jwt-data)
-  (let [next-db (if (cook/get-cookie :show-login-overlay)
+  [db [_]]
+  (let [jwt-data (j/get-contents)
+        next-db (if (cook/get-cookie :show-login-overlay)
                   (assoc db show-login-overlay-key (keyword (cook/get-cookie :show-login-overlay)))
                   db)]
-    (when (and (cook/get-cookie :show-login-overlay)
-               (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
-               (not= (cook/get-cookie :show-login-overlay) "collect-password"))
-      (cook/remove-cookie! :show-login-overlay))
-    (assoc next-db :jwt (j/get-contents))))
-
+    (timbre/debug jwt-data)
+    (assoc next-db :jwt jwt-data)))
 
 ;; Login actions
 

@@ -9,6 +9,7 @@
             [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
             [oc.web.actions]
+            [oc.web.actions.user :as user-actions]
             [oc.web.stores.user]
             [oc.web.stores.search]
             [oc.web.api :as api]
@@ -84,7 +85,7 @@
   (when (and (contains? query-params :jwt)
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
-    (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+    (user-actions/update-jwt (:jwt query-params)))
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url))
@@ -591,7 +592,7 @@
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Persist JWT in App State
-  (oc.web.actions.user/update-jwt (jwt/get-contents))
+  (user-actions/dispatch-jwt)
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ; mount the error banner
