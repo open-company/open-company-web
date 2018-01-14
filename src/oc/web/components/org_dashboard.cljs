@@ -42,7 +42,8 @@
 
   (render-state [_ {:keys [columns-num card-width] :as state}]
     (let [org-data (dis/org-data data)
-          all-posts-data (dis/all-posts-data data)]
+          all-posts-data (dis/all-posts-data data)
+          board-data (dis/board-data data)]
       ;; Show loading if
       (if (or ;; the org data are not loaded yet
               (not org-data)
@@ -52,8 +53,9 @@
                    (pos? (count (:boards org-data))))
               ;; Board specified
               (and (router/current-board-slug)
-                   (and (= (router/current-board-slug) "all-posts")
-                        (not all-posts-data)))
+                   ;; But no board/all-posts data yet
+                   (not board-data)
+                   (not all-posts-data))
               ;; First ever user nux, not enough time
               (and (:nux-loading data)
                    (not (:nux-end data))))

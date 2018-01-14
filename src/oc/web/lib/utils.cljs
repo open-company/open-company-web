@@ -540,7 +540,7 @@
 (defn scroll-to-y [scroll-y & [duration]]
   (.play
     (new Scroll
-         (.-body js/document)
+         (.-scrollingElement js/document)
          #js [0 (.-scrollTop (.-body js/document))]
          #js [0 scroll-y]
          (if (integer? duration) duration oc-animation-duration))))
