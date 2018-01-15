@@ -225,7 +225,7 @@ div.entry-edit-modal-container {
         margin-left: -22px;
 
         @include mobile() {
-          height: calc(100vh - 64px - 59px - 72px - 72px - 1px);
+          min-height: calc(100vh - 64px - 59px - 72px - 72px - 1px);
           max-height: initial;
           margin-left: 0px;
           padding: 24px 16px;
