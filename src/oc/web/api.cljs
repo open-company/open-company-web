@@ -124,10 +124,11 @@
 
 (defn- req [endpoint method path params on-complete]
   (timbre/debug "Req:" (method-name method) (str endpoint path))
-  (let [jwt (j/jwt)]
-    (timbre/debug jwt j/expired?)
+  (let [jwt (j/jwt)
+        expired? (j/expired?)]
+    (timbre/debug jwt expired?)
     (go
-      (when (and jwt (j/expired?)) (oc.web.actions.user/jwt-refresh))
+      (when (and jwt expired?) (oc.web.actions.user/jwt-refresh))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
