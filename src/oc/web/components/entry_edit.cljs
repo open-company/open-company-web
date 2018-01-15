@@ -273,7 +273,8 @@
                           (:topics entry-board)
                           {:slug (:topic-slug entry-editing)
                            :name (:topic-name entry-editing)})))
-                       (:topics entry-board))]
+                       (:topics entry-board))
+        published? (= (:status entry-editing) "published")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})
@@ -403,15 +404,21 @@
                            (not (is-publishable? entry-editing)))}
             (when @(::publishing s)
               (small-loading))
-            "Post"]
+            (if published?
+              "Save"
+              "Post")]
           (when-not nux
             [:button.mlb-reset.mlb-link-black.form-action-bt
               {:disabled (or @(::saving s)
                              (not (:has-changes entry-editing)))
-               :on-click #(do
-                            (clean-body)
-                            (reset! (::saving s) true)
-                            (dis/dispatch! [:entry-save]))}
+               :on-click #(if published?
+                            (cancel-clicked s)
+                            (do
+                              (clean-body)
+                              (reset! (::saving s) true)
+                              (dis/dispatch! [:entry-save])))}
               (when @(::saving s)
                 (small-loading))
-              "Save draft"])]]]]))
+              (if published?
+                "Cancel"
+                "Save draft")])]]]]))
