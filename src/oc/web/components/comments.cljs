@@ -74,12 +74,12 @@
   (let [inner-html (.-innerHTML add-comment-div)
         with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
         replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
-        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "\n")
-        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "")
+        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "")
+        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "\n")
         final-node (.html (js/$ "<div/>") cleaned-text-1)
         final-text (.trim (.text final-node))]
     (when (pos? (count final-text))
-      (.trim (.html final-node)))))
+      (string/trim (.html final-node)))))
 
 (defn edit-finished
   [e s c]
@@ -193,7 +193,7 @@
           [:div.comment-timestamp
             (utils/time-since (:created-at c))]]
         [:div.comment-body-container
-          [:p.comment-body.group
+          [:div.comment-body.group
            {:ref "comment-body"
             :class (utils/class-set {:editable can-edit?
                                      :is-owner is-owner?
@@ -243,6 +243,9 @@
     (when (not= next-add-bt-disabled @(::add-button-disabled s))
       (reset! (::add-button-disabled s) next-add-bt-disabled))))
 
+(defn editable-input-change [s editable event]
+  (enable-add-comment? s))
+
 (rum/defcs add-comment < rum/reactive
                          rum/static
                          ;; Mixins
@@ -264,20 +267,20 @@
                              (reset! (::medium-editor s) medium-editor)
                              (.subscribe medium-editor
                               "editableInput"
-                              #(enable-add-comment? s))
+                              (partial editable-input-change s))
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
                                (fn [e]
-                                (enable-add-comment? s)
-                                (dis/dispatch! [:input [:add-comment-focus] true])
-                                (reset! (::show-buttons s) true))))
+                                 (enable-add-comment? s)
+                                 (dis/dispatch! [:input [:add-comment-focus] true])
+                                 (reset! (::show-buttons s) true))))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
                                (fn [e]
-                                (enable-add-comment? s)
-                                (when (zero? (count (.-innerText add-comment-node)))
-                                  (dis/dispatch! [:input [:add-comment-focus] false])
-                                  (reset! (::show-buttons s) false)))))
+                                 (enable-add-comment? s)
+                                 (when (zero? (count (.-innerText add-comment-node)))
+                                   (dis/dispatch! [:input [:add-comment-focus] false])
+                                   (reset! (::show-buttons s) false)))))
                              (reset! (::esc-key-listener s)
                                (events/listen
                                 js/window
@@ -291,7 +294,7 @@
                              (.unsubscribe
                               @(::medium-editor s)
                               "editableInput"
-                              #(enable-add-comment? s))
+                              (partial editable-input-change s))
                              (.destroy @(::medium-editor s))
                              (reset! (::medium-editor s) nil))
                            (when @(::esc-key-listener s)
@@ -323,10 +326,11 @@
                               (reset! (::show-buttons s) false)
                               (dis/dispatch! [:input [:add-comment-focus] false])
                               (dis/dispatch! [:comment-add activity-data (add-comment-content add-comment-div)])
-                              (set! (.-innerHTML add-comment-div) ""))
+                              (set! (.-innerHTML add-comment-div) "<p><br/></p>"))
                  :disabled @(::add-button-disabled s)}
                 "Add"]]])]
-       (when-not (js/isIE)
+       (when (and (not (js/isIE))
+                  (not (responsive/is-tablet-or-mobile?)))
          (emoji-picker {:width 32
                         :height 32
                         :add-emoji-cb (fn [active-element emoji already-added?]
@@ -349,7 +353,9 @@
     (when (and comments-internal-scroll
                (or force-scroll
                    @(::scroll-bottom-after-render s)))
-      (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll)))))
+      (if (responsive/is-mobile-size?)
+        (set! (.-scrollTop (.-body js/document)) (.-scrollHeight (.-body js/document)))
+        (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll))))))
 
 (defn load-comments-if-needed [s]
   (let [activity-data (first (:rum/args s))]
@@ -379,12 +385,15 @@
                         (load-comments-if-needed s)
                         s)
                        :did-mount (fn [s]
-                        (utils/after 1000 #(scroll-to-bottom s true))
+                        (when-not (responsive/is-tablet-or-mobile?)
+                          (utils/after 1000 #(scroll-to-bottom s true)))
                         s)
                        :did-remount (fn [o s]
                         (load-comments-if-needed s)
                         (when @(drv/get-ref s :comment-add-finish)
-                          (reset! (::scroll-bottom-after-render s) true))
+                          (reset! (::scroll-bottom-after-render s) true)
+                          (dis/dispatch! [:input [:comment-add-finish] false])
+                          (utils/after 500 #(scroll-to-bottom s true)))
                         (let [add-comment-focus @(drv/get-ref s :add-comment-focus)
                               scrolled-on-add-focus (::scrolled-on-add-focus s)]
                           (when (and (not @scrolled-on-add-focus)
@@ -397,14 +406,12 @@
                           (when (and (not @(::initially-scrolled s))
                                      (not show-loading))
                             (reset! (::initially-scrolled s) true)
-                            (utils/after 230 #(scroll-to-bottom s true))))
+                            (when-not (responsive/is-tablet-or-mobile?)
+                              (utils/after 230 #(scroll-to-bottom s true)))))
                         s)}
   [s activity-data]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
-        plain-sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
-        sorted-comments (if is-mobile?
-                          (reverse plain-sorted-comments)
-                          plain-sorted-comments)
+        sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
         add-comment-focus (drv/react s :add-comment-focus)
         show-loading (show-loading? s)]
     (if show-loading
@@ -419,8 +426,6 @@
           {:class (utils/class-set {:add-comment-focus add-comment-focus
                                     :empty (zero? (count sorted-comments))})}
           [:div.vertical-line]
-          (when is-mobile?
-            (add-comment activity-data))
           (if (pos? (count sorted-comments))
             [:div.comments-internal-scroll
              {:ref "comments-internal-scroll"
@@ -441,5 +446,4 @@
             [:div.comments-internal-empty
               [:div.no-comments-placeholder]
               [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]])
-          (when-not is-mobile?
-            (add-comment activity-data))]])))
+          (add-comment activity-data)]])))

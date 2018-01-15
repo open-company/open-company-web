@@ -259,7 +259,8 @@
                             (rum/local false ::edited-data-loaded)
                             (rum/local nil ::autosave-timer)
                             ;; Mixins
-                            mixins/no-scroll-mixin
+                            (when-not (responsive/is-mobile-size?)
+                              mixins/no-scroll-mixin)
                             mixins/first-render-mixin
 
                             {:before-render (fn [s]
@@ -504,7 +505,8 @@
                   (if editing
                     [:div.activity-modal-footer.group
                       {:class (when @(::show-bottom-border s) "scrolling-content")}
-                      (when-not (js/isIE)
+                      (when (and (not (js/isIE))
+                                 (not is-mobile?))
                         (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                                        :container-selector "div.activity-modal-content"}))
                       [:div.activity-modal-footer-right

@@ -7,7 +7,7 @@ div.comments {
   height: 100%;
 
   @include mobile() {
-    margin: 32px auto 80px;
+    margin: 32px auto;
     height: auto;
   }
 
@@ -205,8 +205,10 @@ div.comments {
       padding: 4px 14px 4px 0px;
       position: relative;
 
-      &:hover div.comment-content div.comment-footer-container div.edit-delete-button button.more-button {
-        opacity: 1;
+      @include big_web() {
+        &:hover div.comment-content div.comment-footer-container div.edit-delete-button button.more-button {
+          opacity: 1;
+        }
       }
 
       div.comment-avatar-container {
@@ -258,7 +260,7 @@ div.comments {
         &.single-emoji {
           div.comment-body-container {
             height: 50px;
-            p.comment-body {
+            div.comment-body {
               background-color: transparent;
               font-size: 50px;
               padding: 0px;
@@ -277,7 +279,7 @@ div.comments {
         div.comment-body-container {
           margin-top: 4px;
 
-          p.comment-body {
+          div.comment-body {
             @include avenir_M();
             font-size: 13px;
             color: rgba(78,90,107,0.8);
@@ -393,8 +395,9 @@ div.comments {
       width: 316px;
 
       @include mobile() {
-        padding: 0px;
+        padding: 16px 0px 0px;
         width: 100%;
+        position: relative;
       }
 
       div.add-comment-label {
@@ -404,6 +407,10 @@ div.comments {
         line-height: 14px;
         margin-bottom: 8px;
         color: $carrot_light_gray_3;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       &:before {
@@ -499,10 +506,16 @@ div.comments {
 
             @include mobile() {
               width: 100%;
+              resize: vertical;
+              height: auto;
             }
 
             &.show-buttons {
               height: 58px;
+
+              @include mobile() {
+                height: auto;
+              }
             }
 
             .emojione {
@@ -531,8 +544,10 @@ div.comments {
                 height: 32px;
                 width: 59px;
 
-                &:hover {
-                  color: white;
+                @include big_web() {
+                  &:hover {
+                    color: white;
+                  }
                 }
               }
             }
