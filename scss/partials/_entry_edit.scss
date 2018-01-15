@@ -10,6 +10,11 @@ div.entry-edit-modal-container {
   z-index: #{$navbar_zindex + 105};
   transition: opacity 180ms ease-in;
 
+  @include mobile() {
+    position: relative;
+    height: initial;
+  }
+
   &.will-appear {
     opacity: 0;
   }
@@ -26,11 +31,11 @@ div.entry-edit-modal-container {
     position: relative;
 
     @include mobile() {
-      min-height: 100vh;
-      max-height: 100vh;
-      height: 100vh !important;
-      margin-top: 0px !important;
+      min-height: initial;
+      max-height: initial;
+      height: initial;
       width: 100%;
+      margin: 0px;
     }
 
     div.entry-edit-modal {
@@ -46,7 +51,68 @@ div.entry-edit-modal-container {
         width: 100%;
         margin: 0px;
         border-radius: 0px;
-        height: 100%;
+        box-shadow: none;
+        height: initial;
+      }
+
+      div.entry-edit-modal-header-mobile {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          height: #{64 + 59}px;
+          background-color: $carrot_light_gray_7;
+          width: 100%;
+          text-align: center;
+          position: relative;
+
+          div.mobile-header {
+            height: 64px;
+            padding: 12px 18px 6px;
+
+            button.mobile-modal-close-bt {
+              @include image-2x("/img/ML/mobile_modal_close");
+              width: 24px;
+              height: 24px;
+              background-repeat: no-repeat;
+              background-size: 14px 14px;
+              background-position: 5px 5px;
+              position: absolute;
+              top: 20px;
+              left: 18px;
+            }
+
+            div.mobile-header-title {
+              @include avenir_H();
+              font-size: 22px;
+              color: $carrot_dark_gray;
+              margin-top: 4px;
+            }
+          }
+
+          div.mobile-second-header {
+            height: 59px;
+            background-color: $carrot_light_gray_2;
+            padding: 16px 18px 12px;
+
+            div.posting-in {
+              @include avenir_H();
+              font-size: 12px;
+              color: rgba($oc_gray_7, 0.5);
+              float: left;
+              margin-top: 5px;
+              max-width: 58%;
+
+              span {
+                float: left;
+              }
+            }
+
+            div.entry-card-dd-container {
+              max-width: 42%;
+            }
+          }
+        }
       }
 
       div.entry-edit-modal-header{
@@ -56,6 +122,10 @@ div.entry-edit-modal-container {
         padding: 20px 24px 20px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
+
+        @include mobile() {
+          display: none;
+        }
 
         div.user-avatar-img-container{
           margin-right: 16px;
@@ -79,39 +149,6 @@ div.entry-edit-modal-container {
               display: none;
             }
           }
-
-          div.boards-dropdown-caret {
-            @include avenir_H();
-            color: $carrot_dark_gray;
-            float: left;
-            margin-left: 6px;
-            cursor: pointer;
-            position: relative;
-
-            &.no-nux:after {
-              float: right;
-              content: "";
-              background-image: cdnUrl("/img/ML/board_settings.svg");
-              background-size: 8px 8px;
-              background-repeat: no-repeat;
-              background-position: 0px 9px;
-              width: 20px;
-              height: 20px;
-              margin-top: -3px;
-              margin-left: 6px;
-              opacity: 0.8;
-
-              &:hover {
-                opacity: 1;
-              }
-            }
-
-            div.dropdown-list-container {
-              top: 20px;
-              left: -44px;
-              width: 200px;
-            }
-          }
         }
 
         @include mobile() {
@@ -126,6 +163,43 @@ div.entry-edit-modal-container {
               }
             }
           }
+        }
+      }
+
+      div.boards-dropdown-caret {
+        @include avenir_H();
+        color: $carrot_dark_gray;
+        float: left;
+        margin-left: 6px;
+        cursor: pointer;
+        position: relative;
+
+        @include mobile() {
+          color: $carrot_green;
+        }
+
+        &.no-nux::after {
+          float: right;
+          content: "";
+          background-image: cdnUrl("/img/ML/board_settings.svg");
+          background-size: 8px 8px;
+          background-repeat: no-repeat;
+          background-position: 0px 9px;
+          width: 20px;
+          height: 20px;
+          margin-top: -3px;
+          margin-left: 6px;
+          opacity: 0.8;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        div.dropdown-list-container {
+          top: 20px;
+          left: -44px;
+          width: 200px;
         }
       }
 
@@ -151,7 +225,10 @@ div.entry-edit-modal-container {
         margin-left: -22px;
 
         @include mobile() {
-          height: calc(100vh - 72px - 88px - 1px);
+          height: calc(100vh - 64px - 59px - 72px - 72px - 1px);
+          max-height: initial;
+          margin-left: 0px;
+          padding: 24px 16px;
         }
 
         div.entry-edit-headline {
@@ -210,6 +287,10 @@ div.entry-edit-modal-container {
 
         div.entry-edit-controls {
           margin-bottom: 16px;
+
+          @include mobile() {
+            display: none;
+          }
         }
       }
 
@@ -222,9 +303,17 @@ div.entry-edit-modal-container {
         margin: 16px 36px 32px;
         position: relative;
 
+        @include mobile() {
+          margin: 16px;
+        }
+
         div.emoji-picker {
           float: left;
           margin-top: 4px;
+
+          @include mobile() {
+            display: none;
+          }
         }
 
         button.attachment {
@@ -236,6 +325,10 @@ div.entry-edit-modal-container {
           opacity: 0.8;
           color: $oc_gray_7;
           transform: rotate(90deg);
+
+          @include mobile() {
+            display: none;
+          }
 
           &:hover {
             opacity: 1;

@@ -260,6 +260,7 @@
         entry-editing     (drv/react s :entry-editing)
         alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
+        is-mobile? (responsive/is-tablet-or-mobile?)
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
         wh (.-innerHeight js/window)
         media-input (drv/react s :media-input)
@@ -285,36 +286,68 @@
         (when (and (not (:media-video media-input))
                    (not (:media-chart media-input))
                    (not alert-modal)
-                   (not nux))
+                   (not nux)
+                   (not is-mobile?))
           [:button.carrot-modal-close.mlb-reset
             {:on-click #(cancel-clicked s)}])
         [:div.entry-edit-modal.group
           {:ref "entry-edit-modal"}
-          [:div.entry-edit-modal-header.group
-            (user-avatar-image current-user-data)
-            [:div.posting-in
-              [:span
-                (if (:uuid entry-editing)
-                  "Draft for "
-                  "Posting in ")]
-              [:div.boards-dropdown-caret
-                {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
-                 :class (when (not nux) "no-nux")}
-                (:board-name entry-editing)
-                (when (and (not nux) @(::show-boards-dropdown s))
-                  (dropdown-list
-                   {:items (map
-                            #(clojure.set/rename-keys % {:name :label :slug :value})
-                            (vals all-boards))
-                    :value (:board-slug entry-editing)
-                    :on-blur #(reset! (::show-boards-dropdown s) false)
-                    :on-change (fn [item]
-                                 (toggle-save-on-exit s true)
-                                 (dis/dispatch! [:input [:entry-editing :has-changes] true])
-                                 (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                 (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
-            (when-not nux
-              (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))]
+          (if is-mobile?
+            [:div.entry-edit-modal-header-mobile
+              [:div.mobile-header
+                [:button.mlb-reset.mobile-modal-close-bt
+                  {:on-click #(cancel-clicked s)}]
+                [:div.mobile-header-title
+                  "New post..."]]
+              [:div.mobile-second-header
+                [:div.posting-in
+                  [:span
+                    (if (:uuid entry-editing)
+                      "Draft for: "
+                      "Posting in: ")]
+                  [:div.boards-dropdown-caret
+                    {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
+                     :class (when (not nux) "no-nux")}
+                    (:board-name entry-editing)
+                    (when (and (not nux) @(::show-boards-dropdown s))
+                      (dropdown-list
+                       {:items (map
+                                #(clojure.set/rename-keys % {:name :label :slug :value})
+                                (vals all-boards))
+                        :value (:board-slug entry-editing)
+                        :on-blur #(reset! (::show-boards-dropdown s) false)
+                        :on-change (fn [item]
+                                     (toggle-save-on-exit s true)
+                                     (dis/dispatch! [:input [:entry-editing :has-changes] true])
+                                     (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
+                                     (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
+                (when-not nux
+                  (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))]]
+            [:div.entry-edit-modal-header.group
+              (user-avatar-image current-user-data)
+              [:div.posting-in
+                [:span
+                  (if (:uuid entry-editing)
+                    "Draft for "
+                    "Posting in ")]
+                [:div.boards-dropdown-caret
+                  {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
+                   :class (when (not nux) "no-nux")}
+                  (:board-name entry-editing)
+                  (when (and (not nux) @(::show-boards-dropdown s))
+                    (dropdown-list
+                     {:items (map
+                              #(clojure.set/rename-keys % {:name :label :slug :value})
+                              (vals all-boards))
+                      :value (:board-slug entry-editing)
+                      :on-blur #(reset! (::show-boards-dropdown s) false)
+                      :on-change (fn [item]
+                                   (toggle-save-on-exit s true)
+                                   (dis/dispatch! [:input [:entry-editing :has-changes] true])
+                                   (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
+                                   (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
+              (when-not nux
+                (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))])
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
