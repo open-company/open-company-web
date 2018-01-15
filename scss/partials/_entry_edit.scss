@@ -229,6 +229,7 @@ div.entry-edit-modal-container {
           max-height: initial;
           margin-left: 0px;
           padding: 24px 16px;
+          width: 100%;
         }
 
         div.entry-edit-headline {
@@ -239,6 +240,12 @@ div.entry-edit-modal-container {
           @include avenir_H();
           font-size: 18px;
           color: $carrot_dark_gray;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+
+          @include mobile() {
+            width: 100%;
+          }
 
           &:empty:before {
             content: attr(placeholder);
@@ -267,7 +274,13 @@ div.entry-edit-modal-container {
             margin: 24px 0;
             cursor: text;
             min-height: 85px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
             @include activity-body();
+
+            @include mobile() {
+              width: 100%;
+            }
 
             @include activity-attachment(true);
 
