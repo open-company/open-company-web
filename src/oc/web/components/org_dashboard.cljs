@@ -110,11 +110,12 @@
           (when (and (:media-input data)
                      (:media-chart (:media-input data)))
             (media-chart-modal))
-          (dom/div {:class "page"}
-            ;; Navbar
-            (when-not (and (responsive/is-tablet-or-mobile?)
-                           (router/current-activity-id))
-              (navbar))
-            (dom/div {:class "dashboard-container"}
-              (dom/div {:class "topic-list"}
-                (dashboard-layout)))))))))
+          (when-not (and (responsive/is-tablet-or-mobile?)
+                         (or (router/current-activity-id)
+                             (:entry-editing data)))
+            (dom/div {:class "page"}
+              ;; Navbar
+              (navbar)
+              (dom/div {:class "dashboard-container"}
+                (dom/div {:class "topic-list"}
+                  (dashboard-layout))))))))))
