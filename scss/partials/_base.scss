@@ -19,6 +19,10 @@ Comment font-weight to font name mapping: https://developer.mozilla.org/en-US/do
 
 html {
   height: 100vh;
+
+  @include mobile() {
+    height: 100%;
+  }
 }
 
 html, body {
