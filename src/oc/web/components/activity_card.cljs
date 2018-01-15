@@ -64,9 +64,10 @@
                                 is-all-posts (nth (:rum/args s) 4 false)]
                             ; Prevent body links in FoC
                             (.click (js/$ body-a-sel) #(.stopPropagation %)))
-                          (doto (js/$ "[data-toggle=\"tooltip\"]")
-                            (.tooltip "fixTitle")
-                            (.tooltip "hide"))
+                          (when-not (responsive/is-tablet-or-mobile?)
+                            (doto (js/$ "[data-toggle=\"tooltip\"]")
+                              (.tooltip "fixTitle")
+                              (.tooltip "hide")))
                           s)
                          :did-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
@@ -87,7 +88,8 @@
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
-        edit-link (utils/link-for (:links activity-data) "partial-update")]
+        edit-link (utils/link-for (:links activity-data) "partial-update")
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :dropdown-active (or @(::more-dropdown s)
@@ -106,10 +108,7 @@
                       @(::more-dropdown s)
                       @(::move-activity s))
 
-                      (dis/dispatch!
-                       [:activity-modal-fade-in
-                        (:board-slug activity-data)
-                        (:uuid activity-data)]))))}
+                      (dis/dispatch! [:activity-modal-fade-in activity-data]))))}
       ; Card header
       [:div.activity-card-head.group
         {:class "entry-card"}
@@ -121,7 +120,7 @@
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
                 {:date-time t
-                 :data-toggle "tooltip"
+                 :data-toggle (when-not is-mobile? "tooltip")
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :title (utils/activity-date-tooltip activity-data)}
@@ -141,7 +140,7 @@
                                (reset! (::more-dropdown s) (not @(::more-dropdown s)))
                                (reset! (::move-activity s) false))
                    :title "More"
-                   :data-toggle "tooltip"
+                   :data-toggle (when-not is-mobile? "tooltip")
                    :data-placement "top"
                    :data-container "body"}]
                 (when @(::more-dropdown s)
@@ -153,11 +152,7 @@
                           {:on-click #(do
                                         (utils/remove-tooltips)
                                         (reset! (::more-dropdown s) false)
-                                        (dis/dispatch!
-                                         [:activity-modal-fade-in
-                                          (:board-slug activity-data)
-                                          (:uuid activity-data)
-                                          true]))}
+                                        (dis/dispatch! [:activity-edit activity-data]))}
                           "Edit"])
                       (when share-link
                         [:li
@@ -232,7 +227,7 @@
         (when (utils/link-for (:links activity-data) "partial-update")
           [:button.mlb-reset.post-edit
             {:title "Edit"
-             :data-toggle "tooltip"
+             :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
              :data-container "body"
              :class (utils/class-set {:not-hover (and (not @(::move-activity s))
@@ -240,8 +235,4 @@
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::more-dropdown s) false)
-                         (dis/dispatch!
-                          [:activity-modal-fade-in
-                           (:board-slug activity-data)
-                           (:uuid activity-data)
-                           true]))}])]]))
+                         (dis/dispatch! [:activity-edit activity-data]))}])]]))
