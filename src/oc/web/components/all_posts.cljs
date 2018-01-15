@@ -6,7 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.lib.logging :as logging]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
@@ -307,7 +307,8 @@
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
-        (when @(::show-all-caught-up-message s)
+        (when (and @(::show-all-caught-up-message s)
+                   (responsive/is-mobile-size?))
           (all-caught-up))]
       [:div.all-posts-nav
         ; [:div.all-posts-nav-inner
