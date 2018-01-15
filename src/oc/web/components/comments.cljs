@@ -392,6 +392,7 @@
                         (load-comments-if-needed s)
                         (when @(drv/get-ref s :comment-add-finish)
                           (reset! (::scroll-bottom-after-render s) true)
+                          (dis/dispatch! [:input [:comment-add-finish] false])
                           (utils/after 500 #(scroll-to-bottom s true)))
                         (let [add-comment-focus @(drv/get-ref s :add-comment-focus)
                               scrolled-on-add-focus (::scrolled-on-add-focus s)]
