@@ -385,7 +385,8 @@
                         (load-comments-if-needed s)
                         s)
                        :did-mount (fn [s]
-                        (utils/after 1000 #(scroll-to-bottom s true))
+                        (when-not (responsive/is-tablet-or-mobile?)
+                          (utils/after 1000 #(scroll-to-bottom s true)))
                         s)
                        :did-remount (fn [o s]
                         (load-comments-if-needed s)
