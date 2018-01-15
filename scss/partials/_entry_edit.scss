@@ -150,20 +150,6 @@ div.entry-edit-modal-container {
             }
           }
         }
-
-        @include mobile() {
-          div.entry-card-dd-container {
-            div.entry-edit-topics-dd {
-              left: unset;
-              right: 0px;
-
-              div.triangle {
-                left: unset;
-                right: 20px;
-              }
-            }
-          }
-        }
       }
 
       div.boards-dropdown-caret {
