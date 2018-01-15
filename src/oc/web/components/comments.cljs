@@ -405,7 +405,8 @@
                           (when (and (not @(::initially-scrolled s))
                                      (not show-loading))
                             (reset! (::initially-scrolled s) true)
-                            (utils/after 230 #(scroll-to-bottom s true))))
+                            (when-not (responsive/is-tablet-or-mobile?)
+                              (utils/after 230 #(scroll-to-bottom s true)))))
                         s)}
   [s activity-data]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
