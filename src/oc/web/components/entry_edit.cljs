@@ -299,7 +299,11 @@
                 [:button.mlb-reset.mobile-modal-close-bt
                   {:on-click #(cancel-clicked s)}]
                 [:div.mobile-header-title
-                  "New post..."]]
+                  (if (:uuid entry-editing)
+                    (if published?
+                      "Edit post..."
+                      "Edit draft...")
+                    "New post...")]]
               [:div.mobile-second-header
                 [:div.posting-in
                   [:span
