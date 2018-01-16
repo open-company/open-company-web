@@ -26,7 +26,7 @@
     [org.omcljs/om "1.0.0-beta1" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
     [org.clojars.martinklepsch/om-tools "0.4.0-w-select"] ; Tools for Om https://github.com/plumatic/om-tools/pull/91
     [rum "0.10.8" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
-    [org.martinklepsch/derivatives "0.2.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
+    [org.martinklepsch/derivatives "0.3.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     
     ;; ClojureScript libraries
