@@ -209,6 +209,12 @@ provided in the table below:
 |  :all-activity-get/finish | API | All activity data loaded, dispatch them. |
 |  :all-activity-more | UI | Load more activities automatically when the user scrolls. |
 |  :all-activity-more/finish | API | More activities loaded, concatenate the new results with the old ones. |
+|  :all-posts-calendar | UI | Load AP give a calendar link. |
+|  :all-posts-get | UI | Load AP. |
+|  :all-posts-get/finish | API | AP loaded. |
+|  :all-posts-more | UI | Load more posts for current AP. |
+|  :all-posts-more/finish | API | More posts loaded. |
+|  :all-posts-reset | UI | Remove AP data from the app state. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |

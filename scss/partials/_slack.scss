@@ -9,6 +9,12 @@ div#wrap {
       padding: 0 32px;
     }
 
+    section {
+      @include mobile_to_tablet(){
+        padding: 0 32px;
+      }
+    }
+
     button.signin-with-slack {
       width: 280px;
       height: 48px;
@@ -229,7 +235,7 @@ div#wrap {
         width: 600px;
         text-align: center;
 
-        @include mobile(){
+        @include tablet(){
           width: 100%;
           margin: 16px auto 0;
           padding: 0 16px;
@@ -247,7 +253,7 @@ div#wrap {
         z-index: 1;
         position: relative;
 
-        @include mobile(){
+        @include tablet(){
           width: calc(100% + 64px);
           height: auto;
           margin-left: -32px;
@@ -262,8 +268,9 @@ div#wrap {
           background-size: 520px 328px;
           background-repeat: no-repeat;
 
-          @include mobile(){
-            width: 100%;
+          @include tablet(){
+            width: 300px;
+            height: 200px;
             background-size: 100%;
           }
         }
@@ -275,7 +282,7 @@ div#wrap {
           width: 734px;
           margin: 44px auto 0px;
 
-          @include mobile(){
+          @include tablet(){
             width: 100%;
           }
         }
@@ -292,7 +299,7 @@ div#wrap {
         background-repeat: no-repeat;
         z-index: 1;
 
-        @include mobile() {
+        @include tablet() {
           display: none;
         }
 
@@ -348,7 +355,7 @@ div#wrap {
         line-height: 30px;
         width: 750px;
 
-        @include mobile(){
+        @include tablet(){
           width: 100%;
           margin: 16px auto 0;
         }
@@ -360,7 +367,7 @@ div#wrap {
         position: relative;
         z-index: 10;
 
-        @include mobile() {
+        @include tablet() {
           width: calc(100% + 64px);
           margin-left: -32px;
         }
@@ -376,7 +383,7 @@ div#wrap {
           text-align: center;
           border-radius: 8px;
 
-          @include mobile() {
+          @include tablet() {
             width: 100%;
             height: auto;
             float: unset;
@@ -388,7 +395,7 @@ div#wrap {
           &.right {
             float: right;
 
-            @include mobile(){
+            @include tablet(){
               float: unset;
             }
           }
@@ -399,7 +406,7 @@ div#wrap {
             background-repeat: no-repeat;
             background-position: center;
 
-            @include mobile() {
+            @include tablet() {
               width: auto;
               margin: 0 auto;
             }
@@ -464,7 +471,7 @@ div#wrap {
         margin: 24px auto 0px;
         width: 800px;
 
-        @include mobile(){
+        @include tablet(){
           width: 100%;
           margin: 16px auto 0;
           padding: 0 16px;

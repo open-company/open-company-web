@@ -17,7 +17,7 @@ div.dashboard-layout {
       margin-right: 36px;
       width: #{$board_container_width}px;
       background-color: $oc_gray_8;
-      left: 50%;
+      position: relative;
 
       @include mobile() {
         width: 100%;

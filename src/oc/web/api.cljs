@@ -137,15 +137,14 @@
         (when (and (j/jwt)
                    (= status 401))
           (router/redirect! oc-urls/logout))
-        ; report all 5xx to sentry
+        ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
-                  (and (>= status 500) (<= status 599))
+                  (and (>= status 500) (<= status 599)))
+          (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
+        ; report all 5xx to sentry
+        (when (or (and (>= status 500) (<= status 599))
                   (= status 400)
                   (= status 422))
-          ; If it was a 5xx or a 0 show a banner for network issues
-          (when (or (zero? status)
-                    (and (>= status 500) (<= status 599)))
-            (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
           (let [report {:response response
                         :path path
                         :method (method-name method)
@@ -777,10 +776,14 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:activity-delete/finish]))))))
 
-(defn get-all-posts [org-data & [activity-link year month]]
+(defn get-all-posts [org-data & [activity-link {:keys [year month from]}]]
   (when org-data
-    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))]
-      (storage-http (method-for-link all-posts-link) (relative-href all-posts-link)
+    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))
+          href (relative-href all-posts-link)
+          final-href (if from
+                       (str href "?start=" from "&direction=around")
+                       href)]
+      (storage-http (method-for-link all-posts-link) final-href
         {:headers (headers-for-link all-posts-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch!
@@ -788,6 +791,7 @@
             {:org (:slug org-data)
              :year year
              :month month
+             :from from
              :body (when success (json->cljs body))}]))))))
 
 (defn load-more-all-posts [more-link direction]

@@ -8,6 +8,13 @@ div.activity-modal-container {
   z-index: #{$navbar_zindex + 100};
   transition: opacity 180ms ease-in;
 
+  @include mobile() {
+    position: unset;
+    top: unset;
+    left: unset;
+    height: auto;
+  }
+
   &.will-appear {
     opacity: 0;
   }
@@ -75,7 +82,7 @@ div.activity-modal-container {
     @include mobile() {
       width: 100%;
       min-height: initial;
-      margin-top: 123px;
+      max-height: initial;
     }
 
     div.activity-modal {
@@ -92,6 +99,8 @@ div.activity-modal-container {
         margin: 0px;
         box-shadow: none;
         border-radius: 0px;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
       div.activity-modal-mobile-header {
@@ -99,11 +108,8 @@ div.activity-modal-container {
 
         @include mobile() {
           display: block;
-          position: fixed;
-          top: 0px;
           height: 64px;
           background-color: $carrot_light_gray_7;
-          left: 0px;
           width: 100%;
           padding: 12px 18px;
           text-align: center;
@@ -140,9 +146,6 @@ div.activity-modal-container {
 
         @include mobile() {
           height: 59px;
-          position: fixed;
-          top: 64px;
-          left: 0px;
           width: 100%;
           border-radius: 0px;
           padding: 14px 17px;
@@ -314,7 +317,11 @@ div.activity-modal-container {
             width: 100%;
             min-height: initial;
             border-radius: 0px;
-            height: calc(100vh - 123px);
+            height: auto;
+            max-height: initial;
+            min-height: initial;
+            flex-shrink: unset;
+            flex-basis: unset;
           }
 
           div.activity-left-column-content {
@@ -331,6 +338,7 @@ div.activity-modal-container {
               @include mobile() {
                 padding: 0px 24px;
                 height: 100%;
+                overflow-y: visible;
               }
 
 
