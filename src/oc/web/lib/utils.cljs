@@ -1087,8 +1087,25 @@
 (defn activity-date-tooltip [activity-data]
   (entry-date-tooltip activity-data))
 
-(defn copy-to-clipboard []
+(defn ios-copy-to-clipboard [el]
+  (let [old-ce (.-contentEditable el)
+        old-ro (.-readOnly el)
+        rg (.createRange js/document)]
+    (set! (.-contentEditable el) true)
+    (set! (.-readOnly el) false)
+    (.selectNodeContents rg el)
+    (let [s (.getSelection js/window)]
+      (.removeAllRanges s)
+      (.addRange s rg)
+      (.setSelectionRange el 0 (.. el -value -length))
+      (set! (.-contentEditable el) old-ce)
+      (set! (.-readOnly el) old-ro))))
+
+(defn copy-to-clipboard [el]
   (try
+    (when (and (responsive/is-tablet-or-mobile?)
+               (js/isSafari))
+      (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e
       false)))
