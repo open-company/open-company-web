@@ -113,7 +113,8 @@
             (media-chart-modal))
           (when-not (and (responsive/is-tablet-or-mobile?)
                          (or (router/current-activity-id)
-                             (:entry-editing data)))
+                             (:entry-editing data)
+                             (:activity-share data)))
             (dom/div {:class "page"}
               ;; Navbar
               (navbar)
