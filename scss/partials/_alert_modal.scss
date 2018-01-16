@@ -25,6 +25,8 @@ div.alert-modal-container {
 
     @include mobile() {
       width: 100%;
+      height: 100vh;
+      margin: 0px;
 
       button.carrot-modal-close {
         display: none;
@@ -43,12 +45,23 @@ div.alert-modal-container {
       text-align: center;
 
       @include mobile() {
-        width: calc(100% - 48px);
-        margin: 0px 24px;
+        margin: 0px;
+        position: absolute;
+        top: unset;
+        bottom: 0px;
+        width: 100%;
+        border-bottom-right-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border-top-right-radius: 8px;
+        border-top-left-radius: 8px;
       }
 
       &.has-buttons {
         min-height: 197px;
+
+        @include mobile() {
+          min-height: initial;
+        }
       }
 
       img.alert-modal-icon {
