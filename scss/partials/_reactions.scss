@@ -57,16 +57,19 @@ div.reactions {
       &.can-react {
         cursor: pointer;
 
-        &.reacted:hover {
-          background-color: rgba(#FED157, 0.4);
-        }
+        @include big_web() {
 
-        &:hover {
-          background-color: #EBE9E3;
+          &.reacted:hover {
+            background-color: rgba(#FED157, 0.4);
+          }
 
-          span.reaction {
-            -webkit-filter: grayscale(0%);
-            filter: grayscale(0%);
+          &:hover {
+            background-color: #EBE9E3;
+
+            span.reaction {
+              -webkit-filter: grayscale(0%);
+              filter: grayscale(0%);
+            }
           }
         }
       }

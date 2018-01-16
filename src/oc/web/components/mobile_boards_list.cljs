@@ -15,7 +15,7 @@
         loading (drv/react s :loading)]
     [:div.mobile-boards-list-container
       (if loading
-        [:div.org-dashboard.main-scroll
+        [:div.org-dashboard
           (loading {:loading true})]
         [:div.mobile-boards-list
           (navbar)

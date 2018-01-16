@@ -8,6 +8,8 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as user-actions]
+            [oc.web.stores.user :as user-store]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.oc-colors :as occ]
             [oc.web.components.ui.icon :as i]
@@ -17,7 +19,7 @@
 
 (defn close-overlay [e]
   (utils/event-stop e)
-  (dis/dispatch! [:login-overlay-show false]))
+  (user-actions/show-login false))
 
 (def dont-scroll
   {:will-mount (fn [s]
@@ -74,7 +76,7 @@
         {:on-click #(do
                      (.preventDefault %)
                      (when (:auth-settings @dis/app-state)
-                       (dis/dispatch! [:login-with-slack])))}
+                       (user-actions/login-with-slack)))}
         [:div.signin-with-slack-content
           "Sign In with "
           [:div.slack-blue-icon]]]
@@ -97,7 +99,7 @@
               [:br]
               "Please try again, or "
               [:a.underline.red
-                {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])}
+                {:on-click #(user-actions/show-login :password-reset)}
                 "reset your password"]
               "."]
             :else
@@ -133,7 +135,7 @@
                :tabIndex 2
                :name "pswd"}]
             [:div.left.forgot-password
-              [:a {:on-click #(dis/dispatch! [:login-overlay-show :password-reset])} "Forgot Password?"]]]
+              [:a {:on-click #(user-actions/show-login :password-reset)} "Forgot Password?"]]]
           ;; Login button
           [:button.mlb-reset.mlb-default.continue
             {:disabled (or (not (:auth-settings (rum/react dis/app-state)))
@@ -143,9 +145,11 @@
                              "authenticate"
                              "GET"
                              {:auth-source "email"})))
-             :on-click #(do
+             :on-click #(let [login-with-email (:login-with-email @dis/app-state)
+                              email (:email login-with-email)
+                              pswd (:pswd login-with-email)]
                           (.preventDefault %)
-                          (dis/dispatch! [:login-with-email]))}
+                          (user-actions/login-with-email email pswd))}
             "Sign In"]]]
       ;; Link to signup
       [:div.footer-link
@@ -200,7 +204,7 @@
             [:div.group.pb3.mt3
               [:div.right
                 [:dubtton.mlb-reset.mlb-default
-                  {:on-click #(dis/dispatch! [:login-overlay-show nil])}
+                  {:on-click #(user-actions/show-login nil)}
                   "Done"]]]
             [:div.group
               [:button.mlb-reset.mlb-default.continue
@@ -208,7 +212,7 @@
                  :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))}
                 "Reset Password"]
               [:button.mlb-reset.mlb-link-black
-                {:on-click #(dis/dispatch! [:login-overlay-show nil])
+                {:on-click #(user-actions/show-login nil)
                  :disabled (not (:auth-settings (rum/react dis/app-state)))}
                 "Cancel"]])]]]])
 
@@ -344,27 +348,27 @@
 
 (rum/defcs login-overlays-handler < rum/static
                                     rum/reactive
-                                    (drv/drv :show-login-overlay)
+                                    (drv/drv user-store/show-login-overlay?)
   [s]
   (cond
     ; login via email
-    (or (= (drv/react s :show-login-overlay) :login-with-email)
-        (= (drv/react s :show-login-overlay) :login-with-slack))
+    (or (= (drv/react s user-store/show-login-overlay-key) :login-with-email)
+        (= (drv/react s user-store/show-login-overlay-key) :login-with-slack))
     (login-with-email)
     ; signup via email
-    (or (= (drv/react s :show-login-overlay) :signup-with-email)
-        (= (drv/react s :show-login-overlay) :signup-with-slack))
+    (or (= (drv/react s user-store/show-login-overlay-key) :signup-with-email)
+        (= (drv/react s user-store/show-login-overlay-key) :signup-with-slack))
     (do
       (utils/after 150 #(router/nav! oc-urls/sign-up))
       [:div])
     ; password reset
-    (= (drv/react s :show-login-overlay) :password-reset)
+    (= (drv/react s user-store/show-login-overlay-key) :password-reset)
     (password-reset)
     ; form to collect name and password
-    (= (drv/react s :show-login-overlay) :collect-name-password)
+    (= (drv/react s user-store/show-login-overlay-key) :collect-name-password)
     (collect-name-password)
     ; form to insert a new password
-    (= (drv/react s :show-login-overlay) :collect-password)
+    (= (drv/react s user-store/show-login-overlay-key) :collect-password)
     (collect-password)
     ; show nothing
     :else

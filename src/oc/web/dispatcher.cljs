@@ -101,9 +101,11 @@
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
+   :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :comment-edit        [[:base] (fn [base] (:comment-edit base))]
+   :add-comment-height  [[:base] (fn [base] (:add-comment-height base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -273,7 +275,10 @@
                                :error (:collect-pswd-error base)})]
    :media-input           [[:base]
                             (fn [base]
-                              (:media-input base))]})
+                              (:media-input base))]
+   :search-active         [[:base] (fn [base] (:search-active base))]
+   :search-results        [[:base] (fn [base] (:search-results base))]})
+
 
 ;; Action Loop =================================================================
 
@@ -329,7 +334,7 @@
     (get-in data (calendar-key org-slug))))
 
 (defn change-data
-  "Get chancge data."
+  "Get change data."
   ([]
     (change-data @app-state))
   ([data]

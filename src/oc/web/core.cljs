@@ -9,6 +9,8 @@
             [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
             [oc.web.actions]
+            [oc.web.stores.user]
+            [oc.web.stores.search]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -62,14 +64,22 @@
   (let [target (sel1 [:div#oc-loading])]
     (drv-root #(om/component (loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))})) target)))
 
-(defn rewrite-url []
+(defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
-        rewrite-to (str (.-pathname l) (.-hash l))]
+        rewrite-to (str (.-pathname l) (.-hash l))
+        search-values (when (seq keep-params)
+                        (remove nil?
+                         (map #(when (get query-params %)
+                                 (str (name %) "=" (get query-params %))) keep-params)))
+        with-search (if (pos? (count search-values))
+                      (str rewrite-to "?"
+                        (clojure.string/join "&" search-values))
+                      rewrite-to)]
     ;; Push state only if the query string has parameters or the history will have duplicates.
     (when (seq (.-search l))
-      (.pushState (.-history js/window) #js {} (.-title js/document) rewrite-to))))
+      (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
 
-(defn pre-routing [query-params & [should-rewrite-url]]
+(defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Setup timbre log level
   (when (:log-level query-params)
     (logging/config-log-level! (:log-level query-params)))
@@ -85,11 +95,29 @@
     (cook/set-cookie! :jwt (:jwt query-params) (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
   (check-get-params query-params)
   (when should-rewrite-url
-    (rewrite-url))
+    (rewrite-url rewrite-params))
   (inject-loading))
 
 (defn post-routing []
-  (utils/after 10 #(dis/dispatch! [:initial-loads])))
+  (utils/after 10 (fn []
+    (let [force-refresh (or (utils/in? (:route @router/path) "org")
+                            (utils/in? (:route @router/path) "login"))
+          latest-entry-point (if (or force-refresh
+                                     (nil? (:latest-entry-point @dis/app-state)))
+                               0
+                               (:latest-entry-point @dis/app-state))
+          latest-auth-settings (if (or force-refresh
+                                       (nil? (:latest-auth-settings @dis/app-state)))
+                                 0
+                                 (:latest-auth-settings @dis/app-state))
+          now (.getTime (js/Date.))
+          reload-time (* 60 60 1000)]
+      (when (or (> (- now latest-entry-point) reload-time)
+                (and (router/current-org-slug)
+                     (nil? (dis/org-data))))
+        (api/get-entry-point))
+      (when (> (- now latest-auth-settings) reload-time)
+        (api/get-auth-settings))))))
 
 ;; home
 (defn home-handler [target params]
@@ -145,12 +173,13 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         entry (:entry (:params params))
-        query-params (:query-params params)]
+        query-params (:query-params params)
+        has-at-param (contains? query-params :at)]
     (when org
       (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
     (when board
       (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
-    (pre-routing query-params true)
+    (pre-routing query-params true {:query-params query-params :keep-params [:at]})
     ;; save the route
     (router/set-route!
      (vec
@@ -161,7 +190,7 @@
       :board board
       :activity entry
       :query-params query-params
-      :from-all-posts (contains? query-params :ap)})
+      :from-all-posts (or has-at-param (contains? query-params :ap))})
     (when board-sort-or-filter
       (swap! dis/app-state assoc :board-filters board-sort-or-filter)
       (when (keyword? board-sort-or-filter)
@@ -194,6 +223,7 @@
                            :main))
           next-app-state {:nux (when show-nux :1)
                           :loading loading
+                          :ap-initial-at (when has-at-param (:at query-params))
                           :org-settings org-settings
                           :nux-loading (cook/get-cookie :nux)
                           :nux-end nil}]
@@ -571,7 +601,7 @@
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Persist JWT in App State
-  (dis/dispatch! [:jwt (jwt/get-contents)])
+  (oc.web.actions.user/update-jwt (jwt/get-contents))
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ; mount the error banner

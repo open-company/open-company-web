@@ -58,6 +58,12 @@ div#wrap {
       padding: 0 32px;
     }
 
+    section {
+      @include mobile_to_tablet(){
+        padding: 0 32px;
+      }
+    }
+
     section.cta {
       padding-top: 142px;
       padding-bottom: 0px;
@@ -286,7 +292,7 @@ div#wrap {
         z-index: 10;
         position: relative;
 
-        @include mobile(){
+        @include tablet() {
           width: 100%;
           height: auto;
           margin: 80px auto 0px;
@@ -297,7 +303,7 @@ div#wrap {
           margin-left: -16px;
           padding: 0;
 
-          @include mobile(){
+          @include tablet() {
             width: 100%;
             height: auto;
             margin: 0px;
@@ -331,19 +337,22 @@ div#wrap {
           background-color: $carrot_text_blue;
         }
 
-        @include mobile() {
-          width: calc(100% + 64px);
+        @include tablet() {
+          width: 100%;
           height: auto;
-          margin: -8px 0px 0px -32px;
+          margin: -8px 0px 0px 0px;
           padding: 16px 32px;
         }
       }
     }
 
     section.second-section {
-      padding: 0px;
       position: relative;
       background-color: $oc_gray_8;
+
+      @include big_web() {
+        padding: 0px;
+      }
 
       @include mobile(){
         width: calc(100% + 64px);
@@ -510,6 +519,10 @@ div#wrap {
           margin-left: -32px;
         }
 
+        @include mobile_to_tablet() {
+          width: 100%;
+        }
+
         div.illustration-container {
           margin: 20px;
           width: 450px;
@@ -521,7 +534,7 @@ div#wrap {
           text-align: center;
           border-radius: 8px;
 
-          @include mobile() {
+          @include tablet() {
             width: 100%;
             height: auto;
             float: unset;
@@ -533,7 +546,7 @@ div#wrap {
           &.right {
             float: right;
 
-            @include mobile(){
+            @include tablet(){
               float: unset;
             }
           }
@@ -544,7 +557,7 @@ div#wrap {
             background-repeat: no-repeat;
             background-position: center;
 
-            @include mobile() {
+            @include tablet(){
               width: auto;
               margin: 0 auto;
             }
@@ -595,7 +608,7 @@ div#wrap {
         text-align: center;
         margin: 60px auto 100px;
 
-        @include mobile(){
+        @include tablet(){
           width: 100%;
           height: auto;
           text-align: center;
@@ -650,7 +663,15 @@ div#wrap {
 
     section.third-section {
       background-color: $carrot_light_yellow_1;
-      padding: 72px 0px 100px;
+
+      @include big_web_no_tablet(){
+        padding: 72px 0px 100px;
+      }
+
+      @include tablet() {
+        width: 100%;
+        padding: 32px 32px 50px;
+      }
 
       @include mobile(){
         width: calc(100% + 64px);
@@ -666,7 +687,7 @@ div#wrap {
         margin: 0 auto;
         padding: 0px;
 
-        @include mobile(){
+        @include tablet(){
           text-align: center;
         }
 
@@ -694,7 +715,7 @@ div#wrap {
         box-shadow: 0px 4px 6px 0px rgba(0,0,0,0.07);
         padding: 40px 24px;
 
-        @include mobile() {
+        @include tablet() {
           width: 100%;
           height: auto;
         }
@@ -706,7 +727,7 @@ div#wrap {
           margin-left: -24px;
           background-color: rgba($carrot_light_gray_7,0.5);
 
-          @include mobile(){
+          @include tablet(){
             width: 100%;
             margin-left: 0px;
           }
@@ -726,7 +747,7 @@ div#wrap {
             background-position: center;
             margin-top: -6px;
 
-            @include mobile (){
+            @include tablet (){
               float: unset;
               text-align: center;
               margin: 0px auto;
@@ -752,7 +773,7 @@ div#wrap {
             letter-spacing: 0.18;
             line-height: 36px;
 
-            @include mobile (){
+            @include tablet (){
               margin: 16px 0px;
               text-align: center;
             }
@@ -767,7 +788,7 @@ div#wrap {
             margin-left: 138px;
             margin-top: 8px;
 
-            @include mobile (){
+            @include tablet (){
               margin: 16px 0px 0px;
               text-align: center;
             }
@@ -787,7 +808,7 @@ div.main.home-page, div.about {
       width: 1053px;
       margin: 0px auto;
 
-      @include mobile(){
+      @include tablet(){
         width: 100%;
         height: auto;
         text-align: center;

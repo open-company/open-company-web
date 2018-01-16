@@ -25,6 +25,8 @@
 
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
+(def ^:private search-endpoint ls/search-server-domain)
+
 (defun- relative-href
   "Given a link map or a link string return the relative href."
 
@@ -76,7 +78,7 @@
     "DELETE" http/delete
     http/get))
 
-(defn refresh-jwt [refresh-link]
+(defn- refresh-jwt [refresh-link]
   (let [refresh-url (if (map? refresh-link)
                       (str ls/auth-server-domain (relative-href refresh-link))
                       refresh-link)
@@ -86,9 +88,19 @@
                   http/get)]
   (method refresh-url (complete-params headers))))
 
-(defn update-jwt-cookie! [jwt]
+(defn- update-jwt-cookie! [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-  (utils/after 1 #(dispatcher/dispatch! [:jwt jwt])))
+  (oc.web.actions.user/update-jwt jwt))
+
+(defn- jwt-refresh []
+  (go
+   (if-let [refresh-url (j/get-key :refresh-url)]
+     (let [res (<! (refresh-jwt refresh-url))]
+       (timbre/debug "jwt-refresh" res)
+       (if (:success res)
+         (update-jwt-cookie! (:body res))
+         (oc.web.actions.user/logout)))
+     (oc.web.actions.user/logout))))
 
 (defn- method-name [method]
   (cond
@@ -114,14 +126,9 @@
 (defn- req [endpoint method path params on-complete]
   (timbre/debug "Req:" (method-name method) (str endpoint path))
   (let [jwt (j/jwt)]
+    (timbre/debug jwt j/expired?)
     (go
-      (when (and jwt (j/expired?) )
-        (if-let [refresh-url (j/get-key :refresh-url)]
-          (let [res (<! (refresh-jwt refresh-url))]
-            (if (:success res)
-              (update-jwt-cookie! (:body res))
-              (dispatcher/dispatch! [:logout])))
-          (dispatcher/dispatch! [:logout])))
+      (when (and jwt (j/expired?)) (jwt-refresh))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
@@ -130,15 +137,14 @@
         (when (and (j/jwt)
                    (= status 401))
           (router/redirect! oc-urls/logout))
-        ; report all 5xx to sentry
+        ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
-                  (and (>= status 500) (<= status 599))
+                  (and (>= status 500) (<= status 599)))
+          (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
+        ; report all 5xx to sentry
+        (when (or (and (>= status 500) (<= status 599))
                   (= status 400)
                   (= status 422))
-          ; If it was a 5xx or a 0 show a banner for network issues
-          (when (or (zero? status)
-                    (and (>= status 500) (<= status 599)))
-            (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
           (let [report {:response response
                         :path path
                         :method (method-name method)
@@ -157,6 +163,8 @@
 (def ^:private pay-http (partial req pay-endpoint))
 
 (def ^:private interaction-http (partial req interaction-endpoint))
+
+(def ^:private search-http (partial req search-endpoint))
 
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
@@ -250,7 +258,7 @@
       (let [body (if (:success response) (:body response) false)]
         (dispatcher/dispatch! [:auth-settings body])))))
 
-(defn auth-with-email [email pswd]
+(defn auth-with-email [email pswd callback]
   (when (and email pswd)
     (let [email-links (:links (:auth-settings @dispatcher/app-state))
           auth-url (utils/link-for email-links "authenticate" "GET" {:auth-source "email"})]
@@ -260,13 +268,7 @@
           :password pswd}
          :headers (headers-for-link auth-url)}
         (fn [{:keys [success body status]}]
-         (if success
-            (dispatcher/dispatch! [:login-with-email/success body])
-            (cond
-              (= status 401)
-              (dispatcher/dispatch! [:login-with-email/failed 401])
-              :else
-              (dispatcher/dispatch! [:login-with-email/failed 500]))))))))
+          (callback success body status))))))
 
 (defn auth-with-token [token]
   (when token
@@ -281,7 +283,6 @@
          (if success
             (do
               (update-jwt-cookie! body)
-              (dispatcher/dispatch! [:jwt (j/get-contents)])
               (dispatcher/dispatch! [:auth-with-token/success body]))
             (cond
               (= status 401)
@@ -400,16 +401,7 @@
            (if (= status 422)
               (dispatcher/dispatch! [:user-profile-update/failed])
              (when success
-                (utils/after 1000
-                  (fn []
-                    (go
-                      (when-let [refresh-url (utils/link-for
-                                              (:links (:auth-settings @dispatcher/app-state))
-                                              "refresh")]
-                        (let [res (<! (refresh-jwt refresh-url))]
-                          (if (:success res)
-                            (update-jwt-cookie! (:body res))
-                            (dispatcher/dispatch! [:logout])))))))
+                (utils/after 1000 jwt-refresh)
                 (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn collect-name-password [firstname lastname pswd]
@@ -427,14 +419,7 @@
             (dispatcher/dispatch! [:name-pswd-collect/finish status nil])
             (when success
               (dispatcher/dispatch! [:name-pswd-collect/finish status (json->cljs body)])
-              (utils/after 1000
-                (fn []
-                  (go
-                    (when-let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
-                      (let [res (<! (refresh-jwt refresh-url))]
-                        (if (:success res)
-                          (update-jwt-cookie! (:body res))
-                          (dispatcher/dispatch! [:logout]))))))))))))))
+              (utils/after 1000 jwt-refresh))))))))
 
 (defn add-email-domain [domain]
   (when domain
@@ -456,9 +441,7 @@
       {:headers (headers-for-link refresh-url)}
       (fn [{:keys [status body success]}]
         (if success
-          (do
-            (update-jwt-cookie! body)
-            (dispatcher/dispatch! [:jwt body]))
+          (update-jwt-cookie! body)
           (router/redirect! oc-urls/logout))))))
 
 (defn patch-team [team-id new-team-data org-data]
@@ -495,7 +478,7 @@
                 ; use the org name
                 ; for it and patch it back
                 (patch-team (:team-id org-data) {:name org-name} org-data)
-                ; if not refirect the user to the slug)
+                ; if not redirect the user to the slug)
                 (dispatcher/dispatch! [:org-redirect org-data])))))))))
 
 (defn create-board [board-data]
@@ -793,10 +776,14 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:activity-delete/finish]))))))
 
-(defn get-all-posts [org-data & [activity-link year month]]
+(defn get-all-posts [org-data & [activity-link {:keys [year month from]}]]
   (when org-data
-    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))]
-      (storage-http (method-for-link all-posts-link) (relative-href all-posts-link)
+    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))
+          href (relative-href all-posts-link)
+          final-href (if from
+                       (str href "?start=" from "&direction=around")
+                       href)]
+      (storage-http (method-for-link all-posts-link) final-href
         {:headers (headers-for-link all-posts-link)}
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch!
@@ -804,6 +791,7 @@
             {:org (:slug org-data)
              :year year
              :month month
+             :from from
              :body (when success (json->cljs body))}]))))))
 
 (defn load-more-all-posts [more-link direction]
@@ -894,14 +882,21 @@
          (fn [{:keys [status success body]}]
            (dispatcher/dispatch! [:private-board-kick-out-self/finish success])))))))
 
+(defn query
+  [org-uuid search-query callback]
+  (when search-query
+    (let [search-link {:href (str "/search/?q=" search-query "&org=" org-uuid)
+                       :content-type (content-type "search")
+                       :method "GET" :rel ""}]
+      (search-http (method-for-link search-link) (relative-href search-link)
+                   {:headers (headers-for-link search-link)}
+                   (fn [{:keys [status success body]}]
+                     (callback {:success success
+                                :error (when-not success body)
+                                :body (when (seq body) (json->cljs body))}))))))
+
+
 (defn force-jwt-refresh []
-  (when (j/jwt)
-    (go
-      (if-let [refresh-url (j/get-key :refresh-url)]
-        (let [res (<! (refresh-jwt refresh-url))]
-          (if (:success res)
-            (update-jwt-cookie! (:body res))
-            (dispatcher/dispatch! [:logout])))
-        (dispatcher/dispatch! [:logout])))))
+  (when (j/jwt) (jwt-refresh)))
 
 (set! (.-OCWebForceRefreshToken js/window) force-jwt-refresh)

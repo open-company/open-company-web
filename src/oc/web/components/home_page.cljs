@@ -5,6 +5,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as user]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
@@ -73,7 +74,7 @@
             (when-not (jwt/jwt)
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                              (user/show-login :signup-with-slack)
                               (router/nav! oc-urls/sign-up))}
                 "Get started for free"])]
           (when (and (not @(::confirm s))
@@ -208,7 +209,7 @@
                 "With Carrot, everyone’s on the same page."]
               [:button.mlb-reset.get-started-button
                 {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (dis/dispatch! [:login-overlay-show :signup-with-slack])
+                              (user/show-login :signup-with-slack)
                               (router/nav! oc-urls/sign-up))}
                 "Get started for free"]]])
       ] ; <!-- .main -->

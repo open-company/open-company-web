@@ -6,7 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.lib.logging :as logging]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.activity-card :refer (activity-card)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
@@ -19,7 +19,7 @@
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 5)
-(def card-avg-height 600)
+(def card-avg-height 372)
 
 (def last-scroll (atom 0))
 
@@ -104,7 +104,7 @@
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
   [s e]
-  (let [scroll-top (.-scrollTop (.-body js/document))
+  (let [scroll-top (.-scrollTop (.-scrollingElement js/document))
         direction (if (> @last-scroll scroll-top)
                     :up
                     (if (< @last-scroll scroll-top)
@@ -142,6 +142,7 @@
                         ;; Derivatives
                         (drv/drv :all-posts)
                         (drv/drv :calendar)
+                        (drv/drv :ap-initial-at)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -165,6 +166,7 @@
                                 next-link (utils/link-for (:links all-posts-data) "previous")
                                 prev-link (utils/link-for (:links all-posts-data) "next")
                                 first-entry-date (utils/js-date (get-activity-date (first sorted-items)))
+                                ap-initial-at @(drv/get-ref s :ap-initial-at)
                                 first-available-entry (when (and year month)
                                                         (get-first-available-entry
                                                          (get-sorted-items all-posts-data)
@@ -204,7 +206,11 @@
                                   ; First load or calendar get
                                   (do
                                     (reset! (::selected-year s) (.getFullYear first-entry-date))
-                                    (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))))))
+                                    (reset! (::selected-month s) (inc (int (.getMonth first-entry-date))))
+                                    (when ap-initial-at
+                                      (reset!
+                                       (::scroll-to-entry s)
+                                       (first (filter #(= (:published-at %) ap-initial-at) sorted-items))))))))
                             (reset! (::retrieving-calendar s) nil)
                             (reset! (::top-loading s) false)
                             (reset! (::bottom-loading s) false)
@@ -224,10 +230,10 @@
                          :after-render (fn [s]
                           (when-let [scroll-to @(::scroll-to-entry s)]
                             (when-let [entry-el (sel1 [(str "div.activity-card-" (:uuid scroll-to))])]
-                              (utils/scroll-to-element entry-el 100 0))
+                              (utils/scroll-to-element entry-el 80 0))
                             (utils/after 100 #(do
-                                                (reset! (::scroll-to-entry s) nil)
-                                                (reset! (::last-direction s) nil))))
+                                               (reset! (::scroll-to-entry s) nil)
+                                               (reset! (::last-direction s) nil))))
                           s)
                          :did-remount (fn [_ s]
                           (let [all-posts-data (first (:rum/args s))
@@ -266,9 +272,9 @@
                                   (reset! (::scroll-to-entry s) first-available-entry)))))
                           s)
                          :will-unmount (fn [s]
-                                        (when @(::scroll-listener s)
-                                          (events/unlistenByKey @(::scroll-listener s)))
-                                         s)}
+                          (when @(::scroll-listener s)
+                            (events/unlistenByKey @(::scroll-listener s)))
+                           s)}
   [s all-posts-data]
   (let [calendar-data (drv/react s :calendar)
         items (get-sorted-items all-posts-data)]
@@ -301,7 +307,8 @@
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
-        (when @(::show-all-caught-up-message s)
+        (when (and @(::show-all-caught-up-message s)
+                   (responsive/is-mobile-size?))
           (all-caught-up))]
       [:div.all-posts-nav
         ; [:div.all-posts-nav-inner

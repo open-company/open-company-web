@@ -16,6 +16,10 @@
 ;; Interaction location
 (def interaction-server-domain "http://localhost:3002")
 
+;; Search location
+(def search-server-domain "http://localhost:3007")
+(def search-enabled? true)
+
 ;; Web location
 (def web-server "localhost:3559")
 

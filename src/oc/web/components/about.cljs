@@ -5,6 +5,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as user]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.site-header :refer (site-header)]
@@ -183,9 +184,9 @@
             [:div.above-noise-description
               "Give your team a clear view of what’s most important."]
             [:button.mlb-reset.get-started-button
-              {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (dis/dispatch! [:login-overlay-show :signup-with-slack])
-                              (router/nav! oc-urls/sign-up))}
+             {:on-click #(if (utils/in? (:route @router/path) "login")
+                           (user/show-login :signup-with-slack)
+                           (router/nav! oc-urls/sign-up))}
               "Get started for free"]]]
       ] ;<!-- main -->
     ] ; <!-- wrap -->

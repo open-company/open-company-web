@@ -33,11 +33,6 @@
   (timbre/info "Full event: " (pr-str payload))
   db)
 
-(defmethod dispatcher/action :logout [db _]
-  (cook/remove-cookie! :jwt)
-  (router/redirect! "/")
-  (dissoc db :jwt :latest-entry-point :latest-auth-settings))
-
 (defmethod dispatcher/action :entry-point
   [db [_ {:keys [success collection]}]]
   (let [next-db (assoc db :latest-entry-point (.getTime (js/Date.)))]
@@ -111,10 +106,12 @@
 
     (cond
       ;; If it's all posts page, loads all posts for the current org
-      (and (router/current-board-slug)
-           (= (router/current-board-slug) "all-posts"))
+      (or (= (router/current-board-slug) "all-posts")
+          (:ap-initial-at db))
       (if (utils/link-for (:links org-data) "activity")
-        (api/get-all-posts org-data)
+        ;; Load all posts only if not coming from a digest url
+        ;; in that case do not load since we already have the results we need
+        (api/get-all-posts org-data (utils/link-for (:links org-data) "activity") {:from (:ap-initial-at db)})
         (do
           ;; Remove the last board cookie to avoid falling in the all-posts 404 again
           (cook/remove-cookie! (router/last-board-cookie (:slug org-data)))
@@ -324,18 +321,6 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
-;; Store JWT in App DB so it can be easily accessed in actions etc.
-
-(defmethod dispatcher/action :jwt
-  [db [_ jwt-data]]
-  (let [next-db (if (cook/get-cookie :show-login-overlay)
-                  (assoc db :show-login-overlay (keyword (cook/get-cookie :show-login-overlay)))
-                  db)]
-    (when (and (cook/get-cookie :show-login-overlay)
-               (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
-               (not= (cook/get-cookie :show-login-overlay) "collect-password"))
-      (cook/remove-cookie! :show-login-overlay))
-    (assoc next-db :jwt (jwt/get-contents))))
 
 ;; Stripe Payment related actions
 
@@ -344,41 +329,6 @@
   (if uuid
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
-
-(defmethod dispatcher/action :login-overlay-show
- [db [_ show-login-overlay]]
- (cond
-    (= show-login-overlay :login-with-email)
-    (-> db
-      (assoc :show-login-overlay show-login-overlay)
-      (assoc :login-with-email {:email "" :pswd ""})
-      (dissoc :login-with-email-error))
-    (= show-login-overlay :signup-with-email)
-    (-> db
-      (assoc :show-login-overlay show-login-overlay)
-      (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""})
-      (dissoc :signup-with-email-error))
-    :else
-    (assoc db :show-login-overlay show-login-overlay)))
-
-(defmethod dispatcher/action :login-with-slack
-  [db [_]]
-  (let [current (router/get-token)
-        auth-url (utils/link-for (:links (:auth-settings db)) "authenticate" "GET" {:auth-source "slack"})
-        auth-url-with-redirect (utils/slack-link-with-state
-                                (:href auth-url)
-                                nil
-                                "open-company-auth" oc-urls/slack-lander-check)
-        current-route (:route @router/path)]
-    (when (and (not (utils/in? current-route "login"))
-               (not (utils/in? current-route "sign-up"))
-               (not (utils/in? current-route "slack"))
-               (not (utils/in? current-route "about"))
-               (not (utils/in? current-route "home"))
-               (not (cook/get-cookie :login-redirect)))
-        (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    (router/redirect! auth-url-with-redirect))
-  (dissoc db :latest-auth-settings :latest-entry-point))
 
 (defmethod dispatcher/action :bot-auth
   [db [_]]
@@ -391,26 +341,6 @@
         fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) team-id (router/get-token))]
     (router/redirect! fixed-auth-url))
   db)
-
-(defmethod dispatcher/action :login-with-email
-  [db [_]]
-  (api/auth-with-email (:email (:login-with-email db)) (:pswd (:login-with-email db)))
-  (dissoc db :login-with-email-error :latest-auth-settings :latest-entry-point))
-
-(defmethod dispatcher/action :login-with-email/failed
-  [db [_ error]]
-  (assoc db :login-with-email-error error))
-
-(defmethod dispatcher/action :login-with-email/success
-  [db [_ jwt]]
-  (if (empty? jwt)
-    (do
-      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" (:email (:signup-with-email db)))))
-      db)
-    (do
-      (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
-      (api/get-entry-point)
-      (dissoc db :show-login-overlay))))
 
 (defmethod dispatcher/action :auth-with-token
   [db [ _ token-type]]
@@ -1499,19 +1429,25 @@
   [db [_]]
   (dissoc db :board-editing))
 
+(defmethod dispatcher/action :all-posts-reset
+ [db [_]]
+ (let [org (router/current-org-slug)
+       all-posts-key (dispatcher/all-posts-key org)]
+  (assoc-in db all-posts-key nil)))
+
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
-  (when (utils/link-for (:links (dispatcher/org-data db)) "activity")
-    (api/get-all-posts (dispatcher/org-data db)))
+  (when-let [activity-link (utils/link-for (:links (dispatcher/org-data db)) "activity")]
+    (api/get-all-posts (dispatcher/org-data db) activity-link {:from (:ap-initial-at db)}))
   db)
 
 (defmethod dispatcher/action :all-posts-calendar
   [db [_ {:keys [link year month]}]]
-  (api/get-all-posts (dispatcher/org-data) link year month)
+  (api/get-all-posts (dispatcher/org-data) link {:year year :month month})
   db)
 
 (defmethod dispatcher/action :all-posts-get/finish
-  [db [_ {:keys [org year month body]}]]
+  [db [_ {:keys [org year month from body]}]]
   (if body
     (let [all-posts-key (dispatcher/all-posts-key org)
           fixed-all-posts (utils/fix-all-posts (:collection body))
@@ -1523,6 +1459,10 @@
                                 (assoc :rand (rand 1000)))]
       (when (and (not year) (not month))
         (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
+      (when (and from
+                 (router/current-activity-id)
+                 (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))
+        (router/redirect-404!))
       (assoc-in db all-posts-key with-calendar-data))
     db))
 
@@ -1636,22 +1576,6 @@
         new-status-data (merge old-status-data clean-status-data)]
     (timbre/debug "Change status data:" new-status-data)
     (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))
-
-(defmethod dispatcher/action :initial-loads
-  [db [_]]
-  (let [force-refresh (or (utils/in? (:route @router/path) "org")
-                          (utils/in? (:route @router/path) "login"))
-        latest-entry-point (if (or force-refresh (nil? (:latest-entry-point db))) 0 (:latest-entry-point db))
-        latest-auth-settings (if (or force-refresh (nil? (:latest-auth-settings db))) 0 (:latest-auth-settings db))
-        now (.getTime (js/Date.))
-        reload-time (* 60 60 1000)]
-    (when (or (> (- now latest-entry-point) reload-time)
-              (and (router/current-org-slug)
-                   (nil? (dispatcher/org-data db (router/current-org-slug)))))
-      (api/get-entry-point))
-    (when (> (- now latest-auth-settings) reload-time)
-      (api/get-auth-settings)))
-  db)
 
 (defmethod dispatcher/action :nux-end
   [db [_]]

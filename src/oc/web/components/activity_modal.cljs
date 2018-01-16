@@ -62,7 +62,10 @@
               (oc-urls/board org board))))))))
 
 (defn close-clicked [s & [board-filters]]
-  (when-not (:from-all-posts @router/path)
+  (if (:from-all-posts @router/path)
+    ;; Remove AP data from the DB to avoid showing results before loading and results again
+    (when-not (string? board-filters)
+      (dis/dispatch! [:all-posts-reset]))
     ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
     (dis/dispatch! [:input [:no-reset-seen-at] true]))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
@@ -256,7 +259,8 @@
                             (rum/local false ::edited-data-loaded)
                             (rum/local nil ::autosave-timer)
                             ;; Mixins
-                            mixins/no-scroll-mixin
+                            (when-not (responsive/is-mobile-size?)
+                              mixins/no-scroll-mixin)
                             mixins/first-render-mixin
 
                             {:before-render (fn [s]
@@ -501,7 +505,8 @@
                   (if editing
                     [:div.activity-modal-footer.group
                       {:class (when @(::show-bottom-border s) "scrolling-content")}
-                      (when-not (js/isIE)
+                      (when (and (not (js/isIE))
+                                 (not is-mobile?))
                         (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                                        :container-selector "div.activity-modal-content"}))
                       [:div.activity-modal-footer-right

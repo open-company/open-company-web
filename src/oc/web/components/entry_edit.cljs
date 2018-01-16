@@ -347,6 +347,7 @@
           {:class (when-not @(::show-divider-line s) "not-visible")}]
         [:div.entry-edit-modal-footer.group
           (when (and (not nux)
+                     (not (responsive/is-tablet-or-mobile?))
                      (not (js/isIE)))
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :container-selector "div.entry-edit-modal"}))

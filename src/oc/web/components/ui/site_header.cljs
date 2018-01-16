@@ -6,6 +6,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as user]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
@@ -17,7 +18,7 @@
   (.preventDefault e)
   (when (responsive/is-mobile-size?)
     (dis/dispatch! [:site-menu-toggle true]))
-  (dis/dispatch! [:login-overlay-show nil])
+  (user/show-login nil)
   (router/nav! uri))
 
 (rum/defc site-header < rum/static
@@ -53,8 +54,8 @@
            :on-click (fn [e]
                        (.preventDefault e)
                        (if (jwt/jwt)
-                        (nav! (utils/your-boards-url) e)
-                        (dis/dispatch! [:login-overlay-show :login-with-slack])))}
+                         (nav! (utils/your-boards-url) e)
+                         (user/show-login :login-with-slack)))}
           (if (jwt/jwt)
             "Your Boards"
             "Login")]]

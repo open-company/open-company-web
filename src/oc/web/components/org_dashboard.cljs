@@ -41,11 +41,9 @@
     (refresh-board-data))
 
   (render-state [_ {:keys [columns-num card-width] :as state}]
-    (let [org-slug (keyword (router/current-org-slug))
-          org-data (dis/org-data data)
-          board-slug (keyword (router/current-board-slug))
-          board-data (dis/board-data data)
-          all-posts-data (dis/all-posts-data data)]
+    (let [org-data (dis/org-data data)
+          all-posts-data (dis/all-posts-data data)
+          board-data (dis/board-data data)]
       ;; Show loading if
       (if (or ;; the org data are not loaded yet
               (not org-data)
@@ -55,24 +53,20 @@
                    (pos? (count (:boards org-data))))
               ;; Board specified
               (and (router/current-board-slug)
-                       ;; But the data are not loaded yet
-                   (or (and (not= (router/current-board-slug) "all-posts")
-                            (not board-data))
-                       ;; Or the all-posts data
-                       (and (= (router/current-board-slug) "all-posts")
-                            (not all-posts-data))))
+                   ;; But no board/all-posts data yet
+                   (not board-data)
+                   (not all-posts-data))
               ;; First ever user nux, not enough time
               (and (:nux-loading data)
                    (not (:nux-end data))))
-        (dom/div {:class (utils/class-set {:org-dashboard true
-                                           :main-scroll true})}
+        (dom/div {:class "org-dashboard"}
           (loading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))}))
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)
                                            :mobile-or-tablet (responsive/is-tablet-or-mobile?)
-                                           :main-scroll true
-                                           :no-scroll (router/current-activity-id)})}
+                                           :no-scroll (and (not (responsive/is-mobile-size?))
+                                                           (router/current-activity-id))})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
           (cond
             (some #{(:nux data)} [:1 :7])
@@ -117,11 +111,10 @@
           (when (and (:media-input data)
                      (:media-chart (:media-input data)))
             (media-chart-modal))
-          (dom/div {:class "page"}
-            ;; Navbar
-            (when-not (and (responsive/is-tablet-or-mobile?)
+          (when-not (and (responsive/is-tablet-or-mobile?)
                            (router/current-activity-id))
-              (navbar))
-            (dom/div {:class "dashboard-container"}
-              (dom/div {:class "topic-list"}
-                (dashboard-layout)))))))))
+            (dom/div {:class "page"}
+              (navbar)
+              (dom/div {:class "dashboard-container"}
+                (dom/div {:class "topic-list"}
+                  (dashboard-layout))))))))))

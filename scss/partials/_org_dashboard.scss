@@ -27,7 +27,7 @@ div.org-dashboard {
       background-color: $oc_gray_8;
 
       @include big_web() {
-        min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}
+        min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}px;
       }
 
       @include mobile() {
