@@ -399,11 +399,19 @@
           [:button.mlb-reset.mlb-default.form-action-bt.post-btn
             {:on-click #(do
                           (clean-body)
-                          (reset! (::publishing s) true)
-                          (dis/dispatch! [:entry-publish]))
+                          (if published?
+                            (do
+                             (reset! (::saving s) true)
+                             (dis/dispatch! [:entry-save]))
+                            (do
+                             (reset! (::publishing s) true)
+                             (dis/dispatch! [:entry-publish]))))
              :disabled (or @(::publishing s)
                            (not (is-publishable? entry-editing)))}
-            (when @(::publishing s)
+            (when (or (and published?
+                           @(::saving s))
+                      (and (not published?)
+                           @(::publishing s)))
               (small-loading))
             (if published?
               "Save"
@@ -418,7 +426,8 @@
                               (clean-body)
                               (reset! (::saving s) true)
                               (dis/dispatch! [:entry-save])))}
-              (when @(::saving s)
+              (when (and (not published?)
+                         @(::saving s))
                 (small-loading))
               (if published?
                 "Cancel"
