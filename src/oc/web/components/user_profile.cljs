@@ -221,7 +221,7 @@
                    :data-toggle "tooltip"
                    :data-placement "top"}]]  
               [:div.user-profile-field.digest-frequency-field.digest-frequency
-                [:div.dropdown
+                [:div.dropdown {:class "dropdown-button"}
                   [:button.btn-reset.user-type-btn.dropdown-toggle
                     {:id "user-digest-frequency-dropdown"
                      :data-toggle "dropdown"
@@ -299,7 +299,7 @@
               [:div.user-profile-field-label
                 "Digest Type"]
               [:div.user-profile-field.digest-medium
-                [:div.dropdown
+                [:div.dropdown {:class "dropdown-button"}
                   [:button.btn-reset.user-type-btn.dropdown-toggle
                     {:id "user-digest-medium-dropdown"
                      :data-toggle "dropdown"
