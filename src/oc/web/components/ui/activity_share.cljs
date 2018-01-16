@@ -253,33 +253,35 @@
                        "Share"])]]]])
           (when (= @(::medium s) :url)
             [:div.activity-share-modal-shared.group
-              (let [share-url (str
-                               "http"
-                               (when ls/jwt-cookie-secure
-                                "s")
-                               "://"
-                               ls/web-server
-                               (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
-                [:div.shared-url-container.group
-                  [:input
-                    {:value share-url
-                     :read-only true
-                     :on-click #(highlight-url s)
-                     :ref "activity-share-url-field"
-                     :data-placement "top"}]])
-              [:button.mlb-reset.mlb-default.copy-btn
-                {:ref "activity-share-url-copy-btn"
-                 :on-click (fn [e]
-                            (utils/event-stop e)
-                            (highlight-url s)
-                            (when (utils/copy-to-clipboard)
-                              (reset! (::copied s) true)
-                              (utils/after
-                               2000
-                               #(reset! (::copied s) false))))}
-                (if @(::copied s)
-                  "Copied!"
-                  "Copy URL")]])
+              [:form
+                {:on-submit #(utils/event-stop %)}
+                (let [share-url (str
+                                 "http"
+                                 (when ls/jwt-cookie-secure
+                                  "s")
+                                 "://"
+                                 ls/web-server
+                                 (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
+                  [:div.shared-url-container.group
+                    [:input
+                      {:value share-url
+                       :read-only true
+                       :content-editable false
+                       :on-click #(highlight-url s)
+                       :ref "activity-share-url-field"
+                       :data-placement "top"}]])
+                [:button.mlb-reset.mlb-default.copy-btn
+                  {:ref "activity-share-url-copy-btn"
+                   :on-click (fn [e]
+                              (utils/event-stop e)
+                              (let [url-input (rum/ref-node s "activity-share-url-field")]
+                                (highlight-url s)
+                                (when (utils/copy-to-clipboard url-input)
+                                  (reset! (::copied s) true)
+                                  (utils/after 2000 #(reset! (::copied s) false)))))}
+                  (if @(::copied s)
+                    "Copied!"
+                    "Copy URL")]]])
           (when (= @(::medium s) :slack)
             [:div.activity-share-share
               [:div.mediums-box
