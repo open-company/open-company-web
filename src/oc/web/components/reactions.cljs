@@ -67,9 +67,7 @@
   (let [reactions-data (vec (:reactions entry-data))
         reactions-loading (:reactions-loading entry-data)
         react-link (utils/link-for (:links entry-data) "react")
-        is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-picker? (and (not is-mobile?)
-                                 react-link
+        should-show-picker? (and react-link
                                  (< (count reactions-data) default-reaction-number))]
     ;; If there are reactions to render or there is at least the link to add a reaction from the picker
     (when (or (seq reactions-data)
@@ -137,6 +135,10 @@
               [:div.count "+"]])]
         [:div.reactions-picker-container
           {:class (utils/class-set {:visible @(::show-picker s)})}
+          (when (responsive/is-tablet-or-mobile?)
+            [:button.mlb-reset.dismiss-mobile-picker
+              {:on-click #(reset! (::show-picker s) false)}
+              "Cancel"])
           (when-not (utils/is-test-env?)
             (react-utils/build (.-Picker js/EmojiMart)
               {:native true
