@@ -6,12 +6,11 @@
 
 (let [get-k "org.martinklepsch.derivatives/get"
       release-k "org.martinklepsch.derivatives/release"]
-  (defn om-derivatives [mngr]
+  (defn- om-derivatives [pool]
     (->> {:childContextTypes {get-k js/React.PropTypes.func
                               release-k js/React.PropTypes.func}
-          :getChildContext (fn [] (let [{:keys [release! get!]} mngr]
-                                    (clj->js {get-k get!
-                                              release-k release!})))}
+          :getChildContext (fn [] (clj->js {get-k     (partial drv/get! pool)
+                                            release-k (partial drv/release! pool)}))}
          (merge om/pure-methods)
          clj->js
          om/specify-state-methods!)))
