@@ -116,11 +116,13 @@
       (dis/dispatch! [:user-profile-save]))))
 
 (rum/defcs user-profile < rum/reactive
-                          (rum/local false ::loading)
-                          (rum/local false ::show-success)
-                          (drv/drv :edit-user-profile)
+                          ;; Derivatives
                           (drv/drv :orgs)
                           (drv/drv :alert-modal)
+                          (drv/drv :edit-user-profile)
+                          ;; Locals
+                          (rum/local false ::loading)
+                          (rum/local false ::show-success)
                           (rum/local false ::name-error)
                           (rum/local false ::email-error)
                           (rum/local false ::password-error)
@@ -295,28 +297,29 @@
                        :value t}
                       t])]]]
             ;; Digest Medium
-            [:div.user-profile-field-box
-              [:div.user-profile-field-label
-                "Digest Type"]
-              [:div.user-profile-field.digest-medium
-                [:div.dropdown {:class "dropdown-button"}
-                  [:button.btn-reset.user-type-btn.dropdown-toggle
-                    {:id "user-digest-medium-dropdown"
-                     :data-toggle "dropdown"
-                     :aria-haspopup true
-                     :aria-expanded false}
-                    (case (:digest-medium current-user-data)
-                      "slack"
-                      "Slack"
-                      "Email")]
-                  [:ul.dropdown-menu.user-type-dropdown-menu
-                    {:aria-labelledby "user-digest-medium-dropdown"}
-                    [:li
-                      {:on-click #(change! s :digest-medium "email")}
-                      "Email"]
-                    [:li
-                      {:on-click #(change! s :digest-medium "slack")}
-                      "Slack"]]]]]]]]
+            (when true ; should be conditional on team having a bot, but that's not in scope here in user profile
+              [:div.user-profile-field-box
+                [:div.user-profile-field-label
+                  "Digest Type"]
+                [:div.user-profile-field.digest-medium
+                  [:div.dropdown {:class "dropdown-button"}
+                    [:button.btn-reset.user-type-btn.dropdown-toggle
+                      {:id "user-digest-medium-dropdown"
+                       :data-toggle "dropdown"
+                       :aria-haspopup true
+                       :aria-expanded false}
+                      (case (:digest-medium current-user-data)
+                        "slack"
+                        "Slack"
+                        "Email")]
+                    [:ul.dropdown-menu.user-type-dropdown-menu
+                      {:aria-labelledby "user-digest-medium-dropdown"}
+                      [:li
+                        {:on-click #(change! s :digest-medium "email")}
+                        "Email"]
+                      [:li
+                        {:on-click #(change! s :digest-medium "slack")}
+                        "Slack"]]]]])]]]
             ;; Eventually we want them to be able specify day and time of digest, but not yet
             ; [:div.user-profile-field.digest-frequency-field.digest-day
             ;   [:select
