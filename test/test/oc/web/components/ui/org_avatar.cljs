@@ -1,8 +1,6 @@
 (ns test.oc.web.components.ui.org-avatar
   (:require [cljs-react-test.utils :as tu]
             [cljs-react-test.simulate :as sim]
-            [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
             [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
             [oc.web.rum-utils :as ru]
@@ -38,7 +36,7 @@
         (ru/drv-root {:state test-atom
                       :drv-spec (dis/drv-spec test-atom (atom {}))
                       :target c
-                      :component #(om/component (org-avatar (:org-data test-atom) true))})
+                      :component #(org-avatar (:org-data test-atom) true)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
         (is (not (nil? (sel1 c [:div.org-avatar :a.org-link]))))
         (is (nil? (sel1 c [:div.org-avatar :img.org-avatar-img])))
@@ -50,7 +48,7 @@
         (ru/drv-root {:state test-atom
                       :drv-spec (dis/drv-spec test-atom (atom {}))
                       :target c
-                      :component #(om/component (org-avatar (:org-data test-atom) false))})
+                      :component #(org-avatar (:org-data test-atom) false)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
         (is (nil? (sel1 c [:div.org-avatar :a.org-link])))
         (is (not (nil? (sel1 c [:div.org-avatar :img.org-avatar-img]))))
@@ -62,7 +60,7 @@
         (ru/drv-root {:state test-atom
                       :drv-spec (dis/drv-spec test-atom (atom {}))
                       :target c
-                      :component #(om/component (org-avatar (:org-data test-atom) false :always))})
+                      :component #(org-avatar (:org-data test-atom) false :always)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
         (is (nil? (sel1 c [:div.org-avatar :a.org-link])))
         (is (not (nil? (sel1 c [:div.org-avatar :img.org-avatar-img]))))
@@ -74,7 +72,7 @@
         (ru/drv-root {:state test-atom
                       :drv-spec (dis/drv-spec test-atom (atom {}))
                       :target c
-                      :component #(om/component (org-avatar (:org-data test-atom) false :always))})
+                      :component #(org-avatar (:org-data test-atom) false :always)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
         (is (nil? (sel1 c [:div.org-avatar :a.org-link])))
         (is (nil? (sel1 c [:div.org-avatar :img.org-avatar-img])))
@@ -86,7 +84,7 @@
         (ru/drv-root {:state test-atom
                       :drv-spec (dis/drv-spec test-atom (atom {}))
                       :target c
-                      :component #(om/component (org-avatar (:org-data test-atom) false :never))})
+                      :component #(org-avatar (:org-data test-atom) false :never)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
         (is (nil? (sel1 c [:div.org-avatar :a.org-link])))
         (is (not (nil? (sel1 c [:div.org-avatar :img.org-avatar-img]))))
@@ -98,7 +96,7 @@
         (ru/drv-root {:state test-atom
                       :drv-spec (dis/drv-spec test-atom (atom {}))
                       :target c
-                      :component #(om/component (org-avatar (:org-data test-atom) false :never))})
+                      :component #(org-avatar (:org-data test-atom) false :never)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
         (is (nil? (sel1 c [:div.org-avatar :a.org-link])))
         (is (nil? (sel1 c [:div.org-avatar :img.org-avatar-img])))
