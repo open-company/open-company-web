@@ -367,7 +367,10 @@
         editing (:modal-editing modal-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         show-comments? (and (not is-mobile?)
-                            (utils/link-for (:links activity-data) "comments"))]
+                            (utils/link-for (:links activity-data) "comments"))
+        delete-link (utils/link-for (:links activity-data) "delete")
+        edit-link (utils/link-for (:links activity-data) "partial-update")
+        share-link (utils/link-for (:links activity-data) "share")]
     [:div.activity-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -406,9 +409,9 @@
                    :title (utils/activity-date-tooltip activity-data)}
                   (utils/time-since (:published-at activity-data))]]]
             [:div.activity-modal-header-right
-              (when (and (not is-mobile?)
-                         (or (utils/link-for (:links activity-data) "partial-update")
-                             (utils/link-for (:links activity-data) "delete")))
+              (when (or edit-link
+                        share-link
+                        delete-link)
                 (let [all-boards (filter
                                   #(not= (:slug %) utils/default-drafts-board-slug)
                                   (:boards (:org-data modal-data)))]
@@ -427,14 +430,28 @@
                       [:div.activity-modal-dropdown-menu
                         [:div.triangle]
                         [:ul.activity-modal-more-menu
-                          (when (utils/link-for (:links activity-data) "partial-update")
+                          (when (and is-mobile?
+                                     edit-link)
+                           [:li.no-editing
+                             {:on-click #(do
+                                          (reset! (::showing-dropdown s) false)
+                                          (dis/dispatch! [:activity-edit activity-data]))}
+                             "Edit"])
+                          (when (and is-mobile?
+                                     share-link)
+                           [:li.no-editing
+                             {:on-click #(do
+                                          (reset! (::showing-dropdown s) false)
+                                          (dis/dispatch! [:activity-share-show activity-data]))}
+                             "Share"])
+                          (when edit-link
                             [:li
                               {:class (if editing "disabled" "no-editing")
                                :on-click #(when-not editing
                                            (reset! (::showing-dropdown s) false)
                                            (reset! (::move-activity s) true))}
                               "Move"])
-                          (when (utils/link-for (:links activity-data) "delete")
+                          (when delete-link
                             [:li
                               {:on-click #(do
                                             (reset! (::showing-dropdown s) false)
@@ -525,7 +542,7 @@
                       (reactions activity-data)
                       [:div.activity-modal-footer-right
                         (when (and (not is-mobile?)
-                                   (utils/link-for (:links activity-data) "partial-update"))
+                                   edit-link)
                           [:button.mlb-reset.post-edit
                             {:class (utils/class-set {:not-hover (and (not @(::move-activity s))
                                                                       (not @(::showing-dropdown s)))})

@@ -41,6 +41,11 @@ div.entry-card-dd-container {
     box-shadow: none;
     background-color: transparent;
 
+    @include mobile() {
+      left: unset;
+      right: 0px;
+    }
+
     div.triangle {
       position: absolute;
       top: 1px;
@@ -51,6 +56,11 @@ div.entry-card-dd-container {
       transform: rotate(45deg);
       width: 15px;
       height: 15px;
+
+      @include mobile() {
+        left: unset;
+        right: 20px;
+      }
     }
 
     div.entry-dropdown-list-content {
@@ -60,6 +70,12 @@ div.entry-card-dd-container {
       border-radius: 5px;
       margin: 8px 0;
       min-height: 50px;
+      text-align: left;
+
+      @include mobile() {
+        max-height: calc(100vh - 200px);
+        overflow-y: scroll;
+      }
 
       ul {
         list-style-type: none;

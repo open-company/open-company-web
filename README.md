@@ -190,6 +190,7 @@ provided in the table below:
 
 |  **Action** | **Caller** | **Description** |
 |  ------ | ------ | ------ |
+|  :activity-edit | UI | Used to handle the various activity edit cases: if on mobile or if the post is not published, uses the entry-edit component, otherwise uses the activity-modal view. |
 |  :activity-delete | UI | Delete the selected entry. |
 |  :activity-delete/finish | API | Entry delete request finished, refresh the board data. |
 |  :activity-get/finish | API | Activity (secure or not) loaded from API. |

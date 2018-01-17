@@ -128,7 +128,14 @@
         expired? (j/expired?)]
     (timbre/debug jwt expired?)
     (go
-      (when (and jwt expired?) (oc.web.actions.user/jwt-refresh))
+      (when (and jwt expired?)
+        (if-let [refresh-url (j/get-key :refresh-url)]
+          (let [res (<! (refresh-jwt refresh-url))]
+            (timbre/debug "jwt-refresh" res)
+            (if (:success res)
+              (oc.web.actions.user/update-jwt (:body res))
+              (oc.web.actions.user/logout)))
+          (oc.web.actions.user/logout)))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
@@ -378,7 +385,7 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:user-data (json->cljs body)])))))
 
-(def user-profile-keys [:first-name :last-name :email :password :avatar-url])
+(def user-profile-keys [:first-name :last-name :email :password :avatar-url :timezone :digest-frequency :digest-medium])
 
 (defn patch-user-profile [old-user-data new-user-data]
   (when (and (:links old-user-data)

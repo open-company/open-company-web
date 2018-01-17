@@ -133,19 +133,38 @@ div.user-profile {
 
         div.user-profile-field-label {
           @include avenir_H();
-          font-size: 15px;
-          color: $carrot_gray;
+          font-size: 14px;
+          color: $oc_gray_7;
           margin-top: 32px;
 
           span.error {
             margin-left: 16px;
             color: $carrot_orange;
           }
+
+          i.mdi.mdi-information-outline {
+            margin-left: 8px;
+            
+            &:before {
+              font-size: 14px;
+            }
+          }
         }
 
         div.user-profile-field {
           margin: 8px 0 24px 0;
           padding: 0;
+
+           div.dropdown {
+            height: 40px;
+            padding: 10px 8px;
+            border: 1px solid rgba($carrot_light_gray_1, 0.5);
+            border-radius: 4px;
+          }
+
+          div.dropdown.dropdown-button {
+            border: 0px;
+          }
 
           input, select {
             width: 100%;
@@ -168,16 +187,6 @@ div.user-profile {
               @include avenir_R();
               font-size: 16px;
               color: $carrot_light_gray;
-            }
-          }
-
-          &.digest-frequency-field {
-            float: left;
-            width: 208px;
-            margin-right: 10px;
-
-            &:last-child {
-              margin-right: 0px;
             }
           }
         }
