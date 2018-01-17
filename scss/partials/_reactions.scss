@@ -100,6 +100,23 @@ div.reactions {
     display: none;
     z-index: 1234;
 
+    @include mobile() {
+      padding-top: 29px;
+      background-color: white;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      width: 100vw;
+      height: 100vh;
+
+      button.dismiss-mobile-picker {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        color: black;
+      }
+    }
+
     &.visible {
       display: block;
     }
@@ -107,6 +124,21 @@ div.reactions {
     div.emoji-mart {
       position: absolute;
       bottom: -31px;
+
+      @include mobile() {
+        position: relative;
+        width: 100% !important;
+        height: calc(100vh - 29px);
+        bottom: unset;
+
+        div.emoji-mart-scroll {
+          height: calc(100vh - 29px - 46px - 29px);
+        }
+
+        div.emoji-mart-bar:last-child {
+          display: none;
+        }
+      }
     }
   }
 }
