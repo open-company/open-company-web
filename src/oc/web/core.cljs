@@ -1,6 +1,5 @@
 (ns oc.web.core
-  (:require [om.core :as om :include-macros true]
-            [secretary.core :as secretary :refer-macros (defroute)]
+  (:require [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
@@ -40,11 +39,11 @@
 
 (enable-console-print!)
 
-(defn drv-root [om-component target]
+(defn drv-root [component target]
   (swap! dis/app-state assoc :router-path @router/path)
   (ru/drv-root {:state dis/app-state
                 :drv-spec (dis/drv-spec dis/app-state router/path)
-                :component om-component
+                :component component
                 :target target}))
 
 ;; setup Sentry error reporting
@@ -63,7 +62,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root #(om/component (loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))})) target)))
+    (drv-root #(loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))}) target)))
 
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
@@ -127,7 +126,7 @@
   (router/set-route! ["home"] {:query-params (:query-params params)})
   (post-routing)
   ;; render component
-  (drv-root #(om/component (home-page)) target))
+  (drv-root home-page target))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -162,10 +161,10 @@
        (* 60 60)
        "/"
        ls/jwt-cookie-domain ls/jwt-cookie-secure))
-    ; remove om component if mounted to the same node
-    (om/detach-root target)
+    ; remove rum component if mounted to the same node
+    (rum/unmount target)
     ;; render component
-    (drv-root #(om/component (component)) target)))
+    (drv-root component target)))
 
 (def default-nux-setup-time 3000)
 
@@ -458,23 +457,23 @@
       (router/set-route! ["user-profile"] {:query-params (:query-params params)})
       (post-routing)
       (if (jwt/jwt)
-        (drv-root #(om/component (user-profile)) target)
+        (drv-root user-profile target)
         (router/redirect! urls/home)))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
-      (secure-activity-handler #(om/component (secure-activity)) "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params))
 
     (defroute secure-activity-slash-route (str (urls/secure-activity ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
-      (secure-activity-handler #(om/component (secure-activity)) "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params))
 
     (defroute boards-list-route (urls/boards ":org") {:as params}
       (timbre/info "Routing boards-list-route" (urls/boards ":org"))
       (swap! dis/app-state assoc :loading true)
       (if (responsive/is-mobile-size?)
         (simple-handler mobile-boards-list "boards-list" target params)
-        (org-handler "boards-list" target #(om/component) params)))
+        (org-handler "boards-list" target [:div] params)))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
@@ -606,7 +605,7 @@
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ; mount the error banner
-  (drv-root #(om/component (error-banner)) (sel1 [:div#oc-error-banner]))
+  (drv-root error-banner (sel1 [:div#oc-error-banner]))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
