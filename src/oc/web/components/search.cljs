@@ -54,6 +54,7 @@
                         (rum/local nil ::window-click)
                         (rum/local false ::search-clicked?)
                         {:will-mount (fn [s]
+                          (search/inactive)
                           (reset! (::window-click s)
                             (events/listen
                              js/window
