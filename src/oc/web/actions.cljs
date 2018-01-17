@@ -1103,25 +1103,26 @@
        (dispatcher/dispatch! [:input [:modal-editing] true])
        (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
 
-(defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ board-slug activity-uuid editing]]
+(defn activity-modal-fade-in
+  [db activity-data editing]
   (utils/after 10
    #(let [from-all-posts (= (router/current-board-slug) "all-posts")
-          activity-url (oc-urls/entry board-slug activity-uuid)]
+          activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))]
       (router/nav! (str activity-url (when from-all-posts "?ap")))))
   (when editing
-    (let [board-key (dispatcher/current-board-key)
-          board-data (get-in db board-key)
-          activity-data (get-in board-data [:fixed-items activity-uuid])]
-      (utils/after 100 #(activity-load-cached-item activity-data))))
+    (utils/after 100 #(activity-load-cached-item activity-data)))
   (-> db
-    (assoc :activity-modal-fade-in activity-uuid)
+    (assoc :activity-modal-fade-in (:uuid activity-data))
     (assoc :dismiss-modal-on-editing-stop editing)
     ;; Make sure the seen-at is not reset when navigating to modal view
     (assoc :no-reset-seen-at true)))
 
-(defmethod dispatcher/action :entry-edit
-  [db [_ initial-entry-data]]
+(defmethod dispatcher/action :activity-modal-fade-in
+  [db [_ activity-data editing]]
+  (activity-modal-fade-in db activity-data editing))
+
+(defn entry-edit
+  [db initial-entry-data]
   ;; Delay the entry-edit open to the cached item load
   ;; if we have a cached item starts with it, if not start with the initial passed data
   (let [cache-key (get-entry-cache-key (:uuid initial-entry-data))]
@@ -1141,6 +1142,17 @@
              (remove-cached-item (:uuid initial-entry-data)))
            (dispatcher/dispatch! [:input [:entry-editing] initial-entry-data]))))))
   db)
+
+(defmethod dispatcher/action :entry-edit
+  [db [_ initial-entry-data]]
+  (entry-edit db initial-entry-data))
+
+(defmethod dispatcher/action :activity-edit
+  [db [_ activity-data]]
+  (if (or (responsive/is-tablet-or-mobile?)
+          (not= (:status activity-data) "published"))
+    (entry-edit db activity-data)
+    (activity-modal-fade-in db activity-data true)))
 
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]

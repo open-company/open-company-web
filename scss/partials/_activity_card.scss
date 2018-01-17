@@ -253,6 +253,10 @@ div.activity-card {
           top: 36px;
           left: unset;
           right: -10px;
+
+          @include mobile() {
+            right: -10px;
+          }
         }
 
         div.activity-more-dropdown-menu {
