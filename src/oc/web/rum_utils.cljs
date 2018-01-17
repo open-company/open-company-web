@@ -9,9 +9,8 @@
   (defn- om-derivatives [pool]
     (->> {:childContextTypes {get-k js/React.PropTypes.func
                               release-k js/React.PropTypes.func}
-          :getChildContext (fn [] (let [pool]
-                                    (clj->js {get-k     (partial drv/get! pool)
-                                              release-k (partial drv/release! pool)})))}
+          :getChildContext (fn [] (clj->js {get-k     (partial drv/get! pool)
+                                            release-k (partial drv/release! pool)}))}
          (merge om/pure-methods)
          clj->js
          om/specify-state-methods!)))
