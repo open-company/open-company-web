@@ -74,17 +74,17 @@ div.triangle {
 }
 
 div.search-results {
-
+  border: 1px solid rgba(177,184,192,0.50);
   border-radius: 5px;
-  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+
   margin: 41px 0px 0px 23px;
   width: 450px;
-  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
 
   div.header {
     background-color: white;
     font-size: 12px;
-    padding: 15px 0px 0px 15px;
+    padding: 20px 0px 10px 15px;
 
     span.count {
       margin-left: 5px;
@@ -99,7 +99,7 @@ div.search-results {
     div.author {
       @include avenir_H();
 
-      padding: 10px 20px 5px 20px;
+      padding: 10px 20px 10px 20px;
 
       @include activity-author();
 
@@ -128,7 +128,7 @@ div.search-results {
   div.empty-result {
     width: 100%;
     background-color: white;
-    padding: 15px;
+    padding: 20px;
     font-size: 16px;
 
     img {
