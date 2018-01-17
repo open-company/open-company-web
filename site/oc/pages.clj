@@ -15,7 +15,7 @@
 (defn carrot-box-thanks [carrot-box-class]
   [:div.carrot-box-container.group
     {:class carrot-box-class
-     :style #js {:display "none"}}
+     :style {:display "none"}}
     ; [:img.carrot-box {:src (cdn "/img/ML/carrot_box.svg")}]
     [:div.carrot-box-thanks
       [:div.thanks-headline "Thanks!"]
@@ -85,7 +85,7 @@
             "Get started for free"]]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
-          {:style #js {:display "none"}}
+          {:style {:display "none"}}
           [:div.carrot-box-thanks
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
