@@ -1,6 +1,5 @@
 (ns oc.web.lib.utils
-  (:require [om.core :as om :include-macros true]
-            [clojure.string]
+  (:require [clojure.string]
             [dommy.core :as dommy :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [cljs-time.format :as cljs-time-format]
@@ -50,14 +49,6 @@
 
 (defn remove-channel [channel-name]
   (swap! channel-coll dissoc channel-name))
-
-(defn handle-change [cursor value key]
-  (if (array? key)
-    (om/transact! cursor assoc-in key (fn [_] value))
-    (om/transact! cursor key (fn [_] value))))
-
-(defn change-value [cursor e key]
-  (handle-change cursor (.. e -target -value) key))
 
 (defn save-values [channel-name]
   (let [save-channel (get-channel channel-name)]
