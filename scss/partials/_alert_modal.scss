@@ -45,15 +45,9 @@ div.alert-modal-container {
       text-align: center;
 
       @include mobile() {
-        margin: 0px;
-        position: absolute;
-        top: unset;
-        bottom: 0px;
+        margin: 100px 0px 0px;
         width: 100%;
-        border-bottom-right-radius: 0px;
-        border-bottom-left-radius: 0px;
-        border-top-right-radius: 8px;
-        border-top-left-radius: 8px;
+        border-radius: 8px;
       }
 
       &.has-buttons {
