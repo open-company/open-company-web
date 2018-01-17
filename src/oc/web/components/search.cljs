@@ -80,6 +80,7 @@
                                       "inactive")
                              :on-click (fn [e]
                                          (reset! (::search-clicked? s) false)
+                                         (set! (.-innerHTML (rum/ref-node s "search-input")) "")
                                          (search/inactive))}]
       [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")}]
       [:div.search
@@ -87,11 +88,11 @@
          :ref "search-input"
          :placeholder "Search"
          :on-click #(reset! (::search-clicked? s) true)
-         :on-focus #(let [search-query (.-innerHTML (rum/ref-node s "search-input"))]
+         :on-focus #(let [search-query (.-innerText (rum/ref-node s "search-input"))]
                       (search/query search-query))
          :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
          :on-key-up #(search/query
-                      (.-innerHTML (rum/ref-node s "search-input")))
+                      (.-innerText (rum/ref-node s "search-input")))
          }]
       [:div.triangle {:class (when (not search-active?) "inactive")}]
       [:div.search-results {:ref "results"

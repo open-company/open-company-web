@@ -4,6 +4,10 @@ div.search-box {
 
   img.spyglass {
     display: inline;
+    margin: 0px 0px 5px 0px;
+  }
+
+  &.active {
     margin: 0px 0px 5px 30px;
   }
 
@@ -11,6 +15,7 @@ div.search-box {
     display: inline-block;
     margin: 5px 5px 0px 10px;
     outline: none;
+    caret-color: $carrot_text_blue_3;
 
     &:empty:before {
       content: attr(placeholder);
@@ -22,6 +27,7 @@ div.search-box {
   button.search-close {
     width: 15px;
     height: 15px;
+    background-color: white;
     background-image: cdnUrl("/img/ML/black_close.svg");
     background-size: 15px;
     background-position: 50%;
@@ -29,6 +35,7 @@ div.search-box {
     opacity: 0.7;
     border: none;
     margin: 0px 10px 0px 0px;
+    padding: 10px 0px 0px 0px;
 
     &:hover {
         opacity: 1;
@@ -38,6 +45,10 @@ div.search-box {
       background-image: none;
       border: none;
       outline: none;
+      width: 0px;
+      height: 0px;
+      padding: 0px;
+      margin: 0px;
     }
   }
 }
@@ -66,13 +77,13 @@ div.search-results {
 
   border-radius: 5px;
   border: 1px solid rgba($carrot_light_gray_1, 0.5);
-  margin: 41px 0px 0px 55px;
+  margin: 41px 0px 0px 23px;
   width: 450px;
   box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
 
   div.header {
     background-color: white;
-    font-size: 13px;
+    font-size: 12px;
     padding: 15px 0px 0px 15px;
 
     span.count {
@@ -101,8 +112,15 @@ div.search-results {
       }
 
       &:hover {
-        background-color: rgba($carrot_text_blue, 0.3);
-        font-color: $carrot_text_blue;
+        background-color: rgba($carrot_light_blue, 0.3);
+
+        div.title {
+          color: $carrot_text_blue_3;
+        }
+
+        div.time-since {
+          color: rgba($carrot_text_blue_3, 0.3);
+        }
       }
     }
   }
@@ -111,7 +129,7 @@ div.search-results {
     width: 100%;
     background-color: white;
     padding: 15px;
-    font-size: 14px;
+    font-size: 16px;
 
     img {
       margin: auto;
@@ -121,6 +139,7 @@ div.search-results {
     div.message {
       margin: auto;
       width: 100%;
+      color: rgba($carrot_light_gray_3, 0.4);
     }
   }
 }
