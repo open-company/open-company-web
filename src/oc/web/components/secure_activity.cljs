@@ -53,7 +53,8 @@
               [:div.activity-body
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])]]
         [:div.activity-content-footer
-          {:on-click #(dis/dispatch! [:made-with-carrot-modal-show])}
+          {:on-click #(when-not (responsive/is-tablet-or-mobile?)
+                        (dis/dispatch! [:made-with-carrot-modal-show]))}
           [:div.activity-content-footer-inner
             [:div.carrot-logo]
             [:div.you-did-it "Made with Carrot"]]]]

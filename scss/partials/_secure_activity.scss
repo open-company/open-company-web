@@ -6,6 +6,10 @@ div.secure-activity-container {
   background-color: white;
   min-height: 100vh;
 
+  @include mobile() {
+    min-height: calc(100vh - 69px);
+  }
+
   div.activity-header {
     height: 72px;
     position: fixed;
@@ -16,11 +20,20 @@ div.secure-activity-container {
     text-align: center;
     z-index: 10;
 
+    @include mobile() {
+      position: absolute;
+    }
+
     div.org-avatar {
       height: 40px;
       position: absolute;
       left: 50%;
       margin-left: -20px;
+
+      @include mobile(){
+        left: unset;
+        margin-left: 0px;
+      }
 
       div.org-avatar-container {
         height: 40px;
@@ -41,10 +54,20 @@ div.secure-activity-container {
     width: 840px;
     transition: margin-left 230ms;
 
+    @include mobile() {
+      width: 100%;
+      margin: 0px auto;
+    }
+
     div.activity-content {
       min-height: 136px;
       padding: 68px 80px 32px;
       border-radius: 8px;
+
+      @include mobile() {
+        padding: 32px;
+        min-height: calc(100vh - 69px - 70px);
+      }
 
       div.activity-banner {
         margin-left: -80px;
@@ -55,9 +78,10 @@ div.secure-activity-container {
         background-position: 50%;
         background-size: cover;
         background-repeat: no-repeat;
-        // border-radius: 8px;
-        // border-top-left-radius: 8px;
-        // border-top-right-radius: 8px;
+
+        @include mobile() {
+          width: 100%;
+        }
       }
 
       div.activity-tags {
@@ -148,6 +172,10 @@ div.secure-activity-container {
     text-align: center;
     background-color: $oc_gray_8;
     cursor: pointer;
+
+    @include mobile() {
+      position: relative;
+    }
 
     &:hover {
       div.activity-content-footer-inner {
