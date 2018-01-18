@@ -147,10 +147,6 @@ div.onboard-overlay-container {
 
         button.continue-btn {
           margin-top: 32px;
-
-          @include mobile() {
-            margin-top: 8px;
-          }
         }
       }
 
