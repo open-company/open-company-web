@@ -28,7 +28,7 @@
     (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
           second-line (str "M0,138\n")
           nth-line-3 (str "L" width ",138\n"
-                          "L"width",438\n"
+                          "L" width ",438\n"
                           "L0,438\n"
                           "L0,138\n"
                           "Z\n")]
