@@ -114,7 +114,8 @@
                    (:media-chart (:media-input data)))
           (media-chart-modal))
         (when-not (and (responsive/is-tablet-or-mobile?)
-                         (router/current-activity-id))
+                         (or (router/current-activity-id)
+                             (:entry-editing data)))
           [:div.page
             (navbar)
             [:div.dashboard-container

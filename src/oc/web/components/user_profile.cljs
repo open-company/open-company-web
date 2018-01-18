@@ -11,7 +11,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
-            ; [cljsjs.moment-timezone]
+            [cljsjs.moment-timezone]
             [goog.object :as googobj]
             [goog.dom :as gdom]))
 
@@ -116,11 +116,13 @@
       (dis/dispatch! [:user-profile-save]))))
 
 (rum/defcs user-profile < rum/reactive
-                          (rum/local false ::loading)
-                          (rum/local false ::show-success)
-                          (drv/drv :edit-user-profile)
+                          ;; Derivatives
                           (drv/drv :orgs)
                           (drv/drv :alert-modal)
+                          (drv/drv :edit-user-profile)
+                          ;; Locals
+                          (rum/local false ::loading)
+                          (rum/local false ::show-success)
                           (rum/local false ::name-error)
                           (rum/local false ::email-error)
                           (rum/local false ::password-error)
@@ -128,15 +130,17 @@
                           {:will-mount (fn [s]
                             (dis/dispatch! [:user-profile-reset])
                             s)
-                           ; :after-render (fn [s]
-                           ;  (when (empty?
-                           ;         (:timezone
-                           ;          (:user-data @(drv/get-ref s :edit-user-profile))))
-                           ;    (dis/dispatch!
-                           ;     [:input
-                           ;      [:edit-user-profile :timezone]
-                           ;      (.. js/moment -tz guess)]))
-                           ;  s)
+                           :after-render (fn [s]
+                              (when-not (utils/is-test-env?)
+                                (doto (js/$ "[data-toggle=\"tooltip\"]")
+                                  (.tooltip "fixTitle")
+                                  (.tooltip "hide"))
+                                (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
+                                  (dis/dispatch!
+                                    [:input
+                                     [:edit-user-profile :timezone]
+                                     (.. js/moment -tz guess)])))
+                              s)
                            :did-remount (fn [old-state new-state]
                             (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
                               (when (and @(::loading new-state)
@@ -149,7 +153,7 @@
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
-        ; timezones (.names (.-tz js/moment))
+        timezones (.names (.-tz js/moment))
         orgs (drv/react s :orgs)]
     [:div.user-profile.fullscreen-page
       (when (drv/react s :alert-modal)
@@ -210,7 +214,40 @@
                   {:type "text"
                    :tab-index 5
                    :on-change #(change! s :email (.. % -target -value))
-                   :value (:email current-user-data)}]]]]
+                   :value (:email current-user-data)}]]]
+            ;; Digest frequency
+            [:div.user-profile-field-box
+              [:div.user-profile-field-label
+                "Digest Frequency " [:i.mdi.mdi-information-outline
+                  {:title "Receive a digest of newly created posts."
+                   :data-toggle "tooltip"
+                   :data-placement "top"}]]  
+              [:div.user-profile-field.digest-frequency-field.digest-frequency
+                [:div.dropdown {:class "dropdown-button"}
+                  [:button.btn-reset.user-type-btn.dropdown-toggle
+                    {:id "user-digest-frequency-dropdown"
+                     :data-toggle "dropdown"
+                     :aria-haspopup true
+                     :aria-expanded false}
+                    (case (:digest-frequency current-user-data)
+                      "daily"
+                      "Daily"
+                      "weekly"
+                      "Weekly"
+                      "Never")]
+                  [:ul.dropdown-menu.user-type-dropdown-menu
+                    {:aria-labelledby "user-digest-frequency-dropdown"}
+                    [:li
+                      {:on-click #(change! s :digest-frequency "daily")}
+                      "Daily"]
+                    [:li
+                      {:on-click #(change! s :digest-frequency "weekly")}
+                      "Weekly"]
+                    [:li
+                      {:on-click #(change! s :digest-frequency "never")}
+                      "Never"]]]]]]
+
+
           ; Right column
           [:div.user-profile-column-right
             ; Last name
@@ -235,84 +272,96 @@
                    :tab-index 4
                    :on-change #(change! s :password (.. % -target -value))
                    :value (:password current-user-data)}]]]
-            ; ; Time zone
-            ; [:div.user-profile-field-box
-            ;   [:div.user-profile-field-label
-            ;     "Time Zone"]
-            ;   [:div.user-profile-field
-            ;     [:select
-            ;       {:value (:timezone current-user-data)
-            ;        :on-change #(change! s :timezone (.. % -target -value))}
-            ;       ;; Promoted timezones
-            ;       (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
-            ;         [:option
-            ;           {:key (str "timezone-" t "-promoted")
-            ;            :value t} t])
-            ;       ;; Divider line option
-            ;       [:option
-            ;         {:disabled true
-            ;          :value ""}
-            ;         "------------"]
-            ;       ;; All the timezones, repeating the promoted
-            ;       (for [t timezones]
-            ;         [:option
-            ;           {:key (str "timezone-" t)
-            ;            :value t}
-            ;           t])]]]
-            ]
-          ; ; Digest frequency
-          ; [:div.user-profile-field-box
-          ;   [:div.user-profile-field-label
-          ;     "Digest Frequency " [:i.fa.fa-info-circle]]
-          ;   [:div.user-profile-field.digest-frequency-field.digest-frequency
-          ;     [:select
-          ;       {:value (:digest-frequency current-user-data)
-          ;        :on-change #(change! s :digest-frequency (.. % -target -value))}
-          ;       [:option {:value "weekly"} "WEEKLY"]
-          ;       [:option {:value "daily"} "DAILY"]
-          ;       [:option {:value "never"} "NEVER"]]]
-          ;   [:div.user-profile-field.digest-frequency-field.digest-day
-          ;     [:select
-          ;       {:value (:digest-day current-user-data)
-          ;        :disabled (not= (:digest-frequency current-user-data) "weekly")
-          ;        :on-change #(change! s :digest-day (.. % -target -value))}
-          ;       [:option {:value "monday"} "MONDAY"]
-          ;       [:option {:value "tuesday"} "TUESDAY"]
-          ;       [:option {:value "wednesday"} "WEDNESDAY"]
-          ;       [:option {:value "thursday"} "THURSDAY"]
-          ;       [:option {:value "friday"} "FRIDAY"]
-          ;       [:option {:value "saturday"} "SATURDAY"]
-          ;       [:option {:value "sunday"} "SUNDAY"]]]
-          ;   [:div.user-profile-field.digest-frequency-field.digest-time
-          ;     [:select
-          ;       {:value (:digest-time current-user-data)
-          ;        :disabled (= (:digest-frequency current-user-data) "never")
-          ;        :on-change #(change! s :digest-time (.. % -target -value))}
-          ;       [:option {:value "7am"} "7AM"]
-          ;       [:option {:value "8am"} "8AM"]
-          ;       [:option {:value "9am"} "9AM"]
-          ;       [:option {:value "10am"} "10AM"]
-          ;       [:option {:value "11am"} "11AM"]
-          ;       [:option {:value "12pm"} "12PM"]
-          ;       [:option {:value "1pm"} "1PM"]
-          ;       [:option {:value "2pm"} "2PM"]
-          ;       [:option {:value "3pm"} "3PM"]
-          ;       [:option {:value "4pm"} "4PM"]
-          ;       [:option {:value "5pm"} "5PM"]
-          ;       [:option {:value "6pm"} "6PM"]
-          ;       [:option {:value "7pm"} "7PM"]
-          ;       [:option {:value "8pm"} "8PM"]
-          ;       [:option {:value "9pm"} "9PM"]
-          ;       [:option {:value "10pm"} "10PM"]
-          ;       [:option {:value "11pm"} "11PM"]
-          ;       [:option {:value "12am"} "12AM"]
-          ;       [:option {:value "1am"} "1AM"]
-          ;       [:option {:value "2am"} "2AM"]
-          ;       [:option {:value "3am"} "3AM"]
-          ;       [:option {:value "4am"} "4AM"]
-          ;       [:option {:value "5am"} "5AM"]
-          ;       [:option {:value "6am"} "6AM"]]]]
-          ]]
+            ;; Time zone
+            [:div.user-profile-field-box
+              [:div.user-profile-field-label
+                "Time Zone"]
+              [:div.user-profile-field.timezone
+                [:select
+                  {:value (:timezone current-user-data)
+                   :on-change #(change! s :timezone (.. % -target -value))}
+                  ;; Promoted timezones
+                  (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
+                    [:option
+                      {:key (str "timezone-" t "-promoted")
+                       :value t} t])
+                  ;; Divider line option
+                  [:option
+                    {:disabled true
+                     :value ""}
+                    "------------"]
+                  ;; All the timezones, repeating the promoted
+                  (for [t timezones]
+                    [:option
+                      {:key (str "timezone-" t)
+                       :value t}
+                      t])]]]
+            ;; Digest Medium
+            (when true ; should be conditional on team having a bot, but that's not in scope here in user profile
+              [:div.user-profile-field-box
+                [:div.user-profile-field-label
+                  "Digest Type"]
+                [:div.user-profile-field.digest-medium
+                  [:div.dropdown {:class "dropdown-button"}
+                    [:button.btn-reset.user-type-btn.dropdown-toggle
+                      {:id "user-digest-medium-dropdown"
+                       :data-toggle "dropdown"
+                       :aria-haspopup true
+                       :aria-expanded false}
+                      (case (:digest-medium current-user-data)
+                        "slack"
+                        "Slack"
+                        "Email")]
+                    [:ul.dropdown-menu.user-type-dropdown-menu
+                      {:aria-labelledby "user-digest-medium-dropdown"}
+                      [:li
+                        {:on-click #(change! s :digest-medium "email")}
+                        "Email"]
+                      [:li
+                        {:on-click #(change! s :digest-medium "slack")}
+                        "Slack"]]]]])]]]
+            ;; Eventually we want them to be able specify day and time of digest, but not yet
+            ; [:div.user-profile-field.digest-frequency-field.digest-day
+            ;   [:select
+            ;     {:value (:digest-day current-user-data)
+            ;      :disabled (not= (:digest-frequency current-user-data) "weekly")
+            ;      :on-change #(change! s :digest-day (.. % -target -value))}
+            ;     [:option {:value "monday"} "MONDAY"]
+            ;     [:option {:value "tuesday"} "TUESDAY"]
+            ;     [:option {:value "wednesday"} "WEDNESDAY"]
+            ;     [:option {:value "thursday"} "THURSDAY"]
+            ;     [:option {:value "friday"} "FRIDAY"]
+            ;     [:option {:value "saturday"} "SATURDAY"]
+            ;     [:option {:value "sunday"} "SUNDAY"]]]
+            ; [:div.user-profile-field.digest-frequency-field.digest-time
+            ;   [:select
+            ;     {:value (:digest-time current-user-data)
+            ;      :disabled (= (:digest-frequency current-user-data) "never")
+            ;      :on-change #(change! s :digest-time (.. % -target -value))}
+            ;     [:option {:value "7am"} "7AM"]
+            ;     [:option {:value "8am"} "8AM"]
+            ;     [:option {:value "9am"} "9AM"]
+            ;     [:option {:value "10am"} "10AM"]
+            ;     [:option {:value "11am"} "11AM"]
+            ;     [:option {:value "12pm"} "12PM"]
+            ;     [:option {:value "1pm"} "1PM"]
+            ;     [:option {:value "2pm"} "2PM"]
+            ;     [:option {:value "3pm"} "3PM"]
+            ;     [:option {:value "4pm"} "4PM"]
+            ;     [:option {:value "5pm"} "5PM"]
+            ;     [:option {:value "6pm"} "6PM"]
+            ;     [:option {:value "7pm"} "7PM"]
+            ;     [:option {:value "8pm"} "8PM"]
+            ;     [:option {:value "9pm"} "9PM"]
+            ;     [:option {:value "10pm"} "10PM"]
+            ;     [:option {:value "11pm"} "11PM"]
+            ;     [:option {:value "12am"} "12AM"]
+            ;     [:option {:value "1am"} "1AM"]
+            ;     [:option {:value "2am"} "2AM"]
+            ;     [:option {:value "3am"} "3AM"]
+            ;     [:option {:value "4am"} "4AM"]
+            ;     [:option {:value "5am"} "5AM"]
+            ;     [:option {:value "6am"} "6AM"]]]
         [:div.user-profile-footer
           [:button.mlb-reset.mlb-default
             {:on-click #(save-clicked s)

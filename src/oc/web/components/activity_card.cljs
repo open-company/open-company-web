@@ -31,8 +31,7 @@
         [:div.activity-card-title
           "This topic’s a little sparse. "
           [:button.mlb-reset
-            {:on-click #(when-not (responsive/is-tablet-or-mobile?)
-                          (dis/dispatch! [:entry-edit topic]))}
+            {:on-click #(dis/dispatch! [:entry-edit topic])}
             "Add an update?"]]])])
 
 (defn- delete-clicked [e activity-data]
@@ -65,9 +64,10 @@
                                 is-all-posts (nth (:rum/args s) 4 false)]
                             ; Prevent body links in FoC
                             (.click (js/$ body-a-sel) #(.stopPropagation %)))
-                          (doto (js/$ "[data-toggle=\"tooltip\"]")
-                            (.tooltip "fixTitle")
-                            (.tooltip "hide"))
+                          (when-not (responsive/is-tablet-or-mobile?)
+                            (doto (js/$ "[data-toggle=\"tooltip\"]")
+                              (.tooltip "fixTitle")
+                              (.tooltip "hide")))
                           s)
                          :did-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
@@ -88,7 +88,8 @@
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (utils/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
-        edit-link (utils/link-for (:links activity-data) "partial-update")]
+        edit-link (utils/link-for (:links activity-data) "partial-update")
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :dropdown-active (or @(::more-dropdown s)
@@ -107,10 +108,7 @@
                       @(::more-dropdown s)
                       @(::move-activity s))
 
-                      (dis/dispatch!
-                       [:activity-modal-fade-in
-                        (:board-slug activity-data)
-                        (:uuid activity-data)]))))}
+                      (dis/dispatch! [:activity-modal-fade-in activity-data]))))}
       ; Card header
       [:div.activity-card-head.group
         {:class "entry-card"}
@@ -122,16 +120,15 @@
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
                 {:date-time t
-                 :data-toggle "tooltip"
+                 :data-toggle (when-not is-mobile? "tooltip")
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
-          (when (and (not (responsive/is-tablet-or-mobile?))
-                     (or (utils/link-for (:links activity-data) "partial-update")
-                         (utils/link-for (:links activity-data) "delete")))
+          (when (or (utils/link-for (:links activity-data) "partial-update")
+                    (utils/link-for (:links activity-data) "delete"))
             (let [all-boards (filter
                               #(not= (:slug %) utils/default-drafts-board-slug)
                               (:boards (drv/react s :org-data)))]
@@ -143,7 +140,7 @@
                                (reset! (::more-dropdown s) (not @(::more-dropdown s)))
                                (reset! (::move-activity s) false))
                    :title "More"
-                   :data-toggle "tooltip"
+                   :data-toggle (when-not is-mobile? "tooltip")
                    :data-placement "top"
                    :data-container "body"}]
                 (when @(::more-dropdown s)
@@ -155,11 +152,7 @@
                           {:on-click #(do
                                         (utils/remove-tooltips)
                                         (reset! (::more-dropdown s) false)
-                                        (dis/dispatch!
-                                         [:activity-modal-fade-in
-                                          (:board-slug activity-data)
-                                          (:uuid activity-data)
-                                          true]))}
+                                        (dis/dispatch! [:activity-edit activity-data]))}
                           "Edit"])
                       (when share-link
                         [:li
@@ -191,12 +184,11 @@
             (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
               [:div.activity-tag.on-gray
                 {:class (when is-all-posts "double-tag")
-                 :on-click #(when-not (responsive/is-tablet-or-mobile?)
-                             (router/nav!
-                              (oc-urls/board-filter-by-topic
-                               (router/current-org-slug)
-                               (:board-slug activity-data)
-                               (:topic-slug activity-data))))}
+                 :on-click #(router/nav!
+                             (oc-urls/board-filter-by-topic
+                              (router/current-org-slug)
+                              (:board-slug activity-data)
+                              (:topic-slug activity-data)))}
                 topic-name]))
           (when is-all-posts
             [:div.activity-tag.board-tag.on-gray
@@ -232,11 +224,10 @@
         (when share-thoughts
           [:div.activity-share-thoughts
             "Share your thoughts"])
-        (when (and (utils/link-for (:links activity-data) "partial-update")
-                   (not (responsive/is-tablet-or-mobile?)))
+        (when (utils/link-for (:links activity-data) "partial-update")
           [:button.mlb-reset.post-edit
             {:title "Edit"
-             :data-toggle "tooltip"
+             :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
              :data-container "body"
              :class (utils/class-set {:not-hover (and (not @(::move-activity s))
@@ -244,8 +235,4 @@
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::more-dropdown s) false)
-                         (dis/dispatch!
-                          [:activity-modal-fade-in
-                           (:board-slug activity-data)
-                           (:uuid activity-data)
-                           true]))}])]]))
+                         (dis/dispatch! [:activity-edit activity-data]))}])]]))

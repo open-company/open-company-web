@@ -205,6 +205,10 @@ div.comments {
       padding: 4px 14px 4px 0px;
       position: relative;
 
+      @include mobile() {
+        padding: 4px 0px;
+      }
+
       @include big_web() {
         &:hover div.comment-content div.comment-footer-container div.edit-delete-button button.more-button {
           opacity: 1;
