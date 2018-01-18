@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.carrot-tip
   (:require [rum.core :as rum]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]))
 
 (defn second-step-oval [width height px py]
   (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
@@ -23,44 +24,65 @@
     (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)))
 
 (defn third-step-oval [width height px py]
-  (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
-        offset-x px
-        offset-y py
-        second-line (str "M" (+ 485 offset-x) "," (+ 132.916372 offset-y) "\n")
-        nth-line-3 (str "C" (+ 382.44772 offset-x)  "," (+ 132.869289 offset-y)
-                        " " (+ 301.172233 offset-x) "," (+ 217.560286 offset-y)
-                        " " (+ 279.089994 offset-x) "," (+ 319.839231 offset-y) "\n")
-        nth-line-4 (str "C" (+ 257.668873 offset-x) "," (+ 418.502182 offset-y)
-                        " " (+ 349.904004 offset-x) "," (+ 519.895962 offset-y)
-                        " " (+ 485 offset-x)        "," (+ 522.916353 offset-y) "\n")
-        nth-line-5 (str "C" (+ 620.095996 offset-x) "," (+ 519.895962 offset-y)
-                        " " (+ 712.331127 offset-x) "," (+ 418.499828 offset-y)
-                        " " (+ 690.910006 offset-x) "," (+ 319.839231 offset-y) "\n")
-        nth-line-6 (str "C" (+ 668.827767 offset-x) "," (+ 217.560286 offset-y)
-                        " " (+ 587.55228 offset-x)  "," (+ 132.869289 offset-y)
-                        " " (+ 485 offset-x)        "," (+ 132.916372 offset-y)
-                        " Z ")]
-    (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)))
+  (if (responsive/is-tablet-or-mobile?)
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          second-line (str "M0,138\n")
+          nth-line-3 (str "L" width ",138\n"
+                          "L"width",438\n"
+                          "L0,438\n"
+                          "L0,138\n"
+                          "Z\n")]
+      (str first-line second-line nth-line-3))
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          offset-x px
+          offset-y py
+          second-line (str "M" (+ 485 offset-x) "," (+ 132.916372 offset-y) "\n")
+          nth-line-3 (str "C" (+ 382.44772 offset-x)  "," (+ 132.869289 offset-y)
+                          " " (+ 301.172233 offset-x) "," (+ 217.560286 offset-y)
+                          " " (+ 279.089994 offset-x) "," (+ 319.839231 offset-y) "\n")
+          nth-line-4 (str "C" (+ 257.668873 offset-x) "," (+ 418.502182 offset-y)
+                          " " (+ 349.904004 offset-x) "," (+ 519.895962 offset-y)
+                          " " (+ 485 offset-x)        "," (+ 522.916353 offset-y) "\n")
+          nth-line-5 (str "C" (+ 620.095996 offset-x) "," (+ 519.895962 offset-y)
+                          " " (+ 712.331127 offset-x) "," (+ 418.499828 offset-y)
+                          " " (+ 690.910006 offset-x) "," (+ 319.839231 offset-y) "\n")
+          nth-line-6 (str "C" (+ 668.827767 offset-x) "," (+ 217.560286 offset-y)
+                          " " (+ 587.55228 offset-x)  "," (+ 132.869289 offset-y)
+                          " " (+ 485 offset-x)        "," (+ 132.916372 offset-y)
+                          " Z ")]
+      (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6))))
 
 (defn fourth-step-oval [width height px py]
-  (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
-        offset-x px
-        offset-y py
-        second-line (str "M" (+ 1071.3683 offset-x) "," (+ 218.965915 offset-y) "\n")
-        nth-line-3 (str "C" (+ 1117.20129 offset-x) "," (+ 246.53226 offset-y)
-                        " " (+ 1175.09029 offset-x) "," (+ 232.488897 offset-y)
-                        " " (+ 1210.99409 offset-x) "," (+ 195.095574 offset-y) "\n")
-        nth-line-4 (str "C" (+ 1245.68139 offset-x) "," (+ 159.057381 offset-y)
-                        " " (+ 1230.25612 offset-x) "," (+ 91.3314095 offset-y)
-                        " " (+ 1170.63164 offset-x) "," (+ 53.7640728 offset-y) "\n")
-        nth-line-5 (str "C" (+ 1109.46966 offset-x) "," (+ 18.7555776 offset-y)
-                        " " (+ 1042.43005 offset-x) "," (+ 36.9302954 offset-y)
-                        " " (+ 1026.89431 offset-x) "," (+ 84.4772704 offset-y) "\n")
-        nth-line-6 (str "C" (+ 1010.73378 offset-x) "," (+ 133.733542 offset-y)
-                        " " (+ 1025.51147 offset-x) "," (+ 191.439458 offset-y)
-                        " " (+ 1071.36836 offset-x) "," (+ 218.965915 offset-y)
-                        " Z ")]
-    (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)))
+  (if (responsive/is-tablet-or-mobile?)
+    (let [cx (- width 30)
+          cy (- height 30)
+          r 33
+          first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          second-line (str "M" cx "," cy "\n")
+          nth-line-3 (str "m -" r ",0\n"
+                          "a " r "," r " 0 1,0 " (* r 2) ",0\n"
+                          "a " r "," r " 0 1,0 -" (* r 2) ",0\n"
+                          "L0,138\n"
+                          "Z\n")]
+      (str first-line second-line nth-line-3))
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          offset-x px
+          offset-y py
+          second-line (str "M" (+ 1071.3683 offset-x) "," (+ 218.965915 offset-y) "\n")
+          nth-line-3 (str "C" (+ 1117.20129 offset-x) "," (+ 246.53226 offset-y)
+                          " " (+ 1175.09029 offset-x) "," (+ 232.488897 offset-y)
+                          " " (+ 1210.99409 offset-x) "," (+ 195.095574 offset-y) "\n")
+          nth-line-4 (str "C" (+ 1245.68139 offset-x) "," (+ 159.057381 offset-y)
+                          " " (+ 1230.25612 offset-x) "," (+ 91.3314095 offset-y)
+                          " " (+ 1170.63164 offset-x) "," (+ 53.7640728 offset-y) "\n")
+          nth-line-5 (str "C" (+ 1109.46966 offset-x) "," (+ 18.7555776 offset-y)
+                          " " (+ 1042.43005 offset-x) "," (+ 36.9302954 offset-y)
+                          " " (+ 1026.89431 offset-x) "," (+ 84.4772704 offset-y) "\n")
+          nth-line-6 (str "C" (+ 1010.73378 offset-x) "," (+ 133.733542 offset-y)
+                          " " (+ 1025.51147 offset-x) "," (+ 191.439458 offset-y)
+                          " " (+ 1071.36836 offset-x) "," (+ 218.965915 offset-y)
+                          " Z ")]
+      (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6))))
 
 (defn fifth-step-oval [width height px py]
   (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
@@ -104,7 +126,14 @@
 
 (defn is-step-with-oval
   [step]
-  (some #{step} [:2 :3 :4 :5 :6]))
+  (cond
+    (and (not (responsive/is-tablet-or-mobile?))
+         (= step :2))
+    true
+    (some #{step} [:3 :4 :5 :6])
+    true
+    :else
+    false))
 
 (defn carrot-tip-inner
   [{:keys [x y width height ;; container data
@@ -115,8 +144,9 @@
            circle-type ;; used to check if it has circle or not
            step ;; step of the NUX
            ] :as data}]
-  [:div.carrot-tip
-    {:style (when (is-step-with-oval step)
+  [:div.carrot-tip.group
+    {:style (when (and (not (responsive/is-tablet-or-mobile?))
+                       (is-step-with-oval step))
               {:left (str x "px")
                :top (str y "px")
                :width (str width "px")
@@ -152,64 +182,63 @@
            circle-type circle-offset ;; type of background circle
            step ;; Overall nux step
            ] :as data}]
-  (if (is-step-with-oval step)
-    [:div.carrot-tip-container.needs-background
-      {:class (str "step-" (name step))}
-      [:div.carrot-tip-background
-        [:svg
-          {:width "100%"
-           :height "100%"
-           :viewBox (str "0 0 " (.-innerWidth js/window) " " (.-innerHeight js/window))
-           :version "1.1"
-           :xmlns "http://www.w3.org/2000/svg"
-           :xmlnsXlink "http://www.w3.org/1999/xlink"}
-          [:g
-            {:stroke "none"
-             :stroke-width "1"
-             :fill "none"
-             :fill-rule "evenodd"
-             :fill-opacity "0.9"
-             :opacity "0.3"}
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)]
+    (if (is-step-with-oval step)
+      [:div.carrot-tip-container.needs-background
+        {:class (str "step-" (name step))}
+        [:div.carrot-tip-background
+          [:svg
+            {:width "100%"
+             :height "100%"
+             :viewBox (str "0 0 " (.-innerWidth js/window) " " (.-innerHeight js/window))
+             :version "1.1"
+             :xmlns "http://www.w3.org/2000/svg"
+             :xmlnsXlink "http://www.w3.org/1999/xlink"}
             [:g
-              {:fill "#34414F"}
-              [:g
-                [:path
-                  {:d (cond
-                       (= :2 step)
-                       (second-step-oval
-                        (.-innerWidth js/window)
-                        (.-innerHeight js/window)
-                        (+ x (:left circle-offset))
-                        (+ y (:top circle-offset)))
-                       (= :3 step)
-                       (third-step-oval
-                        (.-innerWidth js/window)
-                        (.-innerHeight js/window)
-                        (+ x (:left circle-offset))
-                        (+ y (:top circle-offset)))
-                       (= :4 step)
-                       (fourth-step-oval
-                        (.-innerWidth js/window)
-                        (.-innerHeight js/window)
-                        (+ x (:left circle-offset))
-                        (+ y (:top circle-offset)))
-                       (= :5 step)
-                       (fifth-step-oval
-                        (.-innerWidth js/window)
-                        (.-innerHeight js/window)
-                        (+ x (:left circle-offset))
-                        (+ y (:top circle-offset)))
-                       (= :6 step)
-                       (sixth-step-oval
-                        (.-innerWidth js/window)
-                        (.-innerHeight js/window)
-                        (+ x (:left circle-offset))
-                        (+ y (:top circle-offset))))}]]]]]]
-      (carrot-tip-inner data)]
-    [:div.carrot-tip-container
-      {:style {:left (str x "px")
-               :top (str y "px")
-               :width (str width "px")
-               :height (str height "px")}
-       :class (str "step-" (name step))}
-      (carrot-tip-inner data)]))
+              {:stroke "none"
+               :stroke-width "1"
+               :fill-rule "evenodd"
+               :fill-opacity "0.9"
+               :opacity "0.3"
+               :fill "#34414F"}
+              [:path
+                {:d (cond
+                     (= :2 step)
+                     (second-step-oval
+                      (.-innerWidth js/window)
+                      (.-innerHeight js/window)
+                      (+ x (:left circle-offset))
+                      (+ y (:top circle-offset)))
+                     (= :3 step)
+                     (third-step-oval
+                      (.-innerWidth js/window)
+                      (.-innerHeight js/window)
+                      (+ x (:left circle-offset))
+                      (+ y (:top circle-offset)))
+                     (= :4 step)
+                     (fourth-step-oval
+                      (.-innerWidth js/window)
+                      (.-innerHeight js/window)
+                      (+ x (:left circle-offset))
+                      (+ y (:top circle-offset)))
+                     (= :5 step)
+                     (fifth-step-oval
+                      (.-innerWidth js/window)
+                      (.-innerHeight js/window)
+                      (+ x (:left circle-offset))
+                      (+ y (:top circle-offset)))
+                     (= :6 step)
+                     (sixth-step-oval
+                      (.-innerWidth js/window)
+                      (.-innerHeight js/window)
+                      (+ x (:left circle-offset))
+                      (+ y (:top circle-offset))))}]]]]
+        (carrot-tip-inner data)]
+      [:div.carrot-tip-container
+        {:style (when-not (responsive/is-tablet-or-mobile?)
+                  {:left (str x "px")
+                   :top (str y "px")
+                   :width (str width "px")
+                   :height (str height "px")})
+         :class (str "step-" (name step))}
+        (carrot-tip-inner data)])))

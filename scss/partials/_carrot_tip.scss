@@ -13,15 +13,37 @@ div.carrot-tip-container {
     bottom: 0px;
   }
 
+  @include mobile() {
+    position: absolute;
+  }
+
   &.step-2 {
     pointer-events: none;
+
+    @include mobile() {
+      width: 100%;
+      height: auto;
+      left: 0px;
+      bottom: 70px;
+    }
 
     div.carrot-tip {
       width: 494px;
 
+      @include mobile() {
+        width: 100%;
+      }
+
       div.arrow {
         top: 32px;
         left: 486px;
+
+        @include mobile() {
+          right: 53px;
+          left: unset;
+          top: unset;
+          bottom: -7px;
+        }
       }
 
       div.balloons-background {
@@ -33,27 +55,64 @@ div.carrot-tip-container {
         top: 77px;
         right: 10px;
         overflow: hidden;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.carrot-tip-inner {
 
         div.carrot-tip-title {
           width: 334px;
+
+          @include mobile() {
+            width: 100%;
+          }
         }
 
         div.carrot-tip-description {
           width: 334px;
+
+          @include mobile() {
+            width: 100%;
+          }
         }
       }
     }
   }
 
   &.step-3 {
+    @include mobile() {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+
+    div.carrot-tip-background {
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      position: absolute;
+    }
+
     div.carrot-tip{
+
+      @include mobile() {
+        width: 100%;
+        height: auto;
+        top: 439px;
+      }
 
       div.arrow {
         left: -8px;
         top: calc(50% - 4px);
+
+        @include mobile() {
+          left: calc(50% - 8px);
+          top: -8px;
+        }
       }
 
       div.balloons-background {
@@ -65,6 +124,10 @@ div.carrot-tip-container {
         bottom: 0px;
         right: -20px;
         overflow: hidden;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.carrot-tip-inner {
@@ -89,7 +152,19 @@ div.carrot-tip-container {
   }
 
   &.step-4 {
+    @include mobile() {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+
     div.carrot-tip{
+
+      @include mobile() {
+        width: 100%;
+        height: auto;
+        top: 239px;
+      }
 
       div.arrow {
         right: 64px;
@@ -105,6 +180,10 @@ div.carrot-tip-container {
         bottom: 0px;
         right: 30px;
         overflow: hidden;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.carrot-tip-inner {
@@ -137,6 +216,10 @@ div.carrot-tip-container {
         bottom: 0px;
         right: 0px;
         overflow: hidden;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.carrot-tip-inner {
@@ -170,6 +253,10 @@ div.carrot-tip-container {
         bottom: 0px;
         right: 70px;
         overflow: hidden;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.carrot-tip-inner {
@@ -189,6 +276,10 @@ div.carrot-tip-container {
   div.carrot-tip-background {
     width: 100%;
     height: 100%;
+
+    @include mobile() {
+      position: absolute;
+    }
   }
 
   div.carrot-tip {
@@ -196,6 +287,13 @@ div.carrot-tip-container {
     padding: 27px 40px;
     background-color: $carrot_text_blue;
     border-radius: 4px;
+
+    @include mobile() {
+      position: relative;
+      padding: 24px;
+      width: 100%;
+      height: auto;
+    }
 
     div.arrow {
       position: absolute;
