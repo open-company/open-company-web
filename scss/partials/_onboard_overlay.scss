@@ -9,6 +9,11 @@ div.onboard-overlay-container {
   transition: opacity 180ms ease-in;
   overflow: auto;
 
+  @include mobile() {
+    position: relative;
+    height: 100%;
+  }
+
   &.will-appear {
     opacity: 0;
   }
@@ -49,6 +54,7 @@ div.onboard-overlay-container {
       @include mobile(){
         width: 100%;
         height: 100%;
+        padding: 24px 16px;
       }
 
       div.onboard-overlay-step-title {
@@ -61,6 +67,10 @@ div.onboard-overlay-container {
         margin: 32px auto 0px;
         background-position: center;
         background-repeat: no-repeat;
+
+        @include mobile() {
+          margin: 8px auto 0px;
+        }
       }
 
       div.onboard-overlay-step-description {
@@ -129,10 +139,18 @@ div.onboard-overlay-container {
 
         div.onboard-overlay-step-description {
           margin-top: 48px;
+
+          @include mobile() {
+            margin-top: 8px;
+          }
         }
 
         button.continue-btn {
           margin-top: 32px;
+
+          @include mobile() {
+            margin-top: 8px;
+          }
         }
       }
 
@@ -168,6 +186,10 @@ div.onboard-overlay-container {
         button.continue-btn {
           margin-top: 41px;
           text-align: center;
+
+          @include mobile() {
+            margin-top: 8px;
+          }
 
           &:after {
             background-image: none;
