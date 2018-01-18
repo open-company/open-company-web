@@ -4,11 +4,7 @@ div.search-box {
 
   img.spyglass {
     display: inline;
-    margin: 0px 0px 5px 0px;
-  }
-
-  &.active {
-    margin: 0px 0px 5px 30px;
+    margin: 0px 0px 6px 0px;
   }
 
   div.search {
@@ -34,8 +30,8 @@ div.search-box {
     background-repeat: no-repeat;
     opacity: 0.7;
     border: none;
-    margin: 0px 10px 0px 0px;
-    padding: 10px 0px 0px 0px;
+    margin: 0px 30px 0px 0px;
+    padding: 12px 0px 0px 0px;
 
     &:hover {
         opacity: 1;
