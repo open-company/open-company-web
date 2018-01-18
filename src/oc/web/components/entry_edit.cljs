@@ -282,7 +282,7 @@
                              (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
                     (cancel-clicked s))}
       [:div.modal-wrapper
-        {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
+        {:style (when-not is-mobile? {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")})}
         ;; Show the close button only when there are no modals shown
         (when (and (not (:media-video media-input))
                    (not (:media-chart media-input))
