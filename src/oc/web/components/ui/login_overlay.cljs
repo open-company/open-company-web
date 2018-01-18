@@ -79,7 +79,8 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
-                         (user-actions/login-with-slack auth-link)))}
+                         (user-actions/login-with-slack auth-link)))
+           :on-touch-start identity}
           [:div.signin-with-slack-content
             "Sign In with "
             [:div.slack-blue-icon]]]
@@ -148,6 +149,7 @@
                                "authenticate"
                                "GET"
                                {:auth-source "email"})))
+               :on-touch-start identity
                :on-click #(let [login-with-email (:login-with-email @dis/app-state)
                                 email (:email login-with-email)
                                 pswd (:pswd login-with-email)]
@@ -160,6 +162,7 @@
           [:a
             {:href oc-urls/sign-up
              :on-click (fn [e]
+                         (js/console.log "login-overlay on-click")
                          (utils/event-stop e)
                          (router/nav! oc-urls/sign-up))}
             "Signup here"]]]]))
@@ -214,11 +217,13 @@
               [:div.group
                 [:button.mlb-reset.mlb-default.continue
                   {:on-click #(dis/dispatch! [:password-reset])
-                   :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))}
+                   :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))
+                   :on-touch-start identity}
                   "Reset Password"]
                 [:button.mlb-reset.mlb-link-black
                   {:on-click #(user-actions/show-login nil)
-                   :disabled (not auth-settings)}
+                   :disabled (not auth-settings)
+                   :on-touch-start identity}
                   "Cancel"]])]]]]))
 
 (rum/defcs collect-name-password < rum/reactive
@@ -296,6 +301,7 @@
               {:disabled (or (and (s/blank? (:firstname (:collect-name-pswd (rum/react dis/app-state))))
                                   (s/blank? (:lastname (:collect-name-pswd (rum/react dis/app-state)))))
                              (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 8))
+               :on-touch-start identity
                :on-click #(do
                             (utils/event-stop %)
                             (dis/dispatch! [:name-pswd-collect]))}
@@ -352,7 +358,8 @@
               {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                :on-click #(do
                             (utils/event-stop %)
-                            (dis/dispatch! [:pswd-collect true]))}
+                            (dis/dispatch! [:pswd-collect true]))
+               :on-touch-start identity}
               "Let Me In"]]]]]))
 
 (rum/defcs login-overlays-handler < rum/static
