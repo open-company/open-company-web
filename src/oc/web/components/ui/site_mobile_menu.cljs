@@ -75,10 +75,12 @@
                         (dis/dispatch! [:site-menu-toggle])
                         (if (utils/in? (:route @router/path) "login")
                           (user/show-login :login-with-slack)
-                          (router/nav! oc-urls/login)))}
+                          (router/nav! oc-urls/login)))
+             :on-touch-start identity}
             "Log In"])
         [:button.mlb-reset.get-started-button
           {:class (when (jwt/jwt) "your-boards")
+           :on-touch-start identity
            :on-click (fn [e]
                       (dis/dispatch! [:site-menu-toggle])
                       (if (jwt/jwt)
