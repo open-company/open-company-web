@@ -201,6 +201,7 @@
                                      :container-node :div.email-field
                                      :valid-item? utils/valid-email?
                                      :items (:to email-data)
+                                     :input-type "email"
                                      :on-intermediate-change #(reset!
                                                                (::email-data s)
                                                                (merge email-data {:to-error false}))
