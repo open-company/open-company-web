@@ -53,83 +53,84 @@
 
 (defn nux-steps
   [org-data board-data nux]
-  (case nux
-    :3
-    (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
-                first-card-offset (.offset first-card)]
-      (carrot-tip {:step nux
-                   :x (+ (aget first-card-offset "left") (.width first-card) 24)
-                   :y (aget first-card-offset "top")
-                   :width 432
-                   :circle-offset {:top -170
-                                   :left -750}
-                   :title "Success!"
-                   :message (str "Your first post is on the " (:name board-data) " board!")
-                   :step-label "1 of 4"
-                   :button-title "Cool"
-                   :button-position "left"
-                   :on-next-click #(dis/dispatch! [:input [:nux] :4])}))
-    :4
-    (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
-                offset (.offset new-post-bt)]
-      (let [create-link (utils/link-for (:links org-data) "create")]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)]
+    (case nux
+      :3
+      (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
+                  first-card-offset (.offset first-card)]
         (carrot-tip {:step nux
-                     :x (- (aget offset "left") 284)
-                     :y (+ (aget offset "top") 60)
-                     :circle-offset {:top -170
-                                     :left -760}
+                     :x (+ (aget first-card-offset "left") (.width first-card) 24)
+                     :y (aget first-card-offset "top")
                      :width 432
-                     :title "It’s simple to post something"
+                     :circle-offset {:top -170
+                                     :left -750}
+                     :title "Success!"
+                     :message (str "Your first post is on the " (:name board-data) " board!")
+                     :step-label (if is-mobile? "1 of 2" "1 of 4")
+                     :button-title "Cool"
+                     :button-position "left"
+                     :on-next-click #(dis/dispatch! [:input [:nux] :4])}))
+      :4
+      (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
+                  offset (.offset new-post-bt)]
+        (let [create-link (utils/link-for (:links org-data) "create")]
+          (carrot-tip {:step nux
+                       :x (- (aget offset "left") 284)
+                       :y (+ (aget offset "top") 60)
+                       :circle-offset {:top -170
+                                       :left -760}
+                       :width 432
+                       :title "It’s simple to post something"
+                       :message (str
+                                 "Add new announcements, updates, and plans "
+                                 "for your team in no time. Just click the New "
+                                 "Post button!")
+                       :step-label (if is-mobile? "2 of 2" "2 of 4")
+                       :button-title "Got it"
+                       :button-position "left"
+                       :on-next-click (fn []
+                                        (dis/dispatch! [:input [:nux] (if (not is-mobile?)
+                                                                       :5
+                                                                       :7)]))})))
+      :5
+      (when-let* [plus-button (js/$ "button#add-board-button")
+                  plus-offset (.offset plus-button)]
+        (carrot-tip {:step nux
+                     :x (+ (aget plus-offset "left") 40)
+                     :y (- (aget plus-offset "top") 22)
+                     :width 432
+                     :circle-offset {:top -70
+                                     :left -220}
+                     :title "Boards keep posts organized"
                      :message (str
-                               "Add new announcements, updates, and plans "
-                               "for your team in no time. Just click the New "
-                               "Post button!")
-                     :step-label "2 of 4"
-                     :button-title "Got it"
+                               "You can add high-level boards like "
+                               "All-hands, Strategy, and Who We Are; or "
+                               "group-level boards like Sales, Marketing and "
+                               "Design.")
+                     :step-label "3 of 4"
+                     :button-title "Makes sense"
                      :button-position "left"
                      :on-next-click (fn []
-                                      (dis/dispatch! [:input [:nux] (if (not (responsive/is-tablet-or-mobile?))
-                                                                     :5
-                                                                     :7)]))})))
-    :5
-    (when-let* [plus-button (js/$ "button#add-board-button")
-                plus-offset (.offset plus-button)]
-      (carrot-tip {:step nux
-                   :x (+ (aget plus-offset "left") 40)
-                   :y (- (aget plus-offset "top") 22)
-                   :width 432
-                   :circle-offset {:top -70
-                                   :left -220}
-                   :title "Boards keep posts organized"
-                   :message (str
-                             "You can add high-level boards like "
-                             "All-hands, Strategy, and Who We Are; or "
-                             "group-level boards like Sales, Marketing and "
-                             "Design.")
-                   :step-label "3 of 4"
-                   :button-title "Makes sense"
-                   :button-position "left"
-                   :on-next-click (fn []
-                                    (let [is-admin? (jwt/is-admin? (:team-id org-data))]
-                                      (dis/dispatch! [:input [:nux] (if is-admin? :6 :7)])))}))
-    :6
-    (when-let* [invite-button (js/$ "button.invite-people-btn")
-                invite-offset (.offset invite-button)]
-      (carrot-tip {:step nux
-                   :x (+ (aget invite-offset "left") 16)
-                   :y (- (aget invite-offset "top") 255)
-                   :width 432
-                   :circle-offset {:top -350
-                                   :left -80}
-                   :title "Invite your teammates"
-                   :message (str
-                             "The best way to keep your team aligned? Invite "
-                             "them to join you on Carrot!")
-                   :step-label "4 of 4"
-                   :button-title "Will do"
-                   :button-position "left"
-                   :on-next-click (fn []
-                                    (dis/dispatch! [:input [:nux] :7]))}))))
+                                      (let [is-admin? (jwt/is-admin? (:team-id org-data))]
+                                        (dis/dispatch! [:input [:nux] (if is-admin? :6 :7)])))}))
+      :6
+      (when-let* [invite-button (js/$ "button.invite-people-btn")
+                  invite-offset (.offset invite-button)]
+        (carrot-tip {:step nux
+                     :x (+ (aget invite-offset "left") 16)
+                     :y (- (aget invite-offset "top") 255)
+                     :width 432
+                     :circle-offset {:top -350
+                                     :left -80}
+                     :title "Invite your teammates"
+                     :message (str
+                               "The best way to keep your team aligned? Invite "
+                               "them to join you on Carrot!")
+                     :step-label "4 of 4"
+                     :button-title "Will do"
+                     :button-position "left"
+                     :on-next-click (fn []
+                                      (dis/dispatch! [:input [:nux] :7]))})))))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
