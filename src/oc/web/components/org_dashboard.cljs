@@ -44,7 +44,8 @@
   (let [data (drv/react s :base)
         org-data (dis/org-data data)
         all-posts-data (dis/all-posts-data data)
-        board-data (dis/board-data data)]
+        board-data (dis/board-data data)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
             (not org-data)
@@ -66,7 +67,7 @@
         {:class (utils/class-set {:org-dashboard true
                                   :mobile-dashboard (responsive/is-mobile-size?)
                                   :modal-activity-view (router/current-activity-id)
-                                  :mobile-or-tablet (responsive/is-tablet-or-mobile?)
+                                  :mobile-or-tablet is-mobile?
                                   :no-scroll (and (not (responsive/is-mobile-size?))
                                                   (router/current-activity-id))})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
@@ -88,6 +89,9 @@
           ;; Board editing
           (:board-editing data)
           (board-edit)
+          (and is-mobile?
+               (:activity-share data))
+          (activity-share)
           ;; Activity modal
           (and (router/current-activity-id)
                (not (:entry-edit-dissmissing data)))
@@ -100,8 +104,9 @@
               (router/current-activity-id)
               data))))
         ;; Activity share modal
-        (when (:activity-share data)
-          (activity-share))
+        (when (and (not is-mobile?)
+                     (:activity-share data))
+            (activity-share))
         ;; Alert modal
         (when (:alert-modal data)
           (alert-modal))
@@ -113,9 +118,10 @@
         (when (and (:media-input data)
                    (:media-chart (:media-input data)))
           (media-chart-modal))
-        (when-not (and (responsive/is-tablet-or-mobile?)
-                         (or (router/current-activity-id)
-                             (:entry-editing data)))
+        (when-not (and is-mobile?
+                       (or (router/current-activity-id)
+                           (:entry-editing data)
+                           (:activity-share data)))
           [:div.page
             (navbar)
             [:div.dashboard-container
