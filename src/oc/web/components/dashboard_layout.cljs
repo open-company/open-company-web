@@ -66,7 +66,7 @@
                                      :left -750}
                      :title "Success!"
                      :message (str "Your first post is on the " (:name board-data) " board!")
-                     :step-label (if is-mobile? "1 of 2" "1 of 4")
+                     :step-label (if is-mobile? "1 of 3" "1 of 4")
                      :button-title "Cool"
                      :button-position "left"
                      :on-next-click #(dis/dispatch! [:input [:nux] :4])}))
@@ -85,34 +85,43 @@
                                  "Add new announcements, updates, and plans "
                                  "for your team in no time. Just click the New "
                                  "Post button!")
-                       :step-label (if is-mobile? "2 of 2" "2 of 4")
+                       :step-label (if is-mobile? "2 of 3" "2 of 4")
                        :button-title "Got it"
                        :button-position "left"
                        :on-next-click (fn []
-                                        (dis/dispatch! [:input [:nux] (if (not is-mobile?)
-                                                                       :5
-                                                                       :7)]))})))
+                                        (dis/dispatch! [:input [:nux] :5]))})))
       :5
-      (when-let* [plus-button (js/$ "button#add-board-button")
-                  plus-offset (.offset plus-button)]
-        (carrot-tip {:step nux
-                     :x (+ (aget plus-offset "left") 40)
-                     :y (- (aget plus-offset "top") 22)
-                     :width 432
-                     :circle-offset {:top -70
-                                     :left -220}
-                     :title "Boards keep posts organized"
-                     :message (str
-                               "You can add high-level boards like "
-                               "All-hands, Strategy, and Who We Are; or "
-                               "group-level boards like Sales, Marketing and "
-                               "Design.")
-                     :step-label "3 of 4"
-                     :button-title "Makes sense"
-                     :button-position "left"
-                     :on-next-click (fn []
-                                      (let [is-admin? (jwt/is-admin? (:team-id org-data))]
-                                        (dis/dispatch! [:input [:nux] (if is-admin? :6 :7)])))}))
+      (let [plus-button (js/$ "button#add-board-button")
+            plus-offset (.offset plus-button)
+            mobile-ham-button (js/$ "button.mobile-navigation-sidebar-ham-bt")
+            mobile-ham-offset (.offset mobile-ham-button)]
+        (when (or (and is-mobile?
+                       mobile-ham-button
+                       mobile-ham-offset)
+                  (and (not is-mobile?)
+                       plus-button
+                       plus-offset))
+          (carrot-tip {:step nux
+                       :x (+ (aget (if is-mobile? mobile-ham-offset plus-offset ) "left") 40)
+                       :y (- (aget (if is-mobile? mobile-ham-offset plus-offset) "top") 22)
+                       :width 432
+                       :circle-offset {:top -70
+                                       :left -220}
+                       :title "Boards keep posts organized"
+                       :message (str
+                                 "You can add high-level boards like "
+                                 "All-hands, Strategy, and Who We Are; or "
+                                 "group-level boards like Sales, Marketing and "
+                                 "Design.")
+                       :step-label (if is-mobile? "3 of 3" "3 of 4")
+                       :button-title "Makes sense"
+                       :button-position "left"
+                       :on-next-click (fn []
+                                        (let [is-admin? (jwt/is-admin? (:team-id org-data))]
+                                          (dis/dispatch! [:input [:nux] (if (and (not is-mobile?)
+                                                                                 is-admin?)
+                                                                          :6
+                                                                          :7)])))})))
       :6
       (when-let* [invite-button (js/$ "button.invite-people-btn")
                   invite-offset (.offset invite-button)]

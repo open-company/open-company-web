@@ -24,13 +24,16 @@
     [:g
       {:stroke "none"
        :stroke-width "1"
+       :fill "none"
        :fill-rule "evenodd"
        :fill-opacity "0.9"
-       :opacity "0.3"
-       :fill "#34414F"}
-      [:path
-        {:d
-          (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]))
+       :opacity "0.3"}
+      [:g
+        {:fill "#34414F"}
+        [:g
+          [:path
+            {:d
+              (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]]))
 
 (defn third-step-oval [width height px py]
   (if (responsive/is-tablet-or-mobile?)
@@ -69,13 +72,16 @@
       [:g
         {:stroke "none"
          :stroke-width "1"
+         :fill "none"
          :fill-rule "evenodd"
          :fill-opacity "0.9"
-         :opacity "0.3"
-         :fill "#34414F"}
-        [:path
-          {:d
-            (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]])))
+         :opacity "0.3"}
+        [:g
+          {:fill "#34414F"}
+          [:g
+            [:path
+              {:d
+                (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
 
 (defn fourth-step-oval [width height px py]
   (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
@@ -98,42 +104,60 @@
     [:g
       {:stroke "none"
        :stroke-width "1"
+       :fill "none"
        :fill-rule "evenodd"
        :fill-opacity "0.9"
-       :opacity "0.3"
-       :fill "#34414F"}
-      [:path
-        {:d
-          (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]))
+       :opacity "0.3"}
+      [:g
+        {:fill "#34414F"}
+        [:g
+          [:path
+            {:d
+              (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]]))
 
 (defn fifth-step-oval [width height px py]
-  (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
-        offset-x px
-        offset-y py
-        second-line (str "M" (+ 102.465877 offset-x) "," (+ 29.4005311 offset-y) "\n")
-        nth-line-3 (str "C" (+ 47.9448333 offset-x) "," (+ 50.3042759 offset-y)
-                        " " (+ 19.7406369 offset-x) "," (+ 105.961005 offset-y)
-                        " " (+ 26.1160043 offset-x) "," (+ 157.653849 offset-y) "\n")
-        nth-line-4 (str "C" (+ 32.2024097 offset-x) "," (+ 207.543534 offset-y)
-                        " " (+ 99.1875736 offset-x) "," (+ 235.501906 offset-y)
-                        " " (+ 171.534127 offset-x) "," (+ 209.329474 offset-y) "\n")
-        nth-line-5 (str "C" (+ 242.810869 offset-x) "," (+ 180.370089 offset-y)
-                        " " (+ 273.882327 offset-x) "," (+ 114.770059 offset-y)
-                        " " (+ 245.02311 offset-x) "," (+ 73.6232845 offset-y) "\n")
-        nth-line-6 (str "C" (+ 215.171667 offset-x) "," (+ 30.9420608 offset-y)
-                        " " (+ 156.970244 offset-x) "," (+ 8.45334202 offset-y)
-                        " " (+ 102.465877 offset-x) "," (+ 29.4005311 offset-y)
-                        " Z ")]
-    [:g
-      {:stroke "none"
-       :stroke-width "1"
-       :fill-rule "evenodd"
-       :fill-opacity "0.9"
-       :opacity "0.3"
-       :fill "#34414F"}
-      [:path
-        {:d
-          (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]))
+  (if (responsive/is-tablet-or-mobile?)
+    (let [navbar-height 64]
+      [:g
+        {:stroke "none"
+         :fill-opacity "0.9"
+         :opacity "0.3"
+         :fill "#34413F"}
+        [:rect
+          {:x "0"
+           :y (str navbar-height)
+           :width (str (.-innerWidth js/window))
+           :height (str (- (.-height (.getBoundingClientRect (.-body js/document))) navbar-height))}]])
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          offset-x px
+          offset-y py
+          second-line (str "M" (+ 102.465877 offset-x) "," (+ 29.4005311 offset-y) "\n")
+          nth-line-3 (str "C" (+ 47.9448333 offset-x) "," (+ 50.3042759 offset-y)
+                          " " (+ 19.7406369 offset-x) "," (+ 105.961005 offset-y)
+                          " " (+ 26.1160043 offset-x) "," (+ 157.653849 offset-y) "\n")
+          nth-line-4 (str "C" (+ 32.2024097 offset-x) "," (+ 207.543534 offset-y)
+                          " " (+ 99.1875736 offset-x) "," (+ 235.501906 offset-y)
+                          " " (+ 171.534127 offset-x) "," (+ 209.329474 offset-y) "\n")
+          nth-line-5 (str "C" (+ 242.810869 offset-x) "," (+ 180.370089 offset-y)
+                          " " (+ 273.882327 offset-x) "," (+ 114.770059 offset-y)
+                          " " (+ 245.02311 offset-x) "," (+ 73.6232845 offset-y) "\n")
+          nth-line-6 (str "C" (+ 215.171667 offset-x) "," (+ 30.9420608 offset-y)
+                          " " (+ 156.970244 offset-x) "," (+ 8.45334202 offset-y)
+                          " " (+ 102.465877 offset-x) "," (+ 29.4005311 offset-y)
+                          " Z ")]
+      [:g
+        {:stroke "none"
+         :stroke-width "1"
+         :fill "none"
+         :fill-rule "evenodd"
+         :fill-opacity "0.9"
+         :opacity "0.3"}
+        [:g
+          {:fill "#34414F"}
+          [:g
+            [:path
+              {:d
+                (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
 
 (defn sixth-step-oval [width height px py]
   (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
@@ -156,22 +180,22 @@
     [:g
       {:stroke "none"
        :stroke-width "1"
+       :fill "none"
        :fill-rule "evenodd"
        :fill-opacity "0.9"
-       :opacity "0.3"
-       :fill "#34414F"}
-      [:path
-        {:d
-          (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]))
+       :opacity "0.3"}
+      [:g
+        {:fill "#34414F"}
+        [:g
+          [:path
+            {:d
+              (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]]))
 
 (defn is-step-with-oval
   [step]
   (cond
     (and (not (responsive/is-tablet-or-mobile?))
-         (= step :2))
-    true
-    (and (not (responsive/is-tablet-or-mobile?))
-         (= step :4))
+         (some #{step} [:2 :4]))
     true
     (some #{step} [:3 :5 :6])
     true
@@ -199,10 +223,10 @@
       {:style {:top (str arrow-top "px")
                :left (str arrow-left "px")}}]
     [:div.balloons-background]
+    (when step-label
+      [:div.carrot-tip-step
+        step-label])
     [:div.carrot-tip-inner
-      (when step-label
-        [:div.carrot-tip-step
-          step-label])
       [:div.carrot-tip-title
         title]
       [:div.carrot-tip-description
@@ -233,7 +257,7 @@
           [:svg
             {:width "100%"
              :height "100%"
-             :viewBox (str "0 0 " (.-innerWidth js/window) " " (.-height (.getBoundingClientRect (.-body js/document))))
+             :viewBox (str "0px 0px " (.-innerWidth js/window) "px " (.-height (.getBoundingClientRect (.-body js/document))) "px")
              :version "1.1"
              :xmlns "http://www.w3.org/2000/svg"
              :xmlnsXlink "http://www.w3.org/1999/xlink"}

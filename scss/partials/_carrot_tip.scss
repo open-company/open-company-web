@@ -130,11 +130,15 @@ div.carrot-tip-container {
         }
       }
 
-      div.carrot-tip-inner {
+      div.carrot-tip-step {
+        top: 16px;
 
-        div.carrot-tip-step {
-          top: -20px;
+        @include mobile() {
+          top: unset;
         }
+      }
+
+      div.carrot-tip-inner {
 
         div.carrot-tip-title {
           margin-top: 8px;
@@ -165,7 +169,7 @@ div.carrot-tip-container {
       @include mobile() {
         width: 100%;
         height: auto;
-        top: calc(100vh - 374px);
+        bottom: -40px;
       }
 
       div.arrow {
@@ -210,9 +214,18 @@ div.carrot-tip-container {
   &.step-5 {
     div.carrot-tip{
 
+      @include mobile() {
+        top: 64px;
+      }
+
       div.arrow {
         left: -7px;
         top: 24px;
+
+        @include mobile() {
+          top: -7px;
+          left: 30px;
+        }
       }
 
       div.balloons-background {
@@ -316,18 +329,24 @@ div.carrot-tip-container {
       position: absolute;
     }
 
+    div.carrot-tip-step {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      color: white;
+      @include avenir_H();
+      font-size: 16px;
+      line-height: 28px;
+
+      @include mobile() {
+        top: unset;
+        bottom: 20px;
+        right: 16px;
+      }
+    }
+
     div.carrot-tip-inner {
       position: relative;
-
-      div.carrot-tip-step {
-        position: absolute;
-        top: -11px;
-        right: -16px;
-        color: white;
-        @include avenir_H();
-        font-size: 16px;
-        line-height: 28px;
-      }
 
       div.carrot-tip-title {
         @include avenir_H();
