@@ -44,6 +44,7 @@
     (let [org-data (dis/org-data data)
           all-posts-data (dis/all-posts-data data)
           board-data (dis/board-data data)
+          is-mobile? (responsive/is-tablet-or-mobile?)
           should-show-onboard-overlay? (some #{(:nux data)} [:1 :7])]
       ;; Show loading if
       (if (or ;; the org data are not loaded yet
@@ -65,7 +66,7 @@
         (dom/div {:class (utils/class-set {:org-dashboard true
                                            :mobile-dashboard (responsive/is-mobile-size?)
                                            :modal-activity-view (router/current-activity-id)
-                                           :mobile-or-tablet (responsive/is-tablet-or-mobile?)
+                                           :mobile-or-tablet is-mobile?
                                            :no-scroll (and (not (responsive/is-mobile-size?))
                                                            (router/current-activity-id))})}
           ;; Use cond for the next components to exclud each other and avoid rendering all of them
@@ -87,6 +88,9 @@
             ;; Board editing
             (:board-editing data)
             (board-edit)
+            (and is-mobile?
+                 (:activity-share data))
+            (activity-share)
             ;; Activity modal
             (and (router/current-activity-id)
                  (not (:entry-edit-dissmissing data)))
@@ -99,7 +103,8 @@
                 (router/current-activity-id)
                 data))))
           ;; Activity share modal
-          (when (:activity-share data)
+          (when (and (not is-mobile?)
+                     (:activity-share data))
             (activity-share))
           ;; Alert modal
           (when (:alert-modal data)
@@ -112,10 +117,11 @@
           (when (and (:media-input data)
                      (:media-chart (:media-input data)))
             (media-chart-modal))
-          (when-not (and (responsive/is-tablet-or-mobile?)
+          (when-not (and is-mobile?
                          (or (router/current-activity-id)
                              (:entry-editing data)
-                             should-show-onboard-overlay?))
+                             should-show-onboard-overlay?
+                             (:activity-share data)))
             (dom/div {:class "page"}
               ;; Navbar
               (navbar)
