@@ -40,12 +40,13 @@
       s)}
   [s {:keys [item-render on-change match-ptn split-ptn tab-index
              valid-item? container-node input-node placeholder auto-focus
-             on-intermediate-change]
+             on-intermediate-change input-type]
       :or {valid-item? identity
            tab-index 0
            auto-focus true
            container-node :div
-           input-node :input}}]
+           input-node :input
+           input-type "text"}}]
   (let [*items       (::items s) ; tracking items already entered
         *input       (::input s) ; tracking value of input field
         *show-input? (::show-input? s)
@@ -79,7 +80,7 @@
        ;; Render actual input to add new items
        @*show-input?
        [input-node
-        {:type      "text"
+        {:type      input-type
          :class     (when-not (seq @*items) "col-12")
          :placeholder (when-not (seq @*items) placeholder )
          :auto-focus auto-focus

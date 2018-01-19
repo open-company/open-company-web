@@ -7,8 +7,9 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.local-settings :as ls]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.item-input :refer (item-input email-item)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
@@ -113,7 +114,8 @@
         slack-data @(::slack-data s)
         secure-uuid (:secure-uuid activity-data)
         ;; Make sure it gets remounted when share request finishes
-        _ (drv/react s :activity-shared-data)]
+        _ (drv/react s :activity-shared-data)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})
@@ -122,16 +124,24 @@
                     (close-clicked s)))}
       [:div.modal-wrapper
         {:ref "activity-share-modal-wrapper"}
-        [:button.carrot-modal-close.mlb-reset
-            {:on-click #(close-clicked s)}]
+        (when-not is-mobile?
+          [:button.carrot-modal-close.mlb-reset
+            {:on-click #(close-clicked s)}])
         [:div.activity-share-modal
-          [:div.activity-share-main-cta
-            [:span "Share "]
-            [:span.activity-share-post-title
-              {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]
-          [:div.activity-share-divider-line]
-          [:div.activity-share-subheadline
-            "People outside your Carrot team will not see comments."]
+          (if is-mobile?
+            [:div.activity-share-main-cta
+              [:button.mobile-modal-close-bt.mlb-reset
+                {:on-click #(close-clicked s)}]
+              [:span "Share post via..."]]
+            [:div.activity-share-main-cta
+              [:span "Share "]
+              [:span.activity-share-post-title
+                {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]])
+          (when-not is-mobile?
+            [:div.activity-share-divider-line])
+          (when-not is-mobile?
+            [:div.activity-share-subheadline
+              "People outside your Carrot team will not see comments."])
           [:div.activity-share-medium-selector-container
             (let [slack-disabled (not (has-bot? org-data))
                   show-slack-tooltip? (show-slack-tooltip? org-data)]
@@ -169,6 +179,9 @@
                            (reset! (::medium s) :email))}
               "Email"]
             ]
+          (when is-mobile?
+            [:div.activity-share-subheadline
+              "People outside your Carrot team will not see comments."])
           [:div.activity-share-divider-line]
           (when (= @(::medium s) :email)
             [:div.activity-share-share
@@ -188,6 +201,7 @@
                                      :container-node :div.email-field
                                      :valid-item? utils/valid-email?
                                      :items (:to email-data)
+                                     :input-type "email"
                                      :on-intermediate-change #(reset!
                                                                (::email-data s)
                                                                (merge email-data {:to-error false}))
@@ -240,33 +254,35 @@
                        "Share"])]]]])
           (when (= @(::medium s) :url)
             [:div.activity-share-modal-shared.group
-              (let [share-url (str
-                               "http"
-                               (when ls/jwt-cookie-secure
-                                "s")
-                               "://"
-                               ls/web-server
-                               (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
-                [:div.shared-url-container.group
-                  [:input
-                    {:value share-url
-                     :read-only true
-                     :on-click #(highlight-url s)
-                     :ref "activity-share-url-field"
-                     :data-placement "top"}]])
-              [:button.mlb-reset.mlb-default.copy-btn
-                {:ref "activity-share-url-copy-btn"
-                 :on-click (fn [e]
-                            (utils/event-stop e)
-                            (highlight-url s)
-                            (when (utils/copy-to-clipboard)
-                              (reset! (::copied s) true)
-                              (utils/after
-                               2000
-                               #(reset! (::copied s) false))))}
-                (if @(::copied s)
-                  "Copied!"
-                  "Copy URL")]])
+              [:form
+                {:on-submit #(utils/event-stop %)}
+                (let [share-url (str
+                                 "http"
+                                 (when ls/jwt-cookie-secure
+                                  "s")
+                                 "://"
+                                 ls/web-server
+                                 (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
+                  [:div.shared-url-container.group
+                    [:input
+                      {:value share-url
+                       :read-only true
+                       :content-editable false
+                       :on-click #(highlight-url s)
+                       :ref "activity-share-url-field"
+                       :data-placement "top"}]])
+                [:button.mlb-reset.mlb-default.copy-btn
+                  {:ref "activity-share-url-copy-btn"
+                   :on-click (fn [e]
+                              (utils/event-stop e)
+                              (let [url-input (rum/ref-node s "activity-share-url-field")]
+                                (highlight-url s)
+                                (when (utils/copy-to-clipboard url-input)
+                                  (reset! (::copied s) true)
+                                  (utils/after 2000 #(reset! (::copied s) false)))))}
+                  (if @(::copied s)
+                    "Copied!"
+                    "Copy URL")]]])
           (when (= @(::medium s) :slack)
             [:div.activity-share-share
               [:div.mediums-box
