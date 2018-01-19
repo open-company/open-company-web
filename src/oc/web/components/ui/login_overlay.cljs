@@ -162,7 +162,6 @@
           [:a
             {:href oc-urls/sign-up
              :on-click (fn [e]
-                         (js/console.log "login-overlay on-click")
                          (utils/event-stop e)
                          (router/nav! oc-urls/sign-up))}
             "Signup here"]]]]))
