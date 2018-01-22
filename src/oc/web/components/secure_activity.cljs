@@ -27,9 +27,10 @@
                           {:will-mount (fn [s]
                             (utils/after 100 #(dis/dispatch! [:secure-activity-get]))
                             (save-win-height s)
-                            (reset! (::win-resize-listener s)
-                             (events/listen js/window EventType/RESIZE
-                              #(save-win-height s)))
+                            (when (responsive/is-tablet-or-mobile?)
+                              (reset! (::win-resize-listener s)
+                               (events/listen js/window EventType/RESIZE
+                                #(save-win-height s))))
                             s)
                            :will-unmount (fn [s]
                             (when @(::win-resize-listener s)
@@ -43,9 +44,8 @@
         win-height @(::win-height s)]
     (if activity-data
       [:div.secure-activity-container
-        {:style {:min-height (if is-mobile?
-                               (str (- win-height default-activity-header-height) "px")
-                               (str win-height "px"))}}
+        {:style {:min-height (when is-mobile?
+                               (str (- win-height default-activity-header-height) "px"))}}
         (when (drv/react s :made-with-carrot-modal)
           (made-with-carrot-modal))
         [:div.activity-header.group
@@ -58,9 +58,8 @@
                         :org-slug :slug}))]
         [:div.activity-content-outer
           [:div.activity-content
-            {:style {:min-height (if is-mobile?
-                                  (str (- win-height default-activity-header-height) "px")
-                                  (str default-activity-content-height "px"))}}
+            {:style {:min-height (when is-mobile?
+                                  (str (- win-height default-activity-header-height) "px"))}}
             (when (:headline activity-data)
               [:div.activity-title
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
