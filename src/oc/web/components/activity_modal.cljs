@@ -62,12 +62,14 @@
               (oc-urls/board org board))))))))
 
 (defn close-clicked [s & [board-filters]]
-  (if (:from-all-posts @router/path)
-    ;; Remove AP data from the DB to avoid showing results before loading and results again
-    (when-not (string? board-filters)
-      (dis/dispatch! [:all-posts-reset]))
-    ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
-    (dis/dispatch! [:input [:no-reset-seen-at] true]))
+  (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
+    (if (:from-all-posts @router/path)
+      ;; Remove AP data from the DB to avoid showing results before loading and results again
+      (when (and (not (string? board-filters))
+                 ap-initial-at)
+        (dis/dispatch! [:all-posts-reset]))
+      ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
+      (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s board-filters)))
