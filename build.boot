@@ -18,20 +18,17 @@
     ;; NB: Can't go past ClojureScript 1.9.908 right now due to issues w/ React
     [org.clojure/clojurescript "1.9.908"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
-    ;; Om and Rum React Frameworks
-    ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes acecss
+    ;; Rum React Frameworks
+    ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes access
     ;; and some change to omcljs/om to not use createClass anymore. See React docs for more info.
     [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [org.omcljs/om "1.0.0-beta1" :excludes [cljsjs/react]] ; Cljs interface to React https://github.com/omcljs/om
-    [org.clojars.martinklepsch/om-tools "0.4.0-w-select"] ; Tools for Om https://github.com/plumatic/om-tools/pull/91
     [rum "0.10.8" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
     [org.martinklepsch/derivatives "0.3.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     
     ;; ClojureScript libraries
     [cljs-http "0.1.44"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [prismatic/schema "1.1.7"] ; Dependency of om-tools https://github.com/Prismatic/schema
     [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [com.cognitect/transit-cljs "0.8.243"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
