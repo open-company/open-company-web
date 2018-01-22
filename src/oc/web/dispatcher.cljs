@@ -239,8 +239,8 @@
                                 (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
-   :modal-data          [[:base :org-data :entry-edit-topics :activity-share :add-comment-focus :comment-edit]
-                          (fn [base org-data entry-edit-topics activity-share add-comment-focus comment-edit]
+   :modal-data          [[:base :org-data :entry-edit-topics :activity-share :add-comment-focus :comment-edit :ap-initial-at]
+                          (fn [base org-data entry-edit-topics activity-share add-comment-focus comment-edit ap-initial-at]
                             {:org-data org-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
                              :board-filters (:board-filters base)
@@ -251,7 +251,8 @@
                              :activity-share activity-share
                              :entry-save-on-exit (:entry-save-on-exit base)
                              :add-comment-focus add-comment-focus
-                             :comment-edit comment-edit})]
+                             :comment-edit comment-edit
+                             :ap-initial-at ap-initial-at})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
