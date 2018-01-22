@@ -13,18 +13,39 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn save-win-height [s]
+  (reset! (::win-height s) (.-innerHeight js/window)))
+
+(def default-activity-header-height 69)
+(def default-activity-content-height 136)
+
 (rum/defcs secure-activity < rum/reactive
                           (drv/drv :secure-activity-data)
                           (drv/drv :made-with-carrot-modal)
+                          (rum/local 0 ::win-height)
+                          (rum/local nil ::win-resize-listener)
                           {:will-mount (fn [s]
-                                         (utils/after 100 #(dis/dispatch! [:secure-activity-get]))
-                                         s)}
+                            (utils/after 100 #(dis/dispatch! [:secure-activity-get]))
+                            (save-win-height s)
+                            (reset! (::win-resize-listener s)
+                             (events/listen js/window EventType/RESIZE
+                              #(save-win-height s)))
+                            s)
+                           :will-unmount (fn [s]
+                            (when @(::win-resize-listener s)
+                              (events/unlistenByKey @(::win-resize-listener s))
+                              (reset! (::win-resize-listener s) nil))
+                            s)}
   [s]
   (let [activity-data (drv/react s :secure-activity-data)
         activity-author (:publisher activity-data)
-        ww (min (responsive/ww) 840)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        win-height @(::win-height s)]
     (if activity-data
       [:div.secure-activity-container
+        {:style {:min-height (if is-mobile?
+                               (str (- win-height default-activity-header-height) "px")
+                               (str win-height "px"))}}
         (when (drv/react s :made-with-carrot-modal)
           (made-with-carrot-modal))
         [:div.activity-header.group
@@ -37,6 +58,9 @@
                         :org-slug :slug}))]
         [:div.activity-content-outer
           [:div.activity-content
+            {:style {:min-height (if is-mobile?
+                                  (str (- win-height default-activity-header-height) "px")
+                                  (str default-activity-content-height "px"))}}
             (when (:headline activity-data)
               [:div.activity-title
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
@@ -53,7 +77,7 @@
               [:div.activity-body
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])]]
         [:div.activity-content-footer
-          {:on-click #(when-not (responsive/is-tablet-or-mobile?)
+          {:on-click #(when-not is-mobile?
                         (dis/dispatch! [:made-with-carrot-modal-show]))}
           [:div.activity-content-footer-inner
             [:div.carrot-logo]

@@ -6,10 +6,6 @@ div.secure-activity-container {
   background-color: white;
   min-height: 100vh;
 
-  @include mobile() {
-    min-height: calc(100vh - 69px);
-  }
-
   div.activity-header {
     height: 72px;
     position: fixed;
@@ -66,7 +62,6 @@ div.secure-activity-container {
 
       @include mobile() {
         padding: 32px;
-        min-height: calc(100vh - 69px - 70px);
       }
 
       div.activity-banner {
