@@ -1130,7 +1130,9 @@
 
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ activity-data editing]]
-  (activity-modal-fade-in db activity-data editing))
+  (if (get-in db [:search-active])
+    db
+    (activity-modal-fade-in db activity-data editing)))
 
 (defn entry-edit
   [db initial-entry-data]

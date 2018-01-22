@@ -72,10 +72,12 @@ div.triangle {
 div.search-results {
   border: 1px solid rgba(177,184,192,0.50);
   border-radius: 5px;
-
+  max-height: 450px;
   margin: 41px 0px 0px 23px;
   width: 450px;
   box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
+  overflow-x: visible;
+  overflow-y: auto;
 
   div.header {
     background-color: white;
@@ -118,6 +120,27 @@ div.search-results {
           color: rgba($carrot_text_blue_3, 0.3);
         }
       }
+    }
+  }
+
+  div.show-more {
+    background: white;
+    color: $oc_green_regular;
+    font-size: 14px;
+    padding: 5px 0px 10px 30px;
+    cursor: pointer;
+
+    button {
+      float: left;
+      font-size: 14px;
+      line-height: 1;
+      width: 15px;
+      height: 15px;
+      margin-top: 4px;
+      border: 0px solid transparent;
+      background-color: transparent;
+      background-repeat: no-repeat;
+      background-image: url('/img/ML/show_more_arrow.svg');
     }
   }
 

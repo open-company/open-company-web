@@ -47,13 +47,21 @@
       ]
      ]))
 
+(defn scroll-to-bottom [s]
+  (when-let [results-scroll (rum/ref-node s "results")]
+    (when results-scroll
+      (set! (.-scrollTop results-scroll) (.-scrollHeight results-scroll)))))
+
 (rum/defcs search-box < (drv/drv store/search-key)
                         (drv/drv store/search-active?)
                         rum/reactive
                         rum/static
                         (rum/local nil ::window-click)
                         (rum/local false ::search-clicked?)
-                        {:will-mount (fn [s]
+                        (rum/local 5 ::page-size)
+                        (rum/local 0 ::page-start)
+                        {:after-render (fn [s] (utils/after 500 #(scroll-to-bottom s)) s)
+                         :will-mount (fn [s]
                           (search/inactive)
                           (reset! (::window-click s)
                             (events/listen
@@ -64,7 +72,9 @@
                                       (utils/event-inside? e
                                         (sel1 [:div.search-box])))
                                  (do
+                                   (.stopPropagation e)
                                    (reset! (::search-clicked? s) false)
+                                   (reset! (::page-size s) 5)
                                    (search/inactive)))
                                e)))
                           s)
@@ -81,6 +91,7 @@
                                       "inactive")
                              :on-click (fn [e]
                                          (reset! (::search-clicked? s) false)
+                                         (reset! (::page-size s) 5)
                                          (set! (.-innerHTML (rum/ref-node s "search-input")) "")
                                          (search/inactive))}]
       [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")}]
@@ -100,14 +111,20 @@
                             :class (when (not search-active?) "inactive")}
         [:div.header
           [:span "SEARCH RESULTS"]
-          (when (pos? (count search-results))
-            [:span.count (str "(" (count search-results) ")")])]
-        (if (pos? (count search-results))
-          (for [sr search-results]
-            (let [key (str "result-" (:uuid (:_source sr)))]
-              (case (:type (:_source sr))
-                "entry" (rum/with-key (entry-display sr) key)
-                "board" (rum/with-key (board-display sr) key))))
+          (when (pos? (:count search-results))
+            [:span.count (str "(" (:count search-results) ")")])]
+        (if (pos? (:count search-results))
+          (let [results (reverse (:results search-results))]
+            (for [sr (take @(::page-size s) results)]
+              (let [key (str "result-" (:uuid (:_source sr)))]
+                (case (:type (:_source sr))
+                  "entry" (rum/with-key (entry-display sr) key)
+                  "board" (rum/with-key (board-display sr) key)))))
           [:div.empty-result
-            [:div.message "No matching results..."]]
-        )]]))
+            [:div.message "No matching results..."]])
+        (when (< @(::page-size s) (:count search-results))
+          [:div.show-more
+            {:on-click (fn [e] (reset! (::page-size s)
+                                       (+ @(::page-size s) 5)))}
+            [:button] "Show More"])
+       ]]))
