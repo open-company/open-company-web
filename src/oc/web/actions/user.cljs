@@ -89,7 +89,8 @@
 (defn bot-auth [org-data team-data user-data]
   (let [current (router/get-token)
         auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:id team-data) (router/get-token))]
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:id team-data)
+                        (router/get-token))]
     (router/redirect! fixed-auth-url)))
 
 (defn auth-with-token-failed [error]

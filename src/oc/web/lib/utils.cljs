@@ -1,6 +1,5 @@
 (ns oc.web.lib.utils
-  (:require [om.core :as om :include-macros true]
-            [clojure.string]
+  (:require [clojure.string]
             [dommy.core :as dommy :refer-macros (sel1)]
             [cljs.core.async :refer (put!)]
             [cljs-time.format :as cljs-time-format]
@@ -50,14 +49,6 @@
 
 (defn remove-channel [channel-name]
   (swap! channel-coll dissoc channel-name))
-
-(defn handle-change [cursor value key]
-  (if (array? key)
-    (om/transact! cursor assoc-in key (fn [_] value))
-    (om/transact! cursor key (fn [_] value))))
-
-(defn change-value [cursor e key]
-  (handle-change cursor (.. e -target -value) key))
 
 (defn save-values [channel-name]
   (let [save-channel (get-channel channel-name)]
@@ -1087,8 +1078,25 @@
 (defn activity-date-tooltip [activity-data]
   (entry-date-tooltip activity-data))
 
-(defn copy-to-clipboard []
+(defn ios-copy-to-clipboard [el]
+  (let [old-ce (.-contentEditable el)
+        old-ro (.-readOnly el)
+        rg (.createRange js/document)]
+    (set! (.-contentEditable el) true)
+    (set! (.-readOnly el) false)
+    (.selectNodeContents rg el)
+    (let [s (.getSelection js/window)]
+      (.removeAllRanges s)
+      (.addRange s rg)
+      (.setSelectionRange el 0 (.. el -value -length))
+      (set! (.-contentEditable el) old-ce)
+      (set! (.-readOnly el) old-ro))))
+
+(defn copy-to-clipboard [el]
   (try
+    (when (and (responsive/is-tablet-or-mobile?)
+               (js/isSafari))
+      (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e
       false)))
