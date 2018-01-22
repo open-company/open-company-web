@@ -125,10 +125,13 @@ nav.oc-navbar {
 
     div.navbar-left {
       float: left;
-      margin-left: 16px;
       margin-top: 8px;
       width: 24px;
       height: 24px;
+
+      @include mobile() {
+        margin-left: 16px;
+      }
 
       button.mobile-navigation-sidebar-ham-bt {
         display: none;
