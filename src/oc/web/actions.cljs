@@ -102,6 +102,10 @@
 
 (defmethod dispatcher/action :org
   [db [_ org-data saved?]]
+  ;; Save the last visited org
+  (when (and org-data
+             (= (router/current-org-slug) (:slug org-data)))
+    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
   (let [boards (:boards org-data)]
 
     (cond
