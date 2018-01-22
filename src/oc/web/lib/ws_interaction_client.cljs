@@ -1,8 +1,6 @@
 (ns oc.web.lib.ws-interaction-client
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]
-            [sablono.core :as html :refer-macros [html]]
+  (:require [sablono.core :as html :refer-macros [html]]
             [taoensso.sente :as s]
             [taoensso.timbre :as timbre]
             [cljs.core.async :as async :refer [<! >! chan]]

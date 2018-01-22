@@ -1,9 +1,7 @@
 (ns oc.web.components.org-editor
-  (:require [om.core :as om :include-macros true]
-            [om-tools.core :as om-core :refer-macros (defcomponent)]
-            [om-tools.dom :as dom :include-macros true]
-            [rum.core :as rum]
-            [cuerdas.core :as s]
+  (:require [rum.core :as rum]
+            [cuerdas.core :as string]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
@@ -12,7 +10,7 @@
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.small-loading :as loading]))
 
-(defn- create-org-alert [owner]
+(defn- create-org-alert []
   (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "create-org-alert"
                     :title "Please enter a company name."
@@ -21,19 +19,18 @@
                     :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn create-org-clicked [owner e]
+(defn create-org-clicked [s e]
   (utils/event-stop e)
-  (when-not (om/get-state owner :loading)
-    (let [data         (om/get-props owner)
-          org-name (:name (:org-editing data))]
+  (when-not @(::loading s) ;(om/get-state owner :loading)
+    (let [org-name (:name @(drv/get-ref s :org-editing))]
       (if (clojure.string/blank? org-name)
-        (create-org-alert owner)
+        (create-org-alert)
         (do
-          (om/set-state! owner :loading true)
+          (reset! (::loading s) true)
           (dis/dispatch! [:org-create]))))))
 
-(defn setup-org-name [owner data]
-  (when-let [team-data (first (:teams (:teams-data data)))]
+(defn setup-org-name [s]
+  (when-let [team-data (first (:teams @(drv/get-ref s :teams-data)))]
     ;; using utils/after here because we can't dispatch inside another dispatch.
     ;; ultimately we should switch to some event-loop impl that works like a proper queue
     ;; and does not have these limitations
@@ -43,44 +40,45 @@
                       {:name (or (:name team-data) "")
                        :logo-url (or (:logo-url team-data) "")}]))
     (when (seq (:name team-data))
-      (om/set-state! owner :message "Is this the organization name you’d like to use?"))))
+      (reset! (::message s) "Is this the organization name you’d like to use?"))))
 
-(defcomponent org-editor [data owner]
-
-  (init-state [_]
-    {:loading false
-     :message "What's the name of your organization?"
-     :name-did-change false})
-
-  (did-mount [_]
-    (when-not (:org-editing data)
-      (setup-org-name owner data)))
-
-  (will-receive-props [_ next-props]
-    (when-not (om/get-state owner :name-did-change)
-      (setup-org-name owner next-props)))
-
-  (render-state [_ {:keys [loading message]}]
-    (dom/div {:class "org-editor"}
-      (dom/div {:class "fullscreen-page"}
+(rum/defcs org-editor < (drv/drv :org-editing)
+                        (drv/drv :teams-data)
+                        (rum/local false ::loading)
+                        (rum/local "What's the name of your organization?" ::message)
+                        (rum/local false ::name-did-change)
+                        {:did-mount (fn [s]
+                          (when-not @(drv/get-ref s :org-editing)
+                            (setup-org-name s))
+                          s)
+                         :did-remount (fn [_ s]
+                          (when-not @(::name-did-change s)
+                            (setup-org-name s))
+                          s)}
+  [s]
+  (let [org-editing (drv/react s :org-editing)]
+    [:div.org-editor
+      [:div.fullscreen-page
         (navbar true)
-        (dom/div {:class "org-editor-container"}
-          (dom/div {:class "org-editor-box"}
-            (dom/form {:on-submit (partial create-org-clicked owner)}
-              (dom/div {:class "form-group"}
+        [:div.org-editor-container
+          [:div.org-editor-box
+            [:form
+              {:on-submit (partial create-org-clicked s)}
+              [:div.form-group
                 (when (and (jwt/jwt) (jwt/get-key :first-name))
-                  (dom/label {:class "org-editor-message"} (str "Hi " (s/capital (jwt/get-key :first-name)) "!")))
-                (dom/label {:class "org-editor-message"} message)
-                (dom/input {:type "text"
-                            :class "org-editor-input domine h4"
-                            :style #js {:width "100%"}
-                            :placeholder "Simple name without the Inc., LLC, etc."
-                            :value (or (:name (:org-editing data)) "")
-                            :on-change #(do
-                                          (om/set-state! owner :name-did-change true)
-                                          (dis/dispatch! [:input [:org-editing :name] (.. % -target -value)]))})))
-              (dom/div {:class "center"}
-                (dom/button {:class "mlb-reset mlb-default"
-                             :disabled (not (pos? (count (:name (:org-editing data)))))
-                             :on-click (partial create-org-clicked owner)}
-                            "Ok, Let’s Go"))))))))
+                  [:label.org-editor-message
+                    (str "Hi " (string/capital (jwt/get-key :first-name)) "!")])
+                [:label.org-editor-message
+                  @(::message s)]
+                [:input.org-editor-input.h4
+                  {:type "text"
+                   :style #js {:width "100%"}
+                   :placeholder "Simple name without the Inc., LLC, etc."
+                   :value (or (:name org-editing) "")
+                   :on-change #(let [v (.. % -target -value)]
+                                 (reset! (::name-did-change s) true)
+                                 (dis/dispatch! [:input [:org-editing :name] v]))}]]]
+            [:div.center
+              [:button.mlb-reset.mlb-default
+                {:disabled (not (pos? (count (:name org-editing))))
+                 :on-click (partial create-org-clicked s)}]]]]]]))
