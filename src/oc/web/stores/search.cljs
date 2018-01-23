@@ -36,4 +36,6 @@
 
 (defmethod dispatcher/action :search-reset
   [db [_]]
-  (assoc db search-key []))
+  (-> db
+      (assoc search-active? false)
+      (assoc search-key [])))

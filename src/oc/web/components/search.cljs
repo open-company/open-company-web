@@ -52,6 +52,12 @@
     (when results-scroll
       (set! (.-scrollTop results-scroll) (.-scrollHeight results-scroll)))))
 
+(defn search-inactive [s]
+  (reset! (::search-clicked? s) false)
+  (reset! (::page-size s) 5)
+  (set! (.-value (rum/ref-node s "search-input")) "")
+  (search/inactive))
+
 (rum/defcs search-box < (drv/drv store/search-key)
                         (drv/drv store/search-active?)
                         rum/reactive
@@ -60,7 +66,7 @@
                         (rum/local false ::search-clicked?)
                         (rum/local 5 ::page-size)
                         (rum/local 0 ::page-start)
-                        {:after-render (fn [s] (utils/after 500 #(scroll-to-bottom s)) s)
+                        {:after-render (fn [s] (utils/after 100 #(scroll-to-bottom s)) s)
                          :will-mount (fn [s]
                           (search/inactive)
                           (reset! (::window-click s)
@@ -73,9 +79,7 @@
                                         (sel1 [:div.search-box])))
                                  (do
                                    (.stopPropagation e)
-                                   (reset! (::search-clicked? s) false)
-                                   (reset! (::page-size s) 5)
-                                   (search/inactive)))
+                                   (search-inactive s)))
                                e)))
                           s)
                          :will-unmount (fn [s]
@@ -89,22 +93,20 @@
     [:div.search-box {:class (when @(::search-clicked? s) "active")}
       [:button.search-close {:class (when (not @(::search-clicked? s))
                                       "inactive")
-                             :on-click (fn [e]
-                                         (reset! (::search-clicked? s) false)
-                                         (reset! (::page-size s) 5)
-                                         (set! (.-innerHTML (rum/ref-node s "search-input")) "")
-                                         (search/inactive))}]
-      [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")}]
-      [:div.search
-        {:content-editable true
-         :ref "search-input"
+                             :on-click #(search-inactive s)}]
+      [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")
+                      :on-click (fn [e]
+                                  (reset! (::search-clicked? s) true)
+                                  (.focus (rum/ref-node s "search-input")))}]
+      [:input.search
+        {:ref "search-input"
          :placeholder "Search"
          :on-click #(reset! (::search-clicked? s) true)
-         :on-focus #(let [search-query (.-innerText (rum/ref-node s "search-input"))]
+         :on-focus #(let [search-query (.-value (rum/ref-node s "search-input"))]
                       (search/query search-query))
          :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
-         :on-key-up #(search/query
-                      (.-innerText (rum/ref-node s "search-input")))
+         :on-change #(search/query
+                      (.-value (rum/ref-node s "search-input")))
          }]
       [:div.triangle {:class (when (not search-active?) "inactive")}]
       [:div.search-results {:ref "results"
@@ -125,6 +127,6 @@
         (when (< @(::page-size s) (:count search-results))
           [:div.show-more
             {:on-click (fn [e] (reset! (::page-size s)
-                                       (+ @(::page-size s) 5)))}
+                                       (+ @(::page-size s) 15)))}
             [:button] "Show More"])
        ]]))
