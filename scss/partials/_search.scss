@@ -73,52 +73,56 @@ div.triangle {
 div.search-results {
   border: 1px solid rgba(177,184,192,0.50);
   border-radius: 5px;
-  max-height: calc(100vh - 180px);
+
   margin: 41px 0px 0px 45px;
   width: 450px;
   box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
-  overflow-x: visible;
-  overflow-y: auto;
 
   div.header {
     background-color: white;
     font-size: 12px;
     padding: 20px 0px 10px 15px;
+    height: 47px;
 
     span.count {
       margin-left: 5px;
     }
   }
 
-  div.search-result {
-    width: 100%;
-    background-color: white;
-    font-size: 14px;
+  div.search-results-container {
+    overflow-y: auto;
+    max-height: calc(100vh - 180px - 47px);
 
-    div.author {
-      @include avenir_H();
+    div.search-result {
+      width: 100%;
+      background-color: white;
+      font-size: 14px;
 
-      padding: 10px 20px 10px 20px;
+      div.author {
+        @include avenir_H();
 
-      @include activity-author();
+        padding: 10px 20px 10px 20px;
 
-      div.name {
-        font-size: 11px;
-      }
+        @include activity-author();
 
-      div.title {
-        overflow: hidden;
-      }
-
-      &:hover {
-        background-color: rgba($carrot_light_blue, 0.3);
-
-        div.title {
-          color: $carrot_text_blue_3;
+        div.name {
+          font-size: 11px;
         }
 
-        div.time-since {
-          color: rgba($carrot_text_blue_3, 0.3);
+        div.title {
+          overflow: hidden;
+        }
+
+        &:hover {
+          background-color: rgba($carrot_light_blue, 0.3);
+
+          div.title {
+            color: $carrot_text_blue_3;
+          }
+
+          div.time-since {
+            color: rgba($carrot_text_blue_3, 0.3);
+          }
         }
       }
     }

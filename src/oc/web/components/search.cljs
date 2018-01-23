@@ -109,15 +109,16 @@
           [:span "SEARCH RESULTS"]
           (when (pos? (:count search-results))
             [:span.count (str "(" (:count search-results) ")")])]
-        (if (pos? (:count search-results))
-          (let [results (reverse (:results search-results))]
-            (for [sr (take @(::page-size s) results)]
-              (let [key (str "result-" (:uuid (:_source sr)))]
-                (case (:type (:_source sr))
-                  "entry" (rum/with-key (entry-display sr) key)
-                  "board" (rum/with-key (board-display sr) key)))))
-          [:div.empty-result
-            [:div.message "No matching results..."]])
+        [:div.search-results-container
+          (if (pos? (:count search-results))
+            (let [results (reverse (:results search-results))]
+              (for [sr (take @(::page-size s) results)]
+                (let [key (str "result-" (:uuid (:_source sr)))]
+                  (case (:type (:_source sr))
+                    "entry" (rum/with-key (entry-display sr) key)
+                    "board" (rum/with-key (board-display sr) key)))))
+            [:div.empty-result
+              [:div.message "No matching results..."]])]
         (when (< @(::page-size s) (:count search-results))
           [:div.show-more
             {:on-click (fn [e] (reset! (::page-size s)
