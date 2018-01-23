@@ -47,11 +47,6 @@
       ]
      ]))
 
-(defn scroll-to-bottom [s]
-  (when-let [results-scroll (rum/ref-node s "results")]
-    (when results-scroll
-      (set! (.-scrollTop results-scroll) (.-scrollHeight results-scroll)))))
-
 (defn search-inactive [s]
   (reset! (::search-clicked? s) false)
   (reset! (::page-size s) 5)
@@ -66,8 +61,7 @@
                         (rum/local false ::search-clicked?)
                         (rum/local 5 ::page-size)
                         (rum/local 0 ::page-start)
-                        {:after-render (fn [s] (utils/after 100 #(scroll-to-bottom s)) s)
-                         :will-mount (fn [s]
+                        {:will-mount (fn [s]
                           (search/inactive)
                           (reset! (::window-click s)
                             (events/listen
