@@ -9,15 +9,18 @@ div.search-box {
   }
 
   input.search {
-    margin: 5px 5px 0px 10px;
+    margin: 5px 5px 0px 16px;
     outline: none;
     border: none;
     caret-color: $carrot_text_blue_3;
+    @include avenir_M();
+    color: $carrot_dark_brown_1;
 
-    &:empty:before {
-      content: attr(placeholder);
-      color: rgba($carrot_light_gray_3, 0.4);
-      cursor: text;
+    &::placeholder {
+      color: $carrot_light_gray_10;
+    }
+    &:focus::placeholder {
+      color: $carrot_dark_brown_1;
     }
   }
 
@@ -31,7 +34,7 @@ div.search-box {
     background-repeat: no-repeat;
     opacity: 0.7;
     border: none;
-    margin: 0px 30px 0px 0px;
+    margin: 0px 24px 0px 0px;
     padding: 12px 0px 0px 0px;
 
     &:hover {
@@ -56,7 +59,7 @@ div.search-results.inactive {
 
 div.triangle {
   position: absolute;
-  top: 84px;
+  top: 81px;
   left: 96px;
   background-color: white;
   border-top: 1px solid rgba(177,184,192,0.50);
