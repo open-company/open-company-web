@@ -126,7 +126,7 @@ div.search-results {
 
   div.show-more {
     background: white;
-    color: $carrot_green_3;
+    color: $carrot_green_2;
     font-size: 14px;
     padding: 5px 0px 10px 30px;
     cursor: pointer;
@@ -142,10 +142,6 @@ div.search-results {
       background-color: transparent;
       background-repeat: no-repeat;
       background-image: cdnUrl('/img/ML/show_more_arrow.svg');
-    }
-
-    &:hover {
-      color: $carrot_green_2;
     }
   }
 
