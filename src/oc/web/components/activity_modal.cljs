@@ -487,7 +487,7 @@
                     [:div.activity-modal-content-headline.emoji-autocomplete.emojiable
                       {:content-editable true
                        :ref "edit-headline"
-                       :placeholder "Add a title"
+                       :placeholder utils/default-headline
                        :on-paste    #(headline-on-paste s %)
                        :on-key-down #(headline-on-change s)
                        :on-click    #(headline-on-change s)
