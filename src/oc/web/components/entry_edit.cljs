@@ -144,6 +144,12 @@
   (and (seq (:board-slug entry-editing))
        (seq (:headline entry-editing))))
 
+(defn- topic-did-change [s entry-editing topic-map]
+  (toggle-save-on-exit s true)
+  (dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-slug (:slug topic-map)
+                                                                :topic-name (:name topic-map)
+                                                                :has-changes true})]))
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
@@ -327,7 +333,12 @@
                                      (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                      (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
                 (when-not nux
-                  (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))]]
+                  (topics-dropdown
+                   (:board-slug entry-editing)
+                   board-topics
+                   {:slug (:topic-slug entry-editing)
+                    :name (:topic-name entry-editing)}
+                   #(topic-did-change s entry-editing %)))]]
             [:div.entry-edit-modal-header.group
               (user-avatar-image current-user-data)
               [:div.posting-in
@@ -352,7 +363,12 @@
                                    (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                    (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
               (when-not nux
-                (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))])
+                (topics-dropdown
+                 (:board-slug entry-editing)
+                 board-topics
+                 {:slug (:topic-slug entry-editing)
+                  :name (:topic-name entry-editing)}
+                 #(topic-did-change s entry-editing %)))])
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
