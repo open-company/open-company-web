@@ -197,8 +197,8 @@
     (if (:has-changes (:modal-editing-data modal-data))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "dismiss-edit-dirty-data"
-                        :message (str "Cancel without saving your changes?")
-                        :link-button-title "No"
+                        :message (str "Leave without saving your changes?")
+                        :link-button-title "Stay"
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-style :red
                         :solid-button-title "Lose changes"
