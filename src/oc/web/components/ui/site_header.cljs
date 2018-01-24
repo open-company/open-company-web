@@ -49,7 +49,7 @@
                          (router/nav! oc-urls/sign-up))}
             "Get Started"])
         [:a.login
-          {:href oc-urls/login
+          {:href (utils/your-boards-url)
            :class (when (jwt/jwt) "your-boards")
            :on-click (fn [e]
                        (.preventDefault e)

@@ -133,10 +133,6 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         query-params (:query-params params)]
-    (when org
-      (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
-    (when (= route "all-posts")
-      (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
     (pre-routing query-params)
     ;; save route
     (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
@@ -175,10 +171,6 @@
         entry (:entry (:params params))
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
-    (when org
-      (cook/set-cookie! (router/last-org-cookie) org (* 60 60 24 6)))
-    (when board
-      (cook/set-cookie! (router/last-board-cookie org) board (* 60 60 24 6)))
     (pre-routing query-params true {:query-params query-params :keep-params [:at]})
     ;; save the route
     (router/set-route!
