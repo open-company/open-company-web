@@ -196,7 +196,8 @@
                       :message (str "Cancel before finishing upload?")
                       :link-button-title "No"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                      :solid-button-title "Yes"
+                      :solid-button-style :red
+                      :solid-button-title "Cancel upload"
                       :solid-button-cb #(do
                                           (dis/dispatch! [:alert-modal-hide])
                                           (dismiss-fn))
@@ -208,7 +209,8 @@
                         :message (str "Cancel without saving your changes?")
                         :link-button-title "No"
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                        :solid-button-title "Yes"
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (dis/dispatch! [:alert-modal-hide])
                                             (dismiss-fn))
