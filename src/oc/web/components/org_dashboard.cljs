@@ -46,6 +46,10 @@
         all-posts-data (dis/all-posts-data data)
         board-data (dis/board-data data)
         is-mobile? (responsive/is-tablet-or-mobile?)
+<<<<<<< HEAD
+=======
+        ap-initial-at (:ap-initial-at data)
+>>>>>>> mainline
         should-show-onboard-overlay? (some #{(:nux data)} [:1 :7])]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
@@ -55,9 +59,14 @@
                  ;; but there are some
                  (pos? (count (:boards org-data))))
             ;; Board specified
-            (and (router/current-board-slug)
-                 ;; But no board/all-posts data yet
-                 (not board-data)
+            (and (not= (router/current-board-slug) "all-posts")
+                 (not ap-initial-at)
+                 ;; But no board data yet
+                 (not board-data))
+            ;; All posts
+            (and (or (= (router/current-board-slug) "all-posts")
+                     ap-initial-at)
+                 ;; But no all-posts data yet
                  (not all-posts-data))
             ;; First ever user nux, not enough time
             (and (:nux-loading data)

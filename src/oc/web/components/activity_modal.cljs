@@ -62,12 +62,14 @@
               (oc-urls/board org board))))))))
 
 (defn close-clicked [s & [board-filters]]
-  (if (:from-all-posts @router/path)
-    ;; Remove AP data from the DB to avoid showing results before loading and results again
-    (when-not (string? board-filters)
-      (dis/dispatch! [:all-posts-reset]))
-    ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
-    (dis/dispatch! [:input [:no-reset-seen-at] true]))
+  (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
+    (if (:from-all-posts @router/path)
+      ;; Remove AP data from the DB to avoid showing results before loading and results again
+      (when (and (not (string? board-filters))
+                 ap-initial-at)
+        (dis/dispatch! [:all-posts-reset]))
+      ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
+      (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s board-filters)))
@@ -148,15 +150,6 @@
            (when-let [headline-el (rum/ref-node state "edit-headline")]
              (utils/to-end-of-content-editable headline-el)))))))
 
-(defn- start-editing? [state & [focus]]
-  (let [activity-data (first (:rum/args state))]
-    (when (and (not (responsive/is-tablet-or-mobile?))
-               (utils/link-for (:links activity-data) "partial-update")
-               (not @(::showing-dropdown state))
-               (not @(::move-activity state))
-               (not (.contains (.-classList (.-activeElement js/document)) "add-comment")))
-      (real-start-editing state focus))))
-
 (defn- stop-editing [state]
   (save-on-exit? state)
   (toggle-save-on-exit state false)
@@ -191,10 +184,11 @@
   (if @(::uploading-media state)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "dismiss-edit-uploading-media"
-                      :message (str "Cancel before finishing upload?")
-                      :link-button-title "No"
+                      :message (str "Leave before finishing upload?")
+                      :link-button-title "Stay"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                      :solid-button-title "Yes"
+                      :solid-button-style :red
+                      :solid-button-title "Cancel upload"
                       :solid-button-cb #(do
                                           (dis/dispatch! [:alert-modal-hide])
                                           (dismiss-fn))
@@ -203,10 +197,11 @@
     (if (:has-changes (:modal-editing-data modal-data))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "dismiss-edit-dirty-data"
-                        :message (str "Cancel without saving your changes?")
-                        :link-button-title "No"
+                        :message (str "Leave without saving your changes?")
+                        :link-button-title "Stay"
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                        :solid-button-title "Yes"
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (dis/dispatch! [:alert-modal-hide])
                                             (dismiss-fn))
@@ -485,7 +480,7 @@
                     [:div.activity-modal-content-headline.emoji-autocomplete.emojiable
                       {:content-editable true
                        :ref "edit-headline"
-                       :placeholder "Add a title"
+                       :placeholder utils/default-headline
                        :on-paste    #(headline-on-paste s %)
                        :on-key-down #(headline-on-change s)
                        :on-click    #(headline-on-change s)
@@ -508,11 +503,9 @@
                   [:div.activity-modal-content
                     {:key "activity-modal-content"}
                     [:div.activity-modal-content-headline
-                      {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-                       :on-click #(start-editing? s :headline)}]
+                      {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
                     [:div.activity-modal-content-body
                       {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                       :on-click #(start-editing? s :body)
                        :class (when (empty? (:headline activity-data)) "no-headline")}]
                     (when is-mobile?
                       (reactions activity-data))

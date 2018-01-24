@@ -44,6 +44,7 @@
    :message A description message to show in the view.
    :link-button-title The title for the first button, it's black link styled.
    :link-button-cb The function to execute when the first button is clicked.
+   :solid-button-style The style of the button: default green, :red.
    :solid-button-title The title for the second button, it's green solid styled.
    :solid-button-cb The function to execute when the second button is clicked."
   [s]
@@ -80,5 +81,6 @@
                   (:link-button-title alert-modal)])
               (when (:solid-button-title alert-modal)
                 [:button.mlb-reset.mlb-default
-                  {:on-click #(solid-button-clicked alert-modal %)}
+                  {:on-click #(solid-button-clicked alert-modal %)
+                   :class (when (= (:solid-button-style alert-modal) :red) "red")}
                   (:solid-button-title alert-modal)])])]]]))

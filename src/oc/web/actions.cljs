@@ -102,6 +102,10 @@
 
 (defmethod dispatcher/action :org
   [db [_ org-data saved?]]
+  ;; Save the last visited org
+  (when (and org-data
+             (= (router/current-org-slug) (:slug org-data)))
+    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
   (let [boards (:boards org-data)]
 
     (cond
@@ -112,10 +116,7 @@
         ;; Load all posts only if not coming from a digest url
         ;; in that case do not load since we already have the results we need
         (api/get-all-posts org-data (utils/link-for (:links org-data) "activity") {:from (:ap-initial-at db)})
-        (do
-          ;; Remove the last board cookie to avoid falling in the all-posts 404 again
-          (cook/remove-cookie! (router/last-board-cookie (:slug org-data)))
-          (router/redirect-404!)))
+        (router/redirect-404!))
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
@@ -227,23 +228,29 @@
 
 (defmethod dispatcher/action :board
   [db [_ board-data]]
-  (let [is-currently-shown (= (router/current-board-slug) (:slug board-data))
+  (let [org (router/current-org-slug)
+        is-currently-shown (= (router/current-board-slug) (:slug board-data))
         fixed-board-data (utils/fix-board board-data)
         db-loading (if (and is-currently-shown
                             (router/current-activity-id)
                             (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                      (dissoc db :loading)
-                     db)]
+                     db)
+        should-404? (and is-currently-shown
+                         (string? (:board-filters db))
+                         (not= (:board-filters db) "uncategorized")
+                         (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))]
     (when is-currently-shown
 
       (when (and (router/current-activity-id)
                  (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id))))
         (router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data))))
 
-      (when (and (string? (:board-filters db))
-                 (not= (:board-filters db) "uncategorized")
-                 (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))
+      (when should-404?
         (router/redirect-404!))
+
+      (when-not should-404?
+        (cook/set-cookie! (router/last-board-cookie org) (router/current-board-slug) (* 60 60 24 6)))
 
       ;; Follow the interactions link to connect to the Interaction service WebSocket to watch for comment/reaction
       ;; changes, this will also disconnect prior connection if we were watching another board already
@@ -1386,20 +1393,27 @@
 (defmethod dispatcher/action :all-posts-get/finish
   [db [_ {:keys [org year month from body]}]]
   (if body
-    (let [all-posts-key (dispatcher/all-posts-key org)
+    (let [org (router/current-org-slug)
+          all-posts-key (dispatcher/all-posts-key org)
           fixed-all-posts (utils/fix-all-posts (:collection body))
           with-calendar-data (-> fixed-all-posts
                                 (assoc :year year)
                                 (assoc :month month)
                                 ;; Force the component to trigger a did-remount
                                 ;; or it won't see the finish of the loading
-                                (assoc :rand (rand 1000)))]
+                                (assoc :rand (rand 1000)))
+          should-404? (and from
+                           (router/current-activity-id)
+                           (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
       (when (and (not year) (not month))
         (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
-      (when (and from
-                 (router/current-activity-id)
-                 (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))
+      (when should-404?
         (router/redirect-404!))
+      (when (and (not should-404?)
+                 (not year)
+                 (not month)
+                 (= (router/current-board-slug) "all-posts"))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (assoc-in db all-posts-key with-calendar-data))
     db))
 

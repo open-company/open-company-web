@@ -307,6 +307,10 @@ div.entry-edit-modal-container {
           position: initial;
         }
 
+        div.tooltip {
+          max-width: 170px;
+        }
+
         div.emoji-picker {
           float: left;
           margin-top: 4px;
@@ -345,4 +349,8 @@ div.entry-edit-modal-container {
       }
     }
   }
+}
+
+div.tooltip.post-btn-tooltip {
+  max-width: 175px;
 }

@@ -1216,6 +1216,8 @@
       (nth parts 4)
       (nth parts 2))))
 
+(def default-headline "Untitled post")
+
 (def default-drafts-board-name "Drafts")
 
 (def default-drafts-board-slug "drafts")
