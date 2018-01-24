@@ -37,9 +37,7 @@
         [:div.whats-new-modal
           [:div.carrot-logo]
           [:div.about-title
-            (if (empty? whats-new-data)
-              "About Carrot"
-              "What’s New with Carrot")]
+            "Support"]
           [:div.about-links
             [:a.about-link
               {:href oc-urls/about

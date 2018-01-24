@@ -211,4 +211,4 @@
                         (dis/dispatch! [:whats-new-modal-show])
                         (close-navigation-sidebar))}
           [:div.about-carrot-icon]
-          [:span "About Carrot"]]]]))
+          [:span "Support"]]]]))
