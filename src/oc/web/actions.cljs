@@ -8,6 +8,7 @@
             [oc.web.router :as router]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
+            [oc.web.actions.user :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -32,73 +33,6 @@
   (timbre/warn "No handler defined for" (str (first payload)))
   (timbre/info "Full event: " (pr-str payload))
   db)
-
-(defmethod dispatcher/action :entry-point
-  [db [_ {:keys [success collection]}]]
-  (let [next-db (assoc db :latest-entry-point (.getTime (js/Date.)))]
-    (if success
-      (let [orgs (:items collection)]
-        (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
-          (api/get-whats-new whats-new-link))
-        ;; Skip all the checks below if looking at the secure page
-        (when-not (router/current-secure-activity-id)
-          (cond
-            (and (:slack-lander-check-team-redirect db)
-                 (zero? (count orgs)))
-            (router/nav! oc-urls/sign-up-team)
-            (and (:email-lander-check-team-redirect db)
-                 (zero? (count orgs)))
-            (router/nav! oc-urls/sign-up-team)
-            ; If i have an org slug let's load the org data
-            (router/current-org-slug)
-            (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
-              (api/get-org org-data)
-              (router/redirect-404!))
-            ; In password reset flow, when the token is exchanged and the user is authed
-            ; i reload the entry point to get the list of orgs
-            ; and redirect the user to its first organization
-            ; if he has no orgs to the user profile page
-            (and (or (utils/in? (:route @router/path) "password-reset")
-                     (utils/in? (:route @router/path) "email-verification"))
-                 (:first-org-redirect db))
-            (let [to-org (utils/get-default-org orgs)]
-              (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))
-            ; If not redirect the user to the first useful org or to the create org UI
-            (and (jwt/jwt)
-                 (not (utils/in? (:route @router/path) "create-org"))
-                 (not (utils/in? (:route @router/path) "user-profile"))
-                 (not (utils/in? (:route @router/path) "email-verification"))
-                 (not (utils/in? (:route @router/path) "about"))
-                 (not (utils/in? (:route @router/path) "slack"))
-                 (not (utils/in? (:route @router/path) "email-wall"))
-                 (not (utils/in? (:route @router/path) "sign-up"))
-                 (not (utils/in? (:route @router/path) "confirm-invitation")))
-            (let [login-redirect (cook/get-cookie :login-redirect)]
-              (cond
-                ; redirect to create-company if the user has no companies
-                (zero? (count orgs))
-                (let [user-data (if (contains? db :current-user-data)
-                                  (:current-user-data db)
-                                  (jwt/get-contents))]
-                  (if (or (and (empty? (:first-name user-data))
-                               (empty? (:last-name user-data)))
-                          (empty? (:avatar-url user-data)))
-                    (router/nav! oc-urls/sign-up-profile)
-                    (router/nav! oc-urls/sign-up-team)))
-                ; if there is a login-redirect use it
-                (and (jwt/jwt) login-redirect)  (do
-                                                  (cook/remove-cookie! :login-redirect)
-                                                  (router/redirect! login-redirect))
-                ; if the user has only one company, send him to the company dashboard
-                (pos? (count orgs))        (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))
-        (-> next-db
-            (dissoc :loading)
-            (assoc :orgs orgs)
-            (assoc-in dispatcher/api-entry-point-key (:links collection))
-            (dissoc :slack-lander-check-team-redirect :email-lander-check-team-redirect)))
-      (-> next-db
-        (assoc :error-banner-message utils/generic-network-error)
-        (assoc :error-banner-time 0)))))
 
 (defmethod dispatcher/action :org
   [db [_ org-data saved?]]
@@ -302,7 +236,7 @@
           (and (utils/in? (:route @router/path) "confirm-invitation")
                (contains? (:query-params @router/path) :token)
                (not (contains? db :email-confirmed)))
-          (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)))))
+          (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)) ua/invitation-confirmed)))
         (assoc next-db :auth-settings body))
       ; if the auth-settings call failed retry it in 2 seconds
       (let [auth-settings-retry (or (:auth-settings-retry db) 1000)]
@@ -345,13 +279,6 @@
   [db [_]]
   (api/get-auth-settings)
   db)
-
-(defmethod dispatcher/action :entry-point-get
-  [db [_ flags]]
-  (utils/after 100 #(api/get-entry-point))
-  (if (map? flags)
-    (merge db flags)
-    db))
 
 (defmethod dispatcher/action :teams-get
   [db [_]]
@@ -527,15 +454,6 @@
   (api/get-teams (:auth-settings db))
   db)
 
-(defmethod dispatcher/action :invitation-confirmed
-  [db [_ status]]
-  (when (= status 201)
-    (api/get-entry-point)
-    (api/get-auth-settings))
-  (-> db
-    (assoc :email-confirmed (= status 201))
-    (dissoc :latest-entry-point :latest-auth-settings)))
-
 (defmethod dispatcher/action :name-pswd-collect
   [db [_]]
   (let [form-data (:collect-name-pswd db)]
@@ -579,7 +497,7 @@
       (if (:is-password-reset db)
         (do
           (cook/remove-cookie! :show-login-overlay)
-          (router/nav! oc-urls/login))
+          (utils/after 200 #(router/nav! oc-urls/login)))
         (do
           (cook/set-cookie!
            (router/show-nux-cookie (jwt/user-id))

@@ -105,3 +105,21 @@
 (defmethod dispatcher/action :logout
   [db _]
   (dissoc db :jwt :latest-entry-point :latest-auth-settings))
+
+;; API entry point
+(defmethod dispatcher/action :entry-point
+  [db [_ orgs collection]]
+  (-> db
+      (assoc :latest-entry-point (.getTime (js/Date.)))
+      (dissoc :loading)
+      (assoc :orgs orgs)
+      (assoc-in dispatcher/api-entry-point-key (:links collection))
+      (dissoc :slack-lander-check-team-redirect :email-lander-check-team-redirect)))
+
+;; Invitation
+(defmethod dispatcher/action :invitation-confirmed
+  [db [_ confirmed]]
+  (-> db
+      (assoc :email-confirmed confirmed)
+      (dissoc :latest-entry-point :latest-auth-settings)))
+

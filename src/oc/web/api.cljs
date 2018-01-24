@@ -4,6 +4,7 @@
   (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
             [defun.core :refer (defun-)]
+            [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
             [oc.web.dispatcher :as dispatcher]
@@ -191,13 +192,13 @@
     {:headers (headers-for-link {:content-type "text/plain"})}
     (fn [_])))
 
-(defn get-entry-point []
+(defn get-entry-point [callback]
   (let [entry-point-href (str "/" (when (:org @router/path) (str "?requested=" (:org @router/path))))]
     (storage-http http/get entry-point-href
      nil
      (fn [{:keys [success body]}]
        (let [fixed-body (when success (json->cljs body))]
-         (dispatcher/dispatch! [:entry-point {:success success :collection (:collection fixed-body)}]))))))
+         (callback success fixed-body))))))
 
 (defn get-subscription [company-uuid]
   (pay-http http/get (str "/subscriptions/" company-uuid)
@@ -258,12 +259,15 @@
         (fn [{:keys [success body status]}]
           (dispatcher/dispatch! [:org (json->cljs body) true]))))))
 
-(defn get-auth-settings []
-  (auth-http http/get "/"
-    {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
-    (fn [response]
-      (let [body (if (:success response) (:body response) false)]
-        (dispatcher/dispatch! [:auth-settings body])))))
+(defun get-auth-settings
+  ([] (get-auth-settings #()))
+  ([callback]
+     (auth-http http/get "/"
+                {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
+                (fn [response]
+                  (let [body (if (:success response) (:body response) false)]
+                    (dispatcher/dispatch! [:auth-settings body])
+                    (callback body))))))
 
 (defn auth-with-email [email pswd callback]
   (when (and email pswd)
@@ -349,7 +353,7 @@
         (fn [{:keys [status success body]}]
           (dispatcher/dispatch! [:user-action/complete]))))))
 
-(defn confirm-invitation [token]
+(defn confirm-invitation [token callback]
   (let [auth-link (utils/link-for
                    (:links (:auth-settings @dispatcher/app-state))
                    "authenticate"
@@ -362,7 +366,7 @@
                           "Access-Control-Allow-Headers" "Content-Type, Authorization"
                           "Authorization" (str "Bearer " token)})}
         (fn [{:keys [status body success]}]
-          (utils/after 100 #(dispatcher/dispatch! [:invitation-confirmed status]))
+          (utils/after 100 #(callback status))
           (when success
             (update-jwt-cookie! body)))))))
 
