@@ -72,8 +72,8 @@
   (if @(::uploading-media s)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "dismiss-edit-uploading-media"
-                      :message (str "Cancel before finishing upload?")
-                      :link-button-title "No"
+                      :message (str "Leave before finishing upload?")
+                      :link-button-title "Stay"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-style :red
                       :solid-button-title "Cancel upload"
