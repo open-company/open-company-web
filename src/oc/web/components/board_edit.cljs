@@ -384,19 +384,22 @@
                          (utils/link-for (:links board-data) "delete"))
                 [:button.mlb-reset.mlb-link-black.delete-board
                   {:on-click (fn []
-                              (dis/dispatch! [:alert-modal-show {:icon "/img/ML/trash.svg"
-                                                                 :action "delete-board"
-                                                                 :message (str "Delete this board?")
-                                                                 :link-button-title "No"
-                                                                 :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                                                                 :solid-button-title "Yes"
-                                                                 :solid-button-cb (fn []
-                                                                                    (dis/dispatch!
-                                                                                     [:board-delete
-                                                                                     (:slug board-data)])
-                                                                                    (dis/dispatch!
-                                                                                     [:alert-modal-hide])
-                                                                                    (close-clicked s))}]))}
+                              (dis/dispatch!
+                               [:alert-modal-show
+                                {:icon "/img/ML/trash.svg"
+                                 :action "delete-board"
+                                 :message (str
+                                           "Are you sure? This will delete the board and ALL it’s posts, too.")
+                                 :link-button-title "No"
+                                 :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                 :solid-button-title "Yes"
+                                 :solid-button-cb (fn []
+                                                    (dis/dispatch!
+                                                     [:board-delete
+                                                     (:slug board-data)])
+                                                    (dis/dispatch!
+                                                     [:alert-modal-hide])
+                                                    (close-clicked s))}]))}
                   "Delete"])]
             [:div.board-edit-footer-right.group
               [:button.mlb-reset.mlb-default
