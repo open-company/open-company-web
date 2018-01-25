@@ -96,10 +96,6 @@
   (dis/dispatch! [:input [:comment-edit] (:uuid (first (:rum/args s)))])
   (let [comment-node (rum/ref-node s "comment-body")
         medium-editor (setup-medium-editor comment-node)]
-    ; (.subscribe medium-editor
-    ;  "editableBlur"
-    ;  (fn [e editable]
-    ;    (edit-finished e s (first (:rum/args s)))))
     (reset! (::esc-key-listener s)
      (events/listen
       js/window
@@ -107,7 +103,6 @@
       (fn [e]
         (when (and (= "Enter" (.-key e))
                    (not (.-shiftKey e)))
-          ; (.blur (rum/ref-node s "comment-body"))
           (edit-finished e s (first (:rum/args s)))
           (.preventDefault e))
         (when (= "Escape" (.-key e))
@@ -134,14 +129,9 @@
 
 (defn is-emoji
   [body]
-  ; (let [ranges #js ["\\ud83c[\\udf00-\\udfff]"  ;; U+1F300 to U+1F3FF
-  ;                   "\\ud83d[\\udc00-\\ude4f]"  ;; U+1F400 to U+1F64F
-  ;                   "\\ud83d[\\ude80-\\udeff]"]] ;; U+1F680 to U+1F6FF
-  ;   (.match body (.join ranges "|")))
   (let [r (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")]
     (and ;; emojis can have up to 11 codepoints
          (<= (count body) 11)
-         ;;
          (.match body r)
          (not (.match body (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g"))))))
 
