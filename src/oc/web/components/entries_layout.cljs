@@ -66,9 +66,9 @@
                           (drv/drv :board-data)
                           (drv/drv :board-filters)
                           {:will-unmount (fn [s]
-                            (dis/dispatch! [:board-nav-away {:board-uuid (:uuid (first (:rum/args s)))}])
+                            (let [board-data @(drv/get-ref s :board-data)]
+                              (dis/dispatch! [:board-nav-away {:board-uuid (:uuid board-data)}]))
                             s)}
-
   [s]
   [:div.entries-layout
     (let [layout-type (drv/react s :board-filters)
