@@ -181,7 +181,6 @@
                                         (str "dashboard-layout-" (if is-all-posts "all-posts" (:slug board-data))))
         empty-board? (and (not nux)
                           (zero? (count (:fixed-items board-data))))
-        org-data (dis/org-data)
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
         board-container-style {:marginLeft (if is-mobile-size?
@@ -308,7 +307,7 @@
                 (drafts-layout board-data)
                 ;; Entries
                 :else
-                (entries-layout board-data board-filters)))
+                (entries-layout)))
             ;; Add entry floating button
             (when (and (not (:read-only org-data))
                        (or (utils/link-for (:links board-data) "create")

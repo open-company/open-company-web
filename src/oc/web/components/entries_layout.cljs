@@ -63,13 +63,17 @@
 
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
+                          (drv/drv :board-data)
+                          (drv/drv :board-filters)
                           {:will-unmount (fn [s]
                             (dis/dispatch! [:board-nav-away {:board-uuid (:uuid (first (:rum/args s)))}])
                             s)}
 
-  [s board-data layout-type]
+  [s]
   [:div.entries-layout
-    (let [change-data (drv/react s :change-data)
+    (let [layout-type (drv/react s :board-filters)
+          board-data (drv/react s :board-data)
+          change-data (drv/react s :change-data)
           board-uuid (:uuid board-data)
           changes (get change-data board-uuid)
           share-thoughts-uuid (find-share-thoughts-uuid board-data changes)
