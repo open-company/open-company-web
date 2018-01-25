@@ -389,10 +389,11 @@
                                 {:icon "/img/ML/trash.svg"
                                  :action "delete-board"
                                  :message (str
-                                           "Are you sure? This will delete the board and ALL it’s posts, too.")
+                                           "Are you sure? This will delete the board and ALL its posts, too.")
                                  :link-button-title "No"
                                  :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                                 :solid-button-title "Yes"
+                                 :solid-button-style :red
+                                 :solid-button-title "Yes, I'm sure"
                                  :solid-button-cb (fn []
                                                     (dis/dispatch!
                                                      [:board-delete
