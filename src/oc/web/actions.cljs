@@ -328,6 +328,10 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
+(defmethod dispatcher/action :update [db [_ path value-fn]]
+  (if (fn? value-fn)
+    (update-in db path value-fn)
+    db))
 
 ;; Stripe Payment related actions
 

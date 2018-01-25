@@ -322,6 +322,7 @@ provided in the table below:
 |  :topic-add | UI | Add a new topic to the topics list of the current board. |
 |  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
 |  :trend-bar-status | UI | Change the trend bar status, it accepts: :hidden, :collapsed, :expanded and :trending as in oc.web.components.trend-bar. |
+|  :update | UI | Generic input action, it's used passing in a path and a function to replace the value. It's like update-in and in fact it uses it. |
 |  :update-loaded | API | Read and save the data of certain update in the app-state |
 |  :user-action | UI | Start a user action: given a team-id, a user data object, the action and a method make a request to complete the action. Can pass optional payload (if it's not a GET request). |
 |  :user-action/complete | API | Refresh the team data to show the completed user action. |
