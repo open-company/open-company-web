@@ -45,7 +45,6 @@
   (let [{:keys [org-data
                 board-data
                 all-posts-data
-                activity-data
                 nux
                 nux-loading
                 nux-end
@@ -117,7 +116,7 @@
                (not entry-edit-dissmissing))
           (let [from-ap (:from-all-posts @router/path)
                 board-slug (if from-ap :all-posts (router/current-board-slug))]
-            (activity-modal activity-data)))
+            (activity-modal)))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    activity-share-data)
