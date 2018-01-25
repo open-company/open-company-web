@@ -388,10 +388,10 @@
                                [:alert-modal-show
                                 {:icon "/img/ML/trash.svg"
                                  :action "delete-board"
-                                 :message (str
-                                           "Are you sure?"
-                                           (when (-> board-data :fixed-items count pos?)
-                                             " This will delete the board and all its posts, too."))
+                                 :message [:span
+                                            [:span "Are you sure?"]
+                                            (when (-> board-data :fixed-items count pos?)
+                                              [:span " This will delete the board and " [:strong "all"] " its posts, too."])]
                                  :link-button-title "No"
                                  :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                  :solid-button-style :red
