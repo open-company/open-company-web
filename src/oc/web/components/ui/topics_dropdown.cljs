@@ -1,8 +1,10 @@
 (ns oc.web.components.ui.topics-dropdown
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -14,27 +16,23 @@
 
 (defn- create-new-topic [s]
   (when (seq @(::new-topic s))
-    (let [topics (first (:rum/args s))
-          topic-name (s/trim @(::new-topic s))
-          topic-slug (unique-slug topics topic-name)
-          edit-key (nth (:rum/args s) 2)]
-      (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug} edit-key])
+    (let [[topics _ on-change] (:rum/args s)
+          topic-name @(::new-topic s)
+          topic-slug (unique-slug topics topic-name)]
+      (when-not (some #{topic-slug} (map :slug topics))
+        (dis/dispatch! [:topic-add {:name topic-name :slug topic-slug}]))
       (reset! (::new-topic s) "")
-      (reset! (::showing-dropdown s) false))))
+      (reset! (::showing-dropdown s) false)
+      (when (fn? on-change)
+        (on-change {:slug topic-slug :name topic-name})))))
 
 (rum/defcs topics-dropdown < (rum/local "" ::new-topic)
                              (rum/local false ::focusing-create-topic)
                              (rum/local false ::showing-dropdown)
                              (rum/local nil ::window-click)
                              rum/reactive
-
-                             {:will-mount (fn [s]
-                               ;; Load board if it's not already
-                               (let [[topics entry-editing] (:rum/args s)]
-                                 (when-not topics
-                                   (dis/dispatch! [:board-get (utils/link-for (:links entry-editing) "up")])))
-                               s)
-                              :did-mount (fn [s]
+                             (drv/drv :entry-topic-loading)
+                             {:did-mount (fn [s]
                                 (reset! (::window-click s)
                                  (events/listen
                                   js/window
@@ -47,34 +45,35 @@
                                   (events/unlistenByKey @(::window-click s))
                                   (reset! (::window-click s) nil))
                                 s)}
-  [s topics entry-editing edit-key on-change-cb]
+  [s board-slug topics value on-change]
   [:div.entry-card-dd-container
     [:button.mlb-reset.entry-card-dd-button
-      {:class (utils/class-set {:has-topic (not (empty? (:topic-name entry-editing)))
+      {:class (utils/class-set {:has-topic (not (empty? (:name value)))
                                 :active @(::showing-dropdown s)})
        :on-click #(reset! (::showing-dropdown s) (not @(::showing-dropdown s)))}
-      (if (:topic-name entry-editing)
+      (if (:name value)
         [:div.activity-tag.on-gray
           {:class (when @(::showing-dropdown s) "active")}
-          (:topic-name entry-editing)]
-        "+ Add a topic")]
+          (when (drv/react s :entry-topic-loading)
+            (small-loading))
+          (:name value)]
+        [:div
+          (when (drv/react s :entry-topic-loading)
+            (small-loading))
+          "+ Add a topic"])]
     (when @(::showing-dropdown s)
       [:div.entry-edit-topics-dd
         [:div.triangle]
         [:div.entry-dropdown-list-content
           [:ul
             (for [t (sort #(compare (:name %1) (:name %2)) topics)
-                  :let [selected (= (:topic-name entry-editing) (:name t))]]
+                  :let [selected (= (:name value) (:name t))]]
               [:li.selectable.group
                 {:key (str "entry-edit-dd-" (:slug t))
                  :on-click #(do
                              (reset! (::showing-dropdown s) false)
-                             (dis/dispatch!
-                              [:input
-                               [edit-key]
-                               (merge entry-editing {:topic-name (:name t) :has-changes true})])
-                             (when (fn? on-change-cb)
-                               (on-change-cb t)))
+                             (when (fn? on-change)
+                               (on-change t)))
                  :class (when selected "select")}
                 [:button.mlb-reset
                   (:name t)]
@@ -83,12 +82,8 @@
                     {:on-click (fn [e]
                                  (utils/event-stop e)
                                  (reset! (::showing-dropdown s) false)
-                                 (dis/dispatch!
-                                  [:input
-                                   [edit-key]
-                                   (merge entry-editing {:topic-slug nil :topic-name nil :has-changes true})])
-                                 (when (fn? on-change-cb)
-                                   (on-change-cb nil)))}
+                                 (when (fn? on-change)
+                                   (on-change nil)))}
                     "Remove"])])
             [:li.divider]
             [:li.entry-edit-new-topic.group

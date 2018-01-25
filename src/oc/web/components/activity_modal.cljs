@@ -231,6 +231,18 @@
         (reset! (::initial-headline s) initial-headline)
         (reset! (::edited-data-loaded s) true)))))
 
+(defn topic-did-change [s editing topic-map]
+  (let [activity-data (first (:rum/args s))]
+    (if editing
+      (do
+        (dis/dispatch! [:input [:modal-editing-data :topic-slug] (:slug topic-map)])
+        (dis/dispatch! [:input [:modal-editing-data :topic-name] (:name topic-map)])
+        (dis/dispatch! [:input [:modal-editing-data :has-changes] true])
+        (toggle-save-on-exit s true))
+      (dis/dispatch! [:entry-topic-change (merge activity-data
+                                           {:topic-slug (:slug topic-map)
+                                            :topic-name (:name topic-map)})]))))
+
 (rum/defcs activity-modal < rum/reactive
                             ;; Derivatives
                             (drv/drv :modal-data)
@@ -459,17 +471,14 @@
                                       :on-change #(close-clicked s nil)}))]))
               (when-not is-mobile?
                 (activity-attachments activity-data false))
-              (if editing
+              (let [topics (distinct (:entry-edit-topics modal-data))
+                    entry-data (if editing (:modal-editing-data modal-data) activity-data)]
                 (topics-dropdown
-                 (distinct (:entry-edit-topics modal-data))
-                 (:modal-editing-data modal-data)
-                 :modal-editing-data
-                 #(toggle-save-on-exit s true))
-                (when (:topic-slug activity-data)
-                  (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                    [:div.activity-tag.on-gray
-                      {:on-click #(close-clicked s (:topic-slug activity-data))}
-                      topic-name])))]]
+                 (:board-slug entry-data)
+                 topics
+                 {:slug (:topic-slug entry-data)
+                  :name (:topic-name entry-data)}
+                 #(topic-did-change s editing %)))]]
           [:div.activity-modal-columns
             ;; Left column
             [:div.activity-left-column

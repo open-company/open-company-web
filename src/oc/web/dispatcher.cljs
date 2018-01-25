@@ -106,6 +106,7 @@
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :comment-edit        [[:base] (fn [base] (:comment-edit base))]
    :add-comment-height  [[:base] (fn [base] (:add-comment-height base))]
+   :entry-topic-loading [[:base] (fn [base] (:entry-topic-loading base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings

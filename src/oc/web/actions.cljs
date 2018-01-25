@@ -1191,17 +1191,12 @@
     (assoc :entry-edit-dissmissing true)))
 
 (defmethod dispatcher/action :topic-add
-  [db [_ topic-map edit-key]]
-  (let [board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
+  [db [_ topic-map board-slug]]
+  (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
         board-data (get-in db board-key)
         next-topics (conj (:topics board-data) topic-map)
-        next-board-data (assoc board-data :topics next-topics)
-        next-db (assoc-in db board-key next-board-data)]
-    (if edit-key
-      (update-in next-db [edit-key] merge {:topic-slug (:slug topic-map)
-                                           :topic-name (:name topic-map)
-                                           :has-changes true})
-      next-db)))
+        next-board-data (assoc board-data :topics next-topics)]
+    (assoc-in db board-key next-board-data)))
 
 (defmethod dispatcher/action :entry-save
   [db [_]]
@@ -1217,6 +1212,11 @@
             entry-create-link (utils/link-for (:links entry-board-data) "create")]
         (api/create-entry entry-data entry-create-link)))
     (assoc-in db [:entry-editing :loading] true)))
+
+(defmethod dispatcher/action :entry-topic-change
+  [db [_ entry-data]]
+  (api/update-entry entry-data (router/current-board-slug) :modal-editing-data)
+  (assoc db :entry-topic-loading true))
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [activity-data board-slug edit-key]}]]
@@ -1237,8 +1237,9 @@
           with-edited-key (if edit-key
                             (update-in next-db [edit-key] dissoc :loading)
                             next-db)
-          without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)]
-      without-entry-save-on-exit)))
+          without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)
+          without-entry-topic-loading (dissoc without-entry-save-on-exit :entry-topic-loading)]
+      without-entry-topic-loading)))
 
 (defmethod dispatcher/action :entry-save/failed
   [db [_ edit-key]]
