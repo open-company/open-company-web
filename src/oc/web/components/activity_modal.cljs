@@ -471,13 +471,6 @@
                                       :on-change #(close-clicked s nil)}))]))
               (when-not is-mobile?
                 (activity-attachments activity-data false))
-              ; (if editing
-
-              ;   (when (:topic-slug activity-data)
-              ;     (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-              ;       [:div.activity-tag.on-gray
-              ;         {:on-click #(close-clicked s (:topic-slug activity-data))}
-              ;         topic-name])))
               (let [topics (distinct (:entry-edit-topics modal-data))
                     entry-data (if editing (:modal-editing-data modal-data) activity-data)]
                 (topics-dropdown
