@@ -90,12 +90,29 @@ div.alert-modal-container {
         }
 
         button {
-          width: calc(50% - 14px);
+          // width: calc(50% - 14px);
           float: left;
           height: 40px;
+          padding: 0px 11%;
 
           &:not(:first-child) {
             margin-left: 14px;
+            float: right;
+          }
+
+          &.mlb-default.red {
+            background-color: $carrot_orange_light;
+            color: $carrot_orange;
+
+            &:hover, &:focus {
+              background-color: $carrot_orange;
+              color: white;
+            }
+
+            &:active, &.active {
+              background-color: $carrot_orange;
+              color: white;
+            }
           }
         }
       }

@@ -72,10 +72,11 @@
   (if @(::uploading-media s)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "dismiss-edit-uploading-media"
-                      :message (str "Cancel before finishing upload?")
-                      :link-button-title "No"
+                      :message (str "Leave before finishing upload?")
+                      :link-button-title "Stay"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                      :solid-button-title "Yes"
+                      :solid-button-style :red
+                      :solid-button-title "Cancel upload"
                       :solid-button-cb #(do
                                           (dis/dispatch! [:alert-modal-hide])
                                           (real-close s))
@@ -84,10 +85,11 @@
     (if (:has-changes @(drv/get-ref s :entry-editing))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "dismiss-edit-dirty-data"
-                        :message (str "Cancel without saving your changes?")
-                        :link-button-title "No"
+                        :message (str "Leave without saving your changes?")
+                        :link-button-title "Stay"
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                        :solid-button-title "Yes"
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (dis/dispatch! [:entry-clear-local-cache :entry-editing])
                                             (dis/dispatch! [:alert-modal-hide])
@@ -141,8 +143,7 @@
     (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))])))
 
 (defn- is-publishable? [entry-editing]
-  (and (seq (:board-slug entry-editing))
-       (seq (:headline entry-editing))))
+  (seq (:board-slug entry-editing)))
 
 (defn- topic-did-change [s entry-editing topic-map]
   (toggle-save-on-exit s true)
@@ -375,7 +376,7 @@
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
             {:content-editable (not nux)
              :ref "headline"
-             :placeholder "Add a title"
+             :placeholder utils/default-headline
              :on-paste    #(headline-on-paste s %)
              :on-key-down #(headline-on-change s)
              :on-click    #(headline-on-change s)
@@ -417,17 +418,32 @@
                            :message "Click the green Post button to see how it works."
                            :width 494})))
           [:button.mlb-reset.mlb-default.form-action-bt.post-btn
-            {:on-click #(do
-                          (clean-body)
-                          (if published?
-                            (do
-                             (reset! (::saving s) true)
-                             (dis/dispatch! [:entry-save]))
-                            (do
-                             (reset! (::publishing s) true)
-                             (dis/dispatch! [:entry-publish]))))
-             :disabled (or @(::publishing s)
-                           (not (is-publishable? entry-editing)))}
+            {:ref "post-btn"
+             :on-click (fn [_]
+                         (clean-body)
+                         (if (and (is-publishable? entry-editing)
+                                  (not (zero? (count (:headline entry-editing)))))
+                           (if published?
+                             (do
+                               (reset! (::saving s) true)
+                               (dis/dispatch! [:entry-save]))
+                             (do
+                               (reset! (::publishing s) true)
+                               (dis/dispatch! [:entry-publish])))
+                           (when (zero? (count (:headline entry-editing)))
+                             (when-let [$post-btn (js/$ (rum/ref-node s "post-btn"))]
+                               (when-not (.data $post-btn "bs.tooltip")
+                                 (.tooltip $post-btn
+                                  (clj->js {:container "body"
+                                            :placement "top"
+                                            :trigger "manual"
+                                            :template "<div class=\"tooltip post-btn-tooltip\"><div class=\"tooltip-arrow\"></div><div class=\"tooltip-inner\"></div></div>"
+                                            :title "A title is required in order to save or share this post."})))
+                               (utils/after 10 #(.tooltip $post-btn "show"))
+                               (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+             :class (when (or @(::publishing s)
+                              (not (is-publishable? entry-editing)))
+                      "disabled")}
             (when (or (and published?
                            @(::saving s))
                       (and (not published?)

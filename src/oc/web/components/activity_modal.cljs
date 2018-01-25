@@ -184,10 +184,11 @@
   (if @(::uploading-media state)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "dismiss-edit-uploading-media"
-                      :message (str "Cancel before finishing upload?")
-                      :link-button-title "No"
+                      :message (str "Leave before finishing upload?")
+                      :link-button-title "Stay"
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                      :solid-button-title "Yes"
+                      :solid-button-style :red
+                      :solid-button-title "Cancel upload"
                       :solid-button-cb #(do
                                           (dis/dispatch! [:alert-modal-hide])
                                           (dismiss-fn))
@@ -196,10 +197,11 @@
     (if (:has-changes (:modal-editing-data modal-data))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "dismiss-edit-dirty-data"
-                        :message (str "Cancel without saving your changes?")
-                        :link-button-title "No"
+                        :message (str "Leave without saving your changes?")
+                        :link-button-title "Stay"
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                        :solid-button-title "Yes"
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (dis/dispatch! [:alert-modal-hide])
                                             (dismiss-fn))
@@ -494,7 +496,7 @@
                     [:div.activity-modal-content-headline.emoji-autocomplete.emojiable
                       {:content-editable true
                        :ref "edit-headline"
-                       :placeholder "Add a title"
+                       :placeholder utils/default-headline
                        :on-paste    #(headline-on-paste s %)
                        :on-key-down #(headline-on-change s)
                        :on-click    #(headline-on-change s)

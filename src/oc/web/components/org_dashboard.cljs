@@ -72,10 +72,9 @@
         (loading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))})]
       [:div
         {:class (utils/class-set {:org-dashboard true
-                                  :mobile-dashboard (responsive/is-mobile-size?)
                                   :modal-activity-view (router/current-activity-id)
                                   :mobile-or-tablet is-mobile?
-                                  :no-scroll (and (not (responsive/is-mobile-size?))
+                                  :no-scroll (and (not is-mobile?)
                                                   (router/current-activity-id))})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (cond

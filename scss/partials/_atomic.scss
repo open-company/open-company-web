@@ -32,14 +32,16 @@
   padding: .2em 1em;
   transition: opacity 230ms, color 230ms, background-color 230ms;
 
-  &:hover, &:focus {
-    background-color: $carrot_green_2;
-    color: #FFFFFF;
-  }
+  &:not(.disabled) {
+    &:hover, &:focus {
+      background-color: $carrot_green_2;
+      color: #FFFFFF;
+    }
 
-  &:active, &.active {
-    background-color: $carrot_green_1;
-    color: white;
+    &:active, &.active {
+      background-color: $carrot_green_1;
+      color: white;
+    }
   }
 
   &:disabled, &.disabled {
