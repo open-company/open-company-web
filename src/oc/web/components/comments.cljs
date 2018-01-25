@@ -96,10 +96,6 @@
   (dis/dispatch! [:input [:comment-edit] (:uuid (first (:rum/args s)))])
   (let [comment-node (rum/ref-node s "comment-body")
         medium-editor (setup-medium-editor comment-node)]
-    (.subscribe medium-editor
-     "editableBlur"
-     (fn [e editable]
-       (edit-finished e s (first (:rum/args s)))))
     (reset! (::esc-key-listener s)
      (events/listen
       js/window
@@ -107,7 +103,7 @@
       (fn [e]
         (when (and (= "Enter" (.-key e))
                    (not (.-shiftKey e)))
-          (.blur (rum/ref-node s "comment-body"))
+          (edit-finished e s (first (:rum/args s)))
           (.preventDefault e))
         (when (= "Escape" (.-key e))
           (cancel-edit e s (first (:rum/args s)))))))
@@ -133,14 +129,9 @@
 
 (defn is-emoji
   [body]
-  ; (let [ranges #js ["\\ud83c[\\udf00-\\udfff]"  ;; U+1F300 to U+1F3FF
-  ;                   "\\ud83d[\\udc00-\\ude4f]"  ;; U+1F400 to U+1F64F
-  ;                   "\\ud83d[\\ude80-\\udeff]"]] ;; U+1F680 to U+1F6FF
-  ;   (.match body (.join ranges "|")))
   (let [r (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")]
     (and ;; emojis can have up to 11 codepoints
          (<= (count body) 11)
-         ;;
          (.match body r)
          (not (.match body (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g"))))))
 
@@ -157,10 +148,6 @@
                               js/window
                               EventType/CLICK
                               (fn [e]
-                                (when (and @(::editing? s)
-                                       (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete")))
-                                       (not (utils/event-inside? e (rum/ref-node s "comment-body"))))
-                                  (stop-editing s))
                                 (when (and @(::show-more-dropdown s)
                                            (not (utils/event-inside? e (rum/ref-node s "comment-edit-delete"))))
                                   (reset! (::show-more-dropdown s) false)))))
@@ -205,8 +192,7 @@
           [:div.comment-footer-container.group
             (when should-show-comment-reaction?
               (comment-reactions/comment-reactions c))
-            (when (and (responsive/is-tablet-or-mobile?)
-                       @(::editing? s))
+            (when @(::editing? s)
               [:div.save-cancel-edit-buttons
                 [:button.mlb-reset.mlb-link-green
                   {:on-click #(edit-finished % s c)}
@@ -214,7 +200,8 @@
                 [:button.mlb-reset.mlb-link-black
                   {:on-click #(cancel-edit % s c)}
                   "Cancel"]])
-            (when editable
+            (when (and editable
+                       (not @(::editing? s)))
               [:div.edit-delete-button
                 {:ref "comment-edit-delete"
                  :class (when @(::editing? s) "editing")}
