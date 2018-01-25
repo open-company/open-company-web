@@ -1,11 +1,33 @@
-
 div.search-box {
   width: 400px;
 
+  @include mobile() {
+    display: inline;
+    min-width: 150px;
+    min-height: 40px;
+
+    &.active {
+      position: absolute;
+      width: 100vw;
+      height: calc(100vh - 13px);
+      top: 10px;
+      left: 0px;
+      background-color: white;
+      z-index: 1081;
+      padding: 0px 16px;
+    }
+  }
 
   img.spyglass {
     display: inline;
     margin: 0px 0px 6px 0px;
+
+    @include mobile() {
+      margin: 0px 0px 6px 24px;
+      &.inactive {
+        margin: 0px 0px 11px 24px;
+      }
+    }
   }
 
   input.search {
@@ -22,6 +44,12 @@ div.search-box {
     &:focus::placeholder {
       color: $carrot_dark_brown_1;
     }
+
+    @include mobile() {
+      &.inactive {
+        display: none;
+      }
+    }
   }
 
   button.search-close {
@@ -37,8 +65,12 @@ div.search-box {
     margin: 0px 24px 0px 0px;
     padding: 12px 0px 0px 0px;
 
+    @include mobile() {
+      margin: 0px;
+    }
+
     &:hover {
-        opacity: 1;
+      opacity: 1;
     }
 
     &.inactive {
@@ -71,6 +103,9 @@ div.triangle {
   &.inactive {
     display: none;
   }
+  @include mobile() {
+    display: none;
+  }
 }
 
 div.search-results {
@@ -80,6 +115,19 @@ div.search-results {
   margin: 41px 0px 0px 45px;
   width: 450px;
   box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
+
+  @include mobile() {
+    position: absolute;
+    top: 63px;
+    left: 0px;
+    height: 100vh;
+    widght: 100vh;
+    background-color: white;
+    z-index: 1081;
+    margin: -1px;
+    padding: 0px;
+    border-radius: 0;
+  }
 
   div.header {
     background-color: white;
@@ -99,6 +147,10 @@ div.search-results {
   div.search-results-container {
     overflow-y: auto;
     max-height: calc(100vh - 180px - 47px);
+
+    @include mobile() {
+      max-height: calc(100vh - 80px - 47px);
+    }
 
     div.search-result {
       width: 100%;

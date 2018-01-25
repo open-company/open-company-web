@@ -13,6 +13,7 @@
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.search :refer (search-results-view)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
@@ -138,6 +139,7 @@
                            is-sharing-activity))
           [:div.page
             (navbar)
+            (when is-mobile? (search-results-view))
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                 (dashboard-layout)]]])])))
