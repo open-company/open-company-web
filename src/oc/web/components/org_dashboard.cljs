@@ -22,32 +22,45 @@
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
-(defn refresh-board-data []
+(defn refresh-board-data [s]
   (when-not (router/current-activity-id)
     (utils/after 100 (fn []
      (if (= (router/current-board-slug) "all-posts")
        (dis/dispatch! [:all-posts-get])
-       (let [board-data (dis/board-data)
+       (let [{:keys [org-data
+                     board-data]} @(drv/get-ref s :org-dashboard-data)
              fixed-board-data (or
-                                board-data
-                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards (dis/org-data))))]
+                               board-data
+                               (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
          (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))))
 
 (rum/defcs org-dashboard < rum/static
                            rum/reactive
-                           (drv/drv :base)
+                           (drv/drv :org-dashboard-data)
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-                             (refresh-board-data)
+                             (refresh-board-data s)
                              s)}
   [s]
-  (let [data (drv/react s :base)
-        org-data (dis/org-data data)
-        all-posts-data (dis/all-posts-data data)
-        board-data (dis/board-data data)
+  (let [{:keys [org-data
+                board-data
+                all-posts-data
+                activity-data
+                nux
+                nux-loading
+                nux-end
+                ap-initial-at
+                org-settings-data
+                whats-new-modal-data
+                made-with-carrot-modal-data
+                entry-editing
+                board-editing
+                activity-share-data
+                entry-edit-dissmissing
+                alert-modal-data
+                media-input]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        ap-initial-at (:ap-initial-at data)
-        should-show-onboard-overlay? (some #{(:nux data)} [:1 :7])]
+        should-show-onboard-overlay? (some #{nux} [:1 :7])]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
             (not org-data)
@@ -66,10 +79,10 @@
                  ;; But no all-posts data yet
                  (not all-posts-data))
             ;; First ever user nux, not enough time
-            (and (:nux-loading data)
-                 (not (:nux-end data))))
+            (and nux-loading
+                 (not nux-end)))
       [:div.org-dashboard
-        (loading {:loading true :nux (or (cook/get-cookie :nux) (:nux-loading data))})]
+        (loading {:loading true :nux (or (cook/get-cookie :nux) nux-loading)})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :modal-activity-view (router/current-activity-id)
@@ -78,56 +91,52 @@
                                                   (router/current-activity-id))})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (cond
-          (some #{(:nux data)} [:1 :7])
-          (onboard-overlay (:nux data))
+          (some #{nux} [:1 :7])
+          (onboard-overlay nux)
           ;; Org settings
-          (:org-settings data)
+          org-settings-data
           (org-settings)
           ;; About carrot
-          (:whats-new-modal data)
+          whats-new-modal-data
           (whats-new-modal)
           ;; Made with carrot modal
-          (:made-with-carrot-modal data)
+          made-with-carrot-modal-data
           (made-with-carrot-modal)
           ;; Entry editing
-          (:entry-editing data)
+          entry-editing
           (entry-edit)
           ;; Board editing
-          (:board-editing data)
+          board-editing
           (board-edit)
+          ;; Activity share for mobile
           (and is-mobile?
-               (:activity-share data))
+               activity-share-data)
           (activity-share)
           ;; Activity modal
           (and (router/current-activity-id)
-               (not (:entry-edit-dissmissing data)))
+               (not entry-edit-dissmissing))
           (let [from-ap (:from-all-posts @router/path)
                 board-slug (if from-ap :all-posts (router/current-board-slug))]
-            (activity-modal
-             (dis/activity-data
-              (router/current-org-slug)
-              board-slug
-              (router/current-activity-id)
-              data))))
-        ;; Activity share modal
+            (activity-modal activity-data)))
+        ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
-                     (:activity-share data))
-            (activity-share))
+                   activity-share-data)
+          (activity-share))
         ;; Alert modal
-        (when (:alert-modal data)
+        (when alert-modal-data
           (alert-modal))
         ;; Media video modal for entry editing
-        (when (and (:media-input data)
-                   (:media-video (:media-input data)))
+        (when (and media-input
+                   (:media-video media-input))
           (media-video-modal))
         ;; Media chart modal for entry editing
-        (when (and (:media-input data)
-                   (:media-chart (:media-input data)))
+        (when (and media-input
+                   (:media-chart media-input))
           (media-chart-modal))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
-                           (:entry-editing data)
-                           (:activity-share data)))
+                           entry-editing
+                           activity-share-data))
           [:div.page
             (navbar)
             [:div.dashboard-container

@@ -279,7 +279,26 @@
                             (fn [base]
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
-   :search-results        [[:base] (fn [base] (:search-results base))]})
+   :search-results        [[:base] (fn [base] (:search-results base))]
+   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at]
+                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at]
+                              {:nux nux
+                               :nux-loading (:nux-loading base)
+                               :nux-end (:nux-end base)
+                               :org-data org-data
+                               :board-data board-data
+                               :all-posts-data all-posts
+                               :activity-data activity-data
+                               :org-settings-data (:org-settings base)
+                               :whats-new-modal-data (:whats-new-modal base)
+                               :made-with-carrot-modal-data (:made-with-carrot-modal base)
+                               :entry-editing (not (not (:entry-editing base)))
+                               :board-editing (not (not (:board-editing base)))
+                               :activity-share-data (not (not (:activity-share base)))
+                               :entry-edit-dissmissing (:entry-edit-dissmissing base)
+                               :alert-modal-data (not (not (:alert-modal base)))
+                               :media-input (:media-input base)
+                               :ap-initial-at ap-initial-at})]})
 
 
 ;; Action Loop =================================================================
