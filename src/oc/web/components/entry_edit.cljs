@@ -212,9 +212,9 @@
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::autosave-timer s) (utils/every 5000 autosave))
                           s)
-                         :before-render (fn [s] (calc-entry-edit-modal-height s) s)
-                         :after-render  (fn [s] (should-show-divider-line s) s)
-                         :did-remount (fn [_ s]
+                         :before-render (fn [s]
+                          (calc-entry-edit-modal-height s)
+                          ;; Set or remove the onBeforeUnload prompt
                           (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
                             (set! (.-onbeforeunload js/window)
                              (if save-on-exit
@@ -222,6 +222,7 @@
                                 (save-on-exit? s)
                                 "Do you want to save before leaving?")
                               nil)))
+                          ;; Handle saving/publishing states to dismiss the component
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
                             (when @(::saving s)
@@ -245,6 +246,7 @@
                                 (when-not (:error entry-editing)
                                   (real-close s)))))
                           s)
+                         :after-render  (fn [s] (should-show-divider-line s) s)
                          :will-unmount (fn [s]
                           (when @(::body-editor s)
                             (.destroy @(::body-editor s))
