@@ -107,10 +107,10 @@
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
-  (when-let [headline (sel1 [:div.entry-edit-headline])]
-    (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
-      (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
-      (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
+  (when-let [headline (rum/ref-node state "headline")]
+    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
+                                                          :has-changes true})]))))
 
 ;; Headline setup and paste handler
 
