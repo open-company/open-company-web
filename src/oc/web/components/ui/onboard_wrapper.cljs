@@ -12,6 +12,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.user :as user-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image default-avatar-url)]
             [goog.dom :as gdom]
@@ -47,7 +48,8 @@
           "Welcome!"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
-          {:on-click #(do
+          {:on-touch-start identity
+           :on-click #(do
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
@@ -106,6 +108,7 @@
             {:class (when (or (not (utils/valid-email? @(::email s)))
                               (<= (count @(::pswd s)) 7))
                       "disabled")
+             :on-touch-start identity
              :on-click #(if (or (not (utils/valid-email? @(::email s)))
                                 (<= (count @(::pswd s)) 7))
                           (do
@@ -159,7 +162,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container
+          [:div.logo-upload-container.group
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
@@ -194,6 +197,7 @@
             {:disabled (or (and (empty? (:first-name user-data))
                                 (empty? (:last-name user-data)))
                            (empty? (:avatar-url user-data)))
+             :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
                           (dis/dispatch! [:user-profile-save]))}
@@ -215,7 +219,8 @@
          [:input
           [:org-editing]
           first-team])
-        (when-not (:logo-height first-team)
+        (when (and (not (zero? (count (:logo-url first-team))))
+                   (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
             (set! (.-onload img)
              #(do
@@ -310,6 +315,7 @@
                           (merge org-editing {:error nil :name (.. % -target -value)})])}]
           [:button.continue
             {:class (when (< (count (clean-org-name (:name org-editing))) 3) "disabled")
+             :on-touch-start identity
              :on-click #(let [org-name (clean-org-name (:name org-editing))]
                           (dis/dispatch! [:input [:org-editing :name] org-name])
                           (if (and (seq org-name)
@@ -371,7 +377,8 @@
             {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
              :on-click #(if (< (count (:pswd collect-pswd)) 8)
                           (reset! (::password-error s) true)
-                          (dis/dispatch! [:pswd-collect]))}
+                          (dis/dispatch! [:pswd-collect]))
+             :on-touch-start identity}
             "Continue"]]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive
@@ -449,6 +456,7 @@
             {:disabled (or (and (empty? (:first-name user-data))
                                 (empty? (:last-name user-data)))
                            (empty? (:avatar-url user-data)))
+             :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
                           (dis/dispatch! [:user-profile-save]))}
@@ -530,7 +538,8 @@
                                (* 60 60 24 7))
                               (router/nav! oc-urls/confirm-invitation-profile))
                             (router/nav! (oc-urls/org (:slug org))))
-                          (router/nav! oc-urls/login)))}
+                          (router/nav! oc-urls/login)))
+           :on-touch-start identity}
           "Get Started"]]
       :else
       [:div.onboard-email-container.small.dot-animation
@@ -591,4 +600,11 @@
         [:div.onboard-wrapper-logo]
         [:div.onboard-wrapper-box]]
       [:div.onboard-wrapper-right
+        (when (or (= component :lander)
+                  (= component :email-wall))
+          [:button.mlb-reset.mobile-blue-back
+            {:on-click #(do
+                         (dis/dispatch! [:input [user-store/show-login-overlay-key] nil])
+                         (router/nav! oc-urls/home))
+             :on-touch-start identity}])
         (get-component component)]]])

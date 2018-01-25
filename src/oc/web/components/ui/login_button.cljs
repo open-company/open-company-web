@@ -15,10 +15,12 @@
   [:div.login-button
     [:button
       {:class (str "btn-reset signup-signin " (when button-classes button-classes))
-       :on-click #(user/show-login :login-with-slack)}
+       :on-click #(user/show-login :login-with-slack)
+       :on-touch-start identity}
       "Sign In"]
     [:span.signup-signin " / "]
     [:button
       {:class (str "btn-reset signup-signin " (when button-classes button-classes))
-       :on-click #(user/show-login :signup-with-slack)}
+       :on-click #(user/show-login :signup-with-slack)
+       :on-touch-start identity}
       "Sign Up"]])

@@ -46,7 +46,10 @@
         all-posts-data (dis/all-posts-data data)
         board-data (dis/board-data data)
         is-mobile? (responsive/is-tablet-or-mobile?)
+<<<<<<< HEAD
+=======
         ap-initial-at (:ap-initial-at data)
+>>>>>>> mainline
         should-show-onboard-overlay? (some #{(:nux data)} [:1 :7])]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
@@ -78,7 +81,7 @@
                                                   (router/current-activity-id))})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (cond
-          (some #{(:nux data)} [:1 :7])
+          should-show-onboard-overlay?
           (onboard-overlay (:nux data))
           ;; Org settings
           (:org-settings data)
@@ -127,6 +130,7 @@
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            (:entry-editing data)
+                           should-show-onboard-overlay?
                            (:activity-share data)))
           [:div.page
             (navbar)

@@ -60,7 +60,24 @@ div.onboard-wrapper-container {
       @include mobile(){
         flex: unset;
         width: 100%;
-        position: relative;
+        position: unset;
+      }
+
+      button.mobile-blue-back {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          width: 19px;
+          height: 15px;
+          position: absolute;
+          top: 32px;
+          left: 24px;
+          background-image: cdnUrl("/img/ML/blue_back_arrow.svg");
+          background-size: 19px 15px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
       }
     }
   }
@@ -105,7 +122,7 @@ div.onboard-email-container {
     margin-top: 16px;
     width: 170px;
     height: 42px;
-    background-color: #4D67FC;
+    background-color: $carrot_dark_blue_1;
     color: white;
     @include avenir_H();
     font-size: 16px;
@@ -125,13 +142,16 @@ div.onboard-lander {
   div.main-cta {
 
     div.title {
-      margin-top: 64px;
       @include avenir_H();
       font-size: 32px;
       color: $carrot_dark_brown_1;
       letter-spacing: auto;
       line-height: 44px;
       margin-top: 80px;
+
+      @include mobile() {
+        margin-top: 32px;
+      }
     }
 
     div.subtitle {
@@ -168,6 +188,18 @@ div.onboard-lander {
       background-color: rgba($carrot_text_blue, 0.1);
       border-radius: 100px;
       text-align: center;
+
+      &:active {
+        background-color: $carrot_text_blue;
+        div.signup-with-slack-content {
+          color: white;
+
+          div.slack-blue-icon {
+            @include image-2x("/img/ML/slack_white_icon");
+          }
+        }
+
+      }
 
       div.signup-with-slack-content {
         @include avenir_H();
@@ -236,6 +268,12 @@ div.onboard-lander {
       min-height: 80px;
       cursor: pointer;
 
+      @include mobile() {
+        width: 100%;
+        margin: 32px auto;
+        text-align: center;
+      }
+
       &:hover {
         div.add-picture-link {
           text-decoration: underline;
@@ -244,6 +282,11 @@ div.onboard-lander {
 
       &.org-logo {
         width: 340px;
+
+        @include mobile() {
+          max-width: 100%;
+          text-align: center;
+        }
 
         div.org-avatar.missing-logo {
           position: relative;
@@ -269,6 +312,11 @@ div.onboard-lander {
           @include org-avatar(80);
           margin-right: 10px;
 
+          @include mobile() {
+            float: unset;
+            margin: 0px auto 16px;
+          }
+
           div.org-avatar-container {
             img.org-avatar-img {
               max-width: 340px;
@@ -279,16 +327,33 @@ div.onboard-lander {
         div.add-picture-link {
           margin-left: 0px;
           margin-top: 10px;
+
+          @include mobile() {
+            margin-top: 0px;
+            text-align: center;
+            width: 100%;
+          }
         }
 
         div.add-picture-link-subtitle {
           margin-left: 0px;
           margin-top: 10px;
+
+          @include mobile() {
+            margin-top: 0px;
+            text-align: center;
+            width: 100%;
+          }
         }
       }
 
       div.user-avatar-img-container {
         float: left;
+
+        @include mobile() {
+          float: unset;
+          margin: 0px auto;
+        }
       }
 
       @include user-profile(82);
@@ -401,7 +466,7 @@ div.onboard-lander {
       border: none;
       width: 100%;
       height: 48px;
-      background-color: #4D67FC;
+      background-color: $carrot_dark_blue_1;
       color: white;
       @include avenir_H();
       font-size: 16px;
@@ -410,6 +475,10 @@ div.onboard-lander {
       &.disabled {
         opacity: 0.8;
       }
+
+      @include mobile() {
+        margin-bottom: 32px;
+      }
     }
   }
 
@@ -417,6 +486,10 @@ div.onboard-lander {
     div.onboard-form {
       button.continue {
         margin-top: 108px;
+
+        @include mobile() {
+          margin-top: 32px;
+        }
       }
     }
   }

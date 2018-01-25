@@ -304,6 +304,7 @@ div.entry-edit-modal-container {
 
         @include mobile() {
           margin: 16px;
+          position: initial;
         }
 
         div.tooltip {
