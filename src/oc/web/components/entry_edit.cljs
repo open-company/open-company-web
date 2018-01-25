@@ -286,7 +286,7 @@
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})
        :on-click #(when (and (not (:has-changes entry-editing))
-                             (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
+                             (not (utils/event-inside? % (rum/ref-node s "entry-edit-modal"))))
                     (cancel-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
