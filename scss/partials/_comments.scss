@@ -326,16 +326,10 @@ div.comments {
           margin-top: 4px;
 
           div.save-cancel-edit-buttons {
-            display: none;
-
-            @include mobile() {
-              display: block;
-
-              button {
-                height: 20px;
-                float: right;
-                margin-left: 8px;
-              }
+            button {
+              height: 20px;
+              float: right;
+              margin-left: 8px;
             }
           }
 
