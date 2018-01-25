@@ -102,9 +102,9 @@ nav.oc-navbar {
         font-size: 26px;
 
         @include mobile() {
-          width: 200px;
+          width: 40%;
           height: 32px;
-          margin-left: -107px;
+          margin-left: -82px;
           top: 0px;
         }
 
@@ -132,7 +132,7 @@ nav.oc-navbar {
       @include mobile() {
         margin-top: 10px;
         margin-left: 16px;
-        width: 150px;
+        width: 40%;
         height: 40px;
       }
 
