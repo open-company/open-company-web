@@ -240,9 +240,14 @@
                                 (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
-   :modal-data          [[:base :org-data :entry-edit-topics :activity-share :add-comment-focus :comment-edit :ap-initial-at]
-                          (fn [base org-data entry-edit-topics activity-share add-comment-focus comment-edit ap-initial-at]
+   :modal-data          [[:base :org-data :activity-data :entry-edit-topics
+                          :activity-share :add-comment-focus :comment-edit
+                          :ap-initial-at]
+                          (fn [base org-data activity-data entry-edit-topics
+                               activity-share add-comment-focus comment-edit
+                               ap-initial-at]
                             {:org-data org-data
+                             :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
                              :board-filters (:board-filters base)
                              :modal-editing-data (:modal-editing-data base)
@@ -288,7 +293,6 @@
                                :org-data org-data
                                :board-data board-data
                                :all-posts-data all-posts
-                               :activity-data activity-data
                                :org-settings-data (:org-settings base)
                                :whats-new-modal-data (:whats-new-modal base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
