@@ -265,6 +265,7 @@ provided in the table below:
 |  :entry-save/failed | API | Save entry reuqest finish but failed. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :entry-toggle-save-on-exit | UI | Toggle save on exit to avoid losing edits on page unload or edit exit. |
+|  :entry-topic-change | UI | Change the topic of the given topic. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
 |  :input | UI | Generic input action, it's used passing in a path and the value. The value is saved at the specified path of the app-state. |
 |  :invitation-confirmed | API | Confirm invitation request succeeded. |
