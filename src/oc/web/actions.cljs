@@ -1188,7 +1188,11 @@
                           ;; Board most recent or by topic
                           :else
                           board-url)))))
-  (dissoc db :entry-editing))
+  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
+  (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
+  (-> db
+    (dissoc :entry-editing)
+    (assoc :entry-edit-dissmissing true)))
 
 (defmethod dispatcher/action :topic-add
   [db [_ topic-map board-slug]]

@@ -300,6 +300,7 @@
                                :board-editing (not (not (:board-editing base)))
                                :activity-share-data (not (not (:activity-share base)))
                                :alert-modal-data (not (not (:alert-modal base)))
+                               :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
                                :ap-initial-at ap-initial-at})]})
 
