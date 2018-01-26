@@ -52,11 +52,11 @@
                 org-settings-data
                 whats-new-modal-data
                 made-with-carrot-modal-data
-                entry-editing
-                board-editing
-                activity-share-data
+                is-entry-editing
+                is-board-editing
+                is-sharing-activity
                 entry-edit-dissmissing
-                alert-modal-data
+                is-showing-alert
                 media-input]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (some #{nux} [:1 :7])]
@@ -102,14 +102,14 @@
           made-with-carrot-modal-data
           (made-with-carrot-modal)
           ;; Entry editing
-          entry-editing
+          is-entry-editing
           (entry-edit)
           ;; Board editing
-          board-editing
+          is-board-editing
           (board-edit)
           ;; Activity share for mobile
           (and is-mobile?
-               activity-share-data)
+               is-sharing-activity)
           (activity-share)
           ;; Activity modal
           (and (router/current-activity-id)
@@ -119,10 +119,10 @@
             (activity-modal)))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
-                   activity-share-data)
+                   is-sharing-activity)
           (activity-share))
         ;; Alert modal
-        (when alert-modal-data
+        (when is-showing-alert
           (alert-modal))
         ;; Media video modal for entry editing
         (when (and media-input
@@ -134,8 +134,8 @@
           (media-chart-modal))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
-                           entry-editing
-                           activity-share-data))
+                           is-entry-editing
+                           is-sharing-activity))
           [:div.page
             (navbar)
             [:div.dashboard-container
