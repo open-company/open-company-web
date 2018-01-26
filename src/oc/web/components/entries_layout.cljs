@@ -65,9 +65,14 @@
                           (drv/drv :change-data)
                           (drv/drv :board-data)
                           (drv/drv :board-filters)
-                          {:will-unmount (fn [s]
-                            (let [board-data @(drv/get-ref s :board-data)]
-                              (dis/dispatch! [:board-nav-away {:board-uuid (:uuid board-data)}]))
+                          (rum/local nil ::board-uuid)
+                          {:after-render (fn [s]
+                            (when-not @(::board-uuid s)
+                              (let [board-data @(drv/get-ref s :board-data)]
+                                (reset! (::board-uuid s) (:uuid board-data))))
+                            s)
+                           :will-unmount (fn [s]
+                            (dis/dispatch! [:board-nav-away {:board-uuid @(::board-uuid s)}])
                             s)}
   [s]
   [:div.entries-layout
