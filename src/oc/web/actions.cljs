@@ -1228,7 +1228,9 @@
     ; Remove saved cached item
     (remove-cached-item (-> db edit-key :uuid))
     ; Add the new activity into the board
-    (let [board-key (dispatcher/current-board-key)
+    (let [board-key (if (= (:status activity-data) "published")
+                     (dispatcher/current-board-key)
+                     (dispatcher/board-data-key (router/current-org-slug) utils/default-drafts-board-slug))
           board-data (or (get-in db board-key) utils/default-drafts-board)
           activity-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) board-slug))
           fixed-activity-data (utils/fix-entry activity-data activity-board-data (:topics activity-board-data))
