@@ -230,21 +230,24 @@
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
                                 (when-not (:error entry-editing)
-                                  ;; If it's not published already redirect to drafts board
-                                  (when (not= (:status entry-editing) "published")
-                                    (utils/after 180 #(router/nav! (oc-urls/drafts (router/current-org-slug)))))
-                                  (real-close s))))
+                                  (let [redirect? (not= (:status entry-editing) "published")]
+                                    ;; If it's not published already redirect to drafts board
+                                    (when redirect?
+                                      (real-close s)
+                                      (utils/after 250
+                                       #(router/nav! (oc-urls/drafts (router/current-org-slug)))))))))
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
-                                ;; Redirect to the publishing board if the slug is available
-                                (when (seq (:board-slug entry-editing))
-                                  (utils/after
-                                   180
-                                   #(router/nav!
-                                     (oc-urls/board (router/current-org-slug) (:board-slug entry-editing)))))
                                 (when-not (:error entry-editing)
-                                  (real-close s)))))
+                                  (let [redirect? (seq (:board-slug entry-editing))]
+                                    ;; Redirect to the publishing board if the slug is available
+                                    (when redirect?
+                                      (real-close s)
+                                      (utils/after
+                                       250
+                                       #(router/nav!
+                                          (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))))))))
                           s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
                          :will-unmount (fn [s]
@@ -439,7 +442,10 @@
                                   (clj->js {:container "body"
                                             :placement "top"
                                             :trigger "manual"
-                                            :template "<div class=\"tooltip post-btn-tooltip\"><div class=\"tooltip-arrow\"></div><div class=\"tooltip-inner\"></div></div>"
+                                            :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                             "<div class=\"tooltip-arrow\"></div>"
+                                                             "<div class=\"tooltip-inner\"></div>"
+                                                           "</div>")
                                             :title "A title is required in order to save or share this post."})))
                                (utils/after 10 #(.tooltip $post-btn "show"))
                                (utils/after 5000 #(.tooltip $post-btn "hide"))))))
