@@ -26,28 +26,10 @@
   ; <!-- Nav Bar -->
   [:nav.site-navbar
     [:div.site-navbar-container
-      [:a.navbar-brand-center
+      [:a.navbar-brand-left
         {:href oc-urls/home
          :on-click (partial nav! oc-urls/home)}]
-      [:div.site-navbar-left.big-web-only
-        [:a
-          {:href oc-urls/about
-           :on-click (partial nav! oc-urls/about)}
-          "About"]
-        [:a.big-web-only
-          {:href "http://blog.carrot.io"
-           :target "_blank"}
-          "Blog"]]
       [:div.site-navbar-right.big-web-only
-        (when-not (jwt/jwt)
-          [:a
-            {:href oc-urls/sign-up
-             :on-click (fn [e]
-                         (.preventDefault e)
-                         (when (responsive/is-mobile-size?)
-                           (dis/dispatch! [:site-menu-toggle true]))
-                         (router/nav! oc-urls/sign-up))}
-            "Get Started"])
         [:a.login
           {:href (utils/your-boards-url)
            :class (when (jwt/jwt) "your-boards")
@@ -58,6 +40,15 @@
                          (user/show-login :login-with-slack)))}
           (if (jwt/jwt)
             "Your Boards"
-            "Login")]]
+            "Log in")]
+        (when-not (jwt/jwt)
+          [:a.start
+            {:href oc-urls/sign-up
+             :on-click (fn [e]
+                         (.preventDefault e)
+                         (when (responsive/is-mobile-size?)
+                           (dis/dispatch! [:site-menu-toggle true]))
+                         (router/nav! oc-urls/sign-up))}
+            "Start"])]
       [:div.mobile-ham-menu.mobile-only
         {:on-click #(dis/dispatch! [:site-menu-toggle])}]]])

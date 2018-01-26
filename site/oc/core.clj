@@ -98,24 +98,17 @@
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
   [:nav.site-navbar
     [:div.site-navbar-container
-      [:a.navbar-brand-center
+      [:a.navbar-brand-left
         {:href "/"}]
-      [:div.site-navbar-left.big-web-only
-        [:a
-          {:href "/about"}
-          "About"]
-        [:a
-          {:href "http://blog.carrot.io"}
-          "Blog"]]
       [:div.site-navbar-right.big-web-only
-        [:a
+        [:a.login
           {:id "site-header-signup-item"
            :href "/sign-up"}
-          "Get Started"]
-        [:a.login
+          "Log in"]
+        [:a.start
           {:id "site-header-login-item"
            :href "/login"}
-          "Login"]]
+          "Start"]]
       [:div.mobile-ham-menu.mobile-only
         {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 

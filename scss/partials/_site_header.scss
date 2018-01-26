@@ -49,16 +49,14 @@ nav.site-navbar {
     div.site-navbar-right {
       position: absolute;
       top: 15px;
-      right: 16px;
+      right: 40px;
       height: 42px;
 
       a.login {
         min-width: 96px;
         height: 42px;
-        border-radius: 100px;
-        background-color: $carrot_orange_light;
-        color: #FA6654;
-        @include avenir_H();
+        color: $carrot_light_gray_3;
+        @include avenir_M();
         font-size: 16px;
         padding: 11px 24px;
         text-align: center;
@@ -66,13 +64,9 @@ nav.site-navbar {
 
         &.your-boards {
           text-align: center;
-          background-color: $carrot_text_blue;
-          color: white;
           opacity: 0.8;
 
           &:hover {
-            background-color: $carrot_text_blue;
-            color: white;
             opacity: 1;
           }
 
@@ -87,13 +81,26 @@ nav.site-navbar {
           text-decoration: none;
         }
       }
+
+      a.start {
+        min-width: 84px;
+        height: 42px;
+        border: 2px solid $carrot_light_blue_2;
+        border-radius: 100px;
+        @include avenir_H();
+        font-size: 16px;
+        color: $carrot_text_blue_3;
+        padding: 11px 24px;
+        text-align: center;
+        margin-top: 0px;
+      }
     }
 
-    a.navbar-brand-center {
+    a.navbar-brand-left {
       position: relative;
-      left: 50%;
       top: 7px;
-      margin: 0px 0px 0px -57px;
+      left: 0px;
+      margin: 0px;
       width: 115px;
       height: 28px;
       background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
