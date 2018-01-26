@@ -221,7 +221,7 @@
                 "Digest Frequency " [:i.mdi.mdi-information-outline
                   {:title "Receive a digest of newly created posts."
                    :data-toggle "tooltip"
-                   :data-placement "top"}]]  
+                   :data-placement "top"}]]
               [:div.user-profile-field.digest-frequency-field.digest-frequency
                 [:div.dropdown {:class "dropdown-button"}
                   [:button.btn-reset.user-type-btn.dropdown-toggle
