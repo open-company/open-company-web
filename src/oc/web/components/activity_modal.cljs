@@ -100,13 +100,11 @@
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
-  (utils/after 10
-    (fn []
-      (when-let [headline (sel1 [:div.activity-modal-content-headline])]
-        (let [emojied-headline (utils/emoji-images-to-unicode
-                                (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
-          (dis/dispatch! [:update [:moda-editing-data] #(merge % {:headline emojied-headline
-                                                                  :has-changes true})]))))))
+  (when-let [headline (rum/ref-node state "edit-headline")]
+    (let [emojied-headline (utils/emoji-images-to-unicode
+                            (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:update [:modal-editing-data] #(merge % {:headline emojied-headline
+                                                               :has-changes true})]))))
 
 (defn- setup-headline [state]
   (when-let [headline-el  (rum/ref-node state "edit-headline")]
@@ -279,6 +277,30 @@
                                          (= (:activity-modal-fade-in modal-data) (:uuid (:activity-data modal-data))))
                                   (reset! (::animate s) true)))
                               (modal-height-did-change s)
+                              (setup-editing-data s)
+                              (let [modal-data @(drv/get-ref s :modal-data)]
+                                (let [save-on-exit (:entry-save-on-exit modal-data)]
+                                  (set! (.-onbeforeunload js/window)
+                                   (if save-on-exit
+                                    #(do
+                                      (save-on-exit? s)
+                                      "Do you want to save before leaving?")
+                                    nil)))
+                                (when (and (:modal-editing modal-data)
+                                           (nil? @(::autosave-timer s)))
+                                  (utils/after 1000 #(real-start-editing s :headline)))
+                                (when (and (:modal-editing modal-data)
+                                           @(::entry-saving s))
+                                  (let [entry-edit (:modal-editing-data modal-data)
+                                        initial-body (:body entry-edit)
+                                        initial-headline (utils/emojify (:headline entry-edit))]
+                                    (when-not (:loading entry-edit)
+                                      (when-not (:error entry-edit)
+                                        (reset! (::initial-headline s) initial-headline)
+                                        (reset! (::initial-body s) initial-body)
+                                        (stop-editing s))
+                                      (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
+                                      (reset! (::entry-saving s) false)))))
                               s)
                              :will-mount (fn [s]
                               (reset! (::esc-key-listener s)
@@ -340,35 +362,6 @@
                                 (events/unlistenByKey @(::window-resize-listener s))
                                 (reset! (::window-resize-listener s) nil))
                               (set! (.-onbeforeunload js/window) nil)
-                              s)
-                             :will-update (fn [s]
-                              (setup-editing-data s)
-                              s)
-                             :did-remount (fn [_ s]
-                              (let [modal-data @(drv/get-ref s :modal-data)]
-                                (let [save-on-exit (:entry-save-on-exit modal-data)]
-                                  (set! (.-onbeforeunload js/window)
-                                   (if save-on-exit
-                                    #(do
-                                      (save-on-exit? s)
-                                      "Do you want to save before leaving?")
-                                    nil)))
-                                (setup-editing-data s)
-                                (when (and (:modal-editing modal-data)
-                                           (nil? @(::autosave-timer s)))
-                                  (utils/after 1000 #(real-start-editing s :headline)))
-                                (when (and (:modal-editing modal-data)
-                                           @(::entry-saving s))
-                                  (let [entry-edit (:modal-editing-data modal-data)
-                                        initial-body (:body entry-edit)
-                                        initial-headline (utils/emojify (:headline entry-edit))]
-                                    (when-not (:loading entry-edit)
-                                      (when-not (:error entry-edit)
-                                        (reset! (::initial-headline s) initial-headline)
-                                        (reset! (::initial-body s) initial-body)
-                                        (stop-editing s))
-                                      (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
-                                      (reset! (::entry-saving s) false)))))
                               s)}
   [s]
   (let [fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
