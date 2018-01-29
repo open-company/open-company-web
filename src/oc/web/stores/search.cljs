@@ -14,9 +14,6 @@
   " If the user is anonymous or not part of the orginization
     don't display search component.
   "
-  (timbre/debug jwt/jwt)
-  (timbre/debug (:team-id (dispatcher/org-data)))
-  (timbre/debug (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data))))
   (if (not (jwt/jwt))
     false
     (if (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
