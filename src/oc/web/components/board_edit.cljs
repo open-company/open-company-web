@@ -391,7 +391,10 @@
                                  :message [:span
                                             [:span "Are you sure?"]
                                             (when (-> board-data :fixed-items count pos?)
-                                              [:span " This will delete the board and " [:strong "all"] " its posts, too."])]
+                                              [:span
+                                                " This will delete the board and "
+                                                [:strong "all"]
+                                                " its posts, too."])]
                                  :link-button-title "No"
                                  :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                                  :solid-button-style :red
