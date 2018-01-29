@@ -52,6 +52,10 @@ div#wrap {
   div.main.home-page {
     width: 100%;
     margin-top: 1px;
+    background-image: cdnUrl("/img/ML/homepage_blue_bg.svg");
+    background-size: 1400px;
+    background-position: center 540px;
+    background-repeat: no-repeat;
 
     @include mobile() {
       padding: 0 32px;
@@ -65,7 +69,7 @@ div#wrap {
 
     section.cta {
       padding-top: 142px;
-      padding-bottom: 0px;
+      padding-bottom: 232px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -78,10 +82,6 @@ div#wrap {
 
       &.no-get-started-button {
         div.balloon {
-          &.small-red-face {
-            top: 330px;
-          }
-
           &.big-green {
             top: 321px;
           }
@@ -107,8 +107,8 @@ div#wrap {
           background-size: 172px 172px;
           width: 172px;
           height: 172px;
-          top: -46px;
-          left: -57px;
+          top: -66px;
+          left: -76px;
         }
 
         &.big-purple {
@@ -139,22 +139,13 @@ div#wrap {
           margin-left: -534px;
         }
 
-        &.small-purple-face {
-          @include image-2x("/img/ML/balloon_small_purple_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 118px;
-          left: 5.78%;
-        }
-
-        &.small-red {
-          @include image-2x("/img/ML/balloon_small_red");
+        &.small-blue {
+          @include image-2x("/img/ML/balloon_small_blue");
           background-size: 15px 17px;
           width: 15px;
           height: 17px;
-          top: 103px;
-          left: 13.71%;
+          top: 91px;
+          left: 6.71%;
         }
 
         &.small-yellow-face {
@@ -166,71 +157,52 @@ div#wrap {
           left: 78.57%;
         }
 
-        &.small-yellow {
-          @include image-2x("/img/ML/balloon_small_yellow");
-          background-size: 15px 15px;
-          width: 15px;
-          height: 15px;
-          top: 179px;
-          left: 86.36%;
-        }
-
-        &.small-red-face {
-          @include image-2x("/img/ML/balloon_small_red_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 426px;
-          left: 50%;
-          margin-left: -278px;
-          z-index: 11;
-        }
-
         &.small-purple {
           @include image-2x("/img/ML/balloon_small_purple");
           background-size: 23px 21px;
           width: 23px;
           height: 21px;
-          top: 374px;
-          left: 23.64%;
+          top: 179px;
+          left: 86.36%;
         }
 
-        &.small-blue-face {
-          @include image-2x("/img/ML/balloon_small_blue_face");
-          background-size: 42px 42px;
-          width: 42px;
-          height: 42px;
-          top: 904px;
-          left: 7.07%;
-        }
-
-        &.small-red-1 {
-          @include image-2x("/img/ML/balloon_small_red_1");
-          background-size: 17px 15px;
-          width: 17px;
-          height: 15px;
-          top: 1203px;
+        &.small-red {
+          @include image-2x("/img/ML/balloon_small_red_3");
+          background-size: 47px 48px;
+          width: 47px;
+          height: 48px;
+          top: 564px;
           left: 9.71%;
         }
 
-        &.small-yellow-1 {
-          @include image-2x("/img/ML/balloon_small_yellow_1");
+        &.small-purple-2 {
+          @include image-2x("/img/ML/why_balloon_small_purple");
+          background-size: 33px 30px;
+          width: 33px;
+          height: 30px;
+          top: 1609px;
+          left: 11.93%;
+        }
+
+        &.big-green-2 {
+          @include image-2x("/img/ML/balloon_big_green");
+          background-size: 200px 172px;
+          width: 200px;
+          height: 172px;
+          top: 1914px;
+          left: 50%;
+          margin-left: 319px;
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/why_balloon_small_yellow");
           background-size: 25px 25px;
           width: 25px;
           height: 25px;
-          top: 765px;
-          left: 85.86%;
+          top: 2072px;
+          left: 50%;
+          margin-left: 286px;
         }
-
-        &.small-green-face {
-          @include image-2x("/img/ML/balloon_small_green_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 686px;
-          left: 82.14%;
-        }
-
       }
 
       h1.headline {
@@ -290,6 +262,7 @@ div#wrap {
         padding: 0;
         z-index: 10;
         position: relative;
+        border-radius: 8px;
 
         @include tablet() {
           width: 100%;
@@ -310,528 +283,233 @@ div#wrap {
         }
       }
 
-      div.homepage-screenshot-bubble {
-        background-color: $carrot_text_blue;
-        border-radius: 8px;
-        width: 940px;
-        height: auto;
-        margin: -120px auto 0px;
-        @include avenir_H();
-        color: white;
-        font-size: 24px;
-        text-align: center;
-        padding: 32px;
-        z-index: 12;
-        position: relative;
+      div.stay-aligned-container {
+        max-width: 678px;
+        margin: 62px auto 72px;
+        text-align: right;
 
-        &:after {
-          content: "";
-          position: absolute;
-          top: -9px;
-          left: calc(50% - 12px);
-          width: 18px;
-          height: 18px;
-          -webkit-transform: rotate(45deg);
-          transform: rotate(45deg);
-          background-color: $carrot_text_blue;
+        div.stay-aligned-icon {
+          width: 44px;
+          height: 44px;
+          @include image-2x("/img/ML/homepage_clarity");
+          background-size: 44px;
+          background-repeat: no-repeat;
+          background-position: center;
+          float: left;
         }
 
-        @include tablet() {
-          width: 100%;
-          height: auto;
-          margin: -8px 0px 0px 0px;
-          padding: 16px 32px;
+        div.stay-aligned-message {
+          @include avenir_M();
+          font-size: 34px;
+          color: white;
+          line-height: 42px;
+          margin-top: 8px;
+          display: inline-block;
+        }
+      }
+
+      div.cards-container {
+        max-width: 940px;
+        margin: 0px auto;
+        position: relative;
+        z-index: 2;
+
+        div.cards-row {
+          margin-top: 20px;
+
+          div.card {
+            &:not(:first-child) {
+              margin-left: 20px;
+            }
+
+            text-align: left;
+            float: left;
+            width: 300px;
+            height: 332px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.07);
+            padding: 40px;
+
+            div.card-icon {
+              background-repeat: no-repeat;
+              background-position: center;
+            }
+
+            div.card-title {
+              @include avenir_M();
+              font-size: 20px;
+              color: $carrot_dark_gray;
+              width: 70%;
+            }
+
+            div.card-content {
+              @include avenir_R();
+              font-size: 18px;
+              color: rgba($carrot_dark_gray, 0.8);
+              margin-top: 11px;
+
+              a {
+                color: $carrot_text_blue_3;
+                text-decoration: none;
+              }
+            }
+
+            &.card-1 {
+              div.card-icon {
+                width: 44px;
+                height: 41px;
+                background-size: 44px 41px;
+                @include image-2x("/img/ML/homepage_card_icon_1");
+                margin-bottom: 35px;
+              }
+            }
+
+            &.card-2 {
+              div.card-icon {
+                width: 40px;
+                height: 40px;
+                background-size: 40px 40px;
+                @include image-2x("/img/ML/homepage_card_icon_2");
+                margin-bottom: 36px;
+              }
+            }
+
+            &.card-3 {
+              div.card-icon {
+                width: 44px;
+                height: 44px;
+                background-size: 44px 44px;
+                @include image-2x("/img/ML/homepage_card_icon_3");
+                margin-bottom: 31px;
+              }
+            }
+
+            &.card-4 {
+              div.card-icon {
+                width: 32px;
+                height: 40px;
+                background-size: 32px 40px;
+                @include image-2x("/img/ML/homepage_card_icon_4");
+                margin-bottom: 36px;
+              }
+
+              div.card-title {
+                width: 50%;
+              }
+            }
+
+            &.card-5 {
+              div.card-icon {
+                width: 42px;
+                height: 41px;
+                background-size: 42px 41px;
+                @include image-2x("/img/ML/homepage_card_icon_5");
+                margin-bottom: 35px;
+              }
+            }
+
+            &.card-6 {
+              div.card-icon {
+                width: 40px;
+                height: 40px;
+                background-size: 40px 40px;
+                @include image-2x("/img/ML/homepage_card_icon_6");
+                margin-bottom: 36px;
+              }
+
+              div.card-title {
+                width: 43%;
+              }
+            }
+          }
         }
       }
     }
 
     section.second-section {
-      position: relative;
-      background-color: $oc_gray_8;
+      background-color: $carrot_dark_gray;
+      text-align: center;
+      padding: 72px 0px;
 
-      @include big_web() {
-        padding: 0px;
+      div.second-section-title {
+        @include avenir_M();
+        color: white;
+        font-size: 38px;
       }
 
-      @include mobile(){
-        width: calc(100% + 64px);
-        margin-left: -32px;
-        padding: 40px 32px 0px;
+      div.second-section-subtitle {
+        @include avenir_M();
+        font-size: 20px;
+        color: #C4C6C9;
+        margin-top: 11px;
       }
 
-      div.why-balloon {
-        position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
+      div.cards-container {
+        width: 1164px;
+        margin: 50px auto 0px;
 
-        @include mobile() {
-          display: none;
-        }
-
-        &.big-red {
-          @include image-2x("/img/ML/why_balloon_big_red");
-          background-size: 192px 199px;
-          width: 192px;
-          height: 199px;
-          top: 199px;
-          left: -83px;
-        }
-
-
-        // &.big-blue {
-        //   @include image-2x("/img/ML/why_balloon_big_blue");
-        //   background-size: 121px 125px;
-        //   width: 121px;
-        //   height: 125px;
-        //   top: 38px;
-        //   left: 65px;
-        // }
-
-        &.small-yellow {
-          @include image-2x("/img/ML/why_balloon_small_yellow");
-          background-size: 25px 25px;
-          width: 25px;
-          height: 25px;
-          top: 17px;
-          left: 83%;
-        }
-
-        &.big-purple {
-          @include image-2x("/img/ML/why_balloon_big_purple");
-          background-size: 110px 111px;
-          width: 110px;
-          height: 111px;
-          top: 48px;
-          left: 85.93%;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/why_balloon_small_purple");
-          background-size: 33px 30px;
-          width: 33px;
-          height: 30px;
-          top: 482px;
-          left: 11.93%;
-        }
-
-        &.big-yellow {
-          @include image-2x("/img/ML/why_balloon_big_yellow");
-          background-size: 217px 216px;
-          width: 217px;
-          height: 216px;
-          top: 537px;
-          left: 78.57%;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/why_balloon_big_green");
-          background-size: 132px 132px;
-          width: 132px;
-          height: 132px;
-          top: 989px;
-          left: 12.21%;
-        }
-
-        &.small-yellow {
-          @include image-2x("/img/ML/why_balloon_small_yellow");
-          background-size: 25px 25px;
-          width: 25px;
-          height: 25px;
-          top: 999px;
-          left: 11.93%;
-          z-index: 2;
-        }
-
-        &.small-red {
-          @include image-2x("/img/ML/why_balloon_small_red");
-          background-size: 17px 15px;
-          width: 17px;
-          height: 15px;
-          top: 1353px;
-          left: 86%;
-        }
-
-        &.small-purple-face {
-          @include image-2x("/img/ML/why_balloon_small_purple_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 1384px;
-          left: 82%;
-        }
-      }
-
-      div.illustrations-title {
-        margin-bottom: 60px;
-        max-width: 940px;
-        text-align: center;
-        margin: 70px auto 0px;
-        padding: 0px;
-
-        @include mobile(){
-          text-align: left;
-          margin-top: 40px;
-        }
-
-        div.why-carrot {
-          @include avenir_H();
-          font-size: 48px;
-          color: $carrot_dark_brown_1;
-          margin-bottom: 12px;
-          z-index: 2;
-          position: relative;
-
-          @include mobile() {
-            width: calc(100% + 64px);
-            margin-left: -32px;
-            text-align: center;
-          }
-        }
-
-        div.why-carrot-description {
-          @include avenir_R();
-          font-size: 20px;
-          line-height: 30px;
-          color: $carrot_dark_brown;
-          z-index: 2;
-          position: relative;
-          width: 720px;
-          margin: 0 auto;
-
-          @include mobile() {
-            width: 100%;
-            max-width: 100%;
-            text-align: center;
-          }
-        }
-      }
-
-      div.illustrations {
-        width: 980px;
-        margin: 54px auto;
-        position: relative;
-        z-index: 10;
-
-        @include mobile() {
-          width: calc(100% + 64px);
-          margin-left: -32px;
-        }
-
-        @include mobile_to_tablet() {
-          width: 100%;
-        }
-
-        div.illustration-container {
-          margin: 20px;
-          width: 450px;
-          height: 400px;
-          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
-          padding: 40px 50px;
-          background-color: white;
+        div.card {
           float: left;
-          text-align: center;
+          width: 276px;
+          background-color: white;
           border-radius: 8px;
+          padding: 24px 26px;
+          text-align: left;
 
-          @include tablet() {
-            width: 100%;
-            height: auto;
-            float: unset;
-            margin: 16px 0px 0px;
-            padding: 30px 32px;
-            border-radius: 0px;
+          &:not(:first-child) {
+            margin-left: 20px;
           }
 
-          &.right {
-            float: right;
-
-            @include tablet(){
-              float: unset;
-            }
+          div.card-content {
+            @include avenir_M();
+            font-size: 16px;
+            color: rgba($carrot_dark_gray, 0.8);
+            line-height: 24px;
           }
 
-          div.illustration {
-            width: 350px;
-            height: 160px;
-            background-repeat: no-repeat;
-            background-position: center;
+          div.card-author {
+            margin-top: 8px;
 
-            @include tablet(){
-              width: auto;
-              margin: 0 auto;
+            img.card-avatar {
+              max-width: 40px;
+              max-height: 40px;
+              border-radius: 50%;
+              float: left;
             }
 
-            &.illustration-1 {
-              @include image-2x("/img/ML/why_illustration_1_246_151");
-              background-size: 246px 151px;
-            }
-
-            &.illustration-2 {
-              @include image-2x("/img/ML/why_illustration_2_235_150");
-              background-size: 235px 150px;
-            }
-
-            &.illustration-3 {
-              @include image-2x("/img/ML/why_illustration_3_225_151");
-              background-size: 225px 151px;
-            }
-
-            &.illustration-4 {
-              @include image-2x("/img/ML/why_illustration_4_165_160");
-              background-size: 165px 160px;
-            }
-          }
-
-          div.description {
-            margin-top: 24px;
-
-            div.title {
-              color: $carrot_dark_brown;
+            div.author-name {
               @include avenir_H();
-              font-size: 26px;
+              font-size: 14px;
+              color: $carrot_dark_gray;
+              margin-left: 48px;
             }
 
-            div.subtitle {
-              color: $carrot_dark_brown;
-              @include avenir_R();
-              font-size: 20px;
-              margin: 10px auto;
+            div.author-company {
+              @include avenir_M();
+              font-size: 12px;
+              color: rgba($carrot_light_gray_3, 0.5);
+              margin-left: 48px;
             }
-          }
-        }
-      }
-
-      div.slack-section {
-        width: 800px;
-        height: 293px;
-        text-align: center;
-        margin: 60px auto 100px;
-
-        @include tablet(){
-          width: 100%;
-          height: auto;
-          text-align: center;
-        }
-
-        div.slack-logo {
-          @include image-2x("/img/ML/carrot_plus_slack");
-          background-repeat: no-repeat;
-          background-position: center;
-          background-size: 254px 100px;
-          width: 254px;
-          height: 100px;
-          margin: 0 auto;
-        }
-
-        div.slack-title {
-          color: $carrot_dark_brown;
-          @include avenir_H();
-          font-size: 26px;
-          margin-top: 16px;
-        }
-
-        div.slack-description {
-          color: $carrot_dark_brown;
-          @include avenir_R();
-          font-size: 20px;
-          margin-top: 20px;
-          line-height: 30px;
-          opacity: 0.8;
-        }
-
-        button.mlb-reset.slack-btn {
-          width: 160px;
-          height: 48px;
-          border-radius: 100px;
-          background-color: $carrot_orange_light;
-          color: #FA6654;
-          @include avenir_H();
-          font-size: 16px;
-          padding: 10px 8px;
-          text-align: center;
-          margin: 32px auto 0px;
-
-          &:hover {
-            background-color: #FA6654;
-            color: white;
-            text-decoration: none;
           }
         }
       }
     }
 
     section.third-section {
-      background-color: $carrot_light_yellow_1;
+      padding: 72px 0px;
+      text-align: center;
 
-      @include big_web_no_tablet(){
-        padding: 72px 0px 100px;
-      }
-
-      @include tablet() {
-        width: 100%;
-        padding: 32px 32px 50px;
-      }
-
-      @include mobile(){
-        width: calc(100% + 64px);
-        margin-left: -32px;
-        padding: 32px 32px 50px;
-        text-align: center;
-      }
-
-      div.illustrations-title {
-        margin-bottom: 60px;
-        max-width: 940px;
-        text-align: center;
-        margin: 0 auto;
-        padding: 0px;
-
-        @include tablet(){
-          text-align: center;
-        }
-
-        div.why-carrot {
-          @include avenir_H();
-          font-size: 48px;
-          color: $carrot_dark_brown_1;
-          margin-bottom: 24px;
-          line-height: 60px;
-        }
-
-        div.why-carrot-description {
-          @include avenir_R();
-          font-size: 20px;
-          color: $carrot_dark_brown;
-        }
-      }
-
-      div.third-section-footer {
-        width: 940px;
-        height: 336px;
-        background-color: white;
-        margin: 60px auto 0px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 6px 0px rgba(0,0,0,0.07);
-        padding: 40px 24px;
-
-        @include tablet() {
-          width: 100%;
-          height: auto;
-        }
-
-        div.copy-separator {
-          margin-top: 26px;
-          width: calc(100% + 48px);
-          height: 1px;
-          margin-left: -24px;
-          background-color: rgba($carrot_light_gray_7,0.5);
-
-          @include tablet(){
-            width: 100%;
-            margin-left: 0px;
-          }
-        }
-
-        div.copy {
-          &:first-child {
-            margin-top: 0px;
-          }
-          margin-top: 26px;
-
-          div.copy-icon {
-            float: left;
-            width: 114px;
-            height: 114px;
-            background-repeat: no-repeat;
-            background-position: center;
-            margin-top: -6px;
-
-            @include tablet (){
-              float: unset;
-              text-align: center;
-              margin: 0px auto;
-            }
-
-            &.copy-simplify {
-              @include image-2x("/img/ML/homepage_illustration_simplify");
-              background-size: 108px 108px;
-            }
-
-            &.copy-expand {
-              @include image-2x("/img/ML/homepage_illustration_expand");
-              background-size: 110px 114px;
-            }
-          }
-
-          div.title {
-            color: $carrot_dark_brown;
-            @include avenir_H();
-            font-size: 26px;
-            text-align: left;
-            margin-left: 138px;
-            letter-spacing: 0.18;
-            line-height: 36px;
-
-            @include tablet (){
-              margin: 16px 0px;
-              text-align: center;
-            }
-          }
-
-          div.description {
-            color: $carrot_dark_brown;
-            @include avenir_R();
-            font-size: 20px;
-            line-height: 30px;
-            text-align: left;
-            margin-left: 138px;
-            margin-top: 8px;
-
-            @include tablet (){
-              margin: 16px 0px 0px;
-              text-align: center;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-div.main.home-page, div.about {
-  section.fourth-section {
-    text-align: center;
-    padding: 60px 0px;
-
-    div.above-noise-container {
-      width: 1053px;
-      margin: 0px auto;
-
-      @include tablet(){
-        width: 100%;
-        height: auto;
-        text-align: center;
-      }
-
-      div.above-noise-title {
-        color: $carrot_dark_brown_1;
-        @include avenir_H();
-        font-size: 48px;
-        margin-top: 16px;
-      }
-
-      div.above-noise-description {
-        color: $carrot_dark_brown_1;
-        @include avenir_H();
-        font-size: 40px;
-        color: #373f4f;
-        margin-top: 16px;
+      div.third-section-title {
+        @include avenir_M();
+        font-size: 34px;
+        color: $carrot_dark_gray;
+        margin-bottom: 20px;
       }
 
       button.get-started-button {
-        margin-top: 60px;
+        margin-top: 0px;
       }
     }
   }
-
 }

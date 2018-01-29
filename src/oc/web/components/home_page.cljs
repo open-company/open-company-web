@@ -46,27 +46,24 @@
           [:div.balloon.big-red]
           [:div.balloon.big-purple]
           [:div.balloon.big-green]
-          [:div.balloon.small-purple-face]
-          [:div.balloon.small-red]
+          [:div.balloon.small-blue]
           [:div.balloon.small-yellow-face]
-          [:div.balloon.small-yellow]
-          [:div.balloon.small-red-face]
           [:div.balloon.small-purple]
-          [:div.balloon.small-blue-face]
-          [:div.balloon.small-red-1]
-          [:div.balloon.small-yellow-1]
-          [:div.balloon.small-green-face]
+          [:div.balloon.small-red]
+          [:div.balloon.small-purple-2]
+          [:div.balloon.big-green-2]
+          [:div.balloon.small-yellow]
 
           [:h1.headline
-            "Rise above the noise"]
+            "Where leaders speak"]
           [:div.subheadline.big-web-only
-            "Give your team a clear view of what’s most important"]
+            "Leadership updates that keep everyone aligned"]
           [:div.subheadline.second-line.big-web-only
-            "to keep everyone on the same page"]
+            "around what matters most."]
           [:div.subheadline.mobile-only
             (str
-             "Give your team a clear view of what’s most important "
-             "to keep everyone on the same page")]
+             "Leadership updates that keep everyone aligned "
+             "around what matters most.")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -99,119 +96,161 @@
                :type "video/mp4"}]
             [:div.fallback
               "Your browser doesn’t support this video format."]]
-          [:div.homepage-screenshot-bubble
-            "It’s never been easier to keep everyone on the same page"]]
 
-        [:section.second-section.group
-          [:div.why-balloon.big-red]
-          ; [:div.why-balloon.big-blue]
-          [:div.why-balloon.small-yellow]
-          [:div.why-balloon.big-purple]
-          [:div.why-balloon.small-purple]
-          [:div.why-balloon.big-yellow]
-          [:div.why-balloon.small-yellow]
-          [:div.why-balloon.big-green]
-          [:div.why-balloon.small-red]
-          [:div.why-balloon.small-purple-face]
+          [:div.stay-aligned-container
+            [:div.stay-aligned-icon]
+            [:div.stay-aligned-message
+              "Stay aligned around topics that matter."]]
 
-          [:div.illustrations-title
-            [:div.why-carrot
-              "Why Carrot?"]
-            [:div.why-carrot-description
-              (str
-               "Growing teams need a place to rise above the noise of real-time conversations to see "
-               "what’s really happening across the company.")]]
 
-          [:div.illustrations.group
-            [:div.illustration-container
-              [:div.illustration.illustration-1]
-              [:div.description
-                [:div.title
-                  "Visibility"]
-                [:div.subtitle
+          [:div.cards-container
+            [:div.cards-row.group
+              [:div.card.card-1
+                [:div.card-icon]
+                [:div.card-title
                   (str
-                   "A bird’s-eye view of essential "
-                 "information that’s easy to read and "
-                 "creates real transparency.")]]]
-            [:div.illustration-container.right
-              [:div.illustration.illustration-2]
-              [:div.description
-                [:div.title
-                  "In context"]
-                [:div.subtitle
+                   "Highlight what’s "
+                   "important")]
+                [:div.card-content
                   (str
-                   "Related information stays organized to "
-                   "have the most impact. Great for current "
-                   "and new employees.")]]]
-            [:div.illustration-container
-              [:div.illustration.illustration-3]
-              [:div.description
-                [:div.title
-                  "Feedback & engagement"]
-                [:div.subtitle
+                    "Elevate key updates above "
+                    "the noise so they won’t be "
+                    "missed. It’s perfect for "
+                    "distributed teams, too.")]]
+              [:div.card.card-2
+                [:div.card-icon]
+                [:div.card-title
                   (str
-                   "Capture team sentiment and reactions "
-                   "to key communications. It’s fun and "
-                   "great for distributed teams too!")]]]
-            [:div.illustration-container.right
-              [:div.illustration.illustration-4]
-              [:div.description
-                [:div.title
-                  "The big picture"]
-                [:div.subtitle
+                    "Cross-team "
+                    "awareness")]
+                [:div.card-content
                   (str
-                   "Daily or weekly digest for email "
-                   "and Slack ensures everyone has the "
-                   "same view of what’s important.")]]]]
+                    "Keep teams in sync with "
+                    "each other so you can see "
+                    "what’s happening across "
+                    "the company.")]]
+              [:div.card.card-3
+                [:div.card-icon]
+                [:div.card-title
+                  (str
+                    "Focused "
+                    "conversations")]
+                [:div.card-content
+                  (str
+                    "Capture team reactions, "
+                    "comments and questions "
+                    "together in one place.")]]]
+            [:div.cards-row.group
+              [:div.card.card-4
+                [:div.card-icon]
+                [:div.card-title
+                  (str
+                    "The whole "
+                    "story")]
+                [:div.card-content
+                  (str
+                    "New employees get up to "
+                    "speed quickly with the full "
+                    "picture in one place.")]]
+              [:div.card.card-5
+                [:div.card-icon]
+                [:div.card-title
+                  (str
+                    "Visible "
+                    "engagement")]
+                [:div.card-content
+                  (str
+                    "Carrot measures team "
+                    "engagement so leaders "
+                    "can actually see if their "
+                    "teams are aligned or not.")]]
+              [:div.card.card-6
+                [:div.card-icon]
+                [:div.card-title
+                  (str
+                    "In sync "
+                    "with Slack")]
+                [:div.card-content
+                  (str
+                    "Communication is "
+                    "automatically shared to the "
+                    "right channel. ")
+                  [:a
+                    {:href oc-urls/slack
+                     :on-click #(router/nav! oc-urls/slack)}
+                    "Learn more"]]]]]]
 
-          [:div.slack-section
-            [:div.slack-logo]
-            [:div.slack-title
-              "Did we mention our Slack integration?"]
-            [:div.slack-description
-              (str
-               "Posts are automatically shared to the right channels. Discussions about posts happen "
-               "in Slack and Carrot - everything is kept in sync.")]
-            [:button.mlb-reset.slack-btn
-              {:on-click #(router/nav! oc-urls/slack)}
-              "Learn More"]]]
-
-        [:section.third-section.group
-          [:div.illustrations-title
-            [:div.why-carrot
-              "Keep your stakeholders informed"]
-            [:div.why-carrot-description
-              "Share the latest news with your extended team."]]
-          [:div.third-section-footer.group
-            [:div.copy
-              [:div.copy-icon.copy-simplify]
-              [:div.title
-                "Simplify investor updates"]
-              [:div.description
+        [:section.second-section
+          [:div.second-section-title
+            "Don’t take our word for it"]
+          [:div.second-section-subtitle
+            "Here’s how we’re is helping teams like yours."]
+          [:div.cards-container.group
+            [:div.card
+              [:div.card-content
                 (str
-                 "Create beautiful updates in a snap, and keep them "
-                 "organized in one place. Also ideal for keeping friends "
-                 "and family in the loop.")]]
-            [:div.copy-separator]
-            [:div.copy
-              [:div.copy-icon.copy-expand]
-              [:div.title
-                "Expand your network"]
-              [:div.description
+                 "We love Slack for spontaneous "
+                 "stuff, but Carrot is the bomb "
+                 "for more focused, topic-based "
+                 "conversations.")]
+              [:div.card-author
+                [:img.card-avatar
+                  {:src (utils/cdn "/img/ML/happy_face_blue.svg")}]
+                [:div.author-name
+                  "John Smith"]
+                [:div.author-company
+                  "Acme Co."]]]
+            [:div.card
+              [:div.card-content
                 (str
-                 "Share news with recruits, potential investors and customers to keep them "
-                 "engaged and supportive. Build trust and grow your business.")]]]]
-
-        (when-not (jwt/jwt)
-          [:section.fourth-section.group
-            [:div.above-noise-container
-              [:div.above-noise-description
-                "With Carrot, everyone’s on the same page."]
-              [:button.mlb-reset.get-started-button
-                {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (user/show-login :signup-with-slack)
-                              (router/nav! oc-urls/sign-up))}
-                "Get started for free"]]])
+                 "Crucial updates we're "
+                 "drowned out with \"taco "
+                 "Tuesday?\" and a healthy dose "
+                 "of amazing memes. Chat is "
+                 "fun, but hard to compete with "
+                 "when you need to make sure "
+                 "something is heard.")]
+              [:div.card-author
+                [:img.card-avatar
+                  {:src (utils/cdn "/img/ML/happy_face_purple.svg")}]
+                [:div.author-name
+                  "John Smith"]
+                [:div.author-company
+                  "Acme Co."]]]
+            [:div.card
+              [:div.card-content
+                (str
+                 "RIP team email! 👻  With "
+                 "Carrot, email is finally "
+                 "obsolete for team updates "
+                 "and the rest.")]
+              [:div.card-author
+                [:img.card-avatar
+                  {:src (utils/cdn "/img/ML/happy_face_red.svg")}]
+                [:div.author-name
+                  "John Smith"]
+                [:div.author-company
+                  "Acme Co."]]]
+            [:div.card
+              [:div.card-content
+                (str
+                 "I'm never sure if everyone in "
+                 "my company is getting my "
+                 "updates. Carrot is where I can "
+                 "track who's viewed what, and "
+                 "how everyone is feeling.")]
+              [:div.card-author
+                [:img.card-avatar
+                  {:src (utils/cdn "/img/ML/happy_face_yellow.svg")}]
+                [:div.author-name
+                  "John Smith"]
+                [:div.author-company
+                  "Acme Co."]]]]]
+        [:section.third-section
+          [:div.third-section-title
+            "Keep everyone aligned around what matters most."]
+          [:button.mlb-reset.get-started-button
+            "Get started for free"]]
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 
