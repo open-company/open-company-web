@@ -76,8 +76,9 @@ div#wrap {
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding-top: 76px;
-        margin-bottom: 76px;
+        padding-top: 152px;
+        margin-bottom: 80px;
+        padding-bottom: 0px;
       }
 
       &.no-get-started-button {
@@ -222,7 +223,7 @@ div#wrap {
       }
 
       div.subheadline {
-        color: rgba(#70674B, 0.8);
+        color: rgba($carrot_light_gray_3, 0.8);
         font-size: 24px;
         padding: 0 16px;
         @include avenir_R();
@@ -234,6 +235,7 @@ div#wrap {
         @include mobile(){
           margin-top: 16px;
           font-size: 24px;
+          padding: 0px;
         }
       }
 
@@ -257,7 +259,7 @@ div#wrap {
       div.horizontal-carousell {
         width: 100vw;
         height: 482px;
-        margin-top: 85px;
+        margin-top: 64px;
         margin-left: -32px;
         z-index: 10;
         overflow-x: auto;
@@ -275,6 +277,8 @@ div#wrap {
             height: 482px;
             float: left;
             display: inline;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
           }
 
           img.horizontal-carousell-1 {
@@ -325,6 +329,10 @@ div#wrap {
         max-width: 678px;
         margin: 62px auto 72px;
         text-align: right;
+
+        @include mobile() {
+          margin: 80px auto;
+        }
 
         div.stay-aligned-icon {
           width: 44px;
