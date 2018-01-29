@@ -51,8 +51,6 @@ div#wrap {
 
   div.main.home-page {
     width: 100%;
-    background: linear-gradient(to top, #FBFAF7 70%, #FBE3DD 84%, #FFEFBD 88%, #FFFBED 105%);
-    margin-top: 1px;
 
     @include mobile() {
       padding: 0 32px;
