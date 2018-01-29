@@ -96,21 +96,26 @@
    and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-  [:nav.site-navbar
-    [:div.site-navbar-container
-      [:a.navbar-brand-left
-        {:href "/"}]
-      [:div.site-navbar-right.big-web-only
-        [:a.login
-          {:id "site-header-signup-item"
-           :href "/sign-up"}
-          "Log in"]
-        [:a.start
-          {:id "site-header-login-item"
-           :href "/login"}
-          "Start"]]
-      [:div.mobile-ham-menu.mobile-only
-        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
+    [:nav.site-navbar
+      [:div.site-navbar-container
+        [:a.navbar-brand-left
+          {:href "/"}]
+        [:div.site-navbar-right.big-web-only
+          [:a.login
+            {:id "site-header-login-item"
+             :href "/login"}
+              "Log in"]
+          [:a.start
+            {:id "site-header-signup-item"
+             :href "/sign-up"}
+            "Start"]]
+        [:div.site-navbar-right.mobile-only
+          [:a.start
+            {:id "site-header-mobile-signup-item"
+             :href "/sign-up"}
+              "Start"]]
+        [:div.mobile-ham-menu.mobile-only
+          {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer

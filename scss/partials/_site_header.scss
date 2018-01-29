@@ -52,33 +52,38 @@ nav.site-navbar {
       right: 40px;
       height: 42px;
 
+      a {
+        margin: 0px 0px 0px 8px;
+      }
+
       a.login {
         min-width: 96px;
         height: 42px;
         color: $carrot_light_gray_3;
         @include avenir_M();
         font-size: 16px;
-        padding: 11px 24px;
+        padding: 10px 24px;
         text-align: center;
         margin-top: 0px;
-
-        &.your-boards {
-          text-align: center;
-          opacity: 0.8;
-
-          &:hover {
-            opacity: 1;
-          }
-
-          &:after {
-            background-image: none;
-          }
-        }
+        border-radius: 100px;
+        opacity: 0.8;
 
         &:hover {
-          background-color: #FA6654;
-          color: white;
+          // background-color: #FA6654;
+          // color: white;
           text-decoration: none;
+          opacity: 1;
+        }
+      }
+
+      a.mobile-your-boards {
+        margin-top: 6px;
+
+        img.user-avatar {
+          max-width: 32px;
+          max-height: 32px;
+          float: left;
+          border-radius: 50%;
         }
       }
 
@@ -90,9 +95,46 @@ nav.site-navbar {
         @include avenir_H();
         font-size: 16px;
         color: $carrot_text_blue_3;
-        padding: 11px 24px;
+        padding: 10px 24px;
         text-align: center;
         margin-top: 0px;
+        opacity: 0.8;
+
+        &.your-boards {
+          padding: 7px 16px 7px 8px;
+          span {
+            img.user-avatar {
+              max-width: 26px;
+              max-height: 26px;
+              float: left;
+              border-radius: 50%;
+              margin-right: 12px;
+            }
+
+            span {
+              margin-top: 2px;
+              display: inline-block;
+
+              &:after {
+                content: "";
+                @include image-2x("/img/ML/get_started_arrow_blue");
+                width: 20px;
+                height: 20px;
+                background-size: 20px 20px;
+                background-position: center;
+                background-repeat: no-repeat;
+                float: right;
+                margin-left: 12px;
+                margin-top: 1px;
+              }
+            }
+          }
+        }
+
+        &:hover {
+          text-decoration: none;
+          opacity: 1;
+        }
       }
     }
 
@@ -108,6 +150,10 @@ nav.site-navbar {
       background-repeat: no-repeat;
       padding: 0;
       display: block;
+
+      @include mobile() {
+        left: 32px;
+      }
     }
   }
 }
