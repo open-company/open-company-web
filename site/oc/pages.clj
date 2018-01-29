@@ -70,11 +70,11 @@
         [:div.subheadline.big-web-only
           "Leadership updates that keep everyone aligned"]
         [:div.subheadline.second-line.big-web-only
-          "around what matters most."]
+          "around what matters most"]
         [:div.subheadline.mobile-only
           (str
            "Leadership updates that keep everyone aligned "
-           "around what matters most.")]
+           "around what matters most")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -151,7 +151,7 @@
               [:div.card-icon]
               [:div.card-title
                 (str
-                  "Focused "
+                  "Focused, topic-based "
                   "conversations")]
               [:div.card-content
                 (str
@@ -203,14 +203,14 @@
         [:div.second-section-title
           "Don’t take our word for it"]
         [:div.second-section-subtitle
-          "Here’s how we’re is helping teams like yours."]
+          "Here’s how we’re helping teams like yours."]
         [:div.cards-container.group
           [:div.card
             [:div.card-content
               (str
                "We love Slack for spontaneous "
-               "stuff, but Carrot is the bomb "
-               "for more focused, topic-based "
+               "stuff, but Carrot for more "
+               "focused, topic-based "
                "conversations.")]
             [:div.card-author
               [:img.card-avatar
@@ -222,13 +222,11 @@
           [:div.card
             [:div.card-content
               (str
-               "Crucial updates we're "
-               "drowned out with \"taco "
-               "Tuesday?\" and a healthy dose "
-               "of amazing memes. Chat is "
-               "fun, but hard to compete with "
-               "when you need to make sure "
-               "something is heard.")]
+               "Crucial updates get drowned "
+               "out by \"taco "
+               "Tuesday?\" and silly memes. "
+               "Carrot makes sure the "
+               "important stuff is always there.")]
             [:div.card-author
               [:img.card-avatar
                 {:src (cdn "/img/ML/happy_face_purple.svg")}]
@@ -253,11 +251,10 @@
           [:div.card
             [:div.card-content
               (str
-               "I'm never sure if everyone in "
-               "my company is getting my "
-               "updates. Carrot is where I can "
-               "track who's viewed what, and "
-               "how everyone is feeling.")]
+               "I never knew if anyone even "
+               "saw my updates! Carrot shows "
+               "me who's viewed what so I know "
+               "who’s engaged and aligned. 🙏")]
             [:div.card-author
               [:img.card-avatar
                 {:src (cdn "/img/ML/happy_face_yellow.svg")}]
@@ -265,6 +262,7 @@
                 "John Smith"]
               [:div.author-company
                 "Acme Co."]]]]]
+
       [:section.third-section
         [:div.third-section-title
           "Keep everyone aligned around what matters most."]

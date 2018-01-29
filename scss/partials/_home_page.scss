@@ -435,6 +435,10 @@ div#wrap {
                 @include image-2x("/img/ML/homepage_card_icon_3");
                 margin-bottom: 31px;
               }
+
+              div.card-title {
+                width: 90%;
+              }
             }
 
             &.card-4 {
