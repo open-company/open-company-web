@@ -3,8 +3,10 @@
 nav.site-navbar {
   height: 72px;
   background-color: white;
-  z-index: 10;
   box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100vw;
+  z-index: 100;
 
   div.site-navbar-container {
     height: 72px;
