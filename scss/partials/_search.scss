@@ -133,6 +133,10 @@ div.search-results {
         }
       }
     }
+
+    div.search-result:last-child {
+      padding: 0px 0px 10px 0px;
+    }
   }
 
   div.show-more {
