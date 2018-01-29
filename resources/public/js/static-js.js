@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     // Remove the get started centered button if the user is signed out
     $("#get-started-centred-bt").css({"display": "none"});
     // Hide the try it box at the bottom of the homepage
-    $("section.fourth-section").css({"display": "none"});
+    $("section.third-section").css({"display": "none"});
     // Remove login button from the site mobile menu
     $("button#site-mobile-menu-login").css({"display": "none"});
     // Change Get started button to Your boards on site mobile menu
