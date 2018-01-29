@@ -87,6 +87,20 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
+        [:div.horizontal-carousell
+          [:div.left-gradient]
+          [:div.right-gradient]
+          [:div.horizontal-carousell-inner
+            [:img.horizontal-carousell-1
+              {:src (cdn "/img/ML/homepage_mobile_screenshot_1.png")
+               :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_1@2x.png") " 2x")}]
+            [:img.horizontal-carousell-2
+              {:src (cdn "/img/ML/homepage_mobile_screenshot_2.png")
+               :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_2@2x.png") " 2x")}]
+            [:img.horizontal-carousell-3
+              {:src (cdn "/img/ML/homepage_mobile_screenshot_3.png")
+               :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_3@2x.png") " 2x")}]]]
+
         [:video.homepage-main-animation
           {:controls false
            :autoPlay true
@@ -182,7 +196,10 @@
                 [:a
                   {:href "/slack"}
                   "Learn more"]]]]]]
+
       [:section.second-section
+        [:div.balloon.big-yellow-1]
+        [:div.balloon.small-blue-1]
         [:div.second-section-title
           "Don’t take our word for it"]
         [:div.second-section-subtitle

@@ -97,6 +97,17 @@
             [:div.fallback
               "Your browser doesn’t support this video format."]]
 
+          [:div.horizontal-carousell
+            [:div.left-gradient]
+            [:div.right-gradient]
+            [:div.horizontal-carousell-inner
+              [:img.horizontal-carousell-1
+                {:src (retina-src "/img/ML/homepage_mobile_screenshot_1")}]
+              [:img.horizontal-carousell-2
+                {:src (retina-src "/img/ML/homepage_mobile_screenshot_2")}]
+              [:img.horizontal-carousell-3
+                {:src (retina-src "/img/ML/homepage_mobile_screenshot_3")}]]]
+
           [:div.stay-aligned-container
             [:div.stay-aligned-icon]
             [:div.stay-aligned-message
@@ -181,6 +192,8 @@
                     "Learn more"]]]]]]
 
         [:section.second-section
+          [:div.balloon.big-yellow-1]
+          [:div.balloon.small-blue-1]
           [:div.second-section-title
             "Don’t take our word for it"]
           [:div.second-section-subtitle
