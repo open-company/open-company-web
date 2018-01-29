@@ -82,46 +82,47 @@
                              (reset! (::window-click s) nil))
                            s)}
   [s]
-  (let [search-results (drv/react s store/search-key)
-        search-active? (drv/react s store/search-active?)]
-    [:div.search-box {:class (when @(::search-clicked? s) "active")}
-      [:button.search-close {:class (when (not @(::search-clicked? s))
-                                      "inactive")
-                             :on-click #(search-inactive s)}]
-      [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")
-                      :on-click (fn [e]
-                                  (reset! (::search-clicked? s) true)
-                                  (.focus (rum/ref-node s "search-input")))}]
-      [:input.search
-        {:ref "search-input"
-         :placeholder "Search"
-         :on-click #(reset! (::search-clicked? s) true)
-         :on-focus #(let [search-query (.-value (rum/ref-node s "search-input"))]
-                      (search/query search-query))
-         :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
-         :on-change #(search/query
-                      (.-value (rum/ref-node s "search-input")))
-         }]
-      [:div.triangle {:class (when (not search-active?) "inactive")}]
-      [:div.search-results {:ref "results"
-                            :class (when (not search-active?) "inactive")}
-        [:div.header
-          [:span "SEARCH RESULTS"]
-          (when (pos? (:count search-results))
-            [:span.count (str "(" (:count search-results) ")")])]
-        [:div.search-results-container
-          (if (pos? (:count search-results))
-            (let [results (reverse (:results search-results))]
-              (for [sr (take @(::page-size s) results)]
-                (let [key (str "result-" (:uuid (:_source sr)))]
-                  (case (:type (:_source sr))
-                    "entry" (rum/with-key (entry-display sr) key)
-                    "board" (rum/with-key (board-display sr) key)))))
-            [:div.empty-result
-              [:div.message "No matching results..."]])]
-        (when (< @(::page-size s) (:count search-results))
-          [:div.show-more
-            {:on-click (fn [e] (reset! (::page-size s)
-                                       (+ @(::page-size s) 15)))}
-            [:button] "Show More"])
-       ]]))
+  (when (store/should-display)
+    (let [search-results (drv/react s store/search-key)
+          search-active? (drv/react s store/search-active?)]
+      [:div.search-box {:class (when @(::search-clicked? s) "active")}
+        [:button.search-close {:class (when (not @(::search-clicked? s))
+                                        "inactive")
+                               :on-click #(search-inactive s)}]
+        [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")
+                        :on-click (fn [e]
+                                    (reset! (::search-clicked? s) true)
+                                    (.focus (rum/ref-node s "search-input")))}]
+       [:input.search
+         {:ref "search-input"
+          :placeholder "Search"
+          :on-click #(reset! (::search-clicked? s) true)
+          :on-focus #(let [search-query (.-value (rum/ref-node s "search-input"))]
+                       (search/query search-query))
+          :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
+          :on-change #(search/query
+                       (.-value (rum/ref-node s "search-input")))
+          }]
+        [:div.triangle {:class (when (not search-active?) "inactive")}]
+        [:div.search-results {:ref "results"
+                              :class (when (not search-active?) "inactive")}
+          [:div.header
+            [:span "SEARCH RESULTS"]
+            (when (pos? (:count search-results))
+              [:span.count (str "(" (:count search-results) ")")])]
+          [:div.search-results-container
+            (if (pos? (:count search-results))
+              (let [results (reverse (:results search-results))]
+                (for [sr (take @(::page-size s) results)]
+                  (let [key (str "result-" (:uuid (:_source sr)))]
+                    (case (:type (:_source sr))
+                      "entry" (rum/with-key (entry-display sr) key)
+                      "board" (rum/with-key (board-display sr) key)))))
+              [:div.empty-result
+                [:div.message "No matching results..."]])]
+         (when (< @(::page-size s) (:count search-results))
+            [:div.show-more
+              {:on-click (fn [e] (reset! (::page-size s)
+                                         (+ @(::page-size s) 15)))}
+              [:button] "Show More"])
+         ]])))

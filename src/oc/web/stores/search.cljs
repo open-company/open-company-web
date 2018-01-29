@@ -1,5 +1,6 @@
 (ns oc.web.stores.search
   (:require [taoensso.timbre :as timbre]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]))
 
 (defonce search-key :search-results)
@@ -8,6 +9,19 @@
 (defn search-results []
   (get-in @dispatcher/app-state search-key))
 
+
+(defn should-display []
+  " If the user is anonymous or not part of the orginization
+    don't display search component.
+  "
+  (timbre/debug jwt/jwt)
+  (timbre/debug (:team-id (dispatcher/org-data)))
+  (timbre/debug (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data))))
+  (if (not (jwt/jwt))
+    false
+    (if (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
+      true
+      false)))
 
 (defn- cleanup-uuid
   [results]
