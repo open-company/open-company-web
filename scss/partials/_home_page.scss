@@ -51,6 +51,7 @@ div#wrap {
 
   div.main.home-page {
     width: 100%;
+    margin-top: 1px;
 
     @include mobile() {
       padding: 0 32px;
