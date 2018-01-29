@@ -559,8 +559,41 @@ div#wrap {
     }
 
     section.fourth-section {
+      text-align: center;
+      padding: 60px 0px;
+
       @include mobile(){
         padding: 60px 32px;
+      }
+
+      div.above-noise-container {
+        width: 1053px;
+        margin: 0px auto;
+
+        @include tablet(){
+          width: 100%;
+          height: auto;
+          text-align: center;
+        }
+
+        div.above-noise-title {
+          color: $carrot_dark_brown_1;
+          @include avenir_H();
+          font-size: 48px;
+          margin-top: 16px;
+        }
+
+        div.above-noise-description {
+          color: $carrot_dark_brown_1;
+          @include avenir_H();
+          font-size: 40px;
+          color: #373f4f;
+          margin-top: 16px;
+        }
+
+        button.get-started-button {
+          margin-top: 60px;
+        }
       }
     }
   }
