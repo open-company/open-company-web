@@ -246,11 +246,12 @@
                   "John Smith"]
                 [:div.author-company
                   "Acme Co."]]]]]
-        [:section.third-section
-          [:div.third-section-title
-            "Keep everyone aligned around what matters most."]
-          [:button.mlb-reset.get-started-button
-            "Get started for free"]]
+        (when-not (jwt/jwt)
+          [:section.third-section
+            [:div.third-section-title
+              "Keep everyone aligned around what matters most."]
+            [:button.mlb-reset.get-started-button
+              "Get started for free"]])
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 
