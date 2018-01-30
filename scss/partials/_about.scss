@@ -145,16 +145,30 @@ div#wrap {
 
       div.team-container{
 
+        @include tablet() {
+          margin-top: 80px;
+        }
+
         div.team-row {
           margin: 0px auto;
           width: 940px;
 
+          @include tablet() {
+            width: 100%;
+            max-width: 300px;
+          }
+
           &.two-cards {
             width: 620px;
+
+            @include tablet() {
+              width: 100%;
+              max-width: 300px;
+            }
           }
 
           div.team-card {
-            float: left;
+            display: inline-block;
             margin-left: 20px;
             margin-top: 20px;
             padding: 40px 50px;
@@ -165,6 +179,14 @@ div#wrap {
             height: 252px;
             position: relative;
             z-index: 2;
+
+            @include tablet() {
+              display: block;
+              width: 100%;
+              max-width: 300px;
+              margin-left: 0px;
+              margin-top: 20px;
+            }
 
             &:first-child {
               margin-left: 0px;
@@ -232,6 +254,12 @@ div#wrap {
         width: 940px;
         margin: 80px auto;
 
+        @include tablet() {
+          margin: 40px auto;
+          width: 100%;
+          max-width: 300px;
+        }
+
         div.other-card {
           margin-left: 40px;
           background-color: transparent;
@@ -242,6 +270,15 @@ div#wrap {
           width: 450px;
           height: 296px;
           display: inline-block;
+
+          @include tablet() {
+            display: block;
+            margin-left: 0px;
+            height: auto;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+          }
 
           &:first-child {
             margin-left: 0px;
