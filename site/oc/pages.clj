@@ -399,7 +399,9 @@
               (str
                "Want to join us? We are always looking for "
                "amazing people no matter where they live. ")]
-            [:button.mlb-reset.mlb-default
+            [:a.card-button
+              {:href (:contact-mail-to options)
+               :onTouchStart ""}
               "Say hello!"]]
           [:div.other-card.oss-card
             [:div.card-icon]
@@ -409,7 +411,10 @@
               (str
                "Have an idea you’d like to contribute? A new "
                "integration you’d like to see?")]
-            [:button.mlb-reset.mlb-default
+            [:a.card-button
+              {:href "https://github.com/open-company"
+               :onTouchStart ""
+               :target "_blank"}
               "Build with us on GitHub"]]]
 
         [:div.about-alignment

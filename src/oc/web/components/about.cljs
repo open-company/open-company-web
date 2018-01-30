@@ -2,15 +2,16 @@
   "About page component, this is copied into oc.pages/about and
    every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.user :as user]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.user :as user]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.site-header :refer (site-header)]
-            [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
+            [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defcs about
@@ -99,7 +100,9 @@
                 (str
                  "Want to join us? We are always looking for "
                  "amazing people no matter where they live. ")]
-              [:button.mlb-reset.mlb-default
+              [:a.card-button
+                {:href oc-urls/contact-mail-to
+                 :on-touch-start identity}
                 "Say hello!"]]
             [:div.other-card.oss-card
               [:div.card-icon]
@@ -109,7 +112,10 @@
                 (str
                  "Have an idea you’d like to contribute? A new "
                  "integration you’d like to see?")]
-              [:button.mlb-reset.mlb-default
+              [:a.card-button
+                {:href "https://github.com/open-company"
+                 :on-touch-start identity
+                 :target "_blank"}
                 "Build with us on GitHub"]]]
 
           [:div.about-alignment

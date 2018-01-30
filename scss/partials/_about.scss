@@ -322,7 +322,7 @@ div#wrap {
             margin-top: 16px;
           }
 
-          button.mlb-reset.mlb-default {
+          a.card-button {
             width: 240px;
             height: 40px;
             @include avenir_M();
@@ -331,6 +331,8 @@ div#wrap {
             background-color: $carrot_green_3;
             border-radius: 100px;
             margin-top: 16px;
+            display: block;
+            padding: 10px 16px;
           }
         }
       }
