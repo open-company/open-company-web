@@ -83,12 +83,25 @@ div#wrap {
 
       &.no-get-started-button {
         div.balloon {
+
           &.big-green {
-            top: 321px;
+            top: 351px;
           }
 
-          &.small-purple {
-            top: 294px;
+          &.small-red {
+            top: 523px;
+          }
+
+          &.small-purple-2 {
+            top: 1538px;
+          }
+
+          &.big-green-2 {
+            top: 1843px;
+          }
+
+          &.small-yellow {
+            top: 2001px;
           }
         }
       }
