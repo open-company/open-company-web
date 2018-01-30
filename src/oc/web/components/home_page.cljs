@@ -203,9 +203,9 @@
               [:div.card-content
                 (str
                  "We love Slack for spontaneous "
-                 "stuff, but Carrot for more "
-                 "focused, topic-based "
-                 "conversations.")]
+                 "stuff, but when it’s time to "
+                 "post key updates that can’t "
+                 "be missed, Carrot is awesome.")]
               [:div.card-author
                 [:img.card-avatar
                   {:src (utils/cdn "/img/ML/happy_face_blue.svg")}]
@@ -216,11 +216,10 @@
             [:div.card
               [:div.card-content
                 (str
-                 "Crucial updates get drowned "
-                 "out by \"taco "
-                 "Tuesday?\" and silly memes. "
-                 "Carrot makes sure the "
-                 "important stuff is always there.")]
+                 "Carrot makes sure our crucial "
+                 "updates aren’t drowned out "
+                 "by \"taco Tuesday?\" and "
+                 "silly memes!")]
               [:div.card-author
                 [:img.card-avatar
                   {:src (utils/cdn "/img/ML/happy_face_purple.svg")}]
@@ -245,10 +244,10 @@
             [:div.card
               [:div.card-content
                 (str
-                 "I never knew if anyone even "
-                 "saw my updates! Carrot shows "
-                 "me who's viewed what so I know "
-                 "who’s engaged and aligned. 🙏")]
+                 "Before Carrot, I never knew "
+                 "if anyone saw my updates! "
+                 "Now I know who's engaged "
+                 "and aligned.  🙏")]
               [:div.card-author
                 [:img.card-avatar
                   {:src (utils/cdn "/img/ML/happy_face_yellow.svg")}]
