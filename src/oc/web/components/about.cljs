@@ -30,6 +30,8 @@
           [:div.balloon.small-green-face]
           [:div.balloon.small-blue]
           [:div.balloon.small-purple]
+          [:div.balloon.big-yellow]
+          [:div.balloon.small-purple-1]
 
           [:h1.about "About us"]
           [:div.about-subline

@@ -18,7 +18,7 @@ div#wrap {
 
     section.about-header {
       padding-top: 72px;
-      padding-bottom: 0px;
+      padding-bottom: 80px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -77,6 +77,27 @@ div#wrap {
           top: 149px;
           right: 184px;
         }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow_1");
+          background-size: 135px 135px;
+          width: 135px;
+          height: 135px;
+          top: 787px;
+          left: 50%;
+          margin-left: 226px;
+        }
+
+        &.small-purple-1 {
+          @include image-2x("/img/ML/about_balloon_small_purple_1");
+          background-size: 50px 44px;
+          width: 50px;
+          height: 44px;
+          top: 869px;
+          left: 50%;
+          margin-left: 340px;
+          transform: rotate(90deg);
+        }
       }
 
       h1.about {
@@ -93,7 +114,7 @@ div#wrap {
         font-size: 24px;
         color: rgba($carrot_light_gray_3, 0.8);
         max-width: 660px;
-        margin: 6px auto 80px;
+        margin: 6px auto 60px;
 
         @include tablet(){
           width: 100%;
@@ -122,6 +143,8 @@ div#wrap {
             text-align: center;
             width: 300px;
             height: 252px;
+            position: relative;
+            z-index: 2;
 
             &:first-child {
               margin-left: 0px;
