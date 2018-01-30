@@ -28,5 +28,8 @@
       (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
     (reset)))
 
+(defn result-clicked [url]
+  (dispatcher/dispatch! [:search-result-clicked])
+  (utils/after 10 (router/nav! url)))
 
-(defn result-clicked [url] (utils/after 10 (router/nav! url)))
+

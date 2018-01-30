@@ -84,8 +84,8 @@
             [:button] "Show More"])]))
 
 (defn search-inactive [s]
-  (reset! (::search-clicked? s) false)
   (set! (.-value (rum/ref-node s "search-input")) "")
+  (reset! (::search-clicked? s) false)
   (search/inactive))
 
 (rum/defcs search-box < (drv/drv store/search-key)
@@ -94,7 +94,16 @@
                         rum/static
                         (rum/local nil ::window-click)
                         (rum/local false ::search-clicked?)
-                        {:will-mount (fn [s]
+                        {:after-render (fn [s]
+                                         (when (and
+                                                (pos?
+                                                 (count @store/savedsearch))
+                                                (not
+                                                 @(::search-clicked? s)))
+                                           (.click
+                                            (rum/ref-node s "spyglass")))
+                                         s)
+                         :will-mount (fn [s]
                           (search/inactive)
                           (reset! (::window-click s)
                             (events/listen
@@ -122,6 +131,7 @@
                                         "inactive")
                                :on-click #(search-inactive s)}]
         [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")
+                        :ref "spyglass"
                         :class (when (not @(::search-clicked? s)) "inactive")
                         :on-click (fn [e]
                                     (let [searchel
@@ -134,6 +144,7 @@
           {:class (when (not @(::search-clicked? s)) "inactive")
            :ref "search-input"
            :placeholder "Search"
+           :value @store/savedsearch
            :on-click #(reset! (::search-clicked? s) true)
            :on-focus #(let [search-query (.-value (rum/ref-node s "search-input"))]
                         (search/query search-query))
