@@ -32,6 +32,8 @@
           [:div.balloon.small-purple]
           [:div.balloon.big-yellow]
           [:div.balloon.small-purple-1]
+          [:div.balloon.small-purple-2]
+          [:div.balloon.small-blue-1]
 
           [:h1.about "About us"]
           [:div.about-subline
@@ -86,7 +88,39 @@
                   "Software Engineer"]
                 [:a.linkedin-link
                   {:href "https://www.linkedin.com/in/nathanzorn/"
-                   :target "_blank"}]]]]]
+                   :target "_blank"}]]]]
+
+          [:div.other-cards.group
+            [:div.other-card.heart-card
+              [:div.card-icon]
+              [:div.card-title
+                "Careers at Carrot"]
+              [:div.card-content
+                (str
+                 "Want to join us? We are always looking for "
+                 "amazing people no matter where they live. ")]
+              [:button.mlb-reset.mlb-default
+                "Say hello!"]]
+            [:div.other-card.oss-card
+              [:div.card-icon]
+              [:div.card-title
+                "We’re Crazy for Open Source"]
+              [:div.card-content
+                (str
+                 "Have an idea you’d like to contribute? A new "
+                 "integration you’d like to see?")]
+              [:button.mlb-reset.mlb-default
+                "Build with us on GitHub"]]]
+
+          [:div.about-alignment
+            "Keep everyone aligned around what matters most."]
+          [:div.get-started-button-container
+            (when-not (jwt/jwt)
+              [:button.mlb-reset.get-started-button
+                {:on-click #(if (utils/in? (:route @router/path) "login")
+                              (user/show-login :signup-with-slack)
+                              (router/nav! oc-urls/sign-up))}
+                "Get started for free"])]]
       ] ;<!-- main -->
     ] ; <!-- wrap -->
 

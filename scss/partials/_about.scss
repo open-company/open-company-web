@@ -98,6 +98,26 @@ div#wrap {
           margin-left: 340px;
           transform: rotate(90deg);
         }
+
+        &.small-purple-2 {
+          @include image-2x("/img/ML/about_balloon_small_purple_2");
+          background-size: 17px 15px;
+          width: 17px;
+          height: 15px;
+          top: 1298px;
+          left: 50%;
+          margin-left: -556px;
+        }
+
+        &.small-blue-1 {
+          @include image-2x("/img/ML/about_balloon_small_blue_1");
+          background-size: 47px 48px;
+          width: 47px;
+          height: 48px;
+          top: 1332px;
+          left: 50%;
+          margin-left: -539px;
+        }
       }
 
       h1.about {
@@ -206,6 +226,87 @@ div#wrap {
             }
           }
         }
+      }
+
+      div.other-cards.group {
+        width: 940px;
+        margin: 80px auto;
+
+        div.other-card {
+          margin-left: 40px;
+          background-color: transparent;
+          border-radius: 8px;
+          border: 1px solid #EAE9E4;
+          padding: 40px;
+          text-align: center;
+          width: 450px;
+          height: 296px;
+          display: inline-block;
+
+          &:first-child {
+            margin-left: 0px;
+          }
+
+          &.heart-card {
+            div.card-icon {
+              width: 40px;
+              height: 37px;
+              background-size: 40px 37px;
+              @include image-2x("/img/ML/about_heart_icon");
+            }
+          }
+
+          &.oss-card {
+            div.card-icon {
+              width: 40px;
+              height: 44px;
+              background-size: 40px 44px;
+              @include image-2x("/img/ML/about_oss_icon");
+            }
+          }
+
+          div.card-icon {
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px auto;
+          }
+
+          div.card-title {
+            @include avenir_M();
+            font-size: 20px;
+            color: $carrot_dark_gray;
+            margin-top: 16px;
+          }
+
+          div.card-content {
+            @include avenir_R();
+            font-size: 18px;
+            color: rgba($carrot_light_gray_3, 0.8);
+            margin-top: 16px;
+          }
+
+          button.mlb-reset.mlb-default {
+            width: 240px;
+            height: 40px;
+            @include avenir_M();
+            font-size: 16px;
+            color: $carrot_green_2;
+            background-color: $carrot_green_3;
+            border-radius: 100px;
+            margin-top: 16px;
+          }
+        }
+      }
+
+      div.about-alignment {
+        @include avenir_M();
+        font-size: 34px;
+        color: $carrot_dark_gray;
+        margin: 80px auto 0px;
+      }
+
+      button.get-started-button.bottom-button {
+        margin-top: 20px;
       }
     }
   }
