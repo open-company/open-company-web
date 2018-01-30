@@ -84,9 +84,9 @@
            :target "_blank"}
           "Blog"]]]
     [:div.site-mobile-menu-footer
-      [:button.mlb-reset.mlb-default
+      [:button.mlb-reset.login-btn
         {:id "site-mobile-menu-login"}
-        "Log In"]
+        "Log in"]
       [:button.mlb-reset.get-started-button
         {:id "site-mobile-menu-getstarted"}
         "Get started for free"]]])
