@@ -316,6 +316,7 @@ div#wrap {
         z-index: 10;
         position: relative;
         border-radius: 8px;
+        box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
 
         @include tablet() {
           width: 100%;
