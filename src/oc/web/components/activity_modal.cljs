@@ -46,28 +46,17 @@
 ;; Modal dismiss handling
 
 (defn dismiss-modal [s board-filters]
-  (let [org (router/current-org-slug)
-        board (router/current-board-slug)
-        modal-data @(drv/get-ref s :modal-data)
+  (let [modal-data @(drv/get-ref s :modal-data)
+        activity-data (:activity-data modal-data)
         current-board-filters (:board-filters modal-data)]
-    (router/nav!
-      (if (string? board-filters)
-        (oc-urls/board-filter-by-topic org board board-filters)
-        (if (:from-all-posts @router/path)
-          (oc-urls/all-posts org)
-          (if (string? current-board-filters)
-            (oc-urls/board-filter-by-topic org board current-board-filters)
-            (if (= current-board-filters :by-topic)
-              (oc-urls/board-sort-by-topic org board)
-              (oc-urls/board org board))))))))
+    (dis/dispatch!
+     [:activity-modal-fade-out
+      (:board-slug activity-data)
+      (or board-filters current-board-filters)])))
 
 (defn close-clicked [s & [board-filters]]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
-    (if (:from-all-posts @router/path)
-      ;; Remove AP data from the DB to avoid showing results before loading and results again
-      (when (and (not (string? board-filters))
-                 ap-initial-at)
-        (dis/dispatch! [:all-posts-reset]))
+    (when-not (:from-all-posts @router/path)
       ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
       (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
