@@ -8,12 +8,13 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(defn get-started-button [auth-settings]
+(defn get-started-button [auth-settings & [show-disclaimer]]
   (when-not (jwt/jwt)
     [:div
       [:button.signin-with-slack.mlb-reset
@@ -24,17 +25,19 @@
                        (user-actions/login-with-slack auth-link)))}
         "Sign in with"
         [:div.slack-white-icon]]
-      ; [:div.signin-with-slack-description
-      ;   "Securely sign in or sign up with your Slack account."]
-      [:div.signin-with-slack-description ;.second-line
-        "By signing in, you agree to the "
-        [:a
-          {:href oc-urls/terms}
-          "Terms of Use"]
-        " and "
-        [:a
-          {:href oc-urls/privacy}
-          "Privacy Policy."]]]))
+      (when show-disclaimer
+        [:div.signin-with-slack-disclaimer
+          ; [:div.signin-with-slack-description
+          ;   "Securely sign in or sign up with your Slack account."]
+          [:div.signin-with-slack-description ;.second-line
+            "By signing in, you agree to the "
+            [:a
+              {:href oc-urls/terms}
+              "Terms of Use"]
+            " and "
+            [:a
+              {:href oc-urls/privacy}
+              "Privacy Policy."]]])]))
 
 (rum/defcs slack < rum/static
                    rum/reactive
@@ -45,13 +48,28 @@
       [:div.slack-wrap
         {:id "wrap"}
 
-        (site-header)
+        (site-header auth-settings true)
         (site-mobile-menu)
         (login-overlays-handler)
 
         [:div.main.slack.group
+          {:class (when (jwt/jwt) "no-get-started-button")}
           [:section.carrot-plus-slack.group
-            {:class (when (jwt/jwt) "no-get-started-button")}
+            ;; Top Left
+            [:div.balloon.big-green]
+            [:div.balloon.small-purple]
+            [:div.balloon.small-yellow]
+            ;; Top Right
+            [:div.balloon.big-red]
+            [:div.balloon.small-yellow-face]
+            [:div.balloon.small-purple-1]
+            ;; Center Left
+            [:div.balloon.big-blue]
+            [:div.balloon.small-purple-2]
+            [:div.balloon.small-green]
+            [:div.balloon.big-purple]
+            [:div.balloon.small-red]
+
 
             [:div.carrot-plus-slack]
 
@@ -64,30 +82,11 @@
               [:div.slack-subline
                  "around what matters most."]]
 
-            (get-started-button auth-settings)
+            (get-started-button auth-settings true)
 
-            [:video.slack-main-animation
-              {:controls false
-               :auto-play true
-               :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
-               :loop true}
-              [:source
-                {:src (utils/cdn "/img/ML/animation.webm")
-                 :type "video/webm"}]
-              [:source
-                {:src (utils/cdn "/img/ML/animation.mp4")
-                 :type "video/mp4"}]
-              [:div.fallback
-                "Your browser doesn’t support this video format."]]
+            shared-misc/video
 
-            [:div.horizontal-carousell
-              [:div.horizontal-carousell-inner
-                [:img.horizontal-carousell-1
-                  (utils/retina-src "/img/ML/homepage_mobile_screenshot_1")]
-                [:img.horizontal-carousell-2
-                  (utils/retina-src "/img/ML/homepage_mobile_screenshot_2")]
-                [:img.horizontal-carousell-3
-                  (utils/retina-src "/img/ML/homepage_mobile_screenshot_3")]]]
+            shared-misc/horizontal-carousell
 
             [:div.designed-for-container
               [:div.designed-for
@@ -98,83 +97,18 @@
                  "With Carrot, the important stuff rises above the noise "
                  "keeping everyone on the same page.")]]
 
-            [:div.cards-container
-              [:div.cards-row.group
-                [:div.card.card-1
-                  [:div.card-icon]
-                  [:div.card-title
-                    (str
-                     "Highlight what’s "
-                     "important")]
-                  [:div.card-content
-                    (str
-                      "Elevate key updates above "
-                      "the noise so they won’t be "
-                      "missed. It’s perfect for "
-                      "distributed teams, too.")]]
-                [:div.card.card-2
-                  [:div.card-icon]
-                  [:div.card-title
-                    (str
-                      "Cross-team "
-                      "awareness")]
-                  [:div.card-content
-                    (str
-                      "Keep teams in sync with "
-                      "each other so you can see "
-                      "what’s happening across "
-                      "the company.")]]
-                [:div.card.card-3
-                  [:div.card-icon]
-                  [:div.card-title
-                    (str
-                      "Focused, topic-based "
-                      "conversations")]
-                  [:div.card-content
-                    (str
-                      "Capture team reactions, "
-                      "comments and questions "
-                      "together in one place.")]]]
-              [:div.cards-row.group
-                [:div.card.card-4
-                  [:div.card-icon]
-                  [:div.card-title
-                    (str
-                      "The whole "
-                      "story")]
-                  [:div.card-content
-                    (str
-                      "New employees get up to "
-                      "speed quickly with the full "
-                      "picture in one place.")]]
-                [:div.card.card-5
-                  [:div.card-icon]
-                  [:div.card-title
-                    (str
-                      "Visible "
-                      "engagement")]
-                  [:div.card-content
-                    (str
-                      "Carrot measures team "
-                      "engagement so leaders "
-                      "can actually see if their "
-                      "teams are aligned or not.")]]
-                [:div.card.card-6
-                  [:div.card-icon]
-                  [:div.card-title
-                    (str
-                      "In sync "
-                      "with Slack")]
-                  [:div.card-content
-                    (str
-                      "Communication is "
-                      "automatically shared to the "
-                      "right channel. ")
-                    [:a
-                      {:href oc-urls/slack
-                       :on-click #(router/nav! oc-urls/slack)}
-                      "Learn more"]]]]]
+            shared-misc/carrot-cards]
 
-          ]]]
+          shared-misc/carrot-testimonials
+
+          (when-not (jwt/jwt)
+            [:section.third-section
+              [:div.third-section-title
+                (str
+                 "Slack keeps your team connected in the moment. "
+                 "Carrot keeps it aligned over time.")]
+              (get-started-button auth-settings)])
+
+          ]]
 
         (site-footer)]))

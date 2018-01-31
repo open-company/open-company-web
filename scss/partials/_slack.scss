@@ -1,3 +1,50 @@
+button.signin-with-slack {
+  width: 280px;
+  height: 48px;
+  margin-top: 32px;
+  background-color: $carrot_orange_2;
+  border-radius: 100px;
+  padding: 12px 50px;
+  @include avenir_H();
+  font-size: 18px;
+  color: white;
+  text-align: left;
+
+  div.slack-white-icon {
+    width: 70px;
+    height: 21px;
+    @include image-2x("/img/ML/slack_white_icon");
+    background-repeat: no-repeat;
+    background-size: 70px 21px;
+    float: right;
+  }
+}
+
+div.signin-with-slack-description {
+  @include avenir_M();
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(#8D8162, 0.6);
+  margin: 20px auto 0px;
+  width: 500px;
+
+  a {
+    color: rgba(#8D8162, 0.6);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &.second-line {
+    margin-top: 0px;
+  }
+
+  @include mobile(){
+    width: 100%;
+  }
+}
+
 div#wrap {
   div.main.slack {
     text-align: center;
@@ -6,6 +53,43 @@ div#wrap {
     background-size: 1937px 1550px;
     background-position: center 520px;
     background-repeat: no-repeat;
+
+    @include tablet() {
+      background-position: center 877px;
+      background-size: 2020px 1616px;
+    }
+
+    &.no-get-started-button {
+      background-position: center 389px;
+
+      @include tablet() {
+        background-position: center 746px;
+      }
+
+      section.carrot-plus-slack {
+        div.balloon {
+          &.big-blue {
+            top: 429px;
+          }
+
+          &.small-purple-2 {
+            top: 416px;
+          }
+
+          &.small-green {
+            top: 1649px;
+          }
+
+          &.big-purple {
+            top: 2059px;
+          }
+
+          &.small-red {
+            top: 2236px;;
+          }
+        }
+      }
+    }
 
     @include mobile() {
       padding: 0 32px;
@@ -19,80 +103,14 @@ div#wrap {
 
     section.carrot-plus-slack {
       padding-top: 72px;
-      padding-bottom: 0px;
+      padding-bottom: 232px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
-      button.signin-with-slack {
-        width: 280px;
-        height: 48px;
-        margin-top: 32px;
-        background-color: #FA6654;
-        border-radius: 100px;
-        padding: 12px 50px;
-        @include avenir_H();
-        font-size: 18px;
-        color: white;
-        text-align: left;
-
-        div.slack-white-icon {
-          width: 70px;
-          height: 21px;
-          @include image-2x("/img/ML/slack_white_icon");
-          background-repeat: no-repeat;
-          background-size: 70px 21px;
-          float: right;
-        }
-      }
-
-      div.signin-with-slack-description {
-        @include avenir_M();
-        font-size: 14px;
-        line-height: 20px;
-        color: rgba(#8D8162, 0.6);
-        margin: 20px auto 0px;
-        width: 500px;
-
-        a {
-          color: rgba(#8D8162, 0.6);
-          text-decoration: none;
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-
-        &.second-line {
-          margin-top: 0px;
-        }
-
-        @include mobile(){
-          width: 100%;
-        }
-      }
-
-      @include mobile(){
+      @include tablet(){
         overflow: visible;
-      }
-
-      &.no-get-started-button {
-        div.balloon {
-          &.big-blue {
-            top: 391px;
-          }
-
-          &.big-purple-1 {
-            top: 957px;
-          }
-
-          &.small-purple {
-            top: 374px;
-          }
-
-          &.small-green-face {
-            top: 886px;
-          }
-        }
+        padding: 80px 0px;
       }
 
       div.balloon {
@@ -105,7 +123,109 @@ div#wrap {
           display: none;
         }
 
-        
+        &.big-green {
+          @include image-2x("/img/ML/slack_balloon_big_green");
+          background-size: 172px 172px;
+          width: 172px;
+          height: 172px;
+          top: 6px;
+          left: -76px;
+        }
+
+        &.big-red {
+          @include image-2x("/img/ML/slack_balloon_big_red");
+          background-size: 226px 209px;
+          width: 226px;
+          height: 209px;
+          top: -10px;
+          right: -55px;
+        }
+
+        &.small-purple {
+          @include image-2x("/img/ML/slack_balloon_small_purple");
+          background-size: 75px 76px;
+          width: 75px;
+          height: 76px;
+          top: 122px;
+          left: 40px;
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/slack_balloon_small_yellow");
+          background-size: 17px 15px;
+          width: 17px;
+          height: 15px;
+          top: 115px;
+          left: 155px;
+        }
+
+        &.small-yellow-face {
+          @include image-2x("/img/ML/slack_balloon_small_yellow_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 212px;
+          right: 211px;
+        }
+
+        &.small-purple-1 {
+          @include image-2x("/img/ML/slack_balloon_small_purple_1");
+          background-size: 23px 21px;
+          width: 23px;
+          height: 21px;
+          top: 260px;
+          right: 152px;
+        }
+
+
+        &.big-blue {
+          @include image-2x("/img/ML/slack_balloon_big_blue");
+          background-size: 200px 172px;
+          width: 200px;
+          height: 172px;
+          top: 550px;
+          left: 50%;
+          margin-left: -554px;
+        }
+
+        &.small-purple-2 {
+          @include image-2x("/img/ML/slack_balloon_small_purple_1");
+          background-size: 23px 21px;
+          width: 23px;
+          height: 21px;
+          top: 537px;
+          left: 50%;
+          margin-left: -330px; 
+        }
+
+        &.small-green {
+          @include image-2x("/img/ML/slack_balloon_small_green");
+          background-size: 33px 30px;
+          width: 33px;
+          height: 30px;
+          top: 1770px;
+          right: 187px;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/slack_balloon_big_purple");
+          background-size: 201px 172px;
+          width: 201px;
+          height: 172px;
+          top: 2180px;
+          left: 50%;
+          margin-left: 319px;
+        }
+
+        &.small-red {
+          @include image-2x("/img/ML/slack_balloon_small_red");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 2357px;
+          left: 50%;
+          margin-left: 286px;
+        }
       }
 
       div.carrot-plus-slack {
@@ -148,76 +268,6 @@ div#wrap {
         }
       }
 
-      div.horizontal-carousell {
-        width: 100vw;
-        height: 482px;
-        margin-top: 64px;
-        margin-left: -32px;
-        z-index: 10;
-        overflow-x: auto;
-
-        @include big_web(){
-          display: none;
-        }
-
-        div.horizontal-carousell-inner {
-          width: calc(893px + 24px);
-          height: 482px;
-
-          img {
-            width: 271px;
-            height: 482px;
-            float: left;
-            display: inline;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
-          }
-
-          img.horizontal-carousell-1 {
-            margin-left: 32px;
-          }
-
-          img.horizontal-carousell-2 {
-            margin-left: 20px;
-          }
-
-          img.horizontal-carousell-3 {
-            margin-left: 20px;
-            margin-right: 32px;
-          }
-        }
-      }
-
-      video.slack-main-animation {
-        width: 940px;
-        margin: 85px auto 0px;
-        padding: 0;
-        z-index: 10;
-        position: relative;
-        border-radius: 8px;
-        box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
-
-        @include tablet() {
-          width: 100%;
-        }
-
-        @include mobile() {
-          display: none;
-        }
-
-        img.homepage-main-screenshot {
-          width: 940px;
-          margin-left: -16px;
-          padding: 0;
-
-          @include mobile() {
-            width: 100%;
-            height: auto;
-            margin: 0px;
-          }
-        }
-      }
-
       div.designed-for-container {
         margin: 72px auto 80px;
 
@@ -241,136 +291,17 @@ div#wrap {
           margin: 22px auto 0px;
         }
       }
+    }
 
-      div.cards-container {
-        max-width: 940px;
-        margin: 0px auto;
-        position: relative;
-        z-index: 2;
+    section.third-section {
+      text-align: center;
+      max-width: 800px;
+      margin: 72px auto;
 
-        div.cards-row {
-          margin-top: 20px;
-
-          div.card {
-            &:not(:first-child) {
-              margin-left: 20px;
-            }
-
-            text-align: left;
-            float: left;
-            width: 300px;
-            height: 332px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.07);
-            padding: 40px;
-
-            @include tablet() {
-              float: none;
-              margin: 20px auto 0px;
-
-              &:not(:first-child) {
-                margin: 20px auto 0px;
-              }
-            }
-
-            div.card-icon {
-              background-repeat: no-repeat;
-              background-position: center;
-            }
-
-            div.card-title {
-              @include avenir_M();
-              font-size: 20px;
-              color: $carrot_dark_gray;
-              width: 70%;
-            }
-
-            div.card-content {
-              @include avenir_R();
-              font-size: 18px;
-              color: rgba($carrot_dark_gray, 0.8);
-              margin-top: 11px;
-
-              a {
-                color: $carrot_text_blue_3;
-                text-decoration: none;
-              }
-            }
-
-            &.card-1 {
-              div.card-icon {
-                width: 44px;
-                height: 41px;
-                background-size: 44px 41px;
-                @include image-2x("/img/ML/homepage_card_icon_1");
-                margin-bottom: 35px;
-              }
-            }
-
-            &.card-2 {
-              div.card-icon {
-                width: 40px;
-                height: 40px;
-                background-size: 40px 40px;
-                @include image-2x("/img/ML/homepage_card_icon_2");
-                margin-bottom: 36px;
-              }
-            }
-
-            &.card-3 {
-              div.card-icon {
-                width: 44px;
-                height: 44px;
-                background-size: 44px 44px;
-                @include image-2x("/img/ML/homepage_card_icon_3");
-                margin-bottom: 31px;
-              }
-
-              div.card-title {
-                width: 90%;
-              }
-            }
-
-            &.card-4 {
-              div.card-icon {
-                width: 32px;
-                height: 40px;
-                background-size: 32px 40px;
-                @include image-2x("/img/ML/homepage_card_icon_4");
-                margin-bottom: 36px;
-              }
-
-              div.card-title {
-                width: 50%;
-              }
-            }
-
-            &.card-5 {
-              div.card-icon {
-                width: 42px;
-                height: 41px;
-                background-size: 42px 41px;
-                @include image-2x("/img/ML/homepage_card_icon_5");
-                margin-bottom: 35px;
-              }
-            }
-
-            &.card-6 {
-              div.card-icon {
-                width: 40px;
-                height: 40px;
-                background-size: 40px 40px;
-                @include image-2x("/img/ML/homepage_card_icon_6");
-                margin-bottom: 36px;
-              }
-
-              div.card-title {
-                width: 43%;
-              }
-            }
-          }
-        }
+      div.third-section-title {
+        @include avenir_M();
+        font-size: 34px;
+        color: $carrot_dark_gray;
       }
     }
   }
