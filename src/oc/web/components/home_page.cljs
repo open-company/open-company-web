@@ -14,10 +14,6 @@
             [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(defn retina-src [url]
-  {:src (utils/cdn (str url ".png"))
-   :src-set (str (utils/cdn (str url "@2x.png")) " 2x")})
-
 (rum/defcs home-page < (rum/local false ::thanks-box-top)
                        (rum/local false ::thanks-box-bottom)
                        (rum/local false ::confirm)
@@ -98,15 +94,13 @@
               "Your browser doesn’t support this video format."]]
 
           [:div.horizontal-carousell
-            [:div.left-gradient]
-            [:div.right-gradient]
             [:div.horizontal-carousell-inner
               [:img.horizontal-carousell-1
-                {:src (retina-src "/img/ML/homepage_mobile_screenshot_1")}]
+                (utils/retina-src "/img/ML/homepage_mobile_screenshot_1")]
               [:img.horizontal-carousell-2
-                {:src (retina-src "/img/ML/homepage_mobile_screenshot_2")}]
+                (utils/retina-src "/img/ML/homepage_mobile_screenshot_2")]
               [:img.horizontal-carousell-3
-                {:src (retina-src "/img/ML/homepage_mobile_screenshot_3")}]]]
+                (utils/retina-src "/img/ML/homepage_mobile_screenshot_3")]]]
 
           [:div.stay-aligned-container
             [:div.stay-aligned-icon]

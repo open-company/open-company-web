@@ -88,8 +88,6 @@
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
         [:div.horizontal-carousell
-          [:div.left-gradient]
-          [:div.right-gradient]
           [:div.horizontal-carousell-inner
             [:img.horizontal-carousell-1
               {:src (cdn "/img/ML/homepage_mobile_screenshot_1.png")
