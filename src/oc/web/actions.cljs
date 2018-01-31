@@ -1117,18 +1117,19 @@
 (defn activity-modal-fade-out
   [db board-slug board-filters]
   (let [from-all-posts (:from-all-posts @router/path)
+        to-board (if from-all-posts "all-posts" board-slug)
         org (router/current-org-slug)
         to-url (if (string? board-filters)
                 (oc-urls/board-filter-by-topic org board-slug board-filters)
                 (if (= board-filters :by-topic)
                   (oc-urls/board-sort-by-topic org board-slug)
-                  (if (:from-all-posts @router/path)
+                  (if from-all-posts
                     (oc-urls/all-posts org)
                     (oc-urls/board org board-slug))))]
     (.pushState (.-history js/window) #js {} "" to-url)
-    (router/set-route! [org board-slug (if from-all-posts "all-posts" "dashboard")]
+    (router/set-route! [org to-board (if from-all-posts "all-posts" "dashboard")]
      {:org org
-      :board board-slug
+      :board to-board
       :activity nil
       :query-params (:query-params @router/path)
       :from-all-posts false}))
