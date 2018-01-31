@@ -1114,12 +1114,47 @@
        (dispatcher/dispatch! [:input [:modal-editing] true])
        (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
 
+(defn activity-modal-fade-out
+  [db board-slug board-filters]
+  (let [from-all-posts (:from-all-posts @router/path)
+        org (router/current-org-slug)
+        to-url (if (string? board-filters)
+                (oc-urls/board-filter-by-topic org board-slug board-filters)
+                (if (= board-filters :by-topic)
+                  (oc-urls/board-sort-by-topic org board-slug)
+                  (if (:from-all-posts @router/path)
+                    (oc-urls/all-posts org)
+                    (oc-urls/board org board-slug))))]
+    (.pushState (.-history js/window) #js {} "" to-url)
+    (router/set-route! [org board-slug (if from-all-posts "all-posts" "dashboard")]
+     {:org org
+      :board board-slug
+      :activity nil
+      :query-params (:query-params @router/path)
+      :from-all-posts false}))
+  (-> db
+    (dissoc :activity-modal-fade-in)
+    (dissoc :dismiss-modal-on-editing-stop)))
+
+(defmethod dispatcher/action :activity-modal-fade-out
+  [db [_ board-slug board-filters]]
+  (if (get-in db [:search-active])
+    db
+    (activity-modal-fade-out db board-slug board-filters)))
+
 (defn activity-modal-fade-in
   [db activity-data editing]
-  (utils/after 10
-   #(let [from-all-posts (= (router/current-board-slug) "all-posts")
-          activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))]
-      (router/nav! (str activity-url (when from-all-posts "?ap")))))
+  (let [org (router/current-org-slug)
+        board (:board-slug activity-data)
+        activity-uuid (:uuid activity-data)
+        to-url (oc-urls/entry board activity-uuid)]
+    (.pushState (.-history js/window) #js {} "" to-url)
+    (router/set-route! [org board activity-uuid "activity"]
+     {:org org
+      :board board
+      :activity activity-uuid
+      :query-params (dissoc (:query-params @router/path) :ap-initial-at)
+      :from-all-posts (= (router/current-board-slug) "all-posts")}))
   (when editing
     (utils/after 100 #(activity-load-cached-item activity-data)))
   (-> db
@@ -1381,12 +1416,6 @@
 (defmethod dispatcher/action :board-edit/dismiss
   [db [_]]
   (dissoc db :board-editing))
-
-(defmethod dispatcher/action :all-posts-reset
- [db [_]]
- (let [org (router/current-org-slug)
-       all-posts-key (dispatcher/all-posts-key org)]
-  (assoc-in db all-posts-key nil)))
 
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
