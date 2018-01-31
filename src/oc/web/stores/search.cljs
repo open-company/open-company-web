@@ -1,5 +1,6 @@
 (ns oc.web.stores.search
   (:require [taoensso.timbre :as timbre]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]))
 
 (defonce search-key :search-results)
@@ -8,6 +9,16 @@
 (defn search-results []
   (get-in @dispatcher/app-state search-key))
 
+
+(defn should-display []
+  " If the user is anonymous or not part of the orginization
+    don't display search component.
+  "
+  (if (not (jwt/jwt))
+    false
+    (if (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
+      true
+      false)))
 
 (defn- cleanup-uuid
   [results]
@@ -20,9 +31,10 @@
 
 (defmethod dispatcher/action :search-query/finish
   [db [_ {:keys [success error body]}]]
-  (let [results (vec (sort-by :created-at (:hits body)))]
+  (let [total-hits (:total body)
+        results (vec (sort-by #(:created-at (:_source %)) (:hits body)))]
     (if success
-      (assoc db search-key (cleanup-uuid results))
+      (assoc db search-key {:count total-hits :results (cleanup-uuid results)})
       db)))
 
 (defmethod dispatcher/action :search-active
@@ -35,4 +47,6 @@
 
 (defmethod dispatcher/action :search-reset
   [db [_]]
-  (assoc db search-key []))
+  (-> db
+      (assoc search-active? false)
+      (assoc search-key [])))

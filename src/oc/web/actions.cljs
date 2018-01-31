@@ -328,6 +328,10 @@
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
+(defmethod dispatcher/action :update [db [_ path value-fn]]
+  (if (fn? value-fn)
+    (update-in db path value-fn)
+    db))
 
 ;; Stripe Payment related actions
 
@@ -1126,7 +1130,9 @@
 
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ activity-data editing]]
-  (activity-modal-fade-in db activity-data editing))
+  (if (get-in db [:search-active])
+    db
+    (activity-modal-fade-in db activity-data editing)))
 
 (defn entry-edit
   [db initial-entry-data]
@@ -1228,7 +1234,9 @@
     ; Remove saved cached item
     (remove-cached-item (-> db edit-key :uuid))
     ; Add the new activity into the board
-    (let [board-key (dispatcher/current-board-key)
+    (let [board-key (if (= (:status activity-data) "published")
+                     (dispatcher/current-board-key)
+                     (dispatcher/board-data-key (router/current-org-slug) utils/default-drafts-board-slug))
           board-data (or (get-in db board-key) utils/default-drafts-board)
           activity-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) board-slug))
           fixed-activity-data (utils/fix-entry activity-data activity-board-data (:topics activity-board-data))

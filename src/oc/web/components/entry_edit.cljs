@@ -107,10 +107,10 @@
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
-  (when-let [headline (sel1 [:div.entry-edit-headline])]
-    (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
-      (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
-      (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
+  (when-let [headline (rum/ref-node state "headline")]
+    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
+                                                          :has-changes true})]))))
 
 ;; Headline setup and paste handler
 
@@ -212,9 +212,9 @@
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::autosave-timer s) (utils/every 5000 autosave))
                           s)
-                         :before-render (fn [s] (calc-entry-edit-modal-height s) s)
-                         :after-render  (fn [s] (should-show-divider-line s) s)
-                         :did-remount (fn [_ s]
+                         :before-render (fn [s]
+                          (calc-entry-edit-modal-height s)
+                          ;; Set or remove the onBeforeUnload prompt
                           (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
                             (set! (.-onbeforeunload js/window)
                              (if save-on-exit
@@ -222,6 +222,7 @@
                                 (save-on-exit? s)
                                 "Do you want to save before leaving?")
                               nil)))
+                          ;; Handle saving/publishing states to dismiss the component
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
                             (when @(::saving s)
@@ -229,22 +230,26 @@
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
                                 (when-not (:error entry-editing)
-                                  ;; If it's not published already redirect to drafts board
-                                  (when (not= (:status entry-editing) "published")
-                                    (utils/after 180 #(router/nav! (oc-urls/drafts (router/current-org-slug)))))
-                                  (real-close s))))
+                                  (let [redirect? (not= (:status entry-editing) "published")]
+                                    ;; If it's not published already redirect to drafts board
+                                    (when redirect?
+                                      (real-close s)
+                                      (utils/after 250
+                                       #(router/nav! (oc-urls/drafts (router/current-org-slug)))))))))
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
-                                ;; Redirect to the publishing board if the slug is available
-                                (when (seq (:board-slug entry-editing))
-                                  (utils/after
-                                   180
-                                   #(router/nav!
-                                     (oc-urls/board (router/current-org-slug) (:board-slug entry-editing)))))
                                 (when-not (:error entry-editing)
-                                  (real-close s)))))
+                                  (let [redirect? (seq (:board-slug entry-editing))]
+                                    ;; Redirect to the publishing board if the slug is available
+                                    (when redirect?
+                                      (real-close s)
+                                      (utils/after
+                                       250
+                                       #(router/nav!
+                                          (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))))))))
                           s)
+                         :after-render  (fn [s] (should-show-divider-line s) s)
                          :will-unmount (fn [s]
                           (when @(::body-editor s)
                             (.destroy @(::body-editor s))
@@ -286,7 +291,7 @@
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})
        :on-click #(when (and (not (:has-changes entry-editing))
-                             (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
+                             (not (utils/event-inside? % (rum/ref-node s "entry-edit-modal"))))
                     (cancel-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
@@ -437,7 +442,10 @@
                                   (clj->js {:container "body"
                                             :placement "top"
                                             :trigger "manual"
-                                            :template "<div class=\"tooltip post-btn-tooltip\"><div class=\"tooltip-arrow\"></div><div class=\"tooltip-inner\"></div></div>"
+                                            :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                             "<div class=\"tooltip-arrow\"></div>"
+                                                             "<div class=\"tooltip-inner\"></div>"
+                                                           "</div>")
                                             :title "A title is required in order to save or share this post."})))
                                (utils/after 10 #(.tooltip $post-btn "show"))
                                (utils/after 5000 #(.tooltip $post-btn "hide"))))))

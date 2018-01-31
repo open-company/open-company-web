@@ -67,7 +67,7 @@ nav.oc-navbar {
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 14px 28px 0;
+    padding: 14px 24px 0;
     height: #{$navbar_height}px;
     width: 100%;
 
@@ -125,10 +125,14 @@ nav.oc-navbar {
 
     div.navbar-left {
       float: left;
-      margin-left: 16px;
-      margin-top: 11px;
+      margin-top: 6px;
       width: 24px;
       height: 24px;
+
+      @include mobile() {
+        margin-top: 8px;
+        margin-left: 16px;
+      }
 
       button.mobile-navigation-sidebar-ham-bt {
         display: none;
