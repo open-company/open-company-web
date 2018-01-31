@@ -70,7 +70,7 @@
         [:div.subheadline.big-web-only
           "Leadership updates that keep everyone aligned"]
         [:div.subheadline.second-line.big-web-only
-          "around what matters most"]
+          "around what matters most."]
         [:div.subheadline.mobile-only
           (str
            "Leadership updates that keep everyone aligned "

@@ -50,10 +50,9 @@
           "Cross-team awareness"]
         [:div.card-content
           (str
-            "At a glance view of what’s "
-            "happening across the company "
-            "keeps teams in sync with "
-            "each other.")]]
+            "See what's happening across "
+            "the company so teams stay "
+            "in sync.")]]
       [:div.card.card-3
         [:div.card-icon]
         [:div.card-title
