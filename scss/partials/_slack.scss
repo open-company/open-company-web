@@ -21,15 +21,15 @@ button.signin-with-slack {
 }
 
 div.signin-with-slack-description {
-  @include avenir_M();
-  font-size: 14px;
-  line-height: 20px;
-  color: rgba(#8D8162, 0.6);
+  @include avenir_BOOK();
+  font-size: 12px;
+  line-height: 19px;
+  color: rgba($carrot_dark_gray, 0.6);
   margin: 20px auto 0px;
   width: 500px;
 
   a {
-    color: rgba(#8D8162, 0.6);
+    color: rgba($carrot_text_blue_3, 0.8);
     text-decoration: none;
     &:hover {
       text-decoration: underline;

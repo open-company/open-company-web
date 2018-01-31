@@ -23,7 +23,7 @@
                      (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                            {:auth-source "slack"})]
                        (user-actions/login-with-slack auth-link)))}
-        "Sign in with"
+        "Sign up with"
         [:div.slack-white-icon]]
       (when show-disclaimer
         [:div.signin-with-slack-disclaimer
