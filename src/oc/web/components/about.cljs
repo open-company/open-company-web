@@ -118,15 +118,16 @@
                  :target "_blank"}
                 "Build with us on GitHub"]]]
 
-          [:div.about-alignment
-            "Keep everyone aligned around what matters most."]
-          [:div.get-started-button-container
-            (when-not (jwt/jwt)
-              [:button.mlb-reset.get-started-button
-                {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (user/show-login :signup-with-slack)
-                              (router/nav! oc-urls/sign-up))}
-                "Get started for free"])]]
+          [:div.about-bottom-get-started
+            [:div.about-alignment
+              "Keep everyone aligned around what matters most."]
+            [:div.get-started-button-container
+              (when-not (jwt/jwt)
+                [:button.mlb-reset.get-started-button
+                  {:on-click #(if (utils/in? (:route @router/path) "login")
+                                (user/show-login :signup-with-slack)
+                                (router/nav! oc-urls/sign-up))}
+                  "Get started for free"])]]]
       ] ;<!-- main -->
     ] ; <!-- wrap -->
 

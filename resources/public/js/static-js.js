@@ -88,8 +88,10 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("#site-header-login-item").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
-    // Remove the get started centered button if the user is signed out
+    // Remove the get started centered button if the user is signed in
     $("#get-started-centred-bt").css({"display": "none"});
+    // Remove the get started bottom button if the user is signed in
+    $("div.about-bottom-get-started").css({"display": "none"});
     // Hide the try it box at the bottom of the homepage
     $("section.third-section").css({"display": "none"});
     // Remove login button from the site mobile menu

@@ -415,12 +415,13 @@
                :target "_blank"}
               "Build with us on GitHub"]]]
 
-        [:div.about-alignment
-          "Keep everyone aligned around what matters most."]
-        [:div.get-started-button-container
-          [:button.mlb-reset.get-started-button.bottom-button
-            {:id "get-started-bottom-bt"}
-            "Get started for free"]]]
+        [:div.about-bottom-get-started
+          [:div.about-alignment
+            "Keep everyone aligned around what matters most."]
+          [:div.get-started-button-container
+            [:button.mlb-reset.get-started-button.bottom-button
+              {:id "get-started-bottom-bt"}
+              "Get started for free"]]]]
     ] ;<!-- main -->
   ])
 
