@@ -3,15 +3,16 @@
    and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.user :as user]
-            [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
+            [oc.web.actions.user :as user]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.try-it-form :refer (get-started-button)]))
 
 ;; NB: this has a clone in oc.core/nav, every change should be reflected there and vice-versa
@@ -24,10 +25,12 @@
   (router/nav! uri))
 
 (rum/defc site-header < rum/static
-  []
+  [auth-settings use-slack-signup-button]
   ; <!-- Nav Bar -->
   (let [logged-in (jwt/jwt)
-        your-boards (when logged-in (utils/your-boards-url))]
+        your-boards (when logged-in (utils/your-boards-url))
+        slack-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                         {:auth-source "slack"})]
     [:nav.site-navbar
       [:div.site-navbar-container
         [:a.navbar-brand-left
@@ -37,28 +40,37 @@
           (when-not logged-in
             [:a.login
               {:href (utils/your-boards-url)
-               :class (when (jwt/jwt) "your-boards")
+               :class (when logged-in "your-boards")
                :on-click (fn [e]
                            (.preventDefault e)
-                           (if (jwt/jwt)
+                           (if logged-in
                              (nav! (utils/your-boards-url) e)
-                             )
+                             (nav! oc-urls/login e))
                            (user/show-login :login-with-slack))}
                 "Log in"])
           [:a.start
-            {:href (if logged-in your-boards oc-urls/sign-up)
-             :class (when logged-in "your-boards")
+            {:href (if logged-in
+                    your-boards
+                    oc-urls/sign-up)
+             :class (utils/class-set {:your-boards logged-in
+                                      :slack-get-started use-slack-signup-button})
              :on-click (fn [e]
                          (.preventDefault e)
                          (if logged-in
                           (nav! your-boards e)
-                          (nav! oc-urls/sign-up e)))}
+                          (if use-slack-signup-button
+                            (user-actions/login-with-slack slack-auth-link)
+                            (nav! oc-urls/sign-up e))))}
             (if logged-in
               [:span
                 [:img.user-avatar
                   {:src (jwt/get-key :avatar-url)}]
-                [:span "Continue to posts"]]
-              "Start")]]
+                [:span "Go to posts"]]
+              (if use-slack-signup-button
+                [:span
+                  "Sign up with "
+                  [:span.slack-orange-icon]]
+                "Start"))]]
         [:div.site-navbar-right.mobile-only
           (if logged-in
             [:a.mobile-your-boards
@@ -70,10 +82,16 @@
               {:href oc-urls/sign-up
                :on-click (fn [e]
                            (.preventDefault e)
-                           (if (jwt/jwt)
+                           (if logged-in
                              (nav! your-boards e)
-                             )
-                           (user/show-login :login-with-slack))}
-                "Start"])]
+                             (if use-slack-signup-button
+                               (user-actions/login-with-slack slack-auth-link)
+                               (nav! oc-urls/sign-up e))))
+               :class (when use-slack-signup-button "slack-get-started")}
+                (if use-slack-signup-button
+                  [:span
+                    "Sign up with "
+                    [:span.slack-orange-icon]]
+                  "Start")])]
         [:div.mobile-ham-menu.mobile-only
           {:on-click #(dis/dispatch! [:site-menu-toggle])}]]]))
