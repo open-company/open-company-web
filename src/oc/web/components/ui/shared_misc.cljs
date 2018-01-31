@@ -96,7 +96,7 @@
         [:div.card-content
           (str
             "Discussions are automatically "
-            "shared to the right channels.")
+            "shared to the right channels. ")
           [:a
             {:href oc-urls/slack
              :on-click #(router/nav! oc-urls/slack)}
