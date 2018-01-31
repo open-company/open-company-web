@@ -141,10 +141,9 @@
                   "awareness")]
               [:div.card-content
                 (str
-                  "Keep teams in sync with "
-                  "each other so you can see "
-                  "what’s happening across "
-                  "the company.")]]
+                  "See what's happening across "
+                  "the company so teams stay "
+                  "in sync.")]]
             [:div.card.card-3
               [:div.card-icon]
               [:div.card-title
