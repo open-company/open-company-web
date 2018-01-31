@@ -36,7 +36,7 @@
         [:div.card-icon]
         [:div.card-title
           (str
-           "Highlight what’s "
+           "Know what’s "
            "important")]
         [:div.card-content
           (str
@@ -47,15 +47,13 @@
       [:div.card.card-2
         [:div.card-icon]
         [:div.card-title
-          (str
-            "Cross-team "
-            "awareness")]
+          "Cross-team awareness"]
         [:div.card-content
           (str
-            "Keep teams in sync with "
-            "each other so you can see "
-            "what’s happening across "
-            "the company.")]]
+            "At a glance view of what’s "
+            "happening across the company "
+            "keeps teams in sync with "
+            "each other.")]]
       [:div.card.card-3
         [:div.card-icon]
         [:div.card-title
@@ -83,14 +81,12 @@
         [:div.card-icon]
         [:div.card-title
           (str
-            "Visible "
-            "engagement")]
+            "Visible engagement")]
         [:div.card-content
           (str
-            "Carrot measures team "
-            "engagement so leaders "
-            "can actually see if their "
-            "teams are aligned or not.")]]
+            "Carrot measures engagement "
+            "so leaders can see if their "
+            "teams are aligned.")]]
       [:div.card.card-6
         [:div.card-icon]
         [:div.card-title
@@ -99,9 +95,8 @@
             "with Slack")]
         [:div.card-content
           (str
-            "Communication is "
-            "automatically shared to the "
-            "right channel. ")
+            "Discussions are automatically "
+            "shared to the right channels.")
           [:a
             {:href oc-urls/slack
              :on-click #(router/nav! oc-urls/slack)}
@@ -127,9 +122,9 @@
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_blue.svg")}]
           [:div.author-name
-            "John Smith"]
+            ""]
           [:div.author-company
-            "Acme Co."]]]
+            ""]]]
       [:div.card
         [:div.card-content
           (str
@@ -141,9 +136,9 @@
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_purple.svg")}]
           [:div.author-name
-            "John Smith"]
+            ""]
           [:div.author-company
-            "Acme Co."]]]
+            ""]]]
       [:div.card
         [:div.card-content
           (str
@@ -155,9 +150,9 @@
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_red.svg")}]
           [:div.author-name
-            "John Smith"]
+            ""]
           [:div.author-company
-            "Acme Co."]]]
+            ""]]]
       [:div.card
         [:div.card-content
           (str
@@ -169,6 +164,6 @@
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_yellow.svg")}]
           [:div.author-name
-            "John Smith"]
+            ""]
           [:div.author-company
-            "Acme Co."]]]]])
+            ""]]]]])

@@ -94,8 +94,8 @@
               [:div.designed-for-content
                 (str
                  "Slack is fun and awesome for real-time work, but gets noisy. "
-                 "With Carrot, the important stuff rises above the noise "
-                 "keeping everyone on the same page.")]]
+                 "With Carrot, leaders rise above the noise "
+                 "to keep everyone on the same page.")]]
 
             shared-misc/carrot-cards]
 
