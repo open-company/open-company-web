@@ -118,7 +118,7 @@
            "stuff, but when it’s time to "
            "post key updates that can’t "
            "be missed, Carrot is awesome.")]
-        [:div.card-author
+        [:div.card-author.group
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_blue.svg")}]
           [:div.author-name
@@ -132,7 +132,7 @@
            "updates aren’t drowned out "
            "by \"taco Tuesday?\" and "
            "silly memes!")]
-        [:div.card-author
+        [:div.card-author.group
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_purple.svg")}]
           [:div.author-name
@@ -146,7 +146,7 @@
            "Carrot, email is finally "
            "obsolete for team updates "
            "and the rest.")]
-        [:div.card-author
+        [:div.card-author.group
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_red.svg")}]
           [:div.author-name
@@ -160,7 +160,7 @@
            "if anyone saw my updates! "
            "Now I know who's engaged "
            "and aligned.  🙏")]
-        [:div.card-author
+        [:div.card-author.group
           [:img.card-avatar
             {:src (utils/cdn "/img/ML/happy_face_yellow.svg")}]
           [:div.author-name

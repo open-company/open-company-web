@@ -82,6 +82,8 @@ div.cards-container {
       @include tablet() {
         float: none;
         margin: 20px auto 0px;
+        width: 100%;
+        height: auto;
 
         &:not(:first-child) {
           margin: 20px auto 0px;
@@ -98,6 +100,10 @@ div.cards-container {
         font-size: 20px;
         color: $carrot_dark_gray;
         width: 70%;
+
+        @include tablet() {
+          width: 100%;
+        }
       }
 
       div.card-content {
@@ -143,6 +149,10 @@ div.cards-container {
 
         div.card-title {
           width: 90%;
+
+          @include tablet() {
+            width: 100%;
+          }
         }
       }
 
@@ -157,6 +167,10 @@ div.cards-container {
 
         div.card-title {
           width: 50%;
+
+          @include tablet() {
+            width: 100%;
+          }
         }
       }
 
@@ -265,6 +279,7 @@ section.testimonials-section {
       @include tablet() {
         float: unset;
         margin: 20px auto 0px;
+        width: 100%;
       }
 
       &:not(:first-child) {

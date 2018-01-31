@@ -300,6 +300,15 @@ div#wrap {
               background-size: 40px 44px;
               @include image-2x("/img/ML/about_oss_icon");
             }
+
+            a.card-button {
+              @include tablet(){
+                @include tablet() {
+                  width: calc(100% + 32px);
+                  margin-left: -16px;
+                }
+              }
+            }
           }
 
           div.card-icon {
@@ -333,6 +342,10 @@ div#wrap {
             display: block;
             padding: 10px 16px;
             margin: 16px auto 0px;
+
+            @include tablet() {
+              width: 100%;
+            }
           }
         }
       }
