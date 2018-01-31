@@ -2,8 +2,10 @@ div#wrap {
   div.main.slack {
     text-align: center;
     width: 100%;
-    background: linear-gradient(to top, #FBFAF7 40%, #FBE3DD 64%, #FFEFBD 88%, #FFFBED 125%);
-    margin-top: 1px;
+    background-image: cdnUrl("/img/ML/slack_yellow_bg.svg");
+    background-size: 1937px 1550px;
+    background-position: center 520px;
+    background-repeat: no-repeat;
 
     @include mobile() {
       padding: 0 32px;
@@ -15,59 +17,59 @@ div#wrap {
       }
     }
 
-    button.signin-with-slack {
-      width: 280px;
-      height: 48px;
-      margin-top: 33px;
-      background-color: $carrot_text_blue;
-      border-radius: 100px;
-      padding: 12px 50px;
-      @include avenir_H();
-      font-size: 18px;
-      color: white;
-      text-align: left;
-
-      div.slack-white-icon {
-        width: 70px;
-        height: 21px;
-        @include image-2x("/img/ML/slack_white_icon");
-        background-repeat: no-repeat;
-        background-size: 70px 21px;
-        float: right;
-      }
-    }
-
-    div.signin-with-slack-description {
-      @include avenir_M();
-      font-size: 14px;
-      line-height: 20px;
-      color: rgba(#8D8162, 0.6);
-      margin: 29px auto 0px;
-      width: 500px;
-
-      a {
-        color: rgba(#8D8162, 0.6);
-        text-decoration: none;
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-
-      &.second-line {
-        margin-top: 0px;
-      }
-
-      @include mobile(){
-        width: 100%;
-      }
-    }
-
     section.carrot-plus-slack {
       padding-top: 72px;
       padding-bottom: 0px;
       text-align: center;
       position: relative;
       overflow: hidden;
+
+      button.signin-with-slack {
+        width: 280px;
+        height: 48px;
+        margin-top: 32px;
+        background-color: #FA6654;
+        border-radius: 100px;
+        padding: 12px 50px;
+        @include avenir_H();
+        font-size: 18px;
+        color: white;
+        text-align: left;
+
+        div.slack-white-icon {
+          width: 70px;
+          height: 21px;
+          @include image-2x("/img/ML/slack_white_icon");
+          background-repeat: no-repeat;
+          background-size: 70px 21px;
+          float: right;
+        }
+      }
+
+      div.signin-with-slack-description {
+        @include avenir_M();
+        font-size: 14px;
+        line-height: 20px;
+        color: rgba(#8D8162, 0.6);
+        margin: 20px auto 0px;
+        width: 500px;
+
+        a {
+          color: rgba(#8D8162, 0.6);
+          text-decoration: none;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        &.second-line {
+          margin-top: 0px;
+        }
+
+        @include mobile(){
+          width: 100%;
+        }
+      }
 
       @include mobile(){
         overflow: visible;
@@ -103,382 +105,273 @@ div#wrap {
           display: none;
         }
 
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow");
-          background-size: 172px 172px;
-          width: 172px;
-          height: 172px;
-          top: -46px;
-          left: -57px;
-        }
-
-        &.big-purple {
-          @include image-2x("/img/ML/balloon_big_purple");
-          background-size: 111px 111px;
-          width: 111px;
-          height: 111px;
-          top: -64px;
-          right: 118px;
-        }
-
-        &.big-red {
-          @include image-2x("/img/ML/balloon_big_red");
-          background-size: 226px 208px;
-          width: 226px;
-          height: 208px;
-          top: -82px;
-          right: -55px;
-        }
-
-        &.small-purple-face {
-          @include image-2x("/img/ML/balloon_small_purple_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 118px;
-          left: 5.78%;
-        }
-
-        &.small-red {
-          @include image-2x("/img/ML/balloon_small_red");
-          background-size: 15px 17px;
-          width: 15px;
-          height: 17px;
-          top: 103px;
-          left: 13.71%;
-        }
-
-        &.small-yellow-face {
-          @include image-2x("/img/ML/balloon_small_yellow_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 119px;
-          left: 78.57%;
-        }
-
-        &.small-yellow {
-          @include image-2x("/img/ML/balloon_small_yellow");
-          background-size: 15px 15px;
-          width: 15px;
-          height: 15px;
-          top: 179px;
-          left: 86.36%;
-        }
-
-        &.big-blue {
-          @include image-2x("/img/ML/slack_balloon_big_blue");
-          background-size: 200px 172px;
-          width: 200px;
-          height: 172px;
-          top: 541px;
-          left: 50%;
-          margin-left: -564px;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/balloon_small_purple");
-          background-size: 23px 21px;
-          width: 23px;
-          height: 21px;
-          top: 524px;
-          left: 23.64%;
-        }
-
-        &.big-purple-1 {
-          @include image-2x("/img/ML/slack_balloon_big_purple");
-          background-size: 102px 103px;
-          width: 102px;
-          height: 103px;
-          top: 1107px;
-          left: 50%;
-          margin-left: 434px;
-          z-index: 2;
-        }
-
-        &.small-green-face {
-          @include image-2x("/img/ML/slack_balloon_small_green_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 1036px;
-          left: 86.14%;
-        }
-
+        
       }
 
       div.carrot-plus-slack {
-        width: 254px;
-        height: 100px;
+        width: 217px;
+        height: 81px;
         @include image-2x("/img/ML/carrot_plus_slack");
-        background-size: 254px 100px;
+        background-size: 217px 81px;
         background-repeat: no-repeat;
         background-position: center;
-        margin: 0 auto;
+        margin: 80px auto 0px;
       }
 
       h1.slack {
         @include avenir_H();
         font-size: 48px;
         line-height: 60px;
-        color: $carrot_dark_brown_1;
-        margin: 27px auto 0px;
+        color: $carrot_dark_gray;
+        margin: 34px auto 0px;
         padding: 0px 16px;
       }
 
-      div.slack-subline {
-        @include avenir_R();
-        font-size: 24px;
-        color: rgba($carrot_dark_brown, 0.8);
-        max-width: 744px;
-        margin: 16px auto 0px;
-        width: 600px;
-        text-align: center;
+      div.slack-subline-container {
+        margin-top: 6px;
 
-        @include tablet(){
-          width: 100%;
-          margin: 16px auto 0;
-          padding: 0 16px;
-        }
-      }
-
-      div.slack-box-illustration-container {
-        width: 940px;
-        height: 557px;
-        box-shadow: 0px 4px 6px 0px rgba(black, 0.07);
-        background-color: white;
-        padding: 52px;
-        margin: 90px auto;
-        border-radius: 8px;
-        z-index: 1;
-        position: relative;
-
-        @include tablet(){
-          width: calc(100% + 64px);
-          height: auto;
-          margin-left: -32px;
-          padding: 48px 32px;
-        }
-
-        div.slack-box-illustration {
-          width: 520px;
-          height: 328px;
-          margin: 0 auto;
-          @include image-2x("/img/ML/slack_box_illustration");
-          background-size: 520px 328px;
-          background-repeat: no-repeat;
-
-          @include tablet(){
-            width: 300px;
-            height: 200px;
-            background-size: 100%;
-          }
-        }
-
-        div.slack-box-description {
+        div.slack-subline {
           @include avenir_R();
-          font-size: 20px;
-          color: rgba($carrot_dark_brown, 0.8);
-          width: 734px;
-          margin: 44px auto 0px;
+          font-size: 24px;
+          line-height: 30px;
+          color: rgba($carrot_light_gray_3, 0.8);
+          max-width: 744px;
+          margin: 0px auto;
+          width: 580px;
+          text-align: center;
 
           @include tablet(){
             width: 100%;
+            margin: 16px auto 0;
+            padding: 0 16px;
           }
         }
       }
 
-    }
+      div.horizontal-carousell {
+        width: 100vw;
+        height: 482px;
+        margin-top: 64px;
+        margin-left: -32px;
+        z-index: 10;
+        overflow-x: auto;
 
-    section.why-carrot {
-      position: relative;
-
-      div.why-balloon {
-        position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
-
-        @include tablet() {
+        @include big_web(){
           display: none;
         }
 
-        &.big-yellow {
-          @include image-2x("/img/ML/why_balloon_big_yellow");
-          background-size: 217px 216px;
-          width: 217px;
-          height: 216px;
-          top: 537px;
-          left: 6.57%;
-        }
+        div.horizontal-carousell-inner {
+          width: calc(893px + 24px);
+          height: 482px;
 
-        &.small-purple {
-          @include image-2x("/img/ML/why_balloon_small_purple");
-          background-size: 33px 30px;
-          width: 33px;
-          height: 30px;
-          top: 527px;
-          left: 11.93%;
-        }
+          img {
+            width: 271px;
+            height: 482px;
+            float: left;
+            display: inline;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
+          }
 
-        &.big-green {
-          @include image-2x("/img/ML/why_balloon_big_green");
-          background-size: 132px 132px;
-          width: 132px;
-          height: 132px;
-          top: 989px;
-          left: 78.21%;
-        }
+          img.horizontal-carousell-1 {
+            margin-left: 32px;
+          }
 
-        &.small-yellow {
-          @include image-2x("/img/ML/why_balloon_small_yellow");
-          background-size: 25px 25px;
-          width: 25px;
-          height: 25px;
-          top: 950px;
-          left: 86%;
+          img.horizontal-carousell-2 {
+            margin-left: 20px;
+          }
+
+          img.horizontal-carousell-3 {
+            margin-left: 20px;
+            margin-right: 32px;
+          }
         }
       }
 
-      h1.why-carrot-headline {
-        margin: 60px auto 0px;
-        @include avenir_H();
-        font-style: 48px;
-        color: $carrot_dark_brown_1;
-      }
-
-      div.why-carrot-subheadline {
-        margin: 20px auto 0px;
-        @include avenir_R();
-        font-size: 20px;
-        color: rgba($carrot_dark_brown, 0.8);
-        line-height: 30px;
-        width: 750px;
-
-        @include tablet(){
-          width: 100%;
-          margin: 16px auto 0;
-        }
-      }
-
-      div.illustrations {
-        width: 980px;
-        margin: 54px auto;
-        position: relative;
+      video.slack-main-animation {
+        width: 940px;
+        margin: 85px auto 0px;
+        padding: 0;
         z-index: 10;
+        position: relative;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
 
         @include tablet() {
-          width: calc(100% + 64px);
-          margin-left: -32px;
+          width: 100%;
         }
 
-        div.illustration-container {
-          margin: 20px;
-          width: 450px;
-          height: 400px;
-          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
-          padding: 40px 50px;
-          background-color: white;
-          float: left;
-          text-align: center;
-          border-radius: 8px;
+        @include mobile() {
+          display: none;
+        }
 
-          @include tablet() {
+        img.homepage-main-screenshot {
+          width: 940px;
+          margin-left: -16px;
+          padding: 0;
+
+          @include mobile() {
             width: 100%;
             height: auto;
-            float: unset;
-            margin: 16px 0px 0px;
-            padding: 30px 32px;
-            border-radius: 0px;
+            margin: 0px;
           }
+        }
+      }
 
-          &.right {
-            float: right;
+      div.designed-for-container {
+        margin: 72px auto 80px;
 
-            @include tablet(){
-              float: unset;
+        @include tablet() {
+          margin: 80px auto;
+        }
+
+        div.designed-for {
+          @include avenir_M();
+          font-size: 34px;
+          line-height: 42px;
+          color: $carrot_dark_gray;
+        }
+
+        div.designed-for-content {
+          @include avenir_R();
+          font-size: 24px;
+          line-height: 30px;
+          color: rgba($carrot_dark_gray, 0.8);
+          max-width: 660px;
+          margin: 22px auto 0px;
+        }
+      }
+
+      div.cards-container {
+        max-width: 940px;
+        margin: 0px auto;
+        position: relative;
+        z-index: 2;
+
+        div.cards-row {
+          margin-top: 20px;
+
+          div.card {
+            &:not(:first-child) {
+              margin-left: 20px;
             }
-          }
 
-          div.illustration {
-            width: 350px;
-            height: 160px;
-            background-repeat: no-repeat;
-            background-position: center;
+            text-align: left;
+            float: left;
+            width: 300px;
+            height: 332px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.07);
+            padding: 40px;
 
             @include tablet() {
-              width: auto;
-              margin: 0 auto;
+              float: none;
+              margin: 20px auto 0px;
+
+              &:not(:first-child) {
+                margin: 20px auto 0px;
+              }
             }
 
-            &.illustration-1 {
-              @include image-2x("/img/ML/why_illustration_1_246_151");
-              background-size: 246px 151px;
+            div.card-icon {
+              background-repeat: no-repeat;
+              background-position: center;
             }
 
-            &.illustration-2 {
-              @include image-2x("/img/ML/why_illustration_2_235_150");
-              background-size: 235px 150px;
-            }
-
-            &.illustration-3 {
-              @include image-2x("/img/ML/why_illustration_3_225_151");
-              background-size: 225px 151px;
-            }
-
-            &.illustration-4 {
-              @include image-2x("/img/ML/why_illustration_4_165_160");
-              background-size: 165px 160px;
-            }
-          }
-
-          div.description {
-            margin-top: 24px;
-
-            div.title {
-              color: $carrot_dark_brown;
-              @include avenir_H();
-              font-size: 26px;
-            }
-
-            div.subtitle {
-              color: $carrot_dark_brown;
-              @include avenir_R();
+            div.card-title {
+              @include avenir_M();
               font-size: 20px;
-              margin: 10px auto;
+              color: $carrot_dark_gray;
+              width: 70%;
+            }
+
+            div.card-content {
+              @include avenir_R();
+              font-size: 18px;
+              color: rgba($carrot_dark_gray, 0.8);
+              margin-top: 11px;
+
+              a {
+                color: $carrot_text_blue_3;
+                text-decoration: none;
+              }
+            }
+
+            &.card-1 {
+              div.card-icon {
+                width: 44px;
+                height: 41px;
+                background-size: 44px 41px;
+                @include image-2x("/img/ML/homepage_card_icon_1");
+                margin-bottom: 35px;
+              }
+            }
+
+            &.card-2 {
+              div.card-icon {
+                width: 40px;
+                height: 40px;
+                background-size: 40px 40px;
+                @include image-2x("/img/ML/homepage_card_icon_2");
+                margin-bottom: 36px;
+              }
+            }
+
+            &.card-3 {
+              div.card-icon {
+                width: 44px;
+                height: 44px;
+                background-size: 44px 44px;
+                @include image-2x("/img/ML/homepage_card_icon_3");
+                margin-bottom: 31px;
+              }
+
+              div.card-title {
+                width: 90%;
+              }
+            }
+
+            &.card-4 {
+              div.card-icon {
+                width: 32px;
+                height: 40px;
+                background-size: 32px 40px;
+                @include image-2x("/img/ML/homepage_card_icon_4");
+                margin-bottom: 36px;
+              }
+
+              div.card-title {
+                width: 50%;
+              }
+            }
+
+            &.card-5 {
+              div.card-icon {
+                width: 42px;
+                height: 41px;
+                background-size: 42px 41px;
+                @include image-2x("/img/ML/homepage_card_icon_5");
+                margin-bottom: 35px;
+              }
+            }
+
+            &.card-6 {
+              div.card-icon {
+                width: 40px;
+                height: 40px;
+                background-size: 40px 40px;
+                @include image-2x("/img/ML/homepage_card_icon_6");
+                margin-bottom: 36px;
+              }
+
+              div.card-title {
+                width: 43%;
+              }
             }
           }
         }
       }
-    }
-
-    section.designed-for {
-      position: relative;
-      margin: 0 auto 80px;
-
-      h1.designed-for-headline {
-        @include avenir_H();
-        font-size: 48px;
-        color: $carrot_dark_brown_1;
-        margin: 40px auto 0px;
-      }
-
-      div.designed-for-subheadline {
-        @include avenir_R();
-        font-size: 20px;
-        line-height: 30px;
-        color: rgba($carrot_dark_brown, 0.8);
-        margin: 24px auto 0px;
-        width: 800px;
-
-        @include tablet(){
-          width: 100%;
-          margin: 16px auto 0;
-          padding: 0 16px;
-        }
-      }
-
-
     }
   }
 }

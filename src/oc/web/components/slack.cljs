@@ -24,9 +24,9 @@
                        (user-actions/login-with-slack auth-link)))}
         "Sign in with"
         [:div.slack-white-icon]]
-      [:div.signin-with-slack-description
-        "Securely sign in or sign up with your Slack account."]
-      [:div.signin-with-slack-description.second-line
+      ; [:div.signin-with-slack-description
+      ;   "Securely sign in or sign up with your Slack account."]
+      [:div.signin-with-slack-description ;.second-line
         "By signing in, you agree to the "
         [:a
           {:href oc-urls/terms}
@@ -52,101 +52,129 @@
         [:div.main.slack.group
           [:section.carrot-plus-slack.group
             {:class (when (jwt/jwt) "no-get-started-button")}
-            [:div.balloon.big-yellow]
-            [:div.balloon.big-red]
-            [:div.balloon.big-purple]
-            [:div.balloon.small-purple-face]
-            [:div.balloon.small-red]
-            [:div.balloon.small-yellow-face]
-            [:div.balloon.small-yellow]
-            [:div.balloon.big-blue]
-            [:div.balloon.small-purple]
-            [:div.balloon.small-green-face]
-            [:div.balloon.big-purple-1]
 
             [:div.carrot-plus-slack]
 
             [:h1.slack
-              "Introducing Carrot for Slack"]
+              "Where leaders speak"]
 
-            [:div.slack-subline
-              (str
-               "Slack keeps your team connected in the moment. "
-               "Carrot keeps it aligned over time.")]
+            [:div.slack-subline-container
+              [:div.slack-subline
+                "Leadership updates that keep everyone aligned"]
+              [:div.slack-subline
+                 "around what matters most."]]
 
             (get-started-button auth-settings)
 
-            [:div.slack-box-illustration-container
-              [:div.slack-box-illustration]
-              [:div.slack-box-description
+            [:video.slack-main-animation
+              {:controls false
+               :auto-play true
+               :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
+               :loop true}
+              [:source
+                {:src (utils/cdn "/img/ML/animation.webm")
+                 :type "video/webm"}]
+              [:source
+                {:src (utils/cdn "/img/ML/animation.mp4")
+                 :type "video/mp4"}]
+              [:div.fallback
+                "Your browser doesn’t support this video format."]]
+
+            [:div.horizontal-carousell
+              [:div.horizontal-carousell-inner
+                [:img.horizontal-carousell-1
+                  (utils/retina-src "/img/ML/homepage_mobile_screenshot_1")]
+                [:img.horizontal-carousell-2
+                  (utils/retina-src "/img/ML/homepage_mobile_screenshot_2")]
+                [:img.horizontal-carousell-3
+                  (utils/retina-src "/img/ML/homepage_mobile_screenshot_3")]]]
+
+            [:div.designed-for-container
+              [:div.designed-for
+                "Designed for Slack"]
+              [:div.designed-for-content
                 (str
-                 "Slack is great for real-time work, but it’s easy to miss important stuff in the noise - "
-                 "like key announcements, updates and plans that keep teams on the same page. "
-                 "Carrot works with Slack to make sure that doesn’t happen.")]]
+                 "Slack is fun and awesome for real-time work, but gets noisy. "
+                 "With Carrot, the important stuff rises above the noise "
+                 "keeping everyone on the same page.")]]
 
-          [:section.why-carrot
-            [:div.why-balloon.big-yellow]
-            [:div.why-balloon.small-purple]
-            [:div.why-balloon.big-green]
-            [:div.why-balloon.small-yellow]
-
-            [:h1.why-carrot-headline
-              "Why Carrot?"]
-            [:div.why-carrot-subheadline
-              (str
-                "Growing and distributed teams need a place to rise above the noise of real-time "
-                "conversations to see what’s really happening across the company.")]
-
-            [:div.illustrations.group
-              [:div.illustration-container
-                [:div.illustration.illustration-1]
-                [:div.description
-                  [:div.title
-                    "Visibility"]
-                  [:div.subtitle
+            [:div.cards-container
+              [:div.cards-row.group
+                [:div.card.card-1
+                  [:div.card-icon]
+                  [:div.card-title
                     (str
-                     "A bird’s-eye view of essential "
-                   "information that’s easy to read and "
-                   "creates real transparency.")]]]
-              [:div.illustration-container.right
-                [:div.illustration.illustration-2]
-                [:div.description
-                  [:div.title
-                    "In context"]
-                  [:div.subtitle
+                     "Highlight what’s "
+                     "important")]
+                  [:div.card-content
                     (str
-                     "Related information stays organized to "
-                     "have the most impact. Great for current "
-                     "and new employees.")]]]
-              [:div.illustration-container
-                [:div.illustration.illustration-3]
-                [:div.description
-                  [:div.title
-                    "Feedback & engagement"]
-                  [:div.subtitle
+                      "Elevate key updates above "
+                      "the noise so they won’t be "
+                      "missed. It’s perfect for "
+                      "distributed teams, too.")]]
+                [:div.card.card-2
+                  [:div.card-icon]
+                  [:div.card-title
                     (str
-                     "Capture team sentiment and reactions "
-                     "to key communications. It’s fun and "
-                     "great for distributed teams too!")]]]
-              [:div.illustration-container.right
-                [:div.illustration.illustration-4]
-                [:div.description
-                  [:div.title
-                    "The big picture"]
-                  [:div.subtitle
+                      "Cross-team "
+                      "awareness")]
+                  [:div.card-content
                     (str
-                     "Daily or weekly digest for email "
-                     "and Slack ensures everyone has the "
-                     "same view of what’s important.")]]]]]
+                      "Keep teams in sync with "
+                      "each other so you can see "
+                      "what’s happening across "
+                      "the company.")]]
+                [:div.card.card-3
+                  [:div.card-icon]
+                  [:div.card-title
+                    (str
+                      "Focused, topic-based "
+                      "conversations")]
+                  [:div.card-content
+                    (str
+                      "Capture team reactions, "
+                      "comments and questions "
+                      "together in one place.")]]]
+              [:div.cards-row.group
+                [:div.card.card-4
+                  [:div.card-icon]
+                  [:div.card-title
+                    (str
+                      "The whole "
+                      "story")]
+                  [:div.card-content
+                    (str
+                      "New employees get up to "
+                      "speed quickly with the full "
+                      "picture in one place.")]]
+                [:div.card.card-5
+                  [:div.card-icon]
+                  [:div.card-title
+                    (str
+                      "Visible "
+                      "engagement")]
+                  [:div.card-content
+                    (str
+                      "Carrot measures team "
+                      "engagement so leaders "
+                      "can actually see if their "
+                      "teams are aligned or not.")]]
+                [:div.card.card-6
+                  [:div.card-icon]
+                  [:div.card-title
+                    (str
+                      "In sync "
+                      "with Slack")]
+                  [:div.card-content
+                    (str
+                      "Communication is "
+                      "automatically shared to the "
+                      "right channel. ")
+                    [:a
+                      {:href oc-urls/slack
+                       :on-click #(router/nav! oc-urls/slack)}
+                      "Learn more"]]]]]
 
-          [:section.designed-for
-            [:h1.designed-for-headline
-              "Designed for Slack teams"]
-            [:div.designed-for-subheadline
-              (str
-               "Onboard your Slack team with single sign-on to make management and security simple. "
-               "The Carrot Slack bot makes sharing with Slack teams seamless.")]
-
-            (get-started-button auth-settings)]]]]
+          ]]]
 
         (site-footer)]))
