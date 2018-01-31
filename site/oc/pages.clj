@@ -99,7 +99,7 @@
               {:src (cdn "/img/ML/homepage_mobile_screenshot_3.png")
                :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_3@2x.png") " 2x")}]]]
 
-        [:video.homepage-main-animation
+        [:video.main-animation
           {:controls false
            :autoPlay true
            :poster (cdn "/img/ML/new_homepage_screenshot.png")
@@ -195,14 +195,14 @@
                   {:href "/slack"}
                   "Learn more"]]]]]]
 
-      [:section.second-section
+      [:section.testimonials-section
         [:div.balloon.big-yellow-1]
         [:div.balloon.small-blue-1]
-        [:div.second-section-title
+        [:div.testimonials-section-title
           "Don’t take our word for it"]
-        [:div.second-section-subtitle
+        [:div.testimonials-section-subtitle
           "Here’s how we’re helping teams like yours."]
-        [:div.cards-container.group
+        [:div.testimonials-cards-container.group
           [:div.card
             [:div.card-content
               (str
