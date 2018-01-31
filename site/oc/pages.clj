@@ -214,9 +214,9 @@
               [:img.card-avatar
                 {:src (cdn "/img/ML/happy_face_blue.svg")}]
               [:div.author-name
-                "John Smith"]
+                ""]
               [:div.author-company
-                "Acme Co."]]]
+                ""]]]
           [:div.card
             [:div.card-content
               (str
@@ -228,9 +228,9 @@
               [:img.card-avatar
                 {:src (cdn "/img/ML/happy_face_purple.svg")}]
               [:div.author-name
-                "John Smith"]
+                ""]
               [:div.author-company
-                "Acme Co."]]]
+                ""]]]
           [:div.card
             [:div.card-content
               (str
@@ -242,9 +242,9 @@
               [:img.card-avatar
                 {:src (cdn "/img/ML/happy_face_red.svg")}]
               [:div.author-name
-                "John Smith"]
+                ""]
               [:div.author-company
-                "Acme Co."]]]
+                ""]]]
           [:div.card
             [:div.card-content
               (str
@@ -256,9 +256,9 @@
               [:img.card-avatar
                 {:src (cdn "/img/ML/happy_face_yellow.svg")}]
               [:div.author-name
-                "John Smith"]
+                ""]
               [:div.author-company
-                "Acme Co."]]]]]
+                ""]]]]]
 
       [:section.third-section
         [:div.third-section-title
