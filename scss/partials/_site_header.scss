@@ -100,7 +100,7 @@ nav.site-navbar {
         margin-top: 0px;
         opacity: 0.8;
 
-        &.slack-get-started {
+        &:not(.your-boards).slack-get-started {
           height: 42px;
           background-color: transparent;
           @include avenir_H();
