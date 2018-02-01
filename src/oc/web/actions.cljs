@@ -1095,143 +1095,6 @@
   (remove-cached-item (-> db edit-key :uuid))
   (dissoc db :entry-save-on-exit))
 
-(defn activity-load-cached-item
-  [activity-data]
-  (let [cache-key (get-entry-cache-key (:uuid activity-data))]
-    (uc/get-item cache-key
-     (fn [item err]
-       (if (and (not err)
-                (map? item)
-                (= (:updated-at activity-data) (:updated-at item)))
-         (let [entry-to-save (merge item (select-keys activity-data [:links]))]
-           (dispatcher/dispatch! [:input [:modal-editing-data] entry-to-save]))
-         (do
-           ;; If we got an item remove it since it won't be used
-           ;; since we have an updated version of it already
-           (when item
-             (remove-cached-item (:uuid activity-data)))
-           (dispatcher/dispatch! [:input [:modal-editing-data] activity-data])))
-       (dispatcher/dispatch! [:input [:modal-editing] true])
-       (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
-
-(defn activity-modal-fade-out
-  [db board-slug board-filters]
-  (let [from-all-posts (:from-all-posts @router/path)
-        to-board (if from-all-posts "all-posts" board-slug)
-        org (router/current-org-slug)
-        to-url (if (string? board-filters)
-                (oc-urls/board-filter-by-topic org board-slug board-filters)
-                (if (= board-filters :by-topic)
-                  (oc-urls/board-sort-by-topic org board-slug)
-                  (if from-all-posts
-                    (oc-urls/all-posts org)
-                    (oc-urls/board org board-slug))))]
-    (.pushState (.-history js/window) #js {} "" to-url)
-    (router/set-route! [org to-board (if from-all-posts "all-posts" "dashboard")]
-     {:org org
-      :board to-board
-      :activity nil
-      :query-params (:query-params @router/path)
-      :from-all-posts false}))
-  (-> db
-    (dissoc :activity-modal-fade-in)
-    (dissoc :dismiss-modal-on-editing-stop)))
-
-(defmethod dispatcher/action :activity-modal-fade-out
-  [db [_ board-slug board-filters]]
-  (if (get-in db [:search-active])
-    db
-    (activity-modal-fade-out db board-slug board-filters)))
-
-(defn activity-modal-fade-in
-  [db activity-data editing]
-  (let [org (router/current-org-slug)
-        board (:board-slug activity-data)
-        activity-uuid (:uuid activity-data)
-        to-url (oc-urls/entry board activity-uuid)]
-    (.pushState (.-history js/window) #js {} "" to-url)
-    (router/set-route! [org board activity-uuid "activity"]
-     {:org org
-      :board board
-      :activity activity-uuid
-      :query-params (dissoc (:query-params @router/path) :ap-initial-at)
-      :from-all-posts (= (router/current-board-slug) "all-posts")}))
-  (when editing
-    (utils/after 100 #(activity-load-cached-item activity-data)))
-  (-> db
-    (assoc :activity-modal-fade-in (:uuid activity-data))
-    (assoc :dismiss-modal-on-editing-stop editing)
-    ;; Make sure the seen-at is not reset when navigating to modal view
-    (assoc :no-reset-seen-at true)))
-
-(defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ activity-data editing]]
-  (if (get-in db [:search-active])
-    db
-    (activity-modal-fade-in db activity-data editing)))
-
-(defn entry-edit
-  [db initial-entry-data]
-  ;; Delay the entry-edit open to the cached item load
-  ;; if we have a cached item starts with it, if not start with the initial passed data
-  (let [cache-key (get-entry-cache-key (:uuid initial-entry-data))]
-    (uc/get-item cache-key
-     (fn [item err]
-       (if (and (not err)
-                (map? item)
-                (or (and (:updated-at initial-entry-data)
-                         (= (:updated-at initial-entry-data) (:updated-at item)))
-                    (not (:updated-at initial-entry-data))))
-         (let [entry-to-save (merge item (select-keys initial-entry-data [:links :board-slug :board-name]))]
-           (dispatcher/dispatch! [:input [:entry-editing] entry-to-save]))
-         (do
-           ;; If we got an item remove it since it won't be used
-           ;; since we have an updated version of it already
-           (when item
-             (remove-cached-item (:uuid initial-entry-data)))
-           (dispatcher/dispatch! [:input [:entry-editing] initial-entry-data]))))))
-  db)
-
-(defmethod dispatcher/action :entry-edit
-  [db [_ initial-entry-data]]
-  (entry-edit db initial-entry-data))
-
-(defmethod dispatcher/action :activity-edit
-  [db [_ activity-data]]
-  (if (or (responsive/is-tablet-or-mobile?)
-          (not= (:status activity-data) "published"))
-    (entry-edit db activity-data)
-    (activity-modal-fade-in db activity-data true)))
-
-(defmethod dispatcher/action :entry-edit/dismiss
-  [db [_]]
-  ;; If the user was looking at the modal, dismiss it too
-  (when (router/current-activity-id)
-    (utils/after 1 #(let [board-filters (:board-filters db)
-                          from-all-posts (or
-                                          (:from-all-posts @router/path)
-                                          (= (router/current-board-slug) "all-posts"))
-                          board-url (utils/get-board-url (router/current-org-slug) (router/current-board-slug))]
-                      (router/nav!
-                        (cond
-                          ; AA
-                          from-all-posts
-                          (oc-urls/all-posts (router/current-org-slug))
-                          ; Board with topic filter
-                          (string? board-filters)
-                          (oc-urls/board-filter-by-topic
-                           (router/current-org-slug)
-                           (router/current-board-slug)
-                           board-filters)
-                          ;; Board most recent or by topic
-                          :else
-                          board-url)))))
-  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
-  (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
-  (-> db
-    (dissoc :entry-editing)
-    (assoc :entry-edit-dissmissing true)))
-
 (defmethod dispatcher/action :topic-add
   [db [_ topic-map board-slug]]
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
@@ -1648,15 +1511,6 @@
     (api/update-entry entry-data board-slug :modal-editing-data)
     (assoc-in db [:modal-editing-data :loading] true)))
 
-(defmethod dispatcher/action :activity-modal-edit
-  [db [_ activity-data activate]]
-  (assoc db :modal-editing activate)
-  (if activate
-    (do
-      (activity-load-cached-item activity-data)
-      db)
-    (dissoc db :modal-editing)))
-
 (defmethod dispatcher/action :whats-new/finish
   [db [_ whats-new-data]]
   (if whats-new-data
@@ -1714,21 +1568,6 @@
                        :board-slug (:slug current-board)}]
     (merge db {:entry-editing entry-editing
                :nux :2})))
-
-(defmethod dispatcher/action :entry-toggle-save-on-exit
-  [db [_ enabled?]]
-  (assoc db :entry-save-on-exit enabled?))
-
-(defmethod dispatcher/action :entry-save-on-exit
-  [db [_ edit-key entry-body]]
-  (let [entry-editing (get db edit-key)
-        entry-map (assoc entry-editing :body entry-body)
-        cache-key (get-entry-cache-key (:uuid entry-editing))]
-    (uc/set-item cache-key entry-map
-     (fn [err]
-       (when-not err
-         (dispatcher/dispatch! [:entry-toggle-save-on-exit false]))))
-    db))
 
 (defmethod dispatcher/action :private-board-user-add
   [db [_ user user-type]]

@@ -11,6 +11,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.stores.user]
             [oc.web.stores.search]
+            [oc.web.stores.activity]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
