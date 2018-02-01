@@ -49,6 +49,8 @@
 
 (def oc-github "https://github.com/open-company")
 
+(def oc-trello-public "https://trello.com/b/eKs2LtLu")
+
 (def subscription-callback "/subscription-completed")
 
 (def email-confirmation "/verify")

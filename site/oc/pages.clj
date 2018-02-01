@@ -354,7 +354,7 @@
               [:div.user-name
                 "Sean Johnson"]
               [:div.user-position
-                "CTO & Founder"]
+                "CTO and co-founder"]
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/snootymonkey/"
                  :target "_blank"}]]
@@ -363,7 +363,7 @@
               [:div.user-name
                 "Stuart Levinson"]
               [:div.user-position
-                "CEO & Founder"]
+                "CEO and co-founder"]
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/stuartlevinson/"
                  :target "_blank"}]]]

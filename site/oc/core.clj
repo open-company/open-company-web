@@ -17,7 +17,7 @@
    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
    [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-   [:title "Carrot - Grow together"]
+   [:title "Where leaders speak"]
    ;; Bootstrap - Latest compiled and minified CSS
    [:link
     {:rel "stylesheet"
@@ -137,11 +137,11 @@
           [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
-        [:div.column.column-integration
+        [:div.column.column-resources
           [:div.column-title
             {:onClick (str
-                       "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');"
-                       "$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');")}
+                       "$('nav.navbar-bottom div.column:not(.column-resources)').removeClass('expanded');"
+                       "$('nav.navbar-bottom div.column.column-resources').toggleClass('expanded');")}
             "RESOURCES"]
           [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
           [:div.column-item [:a {:href "/privacy"} "Privacy Policy"]]
@@ -155,7 +155,17 @@
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "SUPPORT"]
           [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]]
+          [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Features"]]
+          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
+
+        [:div.column.column-integrations
+          [:div.column-title
+            {:onClick
+              (str
+               "$('nav.navbar-bottom div.column:not(.column-integrations)').removeClass('expanded');"
+               "$('nav.navbar-bottom div.column.column-integrations').toggleClass('expanded');")}
+            "INTEGRATIONS"]
+          [:div.column-item [:a {:href "/slack"} "Slack"]]]]
       [:div.left-column
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
