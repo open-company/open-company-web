@@ -61,14 +61,16 @@ div.entry-edit-modal-container {
         @include mobile() {
           display: block;
           height: #{64 + 59}px;
-          background-color: $carrot_light_gray_7;
+          background-color: white;
           width: 100%;
           text-align: center;
           position: relative;
 
           div.mobile-header {
             height: 64px;
-            padding: 12px 18px 6px;
+            padding: 20px 24px;
+            box-shadow: 0px 2px 6px 0px rgba($carrot_light_gray_7, 0.5);
+            position: relative;
 
             button.mobile-modal-close-bt {
               @include image-2x("/img/ML/mobile_modal_close");
@@ -82,29 +84,50 @@ div.entry-edit-modal-container {
               left: 18px;
             }
 
-            div.mobile-header-title {
-              @include avenir_H();
-              font-size: 22px;
-              color: $carrot_dark_gray;
-              margin-top: 4px;
+            div.mobile-header-right {
+              position: absolute;
+              top: 20px;
+              right: 24px;
+              max-width: 60%;
+
+              button {
+                margin-left: 16px;
+                float: right;
+                background-color: transparent;
+                color: $carrot_green_2;
+                @include avenir_H();
+                font-size: 14px;
+                height: 24px;
+
+                &.disabled {
+                  opacity: 0.3;
+                }
+              }
             }
           }
 
           div.mobile-second-header {
-            height: 59px;
-            background-color: $carrot_light_gray_2;
-            padding: 16px 18px 12px;
+            height: 58px;
+            padding: 36px 24px 0px;
 
             div.posting-in {
-              @include avenir_H();
-              font-size: 12px;
-              color: rgba($oc_gray_7, 0.5);
+              @include avenir_M();
+              font-size: 16px;
+              color: $oc_gray_7;
               float: left;
               margin-top: 5px;
-              max-width: 58%;
 
               span {
                 float: left;
+              }
+
+              div.boards-dropdown-caret.no-nux {
+                &:after {
+                  background-color: $carrot_light_gray_7;
+                  border-radius: 100px;
+                  margin-top: -2px;
+                  background-position: center 7px;
+                }
               }
             }
 
@@ -137,7 +160,7 @@ div.entry-edit-modal-container {
         div.posting-in {
           @include avenir_M();
           font-size: 16px;
-          color: $oc_gray_7;
+          color: $carrot_dark_gray;
           float: left;
           margin-top: 5px;
           max-width: 50%;
@@ -210,12 +233,12 @@ div.entry-edit-modal-container {
         width: calc(100% + 22px);
         margin-left: -22px;
 
-        @include mobile() {
-          min-height: calc(100vh - 64px - 59px - 72px - 72px - 1px);
+        @include tablet() {
+          min-height: calc(100vh - 64px - 58px);
           max-height: initial;
-          margin-left: 0px;
-          padding: 24px 16px;
+          padding: 30px 24px;
           width: 100%;
+          margin: 0px;
         }
 
         div.entry-edit-headline {
@@ -229,8 +252,10 @@ div.entry-edit-modal-container {
           white-space: pre-wrap;
           word-wrap: break-word;
 
-          @include mobile() {
+          @include tablet() {
             width: 100%;
+            @include avenir_H();
+            font-size: 20px;
           }
 
           &:empty:before {
@@ -238,6 +263,10 @@ div.entry-edit-modal-container {
             display: block;
             color: #8A8E94 !important;
             font-style: none;
+
+            @include tablet() {
+              color: $carrot_dark_gray !important;
+            }
           }
         }
 
@@ -264,14 +293,22 @@ div.entry-edit-modal-container {
             word-wrap: break-word;
             @include activity-body();
 
-            @include mobile() {
+            @include tablet() {
               width: 100%;
+
+              @include avenir_BOOK();
+              font-size: 18px;
+              line-height: 30px;
             }
 
             @include activity-attachment(true);
 
             &.medium-editor-placeholder:after {
               color: #8A8E94 !important;
+
+              @include tablet() {
+                color: $carrot_dark_gray !important;
+              }
             }
 
             * {

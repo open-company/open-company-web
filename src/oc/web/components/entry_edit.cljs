@@ -294,7 +294,7 @@
                              (not (utils/event-inside? % (rum/ref-node s "entry-edit-modal"))))
                     (cancel-clicked s))}
       [:div.modal-wrapper
-        {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
+        {:style {:margin-top (if is-mobile? "0px" (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px"))}}
         ;; Show the close button only when there are no modals shown
         (when (and (not (:media-video media-input))
                    (not (:media-chart media-input))
@@ -310,12 +310,58 @@
               [:div.mobile-header
                 [:button.mlb-reset.mobile-modal-close-bt
                   {:on-click #(cancel-clicked s)}]
-                [:div.mobile-header-title
-                  (if (:uuid entry-editing)
+                [:div.mobile-header-right
+                  [:button.mlb-reset
+                    {:ref "mobile-post-btn"
+                     :on-click (fn [_]
+                                 (clean-body)
+                                 (if (and (is-publishable? entry-editing)
+                                          (not (zero? (count (:headline entry-editing)))))
+                                   (if published?
+                                     (do
+                                       (reset! (::saving s) true)
+                                       (dis/dispatch! [:entry-save]))
+                                     (do
+                                       (reset! (::publishing s) true)
+                                       (dis/dispatch! [:entry-publish])))
+                                   (when (zero? (count (:headline entry-editing)))
+                                     (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+                                       (when-not (.data $post-btn "bs.tooltip")
+                                         (.tooltip $post-btn
+                                          (clj->js {:container "body"
+                                                    :placement "bottom"
+                                                    :trigger "manual"
+                                                    :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                                     "<div class=\"tooltip-arrow\"></div>"
+                                                                     "<div class=\"tooltip-inner\"></div>"
+                                                                   "</div>")
+                                                    :title "A title is required in order to save or share this post."})))
+                                       (utils/after 10 #(.tooltip $post-btn "show"))
+                                       (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+                     :class (when (or @(::publishing s)
+                                      (not (is-publishable? entry-editing))
+                                      (zero? (count (:headline entry-editing))))
+                              "disabled")}
+                    (when (or (and published?
+                                   @(::saving s))
+                              (and (not published?)
+                                   @(::publishing s)))
+                      (small-loading))
                     (if published?
-                      "Edit post..."
-                      "Edit draft...")
-                    "New post...")]]
+                      "Save"
+                      "Post")]
+                  (when (and (not nux)
+                             (not published?))
+                    [:button.mlb-reset
+                      {:disabled (or @(::saving s)
+                                     (not (:has-changes entry-editing)))
+                       :on-click (fn [_]
+                                  (clean-body)
+                                  (reset! (::saving s) true)
+                                  (dis/dispatch! [:entry-save]))}
+                      (when @(::saving s)
+                        (small-loading))
+                      "Save to draft"])]]
               [:div.mobile-second-header
                 [:div.posting-in
                   [:span
@@ -337,14 +383,7 @@
                                      (toggle-save-on-exit s true)
                                      (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                      (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                     (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
-                (when-not nux
-                  (topics-dropdown
-                   (:board-slug entry-editing)
-                   board-topics
-                   {:slug (:topic-slug entry-editing)
-                    :name (:topic-name entry-editing)}
-                   #(topic-did-change s entry-editing %)))]]
+                                     (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]]]
             [:div.entry-edit-modal-header.group
               (user-avatar-image current-user-data)
               [:div.posting-in
