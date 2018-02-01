@@ -10,6 +10,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
@@ -262,7 +263,7 @@
                                                      {:topic-slug (:slug topic-data)
                                                       :topic-name (:name topic-data)})
                                                     entry-data)]
-                                    (dis/dispatch! [:entry-edit with-topic]))))}
+                                    (activity-actions/entry-edit with-topic))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "New Post"]]
@@ -277,8 +278,8 @@
                       :on-blur #(reset! (::show-top-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (reset! (::show-top-boards-dropdown s) false)
-                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
-                                                                :board-name (:label item)}]))}))])
+                                   (activity-actions/entry-edit {:board-slug (:value item)
+                                                                 :board-name (:label item)}))}))])
               ;; Board filters when there is not topic filtering
               (when (and (not is-mobile-size?)
                          (not empty-board?)
@@ -344,7 +345,7 @@
                                                      {:topic-slug (:slug topic-data)
                                                       :topic-name (:name topic-data)})
                                                     entry-data)]
-                                    (dis/dispatch! [:entry-edit with-topic]))))}
+                                    (activity-actions/entry-edit with-topic))))}
                     [:div.add-to-board-pencil]]
                   (when @(::show-floating-boards-dropdown s)
                     (dropdown-list
@@ -357,5 +358,5 @@
                       :on-blur #(reset! (::show-floating-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (reset! (::show-floating-boards-dropdown s) false)
-                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
-                                                                :board-name (:label item)}]))}))]))]]]))
+                                   (activity-actions/entry-edit {:board-slug (:value item)
+                                                                 :board-name (:label item)}))}))]))]]]))

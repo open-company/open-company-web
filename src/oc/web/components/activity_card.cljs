@@ -13,6 +13,7 @@
             [oc.web.lib.activity-utils :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
@@ -31,7 +32,7 @@
         [:div.activity-card-title
           "This topic’s a little sparse. "
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:entry-edit topic])}
+            {:on-click #(activity-actions/entry-edit topic)}
             "Add an update?"]]])])
 
 (defn- delete-clicked [e activity-data]
@@ -108,7 +109,7 @@
                       @(::more-dropdown s)
                       @(::move-activity s))
 
-                      (dis/dispatch! [:activity-modal-fade-in activity-data]))))}
+                      (activity-actions/activity-modal-fade-in activity-data))))}
       ; Card header
       [:div.activity-card-head.group
         {:class "entry-card"}
@@ -152,7 +153,7 @@
                           {:on-click #(do
                                         (utils/remove-tooltips)
                                         (reset! (::more-dropdown s) false)
-                                        (dis/dispatch! [:activity-edit activity-data]))}
+                                        (activity-actions/activity-edit activity-data))}
                           "Edit"])
                       (when share-link
                         [:li
@@ -235,4 +236,4 @@
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::more-dropdown s) false)
-                         (dis/dispatch! [:activity-edit activity-data]))}])]]))
+                         (activity-actions/activity-edit activity-data))}])]]))

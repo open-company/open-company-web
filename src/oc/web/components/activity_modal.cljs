@@ -13,6 +13,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
@@ -26,22 +27,24 @@
 
 ;; Unsaved edits handling
 
-(defn autosave []
+(defn autosave [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (let [cleaned-body (when body-el
+    (let [modal-data @(drv/get-ref s :modal-data)
+          activity-data (:activity-data modal-data)
+          cleaned-body (when body-el
                         (utils/clean-body-html (.-innerHTML body-el)))]
-      (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body]))))
+      (activity-actions/entry-save-on-exit :modal-editing-data (:uuid activity-data) cleaned-body))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when (:entry-save-on-exit @(drv/get-ref s :modal-data))
-    (autosave)))
+    (autosave s)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
   [s turn-on?]
-  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
+  (activity-actions/entry-toggle-save-on-exit turn-on?))
 
 ;; Modal dismiss handling
 
@@ -49,10 +52,8 @@
   (let [modal-data @(drv/get-ref s :modal-data)
         activity-data (:activity-data modal-data)
         current-board-filters (:board-filters modal-data)]
-    (dis/dispatch!
-     [:activity-modal-fade-out
-      (:board-slug activity-data)
-      (or board-filters current-board-filters)])))
+    (activity-actions/activity-modal-fade-out (:board-slug activity-data)
+     (or board-filters current-board-filters))))
 
 (defn close-clicked [s & [board-filters]]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
@@ -123,9 +124,9 @@
 
 (defn- real-start-editing [state & [focus]]
   (when-not (responsive/is-tablet-or-mobile?)
-    (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true])
+    (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true)
     (utils/after 100 #(setup-headline state))
-    (reset! (::autosave-timer state) (utils/every 5000 autosave))
+    (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
     (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
     (when focus
       (utils/after 1000
@@ -145,7 +146,7 @@
   (reset! (::edited-data-loaded state) false)
   (js/clearInterval @(::autosave-timer state))
   (reset! (::autosave-timer state) nil)
-  (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false])
+  (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false)
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
     (reset! (::headline-input-listener state) nil)))
@@ -428,7 +429,7 @@
                            [:li.no-editing
                              {:on-click #(do
                                           (reset! (::showing-dropdown s) false)
-                                          (dis/dispatch! [:activity-edit activity-data]))}
+                                          (activity-actions/activity-edit activity-data))}
                              "Edit"])
                           (when (and is-mobile?
                                      share-link)

@@ -13,6 +13,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -40,31 +41,32 @@
                 (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal)))
         (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
 
-(defn dismiss-modal []
-  (dis/dispatch! [:entry-edit/dismiss]))
+(defn dismiss-modal [board-filters]
+  (activity-actions/entry-edit-dismiss board-filters))
 
 (defn real-close [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 dismiss-modal))
+  (utils/after 180 #(dismiss-modal @(drv/get-ref s :board-filters))))
 
 ;; Local cache for outstanding edits
 
-(defn autosave []
-  (let [body-el (sel1 [:div.rich-body-editor])
+(defn autosave [s]
+  (let [entry-editing @(drv/get-ref s :entry-editing)
+        body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
                       (utils/clean-body-html (.-innerHTML body-el)))]
-    (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body])))
+    (activity-actions/entry-save-on-exit :entry-editing (:uuid entry-editing) cleaned-body)))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when @(drv/get-ref s :entry-save-on-exit)
-    (autosave)))
+    (autosave s)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
   [s turn-on?]
-  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
+  (activity-actions/entry-toggle-save-on-exit turn-on?))
 
 ;; Close dismiss handling
 
@@ -210,7 +212,7 @@
                             js/window
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
-                          (reset! (::autosave-timer s) (utils/every 5000 autosave))
+                          (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           s)
                          :before-render (fn [s]
                           (calc-entry-edit-modal-height s)
