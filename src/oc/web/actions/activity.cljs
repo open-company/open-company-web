@@ -112,9 +112,9 @@
     (dis/dispatch! [:modal-editing-deactivate])))
 
 (defn entry-save-on-exit
-  [edit-key entry-uuid entry-body]
-  (let [entry-map (assoc entry-editing :body entry-body)
-        cache-key (get-entry-cache-key entry-uuid)]
+  [edit-key activity-data entry-body]
+  (let [entry-map (assoc activity-data :body entry-body)
+        cache-key (get-entry-cache-key (:uuid activity-data))]
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err

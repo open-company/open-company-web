@@ -55,7 +55,7 @@
         body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
                       (utils/clean-body-html (.-innerHTML body-el)))]
-    (activity-actions/entry-save-on-exit :entry-editing (:uuid entry-editing) cleaned-body)))
+    (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body)))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
