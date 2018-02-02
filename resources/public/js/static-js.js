@@ -84,6 +84,9 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("#site-header-login-item").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
+    $("div.main.slack").addClass("no-get-started-button");
+    // Remove the signup with slack buttons
+    $("div.sigin-with-slack-container").css({"display": "none"});
     // Remove the get started centered button if the user is signed in
     $("#get-started-centred-bt").css({"display": "none"});
     // Remove the get started bottom button if the user is signed in
@@ -121,8 +124,10 @@ document.addEventListener("DOMContentLoaded", function(_) {
   }else{ // No logged in user
     // Remove get started button missing classes
     $("div.home-page").removeClass("no-get-started-button");
+    $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
     $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner signup button
     $("#site-header-signup-item").attr("href", "/sign-up");
     $("#site-header-mobile-signup-item").attr("href", "/sign-up");

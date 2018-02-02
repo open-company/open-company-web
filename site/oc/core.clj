@@ -202,6 +202,7 @@
                 (case page
                   :index   (pages/index options)
                   :about   (pages/about options)
+                  :slack   (pages/slack options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)

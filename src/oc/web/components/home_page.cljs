@@ -54,9 +54,9 @@
           [:h1.headline
             "Where leaders speak"]
           [:div.subheadline.big-web-only
-            "Leadership updates that keep everyone aligned"]
+            "Company updates, ideas, and stories that keep"]
           [:div.subheadline.second-line.big-web-only
-            "around what matters most"]
+            "teams aligned around what matters most."]
           [:div.subheadline.mobile-only
             (str
              "Leadership updates that keep everyone aligned "
