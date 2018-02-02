@@ -13,11 +13,6 @@
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.search :refer (search-box)]))
 
-(defn- share-new-tooltip [team-id]
-  (if (jwt/team-has-bot? team-id)
-    "Select topics to share by Slack, email or link."
-    "Select topics to share by email or link."))
-
 (rum/defcs navbar < rum/reactive
                      (drv/drv :navbar-data)
                      {:did-mount (fn [s]
