@@ -328,6 +328,7 @@
                       "Save"
                       "Post")]
                   (when (and (not nux)
+                             (not @(::publishing s))
                              (not published?))
                     [:button.mlb-reset
                       {:disabled (or @(::saving s)
@@ -338,29 +339,7 @@
                                   (dis/dispatch! [:entry-save]))}
                       (when @(::saving s)
                         (small-loading))
-                      "Save to draft"])]]
-              [:div.mobile-second-header
-                [:div.posting-in
-                  [:span
-                    (if (:uuid entry-editing)
-                      "Draft for: "
-                      "Posting in: ")]
-                  [:div.boards-dropdown-caret
-                    {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
-                     :class (when (not nux) "no-nux")}
-                    (:board-name entry-editing)
-                    (when (and (not nux) @(::show-boards-dropdown s))
-                      (dropdown-list
-                       {:items (map
-                                #(clojure.set/rename-keys % {:name :label :slug :value})
-                                (vals all-boards))
-                        :value (:board-slug entry-editing)
-                        :on-blur #(reset! (::show-boards-dropdown s) false)
-                        :on-change (fn [item]
-                                     (toggle-save-on-exit s true)
-                                     (dis/dispatch! [:input [:entry-editing :has-changes] true])
-                                     (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                     (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]]]
+                      "Save to draft"])]]]
             [:div.entry-edit-modal-header.group
               (user-avatar-image current-user-data)
               [:div.posting-in
@@ -386,6 +365,28 @@
                                    (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]])
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          (when is-mobile?
+            [:div.mobile-posting-in
+              [:span
+                (if (:uuid entry-editing)
+                  "Draft for: "
+                  "Posting in: ")]
+              [:div.boards-dropdown-caret
+                {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
+                 :class (when (not nux) "no-nux")}
+                (:board-name entry-editing)
+                (when (and (not nux) @(::show-boards-dropdown s))
+                  (dropdown-list
+                   {:items (map
+                            #(clojure.set/rename-keys % {:name :label :slug :value})
+                            (vals all-boards))
+                    :value (:board-slug entry-editing)
+                    :on-blur #(reset! (::show-boards-dropdown s) false)
+                    :on-change (fn [item]
+                                 (toggle-save-on-exit s true)
+                                 (dis/dispatch! [:input [:entry-editing :has-changes] true])
+                                 (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
+                                 (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]])
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable
             {:content-editable (not nux)
@@ -414,74 +415,75 @@
           [:div.entry-edit-controls.group]
         [:div.entry-edit-modal-divider
           {:class (when-not @(::show-divider-line s) "not-visible")}]
-        [:div.entry-edit-modal-footer.group
-          (when (and (not nux)
-                     (not (responsive/is-tablet-or-mobile?))
-                     (not (js/isIE)))
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                           :container-selector "div.entry-edit-modal"}))
-          (when nux
-            (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
-                        post-button-offset (.offset post-button)]
-              (carrot-tip {:step :2
-                           :circle-offset {:top -90
-                                           :left -550}
-                           :x (- (aget post-button-offset "left") 522)
-                           :y (- (aget post-button-offset "top") 20)
-                           :title "Here’s a sample post"
-                           :message "Click the green Post button to see how it works."
-                           :width 494})))
-          [:button.mlb-reset.mlb-default.form-action-bt.post-btn
-            {:ref "post-btn"
-             :on-click (fn [_]
-                         (clean-body)
-                         (if (and (is-publishable? entry-editing)
-                                  (not (zero? (count (:headline entry-editing)))))
-                           (if published?
-                             (do
-                               (reset! (::saving s) true)
-                               (dis/dispatch! [:entry-save]))
-                             (do
-                               (reset! (::publishing s) true)
-                               (dis/dispatch! [:entry-publish])))
-                           (when (zero? (count (:headline entry-editing)))
-                             (when-let [$post-btn (js/$ (rum/ref-node s "post-btn"))]
-                               (when-not (.data $post-btn "bs.tooltip")
-                                 (.tooltip $post-btn
-                                  (clj->js {:container "body"
-                                            :placement "top"
-                                            :trigger "manual"
-                                            :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                             "<div class=\"tooltip-arrow\"></div>"
-                                                             "<div class=\"tooltip-inner\"></div>"
-                                                           "</div>")
-                                            :title "A title is required in order to save or share this post."})))
-                               (utils/after 10 #(.tooltip $post-btn "show"))
-                               (utils/after 5000 #(.tooltip $post-btn "hide"))))))
-             :class (when (or @(::publishing s)
-                              (not (is-publishable? entry-editing)))
-                      "disabled")}
-            (when (or (and published?
-                           @(::saving s))
-                      (and (not published?)
-                           @(::publishing s)))
-              (small-loading))
-            (if published?
-              "Save"
-              "Post")]
-          (when-not nux
-            [:button.mlb-reset.mlb-link-black.form-action-bt
-              {:disabled (or @(::saving s)
-                             (not (:has-changes entry-editing)))
-               :on-click #(if published?
-                            (cancel-clicked s)
-                            (do
-                              (clean-body)
-                              (reset! (::saving s) true)
-                              (dis/dispatch! [:entry-save])))}
-              (when (and (not published?)
-                         @(::saving s))
+        (when-not is-mobile?
+          [:div.entry-edit-modal-footer.group
+            (when (and (not nux)
+                       (not (responsive/is-tablet-or-mobile?))
+                       (not (js/isIE)))
+              (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                             :container-selector "div.entry-edit-modal"}))
+            (when nux
+              (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
+                          post-button-offset (.offset post-button)]
+                (carrot-tip {:step :2
+                             :circle-offset {:top -90
+                                             :left -550}
+                             :x (- (aget post-button-offset "left") 522)
+                             :y (- (aget post-button-offset "top") 20)
+                             :title "Here’s a sample post"
+                             :message "Click the green Post button to see how it works."
+                             :width 494})))
+            [:button.mlb-reset.mlb-default.form-action-bt.post-btn
+              {:ref "post-btn"
+               :on-click (fn [_]
+                           (clean-body)
+                           (if (and (is-publishable? entry-editing)
+                                    (not (zero? (count (:headline entry-editing)))))
+                             (if published?
+                               (do
+                                 (reset! (::saving s) true)
+                                 (dis/dispatch! [:entry-save]))
+                               (do
+                                 (reset! (::publishing s) true)
+                                 (dis/dispatch! [:entry-publish])))
+                             (when (zero? (count (:headline entry-editing)))
+                               (when-let [$post-btn (js/$ (rum/ref-node s "post-btn"))]
+                                 (when-not (.data $post-btn "bs.tooltip")
+                                   (.tooltip $post-btn
+                                    (clj->js {:container "body"
+                                              :placement "top"
+                                              :trigger "manual"
+                                              :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                               "<div class=\"tooltip-arrow\"></div>"
+                                                               "<div class=\"tooltip-inner\"></div>"
+                                                             "</div>")
+                                              :title "A title is required in order to save or share this post."})))
+                                 (utils/after 10 #(.tooltip $post-btn "show"))
+                                 (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+               :class (when (or @(::publishing s)
+                                (not (is-publishable? entry-editing)))
+                        "disabled")}
+              (when (or (and published?
+                             @(::saving s))
+                        (and (not published?)
+                             @(::publishing s)))
                 (small-loading))
               (if published?
-                "Cancel"
-                "Save draft")])]]]]))
+                "Save"
+                "Post")]
+            (when-not nux
+              [:button.mlb-reset.mlb-link-black.form-action-bt
+                {:disabled (or @(::saving s)
+                               (not (:has-changes entry-editing)))
+                 :on-click #(if published?
+                              (cancel-clicked s)
+                              (do
+                                (clean-body)
+                                (reset! (::saving s) true)
+                                (dis/dispatch! [:entry-save])))}
+                (when (and (not published?)
+                           @(::saving s))
+                  (small-loading))
+                (if published?
+                  "Cancel"
+                  "Save draft")])])]]]))

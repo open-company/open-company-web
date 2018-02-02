@@ -60,17 +60,22 @@ div.entry-edit-modal-container {
 
         @include mobile() {
           display: block;
-          height: #{64 + 59}px;
+          height: 64px;
           background-color: white;
-          width: 100%;
+          width: 100vw;
           text-align: center;
-          position: relative;
+          position: fixed;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          z-index: 1;
 
           div.mobile-header {
+            position: relative;
+            width: 100vw;
             height: 64px;
             padding: 20px 24px;
             box-shadow: 0px 2px 6px 0px rgba($carrot_light_gray_7, 0.5);
-            position: relative;
 
             button.mobile-modal-close-bt {
               @include image-2x("/img/ML/mobile_modal_close");
@@ -101,32 +106,6 @@ div.entry-edit-modal-container {
 
                 &.disabled {
                   opacity: 0.3;
-                }
-              }
-            }
-          }
-
-          div.mobile-second-header {
-            height: 58px;
-            padding: 36px 24px 0px;
-
-            div.posting-in {
-              @include avenir_M();
-              font-size: 16px;
-              color: $oc_gray_7;
-              float: left;
-              margin-top: 5px;
-
-              span {
-                float: left;
-              }
-
-              div.boards-dropdown-caret.no-nux {
-                &:after {
-                  background-color: $carrot_light_gray_7;
-                  border-radius: 100px;
-                  margin-top: -2px;
-                  background-position: center 7px;
                 }
               }
             }
@@ -230,11 +209,32 @@ div.entry-edit-modal-container {
         margin-left: -22px;
 
         @include tablet() {
-          min-height: calc(100vh - 64px - 58px);
+          min-height: calc(100vh - 64px - 1px);
           max-height: initial;
           padding: 30px 24px;
           width: 100%;
-          margin: 0px;
+          margin: 64px 0px 0px;
+
+          div.mobile-posting-in {
+            @include avenir_M();
+            font-size: 16px;
+            color: $oc_gray_7;
+            height: 58px;
+            padding: 12px 0px 0px;
+
+            span {
+              float: left;
+            }
+
+            div.boards-dropdown-caret.no-nux {
+              &:after {
+                background-color: $carrot_light_gray_7;
+                border-radius: 100px;
+                margin-top: -2px;
+                background-position: center 7px;
+              }
+            }
+          }
         }
 
         div.entry-edit-headline {
@@ -291,6 +291,8 @@ div.entry-edit-modal-container {
 
             @include tablet() {
               width: 100%;
+              margin: 24px 0px 0px;
+              min-height: calc(100vh - 64px - 240px);
 
               @include avenir_BOOK();
               font-size: 18px;
