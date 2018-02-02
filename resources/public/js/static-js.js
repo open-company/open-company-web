@@ -77,11 +77,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
           if ( org_slug ) {
             board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug))
             if ( board_slug ){
-              if ( OCStaticGetCookie(OCStaticCookieName("last-filter-" + user_id + "-" + board_slug + "-" + org_slug)) === "by-topic" ) {
-                your_board_url = "/" + org_slug + "/" + board_slug + "/by-topic";
-              } else {
-                your_board_url = "/" + org_slug + "/" + board_slug;
-              }
+              your_board_url = "/" + org_slug + "/" + board_slug;
             } else {
               your_board_url = "/" + org_slug;
             }

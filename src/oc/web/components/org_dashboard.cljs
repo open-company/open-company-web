@@ -138,6 +138,6 @@
                            is-sharing-activity))
           [:div.page
             (navbar)
-            [:div.dashboard-container
-              [:div.topic-list
+            [:div.org-dashboard-container
+              [:div.org-dashboard-inner
                 (dashboard-layout)]]])])))

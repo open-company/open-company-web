@@ -23,7 +23,7 @@ div.org-dashboard {
       padding-top: #{$mobile_navbar_height}px;
     }
 
-    div.dashboard-container {
+    div.org-dashboard-container {
       background-color: $oc_gray_8;
 
       @include big_web() {
@@ -78,13 +78,13 @@ div.add-more-tooltip {
 }
 
 div.org-dashboard.modal-activity-view.mobile-or-tablet {
-  div.topic-list{
+  div.org-dashboard-inner {
     padding-bottom: 0px;
     padding-top: 0px;
   }
 }
 
-div.org-dashboard div.topic-list{
+div.org-dashboard div.org-dashboard-inner {
   padding-bottom: 20px;
   background-color: $oc_gray_8;
 
