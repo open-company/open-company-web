@@ -1,6 +1,5 @@
 (ns oc.web.actions.user
   (:require [taoensso.timbre :as timbre]
-            [defun.core :refer (defun)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -44,7 +43,7 @@
   (api/jwt-refresh update-jwt logout))
 
 ;; API Entry point
-(defun entry-point-get-finished
+(defn entry-point-get-finished
   ([success body] (entry-point-get-finished success body #()))
 
   ([success body callback]
@@ -56,6 +55,19 @@
         (callback orgs collection)
         (dis/dispatch! [:entry-point orgs collection]))
       (dis/dispatch! [:error-banner-show utils/generic-network-error 0])))))
+
+(defn entry-point-get [org-slug]
+  (api/get-entry-point
+   (fn [success body]
+     (entry-point-get-finished success body
+       (fn [orgs collection]
+         (if org-slug
+           (do
+             (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+               (api/get-org org-data)
+               (router/redirect-404!)))
+           (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
+             (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
 (defn slack-lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point

@@ -4,7 +4,6 @@
   (:require [cljs.core.async :as async :refer (<!)]
             [cljs-http.client :as http]
             [defun.core :refer (defun-)]
-            [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
             [oc.web.dispatcher :as dispatcher]
@@ -259,7 +258,7 @@
         (fn [{:keys [success body status]}]
           (dispatcher/dispatch! [:org (json->cljs body) true]))))))
 
-(defun get-auth-settings
+(defn get-auth-settings
   ([] (get-auth-settings #()))
   ([callback]
      (auth-http http/get "/"

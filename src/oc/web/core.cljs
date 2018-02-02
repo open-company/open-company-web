@@ -115,17 +115,7 @@
       (when (or (> (- now latest-entry-point) reload-time)
                 (and (router/current-org-slug)
                      (nil? (dis/org-data))))
-        (api/get-entry-point
-         (fn [success body]
-           (user-actions/entry-point-get-finished success body
-             (fn [orgs collection]
-               (if (router/current-org-slug)
-                 (do
-                   (if-let [org-data (first (filter #(= (:slug %) (router/current-org-slug)) orgs))]
-                     (api/get-org org-data)
-                     (router/redirect-404!)))
-                 (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
-                   (router/nav! (urls/org (:slug (first orgs)))))))))))
+        (user-actions/entry-point-get (router/current-org-slug)))
       (when (> (- now latest-auth-settings) reload-time)
         (api/get-auth-settings))))))
 
