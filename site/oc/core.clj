@@ -154,7 +154,7 @@
                "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "SUPPORT"]
-          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          ; [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
           [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
