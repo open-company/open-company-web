@@ -114,7 +114,7 @@
 (defn entry-save-on-exit
   [edit-key activity-data entry-body]
   (let [entry-map (assoc activity-data :body entry-body)
-        cache-key (get-entry-cache-key (:uuid activity-data))]
+        cache-key (actions/get-entry-cache-key (:uuid activity-data))]
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
