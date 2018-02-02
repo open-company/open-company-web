@@ -150,7 +150,7 @@
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)
-                  :let [board-url (utils/get-board-url org-slug (:slug board))
+                  :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (= (router/current-board-slug) (:slug board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-posts) is-current-board) "item-selected")

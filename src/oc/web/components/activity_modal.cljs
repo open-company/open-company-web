@@ -20,7 +20,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
@@ -48,21 +47,19 @@
 
 ;; Modal dismiss handling
 
-(defn dismiss-modal [s board-filters]
+(defn dismiss-modal [s]
   (let [modal-data @(drv/get-ref s :modal-data)
-        activity-data (:activity-data modal-data)
-        current-board-filters (:board-filters modal-data)]
-    (activity-actions/activity-modal-fade-out (:board-slug activity-data)
-     (or board-filters current-board-filters))))
+        activity-data (:activity-data modal-data)]
+    (activity-actions/activity-modal-fade-out (:board-slug activity-data))))
 
-(defn close-clicked [s & [board-filters]]
+(defn close-clicked [s]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
     (when-not (:from-all-posts @router/path)
       ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
       (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal s board-filters)))
+  (utils/after 180 #(dismiss-modal s)))
 
 ;; Delete handling
 
@@ -75,7 +72,7 @@
                     :solid-button-title "Yes"
                     :solid-button-cb #(let [org-slug (router/current-org-slug)
                                             board-slug (router/current-board-slug)
-                                            board-url (utils/get-board-url org-slug board-slug)]
+                                            board-url (oc-urls/board org-slug board-slug)]
                                        (router/nav! board-url)
                                        (dis/dispatch! [:activity-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
@@ -221,18 +218,6 @@
         (reset! (::initial-body s) initial-body)
         (reset! (::initial-headline s) initial-headline)
         (reset! (::edited-data-loaded s) true)))))
-
-(defn topic-did-change [s editing topic-map]
-  (let [activity-data (:activity-data @(drv/get-ref s :modal-data))]
-    (if editing
-      (do
-        (dis/dispatch! [:update [:modal-editing-data] #(merge % {:topic-slug (:slug topic-map)
-                                                                 :topic-name (:name topic-map)
-                                                                 :has-changes true})])
-        (toggle-save-on-exit s true))
-      (dis/dispatch! [:entry-topic-change (merge activity-data
-                                           {:topic-slug (:slug topic-map)
-                                            :topic-name (:name topic-map)})]))))
 
 (rum/defcs activity-modal < rum/reactive
                             ;; Derivatives
@@ -455,17 +440,9 @@
                       (activity-move {:activity-data activity-data
                                       :boards-list all-boards
                                       :dismiss-cb #(reset! (::move-activity s) false)
-                                      :on-change #(close-clicked s nil)}))]))
+                                      :on-change #(close-clicked s)}))]))
               (when-not is-mobile?
-                (activity-attachments activity-data false))
-              (let [topics (distinct (:entry-edit-topics modal-data))
-                    entry-data (if editing (:modal-editing-data modal-data) activity-data)]
-                (topics-dropdown
-                 (:board-slug entry-data)
-                 topics
-                 {:slug (:topic-slug entry-data)
-                  :name (:topic-name entry-data)}
-                 #(topic-did-change s editing %)))]]
+                (activity-attachments activity-data false))]]
           [:div.activity-modal-columns
             ;; Left column
             [:div.activity-left-column

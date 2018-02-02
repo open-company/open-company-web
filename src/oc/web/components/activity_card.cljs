@@ -23,18 +23,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(rum/defc activity-card-empty
-  [topic read-only?]
-  [:div.activity-card.empty-state.group
-    (when-not read-only?
-      [:div.empty-state-content
-        [:img {:src (utils/cdn "/img/ML/entry_empty_state.svg")}]
-        [:div.activity-card-title
-          "This topic’s a little sparse. "
-          [:button.mlb-reset
-            {:on-click #(activity-actions/entry-edit topic)}
-            "Add an update?"]]])])
-
 (defn- delete-clicked [e activity-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-entry"
@@ -180,21 +168,9 @@
                     :boards-list all-boards
                     :dismiss-cb #(reset! (::move-activity s) false)}))]))
           (activity-attachments activity-data true)
-          ; Topic tag button
-          (when (:topic-slug activity-data)
-            (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-              [:div.activity-tag.on-gray
-                {:class (when is-all-posts "double-tag")
-                 :on-click #(router/nav!
-                             (oc-urls/board-filter-by-topic
-                              (router/current-org-slug)
-                              (:board-slug activity-data)
-                              (:topic-slug activity-data)))}
-                topic-name]))
           (when is-all-posts
             [:div.activity-tag.board-tag.on-gray
-              {:class (utils/class-set {:double-tag (:topic-slug activity-data)})
-               :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:board-slug activity-data)))}
+              {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug activity-data)))}
               (:board-name activity-data)])
                 ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
                 ;;(when is-new [:div.new-tag "New"])

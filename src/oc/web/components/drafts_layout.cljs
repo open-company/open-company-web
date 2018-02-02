@@ -54,13 +54,7 @@
                    :data-placement "top"
                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                    :title (utils/activity-date-tooltip draft)}
-                  (utils/time-since t)])]]
-          [:div.draft-card-head-right
-            ; Topic tag button
-            (when (:topic-slug draft)
-              (let [topic-name (or (:topic-name draft) (string/upper (:topic-slug draft)))]
-                [:div.activity-tag.on-gray
-                  topic-name]))]]
+                  (utils/time-since t)])]]]
         [:div.draft-card-content.group
           [:div.draft-card-title
             {:dangerouslySetInnerHTML

@@ -144,7 +144,7 @@
           (utils/after 10
             #(router/nav!
                (if board-to
-                 (utils/get-board-url (:slug org-data) (:slug board-to))
+                 (oc-urls/board (:slug org-data) (:slug board-to))
                  (oc-urls/all-posts (:slug org-data)))))))))
 
   ;; Change service connection
@@ -235,22 +235,12 @@
                             (router/current-activity-id)
                             (contains? (:fixed-items fixed-board-data) (router/current-activity-id)))
                      (dissoc db :loading)
-                     db)
-        should-404? (and is-currently-shown
-                         (string? (:board-filters db))
-                         (not= (:board-filters db) "uncategorized")
-                         (zero? (count (filter #(= (:slug %) (:board-filters db)) (:topics board-data)))))]
+                     db)]
     (when is-currently-shown
 
       (when (and (router/current-activity-id)
                  (not (contains? (:fixed-items fixed-board-data) (router/current-activity-id))))
-        (router/nav! (utils/get-board-url (router/current-org-slug) (:slug board-data))))
-
-      (when should-404?
-        (router/redirect-404!))
-
-      (when-not should-404?
-        (cook/set-cookie! (router/last-board-cookie org) (router/current-board-slug) (* 60 60 24 6)))
+        (router/nav! (oc-urls/board (router/current-org-slug) (:slug board-data))))
 
       ;; Follow the interactions link to connect to the Interaction service WebSocket to watch for comment/reaction
       ;; changes, this will also disconnect prior connection if we were watching another board already
@@ -317,7 +307,7 @@
         board-data (get db board-key)
         new-entries (assoc (get board-data :fixed-items)
                      entry-uuid
-                     (utils/fix-entry body board-data (:topics board-data)))
+                     (utils/fix-entry body board-data))
         new-board-data (assoc board-data :fixed-items new-entries)]
   (assoc db board-key new-board-data)))
 
@@ -967,9 +957,9 @@
           (-> db
               (assoc-in comments-key sorted-comments-data)
               (assoc-in (vec (concat board-key [:fixed-items fixed-activity-uuid])) with-authors)))
-        ;; the entry is not present, refresh the full topic
+        ;; the entry is not present, refresh the full board
         (do
-          ;; force refresh of topic
+          ;; force refresh of board
           (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
           db)))))
 
@@ -1013,7 +1003,7 @@
                                    (assoc old-reactions-data (count old-reactions-data) with-links))
               ; Update the entry with the new reaction
               updated-entry-data (assoc entry-data :reactions new-reactions-data)]
-          ;; Refresh the topic data if the action coming in is from the current user
+          ;; Refresh the activity data if the action coming in is from the current user
           ;; to get the new links to interact with
           (when is-current-user
             (api/get-entry entry-data))
@@ -1022,9 +1012,9 @@
           ;   (utils/pulse-reaction-count fixed-activity-uuid (:reaction reaction-data)))
           ; Update the entry in the local state with the new reaction
           (assoc-in db entry-key updated-entry-data))
-        ;; the entry is not present, refresh the full topic
+        ;; the entry is not present, refresh the full board
         (do
-          ;; force refresh of topic
+          ;; force refresh of board
           (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
           db)))))
 
@@ -1095,6 +1085,7 @@
   (remove-cached-item (-> db edit-key :uuid))
   (dissoc db :entry-save-on-exit))
 
+<<<<<<< HEAD
 (defmethod dispatcher/action :topic-add
   [db [_ topic-map board-slug]]
   (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
@@ -1102,6 +1093,101 @@
         next-topics (conj (:topics board-data) topic-map)
         next-board-data (assoc board-data :topics next-topics)]
     (assoc-in db board-key next-board-data)))
+=======
+(defn activity-load-cached-item
+  [activity-data]
+  (let [cache-key (get-entry-cache-key (:uuid activity-data))]
+    (uc/get-item cache-key
+     (fn [item err]
+       (if (and (not err)
+                (map? item)
+                (= (:updated-at activity-data) (:updated-at item)))
+         (let [entry-to-save (merge item (select-keys activity-data [:links]))]
+           (dispatcher/dispatch! [:input [:modal-editing-data] entry-to-save]))
+         (do
+           ;; If we got an item remove it since it won't be used
+           ;; since we have an updated version of it already
+           (when item
+             (remove-cached-item (:uuid activity-data)))
+           (dispatcher/dispatch! [:input [:modal-editing-data] activity-data])))
+       (dispatcher/dispatch! [:input [:modal-editing] true])
+       (dispatcher/dispatch! [:input [:entry-save-on-exit] true])))))
+
+(defn activity-modal-fade-in
+  [db activity-data editing]
+  (utils/after 10
+   #(let [from-all-posts (= (router/current-board-slug) "all-posts")
+          activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))]
+      (router/nav! (str activity-url (when from-all-posts "?ap")))))
+  (when editing
+    (utils/after 100 #(activity-load-cached-item activity-data)))
+  (-> db
+    (assoc :activity-modal-fade-in (:uuid activity-data))
+    (assoc :dismiss-modal-on-editing-stop editing)
+    ;; Make sure the seen-at is not reset when navigating to modal view
+    (assoc :no-reset-seen-at true)))
+
+(defmethod dispatcher/action :activity-modal-fade-in
+  [db [_ activity-data editing]]
+  (if (get-in db [:search-active])
+    db
+    (activity-modal-fade-in db activity-data editing)))
+
+(defn entry-edit
+  [db initial-entry-data]
+  ;; Delay the entry-edit open to the cached item load
+  ;; if we have a cached item starts with it, if not start with the initial passed data
+  (let [cache-key (get-entry-cache-key (:uuid initial-entry-data))]
+    (uc/get-item cache-key
+     (fn [item err]
+       (if (and (not err)
+                (map? item)
+                (or (and (:updated-at initial-entry-data)
+                         (= (:updated-at initial-entry-data) (:updated-at item)))
+                    (not (:updated-at initial-entry-data))))
+         (let [entry-to-save (merge item (select-keys initial-entry-data [:links :board-slug :board-name]))]
+           (dispatcher/dispatch! [:input [:entry-editing] entry-to-save]))
+         (do
+           ;; If we got an item remove it since it won't be used
+           ;; since we have an updated version of it already
+           (when item
+             (remove-cached-item (:uuid initial-entry-data)))
+           (dispatcher/dispatch! [:input [:entry-editing] initial-entry-data]))))))
+  db)
+
+(defmethod dispatcher/action :entry-edit
+  [db [_ initial-entry-data]]
+  (entry-edit db initial-entry-data))
+
+(defmethod dispatcher/action :activity-edit
+  [db [_ activity-data]]
+  (if (or (responsive/is-tablet-or-mobile?)
+          (not= (:status activity-data) "published"))
+    (entry-edit db activity-data)
+    (activity-modal-fade-in db activity-data true)))
+
+(defmethod dispatcher/action :entry-edit/dismiss
+  [db [_]]
+  ;; If the user was looking at the modal, dismiss it too
+  (when (router/current-activity-id)
+    (utils/after 1 #(let [from-all-posts (or
+                                          (:from-all-posts @router/path)
+                                          (= (router/current-board-slug) "all-posts"))
+                          board-url (oc-urls/board (router/current-org-slug) (router/current-board-slug))]
+                      (router/nav!
+                        (cond
+                          ; AP
+                          from-all-posts
+                          (oc-urls/all-posts (router/current-org-slug))
+                          ;; Board
+                          :else
+                          board-url)))))
+  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
+  (utils/after 1000 #(dispatcher/dispatch! [:input [:entry-edit-dissmissing] false]))
+  (-> db
+    (dissoc :entry-editing)
+    (assoc :entry-edit-dissmissing true)))
+>>>>>>> mainline
 
 (defmethod dispatcher/action :entry-save
   [db [_]]
@@ -1118,11 +1204,6 @@
         (api/create-entry entry-data entry-create-link)))
     (assoc-in db [:entry-editing :loading] true)))
 
-(defmethod dispatcher/action :entry-topic-change
-  [db [_ entry-data]]
-  (api/update-entry entry-data (router/current-board-slug) :modal-editing-data)
-  (assoc db :entry-topic-loading true))
-
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [activity-data board-slug edit-key]}]]
   (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
@@ -1138,15 +1219,14 @@
                      (dispatcher/board-data-key (router/current-org-slug) utils/default-drafts-board-slug))
           board-data (or (get-in db board-key) utils/default-drafts-board)
           activity-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) board-slug))
-          fixed-activity-data (utils/fix-entry activity-data activity-board-data (:topics activity-board-data))
+          fixed-activity-data (utils/fix-entry activity-data activity-board-data)
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
           next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
           with-edited-key (if edit-key
                             (update-in next-db [edit-key] dissoc :loading)
                             next-db)
-          without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)
-          without-entry-topic-loading (dissoc without-entry-save-on-exit :entry-topic-loading)]
-      without-entry-topic-loading)))
+          without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)]
+      without-entry-save-on-exit)))
 
 (defmethod dispatcher/action :entry-save/failed
   [db [_ edit-key]]
@@ -1177,7 +1257,7 @@
     ; Add the new activity into the board
     (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
           board-data (get-in db board-key)
-          fixed-activity-data (utils/fix-entry activity-data board-data (:topics board-data))
+          fixed-activity-data (utils/fix-entry activity-data board-data)
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
@@ -1222,7 +1302,7 @@
          #(router/nav!
             (if (pos? (count boards-no-draft))
               ;; If there is at least one board redirect to it
-              (utils/get-board-url org-slug (:slug (first boards-no-draft)))
+              (oc-urls/board org-slug (:slug (first boards-no-draft)))
               ;; If not boards are available redirect to the empty org
               (oc-urls/org org-slug)))))))
   db)
@@ -1458,7 +1538,7 @@
   [db [_ success shared-data]]
   (assoc db :activity-shared-data
     (if success
-      (utils/fix-entry shared-data (:board-slug shared-data) nil)
+      (utils/fix-entry shared-data (:board-slug shared-data))
       {:error true})))
 
 (defmethod dispatcher/action :made-with-carrot-modal-show
@@ -1483,7 +1563,7 @@
       ; (router/redirect-404!)
       (if (router/current-secure-activity-id)
         (router/redirect-404!)
-        (router/nav! (utils/get-board-url (router/current-org-slug) (router/current-board-slug)))))
+        (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
     (when (and (router/current-secure-activity-id)
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
@@ -1497,7 +1577,7 @@
           fixed-activity-data (utils/fix-entry
                                activity-data
                                {:slug (or (:board-slug activity-data) board-slug)
-                                :name (:board-name activity-data)} nil)]
+                                :name (:board-name activity-data)})]
       (when (jwt/jwt)
         (when-let [ws-link (utils/link-for (:links fixed-activity-data) "interactions")]
           (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
