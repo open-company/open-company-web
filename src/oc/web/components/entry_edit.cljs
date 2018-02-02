@@ -40,12 +40,9 @@
                 (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal)))
         (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
 
-(defn dismiss-modal [board-filters]
-  (activity-actions/entry-edit-dismiss board-filters))
-
 (defn real-close [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal @(drv/get-ref s :board-filters))))
+  (utils/after 180 activity-actions/entry-edit-dismiss))
 
 ;; Local cache for outstanding edits
 

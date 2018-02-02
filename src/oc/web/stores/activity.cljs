@@ -15,7 +15,7 @@
       (assoc :no-reset-seen-at true))))
 
 (defmethod dispatcher/action :activity-modal-fade-out
-  [db [_ board-slug board-filters]]
+  [db [_ board-slug]]
   (if (get-in db [:search-active])
     db
     (-> db

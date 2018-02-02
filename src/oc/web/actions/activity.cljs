@@ -45,17 +45,13 @@
   (dis/dispatch! [:activity-modal-fade-in activity-data editing]))
 
 (defn activity-modal-fade-out
-  [board-slug board-filters]
+  [board-slug]
   (let [from-all-posts (:from-all-posts @router/path)
         to-board (if from-all-posts "all-posts" board-slug)
         org (router/current-org-slug)
-        to-url (if (string? board-filters)
-                (oc-urls/board-filter-by-topic org board-slug board-filters)
-                (if (= board-filters :by-topic)
-                  (oc-urls/board-sort-by-topic org board-slug)
-                  (if from-all-posts
-                    (oc-urls/all-posts org)
-                    (oc-urls/board org board-slug))))]
+        to-url (if from-all-posts
+                (oc-urls/all-posts org)
+                (oc-urls/board org board-slug))]
     (.pushState (.-history js/window) #js {} "" to-url)
     (router/set-route! [org to-board (if from-all-posts "all-posts" "dashboard")]
      {:org org
@@ -63,7 +59,7 @@
       :activity nil
       :query-params (:query-params @router/path)
       :from-all-posts false}))
-  (dis/dispatch! [:activity-modal-fade-out board-slug board-filters]))
+  (dis/dispatch! [:activity-modal-fade-out board-slug]))
 
 (defn entry-edit
   [initial-entry-data]
@@ -78,7 +74,7 @@
     (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate])))))
 
 (defn entry-edit-dismiss
-  [board-filters]
+  []
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
     (utils/after 1 #(let [from-all-posts (or
@@ -90,12 +86,6 @@
                           ; AA
                           from-all-posts
                           (oc-urls/all-posts (router/current-org-slug))
-                          ; Board with topic filter
-                          (string? board-filters)
-                          (oc-urls/board-filter-by-topic
-                           (router/current-org-slug)
-                           (router/current-board-slug)
-                           board-filters)
                           ;; Board most recent or by topic
                           :else
                           board-url)))))

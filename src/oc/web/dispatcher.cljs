@@ -239,7 +239,6 @@
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
-                             :board-filters (:board-filters base)
                              :modal-editing-data (:modal-editing-data base)
                              :modal-editing (:modal-editing base)
                              :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
