@@ -258,7 +258,7 @@ div.entry-edit-modal-container {
             font-size: 20px;
           }
 
-          &:empty:before {
+          &:not(:focus):empty:before {
             content: attr(placeholder);
             display: block;
             color: #8A8E94 !important;
