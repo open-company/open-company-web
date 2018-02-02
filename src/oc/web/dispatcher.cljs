@@ -41,7 +41,8 @@
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
 
 (defn activity-key [org-slug board-slug activity-uuid]
-  (let [board-key (if (= board-slug :all-posts)
+  (let [from-all-posts (or (= board-slug :all-posts) (:from-all-posts @router/path))
+        board-key (if from-all-posts
                     (all-posts-key org-slug)
                     (board-data-key org-slug board-slug))]
     (vec (concat board-key [:fixed-items activity-uuid]))))

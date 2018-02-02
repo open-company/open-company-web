@@ -82,7 +82,7 @@
                                    (js/$ slack-button)
                                    #js {:trigger "manual"})))
                               s)
-                             :did-remount (fn [o s]
+                             :before-render (fn [s]
                               ;; When we have a sharing response
                               (when-let [shared-data @(drv/get-ref s :activity-shared-data)]
                                 (when (compare-and-set! (::sharing s) true false)
