@@ -78,9 +78,9 @@
 
             [:div.slack-subline-container
               [:div.slack-subline
-                "Leadership updates that keep everyone aligned"]
+                "Company updates and stories that keep teams"]
               [:div.slack-subline
-                 "around what matters most."]]
+                 "aligned around what matters most."]]
 
             (get-started-button auth-settings true)
 
