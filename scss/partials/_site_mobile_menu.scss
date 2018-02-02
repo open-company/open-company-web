@@ -16,20 +16,19 @@ div.site-mobile-menu {
   padding: 0px 16px;
 
   div.site-mobile-menu-container {
-    margin: 30px 0px;
+    margin: 64px 0px;
 
     div.site-mobile-menu-item {
       width: 100%;
       text-align: center;
-      padding: 8px 0px;
+      padding: 16px 0px;
 
       a {
         @include avenir_M();
         font-size: 24px;
-        color: #8D8162;
+        color: $carrot_dark_gray;
 
         &.active {
-          color: $carrot_orange;
           text-decoration: underline;
         }
       }
@@ -42,6 +41,15 @@ div.site-mobile-menu {
     bottom: 60px;
     left: 0px;
     padding: 16px;
+
+    button.login-btn {
+      background-color: whtie;
+      border-radius: 100px;
+      border: 2px solid $carrot_light_blue_2;
+      @include avenir_H();
+      font-size: 16px;
+      color: $carrot_text_blue_3;
+    }
 
     button, button.get-started-button {
       max-width: none;

@@ -1129,3 +1129,7 @@
    :fixed-items {}
    :access "private"
    :read-only true})
+
+(defn retina-src [url]
+  {:src (cdn (str url ".png"))
+   :src-set (str (cdn (str url "@2x.png")) " 2x")})

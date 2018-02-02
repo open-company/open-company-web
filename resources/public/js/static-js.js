@@ -41,18 +41,58 @@ function OCStaticCookieName(name){
   return prefix + name;
 }
 
+function OCStaticGetDecodedJWT(jwt) {
+  if (jwt && typeof jwt_decode === "function") {
+    try {
+      return jwt_decode(jwt);
+    } catch(error) {
+      return null;
+    }
+  }
+  return null;
+}
+
+function OCStaticGetYourBoardsUrl (decoded_jwt) {
+  var your_board_url = "/login";
+  if ( decoded_jwt ) {
+    var user_id,
+        org_slug,
+        board_slug;
+    if (decoded_jwt) {
+      user_id = decoded_jwt["user-id"];
+      if ( user_id ) {
+        org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id));
+        if ( org_slug ) {
+          board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
+          if ( board_slug ){
+            your_board_url = "/" + org_slug + "/" + board_slug;
+          } else {
+            your_board_url = "/" + org_slug;
+          }
+        }
+      }
+    }
+  }
+  return your_board_url;
+}
+
 
 document.addEventListener("DOMContentLoaded", function(_) {
   // Get the jwt cookie to know if the user is logged in
   var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
   if (jwt) {
-    $("#site-header-signup-item").hide();
+    $("#site-header-login-item").hide();
     // Move the red guy up
-    $("div.home-page section.cta").addClass("no-get-started-button");
-    // Remove the get started centered button if the user is signed out
+    $("div.home-page").addClass("no-get-started-button");
+    $("div.main.slack").addClass("no-get-started-button");
+    // Remove the signup with slack buttons
+    $("div.sigin-with-slack-container").css({"display": "none"});
+    // Remove the get started centered button if the user is signed in
     $("#get-started-centred-bt").css({"display": "none"});
+    // Remove the get started bottom button if the user is signed in
+    $("div.about-bottom-get-started").css({"display": "none"});
     // Hide the try it box at the bottom of the homepage
-    $("section.fourth-section").css({"display": "none"});
+    $("section.third-section").css({"display": "none"});
     // Remove login button from the site mobile menu
     $("button#site-mobile-menu-login").css({"display": "none"});
     // Change Get started button to Your boards on site mobile menu
@@ -60,32 +100,20 @@ document.addEventListener("DOMContentLoaded", function(_) {
     siteMobileMenuGetStarted.text( "Your Boards" );
     siteMobileMenuGetStarted.addClass("your-boards");
     // Top right corner became Your Boards
-    var loginButton = $("#site-header-login-item");
-    loginButton.text( "Your Boards" );
-    loginButton.addClass("your-boards");
-    var your_board_url = "/login",
-        decoded_jwt;
-    if ( typeof jwt_decode === "function" ) {
-      var decoded_jwt = jwt_decode(jwt),
-          user_id,
-          org_slug,
-          board_slug;
-      if (jwt_decode &&  decoded_jwt) {
-        user_id = decoded_jwt["user-id"];
-        if ( user_id ) {
-          org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id))
-          if ( org_slug ) {
-            board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug))
-            if ( board_slug ){
-              your_board_url = "/" + org_slug + "/" + board_slug;
-            } else {
-              your_board_url = "/" + org_slug;
-            }
-          }
-        }
-      }
-    }
-    loginButton.attr("href", your_board_url);
+    var signupButton = $("#site-header-signup-item");
+    signupButton.addClass("your-boards");
+
+    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
+        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt),
+        user_avatar = decoded_jwt["avatar-url"];
+    signupButton.attr("href", your_board_url);
+    signupButton.html("<span><img class=\"user-avatar\" src=\"" + user_avatar + "\" /><span>Go to posts</span></span>");
+
+    var mobileSignupButton = $("#site-header-mobile-signup-item");
+    mobileSignupButton.removeClass("start");
+    mobileSignupButton.addClass("mobile-your-boards");
+    mobileSignupButton.attr("href", your_board_url);
+    mobileSignupButton.html("<img class=\"user-avatar\" src=\"" + user_avatar + "\" />");
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
     // Set the action of the site mobile menu's Get started button
@@ -94,10 +122,15 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("div.error-page.not-found-page p.not-logged-in").hide();
 
   }else{ // No logged in user
+    // Remove get started button missing classes
+    $("div.home-page").removeClass("no-get-started-button");
+    $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
     $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner signup button
     $("#site-header-signup-item").attr("href", "/sign-up");
+    $("#site-header-mobile-signup-item").attr("href", "/sign-up");
     // Top right corner login button
     $("#site-header-login-item").attr("href", "/login");
     // Mobile menu login button

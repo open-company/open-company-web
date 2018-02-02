@@ -16,6 +16,9 @@
 (defn about []
   (res/resource-response "/about.html" {:root "public"}))
 
+(defn slack []
+  (res/resource-response "/slack.html" {:root "public"}))
+
 (defn privacy []
   (res/resource-response "/privacy.html" {:root "public"}))
 
@@ -44,6 +47,7 @@
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/about" [] (about))
+  (GET "/slack" [] (slack))
   (GET "/privacy" [] (privacy))
   (GET "/terms" [] (terms))
   (GET "/" [] (index))
