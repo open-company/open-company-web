@@ -107,30 +107,6 @@
     0
     (.toLocaleString value)))
 
-(defn calc-burn-rate [revenue costs]
-  (- revenue costs))
-
-(defn calc-runway [cash burn-rate]
-  (int (* (/ cash burn-rate) 30)))
-
-(defn calc-burnrate-runway
-  "Helper function that add burn-rate and runway to each update topic"
-  [finances-data]
-  (if (empty? finances-data)
-    finances-data
-    (let [sort-pred (fn [a b] (compare (:period a) (:period b)))
-          sorted-data (vec (sort sort-pred finances-data))]
-      (vec (map
-              (fn [data]
-                (let [idx (inc (.indexOf (to-array sorted-data) data))
-                      start (max 0 (- idx 3))
-                      sub-data (subvec sorted-data start idx)
-                      burn-rate (calc-burn-rate (:revenue data) (:costs data))
-                      runway (calc-runway (:cash data) burn-rate)]
-                  (merge data {:runway runway
-                               :burn-rate burn-rate})))
-              sorted-data)))))
-
 (defn camel-case-str [value]
   (when value
     (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
@@ -224,10 +200,6 @@
         cur-period (str (.getFullYear fixed-date) "-" month-str)]
     cur-period))
 
-(defn get-topic-keys [company-data]
-  "Get the topic names, as a vector of keywords."
-  (vec (map keyword (:topics company-data))))
-
 (defun link-for
 
   ([links rel]
@@ -273,14 +245,6 @@
   (let [date (js-date)]
     (.toISOString date)))
 
-(defn fix-finances [topic-body]
-  (let [finances-data (if (contains? topic-body :data) (:data topic-body) [])
-        fixed-finances (calc-burnrate-runway finances-data)
-        sort-pred (fn [a b] (compare (:period b) (:period a)))
-        sorted-finances (sort sort-pred fixed-finances)
-        fixed-topic (assoc topic-body :data sorted-finances)]
-    fixed-topic))
-
 (defn css-color [color]
   (let [colors (subvec (clojure.string/split color #"") 2)
         red (take 2 colors)
@@ -288,39 +252,30 @@
         blue (take 2 (drop 4 colors))]
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
 
-(defn get-topic [topics-data k v]
-  (some #(when (= (get % k) v) %) topics-data))
-
 (defn fix-entry
-  "Add `:read-only` and `:topic-name` keys to the entry map"
-  [entry-body board-data topics-data]
-  (let [topic (if (seq (:topic-slug entry-body))
-                (get-topic topics-data :slug (:topic-slug entry-body))
-                (when (seq (:topic-name entry-body))
-                  (get-topic topics-data :name (:topic-name entry-body))))]
-    (-> entry-body
-      (assoc :content-type "entry")
-      (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
-      (assoc :board-name (or (:board-name entry-body) (:name board-data)))
-      (assoc :topic-slug (or (:topic-slug entry-body) (:slug topic)))
-      (assoc :topic-name (or (:topic-name entry-body) (:name topic))))))
+  "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
+  [entry-body board-data]
+  (-> entry-body
+    (assoc :content-type "entry")
+    (assoc :read-only (readonly-entry? (:links entry-body)))
+    (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
+    (assoc :board-name (or (:board-name entry-body) (:name board-data)))))
 
 (defn fix-board
-  "Add topic name in each topic and a topic sorter"
+  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
   [board-data]
   (let [links (:links board-data)
         read-only (readonly-board? links)
         with-read-only (assoc board-data :read-only read-only)
         fixed-entries (zipmap
                        (map :uuid (:entries board-data))
-                       (map #(fix-entry % board-data (:topics board-data)) (:entries board-data)))
+                       (map #(fix-entry % board-data) (:entries board-data)))
         without-entries (dissoc with-read-only :entries)
         with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
     with-fixed-entries))
 
 (defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data nil))
+  (fix-entry activity collection-data))
 
 (defn fix-all-posts
   "Fix org data coming from the API."
@@ -557,9 +512,6 @@
         top (- (+ (scroll-top-with-id id) body-scroll-top) 50)]
     (scroll-to-y top (or duration oc-animation-duration))))
 
-(defn scroll-to-topic [topic-name]
-  (scroll-to-id (str "topic-" (name topic-name))))
-
 (defn round-2-dec [value decimals]
   ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
   (.toLocaleString (js/parseFloat (gstring/format (str "%." decimals "f") value))))
@@ -760,30 +712,9 @@
           (let [hidePlaceholder (gobj/get this "hidePlaceholder")]
             (hidePlaceholder editor-el)))))))
 
-(defn filter-placeholder-topics [topics company-data]
-  (filterv #(let [sd (->> % keyword (get company-data))] (and sd (not (:placeholder sd)))) topics))
-
 (defn su-date-from-created-at [created-at]
   (let [from-js-date (cljs-time/date-time (js-date created-at))]
     (cljs-time-format/unparse (cljs-time-format/formatter "yyyy-MM-dd") from-js-date)))
-
-(def topic-body-limit 500)
-
-(defn exceeds-topic-body-limit [body]
-  (> (count (strip-HTML-tags body)) topic-body-limit))
-
-(def min-no-placeholder-topic-enable-share 1)
-
-(defn can-edit-topics? [company-data]
-  (let [company-topics (vec (map keyword (:topics company-data)))]
-    (and (not (responsive/is-mobile-size?))
-         (responsive/can-edit?)
-         (not (:read-only company-data))
-         (>= (count (filter-placeholder-topics company-topics company-data)) min-no-placeholder-topic-enable-share))))
-
-(defn company-has-topics? [company-data]
-  (let [company-topics (vec (map keyword (:topics company-data)))]
-    (pos? (count (filter-placeholder-topics company-topics company-data)))))
 
 (defn remove-ending-empty-paragraph
   "Remove the last p tag if it's empty."
@@ -793,19 +724,6 @@
                 (zero? (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))))
                 (zero? (.-length (.find (js/$ body-el) ">p:last-child img"))))
       (.remove (js/$ ">p:last-child" (js/$ body-el))))))
-
-(defn data-topic-has-data [topic topic-data]
-  (cond
-    ;; growth check count of metrics and count of data
-    (= (keyword topic) :growth)
-    (and (pos? (count (:metrics topic-data)))
-         (pos? (count (:data topic-data))))
-    ;; finances check count of data
-    (= (keyword topic) :finances)
-    (pos? (count (:data topic-data)))
-    ;; else false
-    :else
-    false))
 
 (defn valid-email? [addr]
   (when addr
@@ -825,24 +743,6 @@
     (let [protocol (.. js/document -location -protocol)
           host     (.. js/document -location -host)]
       (str protocol "//" host relative-su-url))))
-
-(def new-topic-body-placeholder "What would you like to say...")
-
-(defn new-topic-initial-data [topic title old-topic-data]
-  (let [topic-name (name topic)
-        initial-data {:topic topic-name
-                      :title title
-                      :body-placeholder new-topic-body-placeholder
-                      :headline ""
-                      :placeholder true
-                      :links (:links old-topic-data)}
-        with-data (if (and old-topic-data (contains? old-topic-data :data))
-                    (assoc initial-data :data (:data old-topic-data))
-                    initial-data)
-        with-metrics (if (and old-topic-data (contains? old-topic-data :metrics))
-                       (assoc with-data :metrics (:metrics old-topic-data))
-                       with-data)]
-    with-metrics))
 
 (defn sum-revenues [finances-data]
   (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)
@@ -1176,11 +1076,6 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
-(defn get-board-url [org-slug board-slug]
-  (if (= (keyword (cook/get-cookie (router/last-board-filter-cookie org-slug board-slug))) :by-topic)
-    (oc-urls/board-sort-by-topic org-slug board-slug)
-    (oc-urls/board org-slug board-slug)))
-
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.append (js/$ (.-body js/document)) $container)
@@ -1206,7 +1101,7 @@
 (defn your-boards-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
     (if-let [board-slug (cook/get-cookie (router/last-board-cookie org-slug))]
-      (get-board-url org-slug board-slug)
+      (oc-urls/board org-slug board-slug)
       (oc-urls/org org-slug))
     oc-urls/login))
 

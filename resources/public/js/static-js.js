@@ -61,15 +61,11 @@ function OCStaticGetYourBoardsUrl (decoded_jwt) {
     if (decoded_jwt) {
       user_id = decoded_jwt["user-id"];
       if ( user_id ) {
-        org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id))
+        org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id));
         if ( org_slug ) {
-          board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug))
+          board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
           if ( board_slug ){
-            if ( OCStaticGetCookie(OCStaticCookieName("last-filter-" + user_id + "-" + board_slug + "-" + org_slug)) === "by-topic" ) {
-              your_board_url = "/" + org_slug + "/" + board_slug + "/by-topic";
-            } else {
-              your_board_url = "/" + org_slug + "/" + board_slug;
-            }
+            your_board_url = "/" + org_slug + "/" + board_slug;
           } else {
             your_board_url = "/" + org_slug;
           }
@@ -115,7 +111,6 @@ document.addEventListener("DOMContentLoaded", function(_) {
     mobileSignupButton.addClass("mobile-your-boards");
     mobileSignupButton.attr("href", your_board_url);
     mobileSignupButton.html("<img class=\"user-avatar\" src=\"" + user_avatar + "\" />");
-
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
     // Set the action of the site mobile menu's Get started button
