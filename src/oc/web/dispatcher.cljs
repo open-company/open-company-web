@@ -87,12 +87,10 @@
    :org-redirect        [[:base] (fn [base] (:org-redirect base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
-   :topic-slug          [[:route] (fn [route] (:topic route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
    :story-uuid          [[:route] (fn [route] (:activity route))]
    :su-share            [[:base] (fn [base] (:su-share base))]
-   :board-filters       [[:base] (fn [base] (:board-filters base))]
    :loading             [[:base] (fn [base] (:loading base))]
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
    :query-params        [[:route] (fn [route] (:query-params route))]
@@ -107,7 +105,6 @@
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :comment-edit        [[:base] (fn [base] (:comment-edit base))]
    :add-comment-height  [[:base] (fn [base] (:add-comment-height base))]
-   :entry-topic-loading [[:base] (fn [base] (:entry-topic-loading base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -233,20 +230,12 @@
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]
-   :entry-edit-topics   [[:base :org-slug :board-slug :board-data :entry-editing]
-                          (fn [base org-slug board-slug board-data entry-editing]
-                            (if (:topics board-data)
-                              (:topics board-data)
-                              (let [edit-board-slug (:board-slug entry-editing)]
-                                (get-in base (vec (conj (board-data-key org-slug edit-board-slug) :topics))))))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
-   :modal-data          [[:base :org-data :activity-data :entry-edit-topics
-                          :activity-share :add-comment-focus :comment-edit
-                          :ap-initial-at]
-                          (fn [base org-data activity-data entry-edit-topics
-                               activity-share add-comment-focus comment-edit
-                               ap-initial-at]
+   :modal-data          [[:base :org-data :activity-data :activity-share
+                          :add-comment-focus :comment-edit :ap-initial-at]
+                          (fn [base org-data activity-data activity-share
+                               add-comment-focus comment-edit ap-initial-at]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
@@ -254,7 +243,6 @@
                              :modal-editing-data (:modal-editing-data base)
                              :modal-editing (:modal-editing base)
                              :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
-                             :entry-edit-topics entry-edit-topics
                              :activity-share activity-share
                              :entry-save-on-exit (:entry-save-on-exit base)
                              :add-comment-focus add-comment-focus
