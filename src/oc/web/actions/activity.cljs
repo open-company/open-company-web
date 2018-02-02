@@ -79,16 +79,11 @@
   (when (router/current-activity-id)
     (utils/after 1 #(let [from-all-posts (or
                                           (:from-all-posts @router/path)
-                                          (= (router/current-board-slug) "all-posts"))
-                          board-url (utils/get-board-url (router/current-org-slug) (router/current-board-slug))]
+                                          (= (router/current-board-slug) "all-posts"))]
                       (router/nav!
-                        (cond
-                          ; AA
-                          from-all-posts
+                        (if from-all-posts ; AP
                           (oc-urls/all-posts (router/current-org-slug))
-                          ;; Board most recent or by topic
-                          :else
-                          board-url)))))
+                          (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
   (dis/dispatch! [:entry-edit/dismiss]))
