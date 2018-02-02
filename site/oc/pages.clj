@@ -239,13 +239,13 @@
         [:h1.headline
           "Where leaders speak"]
         [:div.subheadline.big-web-only
-          "Company updates, ideas, and stories that keep"]
+          "Company updates and stories that keep teams"]
         [:div.subheadline.second-line.big-web-only
-          "teams aligned around what matters most."]
+          "aligned around what matters most."]
         [:div.subheadline.mobile-only
           (str
-           "Leadership updates that keep everyone aligned "
-           "around what matters most")]
+           "Company updates and stories that keep teams "
+           "aligned around what matters most.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button

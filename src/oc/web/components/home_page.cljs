@@ -54,13 +54,13 @@
           [:h1.headline
             "Where leaders speak"]
           [:div.subheadline.big-web-only
-            "Company updates, ideas, and stories that keep"]
+            "Company updates and stories that keep teams"]
           [:div.subheadline.second-line.big-web-only
-            "teams aligned around what matters most."]
+            "aligned around what matters most."]
           [:div.subheadline.mobile-only
             (str
-             "Leadership updates that keep everyone aligned "
-             "around what matters most.")]
+             "Company updates and stories that keep teams "
+             "aligned around what matters most.")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
