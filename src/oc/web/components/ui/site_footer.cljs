@@ -44,13 +44,13 @@
           [:div.column-item [:a {:href oc-urls/about} "About"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
 
-        [:div.column.column-integration
-          {:class (when (= @(::expanded s) :integration) "expanded")}
+        [:div.column.column-resources
+          {:class (when (= @(::expanded s) :resources) "expanded")}
           [:div.column-title
             {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :integration)
+                          (if (= @(::expanded s) :resources)
                             (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :integration)))}
+                            (reset! (::expanded s) :resources)))}
             "RESOURCES"]
           [:div.column-item [:a {:href oc-urls/oc-github :target "_blank"} "GitHub"]]
           [:div.column-item [:a {:href oc-urls/privacy} "Privacy Policy"]]
@@ -64,8 +64,19 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
-          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]]
+          ; [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
+          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
+
+        [:div.column.column-integrations
+          {:class (when (= @(::expanded s) :integrations) "expanded")}
+          [:div.column-title
+            {:on-click #(when (responsive/is-mobile-size?)
+                          (if (= @(::expanded s) :integrations)
+                            (reset! (::expanded s) nil)
+                            (reset! (::expanded s) :integrations)))}
+            "INTEGRATIONS"]
+          [:div.column-item [:a {:href oc-urls/slack} "Slack"]]]]
 
       [:div.left-column
         [:img.logo
