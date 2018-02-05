@@ -48,6 +48,13 @@
       ]
      ]))
 
+(rum/defcs results-header < rum/static
+  [s search-results]
+  [:div.header
+   [:span "SEARCH RESULTS"]
+   (when (pos? (:count search-results))
+     [:span.count (str "(" (:count search-results) ")")])])
+
 (def default-page-size
   (if (responsive/is-mobile-size?) 300 5))
 
@@ -63,25 +70,24 @@
       (reset! (::page-size s) default-page-size))
     [:div.search-results {:ref "results"
                           :class (when (not search-active?) "inactive")}
-        [:div.header
-          [:span "SEARCH RESULTS"]
-          (when (pos? (:count search-results))
-            [:span.count (str "(" (:count search-results) ")")])]
-        [:div.search-results-container
-          (if (pos? (:count search-results))
-            (let [results (reverse (:results search-results))]
-              (for [sr (take @(::page-size s) results)]
-                (let [key (str "result-" (:uuid (:_source sr)))]
-                  (case (:type (:_source sr))
-                    "entry" (rum/with-key (entry-display sr) key)
-                    "board" (rum/with-key (board-display sr) key)))))
-            [:div.empty-result
-              [:div.message "No matching results..."]])]
-        (when (< @(::page-size s) (:count search-results))
-          [:div.show-more
-            {:on-click (fn [e] (reset! (::page-size s)
-                                       (+ @(::page-size s) 15)))}
-            [:button] "Show More"])]))
+      (when-not (responsive/is-mobile-size?) (results-header search-results))
+      [:div.search-results-container
+        (when (responsive/is-mobile-size?)
+          (results-header search-results))
+        (if (pos? (:count search-results))
+          (let [results (reverse (:results search-results))]
+            (for [sr (take @(::page-size s) results)]
+              (let [key (str "result-" (:uuid (:_source sr)))]
+                (case (:type (:_source sr))
+                  "entry" (rum/with-key (entry-display sr) key)
+                  "board" (rum/with-key (board-display sr) key)))))
+          [:div.empty-result
+            [:div.message "No matching results..."]])]
+      (when (< @(::page-size s) (:count search-results))
+        [:div.show-more
+          {:on-click (fn [e] (reset! (::page-size s)
+                                     (+ @(::page-size s) 15)))}
+          [:button] "Show More"])]))
 
 (defn search-inactive [s]
   (set! (.-value (rum/ref-node s "search-input")) "")
@@ -152,6 +158,6 @@
            :on-change #(search/query
                         (.-value (rum/ref-node s "search-input")))
            }]
-       (when (not (responsive/is-mobile-size?))
-         [:div.triangle {:class (when (not search-active?) "inactive")}]
+       (when-not (responsive/is-mobile-size?)
+         [:div.triangle {:class (when-not search-active? "inactive")}]
          (search-results-view))])))

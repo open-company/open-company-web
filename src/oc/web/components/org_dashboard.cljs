@@ -120,7 +120,7 @@
                is-sharing-activity)
           (activity-share)
           ;; Search results
-          (and is-mobile? (not (router/current-activity-id)))
+          (and is-mobile? search-active? (not (router/current-activity-id)))
           (search-results-view)
           ;; Activity modal
           (and (router/current-activity-id)
