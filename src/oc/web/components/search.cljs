@@ -158,6 +158,5 @@
            :on-change #(search/query
                         (.-value (rum/ref-node s "search-input")))
            }]
-       (when-not (responsive/is-mobile-size?)
-         [:div.triangle {:class (when-not search-active? "inactive")}]
-         (search-results-view))])))
+       [:div.triangle {:class (when-not search-active? "inactive")}]
+       (when-not (responsive/is-mobile-size?)(search-results-view))])))
