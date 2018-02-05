@@ -77,6 +77,7 @@
                       :solid-button-style :red
                       :solid-button-title "Cancel upload"
                       :solid-button-cb #(do
+                                          (dis/dispatch! [:entry-clear-local-cache :entry-editing])
                                           (dis/dispatch! [:alert-modal-hide])
                                           (real-close s))
                       }]
@@ -95,7 +96,9 @@
                                             (real-close s))
                         }]
         (dis/dispatch! [:alert-modal-show alert-data]))
-      (real-close s))))
+      (do
+       (dis/dispatch! [:entry-clear-local-cache :entry-editing])
+       (real-close s)))))
 
 ;; Data change handling
 
