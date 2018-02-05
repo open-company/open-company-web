@@ -60,7 +60,7 @@ div.entry-edit-modal-container {
 
         @include mobile() {
           display: block;
-          height: 64px;
+          height: 112px;
           background-color: white;
           width: 100vw;
           text-align: center;
@@ -75,7 +75,6 @@ div.entry-edit-modal-container {
             width: 100vw;
             height: 64px;
             padding: 20px 24px;
-            box-shadow: 0px 2px 6px 0px rgba($carrot_light_gray_7, 0.5);
 
             button.mobile-modal-close-bt {
               @include image-2x("/img/ML/mobile_modal_close");
@@ -93,20 +92,123 @@ div.entry-edit-modal-container {
               position: absolute;
               top: 20px;
               right: 24px;
-              max-width: 60%;
+              max-width: 80%;
 
-              button {
-                margin-left: 16px;
+              div.mobile-buttons-divider-line {
                 float: right;
-                background-color: transparent;
-                color: $carrot_green_2;
-                @include avenir_H();
-                font-size: 14px;
+                width: 1px;
+                background-color: #D8DBDF;
+                height: 16px;
+                margin: 4px 24px 0px 12px;
+              }
+
+              button.mobile-header-buttons {
                 height: 24px;
+                @include avenir_H();
+                font-size: 15px;
+                color: $carrot_green_2;
+                line-height: 24px;
+                padding: 2px 12px 0px 32px;
+                float: right;
+                position: relative;
+                margin: 0px;
 
                 &.disabled {
-                  opacity: 0.3;
+                  color: $carrot_light_gray_3;
+                  opacity: 1;
                 }
+
+                div.button-icon {
+                  position: absolute;
+                  top: 2px;
+                  left: 0px;
+                  width: 20px;
+                  height: 20px;
+                  background-repeat: no-repeat;
+                  background-color: transparent;
+                  background-position: center;
+                }
+
+                &.post-button {
+                  &.disabled {
+                    div.button-icon {
+                      @include image-2x("/img/ML/entry_post_button_icon");
+                    }
+                  }
+
+                  div.button-icon {
+                    @include image-2x("/img/ML/entry_post_button_icon_green");
+                    background-size: 20px 20px;
+                  }
+                }
+
+                &.save-button {
+                  &.disabled {
+                    div.button-icon {
+                      @include image-2x("/img/ML/entry_save_button_icon");
+                    }
+                  }
+
+                  div.button-icon {
+                    @include image-2x("/img/ML/entry_save_button_icon_green");
+                    background-size: 20px 20px;
+                  }
+                }
+              }
+            }
+          }
+
+          div.mobile-posting-in {
+            @include avenir_M();
+            font-size: 15px;
+            color: $carrot_text_blue_3;
+            height: 48px;
+            padding: 14px 24px 0px;
+            background-color: $carrot_light_blue_2;
+
+            &.active {
+              background-color: $carrot_text_blue_3;
+
+              div.boards-dropdown-caret.no-nux {
+                color: white;
+                &:after {
+                  background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
+                }
+              }
+            }
+
+            span {
+              float: left;
+            }
+
+            div.boards-dropdown-caret.no-nux {
+              @include avenir_H();
+              color: $carrot_text_blue_3;
+
+              &:after {
+                width: 8px 5px;
+                background-size: 8px 5px;
+                background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
+              }
+            }
+
+            div.dropdown-list-container {
+              width: 100vw;
+              height: calc(100vh - 64px - 48px);
+              top: 112px;
+              left: 0px;
+              text-align: left;
+
+              div.triangle {
+                display: none;
+              }
+
+              div.dropdown-list-content {
+                border: none;
+                border-radius: 0px;
+                padding: 24px;
+                margin: 0px;
+                box-shadow: none;
               }
             }
           }
@@ -125,12 +227,11 @@ div.entry-edit-modal-container {
           display: none;
         }
 
-        div.user-avatar-img-container{
-          margin-right: 16px;
+        @include user-profile(32);
+
+        div.user-avatar-img-container {
           float: left;
         }
-
-        @include user-profile(32);
 
         div.posting-in {
           @include avenir_M();
@@ -138,13 +239,22 @@ div.entry-edit-modal-container {
           color: $carrot_dark_gray;
           float: left;
           margin-top: 5px;
-          max-width: 50%;
+          margin-left: 16px;
 
           span {
             float: left;
 
             @include mobile() {
               display: none;
+            }
+          }
+
+          div.boards-dropdown-caret {
+
+            div.dropdown-list-container {
+              top: 20px;
+              left: -44px;
+              width: 200px;
             }
           }
         }
@@ -179,12 +289,6 @@ div.entry-edit-modal-container {
             opacity: 1;
           }
         }
-
-        div.dropdown-list-container {
-          top: 20px;
-          left: -44px;
-          width: 200px;
-        }
       }
 
       div.entry-edit-modal-divider {
@@ -209,32 +313,11 @@ div.entry-edit-modal-container {
         margin-left: -22px;
 
         @include tablet() {
-          min-height: calc(100vh - 64px - 1px);
+          min-height: calc(100vh - 112px - 1px);
           max-height: initial;
-          padding: 30px 24px;
+          padding: 0px;
           width: 100%;
-          margin: 64px 0px 0px;
-
-          div.mobile-posting-in {
-            @include avenir_M();
-            font-size: 16px;
-            color: $oc_gray_7;
-            height: 58px;
-            padding: 12px 0px 0px;
-
-            span {
-              float: left;
-            }
-
-            div.boards-dropdown-caret.no-nux {
-              &:after {
-                background-color: $carrot_light_gray_7;
-                border-radius: 100px;
-                margin-top: -2px;
-                background-position: center 7px;
-              }
-            }
-          }
+          margin: 112px 0px 0px;
         }
 
         div.entry-edit-headline {
@@ -252,6 +335,7 @@ div.entry-edit-modal-container {
             width: 100%;
             @include avenir_H();
             font-size: 20px;
+            margin: 27px 24px 0px;
           }
 
           &:not(:focus):empty:before {
@@ -269,6 +353,10 @@ div.entry-edit-modal-container {
         div.rich-body-editor-container {
           position: relative;
           overflow: visible;
+
+          @include tablet() {
+            margin: 8px 24px 0px;
+          }
 
           div.medium-editor-media-picker {
             margin-top: 0px;
