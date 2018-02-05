@@ -19,7 +19,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
@@ -45,34 +44,26 @@
 
 ;; Modal dismiss handling
 
-(defn dismiss-modal [s board-filters]
+(defn dismiss-modal [s]
   (let [org (router/current-org-slug)
         board (router/current-board-slug)
-        modal-data @(drv/get-ref s :modal-data)
-        current-board-filters (:board-filters modal-data)]
+        modal-data @(drv/get-ref s :modal-data)]
     (router/nav!
-      (if (string? board-filters)
-        (oc-urls/board-filter-by-topic org board board-filters)
-        (if (:from-all-posts @router/path)
-          (oc-urls/all-posts org)
-          (if (string? current-board-filters)
-            (oc-urls/board-filter-by-topic org board current-board-filters)
-            (if (= current-board-filters :by-topic)
-              (oc-urls/board-sort-by-topic org board)
-              (oc-urls/board org board))))))))
+      (if (:from-all-posts @router/path)
+        (oc-urls/all-posts org)
+        (oc-urls/board org board)))))
 
-(defn close-clicked [s & [board-filters]]
+(defn close-clicked [s]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
     (if (:from-all-posts @router/path)
       ;; Remove AP data from the DB to avoid showing results before loading and results again
-      (when (and (not (string? board-filters))
-                 ap-initial-at)
+      (when ap-initial-at
         (dis/dispatch! [:all-posts-reset]))
       ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
       (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal s board-filters)))
+  (utils/after 180 #(dismiss-modal s)))
 
 ;; Delete handling
 
@@ -85,7 +76,7 @@
                     :solid-button-title "Yes"
                     :solid-button-cb #(let [org-slug (router/current-org-slug)
                                             board-slug (router/current-board-slug)
-                                            board-url (utils/get-board-url org-slug board-slug)]
+                                            board-url (oc-urls/board org-slug board-slug)]
                                        (router/nav! board-url)
                                        (dis/dispatch! [:activity-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
@@ -100,11 +91,11 @@
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
-  (utils/after 10
-    #(when-let [headline (sel1 [:div.activity-modal-content-headline])]
-      (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
-        (dis/dispatch! [:input [:modal-editing-data :headline] emojied-headline])
-        (dis/dispatch! [:input [:modal-editing-data :has-changes] true])))))
+  (when-let [headline (rum/ref-node state "edit-headline")]
+    (let [emojied-headline (utils/emoji-images-to-unicode
+                            (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:update [:modal-editing-data] #(merge % {:headline emojied-headline
+                                                               :has-changes true})]))))
 
 (defn- setup-headline [state]
   (when-let [headline-el  (rum/ref-node state "edit-headline")]
@@ -134,7 +125,7 @@
 
 (defn- real-start-editing [state & [focus]]
   (when-not (responsive/is-tablet-or-mobile?)
-    (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) true])
+    (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true])
     (utils/after 100 #(setup-headline state))
     (reset! (::autosave-timer state) (utils/every 5000 autosave))
     (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
@@ -156,7 +147,7 @@
   (reset! (::edited-data-loaded state) false)
   (js/clearInterval @(::autosave-timer state))
   (reset! (::autosave-timer state) nil)
-  (dis/dispatch! [:activity-modal-edit (first (:rum/args state)) false])
+  (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false])
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
     (reset! (::headline-input-listener state) nil)))
@@ -164,7 +155,8 @@
 (defn- clean-body []
   (when-let [body-el (sel1 [:div.rich-body-editor])]
     (let [raw-html (.-innerHTML body-el)]
-      (dis/dispatch! [:input [:modal-editing-data :body] (utils/clean-body-html raw-html)]))))
+      (dis/dispatch! [:update [:modal-editing-data] #(merge % {:body (utils/clean-body-html raw-html)
+                                                               :has-changes true})]))))
 
 (defn- save-editing? [state]
   (let [modal-data @(drv/get-ref state :modal-data)
@@ -261,9 +253,33 @@
                             {:before-render (fn [s]
                               (let [modal-data @(drv/get-ref s :modal-data)]
                                 (when (and (not @(::animate s))
-                                         (= (:activity-modal-fade-in modal-data) (:uuid (first (:rum/args s)))))
+                                         (= (:activity-modal-fade-in modal-data) (:uuid (:activity-data modal-data))))
                                   (reset! (::animate s) true)))
                               (modal-height-did-change s)
+                              (setup-editing-data s)
+                              (let [modal-data @(drv/get-ref s :modal-data)]
+                                (let [save-on-exit (:entry-save-on-exit modal-data)]
+                                  (set! (.-onbeforeunload js/window)
+                                   (if save-on-exit
+                                    #(do
+                                      (save-on-exit? s)
+                                      "Do you want to save before leaving?")
+                                    nil)))
+                                (when (and (:modal-editing modal-data)
+                                           (nil? @(::autosave-timer s)))
+                                  (utils/after 1000 #(real-start-editing s :headline)))
+                                (when (and (:modal-editing modal-data)
+                                           @(::entry-saving s))
+                                  (let [entry-edit (:modal-editing-data modal-data)
+                                        initial-body (:body entry-edit)
+                                        initial-headline (utils/emojify (:headline entry-edit))]
+                                    (when-not (:loading entry-edit)
+                                      (when-not (:error entry-edit)
+                                        (reset! (::initial-headline s) initial-headline)
+                                        (reset! (::initial-body s) initial-body)
+                                        (stop-editing s))
+                                      (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
+                                      (reset! (::entry-saving s) false)))))
                               s)
                              :will-mount (fn [s]
                               (reset! (::esc-key-listener s)
@@ -325,40 +341,12 @@
                                 (events/unlistenByKey @(::window-resize-listener s))
                                 (reset! (::window-resize-listener s) nil))
                               (set! (.-onbeforeunload js/window) nil)
-                              s)
-                             :will-update (fn [s]
-                              (setup-editing-data s)
-                              s)
-                             :did-remount (fn [_ s]
-                              (let [modal-data @(drv/get-ref s :modal-data)]
-                                (let [save-on-exit (:entry-save-on-exit modal-data)]
-                                  (set! (.-onbeforeunload js/window)
-                                   (if save-on-exit
-                                    #(do
-                                      (save-on-exit? s)
-                                      "Do you want to save before leaving?")
-                                    nil)))
-                                (setup-editing-data s)
-                                (when (and (:modal-editing modal-data)
-                                           (nil? @(::autosave-timer s)))
-                                  (utils/after 1000 #(real-start-editing s :headline)))
-                                (when (and (:modal-editing modal-data)
-                                           @(::entry-saving s))
-                                  (let [entry-edit (:modal-editing-data modal-data)
-                                        initial-body (:body entry-edit)
-                                        initial-headline (utils/emojify (:headline entry-edit))]
-                                    (when-not (:loading entry-edit)
-                                      (when-not (:error entry-edit)
-                                        (reset! (::initial-headline s) initial-headline)
-                                        (reset! (::initial-body s) initial-body)
-                                        (stop-editing s))
-                                      (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
-                                      (reset! (::entry-saving s) false)))))
                               s)}
-  [s activity-data]
+  [s]
   (let [fixed-activity-modal-height (max @(::activity-modal-height s) default-min-modal-height)
         wh (.-innerHeight js/window)
         modal-data (drv/react s :modal-data)
+        activity-data (:activity-data modal-data)
         editing (:modal-editing modal-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         show-comments? (and (not is-mobile?)
@@ -456,20 +444,9 @@
                       (activity-move {:activity-data activity-data
                                       :boards-list all-boards
                                       :dismiss-cb #(reset! (::move-activity s) false)
-                                      :on-change #(close-clicked s nil)}))]))
+                                      :on-change #(close-clicked s)}))]))
               (when-not is-mobile?
-                (activity-attachments activity-data false))
-              (if editing
-                (topics-dropdown
-                 (distinct (:entry-edit-topics modal-data))
-                 (:modal-editing-data modal-data)
-                 :modal-editing-data
-                 #(toggle-save-on-exit s true))
-                (when (:topic-slug activity-data)
-                  (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-                    [:div.activity-tag.on-gray
-                      {:on-click #(close-clicked s (:topic-slug activity-data))}
-                      topic-name])))]]
+                (activity-attachments activity-data false))]]
           [:div.activity-modal-columns
             ;; Left column
             [:div.activity-left-column

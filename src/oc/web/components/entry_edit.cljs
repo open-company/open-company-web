@@ -17,7 +17,6 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.object :as gobj]
@@ -107,10 +106,10 @@
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
-  (when-let [headline (sel1 [:div.entry-edit-headline])]
-    (let [emojied-headline (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
-      (dis/dispatch! [:input [:entry-editing :headline] emojied-headline])
-      (dis/dispatch! [:input [:entry-editing :has-changes] true]))))
+  (when-let [headline (rum/ref-node state "headline")]
+    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+      (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
+                                                          :has-changes true})]))))
 
 ;; Headline setup and paste handler
 
@@ -150,7 +149,6 @@
                         (drv/drv :org-data)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
-                        (drv/drv :board-filters)
                         (drv/drv :editable-boards)
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
@@ -177,7 +175,6 @@
                         {:will-mount (fn [s]
                           (let [nux @(drv/get-ref s :nux)
                                 entry-editing @(drv/get-ref s :entry-editing)
-                                board-filters @(drv/get-ref s :board-filters)
                                 initial-body (if (seq (:body entry-editing))
                                                (:body entry-editing)
                                                utils/default-body)
@@ -186,13 +183,7 @@
                                                      (:headline entry-editing)
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
-                            (reset! (::initial-headline s) initial-headline)
-                            (when (and (string? board-filters)
-                                       (nil? (:topic-slug entry-editing)))
-                               (let [topic (first (filter #(= (:slug %) board-filters) (:topics-list entry-editing)))]
-                                 (when topic
-                                   (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
-                                   (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
+                            (reset! (::initial-headline s) initial-headline))
                           s)
                          :did-mount (fn [s]
                           (when-not @(drv/get-ref s :nux)
@@ -206,9 +197,9 @@
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::autosave-timer s) (utils/every 5000 autosave))
                           s)
-                         :before-render (fn [s] (calc-entry-edit-modal-height s) s)
-                         :after-render  (fn [s] (should-show-divider-line s) s)
-                         :did-remount (fn [_ s]
+                         :before-render (fn [s]
+                          (calc-entry-edit-modal-height s)
+                          ;; Set or remove the onBeforeUnload prompt
                           (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
                             (set! (.-onbeforeunload js/window)
                              (if save-on-exit
@@ -216,6 +207,7 @@
                                 (save-on-exit? s)
                                 "Do you want to save before leaving?")
                               nil)))
+                          ;; Handle saving/publishing states to dismiss the component
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
                             (when @(::saving s)
@@ -223,22 +215,26 @@
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
                                 (when-not (:error entry-editing)
-                                  ;; If it's not published already redirect to drafts board
-                                  (when (not= (:status entry-editing) "published")
-                                    (utils/after 180 #(router/nav! (oc-urls/drafts (router/current-org-slug)))))
-                                  (real-close s))))
+                                  (let [redirect? (not= (:status entry-editing) "published")]
+                                    ;; If it's not published already redirect to drafts board
+                                    (when redirect?
+                                      (real-close s)
+                                      (utils/after 250
+                                       #(router/nav! (oc-urls/drafts (router/current-org-slug)))))))))
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
-                                ;; Redirect to the publishing board if the slug is available
-                                (when (seq (:board-slug entry-editing))
-                                  (utils/after
-                                   180
-                                   #(router/nav!
-                                     (oc-urls/board (router/current-org-slug) (:board-slug entry-editing)))))
                                 (when-not (:error entry-editing)
-                                  (real-close s)))))
+                                  (let [redirect? (seq (:board-slug entry-editing))]
+                                    ;; Redirect to the publishing board if the slug is available
+                                    (when redirect?
+                                      (real-close s)
+                                      (utils/after
+                                       250
+                                       #(router/nav!
+                                          (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))))))))
                           s)
+                         :after-render  (fn [s] (should-show-divider-line s) s)
                          :will-unmount (fn [s]
                           (when @(::body-editor s)
                             (.destroy @(::body-editor s))
@@ -267,20 +263,12 @@
         media-input (drv/react s :media-input)
         all-boards (drv/react s :editable-boards)
         entry-board (get all-boards (:board-slug entry-editing))
-        board-topics (if (seq (:topic-slug entry-editing))
-                       (distinct
-                        (vec
-                         (conj
-                          (:topics entry-board)
-                          {:slug (:topic-slug entry-editing)
-                           :name (:topic-name entry-editing)})))
-                       (:topics entry-board))
         published? (= (:status entry-editing) "published")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})
        :on-click #(when (and (not (:has-changes entry-editing))
-                             (not (utils/event-inside? % (sel1 [:div.entry-edit-modal]))))
+                             (not (utils/event-inside? % (rum/ref-node s "entry-edit-modal"))))
                     (cancel-clicked s))}
       [:div.modal-wrapper
         {:style (when-not is-mobile? {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")})}
@@ -326,9 +314,7 @@
                                      (toggle-save-on-exit s true)
                                      (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                      (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                     (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
-                (when-not nux
-                  (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))]]
+                                     (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]]]
             [:div.entry-edit-modal-header.group
               (user-avatar-image current-user-data)
               [:div.posting-in
@@ -351,9 +337,7 @@
                                    (toggle-save-on-exit s true)
                                    (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                    (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                   (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
-              (when-not nux
-                (topics-dropdown board-topics entry-editing :entry-editing #(toggle-save-on-exit s true)))])
+                                   (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]])
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
@@ -421,7 +405,10 @@
                                   (clj->js {:container "body"
                                             :placement "top"
                                             :trigger "manual"
-                                            :template "<div class=\"tooltip post-btn-tooltip\"><div class=\"tooltip-arrow\"></div><div class=\"tooltip-inner\"></div></div>"
+                                            :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                             "<div class=\"tooltip-arrow\"></div>"
+                                                             "<div class=\"tooltip-inner\"></div>"
+                                                           "</div>")
                                             :title "A title is required in order to save or share this post."})))
                                (utils/after 10 #(.tooltip $post-btn "show"))
                                (utils/after 5000 #(.tooltip $post-btn "hide"))))))

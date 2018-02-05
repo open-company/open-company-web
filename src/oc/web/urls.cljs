@@ -49,6 +49,8 @@
 
 (def oc-github "https://github.com/open-company")
 
+(def oc-trello-public "https://trello.com/b/eKs2LtLu")
+
 (def subscription-callback "/subscription-completed")
 
 (def email-confirmation "/verify")
@@ -119,22 +121,6 @@
     (board (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
-
-(defn board-sort-by-topic
-  "Board sorted by latest topic"
-  ([]
-    (board-sort-by-topic (router/current-org-slug) (router/current-board-slug)))
-  ([board-slug]
-   (board-sort-by-topic (router/current-org-slug) board-slug))
-  ([org-slug board-slug]
-   (str (board org-slug board-slug) "/by-topic")))
-
-(defn board-filter-by-topic
-  "Board filtered by topic"
-  ([topic-slug]
-    (board-filter-by-topic (router/current-org-slug) (router/current-board-slug) topic-slug))
-  ([org-slug board-slug topic-slug]
-    (str (board org-slug board-slug) "/topic/" (name topic-slug))))
 
 ;; Drafts
 

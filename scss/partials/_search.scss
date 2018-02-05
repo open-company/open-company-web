@@ -1,14 +1,54 @@
 
 div.search-box {
-  width: 200px;
-  border-radius: 4px;
-  border: 1px solid rgba($carrot_light_gray_1, 0.5);
+  width: 400px;
 
-  div.search {
-    &:empty:before {
-      content: attr(placeholder);
-      color: rgba($carrot_light_gray_3, 0.4);
-      cursor: text;
+
+  img.spyglass {
+    display: inline;
+    margin: 0px 0px 6px 0px;
+  }
+
+  input.search {
+    margin: 5px 5px 0px 16px;
+    outline: none;
+    border: none;
+    caret-color: $carrot_text_blue_3;
+    @include avenir_M();
+    color: $carrot_dark_brown_1;
+
+    &::placeholder {
+      color: $carrot_light_gray_10;
+    }
+    &:focus::placeholder {
+      color: $carrot_dark_brown_1;
+    }
+  }
+
+  button.search-close {
+    width: 15px;
+    height: 15px;
+    background-color: white;
+    background-image: cdnUrl("/img/ML/black_close.svg");
+    background-size: 15px;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    opacity: 0.7;
+    border: none;
+    margin: 0px 24px 0px 0px;
+    padding: 12px 0px 0px 0px;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    &.inactive {
+      background-image: none;
+      border: none;
+      outline: none;
+      width: 0px;
+      height: 0px;
+      padding: 0px;
+      margin: 0px;
     }
   }
 }
@@ -17,49 +57,114 @@ div.search-results.inactive {
   display: none;
 }
 
+div.triangle {
+  position: absolute;
+  top: 81px;
+  left: 96px;
+  background-color: white;
+  border-top: 1px solid rgba(177,184,192,0.50);
+  border-left: 1px solid rgba(177,184,192,0.50);
+  transform: rotate(45deg);
+  width: 12px;
+  height: 12px;
+
+  &.inactive {
+    display: none;
+  }
+}
+
 div.search-results {
+  border: 1px solid rgba(177,184,192,0.50);
+  border-radius: 5px;
+
+  margin: 41px 0px 0px 45px;
+  width: 450px;
+  box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
 
   div.header {
-    background-color: $carrot_light_gray_9;
-    width: 300px;
-    border-radius: 4px;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
-    span.count {
-      float: right;
-      margin-right: 20px;
-    }
-  }
-
-  div.search-result {
-    width: 300px;
     background-color: white;
-    border-radius: 4px;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    padding: 20px 0px 10px 15px;
+    height: 47px;
 
-    div.author {
+    span {
       @include avenir_H();
-      background-color: $carrot_light_gray_9;
-      padding-top: 10px;
-      padding-bottom: 4px;
+      font-size: 12px;
+    }
 
-      @include activity-author();
-
-      div.name {
-        font-size: 11px;
-      }
-
-      div.title {
-        font-size: 14px;
-        margin: 0px 50px;
-        overflow: hidden;
-      }
+    span.count {
+      margin-left: 5px;
     }
   }
+
+  div.search-results-container {
+    overflow-y: auto;
+    max-height: calc(100vh - 180px - 47px);
+
+    div.search-result {
+      width: 100%;
+      background-color: white;
+      font-size: 14px;
+
+      div.author {
+        @include avenir_H();
+
+        padding: 10px 20px 10px 20px;
+
+        @include activity-author();
+
+        div.name {
+          font-size: 11px;
+        }
+
+        div.title {
+          overflow: hidden;
+        }
+
+        &:hover {
+          background-color: rgba($carrot_light_blue, 0.3);
+
+          div.title {
+            color: $carrot_text_blue_3;
+          }
+
+          div.time-since {
+            color: rgba($carrot_text_blue_3, 0.3);
+          }
+        }
+      }
+    }
+
+    div.search-result:last-child {
+      padding: 0px 0px 10px 0px;
+    }
+  }
+
+  div.show-more {
+    background: white;
+    color: $carrot_green_2;
+    font-size: 14px;
+    padding: 5px 0px 10px 30px;
+    cursor: pointer;
+
+    button {
+      float: left;
+      font-size: 14px;
+      line-height: 1;
+      width: 15px;
+      height: 15px;
+      margin-top: 4px;
+      border: 0px solid transparent;
+      background-color: transparent;
+      background-repeat: no-repeat;
+      background-image: cdnUrl('/img/ML/show_more_arrow.svg');
+    }
+  }
+
   div.empty-result {
-    width: 300px;
+    width: 100%;
     background-color: white;
-    border-radius: 4px;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
+    padding: 20px;
+    font-size: 16px;
 
     img {
       margin: auto;
@@ -68,7 +173,8 @@ div.search-results {
 
     div.message {
       margin: auto;
-      width: 50%;
+      width: 100%;
+      color: rgba($carrot_light_gray_3, 0.4);
     }
   }
 }

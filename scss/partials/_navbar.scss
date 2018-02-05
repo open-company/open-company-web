@@ -67,7 +67,7 @@ nav.oc-navbar {
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 14px 28px 0;
+    padding: 14px 24px 0;
     height: #{$navbar_height}px;
     width: 100%;
 
@@ -125,10 +125,14 @@ nav.oc-navbar {
 
     div.navbar-left {
       float: left;
-      margin-left: 16px;
-      margin-top: 11px;
+      margin-top: 6px;
       width: 24px;
       height: 24px;
+
+      @include mobile() {
+        margin-top: 8px;
+        margin-left: 16px;
+      }
 
       button.mobile-navigation-sidebar-ham-bt {
         display: none;
@@ -171,39 +175,6 @@ nav.oc-navbar {
         font-size: 16px;
       }
 
-      div.sharing-button-container{
-        float: right;
-
-        button.sharing-button {
-          margin-top: 14px;
-          font-size: 16px;
-        }
-
-        button.share-selected-topics-button, button.sharing-cancel {
-          margin-top: 16px;
-          margin-right: 10px;
-
-          &.btn-link {
-            font-size: 14px;
-            color: $oc_blue_dark;
-            @include avenir_M();
-            outline: none;
-            text-transform: none;
-            text-decoration: none;
-            opacity: 1;
-            padding: .2rem 0px .3rem .5rem;
-
-            &:hover {
-              color: black;
-            }
-
-            &[disabled] {
-              opacity: 1;
-            }
-          }
-        }
-      }
-
       button.mobile-menu {
         font-size: 24px;
         padding: 0px;
@@ -219,22 +190,6 @@ nav.oc-navbar {
     position: relative;
     margin: 7px auto;
     padding: 0 28px;
-
-    div.sharing-button-container{
-
-      button {
-        width: 128px;
-        margin-left: 10px;
-        height: 33px;
-        font-size: 0.75rem;
-        @include avenir_H();
-      }
-
-      button.share-button {
-        font-size: 16px;
-        padding-top: 3px;
-      }
-    }
 
     a {
       font-size: 14px;

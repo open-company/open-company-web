@@ -1,7 +1,6 @@
 (ns oc.web.components.ui.navbar
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.local_settings :as ls]
             [oc.web.dispatcher :as dis]
             [oc.web.router :as router]
             [oc.web.lib.jwt :as jwt]
@@ -13,11 +12,6 @@
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.search :refer (search-box)]))
-
-(defn- share-new-tooltip [team-id]
-  (if (jwt/team-has-bot? team-id)
-    "Select topics to share by Slack, email or link."
-    "Select topics to share by email or link."))
 
 (rum/defcs navbar < rum/reactive
                      (drv/drv :navbar-data)
@@ -57,7 +51,7 @@
                               (dis/dispatch! [:input [:mobile-menu-open] false])
                               (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
             [:div.nav.navbar-nav.navbar-left
-             (when ls/search-enabled? (search-box))])
+              (search-box)])
           [:div.nav.navbar-nav.navbar-center
             (orgs-dropdown)]
           [:ul.nav.navbar-nav.navbar-right

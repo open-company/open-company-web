@@ -217,7 +217,7 @@ provided in the table below:
 |  :all-posts-reset | UI | Remove AP data from the app state. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
-|  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
+|  :auth-with-token | UI | Given a scope (email reset, invitation etc..) start the token exchange to login the user. |
 |  :auth-with-token/failed | API | Token exchange failed, cleanup the app-state of the token exchange stuff. |
 |  :auth-with-token/success | API | Token exchange succeeded. Show the collect name and password overlay if it was an invitation token, load the orgs associated with the user and redirect. |
 |  :board | API | Read and save the board data from API. Call the :load-other-boards action if necessary |
@@ -250,7 +250,7 @@ provided in the table below:
 |  :first-forced-post-start | UI | Dismiss the first onboarded nux screen and open the new forced post modal. |
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
-|  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
+|  :entries-loaded | API | The request to load the entries topic is finished. |
 |  :entry-clear-local-cache | UI | Remove the locally saved edits for the current editing item. |
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
@@ -317,10 +317,8 @@ provided in the table below:
 |  :team-roster-loaded | API | Save the roster in the team data. |
 |  :teams-get | UI | Start the request to load the list of teams. |
 |  :teams-loaded | API | Read and save the list of teams. Start the request to load the team data or the roster if the link is not present for each team returned. |
-|  :topic | API | Read and save the content of a topic in the app-state. Async start the load of the list of entries. |
-|  :topic-add | UI | Add a new topic to the topics list of the current board. |
-|  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
 |  :trend-bar-status | UI | Change the trend bar status, it accepts: :hidden, :collapsed, :expanded and :trending as in oc.web.components.trend-bar. |
+|  :update | UI | Generic input action, it's used passing in a path and a function to replace the value. It's like update-in and in fact it uses it. |
 |  :update-loaded | API | Read and save the data of certain update in the app-state |
 |  :user-action | UI | Start a user action: given a team-id, a user data object, the action and a method make a request to complete the action. Can pass optional payload (if it's not a GET request). |
 |  :user-action/complete | API | Refresh the team data to show the completed user action. |

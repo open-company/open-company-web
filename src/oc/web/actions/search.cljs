@@ -5,6 +5,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.api :as api]))
 
+
 (defn query-finished
   [result]
   (dispatcher/dispatch! [:search-query/finish result]))
@@ -21,7 +22,6 @@
 (defn query
   "Use the search service to query for results."
   [search-query]
-  (timbre/debug search-query)
   (if (> (count search-query) 1)
     (do
       (active)
