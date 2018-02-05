@@ -292,7 +292,7 @@ div.entry-edit-modal-container {
             @include tablet() {
               width: 100%;
               margin: 24px 0px 0px;
-              min-height: calc(100vh - 64px - 240px);
+              min-height: 64px;
 
               @include avenir_BOOK();
               font-size: 18px;
