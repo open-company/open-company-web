@@ -58,12 +58,11 @@ div.entry-edit-modal-container {
       div.entry-edit-modal-header-mobile {
         display: none;
 
-        @include mobile() {
+        @include tablet() {
           display: block;
           height: 112px;
           background-color: white;
           width: 100vw;
-          text-align: center;
           position: fixed;
           top: 0px;
           left: 0px;
@@ -71,8 +70,6 @@ div.entry-edit-modal-container {
           z-index: 1;
 
           div.mobile-header {
-            position: relative;
-            width: 100vw;
             height: 64px;
             padding: 20px 24px;
 
@@ -335,7 +332,8 @@ div.entry-edit-modal-container {
             width: 100%;
             @include avenir_H();
             font-size: 20px;
-            margin: 27px 24px 0px;
+            margin: 27px 0px 0px;
+            padding: 0px 24px;
           }
 
           &:not(:focus):empty:before {
@@ -355,7 +353,8 @@ div.entry-edit-modal-container {
           overflow: visible;
 
           @include tablet() {
-            margin: 8px 24px 0px;
+            margin: 8px 0px 0px;
+            padding: 0px 24px;
           }
 
           div.medium-editor-media-picker {
