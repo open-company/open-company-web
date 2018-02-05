@@ -46,10 +46,7 @@
         all-posts-data (dis/all-posts-data data)
         board-data (dis/board-data data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-<<<<<<< HEAD
-=======
         ap-initial-at (:ap-initial-at data)
->>>>>>> mainline
         should-show-onboard-overlay? (some #{(:nux data)} [:1 :7])]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
