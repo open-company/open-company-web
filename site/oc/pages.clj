@@ -235,7 +235,7 @@
         [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Stay aligned"]
+          "Where leaders speak"]
         [:div.subheadline.big-web-only
           "Company updates and stories that keep teams"]
         [:div.subheadline.second-line.big-web-only
@@ -352,7 +352,7 @@
         [:div.carrot-plus-slack]
 
         [:h1.slack
-          "Stay aligned"]
+          "Where leaders speak"]
 
         [:div.slack-subline-container
           [:div.slack-subline
@@ -549,7 +549,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Stay aligned"]
+          [:title "Where leaders speak"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -673,7 +673,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Stay aligned"]
+          [:title "Where leaders speak"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/

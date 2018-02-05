@@ -52,7 +52,7 @@
           [:div.balloon.small-yellow]
 
           [:h1.headline
-            "Stay aligned"]
+            "Where leaders speak"]
           [:div.subheadline.big-web-only
             "Company updates and stories that keep teams"]
           [:div.subheadline.second-line.big-web-only

@@ -74,7 +74,7 @@
             [:div.carrot-plus-slack]
 
             [:h1.slack
-              "Stay aligned"]
+              "Where leaders speak"]
 
             [:div.slack-subline-container
               [:div.slack-subline
