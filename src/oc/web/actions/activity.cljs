@@ -63,8 +63,7 @@
 
 (defn entry-edit
   [initial-entry-data]
-  (load-cached-item initial-entry-data :entry-editing)
-  (dis/dispatch! [:entry-edit initial-entry-data]))
+  (load-cached-item initial-entry-data :entry-editing))
 
 (defn activity-edit
   [activity-data]
