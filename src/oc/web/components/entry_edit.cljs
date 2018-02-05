@@ -129,9 +129,10 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-let [headline-el (rum/ref-node state "headline")]
-      ; move cursor at the end
-      (utils/to-end-of-content-editable headline-el))))
+    (when-not (responsive/is-tablet-or-mobile?)
+      (when-let [headline-el (rum/ref-node state "headline")]
+        ; move cursor at the end
+        (utils/to-end-of-content-editable headline-el)))))
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
@@ -188,8 +189,9 @@
                          :did-mount (fn [s]
                           (when-not @(drv/get-ref s :nux)
                             (utils/after 300 #(setup-headline s))
-                            (when-let [headline-el (rum/ref-node s "headline")]
-                              (utils/to-end-of-content-editable headline-el)))
+                            (when-not (responsive/is-tablet-or-mobile?)
+                              (when-let [headline-el (rum/ref-node s "headline")]
+                                (utils/to-end-of-content-editable headline-el))))
                           (reset! (::window-resize-listener s)
                            (events/listen
                             js/window

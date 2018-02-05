@@ -257,11 +257,11 @@ div.entry-edit-modal-container {
           &:not(:focus):empty:before {
             content: attr(placeholder);
             display: block;
-            color: #8A8E94 !important;
+            color: rgba(#8A8E94, 0.5) !important;
             font-style: none;
 
             @include tablet() {
-              color: $carrot_dark_gray !important;
+              color: rgba($carrot_dark_gray, 0.5) !important;
             }
           }
         }
@@ -302,10 +302,10 @@ div.entry-edit-modal-container {
             @include activity-attachment(true);
 
             &.medium-editor-placeholder:after {
-              color: #8A8E94 !important;
+              color: rgba(#8A8E94, 0.5) !important;
 
               @include tablet() {
-                color: $carrot_dark_gray !important;
+                color: rgba($carrot_dark_gray, 0.5) !important;
               }
             }
 
