@@ -263,7 +263,7 @@
         [:div.stay-aligned-container
           [:div.stay-aligned-icon]
           [:div.stay-aligned-message
-            "Keep everyone on the same page."]]
+            "Stay aligned around topics that matter."]]
 
         carrot-cards]
 
