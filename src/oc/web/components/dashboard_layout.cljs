@@ -174,9 +174,6 @@
         nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile-size? (responsive/is-mobile-size?)
-        dashboard-layout-container-key (if current-activity-id
-                                        (str "dashboard-layout-activity-" current-activity-id)
-                                        (str "dashboard-layout-" (if is-all-posts "all-posts" (:slug board-data))))
         empty-board? (and (not nux)
                           (zero? (count (:fixed-items board-data))))
         sidebar-width (+ responsive/left-navigation-sidebar-width
@@ -198,7 +195,6 @@
         (when (some #{nux} [:3 :4 :5 :6])
           (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
-          {:key dashboard-layout-container-key}
           (navigation-sidebar)
           [:div.board-container.group
             {:style board-container-style}
