@@ -79,8 +79,7 @@
       [:div.card.card-5
         [:div.card-icon]
         [:div.card-title
-          (str
-            "Visible engagement")]
+          "See who’s engaged"]
         [:div.card-content
           (str
             "Carrot measures engagement "
