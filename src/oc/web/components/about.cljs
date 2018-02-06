@@ -39,8 +39,8 @@
           [:h1.about "About us"]
           [:div.about-subline
             (str
-             "We empower leaders to create alignment by keeping teams "
-             "focused on what matters most.")]
+             "Carrot is a communication platform that inspires "
+             "transparency and team alignment.")]
 
           [:div.team-container
             [:div.team-row.group.three-cards
