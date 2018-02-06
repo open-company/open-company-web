@@ -47,10 +47,9 @@
          :stroke-width "1"
          :fill "none"
          :fill-rule "evenodd"
-         :fill-opacity "0.9"
-         :opacity "0.3"}
+         :opacity "0.9"}
         [:g
-          {:fill "#34414F"}
+          {:fill "#6187F8"}
           [:g
             [:path
               {:d
@@ -100,10 +99,9 @@
          :stroke-width "1"
          :fill "none"
          :fill-rule "evenodd"
-         :fill-opacity "0.9"
-         :opacity "0.3"}
+         :opacity "0.9"}
         [:g
-          {:fill "#34414F"}
+          {:fill "#6187F8"}
           [:g
             [:path
               {:d
@@ -134,54 +132,67 @@
     (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
           offset-x px
           offset-y py
-          second-line (str "M" (+ 485 offset-x) "," (+ 132.916372 offset-y) "\n")
-          nth-line-3 (str "C" (+ 382.44772 offset-x)  "," (+ 132.869289 offset-y)
-                          " " (+ 301.172233 offset-x) "," (+ 217.560286 offset-y)
-                          " " (+ 279.089994 offset-x) "," (+ 319.839231 offset-y) "\n")
-          nth-line-4 (str "C" (+ 257.668873 offset-x) "," (+ 418.502182 offset-y)
-                          " " (+ 349.904004 offset-x) "," (+ 519.895962 offset-y)
-                          " " (+ 485 offset-x)        "," (+ 522.916353 offset-y) "\n")
-          nth-line-5 (str "C" (+ 620.095996 offset-x) "," (+ 519.895962 offset-y)
-                          " " (+ 712.331127 offset-x) "," (+ 418.499828 offset-y)
-                          " " (+ 690.910006 offset-x) "," (+ 319.839231 offset-y) "\n")
-          nth-line-6 (str "C" (+ 668.827767 offset-x) "," (+ 217.560286 offset-y)
-                          " " (+ 587.55228 offset-x)  "," (+ 132.869289 offset-y)
-                          " " (+ 485 offset-x)        "," (+ 132.916372 offset-y)
-                          " Z ")]
+          angle "a4,4 0 0 1 4,4\n"
+          second-line (str "M" px "," py "\n")
+          nth-line-3 (str "L" (+ px (- 432 4)) "," py "\na4,4 0 0 1 4,4\n")
+          nth-line-4 (str "L" (+ px 432) "," (+ py 300 -4) "\n" "a4,4 0 0 1 -4,4\n")
+          nth-line-5 (str "L" (+ px 4) "," (+ py 300) "\n" "a4,4 0 0 1 -4,-4\n")
+          nth-line-6 (str "L" px "," (+ py 4) "\n" "a4,4 0 0 1 4,-4\n" "Z")]
       [:g
         {:stroke "none"
          :stroke-width "1"
          :fill "none"
          :fill-rule "evenodd"
-         :fill-opacity "0.9"
-         :opacity "0.3"}
+         :opacity "0.9"}
         [:g
-          {:fill "#34414F"}
+          {:fill "#6187F8"}
           [:g
             [:path
               {:d
                 (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
 
+(defn step-element-data [step ui-el]
+  (cond
+    (= step :2)
+    (let [offset (.offset ui-el)]
+      {:x (- (aget offset "left") 284)
+       :y (+ (aget offset "top") 60)
+       :width 432})
+    (= step :3)
+    (let [offset (.offset ui-el)]
+      {:x (- (aget offset "left") 304)
+       :y (+ (aget offset "top") 40)
+       :width 432})
+    (= step :4)
+    (let [offset (.offset ui-el)]
+      {:x (aget offset "left")
+       :y (aget offset "top")
+       :width 432})))
+
+(defn carrot-tip-position [step element-data]
+  (cond
+    (= step :2)
+    {:left (str (- (:x element-data) 170) "px")
+     :top (str (- (:y element-data) 60) "px")
+     :width (str 432 "px")}
+    (= step :3)
+    {:left (str (- (:x element-data) 170) "px")
+     :top (str (- (:y element-data) 160) "px")
+     :width (str 432 "px")}
+    (= step :4)
+    {:left (str (+ (:x element-data) 442) "px")
+     :top (str (:y element-data) "px")
+     :width (str 432 "px")}))
+
 (defn carrot-tip-inner
-  [{:keys [x y width height ;; container data
-           arrow-top arrow-left ;; arrow data
-           step-label ;; label on top right corner
+  [{:keys [step-label ;; label on top right corner
            title message message-2;; content data
            button-title on-next-click button-position ;; button data
-           circle-type ;; used to check if it has circle or not
            step ;; step of the NUX
-           ] :as data}]
+           ] :as data}
+   element-data]
   [:div.carrot-tip.group
-    {:style (when (not (responsive/is-tablet-or-mobile?))
-              {:left (str x "px")
-               :top (str y "px")
-               :width (str width "px")
-               :height (when height
-                         (str height "px"))})}
-    [:div.arrow
-      {:style {:top (str arrow-top "px")
-               :left (str arrow-left "px")}}]
-    [:div.balloons-background]
+    {:style (when element-data (carrot-tip-position step element-data))}
     (when step-label
       [:div.carrot-tip-step
         step-label])
@@ -204,12 +215,30 @@
           button-title])]])
 
 (rum/defc carrot-tip < rum/static
-  [{:keys [x y width height ;; container data
-           arrow-top arrow-left ;; arrow data
-           circle-type circle-offset ;; type of background circle
-           step ;; Overall nux step
+  [{:keys [step ;; Overall nux step
            ] :as data}]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        ui-element (when-not is-mobile?
+                     (cond
+                       (= step :2)
+                       (js/$ "button.add-to-board-top-button")
+                       (= step :3)
+                       (js/$ "div.entry-edit-modal-container button.post-btn")
+                       (= step :4)
+                       (js/$ (.get (js/$ "div.activity-card") 0))))
+        element-data (when-not is-mobile?
+                       (step-element-data step ui-element))
+        circle-offset (when-not is-mobile?
+                        (cond
+                          (= step :2)
+                          {:top -170
+                           :left -760}
+                          (= step :3)
+                          {:top -170
+                           :left -760}
+                          (= step :4)
+                          {:top -170
+                           :left -750}))]
     [:div.carrot-tip-container.needs-background
       {:class (str "step-" (name step))}
       [:div.carrot-tip-background
@@ -225,18 +254,18 @@
            (second-step-oval
             (.-innerWidth js/window)
             (.-innerHeight js/window)
-            (+ x (:left circle-offset))
-            (+ y (:top circle-offset)))
+            (+ (:x element-data) (:left circle-offset))
+            (+ (:y element-data) (:top circle-offset)))
            (= :3 step)
            (third-step-oval
             (.-innerWidth js/window)
             (.-innerHeight js/window)
-            (+ x (:left circle-offset))
-            (+ y (:top circle-offset)))
+            (+ (:x element-data) (:left circle-offset))
+            (+ (:y element-data) (:top circle-offset)))
            (= :4 step)
            (fourth-step-oval
             (.-innerWidth js/window)
             (.-innerHeight js/window)
-            (+ x (:left circle-offset))
-            (+ y (:top circle-offset))))]]
-      (carrot-tip-inner data)]))
+            (:x element-data)
+            (:y element-data)))]]
+      (carrot-tip-inner data element-data)]))
