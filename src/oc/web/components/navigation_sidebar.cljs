@@ -46,6 +46,12 @@
 (def sidebar-top-margin 122)
 (def footer-button-height 31)
 
+(defn save-content-height [s]
+  (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
+    (let [height (.height (js/$ navigation-sidebar-content))]
+      (when (not= height @(::content-height s))
+        (reset! (::content-height s) height)))))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -57,21 +63,22 @@
                                 (rum/local nil ::window-height)
                                 ;; Mixins
                                 first-render-mixin
-                                {:did-mount (fn [s]
-                                  (when-not (utils/is-test-env?)
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                {:will-mount (fn [s]
                                   (reset! (::window-height s) (.-innerHeight js/window))
                                   (reset! (::resize-listener s)
                                    (events/listen
                                     js/window
                                     EventType/RESIZE
                                     #(reset! (::window-height s) (.-innerHeight js/window))))
+                                  (save-content-height s)
+                                  s)
+                                 :did-mount (fn [s]
+                                  (save-content-height s)
+                                  (when-not (utils/is-test-env?)
+                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                   s)
                                  :will-update (fn [s]
-                                  (when @(:first-render-done s)
-                                    (let [height (.height (js/$ (rum/ref-node s "left-navigation-sidebar-content")))]
-                                      (when (not= height @(::content-height s))
-                                        (reset! (::content-height s) height))))
+                                  (save-content-height s)
                                   s)
                                  :did-update (fn [s]
                                   (when-not (utils/is-test-env?)
@@ -101,15 +108,16 @@
         org-slug (router/current-org-slug)
         show-invite-people (and org-slug
                                 (jwt/is-admin? (:team-id org-data)))
-        is-tall-enough? (<
-                         @(::content-height s)
-                         (-
-                          @(::window-height s)
-                          sidebar-top-margin
-                          footer-button-height
-                          20
-                          (when show-invite-people
-                           footer-button-height)))]
+        is-tall-enough? (or (not @(::content-height s))
+                            (<
+                             @(::content-height s)
+                             (-
+                              @(::window-height s)
+                              sidebar-top-margin
+                              footer-button-height
+                              20
+                              (when show-invite-people
+                               footer-button-height))))]
     [:div.left-navigation-sidebar.group
       {:class (when mobile-navigation-sidebar "show-mobile-boards-menu")}
       [:div.left-navigation-sidebar-content

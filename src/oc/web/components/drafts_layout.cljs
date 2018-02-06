@@ -8,6 +8,7 @@
             [oc.web.mixins.activity :as am]
             [oc.web.lib.activity-utils :as au]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn delete-clicked [draft e]
@@ -38,7 +39,7 @@
                               (str "draft-card-" (:uuid draft)) true})
      :key (str "draft-" (:created-at draft))
      :on-click #(when draft
-                  (dis/dispatch! [:entry-edit draft]))}
+                  (activity-actions/entry-edit draft))}
     (when draft
       [:div.draft-card-inner
         [:div.draft-card-head

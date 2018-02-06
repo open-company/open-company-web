@@ -10,6 +10,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
@@ -173,9 +174,6 @@
         nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile-size? (responsive/is-mobile-size?)
-        dashboard-layout-container-key (if current-activity-id
-                                        (str "dashboard-layout-activity-" current-activity-id)
-                                        (str "dashboard-layout-" (if is-all-posts "all-posts" (:slug board-data))))
         empty-board? (and (not nux)
                           (zero? (count (:fixed-items board-data))))
         sidebar-width (+ responsive/left-navigation-sidebar-width
@@ -197,7 +195,6 @@
         (when (some #{nux} [:3 :4 :5 :6])
           (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
-          {:key dashboard-layout-container-key}
           (navigation-sidebar)
           [:div.board-container.group
             {:style board-container-style}
@@ -249,7 +246,7 @@
                                   (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}]
-                                    (dis/dispatch! [:entry-edit entry-data]))))}
+                                    (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "New Post"]]
@@ -264,8 +261,8 @@
                       :on-blur #(reset! (::show-top-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (reset! (::show-top-boards-dropdown s) false)
-                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
-                                                                :board-name (:label item)}]))}))])]
+                                   (activity-actions/entry-edit {:board-slug (:value item)
+                                                                 :board-name (:label item)}))}))])]
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
@@ -316,7 +313,7 @@
                                    (not @(::show-floating-boards-dropdown s)))
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}]
-                                    (dis/dispatch! [:entry-edit entry-data]))))}
+                                    (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]]
                   (when @(::show-floating-boards-dropdown s)
                     (dropdown-list
@@ -329,5 +326,5 @@
                       :on-blur #(reset! (::show-floating-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (reset! (::show-floating-boards-dropdown s) false)
-                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
-                                                                :board-name (:label item)}]))}))]))]]]))
+                                   (activity-actions/entry-edit {:board-slug (:value item)
+                                                                 :board-name (:label item)}))}))]))]]]))

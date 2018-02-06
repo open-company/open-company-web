@@ -14,7 +14,7 @@
   " If the user is anonymous or not part of the orginization
     don't display search component.
   "
-  (if (not (jwt/jwt))
+  (if-not (jwt/jwt)
     false
     (if (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
       true

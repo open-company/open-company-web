@@ -195,6 +195,8 @@ provided in the table below:
 |  :activity-delete/finish | API | Entry delete request finished, refresh the board data. |
 |  :activity-get/finish | API | Activity (secure or not) loaded from API. |
 |  :activity-modal-edit | UI | Activate editing in modal. |
+|  :activity-modal-fade-in | UI | Show the activity modal without reloading the route. |
+|  :activity-modal-fade-out | UI | Dismiss the activity modal and go back to the board. |
 |  :activity-move | UI | Move an activity from a board to another. |
 |  :activity-share-hide | UI | Hide the share modal. |
 |  :activity-share-reset | UI | Reset the shared data to start a new share. |
@@ -214,7 +216,6 @@ provided in the table below:
 |  :all-posts-get/finish | API | AP loaded. |
 |  :all-posts-more | UI | Load more posts for current AP. |
 |  :all-posts-more/finish | API | More posts loaded. |
-|  :all-posts-reset | UI | Remove AP data from the app state. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
 |  :auth-with-token | UI | Given a scope (email reset, invitation etc..) start the token exchange to login the user. |
