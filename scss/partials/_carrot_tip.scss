@@ -172,8 +172,8 @@ div.carrot-tip-container {
       line-height: 28px;
 
       @include mobile() {
-        top: unset;
-        right: 16px;
+        left: 24px;
+        bottom: -8px;
       }
     }
 
@@ -192,6 +192,10 @@ div.carrot-tip-container {
         font-size: 18px;
         color: white;
         line-height: 22px;
+
+        @include mobile() {
+          margin-top: 8px;
+        }
 
         &.second {
           margin-top: 16px;
