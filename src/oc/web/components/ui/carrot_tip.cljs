@@ -111,21 +111,26 @@
 
 (defn fourth-step-oval [width height px py]
   (if (responsive/is-tablet-or-mobile?)
-    [:g
-      {:stroke "none"
-       :fill-opacity "0.9"
-       :opacity "0.3"
-       :fill "#34413F"}
-      [:rect
-        {:x "0"
-         :y "0"
-         :width (str (.-innerWidth js/window))
-         :height "138"}]
-      [:rect
-        {:x "0"
-         :y "438"
-         :width (str (.-innerWidth js/window))
-         :height (str (- (.-height (.getBoundingClientRect (.-body js/document))) 438))}]]
+    (let [mobile-post-offset-y 138
+          mobile-post-height 300
+          first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          second-line (str "M" 0 "," mobile-post-offset-y "\n")
+          nth-line-3 (str "L" width "," mobile-post-offset-y "\n")
+          nth-line-4 (str "L" width "," (+ mobile-post-offset-y mobile-post-height) "\n")
+          nth-line-5 (str "L" 0 "," (+ mobile-post-offset-y mobile-post-height) "\n")
+          nth-line-6 (str "L" 0 "," mobile-post-offset-y "Z")]
+      [:g
+        {:stroke "none"
+         :stroke-width "1"
+         :fill "none"
+         :fill-rule "evenodd"
+         :opacity "0.9"}
+        [:g
+          {:fill "#6187F8"}
+          [:g
+            [:path
+              {:d
+                (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])
     (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
           offset-x px
           offset-y py
@@ -157,90 +162,6 @@
               {:d
                 (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
 
-(defn fifth-step-oval [width height px py]
-  (if (responsive/is-tablet-or-mobile?)
-    (let [navbar-height 64]
-      [:g
-        {:stroke "none"
-         :fill-opacity "0.9"
-         :opacity "0.3"
-         :fill "#34413F"}
-        [:rect
-          {:x "0"
-           :y (str navbar-height)
-           :width (str (.-innerWidth js/window))
-           :height (str (- (.-height (.getBoundingClientRect (.-body js/document))) navbar-height))}]])
-    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
-          offset-x px
-          offset-y py
-          second-line (str "M" (+ 102.465877 offset-x) "," (+ 29.4005311 offset-y) "\n")
-          nth-line-3 (str "C" (+ 47.9448333 offset-x) "," (+ 50.3042759 offset-y)
-                          " " (+ 19.7406369 offset-x) "," (+ 105.961005 offset-y)
-                          " " (+ 26.1160043 offset-x) "," (+ 157.653849 offset-y) "\n")
-          nth-line-4 (str "C" (+ 32.2024097 offset-x) "," (+ 207.543534 offset-y)
-                          " " (+ 99.1875736 offset-x) "," (+ 235.501906 offset-y)
-                          " " (+ 171.534127 offset-x) "," (+ 209.329474 offset-y) "\n")
-          nth-line-5 (str "C" (+ 242.810869 offset-x) "," (+ 180.370089 offset-y)
-                          " " (+ 273.882327 offset-x) "," (+ 114.770059 offset-y)
-                          " " (+ 245.02311 offset-x) "," (+ 73.6232845 offset-y) "\n")
-          nth-line-6 (str "C" (+ 215.171667 offset-x) "," (+ 30.9420608 offset-y)
-                          " " (+ 156.970244 offset-x) "," (+ 8.45334202 offset-y)
-                          " " (+ 102.465877 offset-x) "," (+ 29.4005311 offset-y)
-                          " Z ")]
-      [:g
-        {:stroke "none"
-         :stroke-width "1"
-         :fill "none"
-         :fill-rule "evenodd"
-         :fill-opacity "0.9"
-         :opacity "0.3"}
-        [:g
-          {:fill "#34414F"}
-          [:g
-            [:path
-              {:d
-                (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
-
-(defn sixth-step-oval [width height px py]
-  (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
-        offset-x px
-        offset-y py
-        second-line (str "M" (+ 98.4658768 offset-x) "," (+ 587.400531 offset-y) "\n")
-        nth-line-3 (str "C" (+ 43.9448333 offset-x) "," (+ 608.304276 offset-y)
-                        " " (+ 15.7406369 offset-x) "," (+ 663.961005 offset-y)
-                        " " (+ 22.1160043 offset-x) "," (+ 715.653849 offset-y) "\n")
-        nth-line-4 (str "C" (+ 28.2024097 offset-x) "," (+ 765.543534 offset-y)
-                        " " (+ 95.1875736 offset-x) "," (+ 793.501906 offset-y)
-                        " " (+ 167.534127 offset-x) "," (+ 767.329474 offset-y) "\n")
-        nth-line-5 (str "C" (+ 238.810869 offset-x) "," (+ 738.370089 offset-y)
-                        " " (+ 269.882327 offset-x) "," (+ 672.770059 offset-y)
-                        " " (+ 241.02311 offset-x) "," (+ 631.623284 offset-y) "\n")
-        nth-line-6 (str "C" (+ 211.171667, offset-x) "," (+ 588.942061 offset-y)
-                        " " (+ 152.970244 offset-x) "," (+ 566.453342 offset-y)
-                        " " (+ 98.4658768 offset-x) "," (+ 587.400531 offset-y)
-                        " Z ")]
-    [:g
-      {:stroke "none"
-       :stroke-width "1"
-       :fill "none"
-       :fill-rule "evenodd"
-       :fill-opacity "0.9"
-       :opacity "0.3"}
-      [:g
-        {:fill "#34414F"}
-        [:g
-          [:path
-            {:d
-              (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]]))
-
-(defn is-step-with-oval
-  [step]
-  (cond
-    (some #{step} [:2 :3 :4 :5])
-    true
-    :else
-    false))
-
 (defn carrot-tip-inner
   [{:keys [x y width height ;; container data
            arrow-top arrow-left ;; arrow data
@@ -251,8 +172,7 @@
            step ;; step of the NUX
            ] :as data}]
   [:div.carrot-tip.group
-    {:style (when (and (not (responsive/is-tablet-or-mobile?))
-                       (is-step-with-oval step))
+    {:style (when (not (responsive/is-tablet-or-mobile?))
               {:left (str x "px")
                :top (str y "px")
                :width (str width "px")
@@ -275,7 +195,7 @@
           message-2])
       (when (and (string? button-title)
                  (fn? on-next-click))
-        [:button.mlb-reset.mlb-default.next-button
+        [:button.mlb-reset.next-button
           {:class button-position
            :on-click (fn [e]
                        (utils/event-stop e)
@@ -290,54 +210,33 @@
            step ;; Overall nux step
            ] :as data}]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)]
-    (if (is-step-with-oval step)
-      [:div.carrot-tip-container.needs-background
-        {:class (str "step-" (name step))}
-        [:div.carrot-tip-background
-          [:svg
-            {:width "100%"
-             :height "100%"
-             :viewBox (str "0px 0px " (.-innerWidth js/window) "px " (.-height (.getBoundingClientRect (.-body js/document))) "px")
-             :version "1.1"
-             :xmlns "http://www.w3.org/2000/svg"
-             :xmlnsXlink "http://www.w3.org/1999/xlink"}
-            (cond
-             (= :2 step)
-             (second-step-oval
-              (.-innerWidth js/window)
-              (.-innerHeight js/window)
-              (+ x (:left circle-offset))
-              (+ y (:top circle-offset)))
-             (= :3 step)
-             (third-step-oval
-              (.-innerWidth js/window)
-              (.-innerHeight js/window)
-              (+ x (:left circle-offset))
-              (+ y (:top circle-offset)))
-             (= :4 step)
-             (fourth-step-oval
-              (.-innerWidth js/window)
-              (.-innerHeight js/window)
-              (+ x (:left circle-offset))
-              (+ y (:top circle-offset)))
-             (= :5 step)
-             (fifth-step-oval
-              (.-innerWidth js/window)
-              (.-innerHeight js/window)
-              (+ x (:left circle-offset))
-              (+ y (:top circle-offset)))
-             (= :6 step)
-             (sixth-step-oval
-              (.-innerWidth js/window)
-              (.-innerHeight js/window)
-              (+ x (:left circle-offset))
-              (+ y (:top circle-offset))))]]
-        (carrot-tip-inner data)]
-      [:div.carrot-tip-container
-        {:style (when-not (responsive/is-tablet-or-mobile?)
-                  {:left (str x "px")
-                   :top (str y "px")
-                   :width (str width "px")
-                   :height (str height "px")})
-         :class (str "step-" (name step))}
-        (carrot-tip-inner data)])))
+    [:div.carrot-tip-container.needs-background
+      {:class (str "step-" (name step))}
+      [:div.carrot-tip-background
+        [:svg
+          {:width "100%"
+           :height "100%"
+           :viewBox (str "0 0 " (.-innerWidth js/window) " " (.-innerHeight js/window))
+           :version "1.1"
+           :xmlns "http://www.w3.org/2000/svg"
+           :xmlnsXlink "http://www.w3.org/1999/xlink"}
+          (cond
+           (= :2 step)
+           (second-step-oval
+            (.-innerWidth js/window)
+            (.-innerHeight js/window)
+            (+ x (:left circle-offset))
+            (+ y (:top circle-offset)))
+           (= :3 step)
+           (third-step-oval
+            (.-innerWidth js/window)
+            (.-innerHeight js/window)
+            (+ x (:left circle-offset))
+            (+ y (:top circle-offset)))
+           (= :4 step)
+           (fourth-step-oval
+            (.-innerWidth js/window)
+            (.-innerHeight js/window)
+            (+ x (:left circle-offset))
+            (+ y (:top circle-offset))))]]
+      (carrot-tip-inner data)]))

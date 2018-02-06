@@ -13,10 +13,6 @@ div.carrot-tip-container {
     bottom: 0px;
   }
 
-  @include mobile() {
-    position: absolute;
-  }
-
   &.step-2 {
     pointer-events: none;
 
@@ -60,7 +56,7 @@ div.carrot-tip-container {
           width: 334px;
 
           @include mobile() {
-            width: 100%;
+            width: 300px;
           }
         }
 
@@ -68,7 +64,7 @@ div.carrot-tip-container {
           width: 334px;
 
           @include mobile() {
-            width: 100%;
+            width: 300px;
           }
         }
       }
@@ -76,16 +72,12 @@ div.carrot-tip-container {
   }
 
   &.step-3 {
+    pointer-events: none;
+
     @include mobile() {
       width: 100%;
       height: 100vh;
       position: absolute;
-    }
-
-    div.carrot-tip-background {
-      @include mobile() {
-        margin-top: -112px;
-      }
     }
 
     div.carrot-tip{
@@ -159,7 +151,7 @@ div.carrot-tip-container {
       @include mobile() {
         width: 100%;
         height: auto;
-        bottom: -40px;
+        bottom: 0px;
       }
 
       div.arrow {
@@ -188,97 +180,26 @@ div.carrot-tip-container {
         }
       }
 
-      div.carrot-tip-inner {
-
-        div.carrot-tip-description {
-          margin-top: 20px;
-        }
-
-        button.next-button {
-          margin-top: 60px;
-        }
-      }
-    }
-  }
-
-  &.step-5 {
-    div.carrot-tip{
-
-      @include mobile() {
-        top: 64px;
-      }
-
-      div.arrow {
-        left: -7px;
-        top: 24px;
-
+      div.carrot-tip-step {
         @include mobile() {
-          top: -7px;
-          left: 30px;
-        }
-      }
-
-      div.balloons-background {
-        width: 178px;
-        height: 152px;
-        overflow: hidden;
-        @include image-2x("/img/ML/carrot_tip_bg_4");
-        background-size: 244px 229px;
-        bottom: 0px;
-        right: 0px;
-        overflow: hidden;
-
-        @include mobile() {
-          display: none;
+          right: unset;
+          left: 140px;
+          bottom: 30px;
         }
       }
 
       div.carrot-tip-inner {
 
         div.carrot-tip-description {
-          margin-top: 20px;
+          margin-top: 12px;
+        }
+
+        div.carrot-tip-title {
+          margin-top: 0px;
         }
 
         button.next-button {
-          margin-top: 40px;
-          margin-bottom: 10px;
-        }
-      }
-    }
-  }
-
-  &.step-6 {
-    div.carrot-tip{
-
-      div.arrow {
-        left: 55px;
-        bottom: -7px;
-      }
-
-      div.balloons-background {
-        width: 174px;
-        height: 108px;
-        overflow: hidden;
-        @include image-2x("/img/ML/carrot_tip_bg_5");
-        background-size: 174px 170px;
-        bottom: 0px;
-        right: 70px;
-        overflow: hidden;
-
-        @include mobile() {
-          display: none;
-        }
-      }
-
-      div.carrot-tip-inner {
-
-        div.carrot-tip-description {
           margin-top: 20px;
-        }
-
-        button.next-button {
-          margin-top: 40px;
-          margin-bottom: 10px;
         }
       }
     }
@@ -364,6 +285,11 @@ div.carrot-tip-container {
         padding: 8px 35px;
         height: 40px;
         float: right;
+        background-color: white;
+        color: $carrot_green_2;
+        @include avenir_H();
+        font-size: 14px;
+        border-radius: 100px;
 
         &.left {
           float: left;
