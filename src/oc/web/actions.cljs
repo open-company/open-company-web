@@ -1133,6 +1133,7 @@
      (fn [item err]
        (if (and (not err)
                 (map? item)
+                (not (:nux db))
                 (or (and (:updated-at initial-entry-data)
                          (= (:updated-at initial-entry-data) (:updated-at item)))
                     (not (:updated-at initial-entry-data))))
@@ -1255,7 +1256,7 @@
         (update-in [:entry-editing] dissoc :publishing)
         (dissoc :entry-toggle-save-on-exit)
         ;; Progress the NUX
-        (assoc :nux (when (= (:nux db) :3) :5))))))
+        (assoc :nux (when (= (:nux db) :3) :4))))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
