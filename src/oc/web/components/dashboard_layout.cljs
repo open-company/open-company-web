@@ -1,5 +1,4 @@
 (ns oc.web.components.dashboard-layout
-  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
@@ -12,7 +11,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
-            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
@@ -50,92 +48,6 @@
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
                                  :display (if (pos? opacity) "block" "none")})))))
-
-(defn nux-steps
-  [org-data board-data nux]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)]
-    (case nux
-      :2
-      (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
-                  offset (.offset new-post-bt)]
-        (let [create-link (utils/link-for (:links org-data) "create")]
-          (carrot-tip {:step nux
-                       :x (- (aget offset "left") 284)
-                       :y (+ (aget offset "top") 60)
-                       :circle-offset {:top -170
-                                       :left -760}
-                       :width 432
-                       :title "Update your team"
-                       :message (str
-                                 "Click the compose button to add "
-                                 "updates, announcements and plans "
-                                 "that keep your team aligned.")
-                       :step-label "1 of 4"})))
-      :4
-      (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
-                  first-card-offset (.offset first-card)]
-        (carrot-tip {:step nux
-                     :x (+ (aget first-card-offset "left") (.width first-card) 24)
-                     :y (aget first-card-offset "top")
-                     :width 432
-                     :circle-offset {:top -170
-                                     :left -750}
-                     :title "Success!"
-                     :message (str "Your first post is on the " (:name board-data) " board!")
-                     :step-label (if is-mobile? "1 of 3" "1 of 4")
-                     :button-title "Cool"
-                     :button-position "left"
-                     :on-next-click #(dis/dispatch! [:input [:nux] :5])}))
-      :5
-      (let [plus-button (js/$ "button#add-board-button")
-            plus-offset (.offset plus-button)
-            mobile-ham-button (js/$ "button.mobile-navigation-sidebar-ham-bt")
-            mobile-ham-offset (.offset mobile-ham-button)]
-        (when (or (and is-mobile?
-                       mobile-ham-button
-                       mobile-ham-offset)
-                  (and (not is-mobile?)
-                       plus-button
-                       plus-offset))
-          (carrot-tip {:step nux
-                       :x (+ (aget (if is-mobile? mobile-ham-offset plus-offset ) "left") 40)
-                       :y (- (aget (if is-mobile? mobile-ham-offset plus-offset) "top") 22)
-                       :width 432
-                       :circle-offset {:top -70
-                                       :left -220}
-                       :title "Boards keep posts organized"
-                       :message (str
-                                 "You can add high-level boards like "
-                                 "All-hands, Strategy, and Who We Are; or "
-                                 "group-level boards like Sales, Marketing and "
-                                 "Design.")
-                       :step-label (if is-mobile? "3 of 3" "3 of 4")
-                       :button-title "Makes sense"
-                       :button-position "left"
-                       :on-next-click (fn []
-                                        (let [is-admin? (jwt/is-admin? (:team-id org-data))]
-                                          (dis/dispatch! [:input [:nux] (if (and (not is-mobile?)
-                                                                                 is-admin?)
-                                                                          :6
-                                                                          :7)])))})))
-      :6
-      (when-let* [invite-button (js/$ "button.invite-people-btn")
-                  invite-offset (.offset invite-button)]
-        (carrot-tip {:step nux
-                     :x (+ (aget invite-offset "left") 16)
-                     :y (- (aget invite-offset "top") 255)
-                     :width 432
-                     :circle-offset {:top -350
-                                     :left -80}
-                     :title "Invite your teammates"
-                     :message (str
-                               "The best way to keep your team aligned? Invite "
-                               "them to join you on Carrot!")
-                     :step-label "4 of 4"
-                     :button-title "Will do"
-                     :button-position "left"
-                     :on-next-click (fn []
-                                      (dis/dispatch! [:input [:nux] :7]))})))))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -203,8 +115,6 @@
         all-boards (drv/react s :editable-boards)]
       ;; Entries list
       [:div.dashboard-layout.group
-        (when (some #{nux} [:2 :4 :5])
-          (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
           (navigation-sidebar)
@@ -254,14 +164,11 @@
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
-                                (if nux
-                                  (when (= nux :2)
-                                    (dis/dispatch! [:first-forced-post-start]))
-                                  (if (or is-drafts-board is-all-posts)
-                                    (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
-                                    (let [entry-data {:board-slug (:slug board-data)
-                                                      :board-name (:name board-data)}]
-                                      (dis/dispatch! [:entry-edit entry-data])))))}
+                                (if (or is-drafts-board is-all-posts)
+                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                  (let [entry-data {:board-slug (:slug board-data)
+                                                    :board-name (:name board-data)}]
+                                    (dis/dispatch! [:entry-edit entry-data]))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "New Post"]]
@@ -321,14 +228,17 @@
                      :title "Start a new post"
                      :on-click (fn [_]
                                 (utils/remove-tooltips)
-                                (if (or is-drafts-board
-                                        is-all-posts)
-                                  (reset!
-                                   (::show-floating-boards-dropdown s)
-                                   (not @(::show-floating-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (dis/dispatch! [:entry-edit entry-data]))))}
+                                (if nux
+                                  (when (= nux :2)
+                                    (dis/dispatch! [:first-forced-post-start]))
+                                  (if (or is-drafts-board
+                                          is-all-posts)
+                                    (reset!
+                                     (::show-floating-boards-dropdown s)
+                                     (not @(::show-floating-boards-dropdown s)))
+                                    (let [entry-data {:board-slug (:slug board-data)
+                                                      :board-name (:name board-data)}]
+                                      (dis/dispatch! [:entry-edit entry-data])))))}
                     [:div.add-to-board-pencil]]
                   (when @(::show-floating-boards-dropdown s)
                     (dropdown-list
