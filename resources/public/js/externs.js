@@ -114,3 +114,5 @@ rangy.restoreSelection = function(){};
 rangy.getSelection = function(){};
 // jwt_decode
 var jwt_decode = function(){};
+// Google Analytics
+var ga = window.ga || function(...args) { ga.q = (ga.q || []).push(args) };

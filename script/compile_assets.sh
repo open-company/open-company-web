@@ -6,6 +6,7 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js_output_file oc_assets.js \
 --create_source_map oc_assets.js.map \
 --js lib/print_ascii.js \
+--js lib/autotrack/autotrack.js \
 --js lib/truncate/jquery.dotdotdot.js \
 --js lib/scrollTo/scrollTo.min.js \
 --js js/emojione/autocomplete.js \

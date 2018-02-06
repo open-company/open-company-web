@@ -617,6 +617,8 @@
           [:div#oc-loading]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
+          ;; Gooogle Analytics autotrack
+          [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           ;; JWT decode library
           [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; Custom Tooltips
@@ -743,5 +745,5 @@
              :crossorigin "anonymous"}]
           ;; Compiled oc.min.js from our CDN
           [:script {:src (cdn "/oc.js")}]
-          ;; Compiled assents
+          ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]]})

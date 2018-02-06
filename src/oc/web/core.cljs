@@ -21,6 +21,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.raven :as sentry]
+            [oc.web.lib.google-analytics :as ga]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
@@ -49,6 +50,8 @@
 
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
+;; setup google analytics
+(defonce google-analytics (ga/init))
 
 ;; Avoid warnings
 (declare route-dispatch!)
