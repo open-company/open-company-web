@@ -164,11 +164,14 @@
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
-                                (if (or is-drafts-board is-all-posts)
-                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (dis/dispatch! [:entry-edit entry-data]))))}
+                                (if nux
+                                  (when (= nux :2)
+                                    (dis/dispatch! [:first-forced-post-start]))
+                                  (if (or is-drafts-board is-all-posts)
+                                    (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                    (let [entry-data {:board-slug (:slug board-data)
+                                                      :board-name (:name board-data)}]
+                                      (dis/dispatch! [:entry-edit entry-data])))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "New Post"]]
