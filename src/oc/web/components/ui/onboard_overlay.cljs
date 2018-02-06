@@ -50,7 +50,7 @@
               (if first-ever-user?
                 "Create your first post"
                 "OK, got it")]])
-        :7
+        :5
         [:div.onboard-overlay-step.step-last
           [:div.onboard-balloon.red-balloon-1]
           [:div.onboard-balloon.green-balloon-1]
