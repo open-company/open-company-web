@@ -13,7 +13,6 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
-            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -284,19 +283,6 @@
                     (cancel-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (if is-mobile? "0px" (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px"))}}
-        (when (and is-mobile?
-                   nux)
-          (when-let* [post-button (js/$ "div.entry-edit-modal button.post-button")
-                      post-button-offset (.offset post-button)]
-            (carrot-tip {:step :3
-                         :circle-offset {:top -90
-                                         :left -550}
-                         :x (- (aget post-button-offset "left") 522)
-                         :y (- (aget post-button-offset "top") 20)
-                         :title "Post your updates"
-                         :step-label "2 of 4"
-                         :message "Click the post button to create a sample update we wrote for you. Don't worry, you can delete it later."
-                         :width 494})))
         ;; Show the close button only when there are no modals shown
         (when (and (not (:media-video media-input))
                    (not (:media-chart media-input))
@@ -470,17 +456,6 @@
                        (not (js/isIE)))
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                              :container-selector "div.entry-edit-modal"}))
-            (when nux
-              (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
-                          post-button-offset (.offset post-button)]
-                (carrot-tip {:step :2
-                             :circle-offset {:top -90
-                                             :left -550}
-                             :x (- (aget post-button-offset "left") 522)
-                             :y (- (aget post-button-offset "top") 20)
-                             :title "Here’s a sample post"
-                             :message "Click the green Post button to see how it works."
-                             :width 494})))
             [:button.mlb-reset.mlb-default.form-action-bt.post-btn
               {:ref "post-btn"
                :on-click (fn [_]
