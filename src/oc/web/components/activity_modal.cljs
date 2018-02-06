@@ -27,12 +27,13 @@
 ;; Unsaved edits handling
 
 (defn autosave [s]
-  (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (let [modal-data @(drv/get-ref s :modal-data)
-          activity-data (:modal-editing-data modal-data)
-          cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))]
-      (activity-actions/entry-save-on-exit :modal-editing-data activity-data cleaned-body))))
+  (when s
+    (when-let [body-el (sel1 [:div.rich-body-editor])]
+      (let [modal-data @(drv/get-ref s :modal-data)
+            activity-data (:modal-editing-data modal-data)
+            cleaned-body (when body-el
+                          (utils/clean-body-html (.-innerHTML body-el)))]
+        (activity-actions/entry-save-on-exit :modal-editing-data activity-data cleaned-body)))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
@@ -123,6 +124,8 @@
   (when-not (responsive/is-tablet-or-mobile?)
     (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true)
     (utils/after 100 #(setup-headline state))
+    (when @(::autosave-timer state)
+      (.clearInterval js/window @(::autosave-timer state)))
     (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
     (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
     (when focus
@@ -141,7 +144,7 @@
   (save-on-exit? state)
   (toggle-save-on-exit state false)
   (reset! (::edited-data-loaded state) false)
-  (js/clearInterval @(::autosave-timer state))
+  (.clearInterval js/window @(::autosave-timer state))
   (reset! (::autosave-timer state) nil)
   (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false)
   (when @(::headline-input-listener state)
@@ -311,10 +314,6 @@
                                 js/window
                                 EventType/RESIZE
                                 #(modal-height-did-change s true)))
-                              (let [modal-data @(drv/get-ref s :modal-data)]
-                                (when (:modal-editing modal-data)
-                                  (utils/after 1000
-                                    #(real-start-editing s :headline))))
                               (setup-editing-data s)
                               s)
                              :after-render (fn [s]
