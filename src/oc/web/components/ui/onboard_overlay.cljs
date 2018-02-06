@@ -34,6 +34,9 @@
               board-data (drv/react s :board-data)
               read-only-user (not (utils/link-for (:links board-data) "create"))]
           [:div.onboard-overlay-step.step-1
+            [:div.onboard-balloon.red-balloon]
+            [:div.onboard-balloon.green-balloon]
+            [:div.onboard-balloon.yellow-balloon]
             [:div.onboard-overlay-step-title
               "Keeping your busy team aligned"]
             [:div.step-illustration-container]

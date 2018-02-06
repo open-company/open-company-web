@@ -11,7 +11,6 @@ div.onboard-overlay-container {
 
   @include mobile() {
     position: relative;
-    height: 100%;
   }
 
   &.will-appear {
@@ -50,17 +49,59 @@ div.onboard-overlay-container {
       background-size: 600px 540px;
       background-repeat: no-repeat;
       padding: 50px 32px;
+      position: relative;
 
       @include mobile(){
         width: 100%;
         height: 100%;
-        padding: 24px 16px;
+        padding: 64px 24px;
+      }
+
+      div.onboard-balloon {
+        display: none;
+
+        @include tablet() {
+          display: block;
+          position: absolute;
+          background-position: center;
+          background-repeat: no-repeat;
+          z-index: 1;
+        }
+
+        &.red-balloon {
+          width: 135px;
+          height: 116px;
+          top: -55px;
+          left: -60px;
+          background-size: 135px 116px;
+          @include image-2x("/img/ML/onboard_mobile_red_balloon");
+        }
+
+        &.green-balloon {
+          width: 217px;
+          height: 216px;
+          top: -157px;
+          right: -118px;
+          transform: rotate(130deg);
+          background-size: 217px 216px;
+          @include image-2x("/img/ML/onboard_mobile_green_balloon");
+        }
+
+        &.yellow-balloon {
+          width: 15px;
+          height: 15px;
+          left: 260px;
+          top: 39px;
+          background-size: 15px 15px;
+          @include image-2x("/img/ML/onboard_mobile_yellow_balloon");
+        }
       }
 
       div.onboard-overlay-step-title {
         @include avenir_H();
-        font-size: 25px;
-        color: $carrot_gray;
+        font-size: 32px;
+        color: $carrot_dark_gray;
+        margin-top: 32px;
       }
 
       div.step-illustration-container {
@@ -99,7 +140,11 @@ div.onboard-overlay-container {
         padding: 8px 28px;
 
         @include mobile(){
-          width: 100%;
+          width: 300px;
+          position: absolute;
+          bottom: 64px;
+          left: 50%;
+          margin-left: -150px;
         }
 
         &:after {
@@ -125,16 +170,11 @@ div.onboard-overlay-container {
 
         div.step-illustration-container {
           margin-top: 38px;
-          width: 402px;
-          height: 164px;
-          background-size: 402px 164px;
+          width: 246px;
+          height: 216px;
+          background-size: 246px 216px;
           background-repeat: no-repeat;
           @include image-2x("/img/ML/onboard_overlay_il_1");
-
-          @include mobile(){
-            width: 100%;
-            background-size: 100%;
-          }
         }
 
         div.onboard-overlay-step-description {
