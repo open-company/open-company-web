@@ -148,6 +148,11 @@
 (defn- is-publishable? [entry-editing]
   (seq (:board-slug entry-editing)))
 
+(defn trim [value]
+  (if (string? value)
+    (clojure.string/trim value)
+    value))
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
@@ -296,9 +301,10 @@
                                                     (not @(::publishing s))
                                                     (not published?))]
                   [:div.mobile-header-right
-                    (let [disabled? (or @(::publishing s)
+                    (let [fixed-headline (trim (:headline entry-editing))
+                          disabled? (or @(::publishing s)
                                         (not (is-publishable? entry-editing))
-                                        (zero? (count (:headline entry-editing))))
+                                        (zero? (count fixed-headline)))
                           working? (or (and published?
                                             @(::saving s))
                                        (and (not published?)
@@ -308,15 +314,17 @@
                          :on-click (fn [_]
                                      (clean-body)
                                      (if (and (is-publishable? entry-editing)
-                                              (not (zero? (count (:headline entry-editing)))))
+                                              (not (zero? (count fixed-headline))))
                                        (if published?
                                          (do
                                            (reset! (::saving s) true)
+                                           (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
                                            (dis/dispatch! [:entry-save]))
                                          (do
                                            (reset! (::publishing s) true)
+                                           (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
                                            (dis/dispatch! [:entry-publish])))
-                                       (when (zero? (count (:headline entry-editing)))
+                                       (when (zero? (count fixed-headline))
                                          (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
                                            (when-not (.data $post-btn "bs.tooltip")
                                              (.tooltip $post-btn
@@ -362,7 +370,9 @@
                 [:div.mobile-posting-in
                   [:span
                     (if (:uuid entry-editing)
-                      "Draft for: "
+                      (if (= (:status entry-editing) "published")
+                        "Posted in: "
+                        "Draft for: ")
                       "Posting in: ")]
                   [:div.boards-dropdown-caret
                     {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
@@ -385,8 +395,10 @@
               [:div.posting-in
                 [:span
                   (if (:uuid entry-editing)
-                    "Draft for "
-                    "Posting in ")]
+                    (if (= (:status entry-editing) "published")
+                      "Posted in: "
+                      "Draft for: ")
+                    "Posting in: ")]
                 [:div.boards-dropdown-caret
                   {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
                    :class (utils/class-set {:no-nux (not nux)
@@ -457,7 +469,7 @@
                :on-click (fn [_]
                            (clean-body)
                            (if (and (is-publishable? entry-editing)
-                                    (not (zero? (count (:headline entry-editing)))))
+                                    (not (zero? (count (trim (:headline entry-editing))))))
                              (if published?
                                (do
                                  (reset! (::saving s) true)
@@ -465,7 +477,7 @@
                                (do
                                  (reset! (::publishing s) true)
                                  (dis/dispatch! [:entry-publish])))
-                             (when (zero? (count (:headline entry-editing)))
+                             (when (zero? (count (trim (:headline entry-editing))))
                                (when-let [$post-btn (js/$ (rum/ref-node s "post-btn"))]
                                  (when-not (.data $post-btn "bs.tooltip")
                                    (.tooltip $post-btn
