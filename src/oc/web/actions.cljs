@@ -1656,8 +1656,7 @@
                        :has-changes true
                        :board-name (:name current-board)
                        :board-slug (:slug current-board)}]
-    (merge db {:entry-editing entry-editing
-               :nux :3})))
+    (merge db {:entry-editing entry-editing})))
 
 (defmethod dispatcher/action :entry-toggle-save-on-exit
   [db [_ enabled?]]
