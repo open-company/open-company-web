@@ -245,7 +245,7 @@
                             (events/unlistenByKey @(::window-resize-listener s))
                             (reset! (::window-resize-listener s) nil))
                           (when @(::autosave-timer s)
-                            (js/clearInterval @(::autosave-timer s))
+                            (.clearInterval js/window @(::autosave-timer s))
                             (reset! (::autosave-timer s) nil))
                           (set! (.-onbeforeunload js/window) nil)
                           s)}
