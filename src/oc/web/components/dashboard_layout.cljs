@@ -18,7 +18,6 @@
             [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
