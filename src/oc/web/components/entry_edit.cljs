@@ -225,12 +225,14 @@
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
                                 (when-not (:error entry-editing)
-                                  (let [redirect? (not= (:status entry-editing) "published")]
+                                  (real-close s)
+                                  (let [to-draft? (not= (:status entry-editing) "published")]
                                     ;; If it's not published already redirect to drafts board
-                                    (when redirect?
-                                      (real-close s)
-                                      (utils/after 250
-                                       #(router/nav! (oc-urls/drafts (router/current-org-slug)))))))))
+                                    (utils/after 180
+                                     #(router/nav!
+                                       (if to-draft?
+                                         (oc-urls/drafts (router/current-org-slug))
+                                         (oc-urls/board (:board-slug entry-editing)))))))))
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
@@ -240,7 +242,7 @@
                                     (when redirect?
                                       (real-close s)
                                       (utils/after
-                                       250
+                                       180
                                        #(router/nav!
                                           (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))))))))
                           s)
@@ -387,6 +389,7 @@
                       :on-blur #(reset! (::show-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (toggle-save-on-exit s true)
+                                   (reset! (::show-boards-dropdown s) false)
                                    (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                    (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                    (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))])]
@@ -413,6 +416,7 @@
                       :on-blur #(reset! (::show-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (toggle-save-on-exit s true)
+                                   (reset! (::show-boards-dropdown s) false)
                                    (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                    (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                    (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]])
