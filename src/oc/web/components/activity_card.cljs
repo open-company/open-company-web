@@ -42,6 +42,7 @@
                         (rum/local nil ::window-click)
                         ;; Derivatives
                         (drv/drv :org-data)
+                        (drv/drv :nux)
                         ;; Mixins
                         am/truncate-body-mixin
                         am/body-thumbnail-mixin
@@ -77,7 +78,8 @@
   (let [attachments (utils/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        nux (drv/react s :nux)]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :dropdown-active (or @(::more-dropdown s)
@@ -87,6 +89,7 @@
                    (let [ev-in? (partial utils/event-inside? e)]
                     (when-not
                      (or
+                      (not nux)
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move]))
@@ -115,8 +118,9 @@
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
-          (when (or (utils/link-for (:links activity-data) "partial-update")
-                    (utils/link-for (:links activity-data) "delete"))
+          (when (and (not nux)
+                     (or (utils/link-for (:links activity-data) "partial-update")
+                         (utils/link-for (:links activity-data) "delete")))
             (let [all-boards (filter
                               #(not= (:slug %) utils/default-drafts-board-slug)
                               (:boards (drv/react s :org-data)))]
@@ -200,7 +204,8 @@
         (when share-thoughts
           [:div.activity-share-thoughts
             "Share your thoughts"])
-        (when (utils/link-for (:links activity-data) "partial-update")
+        (when (and (not nux)
+                   (utils/link-for (:links activity-data) "partial-update"))
           [:button.mlb-reset.post-edit
             {:title "Edit"
              :data-toggle (when-not is-mobile? "tooltip")
