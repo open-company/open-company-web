@@ -173,37 +173,19 @@ div.onboard-overlay-container {
       }
 
       button.continue-btn {
-        width: 240px;
+        width: 300px;
         height: 40px;
         border-radius: 100px;
         background-color: $carrot_text_blue;
         color: white;
         @include avenir_H();
         font-size: 16px;
-        position: relative;
         text-align: center;
         padding: 8px 28px;
-
-        @include mobile(){
-          width: 300px;
-          position: absolute;
-          bottom: 64px;
-          left: 50%;
-          margin-left: -150px;
-        }
-
-        &:after {
-          @include image-2x("/img/ML/get_started_arrow");
-          background-size: 20px 20px;
-          background-repeat: no-repeat;
-          background-position: center;
-          content: "";
-          width: 20px;
-          height: 20px;
-          position: absolute;
-          top: 10px;
-          right: 24px;
-        }
+        position: absolute;
+        bottom: 64px;
+        left: 50%;
+        margin-left: -150px;
       }
 
       &.step-1 {
