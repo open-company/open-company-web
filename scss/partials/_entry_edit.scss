@@ -302,7 +302,7 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-body {
         margin: 0px;
-        padding: 24px 50px 24px 72px;
+        padding: 0px 50px 24px 72px;
         overflow-y: auto;
         overflow-x: visible;
         max-height: calc(100vh - 72px - 88px - 1px);
@@ -327,6 +327,8 @@ div.entry-edit-modal-container {
           color: $carrot_dark_gray;
           white-space: pre-wrap;
           word-wrap: break-word;
+          margin-top: 24px;
+          min-height: 26px;
 
           @include tablet() {
             width: 100%;
@@ -336,11 +338,12 @@ div.entry-edit-modal-container {
             padding: 0px 24px;
           }
 
-          &:not(:focus):empty:before {
+          &.show-placeholder:not(:focus):before {
             content: attr(placeholder);
-            display: block;
+            display: inline-block;
             color: rgba(#8A8E94, 0.5) !important;
             font-style: none;
+            height: 26px;
 
             @include tablet() {
               color: rgba($carrot_dark_gray, 0.5) !important;

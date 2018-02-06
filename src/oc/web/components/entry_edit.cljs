@@ -1,7 +1,7 @@
 (ns oc.web.components.entry-edit
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [cuerdas.core :as s]
+            [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
@@ -110,7 +110,7 @@
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
   (when-let [headline (rum/ref-node state "headline")]
-    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerText headline)) "__html"))]
       (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
                                                           :has-changes true})]))))
 
@@ -150,7 +150,7 @@
 
 (defn trim [value]
   (if (string? value)
-    (clojure.string/trim value)
+    (string/trim value)
     value))
 
 (rum/defcs entry-edit < rum/reactive
@@ -423,9 +423,10 @@
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ; Headline element
-          [:div.entry-edit-headline.emoji-autocomplete.emojiable
+          [:div.entry-edit-headline.emoji-autocomplete.emojiable.group
             {:content-editable (not nux)
              :ref "headline"
+             :class (when (zero? (count (trim (:headline entry-editing)))) "show-placeholder")
              :placeholder utils/default-headline
              :on-paste    #(headline-on-paste s %)
              :on-key-down #(headline-on-change s)
