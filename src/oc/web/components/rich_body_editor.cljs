@@ -272,7 +272,7 @@
                              :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop"]
                              :cleanTags #js ["meta" "video" "audio"]
                              :unwrapTags #js ["div" "span" "label" "font" "h1" "h3" "h4" "h5" "h6" "strong"]}
-                 :placeholder #js {:text "Start writing..."
+                 :placeholder #js {:text "What would you like to share?"
                                    :hideOnClick true}
                  :keyboardCommands #js {:commands #js [
                                     #js {
