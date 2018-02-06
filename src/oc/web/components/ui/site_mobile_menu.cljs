@@ -70,13 +70,13 @@
             "Blog"]]]
       [:div.site-mobile-menu-footer
         (when-not (jwt/jwt)
-          [:button.mlb-reset.mlb-default
+          [:button.mlb-reset.login-btn
             {:on-click (fn [e]
                         (dis/dispatch! [:site-menu-toggle])
                         (if (utils/in? (:route @router/path) "login")
                           (user/show-login :login-with-slack)
                           (router/nav! oc-urls/login)))}
-            "Log In"])
+            "Log in"])
         [:button.mlb-reset.get-started-button
           {:class (when (jwt/jwt) "your-boards")
            :on-click (fn [e]
