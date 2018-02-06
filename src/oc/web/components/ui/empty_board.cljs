@@ -3,7 +3,8 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]))
 
 (def mobile-image-size
  {:width 250
@@ -22,7 +23,8 @@
           (str "There aren’t any posts in " (:name board-data) " yet. ")
           (when-not (:read-only board-data)
             [:button.mlb-reset
-              {:on-click #(dis/dispatch! [:entry-edit {:board-slug (:slug board-data) :board-name (:name board-data)}])}
+              {:on-click #(activity-actions/entry-edit {:board-slug (:slug board-data)
+                                                        :board-name (:name board-data)})}
               "Add one?"])])
       [:img.empty-board-image
         {:src (utils/cdn (if mobile?

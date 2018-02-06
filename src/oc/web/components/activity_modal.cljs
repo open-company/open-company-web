@@ -13,6 +13,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
@@ -25,40 +26,36 @@
 
 ;; Unsaved edits handling
 
-(defn autosave []
-  (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (let [cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))]
-      (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body]))))
+(defn autosave [s]
+  (when s
+    (when-let [body-el (sel1 [:div.rich-body-editor])]
+      (let [modal-data @(drv/get-ref s :modal-data)
+            activity-data (:modal-editing-data modal-data)
+            cleaned-body (when body-el
+                          (utils/clean-body-html (.-innerHTML body-el)))]
+        (activity-actions/entry-save-on-exit :modal-editing-data activity-data cleaned-body)))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when (:entry-save-on-exit @(drv/get-ref s :modal-data))
-    (autosave)))
+    (autosave s)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
   [s turn-on?]
-  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
+  (activity-actions/entry-toggle-save-on-exit turn-on?))
 
 ;; Modal dismiss handling
 
 (defn dismiss-modal [s]
-  (let [org (router/current-org-slug)
-        board (router/current-board-slug)
-        modal-data @(drv/get-ref s :modal-data)]
-    (router/nav!
-      (if (:from-all-posts @router/path)
-        (oc-urls/all-posts org)
-        (oc-urls/board org board)))))
+  (let [modal-data @(drv/get-ref s :modal-data)
+        activity-data (:activity-data modal-data)]
+    (activity-actions/activity-modal-fade-out (:board-slug activity-data))))
 
 (defn close-clicked [s]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
-    (if (:from-all-posts @router/path)
-      ;; Remove AP data from the DB to avoid showing results before loading and results again
-      (when ap-initial-at
-        (dis/dispatch! [:all-posts-reset]))
+    (when-not (:from-all-posts @router/path)
       ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
       (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
@@ -125,9 +122,11 @@
 
 (defn- real-start-editing [state & [focus]]
   (when-not (responsive/is-tablet-or-mobile?)
-    (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true])
+    (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true)
     (utils/after 100 #(setup-headline state))
-    (reset! (::autosave-timer state) (utils/every 5000 autosave))
+    (when @(::autosave-timer state)
+      (.clearInterval js/window @(::autosave-timer state)))
+    (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
     (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
     (when focus
       (utils/after 1000
@@ -145,9 +144,9 @@
   (save-on-exit? state)
   (toggle-save-on-exit state false)
   (reset! (::edited-data-loaded state) false)
-  (js/clearInterval @(::autosave-timer state))
+  (.clearInterval js/window @(::autosave-timer state))
   (reset! (::autosave-timer state) nil)
-  (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false])
+  (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false)
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
     (reset! (::headline-input-listener state) nil)))
@@ -315,10 +314,6 @@
                                 js/window
                                 EventType/RESIZE
                                 #(modal-height-did-change s true)))
-                              (let [modal-data @(drv/get-ref s :modal-data)]
-                                (when (:modal-editing modal-data)
-                                  (utils/after 1000
-                                    #(real-start-editing s :headline))))
                               (setup-editing-data s)
                               s)
                              :after-render (fn [s]
@@ -418,7 +413,7 @@
                            [:li.no-editing
                              {:on-click #(do
                                           (reset! (::showing-dropdown s) false)
-                                          (dis/dispatch! [:activity-edit activity-data]))}
+                                          (activity-actions/activity-edit activity-data))}
                              "Edit"])
                           (when (and is-mobile?
                                      share-link)
