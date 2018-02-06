@@ -1,4 +1,5 @@
 (ns oc.web.components.org-dashboard
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
@@ -11,6 +12,7 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
+            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -33,6 +35,40 @@
                                board-data
                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
          (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))))
+
+(defn nux-steps
+  [org-data board-data nux]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)]
+    (case nux
+      :2
+      (let [create-link (utils/link-for (:links org-data) "create")]
+        (carrot-tip {:step nux
+                     :title "Update your team"
+                     :message (str
+                               "Click the compose button to add "
+                               "updates, announcements and plans "
+                               "that keep your team aligned.")
+                     :step-label "1 of 4"
+                     :width 432}))
+      :3
+      (carrot-tip {:step nux
+                   :title "Post your updates"
+                   :message "Click the post button to create a sample update we wrote for you. Don't worry, you can delete it later."
+                   :step-label "2 of 4"
+                   :width 494})
+      :4
+      (carrot-tip {:step nux
+                   :title "Success!"
+                   :message (str
+                             "Now your team will be able to react, "
+                             "comment and ask questions. We "
+                             "keep it all together in one place so "
+                             "it's easy to read anytime.")
+                   :step-label "3 of 4"
+                   :width 432
+                   :button-title "Cool"
+                   :button-position "left"
+                   :on-next-click #(dis/dispatch! [:input [:nux] :5])}))))
 
 (rum/defcs org-dashboard < rum/static
                            rum/reactive
@@ -59,7 +95,7 @@
                 is-showing-alert
                 media-input]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :7])]
+        should-show-onboard-overlay? (some #{nux} [:1 :5])]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
             (not org-data)
@@ -132,6 +168,9 @@
         (when (and media-input
                    (:media-chart media-input))
           (media-chart-modal))
+        ;; Show onboard overlay
+        (when (some #{nux} [:2 :3 :4])
+          (nux-steps org-data board-data nux))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing
