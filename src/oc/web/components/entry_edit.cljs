@@ -51,7 +51,7 @@
 (defn autosave []
   (let [body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerHTML body-el)))]
+                      (utils/clean-body-html (.-innerText body-el)))]
     (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body])))
 
 (defn save-on-exit?
@@ -426,7 +426,6 @@
           [:div.entry-edit-headline.emoji-autocomplete.emojiable.group
             {:content-editable (not nux)
              :ref "headline"
-             :class (when (zero? (count (trim (:headline entry-editing)))) "show-placeholder")
              :placeholder utils/default-headline
              :on-paste    #(headline-on-paste s %)
              :on-key-down #(headline-on-change s)

@@ -338,7 +338,7 @@ div.entry-edit-modal-container {
             padding: 0px 24px;
           }
 
-          &.show-placeholder:not(:focus):before {
+          &:empty:before {
             content: attr(placeholder);
             display: inline-block;
             color: rgba(#8A8E94, 0.5) !important;
