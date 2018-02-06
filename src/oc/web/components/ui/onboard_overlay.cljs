@@ -38,32 +38,35 @@
             [:div.onboard-balloon.green-balloon]
             [:div.onboard-balloon.yellow-balloon]
             [:div.onboard-overlay-step-title
-              "Keeping your busy team aligned"]
-            [:div.step-illustration-container]
-            [:div.onboard-overlay-step-description
-              (if first-ever-user?
+              "Let’s get started!"]
+            [:div.step-illustration-container-center
+              [:div.step-illustration-container]
+              [:div.onboard-overlay-step-description
                 (str
-                 "Team announcements, updates and plans should never "
-                 "get lost in the noise!")
-                (str
-                 "Carrot posts make announcements, updates and plans"
-                 " visible and engaging."))]
+                 "Keep everyone aligned around "
+                 "what matters most.")]]
             [:button.mlb-reset.continue-btn
               {:on-click #(if first-ever-user?
                            (dis/dispatch! [:first-forced-post-start])
                            (dis/dispatch! [:input [:nux] (if read-only-user :7 :4)]))}
               (if first-ever-user?
-                "Create a post"
+                "Create your first post"
                 "OK, got it")]])
         :7
         [:div.onboard-overlay-step.step-last
+          [:div.onboard-balloon.red-balloon-1]
+          [:div.onboard-balloon.green-balloon-1]
+          [:div.onboard-balloon.yellow-balloon-1]
+          [:div.onboard-balloon.purple-balloon]
           [:div.onboard-overlay-step-title
-            "You’re ready!"]
-          [:div.step-illustration-container]
-          [:div.onboard-overlay-step-description
-            (str
-             "Now your team will have a clear view of what’s most "
-             "important so everyone stays on the same page!")]
+            "You’re on your way!"]
+          [:div.step-illustration-container-center
+            [:div.step-illustration-container]
+            [:div.onboard-overlay-step-description
+              (str
+               "Now your team will have a clear view "
+               "of what's most important so everyone "
+               "stays on the same page!")]]
           [:button.mlb-reset.continue-btn
             {:on-click #(close-clicked s)}
             "Start using Carrot"]])]])

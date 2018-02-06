@@ -95,6 +95,42 @@ div.onboard-overlay-container {
           background-size: 15px 15px;
           @include image-2x("/img/ML/onboard_mobile_yellow_balloon");
         }
+
+        &.green-balloon-1 {
+          width: 180px;
+          height: 180px;
+          top: 92px;
+          left: -144px;
+          background-size: 180px 180px;
+          @include image-2x("/img/ML/onboard_mobile_green_balloon_1");
+        }
+
+        &.red-balloon-1 {
+          width: 135px;
+          height: 116px;
+          top: -63px;
+          right: -80px;
+          background-size: 135px 116px;
+          @include image-2x("/img/ML/onboard_mobile_red_balloon");
+        }
+
+        &.yellow-balloon-1 {
+          width: 15px;
+          height: 15px;
+          left: 180px;
+          top: 39px;
+          background-size: 15px 15px;
+          @include image-2x("/img/ML/onboard_mobile_yellow_balloon");
+        }
+
+        &.purple-balloon {
+          width: 23px;
+          height: 21px;
+          left: 282px;
+          top: 139px;
+          background-size: 23px 21px;
+          @include image-2x("/img/ML/onboard_mobile_purple_balloon");
+        }
       }
 
       div.onboard-overlay-step-title {
@@ -104,26 +140,35 @@ div.onboard-overlay-container {
         margin-top: 32px;
       }
 
-      div.step-illustration-container {
-        margin: 32px auto 0px;
-        background-position: center;
-        background-repeat: no-repeat;
+      div.step-illustration-container-center {
+        width: 260px;
+        height: 293px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -130px;
+        margin-top: -146px;
 
-        @include mobile() {
-          margin: 8px auto 0px;
+        div.step-illustration-container {
+          margin: 0px auto;
+          background-position: center;
+          background-repeat: no-repeat;
+
+          @include mobile() {
+            margin: 8px auto 0px;
+          }
         }
-      }
 
-      div.onboard-overlay-step-description {
-        @include avenir_M();
-        font-size: 18px;
-        color: $oc_gray_7;
-        line-height: 26px;
-        width: 450px;
-        margin: 0 auto;
+        div.onboard-overlay-step-description {
+          @include avenir_M();
+          font-size: 18px;
+          color: $oc_gray_7;
+          line-height: 26px;
+          text-align: center;
 
-        @include mobile(){
-          width: 100%;
+          @include mobile(){
+            width: 100%;
+          }
         }
       }
 
@@ -168,20 +213,18 @@ div.onboard-overlay-container {
           background-image: none;
         }
 
-        div.step-illustration-container {
-          margin-top: 38px;
-          width: 246px;
-          height: 216px;
-          background-size: 246px 216px;
-          background-repeat: no-repeat;
-          @include image-2x("/img/ML/onboard_overlay_il_1");
-        }
+        div.step-illustration-container-center {
 
-        div.onboard-overlay-step-description {
-          margin-top: 48px;
+          div.step-illustration-container {
+            width: 246px;
+            height: 216px;
+            background-size: 246px 216px;
+            background-repeat: no-repeat;
+            @include image-2x("/img/ML/onboard_overlay_il_1");
+          }
 
-          @include mobile() {
-            margin-top: 8px;
+          div.onboard-overlay-step-description {
+            margin-top: 20px;
           }
         }
 
@@ -200,24 +243,25 @@ div.onboard-overlay-container {
         div.onboard-overlay-step-title {
           margin-top: 0px;
         }
+
+        div.step-illustration-container-center {
+          width: 311px;
+          margin-left: -155px;
+          height: 329px;
+          margin-top: -164px;
         
-        div.step-illustration-container {
-          margin-top: 17px;
-          width: 260px;
-          height: 231px;
-          background-size: 260px 231px;
-          background-repeat: no-repeat;
-          @include image-2x("/img/ML/onboard_overlay_il_last");
-
-          @include mobile(){
-            width: 100%;
-            background-size: 100%;
-            height: 400px;
+          div.step-illustration-container {
+            width: 260px;
+            margin-left: 25px;
+            height: 231px;
+            background-size: 260px 231px;
+            background-repeat: no-repeat;
+            @include image-2x("/img/ML/onboard_overlay_il_last");
           }
-        }
 
-        div.onboard-overlay-step-description {
-          margin-top: 21px;
+          div.onboard-overlay-step-description {
+            margin-top: 20px;
+          }
         }
 
         button.continue-btn {
