@@ -284,6 +284,19 @@
                     (cancel-clicked s))}
       [:div.modal-wrapper
         {:style {:margin-top (if is-mobile? "0px" (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px"))}}
+        (when (and is-mobile?
+                   nux)
+          (when-let* [post-button (js/$ "div.entry-edit-modal button.post-button")
+                      post-button-offset (.offset post-button)]
+            (carrot-tip {:step :3
+                         :circle-offset {:top -90
+                                         :left -550}
+                         :x (- (aget post-button-offset "left") 522)
+                         :y (- (aget post-button-offset "top") 20)
+                         :title "Post your updates"
+                         :step-label "2 of 4"
+                         :message "Click the post button to create a sample update we wrote for you. Don't worry, you can delete it later."
+                         :width 494})))
         ;; Show the close button only when there are no modals shown
         (when (and (not (:media-video media-input))
                    (not (:media-chart media-input))

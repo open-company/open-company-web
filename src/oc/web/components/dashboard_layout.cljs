@@ -55,7 +55,23 @@
   [org-data board-data nux]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)]
     (case nux
-      :3
+      :2
+      (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
+                  offset (.offset new-post-bt)]
+        (let [create-link (utils/link-for (:links org-data) "create")]
+          (carrot-tip {:step nux
+                       :x (- (aget offset "left") 284)
+                       :y (+ (aget offset "top") 60)
+                       :circle-offset {:top -170
+                                       :left -760}
+                       :width 432
+                       :title "Update your team"
+                       :message (str
+                                 "Click the compose button to add "
+                                 "updates, announcements and plans "
+                                 "that keep your team aligned.")
+                       :step-label "1 of 4"})))
+      :4
       (when-let* [first-card (js/$ "div.entries-cards-container-row:first-child div.activity-card:first-child")
                   first-card-offset (.offset first-card)]
         (carrot-tip {:step nux
@@ -69,27 +85,7 @@
                      :step-label (if is-mobile? "1 of 3" "1 of 4")
                      :button-title "Cool"
                      :button-position "left"
-                     :on-next-click #(dis/dispatch! [:input [:nux] :4])}))
-      :4
-      (when-let* [new-post-bt (js/$ "button.add-to-board-top-button")
-                  offset (.offset new-post-bt)]
-        (let [create-link (utils/link-for (:links org-data) "create")]
-          (carrot-tip {:step nux
-                       :x (- (aget offset "left") 284)
-                       :y (+ (aget offset "top") 60)
-                       :circle-offset {:top -170
-                                       :left -760}
-                       :width 432
-                       :title "It’s simple to post something"
-                       :message (str
-                                 "Add new announcements, updates, and plans "
-                                 "for your team in no time. Just click the New "
-                                 "Post button!")
-                       :step-label (if is-mobile? "2 of 3" "2 of 4")
-                       :button-title "Got it"
-                       :button-position "left"
-                       :on-next-click (fn []
-                                        (dis/dispatch! [:input [:nux] :5]))})))
+                     :on-next-click #(dis/dispatch! [:input [:nux] :5])}))
       :5
       (let [plus-button (js/$ "button#add-board-button")
             plus-offset (.offset plus-button)
@@ -207,7 +203,7 @@
         all-boards (drv/react s :editable-boards)]
       ;; Entries list
       [:div.dashboard-layout.group
-        (when (some #{nux} [:3 :4 :5 :6])
+        (when (some #{nux} [:2 :4 :5])
           (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
           {:key dashboard-layout-container-key}
@@ -258,11 +254,14 @@
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
-                                (if (or is-drafts-board is-all-posts)
-                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (dis/dispatch! [:entry-edit entry-data]))))}
+                                (if nux
+                                  (when (= nux :2)
+                                    (dis/dispatch! [:first-forced-post-start]))
+                                  (if (or is-drafts-board is-all-posts)
+                                    (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                    (let [entry-data {:board-slug (:slug board-data)
+                                                      :board-name (:name board-data)}]
+                                      (dis/dispatch! [:entry-edit entry-data])))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "New Post"]]

@@ -46,9 +46,7 @@
                  "Keep everyone aligned around "
                  "what matters most.")]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(if first-ever-user?
-                           (dis/dispatch! [:first-forced-post-start])
-                           (dis/dispatch! [:input [:nux] (if read-only-user :7 :4)]))}
+              {:on-click #(dis/dispatch! [:input [:nux] :2])}
               (if first-ever-user?
                 "Create your first post"
                 "OK, got it")]])

@@ -4,38 +4,112 @@
             [oc.web.lib.responsive :as responsive]))
 
 (defn second-step-oval [width height px py]
-  (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
-        offset-x px
-        offset-y py
-        second-line (str "M" (+ 1071.3683 offset-x) "," (+ 218.965915 offset-y) "\n")
-        nth-line-3 (str "C" (+ 1117.20129 offset-x) "," (+ 246.53226 offset-y)
-                        " " (+ 1175.09029 offset-x) "," (+ 232.488897 offset-y)
-                        " " (+ 1210.99409 offset-x) "," (+ 195.095574 offset-y) "\n")
-        nth-line-4 (str "C" (+ 1245.68139 offset-x) "," (+ 159.057381 offset-y)
-                        " " (+ 1230.25612 offset-x) "," (+ 91.3314095 offset-y)
-                        " " (+ 1170.63164 offset-x) "," (+ 53.7640728 offset-y) "\n")
-        nth-line-5 (str "C" (+ 1109.46966 offset-x) "," (+ 18.7555776 offset-y)
-                        " " (+ 1042.43005 offset-x) "," (+ 36.9302954 offset-y)
-                        " " (+ 1026.89431 offset-x) "," (+ 84.4772704 offset-y) "\n")
-        nth-line-6 (str "C" (+ 1010.73378 offset-x) "," (+ 133.733542 offset-y)
-                        " " (+ 1025.51147 offset-x) "," (+ 191.439458 offset-y)
-                        " " (+ 1071.36836 offset-x) "," (+ 218.965915 offset-y)
-                        " Z ")]
-    [:g
-      {:stroke "none"
-       :stroke-width "1"
-       :fill "none"
-       :fill-rule "evenodd"
-       :fill-opacity "0.9"
-       :opacity "0.3"}
+  (if (responsive/is-tablet-or-mobile?)
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          second-line (str "M" width "," (- height 118) "\n")
+          nth-line-3 (str "L" width "," height "\n")
+          nth-line-4 (str "L" (- width 114) "," height "\n")
+          nth-line-5 (str "C" (- width 114) "," height
+                          " " (- width 155) "," (- height 121)
+                          " " width "," (- height 118)
+                          "Z")]
       [:g
-        {:fill "#34414F"}
+        {:stroke "none"
+         :stroke-width "1"
+         :fill "none"
+         :fill-rule "evenodd"
+         :opacity "0.9"}
         [:g
-          [:path
-            {:d
-              (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]]))
+          {:fill "#6187F8"}
+          [:g
+            [:path
+              {:d
+                (str first-line second-line nth-line-3 nth-line-4 nth-line-5)}]]]])
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          offset-x px
+          offset-y py
+          second-line (str "M" (+ 1071.3683 offset-x) "," (+ 218.965915 offset-y) "\n")
+          nth-line-3 (str "C" (+ 1117.20129 offset-x) "," (+ 246.53226 offset-y)
+                          " " (+ 1175.09029 offset-x) "," (+ 232.488897 offset-y)
+                          " " (+ 1210.99409 offset-x) "," (+ 195.095574 offset-y) "\n")
+          nth-line-4 (str "C" (+ 1245.68139 offset-x) "," (+ 159.057381 offset-y)
+                          " " (+ 1230.25612 offset-x) "," (+ 91.3314095 offset-y)
+                          " " (+ 1170.63164 offset-x) "," (+ 53.7640728 offset-y) "\n")
+          nth-line-5 (str "C" (+ 1109.46966 offset-x) "," (+ 18.7555776 offset-y)
+                          " " (+ 1042.43005 offset-x) "," (+ 36.9302954 offset-y)
+                          " " (+ 1026.89431 offset-x) "," (+ 84.4772704 offset-y) "\n")
+          nth-line-6 (str "C" (+ 1010.73378 offset-x) "," (+ 133.733542 offset-y)
+                          " " (+ 1025.51147 offset-x) "," (+ 191.439458 offset-y)
+                          " " (+ 1071.36836 offset-x) "," (+ 218.965915 offset-y)
+                          " Z ")]
+      [:g
+        {:stroke "none"
+         :stroke-width "1"
+         :fill "none"
+         :fill-rule "evenodd"
+         :fill-opacity "0.9"
+         :opacity "0.3"}
+        [:g
+          {:fill "#34414F"}
+          [:g
+            [:path
+              {:d
+                (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
 
 (defn third-step-oval [width height px py]
+  (if (responsive/is-tablet-or-mobile?)
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          second-line (str "M" (- width 136) "," 0 "\n")
+          nth-line-3 (str "L" width "," 0 "\n")
+          nth-line-4 (str "L" width "," 90 "\n")
+          nth-line-5 (str "C" width "," 100
+                          " " (- width 124) "," 71
+                          " " (- width 136) "," 0
+                          "Z ")]
+      [:g
+        {:stroke "none"
+         :stroke-width "1"
+         :fill "none"
+         :fill-rule "evenodd"
+         :opacity "0.9"}
+        [:g
+          {:fill "#6187F8"}
+          [:g
+            [:path
+              {:d
+                (str first-line second-line nth-line-3 nth-line-4 nth-line-5)}]]]])
+    (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
+          offset-x px
+          offset-y py
+          second-line (str "M" (+ 1071.3683 offset-x) "," (+ 218.965915 offset-y) "\n")
+          nth-line-3 (str "C" (+ 1117.20129 offset-x) "," (+ 246.53226 offset-y)
+                          " " (+ 1175.09029 offset-x) "," (+ 232.488897 offset-y)
+                          " " (+ 1210.99409 offset-x) "," (+ 195.095574 offset-y) "\n")
+          nth-line-4 (str "C" (+ 1245.68139 offset-x) "," (+ 159.057381 offset-y)
+                          " " (+ 1230.25612 offset-x) "," (+ 91.3314095 offset-y)
+                          " " (+ 1170.63164 offset-x) "," (+ 53.7640728 offset-y) "\n")
+          nth-line-5 (str "C" (+ 1109.46966 offset-x) "," (+ 18.7555776 offset-y)
+                          " " (+ 1042.43005 offset-x) "," (+ 36.9302954 offset-y)
+                          " " (+ 1026.89431 offset-x) "," (+ 84.4772704 offset-y) "\n")
+          nth-line-6 (str "C" (+ 1010.73378 offset-x) "," (+ 133.733542 offset-y)
+                          " " (+ 1025.51147 offset-x) "," (+ 191.439458 offset-y)
+                          " " (+ 1071.36836 offset-x) "," (+ 218.965915 offset-y)
+                          " Z ")]
+      [:g
+        {:stroke "none"
+         :stroke-width "1"
+         :fill "none"
+         :fill-rule "evenodd"
+         :fill-opacity "0.9"
+         :opacity "0.3"}
+        [:g
+          {:fill "#34414F"}
+          [:g
+            [:path
+              {:d
+                (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
+
+(defn fourth-step-oval [width height px py]
   (if (responsive/is-tablet-or-mobile?)
     [:g
       {:stroke "none"
@@ -82,38 +156,6 @@
             [:path
               {:d
                 (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
-
-(defn fourth-step-oval [width height px py]
-  (let [first-line (str "M0,0 L" width ",0 L" width "," height " L0," height " L0,0 Z\n")
-        offset-x px
-        offset-y py
-        second-line (str "M" (+ 1071.3683 offset-x) "," (+ 218.965915 offset-y) "\n")
-        nth-line-3 (str "C" (+ 1117.20129 offset-x) "," (+ 246.53226 offset-y)
-                        " " (+ 1175.09029 offset-x) "," (+ 232.488897 offset-y)
-                        " " (+ 1210.99409 offset-x) "," (+ 195.095574 offset-y) "\n")
-        nth-line-4 (str "C" (+ 1245.68139 offset-x) "," (+ 159.057381 offset-y)
-                        " " (+ 1230.25612 offset-x) "," (+ 91.3314095 offset-y)
-                        " " (+ 1170.63164 offset-x) "," (+ 53.7640728 offset-y) "\n")
-        nth-line-5 (str "C" (+ 1109.46966 offset-x) "," (+ 18.7555776 offset-y)
-                        " " (+ 1042.43005 offset-x) "," (+ 36.9302954 offset-y)
-                        " " (+ 1026.89431 offset-x) "," (+ 84.4772704 offset-y) "\n")
-        nth-line-6 (str "C" (+ 1010.73378 offset-x) "," (+ 133.733542 offset-y)
-                        " " (+ 1025.51147 offset-x) "," (+ 191.439458 offset-y)
-                        " " (+ 1071.36836 offset-x) "," (+ 218.965915 offset-y)
-                        " Z ")]
-    [:g
-      {:stroke "none"
-       :stroke-width "1"
-       :fill "none"
-       :fill-rule "evenodd"
-       :fill-opacity "0.9"
-       :opacity "0.3"}
-      [:g
-        {:fill "#34414F"}
-        [:g
-          [:path
-            {:d
-              (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]]))
 
 (defn fifth-step-oval [width height px py]
   (if (responsive/is-tablet-or-mobile?)
@@ -194,10 +236,7 @@
 (defn is-step-with-oval
   [step]
   (cond
-    (and (not (responsive/is-tablet-or-mobile?))
-         (some #{step} [:2 :4]))
-    true
-    (some #{step} [:3 :5 :6])
+    (some #{step} [:2 :3 :4 :5])
     true
     :else
     false))
@@ -234,7 +273,8 @@
       (when message-2
         [:div.carrot-tip-description.second-line
           message-2])
-      (when (fn? on-next-click)
+      (when (and (string? button-title)
+                 (fn? on-next-click))
         [:button.mlb-reset.mlb-default.next-button
           {:class button-position
            :on-click (fn [e]

@@ -1255,14 +1255,14 @@
         (update-in [:entry-editing] dissoc :publishing)
         (dissoc :entry-toggle-save-on-exit)
         ;; Progress the NUX
-        (assoc :nux (when (= (:nux db) :2) :3))))))
+        (assoc :nux (when (= (:nux db) :3) :5))))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
   (-> db
     (update-in [:entry-editing] dissoc :publishing)
     (update-in [:entry-editing] assoc :error true)
-    (assoc :nux (when (= (:nux db) :2) :4))))
+    (assoc :nux (when (= (:nux db) :3) :5))))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1656,7 +1656,7 @@
                        :board-name (:name current-board)
                        :board-slug (:slug current-board)}]
     (merge db {:entry-editing entry-editing
-               :nux :2})))
+               :nux :3})))
 
 (defmethod dispatcher/action :entry-toggle-save-on-exit
   [db [_ enabled?]]
