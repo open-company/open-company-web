@@ -128,9 +128,7 @@
       [:div.card.card-5
         [:div.card-icon]
         [:div.card-title
-          (str
-            "Visible "
-            "engagement")]
+          "See who’s engaged"]
         [:div.card-content
           (str
             "Carrot measures team "
@@ -328,7 +326,7 @@
      ]])
 
 (defn slack
-  "About page. This is a copy of oc.web.components.slack and
+  "Slack page. This is a copy of oc.web.components.slack and
    every change here should be reflected there and vice versa."
   [options]
   [:div
@@ -430,8 +428,8 @@
         [:h1.about "About us"]
         [:div.about-subline
           (str
-           "We empower leaders to create alignment by keeping teams "
-           "focused on what matters most.")]
+           "Carrot is a communication platform that inspires "
+           "transparency and team alignment.")]
         [:div.team-container
           [:div.team-row.group.three-cards
             [:div.team-card.iacopo-carraro
@@ -551,7 +549,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Stay aligned"]
+          [:title "Where leaders speak"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -675,7 +673,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Stay aligned"]
+          [:title "Where leaders speak"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
