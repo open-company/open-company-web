@@ -343,7 +343,7 @@
     (fn [{:keys [success body status]}]
       (js/console.log "web-app-check" status success body)
       (when (not= status 404)
-        (dis/dispatch! [:error-banner-show (str "You have an older version of the Carrot web app, "
+        (dispatcher/dispatch! [:error-banner-show (str "You have an older version of the Carrot web app, "
                                                 "please refresh your browser window!")]))))
   (if (map? flags)
     (merge db flags)
