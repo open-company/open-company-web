@@ -118,7 +118,7 @@
               {:href oc-urls/privacy}
               "privacy policy"]
             "."]
-          [:button.continue.big-web-only
+          [:button.continue
             {:class (when (or (not (utils/valid-email? @(::email s)))
                               (<= (count @(::pswd s)) 7))
                       "disabled")
@@ -218,7 +218,7 @@
             {:type "text"
              :value (:last-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
-          [:button.continue.big-web-only
+          [:button.continue
             {:disabled (or (and (empty? (:first-name user-data))
                                 (empty? (:last-name user-data)))
                            (empty? (:avatar-url user-data)))
@@ -351,7 +351,7 @@
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing]
                           (merge org-editing {:error nil :name (.. % -target -value)})])}]
-          [:button.continue.big-web-only
+          [:button.continue
             {:class (when (< (count (clean-org-name (:name org-editing))) 3) "disabled")
              :on-touch-start identity
              :on-click #(let [org-name (clean-org-name (:name org-editing))]
