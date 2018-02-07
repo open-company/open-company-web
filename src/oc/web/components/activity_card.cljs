@@ -90,7 +90,7 @@
                    (let [ev-in? (partial utils/event-inside? e)]
                     (when-not
                      (or
-                      (not nux)
+                      nux
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move]))
