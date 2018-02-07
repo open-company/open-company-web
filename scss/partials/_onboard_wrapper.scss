@@ -400,7 +400,6 @@ div.onboard-lander {
           margin-top: 10px;
 
           @include mobile() {
-            margin-top: 0px;
             text-align: center;
             width: 100%;
           }
@@ -426,6 +425,12 @@ div.onboard-lander {
         margin-left: 24px;
         margin-top: 16px;
         width: 220px;
+
+        @include mobile() {
+          text-align: center;
+          width: 100%;
+          margin-left: 0px;
+        }
       }
 
       div.add-picture-link-subtitle {
@@ -436,6 +441,12 @@ div.onboard-lander {
         margin-left: 24px;
         margin-top: 12px;
         width: 220px;
+
+        @include mobile() {
+          text-align: center;
+          width: 100%;
+          margin-left: 0px;
+        }
       }
     }
 
