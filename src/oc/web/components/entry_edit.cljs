@@ -207,6 +207,8 @@
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                          (when (responsive/is-tablet-or-mobile?)
+                            (set! (.-scrollTop (.-body js/document)) 0))
                           s)
                          :before-render (fn [s]
                           (calc-entry-edit-modal-height s)
