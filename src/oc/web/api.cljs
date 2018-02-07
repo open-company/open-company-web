@@ -190,7 +190,7 @@
       ; custom content type
       "content-type" "application/json"}}
     #(when (fn? callback)
-      (callback))))
+      (callback %))))
 
 (defn api-500-test [with-response]
   (storage-http http/get (if with-response "/---error-test---" "/---500-test---")
