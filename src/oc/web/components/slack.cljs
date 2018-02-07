@@ -78,9 +78,9 @@
 
             [:div.slack-subline-container
               [:div.slack-subline
-                "Company updates and stories that keep teams"]
-              [:div.slack-subline
-                 "aligned around what matters most."]]
+                (str
+                  "Company updates and stories that keep teams "
+                  "aligned around what matters most.")]]
 
             (get-started-button auth-settings true)
 
