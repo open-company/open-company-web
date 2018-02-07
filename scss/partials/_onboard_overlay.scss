@@ -11,6 +11,7 @@ div.onboard-overlay-container {
 
   @include mobile() {
     position: relative;
+    height: calc(100vh - 42px);
   }
 
   &.will-appear {
