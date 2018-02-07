@@ -183,7 +183,8 @@ div.entry-edit-modal-container {
               color: $carrot_text_blue_3;
 
               &:after {
-                width: 8px 5px;
+                width: 8px;
+                height: 5px;
                 background-size: 8px 5px;
                 background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
               }
