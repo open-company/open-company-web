@@ -56,5 +56,5 @@
 (def mailchimp-api-endpoint "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
 
 ;; Google Analytics
-
 (def ga-tracking-id "UA-113733066-1")
+(def ga-version "dev")

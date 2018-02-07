@@ -5,7 +5,7 @@
             [cljsjs.google-analytics]))
 
 
-(def tracking-version "1")
+(def tracking-version ls/ga-version)
 (def null-value "(not set)")
 
 (def dimensions {:TRACKING_VERSION "dimension1"
