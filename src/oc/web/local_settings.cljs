@@ -57,4 +57,4 @@
 
 ;; Google Analytics
 
-(def ga-tracking-id "UA-43280002-1")
+(def ga-tracking-id "UA-113733066-1")
