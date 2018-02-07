@@ -29,7 +29,7 @@
   (res/resource-response "/index.html" {:root "public"}))
 
 (defn version-json []
-  (res/resource-response "/version.json" {:root "public"}))
+  (res/resource-response "/version/version.json" {:root "public"}))
 
 ; (defn index []
 ;   (res/resource-response "/index.html" {:root "public"}))
@@ -53,7 +53,7 @@
   (GET "/slack" [] (slack))
   (GET "/privacy" [] (privacy))
   (GET "/terms" [] (terms))
-  (GET "/version.json" [] (version-json))
+  (GET "/version/version.json" [] (version-json))
   (GET "/" [] (index))
   (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
   (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))
