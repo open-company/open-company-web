@@ -24,4 +24,4 @@
       [:div.oc-loading-heart]
       [:div.oc-loading-body]]
     [:div.setup-cta
-      "Here we go!"]])
+      "Hang tight, we’re just getting set up…"]])
