@@ -264,6 +264,7 @@ div.onboard-overlay-container {
         @include avenir_H();
         font-size: 32px;
         max-width: 300px;
+        margin: 0px auto;
       }
 
       div.step-illustration-container-center {
@@ -295,6 +296,8 @@ div.onboard-overlay-container {
           line-height: 26px;
           font-size: 18px;
           text-align: center;
+          max-width: 300px;
+          margin: 0px auto;
         }
       }
 

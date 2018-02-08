@@ -34,13 +34,20 @@
                                  (events/listen js/window EventType/RESIZE
                                   #(reset! (::wh s) (.-innerHeight js/window)))))
                               (reset! (::wh s) (.-innerHeight js/window))
-                              s)}
+                              s)
+                              :will-unmount (fn [s]
+                               (when @(::resize-listener s)
+                                 (events/unlistenByKey @(::resize-listener s))
+                                 (reset! (::resize-listener s) nil))
+                               s)}
   [s step]
   [:div.onboard-overlay-container
     {:class (utils/class-set {:will-appear @(::dismiss s)
                               :appear (not @(::dismiss s))})}
     [:div.onboard-overlay
-      (let [wh @(::wh s)]
+      (let [is-safari-mobile (and (responsive/is-tablet-or-mobile?)
+                                  (js/isSafari))
+            wh @(::wh s)]
         (case step
           :1-mobile
           [:div.onboard-overlay-mobile-step.step-1
@@ -54,9 +61,11 @@
                  "Keep everyone aligned around "
                  "what matters most.")]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(dis/dispatch! [:input [:nux] :2-mobile])}
+              {:on-click #(dis/dispatch! [:input [:nux] :2-mobile])
+               :style {:bottom (if is-safari-mobile "120px" "78px")}}
               "Next"]
             [:div.steps-dot-container
+              {:style {:bottom (if is-safari-mobile "90px" "48px")}}
               [:div.step-dot.active]
               [:div.step-dot]
               [:div.step-dot]]]
@@ -79,9 +88,11 @@
                  "Reactions, comments and questions "
                  "stay together with the original post.")]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(dis/dispatch! [:input [:nux] :3-mobile])}
+              {:on-click #(dis/dispatch! [:input [:nux] :3-mobile])
+               :style {:bottom (if is-safari-mobile "120px" "78px")}}
               "Next"]
             [:div.steps-dot-container
+              {:style {:bottom (if is-safari-mobile "90px" "48px")}}
               [:div.step-dot]
               [:div.step-dot.active]
               [:div.step-dot]]]
@@ -98,9 +109,11 @@
                  "Welcome to Carrot. Where "
                  "companies find alignment")]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(dis/dispatch! [:nux-end])}
+              {:on-click #(dis/dispatch! [:nux-end])
+               :style {:bottom (if is-safari-mobile "120px" "78px")}}
               "Start using Carrot"]
             [:div.steps-dot-container
+              {:style {:bottom (if is-safari-mobile "90px" "48px")}}
               [:div.step-dot]
               [:div.step-dot]
               [:div.step-dot.active]]]
