@@ -95,7 +95,7 @@
                 is-showing-alert
                 media-input]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :5])]
+        should-show-onboard-overlay? (some #{nux} [:1 :1-mobile :2-mobile :3-mobile :5])]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
             (not org-data)
