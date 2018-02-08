@@ -182,7 +182,6 @@
     (dispatcher/dispatch! [action body])))
 
 (defn web-app-version-check [callback]
-  (js/console.log "api/web-app-version-check")
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
     {:heades {
       ; required by Chrome
