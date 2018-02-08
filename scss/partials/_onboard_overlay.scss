@@ -257,7 +257,7 @@ div.onboard-overlay-container {
     div.onboard-overlay-mobile-step {
       width: 100%;
       height: 100%;
-      padding: 40px;
+      padding: 24px 40px;
       position: relative;
 
       div.onboard-overlay-step-title {
@@ -275,7 +275,7 @@ div.onboard-overlay-container {
           background-position: 0px 0px;
           background-repeat: no-repeat;
           position: relative;
-          margin: 32px auto 16px;
+          margin: 16px auto;
 
           &:after {
             // Gradient

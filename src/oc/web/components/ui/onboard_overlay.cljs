@@ -55,7 +55,7 @@
               "Share key updates and stories"]
             [:div.step-illustration-container-center
               [:div.step-illustration-container
-                {:style {:height (str (min 418 (- wh 138 223)) "px")}}]
+                {:style {:height (str (min 418 (- wh 138 163)) "px")}}]
               [:div.onboard-overlay-step-description
                 (str
                  "Keep everyone aligned around "
@@ -75,7 +75,7 @@
               "Capture reactions and questions"]
             [:div.step-illustration-container-center
               (let [max-h 342
-                    height (- wh 138 243)
+                    height (- wh 138 183)
                     next-height (min 342 height)
                     margin-top (if (>= height max-h)
                                  (+ (/ (- height max-h) 2) 32)
@@ -101,7 +101,7 @@
             [:div.onboard-overlay-step-title
               "Find alignment company wide"]
             [:div.step-illustration-container-center
-              (let [margin-top (/ (- wh 115 203 231) 2)]
+              (let [margin-top (/ (- wh 115 203 201) 2)]
                 [:div.step-illustration-container
                   {:style {:margin-top (str margin-top "px")}}])
               [:div.onboard-overlay-step-description
