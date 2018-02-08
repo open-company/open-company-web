@@ -152,37 +152,37 @@
                 (str first-line second-line nth-line-3 nth-line-4 nth-line-5 nth-line-6)}]]]])))
 
 (defn step-element-data [step ui-el]
-  (cond
-    (= step :2)
-    (let [offset (.offset ui-el)]
-      {:x (- (aget offset "left") 284)
-       :y (+ (aget offset "top") 60)
-       :width 432})
-    (= step :3)
-    (let [offset (.offset ui-el)]
-      {:x (- (aget offset "left") 304)
-       :y (+ (aget offset "top") 40)
-       :width 432})
-    (= step :4)
-    (let [offset (.offset ui-el)]
-      {:x (aget offset "left")
-       :y (aget offset "top")
-       :width 432})))
+  (when ui-el
+    (when-let [offset (.offset ui-el)]
+      (cond
+        (= step :2)
+        {:x (- (aget offset "left") 284)
+         :y (+ (aget offset "top") 60)
+         :width 432}
+        (= step :3)
+        {:x (- (aget offset "left") 304)
+         :y (+ (aget offset "top") 40)
+         :width 432}
+        (= step :4)
+        {:x (aget offset "left")
+         :y (aget offset "top")
+         :width 432}))))
 
 (defn carrot-tip-position [step element-data]
-  (cond
-    (= step :2)
-    {:left (str (- (:x element-data) 170) "px")
-     :top (str (- (:y element-data) 60) "px")
-     :width (str 432 "px")}
-    (= step :3)
-    {:left (str (- (:x element-data) 170) "px")
-     :top (str (- (:y element-data) 160) "px")
-     :width (str 432 "px")}
-    (= step :4)
-    {:left (str (+ (:x element-data) 442) "px")
-     :top (str (:y element-data) "px")
-     :width (str 432 "px")}))
+  (when element-data
+    (cond
+      (= step :2)
+      {:left (str (- (:x element-data) 20) "px")
+       :top (str (+ (:y element-data) 40) "px")
+       :width (str 432 "px")}
+      (= step :3)
+      {:left (str (- (:x element-data) 170) "px")
+       :top (str (- (:y element-data) 120) "px")
+       :width (str 432 "px")}
+      (= step :4)
+      {:left (str (+ (:x element-data) 442) "px")
+       :top (str (:y element-data) "px")
+       :width (str 432 "px")})))
 
 (defn carrot-tip-inner
   [{:keys [step-label ;; label on top right corner

@@ -34,7 +34,7 @@ div.carrot-tip-container {
       div.carrot-tip-inner {
 
         div.carrot-tip-title {
-          width: 334px;
+          width: 314px;
 
           @include mobile() {
             width: 300px;
@@ -42,7 +42,7 @@ div.carrot-tip-container {
         }
 
         div.carrot-tip-description {
-          width: 334px;
+          width: 314px;
 
           @include mobile() {
             width: 300px;
@@ -86,18 +86,6 @@ div.carrot-tip-container {
       }
 
       div.carrot-tip-inner {
-
-        div.carrot-tip-title {
-          margin-top: 8px;
-        }
-
-        div.carrot-tip-description {
-          margin-top: 20px;
-        }
-
-        button.next-button {
-          margin-top: 20px;
-        }
       }
     }
   }
@@ -169,10 +157,10 @@ div.carrot-tip-container {
       position: absolute;
       left: 40px;
       bottom: 0px;
-      color: white;
+      color: rgba(white, 0.5);
       @include avenir_H();
-      font-size: 16px;
-      line-height: 28px;
+      font-size: 14px;
+      line-height: 24px;
 
       @include mobile() {
         left: 24px;
@@ -194,7 +182,7 @@ div.carrot-tip-container {
         @include avenir_R();
         font-size: 18px;
         color: white;
-        line-height: 22px;
+        line-height: 24px;
 
         @include mobile() {
           margin-top: 8px;
