@@ -82,9 +82,10 @@
           "See who’s engaged"]
         [:div.card-content
           (str
-            "Carrot measures engagement "
-            "so leaders can see if their "
-            "teams are aligned.")]]
+            "Carrot measures team "
+            "engagement so leaders "
+            "can actually see if their "
+            "teams are aligned or not.")]]
       [:div.card.card-6
         [:div.card-icon]
         [:div.card-title
