@@ -44,6 +44,10 @@
         auth-settings (drv/react s :auth-settings)]
     [:div.onboard-lander.lander
       [:div.main-cta
+        [:button.mlb-reset.top-back-button
+          {:on-touch-start identity
+           :on-click #(router/history-back!)
+           :aria-label "Back"}]
         [:div.title.main-lander
           "Welcome!"]
         [:button.top-continue
@@ -58,8 +62,8 @@
                             (reset! (::email-error s) true))
                           (when (<= (count @(::pswd s)) 7)
                             (reset! (::password-error s) true)))
-                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
-          "Continue"]]
+                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
+           :aria-label "Continue"}]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -70,7 +74,8 @@
                          (user-actions/login-with-slack auth-link)))}
           [:div.signup-with-slack-content
             "Sign Up with "
-            [:div.slack-blue-icon]]]
+            [:div.slack-blue-icon
+              {:aria-label "slack"}]]]
         [:div.or-with-email
           [:div.or-with-email-line]
           [:div.or-with-email-copy
@@ -178,8 +183,8 @@
              :on-touch-start identity
              :on-click #(when-not top-continue-disabled
                           (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save]))}
-            "Continue"])]
+                          (dis/dispatch! [:user-profile-save]))
+             :aria-label "Continue"}])]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -301,8 +306,8 @@
                                      (> (count org-name) 2))
                               ;; Create org and show setup screen
                               (dis/dispatch! [:org-create])
-                              (dis/dispatch! [:input [:org-editing :error] true]))))}
-            "Continue"])]
+                              (dis/dispatch! [:input [:org-editing :error] true]))))
+             :aria-label "Continue"}])]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -638,11 +643,4 @@
         [:div.onboard-wrapper-logo]
         [:div.onboard-wrapper-box]]
       [:div.onboard-wrapper-right
-        (when (or (= component :lander)
-                  (= component :email-wall))
-          [:button.mlb-reset.mobile-blue-back
-            {:on-click #(do
-                         (dis/dispatch! [:input [user-store/show-login-overlay-key] nil])
-                         (router/nav! oc-urls/home))
-             :on-touch-start identity}])
         (get-component component)]]])
