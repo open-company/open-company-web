@@ -112,7 +112,7 @@
                                  0
                                  (:latest-auth-settings @dis/app-state))
           now (.getTime (js/Date.))
-          reload-time (* 60 60 1000)]
+          reload-time (* 1000 60 20)] ; every 20m
       (when (or (> (- now latest-entry-point) reload-time)
                 (and (router/current-org-slug)
                      (nil? (dis/org-data))))
