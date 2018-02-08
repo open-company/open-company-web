@@ -7,7 +7,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.mixins.ui :as mixins]))
+            [oc.web.mixins.ui :as mixins]
+            [oc.web.lib.responsive :as responsive]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:nux-end]))
@@ -16,55 +19,128 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss-modal))
 
-(rum/defcs onboard-overlay < rum/reactive
-                             ;; Locals
+(rum/defcs onboard-overlay < ;; Locals
                              (rum/local false ::dismiss)
+                             (rum/local nil ::resize-listener)
+                             (rum/local nil ::wh)
+                             ;; Derivatives
+                             rum/reactive
                              (drv/drv :board-data)
                              ;; Mixins
                              mixins/no-scroll-mixin
+                             {:did-mount (fn [s]
+                              (when (responsive/is-tablet-or-mobile?)
+                                (reset! (::resize-listener s)
+                                 (events/listen js/window EventType/RESIZE
+                                  #(reset! (::wh s) (.-innerHeight js/window)))))
+                              (reset! (::wh s) (.-innerHeight js/window))
+                              s)}
   [s step]
   [:div.onboard-overlay-container
     {:class (utils/class-set {:will-appear @(::dismiss s)
                               :appear (not @(::dismiss s))})}
     [:div.onboard-overlay
-      (case step
-        :1
-        (let [nux-cookie (cook/get-cookie (router/show-nux-cookie (jwt/user-id)))
-              first-ever-user? (= nux-cookie (:first-ever-user router/nux-cookie-values))
-              board-data (drv/react s :board-data)
-              read-only-user (not (utils/link-for (:links board-data) "create"))]
-          [:div.onboard-overlay-step.step-1
-            [:div.onboard-balloon.red-balloon]
-            [:div.onboard-balloon.green-balloon]
-            [:div.onboard-balloon.yellow-balloon]
+      (let [wh @(::wh s)]
+        (case step
+          :1-mobile
+          [:div.onboard-overlay-mobile-step.step-1
             [:div.onboard-overlay-step-title
-              "Let’s get started!"]
+              "Share key updates and stories"]
             [:div.step-illustration-container-center
-              [:div.step-illustration-container]
+              [:div.step-illustration-container
+                {:style {:height (str (min 418 (- wh 138 223)) "px")}}]
               [:div.onboard-overlay-step-description
                 (str
                  "Keep everyone aligned around "
                  "what matters most.")]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(dis/dispatch! [:input [:nux] :2])}
-              (if first-ever-user?
-                "Create your first post"
-                "OK, got it")]])
-        :5
-        [:div.onboard-overlay-step.step-last
-          [:div.onboard-balloon.red-balloon-1]
-          [:div.onboard-balloon.green-balloon-1]
-          [:div.onboard-balloon.yellow-balloon-1]
-          [:div.onboard-balloon.purple-balloon]
-          [:div.onboard-overlay-step-title
-            "You’re on your way!"]
-          [:div.step-illustration-container-center
-            [:div.step-illustration-container]
-            [:div.onboard-overlay-step-description
-              (str
-               "Now your team will have a clear view "
-               "of what's most important so everyone "
-               "stays on the same page!")]]
-          [:button.mlb-reset.continue-btn
-            {:on-click #(close-clicked s)}
-            "Start using Carrot"]])]])
+              {:on-click #(dis/dispatch! [:input [:nux] :2-mobile])}
+              "Next"]
+            [:div.steps-dot-container
+              [:div.step-dot.active]
+              [:div.step-dot]
+              [:div.step-dot]]]
+          :2-mobile
+          [:div.onboard-overlay-mobile-step.step-2
+            [:div.onboard-overlay-step-title
+              "Capture reactions and questions"]
+            [:div.step-illustration-container-center
+              (let [max-h 342
+                    height (- wh 138 243)
+                    next-height (min 342 height)
+                    margin-top (if (>= height max-h)
+                                 (+ (/ (- height max-h) 2) 32)
+                                 32)]
+                [:div.step-illustration-container
+                  {:style {:height (str next-height "px")
+                           :margin-top (str margin-top "px")}}])
+              [:div.onboard-overlay-step-description
+                (str
+                 "Reactions, comments and questions "
+                 "stay together with the original post.")]]
+            [:button.mlb-reset.continue-btn
+              {:on-click #(dis/dispatch! [:input [:nux] :3-mobile])}
+              "Next"]
+            [:div.steps-dot-container
+              [:div.step-dot]
+              [:div.step-dot.active]
+              [:div.step-dot]]]
+          :3-mobile
+          [:div.onboard-overlay-mobile-step.step-3
+            [:div.onboard-overlay-step-title
+              "Find alignment company wide"]
+            [:div.step-illustration-container-center
+              (let [margin-top (/ (- wh 115 203 231) 2)]
+                [:div.step-illustration-container
+                  {:style {:margin-top (str margin-top "px")}}])
+              [:div.onboard-overlay-step-description
+                (str
+                 "Welcome to Carrot. Where "
+                 "companies find alignment")]]
+            [:button.mlb-reset.continue-btn
+              {:on-click #(dis/dispatch! [:nux-end])}
+              "Start using Carrot"]
+            [:div.steps-dot-container
+              [:div.step-dot]
+              [:div.step-dot]
+              [:div.step-dot.active]]]
+          :1
+          (let [nux-cookie (cook/get-cookie (router/show-nux-cookie (jwt/user-id)))
+                first-ever-user? (= nux-cookie (:first-ever-user router/nux-cookie-values))
+                board-data (drv/react s :board-data)
+                read-only-user (not (utils/link-for (:links board-data) "create"))]
+            [:div.onboard-overlay-step.step-1
+              [:div.onboard-balloon.red-balloon]
+              [:div.onboard-balloon.green-balloon]
+              [:div.onboard-balloon.yellow-balloon]
+              [:div.onboard-overlay-step-title
+                "Let’s get started!"]
+              [:div.step-illustration-container-center
+                [:div.step-illustration-container]
+                [:div.onboard-overlay-step-description
+                  (str
+                   "Keep everyone aligned around "
+                   "what matters most.")]]
+              [:button.mlb-reset.continue-btn
+                {:on-click #(dis/dispatch! [:input [:nux] :2])}
+                (if first-ever-user?
+                  "Create your first post"
+                  "OK, got it")]])
+          :5
+          [:div.onboard-overlay-step.step-last
+            [:div.onboard-balloon.red-balloon-1]
+            [:div.onboard-balloon.green-balloon-1]
+            [:div.onboard-balloon.yellow-balloon-1]
+            [:div.onboard-balloon.purple-balloon]
+            [:div.onboard-overlay-step-title
+              "You’re on your way!"]
+            [:div.step-illustration-container-center
+              [:div.step-illustration-container]
+              [:div.onboard-overlay-step-description
+                (str
+                 "Now your team will have a clear view "
+                 "of what's most important so everyone "
+                 "stays on the same page!")]]
+            [:button.mlb-reset.continue-btn
+              {:on-click #(close-clicked s)}
+              "Start using Carrot"]]))]])

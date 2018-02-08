@@ -47,12 +47,6 @@ div.onboard-overlay-container {
       padding: 50px 32px;
       position: relative;
 
-      @include mobile(){
-        width: 100%;
-        height: 100%;
-        padding: 64px 24px;
-      }
-
       div.onboard-balloon {
         display: none;
 
@@ -255,6 +249,198 @@ div.onboard-overlay-container {
           &:after {
             background-image: none;
           }
+        }
+      }
+    }
+
+    // Mobile NUX
+    div.onboard-overlay-mobile-step {
+      width: 100%;
+      height: 100%;
+      padding: 40px;
+      position: relative;
+
+      div.onboard-overlay-step-title {
+        @include avenir_H();
+        font-size: 32px;
+        max-width: 300px;
+      }
+
+      div.step-illustration-container-center {
+        div.step-illustration-container {
+          width: 280px;
+          height: 297px;
+          overflow: hidden;
+          background-position: 0px 0px;
+          background-repeat: no-repeat;
+          position: relative;
+          margin: 32px auto 16px;
+
+          &:after {
+            // Gradient
+            content: "";
+            height: 54px;
+            width: 100%;
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            z-index: 10;
+            pointer-events: none;
+          }
+        }
+
+        div.onboard-overlay-step-description {
+          @include avenir_M();
+          color: $deep_navy;
+          line-height: 26px;
+          font-size: 18px;
+          text-align: center;
+        }
+      }
+
+      button.continue-btn {
+        position: absolute;
+        bottom: 78px;
+        width: 280px;
+        height: 40px;
+        border-radius: 100px;
+        background-color: $carrot_text_blue;
+        color: white;
+        @include avenir_H();
+        font-size: 16px;
+        text-align: center;
+        padding: 8px 28px;
+        left: 50%;
+        margin-left: -140px;
+      }
+
+      div.steps-dot-container {
+        bottom: 48px;
+        height: 8px;
+        width: 40px;
+        position: absolute;
+        left: 50%;
+        margin-left: -20px;
+
+        div.step-dot {
+          position: absolute;
+          top: 0px;
+          width: 8px;
+          height: 8px;
+          border-radius: 4px;
+          background-color: rgba($deep_navy, 0.2);
+
+          &:first-child {
+            left: 0px;
+
+            &.active {
+              background-color: $carrot_orange;
+            }
+          }
+
+          &:nth-child(2) {
+            left: 16px;
+
+            &.active {
+              background-color: $carrot_green;
+            }
+          }
+
+          &:nth-child(3) {
+            left: 32px;
+
+            &.active {
+              background-color: $carrot_gold;
+            }
+          }
+        }
+      }
+
+      &.step-1 {
+        background-color: $coral;
+
+        div.onboard-overlay-step-title {
+          color: $carrot_orange;
+        }
+
+        div.step-illustration-container-center {
+
+          div.step-illustration-container {
+            @include image-2x("/img/ML/mobile_nux_il_1");
+            background-size: 280px 426px;
+
+            &:after {
+              $gradient_base_color: $coral;
+              background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
+              background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
+              background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
+              background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
+              background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
+              background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
+            }
+          }
+        }
+
+        button.continue-btn {
+          background-color: $carrot_orange;
+        }
+      }
+
+      &.step-2 {
+        background-color: $feint_emerald;
+
+        div.onboard-overlay-step-title {
+          color: $carrot_green;
+        }
+
+        div.step-illustration-container-center {
+
+          div.step-illustration-container {
+            @include image-2x("/img/ML/mobile_nux_il_2");
+            background-size: 280px 350px;
+
+            &:after {
+              $gradient_base_color: $feint_emerald;
+              background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
+              background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
+              background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
+              background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
+              background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
+              background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
+            }
+          }
+        }
+
+        button.continue-btn {
+          background-color: $carrot_green;
+        }
+      }
+
+      &.step-3 {
+        background-color: $light_gold;
+
+        div.onboard-overlay-step-title {
+          color: $carrot_gold;
+        }
+
+        div.step-illustration-container-center {
+
+          div.step-illustration-container {
+            @include image-2x("/img/ML/mobile_nux_il_3");
+            background-size: 263px 231px;
+            width: 263px;
+            height: 231px;
+
+            &:after {
+              display: none;
+            }
+          }
+        }
+
+        button.continue-btn {
+          background-color: $carrot_gold;
         }
       }
     }
