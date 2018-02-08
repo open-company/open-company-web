@@ -65,7 +65,7 @@
               [:span
                 [:img.user-avatar
                   {:src (jwt/get-key :avatar-url)}]
-                [:span "Go to posts"]]
+                [:span "Go to team"]]
               (if use-slack-signup-button
                 [:span
                   "Sign up with "
