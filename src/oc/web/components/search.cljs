@@ -106,8 +106,8 @@
                                                  (count @store/savedsearch))
                                                 (not
                                                  @(::search-clicked? s)))
-                                           (.click
-                                            (rum/ref-node s "spyglass")))
+                                           (.focus
+                                            (rum/ref-node s "search-input")))
                                          s)
                          :will-mount (fn [s]
                           (search/inactive)
@@ -136,23 +136,19 @@
         [:button.search-close {:class (when (not @(::search-clicked? s))
                                         "inactive")
                                :on-click #(search-inactive s)}]
-        [:img.spyglass {:src (utils/cdn "/img/ML/spyglass.svg")
-                        :ref "spyglass"
-                        :class (when (not @(::search-clicked? s)) "inactive")
-                        :on-click (fn [e]
-                                    (let [searchel
-                                          (rum/ref-node s "search-input")]
-                                      (.remove (.-classList searchel)
-                                               "inactive")
-                                      (utils/after 100 #(.focus searchel))
-                                      (reset! (::search-clicked? s) true)))}]
         [:input.search
           {:class (when (not @(::search-clicked? s)) "inactive")
            :ref "search-input"
-           :placeholder "Search"
+           :placeholder (when-not (responsive/is-mobile-size?) "Search")
            :value @store/savedsearch
            :on-click #(reset! (::search-clicked? s) true)
-           :on-focus #(let [search-query (.-value (rum/ref-node s "search-input"))]
+           :on-blur #(when (responsive/is-mobile-size?)
+                       (set! (.-placehoder (rum/ref-node s "search-input")) ""))
+           :on-focus #(let [search-input (rum/ref-node s "search-input")
+                            search-query (.-value search-input)]
+                        (reset! (::search-clicked? s) true)
+                        (when (and (responsive/is-mobile-size?) (zero? (count search-query)))
+                          (set! (.-placeholder search-input) "Search"))
                         (search/query search-query))
            :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
            :on-change #(search/query

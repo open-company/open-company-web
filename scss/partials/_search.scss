@@ -3,40 +3,30 @@ div.search-box {
 
   @include mobile() {
     display: inline;
-    min-width: 150px;
+    width: 40px;
     min-height: 40px;
 
     &.active {
       position: absolute;
+      min-width: 160px;
       width: 100vw;
       height: calc(100vh - 13px);
-      top: 10px;
+      top: 0px;
       left: 0px;
       background-color: white;
       z-index: 1081;
-      padding: 0px 16px;
-    }
-  }
-
-  img.spyglass {
-    display: inline;
-    margin: 0px 0px 6px 0px;
-
-    @include mobile() {
-      width: 16px;
-      height: 16px;
-      margin: 0px 0px 6px 24px;
-      &.inactive {
-        margin: 0px 0px 11px 24px;
-      }
+      padding: 10px 16px;
     }
   }
 
   input.search {
-    margin: 5px 5px 0px 16px;
+    margin: 5px 0px 0px 0px;
     outline: none;
     border: none;
     caret-color: $carrot_text_blue_3;
+    background-image: cdnUrl("/img/ML/spyglass.svg");
+    background-repeat: no-repeat;
+    padding: 2px 0px 0px 31px;
     @include avenir_M();
     color: $carrot_dark_brown_1;
 
@@ -46,10 +36,13 @@ div.search-box {
     &:focus::placeholder {
       color: $carrot_dark_brown_1;
     }
-
     @include mobile() {
+      margin: 5px 0px 0px 26px;
+      padding: 2px 0px 0px 31px;
       &.inactive {
-        display: none;
+        padding: 6px 0px 0px 31px;
+        width: 20px;
+        height: 20px;
       }
     }
   }
@@ -93,7 +86,7 @@ div.search-results.inactive {
 
 div.triangle {
   position: absolute;
-  top: 81px;
+  top: 82px;
   left: 96px;
   background-color: white;
   border-top: 1px solid rgba(177,184,192,0.50);
