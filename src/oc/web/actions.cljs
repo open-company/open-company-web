@@ -341,7 +341,6 @@
   (utils/after 100 #(api/get-entry-point))
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
-      (js/console.log "web-app-check" status success body)
       (when (= status 404)
         (dispatcher/dispatch! [:error-banner-show (str "You have an older version of the Carrot web app, "
                                                 "please refresh your browser window!")]))))
