@@ -58,7 +58,7 @@ div.login-overlay-container {
       top: 0px;
       overflow: auto;
       box-shadow: none;
-      padding: 40px 16px;
+      padding: 0px 32px 40px;
     }
 
     a.red {
@@ -70,11 +70,74 @@ div.login-overlay-container {
     div.login-overlay-cta {
       text-align: center;
 
+      @include mobile() {
+        width: 100vw;
+        margin-left: -32px;
+        height: 64px;
+        box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+      }
+
       div.sign-in-cta {
         @include avenir_H();
         font-size: 32px;
-        color: $carrot_dark_brown_1;
+        color: $deep_navy;
         text-transform: none;
+
+        @include mobile() {
+          font-size: 18px;
+          padding-top: 24px;
+        }
+      }
+
+      button.top-back-button {
+        display: none;
+
+        @include tablet(){
+          display: block;
+          float: left;
+          height: 40px;
+          width: 40px;
+          background-color: white;
+          background-image: cdnUrl("/img/ML/gray_back_x.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          padding: 0px;
+          position: absolute;
+          margin-top: 0px;
+          top: 12px;
+          left: 24px;
+        }
+      }
+
+      button.top-continue {
+        display: none;
+
+        @include tablet(){
+          display: block;
+          float: right;
+          @include avenir_H();
+          font-size: 15px;
+          height: 40px;
+          width: 40px;
+          border-radius: 20px;
+          background-color: $sea_blue;
+          background-image: cdnUrl("/img/ML/white_continue_arrow.svg");
+          background-size: 14px 19px;
+          background-position: center;
+          background-repeat: no-repeat;
+          outline: none;
+          border: none;
+          padding: 0px;
+          position: absolute;
+          top: -20px;
+          right: 24px;
+
+          &.disabled {
+            background-color: $light_ui_grey;
+            opacity: 1;
+          }
+        }
       }
     }
 
@@ -82,28 +145,24 @@ div.login-overlay-container {
       width: 340px;
       height: 48px;
       margin-top: 52px;
-      background-color: rgba($carrot_text_blue, 0.1);
+      border: 2px solid $chalk_blue;
+      color: $sea_blue;
+      background-color: white;
       border-radius: 100px;
       text-align: center;
 
-      &:active {
-        background-color: $carrot_text_blue;
-        div.signin-with-slack-content {
-          color: white;
-
-          div.slack-blue-icon {
-            @include image-2x("/img/ML/slack_white_icon");
-          }
+      div.signin-with-slack-content {
+        div.slack-blue-icon {
+          @include image-2x("/img/ML/slack_blue_icon");
         }
-
       }
 
       div.signin-with-slack-content {
         @include avenir_H();
         font-size: 18px;
         color: $carrot_text_blue;
-        width: 180px;
-        margin: 4px auto 0px;
+        width: 184px;
+        margin: 0px auto;
 
         div.slack-blue-icon {
           width: 70px;
@@ -112,6 +171,7 @@ div.login-overlay-container {
           background-repeat: no-repeat;
           background-size: 70px 21px;
           float: right;
+          margin-left: 4px;
         }
       }
 
@@ -119,6 +179,48 @@ div.login-overlay-container {
         width: 100%;
       }
     }
+
+    // button.signin-with-slack {
+    //   width: 340px;
+    //   height: 48px;
+    //   margin-top: 52px;
+    //   background-color: rgba($carrot_text_blue, 0.1);
+    //   border-radius: 100px;
+    //   text-align: center;
+
+    //   &:active {
+    //     background-color: $carrot_text_blue;
+    //     div.signin-with-slack-content {
+    //       color: white;
+
+    //       div.slack-blue-icon {
+    //         @include image-2x("/img/ML/slack_white_icon");
+    //       }
+    //     }
+
+    //   }
+
+    //   div.signin-with-slack-content {
+    //     @include avenir_H();
+    //     font-size: 18px;
+    //     color: $carrot_text_blue;
+    //     width: 180px;
+    //     margin: 4px auto 0px;
+
+    //     div.slack-blue-icon {
+    //       width: 70px;
+    //       height: 21px;
+    //       @include image-2x("/img/ML/slack_blue_icon");
+    //       background-repeat: no-repeat;
+    //       background-size: 70px 21px;
+    //       float: right;
+    //     }
+    //   }
+
+    //   @include mobile() {
+    //     width: 100%;
+    //   }
+    // }
 
     div.or-with-email {
       width: 100%;
@@ -243,10 +345,10 @@ div.login-overlay-container {
         @include avenir_H();
         font-size: 16px;
         border-radius: 100px;
-        border: 1px solid $carrot_dark_blue_1;
 
         &.disabled {
-          opacity: 0.8;
+          background-color: $light_ui_grey;
+          opacity: 1;
         }
       }
 

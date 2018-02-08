@@ -58,7 +58,20 @@
                                 (.focus (sel1 [:input.email]))
                                 s)}
   [state]
-  (let [auth-settings (drv/react state :auth-settings)]
+  (let [auth-settings (drv/react state :auth-settings)
+        login-disabled (and auth-settings
+                           (not (nil?
+                            (utils/link-for
+                             (:links auth-settings)
+                             "authenticate"
+                             "GET"
+                             {:auth-source "email"}))))
+        login-action #(when-not login-disabled
+                        (let [login-with-email (:login-with-email @dis/app-state)
+                              email (:email login-with-email)
+                              pswd (:pswd login-with-email)]
+                          (.preventDefault %)
+                          (user-actions/login-with-email email pswd)))]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
       ;; Close X button
@@ -68,7 +81,15 @@
       [:div.login-overlay.login-with-email.group
         {:on-click #(utils/event-stop %)}
         [:div.login-overlay-cta.group
-          [:div.sign-in-cta "Sign In"]]
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+             :on-click #(router/history-back!)
+             :aria-label "Back"}]
+          [:div.sign-in-cta "Sign In"]
+          [:button.mlb-reset.top-continue
+            {:aria-label "Login"
+             :class (when login-disabled "disabled")
+             :on-click login-action}]]
         ;; Slack button
         [:button.mlb-reset.signin-with-slack
           {:on-click #(do
@@ -79,7 +100,8 @@
            :on-touch-start identity}
           [:div.signin-with-slack-content
             "Sign In with "
-            [:div.slack-blue-icon]]]
+            [:div.slack-blue-icon
+              {:aria-label "slack"}]]]
         ;; Or with email
         [:div.or-with-email
           [:div.or-with-email-line]
@@ -138,19 +160,9 @@
                 [:a {:on-click #(user-actions/show-login :password-reset)} "Forgot Password?"]]]
             ;; Login button
             [:button.mlb-reset.mlb-default.continue
-              {:disabled (or (not auth-settings)
-                             (nil?
-                              (utils/link-for
-                               (:links auth-settings)
-                               "authenticate"
-                               "GET"
-                               {:auth-source "email"})))
+              {:class (when login-disabled "disabled")
                :on-touch-start identity
-               :on-click #(let [login-with-email (:login-with-email @dis/app-state)
-                                email (:email login-with-email)
-                                pswd (:pswd login-with-email)]
-                            (.preventDefault %)
-                            (user-actions/login-with-email email pswd))}
+               :on-click login-action}
               "Sign In"]]]
         ;; Link to signup
         [:div.footer-link
