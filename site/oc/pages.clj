@@ -133,8 +133,8 @@
           (str
             "Carrot measures team "
             "engagement so leaders "
-            "can actually see if their "
-            "teams are aligned or not.")]]
+            "can see if their teams "
+            "are aligned or not.")]]
       [:div.card.card-6
         [:div.card-icon]
         [:div.card-title
