@@ -12,9 +12,9 @@ div.empty-board {
   }
 
   div.empty-board-headline {
-    @include avenir_H();
-    font-size: 16px;
-    color: $carrot_light_gray;
+    @include avenir_M();
+    font-size: 18px;
+    color: $ui_grey;
     margin: 32px auto;
 
     button {
@@ -26,16 +26,18 @@ div.empty-board {
 
   img.empty-board-image {
     margin: 0px auto;
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
 
     @include mobile() {
-      margin: 20px auto;
+      margin: 40px auto 20px;
     }
   }
 
   div.empty-board-footer {
     @include avenir_M();
-    font-size: 20px;
-    color: #979DA3;
+    font-size: 18px;
+    color: $ui_grey;
   }
 
   button.empty-board-create-first-post {
