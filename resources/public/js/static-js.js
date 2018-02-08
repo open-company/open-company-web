@@ -156,13 +156,14 @@ function OCStaticGetParameterByName(name, url) {
 
 function isSafari(){
   var ua = navigator.userAgent.toLowerCase(); 
-  if (ua.indexOf('safari') != -1) { 
+  if (ua.indexOf('safari') > -1) { 
     if (ua.indexOf('chrome') > -1) {
       return false;
     } else {
       return true;
     }
   }
+  return false;
 }
 
 function isFireFox(){
@@ -217,5 +218,40 @@ if (oc_loading) {
     }else{
       item.classList.remove('setup-screen');
     }
+  });
+}
+
+
+function OCStaticStartFixFixedPositioning(sel) {
+  // Let's assume the fixed top navbar has id="navbar"
+  // Cache the fixed element
+  var $navbar = $(sel);
+
+  var fixFixedPosition = function() {
+    $navbar.css({
+      position: 'absolute',
+      top: document.body.scrollTop + 'px'
+    });
+  };
+  var resetFixedPosition = function() {
+    $navbar.css({
+      position: 'fixed',
+      top: ''
+    });
+    $(document).off('scroll', updateScrollTop);
+  };
+  var updateScrollTop = function() {
+    $navbar.css('top', document.body.scrollTop + 'px');
+  };
+
+  $('input, textarea, [contenteditable=true]').on({
+    focus: function() {
+      // NOTE: The delay is required.
+      setTimeout(fixFixedPosition, 100);
+      // Keep the fixed element absolutely positioned at the top
+      // when the keyboard is visible
+      $(document).scroll(updateScrollTop);
+    },
+    blur: resetFixedPosition
   });
 }

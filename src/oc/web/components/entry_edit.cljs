@@ -205,6 +205,8 @@
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                          (when (and (responsive/is-tablet-or-mobile?) (js/isSafari))
+                            (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
                           s)
                          :before-render (fn [s]
                           (calc-entry-edit-modal-height s)
@@ -366,32 +368,7 @@
                             (small-loading)
                             [:div.button-icon
                               {:class (when disabled? "disabled")}])
-                          "Save draft"]))])]
-              (when is-mobile?
-                [:div.mobile-posting-in
-                  [:span
-                    (if (:uuid entry-editing)
-                      (if (= (:status entry-editing) "published")
-                        "Posted in: "
-                        "Draft for: ")
-                      "Posting in: ")]
-                  [:div.boards-dropdown-caret
-                    {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
-                     :class (when (not nux) "no-nux")}
-                    (:board-name entry-editing)]
-                  (when (and (not nux) @(::show-boards-dropdown s))
-                    (dropdown-list
-                     {:items (map
-                              #(clojure.set/rename-keys % {:name :label :slug :value})
-                              (vals all-boards))
-                      :value (:board-slug entry-editing)
-                      :on-blur #(reset! (::show-boards-dropdown s) false)
-                      :on-change (fn [item]
-                                   (toggle-save-on-exit s true)
-                                   (reset! (::show-boards-dropdown s) false)
-                                   (dis/dispatch! [:input [:entry-editing :has-changes] true])
-                                   (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                   (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))])]
+                          "Save draft"]))])]]
             [:div.entry-edit-modal-header.group
               (user-avatar-image current-user-data)
               [:div.posting-in
@@ -421,6 +398,31 @@
                                    (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]])
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          (when is-mobile?
+            [:div.mobile-posting-in
+              [:span
+                (if (:uuid entry-editing)
+                  (if (= (:status entry-editing) "published")
+                    "Posted in: "
+                    "Draft for: ")
+                  "Posting in: ")]
+              [:div.boards-dropdown-caret
+                {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
+                 :class (when (not nux) "no-nux")}
+                (:board-name entry-editing)]
+              (when (and (not nux) @(::show-boards-dropdown s))
+                (dropdown-list
+                 {:items (map
+                          #(clojure.set/rename-keys % {:name :label :slug :value})
+                          (vals all-boards))
+                  :value (:board-slug entry-editing)
+                  :on-blur #(reset! (::show-boards-dropdown s) false)
+                  :on-change (fn [item]
+                               (toggle-save-on-exit s true)
+                               (reset! (::show-boards-dropdown s) false)
+                               (dis/dispatch! [:input [:entry-editing :has-changes] true])
+                               (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
+                               (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))])
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable.group
             {:content-editable (not nux)
