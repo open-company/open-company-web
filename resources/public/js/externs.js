@@ -99,6 +99,7 @@ moment.tz = {};
 moment.tz.guess = function(){};
 
 var OCStaticMailchimpApiSubmit = function(){};
+var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
 var isSafari = function(){};

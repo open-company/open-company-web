@@ -52,6 +52,7 @@ div.entry-edit-modal-container {
         margin: 0px;
         border-radius: 0px;
         box-shadow: none;
+        position: initial;
         height: initial;
       }
 
@@ -60,7 +61,7 @@ div.entry-edit-modal-container {
 
         @include tablet() {
           display: block;
-          height: 112px;
+          height: 64px;
           background-color: white;
           width: 100vw;
           position: fixed;
@@ -68,6 +69,7 @@ div.entry-edit-modal-container {
           left: 0px;
           right: 0px;
           z-index: 1;
+          box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.12);
 
           div.mobile-header {
             height: 64px;
@@ -151,62 +153,6 @@ div.entry-edit-modal-container {
                     background-size: 20px 20px;
                   }
                 }
-              }
-            }
-          }
-
-          div.mobile-posting-in {
-            @include avenir_M();
-            font-size: 15px;
-            color: $carrot_text_blue_3;
-            height: 48px;
-            padding: 14px 24px 0px;
-            background-color: $carrot_light_blue_2;
-
-            &.active {
-              background-color: $carrot_text_blue_3;
-
-              div.boards-dropdown-caret.no-nux {
-                color: white;
-                &:after {
-                  background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
-                }
-              }
-            }
-
-            span {
-              float: left;
-            }
-
-            div.boards-dropdown-caret.no-nux {
-              @include avenir_H();
-              color: $carrot_text_blue_3;
-
-              &:after {
-                width: 8px;
-                height: 5px;
-                background-size: 8px 5px;
-                background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
-              }
-            }
-
-            div.dropdown-list-container {
-              width: 100vw;
-              height: calc(100vh - 64px - 48px);
-              top: 112px;
-              left: 0px;
-              text-align: left;
-
-              div.triangle {
-                display: none;
-              }
-
-              div.dropdown-list-content {
-                border: none;
-                border-radius: 0px;
-                padding: 24px;
-                margin: 0px;
-                box-shadow: none;
               }
             }
           }
@@ -296,6 +242,10 @@ div.entry-edit-modal-container {
         background-color: $carrot_light_gray_1;
         opacity: 0.3;
 
+        @include mobile() {
+          display: none;
+        }
+
         &.not-visible {
           opacity: 0;
         }
@@ -311,11 +261,69 @@ div.entry-edit-modal-container {
         margin-left: -22px;
 
         @include tablet() {
-          min-height: calc(100vh - 112px - 1px);
+          min-height: 100vh;
           max-height: initial;
-          padding: 0px;
+          padding: 64px 0px 0px;
           width: 100%;
-          margin: 112px 0px 0px;
+          margin: 0px;
+        }
+
+        div.mobile-posting-in {
+          @include avenir_M();
+          font-size: 15px;
+          color: $carrot_text_blue_3;
+          // height: 112px;
+          // padding: 78px 24px 0px;
+          height: 48px;
+          padding: 14px 24px 0px;
+          background-color: $carrot_light_blue_2;
+
+          &.active {
+            background-color: $carrot_text_blue_3;
+
+            div.boards-dropdown-caret.no-nux {
+              color: white;
+              &:after {
+                background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
+              }
+            }
+          }
+
+          span {
+            float: left;
+          }
+
+          div.boards-dropdown-caret.no-nux {
+            @include avenir_H();
+            color: $carrot_text_blue_3;
+
+            &:after {
+              width: 8px 5px;
+              background-size: 8px 5px;
+              background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
+            }
+          }
+
+          div.dropdown-list-container {
+            width: 100vw;
+            height: calc(100vh - 64px - 48px);
+            top: 112px;
+            left: 0px;
+            text-align: left;
+            background-color: white;
+
+            div.triangle {
+              display: none;
+            }
+
+            div.dropdown-list-content {
+              border: none;
+              border-radius: 0px;
+              padding: 24px;
+              margin: 0px;
+              box-shadow: none;
+            }
+          }
         }
 
         div.entry-edit-headline {
