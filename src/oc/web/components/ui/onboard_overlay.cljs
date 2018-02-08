@@ -28,7 +28,7 @@
                              (drv/drv :board-data)
                              ;; Mixins
                              mixins/no-scroll-mixin
-                             {:did-mount (fn [s]
+                             {:will-mount (fn [s]
                               (when (responsive/is-tablet-or-mobile?)
                                 (reset! (::resize-listener s)
                                  (events/listen js/window EventType/RESIZE
