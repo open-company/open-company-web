@@ -85,7 +85,7 @@
             "Carrot measures team "
             "engagement so leaders "
             "can see if their teams "
-            "are aligned or not.")]]
+            "are aligned.")]]
       [:div.card.card-6
         [:div.card-icon]
         [:div.card-title
