@@ -73,7 +73,7 @@
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-404!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (redirect! (str "/404?path=" encoded-url))))
+    (.replace (.-location js/window) (str "/404?path=" encoded-url))))
 
 (defn redirect-500! []
   (let [win-location (.-location js/window)
@@ -83,7 +83,7 @@
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-500!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (redirect! (str "/500?path=" encoded-url))))
+    (.replace (.-location js/window) (str "/500?path=" encoded-url))))
 
 (defn history-back! []
   (timbre/info "history-back!")
