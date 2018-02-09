@@ -102,9 +102,9 @@ nav.oc-navbar {
         font-size: 26px;
 
         @include mobile() {
-          width: 256px;
+          width: 40%;
           height: 32px;
-          margin-left: -128px;
+          margin-left: -82px;
           top: 0px;
         }
 
@@ -130,8 +130,10 @@ nav.oc-navbar {
       height: 24px;
 
       @include mobile() {
-        margin-top: 8px;
+        margin-top: 10px;
         margin-left: 16px;
+        width: 40%;
+        height: 40px;
       }
 
       button.mobile-navigation-sidebar-ham-bt {
@@ -144,7 +146,7 @@ nav.oc-navbar {
           background-repeat: no-repeat;
           background-size: 18px 14px;
           background-position: 3px 5px;
-          display: block;
+          display: inline;
         }
       }
     }

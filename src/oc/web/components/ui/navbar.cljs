@@ -49,7 +49,8 @@
               [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
                 {:on-click #(do
                               (dis/dispatch! [:input [:mobile-menu-open] false])
-                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
+                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]
+             (search-box)]
             [:div.nav.navbar-nav.navbar-left
               (search-box)])
           [:div.nav.navbar-nav.navbar-center

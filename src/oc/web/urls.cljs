@@ -43,7 +43,7 @@
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
 
-(def oc-twitter "https://twitter.com/CarrotBuzz")
+(def oc-twitter "https://twitter.com/carrot_hq")
 
 (def oc-facebook "https://www.facebook.com/Carrot-111981319388047/")
 

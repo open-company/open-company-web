@@ -1,18 +1,32 @@
-
 div.search-box {
   width: 400px;
 
-
-  img.spyglass {
+  @include mobile() {
     display: inline;
-    margin: 0px 0px 6px 0px;
+    width: 40px;
+    min-height: 40px;
+
+    &.active {
+      position: absolute;
+      min-width: 160px;
+      width: 100vw;
+      height: calc(100vh - 13px);
+      top: 0px;
+      left: 0px;
+      background-color: white;
+      z-index: 1081;
+      padding: 10px 16px;
+    }
   }
 
   input.search {
-    margin: 5px 5px 0px 16px;
+    margin: 5px 0px 0px 0px;
     outline: none;
     border: none;
     caret-color: $carrot_text_blue_3;
+    background-image: cdnUrl("/img/ML/spyglass.svg");
+    background-repeat: no-repeat;
+    padding: 2px 0px 0px 31px;
     @include avenir_M();
     color: $carrot_dark_brown_1;
 
@@ -21,6 +35,15 @@ div.search-box {
     }
     &:focus::placeholder {
       color: $carrot_dark_brown_1;
+    }
+    @include mobile() {
+      margin: 5px 0px 0px 26px;
+      padding: 2px 0px 0px 31px;
+      &.inactive {
+        padding: 6px 0px 0px 31px;
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 
@@ -37,8 +60,12 @@ div.search-box {
     margin: 0px 24px 0px 0px;
     padding: 12px 0px 0px 0px;
 
+    @include mobile() {
+      margin: 0px;
+    }
+
     &:hover {
-        opacity: 1;
+      opacity: 1;
     }
 
     &.inactive {
@@ -59,7 +86,7 @@ div.search-results.inactive {
 
 div.triangle {
   position: absolute;
-  top: 81px;
+  top: 82px;
   left: 96px;
   background-color: white;
   border-top: 1px solid rgba(177,184,192,0.50);
@@ -71,6 +98,9 @@ div.triangle {
   &.inactive {
     display: none;
   }
+  @include mobile() {
+    display: none;
+  }
 }
 
 div.search-results {
@@ -80,6 +110,19 @@ div.search-results {
   margin: 41px 0px 0px 45px;
   width: 450px;
   box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
+
+  @include mobile() {
+    position: absolute;
+    top: 63px;
+    left: 0px;
+    height: 100vh;
+    widght: 100vh;
+    background-color: white;
+    z-index: 1081;
+    margin: -1px;
+    padding: 0px;
+    border-radius: 0;
+  }
 
   div.header {
     background-color: white;
@@ -99,6 +142,10 @@ div.search-results {
   div.search-results-container {
     overflow-y: auto;
     max-height: calc(100vh - 180px - 47px);
+
+    @include mobile() {
+      max-height: calc(100vh - 80px - 47px);
+    }
 
     div.search-result {
       width: 100%;

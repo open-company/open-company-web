@@ -74,7 +74,7 @@
             [:div.carrot-plus-slack]
 
             [:h1.slack
-              "Grow together"]
+              "Rise above the noise"]
 
             [:div.slack-subline-container
               [:div.slack-subline
