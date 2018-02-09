@@ -618,7 +618,14 @@
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
           ;; Gooogle Analytics autotrack
+          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
+          [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
+          [:script (str "CarrotGA.init("
+                        (or (env :ga-version) false)
+                        ","
+                        (or (env :ga-tracking-id) false)
+                        ")")]
           ;; JWT decode library
           [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; Custom Tooltips
