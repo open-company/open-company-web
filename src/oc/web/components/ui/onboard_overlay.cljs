@@ -55,7 +55,7 @@
               "Above the noise"]
             [:div.step-illustration-container-center
               [:div.step-illustration-container
-                {:style {:height (str (min 418 (- wh 138 163)) "px")}}]
+                {:style {:height (str (min 418 (- wh 138 203)) "px")}}]
               [:div.onboard-overlay-step-description
                 (str
                  "Share key updates and stories "
@@ -75,7 +75,7 @@
               "Focused conversations"]
             [:div.step-illustration-container-center
               (let [max-h 342
-                    height (- wh 138 183)
+                    height (- wh 138 263)
                     next-height (min 342 height)
                     margin-top (if (>= height max-h)
                                  (+ (/ (- height max-h) 2) 32)
