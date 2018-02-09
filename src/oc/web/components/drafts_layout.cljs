@@ -8,6 +8,7 @@
             [oc.web.mixins.activity :as am]
             [oc.web.lib.activity-utils :as au]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn delete-clicked [draft e]
@@ -38,7 +39,7 @@
                               (str "draft-card-" (:uuid draft)) true})
      :key (str "draft-" (:created-at draft))
      :on-click #(when draft
-                  (dis/dispatch! [:entry-edit draft]))}
+                  (activity-actions/entry-edit draft))}
     (when draft
       [:div.draft-card-inner
         [:div.draft-card-head
@@ -53,13 +54,7 @@
                    :data-placement "top"
                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                    :title (utils/activity-date-tooltip draft)}
-                  (utils/time-since t)])]]
-          [:div.draft-card-head-right
-            ; Topic tag button
-            (when (:topic-slug draft)
-              (let [topic-name (or (:topic-name draft) (string/upper (:topic-slug draft)))]
-                [:div.activity-tag.on-gray
-                  topic-name]))]]
+                  (utils/time-since t)])]]]
         [:div.draft-card-content.group
           [:div.draft-card-title
             {:dangerouslySetInnerHTML

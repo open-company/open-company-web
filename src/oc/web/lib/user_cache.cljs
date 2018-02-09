@@ -16,7 +16,7 @@
      fixed-key
      (clj->js (stringify-keys data-value))
      (fn [err]
-       (timbre/info "set-item error" err)
+       (timbre/info "   - set-item error" err)
        (when (fn? completed-cb)
          (completed-cb err))))))
 
@@ -35,7 +35,7 @@
     (.getItem js/localforage
      fixed-key
      (fn [err value]
-       (timbre/info "get-item for" fixed-key value err)
+       (timbre/info "   - get-item for" fixed-key value err)
        (when (fn? get-item-cb)
          (let [clj-value (if value
                            (keywordize-keys (js->clj value))

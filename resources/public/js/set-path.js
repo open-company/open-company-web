@@ -1,3 +1,3 @@
 if (OCStaticGetParameterByName("path")) {
-  history.pushState(null, "Page could not be found", OCStaticGetParameterByName("path"));
+  history.replaceState(window.history.state, "Page could not be found", OCStaticGetParameterByName("path"));
 }

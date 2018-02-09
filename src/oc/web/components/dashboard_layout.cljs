@@ -10,10 +10,10 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
-            [oc.web.components.ui.filters-dropdown :refer (filters-dropdown)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
@@ -135,7 +135,6 @@
                               (drv/drv :org-data)
                               (drv/drv :board-data)
                               (drv/drv :all-posts)
-                              (drv/drv :board-filters)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
                               ;; Locals
@@ -172,13 +171,9 @@
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
-        board-filters (drv/react s :board-filters)
         nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile-size? (responsive/is-mobile-size?)
-        dashboard-layout-container-key (if current-activity-id
-                                        (str "dashboard-layout-activity-" current-activity-id)
-                                        (str "dashboard-layout-" (if is-all-posts "all-posts" (:slug board-data))))
         empty-board? (and (not nux)
                           (zero? (count (:fixed-items board-data))))
         sidebar-width (+ responsive/left-navigation-sidebar-width
@@ -193,16 +188,13 @@
                                                      2)
                                                    sidebar-width))
                                              "px"))}
-        entry-topics (distinct (remove empty? (map :topic-slug (vals (:fixed-items board-data)))))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
-        all-boards (drv/react s :editable-boards)
-        topics (:topics board-data)]
-      ;; Topic list
+        all-boards (drv/react s :editable-boards)]
+      ;; Entries list
       [:div.dashboard-layout.group
         (when (some #{nux} [:3 :4 :5 :6])
           (nux-steps org-data board-data nux))
         [:div.dashboard-layout-container.group
-          {:key dashboard-layout-container-key}
           (navigation-sidebar)
           [:div.board-container.group
             {:style board-container-style}
@@ -253,16 +245,8 @@
                                 (if (or is-drafts-board is-all-posts)
                                   (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
                                   (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}
-                                        topic-data (when (string? board-filters)
-                                                     (first (filter #(= (:slug %) board-filters) topics)))
-                                        with-topic (if (string? board-filters)
-                                                    (merge
-                                                     entry-data
-                                                     {:topic-slug (:slug topic-data)
-                                                      :topic-name (:name topic-data)})
-                                                    entry-data)]
-                                    (dis/dispatch! [:entry-edit with-topic]))))}
+                                                    :board-name (:name board-data)}]
+                                    (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "New Post"]]
@@ -277,16 +261,9 @@
                       :on-blur #(reset! (::show-top-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (reset! (::show-top-boards-dropdown s) false)
-                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
-                                                                :board-name (:label item)}]))}))])
-              ;; Board filters when there is not topic filtering
-              (when (and (not is-mobile-size?)
-                         (not empty-board?)
-                         (not is-all-posts)
-                         (not is-drafts-board)
-                         (or (string? board-filters) (> (count entry-topics) 1)))
-                (filters-dropdown))]
-            ;; Board content: empty board, add topic, topic view or topic cards
+                                   (activity-actions/entry-edit {:board-slug (:value item)
+                                                                 :board-name (:label item)}))}))])]
+            ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
               (zero? (count (:boards org-data)))
@@ -335,16 +312,8 @@
                                    (::show-floating-boards-dropdown s)
                                    (not @(::show-floating-boards-dropdown s)))
                                   (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}
-                                        topic-data (when (string? board-filters)
-                                                     (first (filter #(= (:slug %) board-filters) topics)))
-                                        with-topic (if (string? board-filters)
-                                                    (merge
-                                                     entry-data
-                                                     {:topic-slug (:slug topic-data)
-                                                      :topic-name (:name topic-data)})
-                                                    entry-data)]
-                                    (dis/dispatch! [:entry-edit with-topic]))))}
+                                                    :board-name (:name board-data)}]
+                                    (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]]
                   (when @(::show-floating-boards-dropdown s)
                     (dropdown-list
@@ -357,5 +326,5 @@
                       :on-blur #(reset! (::show-floating-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (reset! (::show-floating-boards-dropdown s) false)
-                                   (dis/dispatch! [:entry-edit {:board-slug (:value item)
-                                                                :board-name (:label item)}]))}))]))]]]))
+                                   (activity-actions/entry-edit {:board-slug (:value item)
+                                                                 :board-name (:label item)}))}))]))]]]))

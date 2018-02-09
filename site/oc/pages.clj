@@ -47,6 +47,175 @@
          :id "mc-embedded-subscribe"}
         "Get Early Access"]]])
 
+(def mobile-horizontal-carousell
+  [:div.horizontal-carousell
+    [:div.horizontal-carousell-inner
+      [:img.horizontal-carousell-1
+        {:src (cdn "/img/ML/homepage_mobile_screenshot_1.png")
+         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_1@2x.png") " 2x")}]
+      [:img.horizontal-carousell-2
+        {:src (cdn "/img/ML/homepage_mobile_screenshot_2.png")
+         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_2@2x.png") " 2x")}]
+      [:img.horizontal-carousell-3
+        {:src (cdn "/img/ML/homepage_mobile_screenshot_3.png")
+         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_3@2x.png") " 2x")}]]])
+
+(def desktop-video
+  [:video.main-animation
+    {:controls false
+     :autoPlay true
+     :poster (cdn "/img/ML/new_homepage_screenshot.png")
+     :onClick "this.play();"
+     :loop true}
+    [:source
+      {:src (cdn "/img/ML/animation.webm")
+       :type "video/webm"}]
+    [:source
+      {:src (cdn "/img/ML/animation.mp4")
+       :type "video/mp4"}]
+    [:div.fallback
+      "Your browser doesn´t support this video format."]])
+
+(def carrot-cards
+  [:div.cards-container
+    [:div.cards-row.group
+      [:div.card.card-1
+        [:div.card-icon]
+        [:div.card-title
+          (str
+           "Highlight what’s "
+           "important")]
+        [:div.card-content
+          (str
+            "Elevate key updates above "
+            "the noise so they won’t be "
+            "missed. It’s perfect for "
+            "distributed teams, too.")]]
+      [:div.card.card-2
+        [:div.card-icon]
+        [:div.card-title
+          (str
+            "Cross-team "
+            "awareness")]
+        [:div.card-content
+          (str
+            "See what's happening across "
+            "the company so teams stay "
+            "in sync.")]]
+      [:div.card.card-3
+        [:div.card-icon]
+        [:div.card-title
+          (str
+            "Focused, topic-based "
+            "conversations")]
+        [:div.card-content
+          (str
+            "Capture team reactions, "
+            "comments and questions "
+            "together in one place.")]]]
+    [:div.cards-row.group
+      [:div.card.card-4
+        [:div.card-icon]
+        [:div.card-title
+          (str
+            "The whole "
+            "story")]
+        [:div.card-content
+          (str
+            "New employees get up to "
+            "speed quickly with the full "
+            "picture in one place.")]]
+      [:div.card.card-5
+        [:div.card-icon]
+        [:div.card-title
+          "See who’s engaged"]
+        [:div.card-content
+          (str
+            "Carrot measures team "
+            "engagement so leaders "
+            "can see if their teams "
+            "are aligned.")]]
+      [:div.card.card-6
+        [:div.card-icon]
+        [:div.card-title
+          (str
+            "In sync "
+            "with Slack")]
+        [:div.card-content
+          (str
+            "Communication is "
+            "automatically shared to the "
+            "right channel. ")
+          [:a
+            {:href "/slack"}
+            "Learn more"]]]]])
+
+(def testimonials-section
+  [:section.testimonials-section
+    [:div.balloon.big-yellow-1]
+    [:div.balloon.small-blue-1]
+    [:div.testimonials-section-title
+      "Don’t take our word for it"]
+    [:div.testimonials-section-subtitle
+      "Here’s how we’re helping teams like yours."]
+    [:div.testimonials-cards-container.group
+      [:div.card
+        [:div.card-content
+          (str
+           "We love Slack for spontaneous "
+           "stuff, but when it’s time to "
+           "post key updates that can’t "
+           "be missed, Carrot is awesome.")]
+        [:div.card-author.group
+          [:img.card-avatar
+            {:src (cdn "/img/ML/happy_face_blue.svg")}]
+          [:div.author-name
+            ""]
+          [:div.author-company
+            ""]]]
+      [:div.card
+        [:div.card-content
+          (str
+           "Carrot makes sure our crucial "
+           "updates aren’t drowned out "
+           "by \"taco Tuesday?\" and "
+           "silly memes!")]
+        [:div.card-author.group
+          [:img.card-avatar
+            {:src (cdn "/img/ML/happy_face_purple.svg")}]
+          [:div.author-name
+            ""]
+          [:div.author-company
+            ""]]]
+      [:div.card
+        [:div.card-content
+          (str
+           "RIP team email! 👻  With "
+           "Carrot, email is finally "
+           "obsolete for team updates "
+           "and the rest.")]
+        [:div.card-author.group
+          [:img.card-avatar
+            {:src (cdn "/img/ML/happy_face_red.svg")}]
+          [:div.author-name
+            ""]
+          [:div.author-company
+            ""]]]
+      [:div.card
+        [:div.card-content
+          (str
+           "Before Carrot, I never knew "
+           "if anyone saw my updates! "
+           "Now I know who's engaged "
+           "and aligned.  🙏")]
+        [:div.card-author.group
+          [:img.card-avatar
+            {:src (cdn "/img/ML/happy_face_yellow.svg")}]
+          [:div.author-name
+            ""]
+          [:div.author-company
+            ""]]]]])
+
 (defn index [options]
   [:div
     {:id "wrap"}
@@ -57,27 +226,24 @@
         [:div.balloon.big-red]
         [:div.balloon.big-purple]
         [:div.balloon.big-green]
-        [:div.balloon.small-purple-face]
-        [:div.balloon.small-red]
+        [:div.balloon.small-blue]
         [:div.balloon.small-yellow-face]
-        [:div.balloon.small-yellow]
-        [:div.balloon.small-red-face]
         [:div.balloon.small-purple]
-        [:div.balloon.small-blue-face]
-        [:div.balloon.small-red-1]
-        [:div.balloon.small-yellow-1]
-        [:div.balloon.small-green-face]
+        [:div.balloon.small-red]
+        [:div.balloon.small-purple-2]
+        [:div.balloon.big-green-2]
+        [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Rise above the noise"]
+          "Where teams align"]
         [:div.subheadline.big-web-only
-          "Give your team a clear view of what’s most important"]
+          "Company updates and stories that keep teams"]
         [:div.subheadline.second-line.big-web-only
-          "to keep everyone on the same page"]
+          "aligned around what matters most."]
         [:div.subheadline.mobile-only
           (str
-           "Give your team a clear view of what’s most important "
-           "to keep everyone on the same page")]
+           "Company updates and stories that keep teams "
+           "aligned around what matters most.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -90,128 +256,24 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:video.homepage-main-animation
-          {:controls false
-           :autoPlay true
-           :poster (cdn "/img/ML/new_homepage_screenshot.png")
-           :onClick "this.play();"
-           :loop true}
-          [:source
-            {:src (cdn "/img/ML/animation.webm")
-             :type "video/webm"}]
-          [:source
-            {:src (cdn "/img/ML/animation.mp4")
-             :type "video/mp4"}]
-          [:div.fallback
-            "Your browser doesn´t support this video format."]]
-        [:div.homepage-screenshot-bubble
-          "It’s never been easier to keep everyone on the same page"]]
+        mobile-horizontal-carousell
 
-      [:section.second-section.group
-        [:div.why-balloon.big-red]
-        ; [:div.why-balloon.big-blue]
-        [:div.why-balloon.small-yellow]
-        [:div.why-balloon.big-purple]
-        [:div.why-balloon.small-purple]
-        [:div.why-balloon.big-yellow]
-        [:div.why-balloon.small-yellow]
-        [:div.why-balloon.big-green]
-        [:div.why-balloon.small-red]
-        [:div.why-balloon.small-purple-face]
+        desktop-video
 
-        [:div.illustrations-title
-          [:div.why-carrot
-            "Why Carrot?"]
-          [:div.why-carrot-description
-            (str
-             "Growing teams need a place to rise above the noise of real-time conversations to see "
-             "what’s really happening across the company.")]]
+        [:div.stay-aligned-container
+          [:div.stay-aligned-icon]
+          [:div.stay-aligned-message
+            "Stay aligned around the topics that matter."]]
 
-        [:div.illustrations.group
-          [:div.illustration-container
-            [:div.illustration.illustration-1]
-            [:div.description
-              [:div.title
-                "Visibility"]
-              [:div.subtitle
-                (str
-                 "A bird’s-eye view of essential "
-                 "information that’s easy to read and "
-                 "creates real transparency.")]]]
-          [:div.illustration-container.right
-            [:div.illustration.illustration-2]
-            [:div.description
-              [:div.title
-                "In context"]
-              [:div.subtitle
-                (str
-                 "Related information stays organized to "
-                 "have the most impact. Great for current "
-                 "and new employees.")]]]
-          [:div.illustration-container
-            [:div.illustration.illustration-3]
-            [:div.description
-              [:div.title
-                "Feedback & engagement"]
-              [:div.subtitle
-                (str
-                 "Capture team sentiment and reactions "
-                 "to key communications. It’s fun and "
-                 "great for distributed teams too!")]]]
-          [:div.illustration-container.right
-            [:div.illustration.illustration-4]
-            [:div.description
-              [:div.title
-                "The big picture"]
-              [:div.subtitle
-                (str
-                 "Daily or weekly digest for email "
-                 "and Slack ensures everyone has the "
-                 "same view of what’s important.")]]]]
+        carrot-cards]
 
-        [:div.slack-section
-          [:div.slack-logo]
-          [:div.slack-title
-            "Did we mention our Slack integration?"]
-          [:div.slack-description
-            (str
-             "Posts are automatically shared to the right channels. Discussions about posts happen "
-             "in Slack and Carrot - everything is kept in sync.")]
-          [:button.mlb-reset.slack-btn
-            {:onClick "window.location='/slack';"}
-            "Learn More"]]]
+      testimonials-section
 
-      [:section.third-section.group
-        [:div.illustrations-title
-          [:div.why-carrot
-            "Keep your stakeholders informed"]
-          [:div.why-carrot-description
-            "Share the latest news with your extended team."]]
-        [:div.third-section-footer.group
-          [:div.copy
-            [:div.copy-icon.copy-simplify]
-            [:div.title
-              "Simplify investor updates"]
-            [:div.description
-              (str
-               "Create beautiful updates in a snap, and keep them organized in one place. Also "
-               "ideal for keeping friends and family in the loop.")]]
-          [:div.copy-separator]
-          [:div.copy
-            [:div.copy-icon.copy-expand]
-            [:div.title
-              "Expand your network"]
-            [:div.description
-              (str
-               "Share news with recruits, potential investors and customers to keep them "
-               "engaged and supportive. Build trust and grow your business.")]]]]
-
-      [:section.fourth-section.group
-        [:div.above-noise-container
-          [:div.above-noise-description
-            "With Carrot, everyone’s on the same page."]
-          [:button.mlb-reset.get-started-button
-            "Get started for free"]]]
+      [:section.third-section
+        [:div.third-section-title
+          "Keep everyone aligned around what matters most."]
+        [:button.mlb-reset.get-started-button
+          "Get started for free"]]
       ]])
 
 (defn pricing
@@ -263,6 +325,88 @@
         [:p "Impress your investors and advisors with beautful, concise and meaningful updates."]]]]
      ]])
 
+(defn slack
+  "Slack page. This is a copy of oc.web.components.slack and
+   every change here should be reflected there and vice versa."
+  [options]
+  [:div
+    {:id "wrap"}
+    [:div.main.slack.group
+      [:section.carrot-plus-slack.group
+        ;; Top Left
+        [:div.balloon.big-green]
+        [:div.balloon.small-purple]
+        [:div.balloon.small-yellow]
+        ;; Top Right
+        [:div.balloon.big-red]
+        [:div.balloon.small-yellow-face]
+        [:div.balloon.small-purple-1]
+        ;; Center Left
+        [:div.balloon.big-blue]
+        [:div.balloon.small-purple-2]
+        [:div.balloon.small-green]
+        [:div.balloon.big-purple]
+        [:div.balloon.small-red]
+
+
+        [:div.carrot-plus-slack]
+
+        [:h1.slack
+          "Rise above the noise"]
+
+        [:div.slack-subline-container
+          [:div.slack-subline
+            "Company updates and stories that keep teams"]
+          [:div.slack-subline
+            "aligned around what matters most."]]
+
+        [:div.sigin-with-slack-container
+          [:button.signin-with-slack.mlb-reset
+            {:onClick "javascript:window.location=\"/sign-up\";"}
+            "Sign up with"
+            [:div.slack-white-icon]]
+          [:div.signin-with-slack-disclaimer
+            [:div.signin-with-slack-description
+              "By signing in, you agree to the "
+              [:a
+                {:href "/terms"}
+                "Terms of Use"]
+              " and "
+              [:a
+                {:href "/privacy"}
+                "Privacy Policy."]]]]
+
+        mobile-horizontal-carousell
+
+        desktop-video        
+
+        [:div.designed-for-container
+          [:div.designed-for
+            "Designed for Slack"]
+          [:div.designed-for-content
+            (str
+             "Slack is fun and awesome for real-time work, but gets noisy. "
+             "With Carrot, leaders rise above the noise "
+             "to keep everyone on the same page.")]]
+
+        carrot-cards]
+
+      testimonials-section
+
+      [:section.third-section
+        [:div.third-section-title
+          (str
+           "Slack keeps your team connected in the moment. "
+           "Carrot keeps it aligned over time.")]
+        [:div.sigin-with-slack-container
+          [:button.signin-with-slack.mlb-reset
+            {:onClick "javascript:window.location=\"/sign-up\";"}
+            "Sign up with"
+            [:div.slack-white-icon]]]]
+
+      ] ;<!-- main -->
+  ])
+
 (defn about
   "About page. This is a copy of oc.web.components.about and
    every change here should be reflected there and vice versa."
@@ -271,166 +415,104 @@
     {:id "wrap"}
     [:div.main.about
       [:section.about-header
-        [:div.balloon.big-yellow]
         [:div.balloon.big-red]
-        [:div.balloon.big-purple]
-        [:div.balloon.small-purple-face]
-        [:div.balloon.small-red]
-        [:div.balloon.small-yellow-face]
-        [:div.balloon.small-yellow]
-        [:div.balloon.big-purple-1]
-        [:div.balloon.small-green]
-        [:div.balloon.big-blue]
-        [:div.balloon.small-red-2]
+        [:div.balloon.big-green]
+        [:div.balloon.small-green-face]
+        [:div.balloon.small-blue]
+        [:div.balloon.small-purple]
+        [:div.balloon.big-yellow]
+        [:div.balloon.small-purple-1]
+        [:div.balloon.small-purple-2]
+        [:div.balloon.small-blue-1]
 
-        [:h1.about "About"]
+        [:h1.about "About us"]
         [:div.about-subline
           (str
-           "Growing companies struggle to keep everyone on the same page. "
-           "Carrot provides the big picture that keeps them together.")]
+           "Carrot is a communication platform that inspires "
+           "transparency and team alignment.")]
+        [:div.team-container
+          [:div.team-row.group.three-cards
+            [:div.team-card.iacopo-carraro
+              [:div.user-avatar]
+              [:div.user-name
+                "Iacopo Carraro"]
+              [:div.user-position
+                "Software Engineer"]
+              [:a.linkedin-link
+                {:href "https://www.linkedin.com/in/iacopocarraro/"
+                 :target "_blank"}]]
+            [:div.team-card.sean-johnson
+              [:div.user-avatar]
+              [:div.user-name
+                "Sean Johnson"]
+              [:div.user-position
+                "CTO and co-founder"]
+              [:a.linkedin-link
+                {:href "https://linkedin.com/in/snootymonkey/"
+                 :target "_blank"}]]
+            [:div.team-card.stuart-levinson
+              [:div.user-avatar]
+              [:div.user-name
+                "Stuart Levinson"]
+              [:div.user-position
+                "CEO and co-founder"]
+              [:a.linkedin-link
+                {:href "https://linkedin.com/in/stuartlevinson/"
+                 :target "_blank"}]]]
+          [:div.team-row.group.two-cards
+            [:div.team-card.ryan-le-roux
+              [:div.user-avatar]
+              [:div.user-name
+                "Ryan Le Roux"]
+              [:div.user-position
+                "CDO"]
+              [:a.linkedin-link
+                {:href "https://www.linkedin.com/in/ryanleroux/"
+                 :target "_blank"}]]
+            [:div.team-card.nathan-zorn
+              [:div.user-avatar]
+              [:div.user-name
+                "Nathan Zorn"]
+              [:div.user-position
+                "Software Engineer"]
+              [:a.linkedin-link
+                {:href "https://www.linkedin.com/in/nathanzorn/"
+                 :target "_blank"}]]]]
 
-        [:div.paragraphs-container.group
-          [:p
-            (str
-             "Messaging apps are designed for real-time work. They’re great in the moment, "
-             "but chat gets noisy and conversations disappear, making it easy to miss the important stuff.")]
-          [:p
-            (str
-              "Carrot provides an easy to read view of the latest announcements, updates, and stories "
-              "so you can always see what’s happening in context. A common, shared view of what’s "
-              "important creates real transparency and alignment.")]
-          [:p
-            "It also brings teams closer so they can grow together."]
-          [:p
-            "Carrot on!"]
-
-          [:div.principles-title
-            "We designed Carrot based on three core principles:"]
-
-          [:div.principles.group
-            [:div.principle.left-principle
-              [:div.principle-icon]
-              [:div.principle-title
-                (str
-                 "Alignment should be "
-                 "simple and fun.")]
-              [:div.principle-description
-                (str
-                 "Alignment might be essential for success, "
-                 "but achieving it has never been easy. "
-                 "We’re changing that. With a simple "
-                 "structure and beautiful writing experience, "
-                 "it can’t be easier. Just say what’s going on, "
-                 "we’ll take care of the rest.")]]
-
-            [:div.principle.right-principle
-              [:div.principle-icon]
-              [:div.principle-title
-                (str
-                 "The “big picture” should "
-                 "always be visible.")]
-              [:div.principle-description
-                (str
-                 "No one wants to look through folders and "
-                 "documents to understand what’s going on, "
-                 "or search through chat messages to find "
-                 "something. It should be easy to get an "
-                 "instant, bird’s-eye view of what’s "
-                 "happening across the company anytime.")]]]
-
-          [:div.principle.center-principle
-            [:div.principle-icon]
-            [:div.principle-title
+        [:div.other-cards.group
+          [:div.other-card.heart-card
+            [:div.card-icon]
+            [:div.card-title
+              "Careers at Carrot"]
+            [:div.card-content
               (str
-               "It should be easy to keep "
-               "stakeholders in the loop, too.")]
-            [:div.principle-description
+               "Want to join us? We are always looking for "
+               "amazing people no matter where they live. ")]
+            [:a.card-button
+              {:href (:contact-mail-to options)
+               :onTouchStart ""}
+              "Say hello!"]]
+          [:div.other-card.oss-card
+            [:div.card-icon]
+            [:div.card-title
+              "We’re Crazy for Open Source"]
+            [:div.card-content
               (str
-               "Sharing the latest with stakeholders "
-               "shouldn’t be a chore. Just give investors, "
-               "customers and others their own big picture "
-               "view. It’s the surest way to keep them "
-               "engaged and supportive, and an easy way "
-               "to grow your business.")]]]]
+               "Have an idea you’d like to contribute? A new "
+               "integration you’d like to see?")]
+            [:a.card-button
+              {:href "https://github.com/open-company"
+               :onTouchStart ""
+               :target "_blank"}
+              "Build with us on GitHub"]]]
 
-      [:section.about-team.group
-        [:div.about-team-inner.group
-          [:h1.team "Our team"]
-
-          [:div.about-team-users.group
-            [:div.column-left.group
-              [:div.team-card.stuart-levinson
-                [:div.team-avatar
-                  [:img {:src "http://www.gravatar.com/avatar/99399ee082e57d67045cb005f9c2e4ef?s=100"}]]
-                [:div.team-member
-                  [:div.team-name "Stuart Levinson"]
-                  [:div.team-title "CEO and founder"]
-                  [:div.team-media-links
-                    [:a.linkedin {:href "https://linkedin.com/in/stuartlevinson"}]]]]
-              [:div.team-card.iacopo-carraro
-                [:div.team-avatar
-                  [:img {:src "http://www.gravatar.com/avatar/0224b757acf053e02d8cdf807620417c?s=100"}]]
-                [:div.team-member
-                  [:div.team-name "Iacopo Carraro"]
-                  [:div.team-title "Software Engineer"]
-                  [:div.team-media-links
-                    [:a.linkedin {:href "https://www.linkedin.com/in/iacopocarraro"}]]]]]
-
-            [:div.column-right.group
-              [:div.team-card.sean-johnson
-                [:div.team-avatar
-                  [:img {:src "http://www.gravatar.com/avatar/f5b8fc1affa266c8072068f811f63e04?s=100"}]]
-                [:div.team-member
-                  [:div.team-name "Sean Johnson"]
-                  [:div.team-title "CTO and founder"]
-                  [:div.team-media-links
-                    [:a.linkedin {:href "https://linkedin.com/in/snootymonkey"}]]]]
-              [:div.team-card.nathan-zorn
-                [:div.team-avatar
-                  [:img {:src "https://s.gravatar.com/avatar/e7407a2aefa6b5a54a0af630a0a58210?s=100"}]]
-                [:div.team-member
-                  [:div.team-name "Nathan Zorn"]
-                  [:div.team-title "Software Engineer"]
-                  [:div.team-media-links
-                    [:a.linkedin {:href "https://www.linkedin.com/in/nathanzorn"}]]]]]]
-
-          [:div.about-team-users.group
-            [:div.column-center.group
-              [:div.team-card.new-member
-                [:div.team-avatar]
-                  [:div.team-member
-                    [:div.team-name "You?"]
-                    [:div.team-title "We’re always looking for talented"]
-                    [:div.team-title "people to join us."]]]]]]]
-
-      [:section.about-footer.group
-
-        [:div.block.join-us
-          [:div.block-title
-            "Join Us"]
-          [:div.block-description
-            "Want to join us? We are always looking for amazing people no matter where they live."]
-          [:a.link
-            {:href (:contact-mail-to options)}
-            "Say hello"]]
-
-        [:div.block.open-source
-          [:div.block-title
-            "Open Source"]
-          [:div.block-description
-            "Have an idea you’d like to contribute? A new integration you’d like to see?"]
-          [:a.link
-            {:href "https://github.com/open-company"}
-            "Build it with us on Github"]]]
-
-      [:section.fourth-section.group
-        [:div.above-noise-container
-          [:div.above-noise-title
-            "Rise above the noise"]
-          [:div.above-noise-description
-            "Give your team a clear view of what’s most important."]
-          [:button.mlb-reset.get-started-button
-            "Get started for free"]]]
+        [:div.about-bottom-get-started
+          [:div.about-alignment
+            "Keep everyone aligned around what matters most."]
+          [:div.get-started-button-container
+            [:button.mlb-reset.get-started-button.bottom-button
+              {:id "get-started-bottom-bt"}
+              "Get started for free"]]]]
     ] ;<!-- main -->
   ])
 
@@ -467,7 +549,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Stay aligned"]
+          [:title "Grow together"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -591,7 +673,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot - Stay aligned"]
+          [:title "Grow together"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/

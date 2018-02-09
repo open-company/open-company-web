@@ -3,6 +3,9 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]))
 
+(def lastsearch (atom nil))
+(def savedsearch (atom nil))
+
 (defonce search-key :search-results)
 (defonce search-active? :search-active)
 
@@ -14,7 +17,7 @@
   " If the user is anonymous or not part of the orginization
     don't display search component.
   "
-  (if (not (jwt/jwt))
+  (if-not (jwt/jwt)
     false
     (if (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
       true
@@ -30,9 +33,12 @@
             results)))
 
 (defmethod dispatcher/action :search-query/finish
-  [db [_ {:keys [success error body]}]]
+  [db [_ {:keys [success error body query]}]]
   (let [total-hits (:total body)
         results (vec (sort-by #(:created-at (:_source %)) (:hits body)))]
+    (when success
+      (reset! savedsearch nil)
+      (reset! lastsearch query))
     (if success
       (assoc db search-key {:count total-hits :results (cleanup-uuid results)})
       db)))
@@ -47,6 +53,13 @@
 
 (defmethod dispatcher/action :search-reset
   [db [_]]
+  (reset! lastsearch nil)
+  (reset! savedsearch nil)
   (-> db
       (assoc search-active? false)
       (assoc search-key [])))
+
+(defmethod dispatcher/action :search-result-clicked
+  [db [_]]
+  (reset! savedsearch @lastsearch)
+  db)

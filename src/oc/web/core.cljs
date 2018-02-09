@@ -11,6 +11,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.stores.user]
             [oc.web.stores.search]
+            [oc.web.stores.activity]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -111,7 +112,7 @@
                                  0
                                  (:latest-auth-settings @dis/app-state))
           now (.getTime (js/Date.))
-          reload-time (* 60 60 1000)]
+          reload-time (* 1000 60 20)] ; every 20m
       (when (or (> (- now latest-entry-point) reload-time)
                 (and (router/current-org-slug)
                      (nil? (dis/org-data))))
@@ -158,7 +159,7 @@
 (def default-nux-setup-time 3000)
 
 ;; Component specific to a board
-(defn board-handler [route target component params & [board-sort-or-filter]]
+(defn board-handler [route target component params]
   (let [org (:org (:params params))
         board (:board (:params params))
         entry (:entry (:params params))
@@ -176,16 +177,6 @@
       :activity entry
       :query-params query-params
       :from-all-posts (or has-at-param (contains? query-params :ap))})
-    (when board-sort-or-filter
-      (swap! dis/app-state assoc :board-filters board-sort-or-filter)
-      (when (keyword? board-sort-or-filter)
-        (cook/set-cookie!
-         (router/last-board-filter-cookie org board)
-         (name board-sort-or-filter)
-         (* 60 60 24 30)
-         "/"
-         ls/jwt-cookie-domain
-         ls/jwt-cookie-secure)))
     (let [nux-cookie (cook/get-cookie
                       (router/show-nux-cookie
                        (jwt/get-key :user-id)))
@@ -457,32 +448,11 @@
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
-      (board-handler "dashboard" target org-dashboard params :latest))
+      (board-handler "dashboard" target org-dashboard params))
 
     (defroute board-slash-route (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
-      (board-handler "dashboard" target org-dashboard params :latest))
-
-    (defroute board-sort-by-topic-route (urls/board-sort-by-topic ":org" ":board") {:as params}
-      (timbre/info "Routing board-sort-by-topic-route" (urls/board-sort-by-topic ":org" ":board"))
-      (board-handler "dashboard" target org-dashboard params :by-topic))
-
-    (defroute board-sort-by-topic-slash-route (str (urls/board-sort-by-topic ":org" ":board") "/") {:as params}
-      (timbre/info "Routing board-sort-by-topic-slash-route" (str (urls/board-sort-by-topic ":org" ":board") "/"))
-      (board-handler "dashboard" target org-dashboard params :by-topic))
-
-    (defroute board-filter-by-topic-route (urls/board-filter-by-topic ":org" ":board" ":topic-filter") {:as params}
-      (timbre/info "Routing board-filter-by-topic-route" (urls/board-filter-by-topic ":org" ":board" ":topic-filter"))
-      (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
-
-    (defroute
-     board-filter-by-topic-slash-route
-     (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/")
-     {:as params}
-      (timbre/info
-       "Routing board-filter-by-topic-slash-route"
-       (str (urls/board-filter-by-topic ":org" ":board" ":topic-filter") "/"))
-      (board-handler "dashboard" target org-dashboard params (:topic-filter (:params params))))
+      (board-handler "dashboard" target org-dashboard params))
 
     (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
       (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))
@@ -548,15 +518,9 @@
                                  boards-list-route
                                  board-route
                                  board-slash-route
-                                 ; ;; Board sorting
-                                 board-sort-by-topic-route
-                                 board-sort-by-topic-slash-route
                                  ; Entry route
                                  entry-route
                                  entry-slash-route
-                                 ; ;; Board filter
-                                 board-filter-by-topic-route
-                                 board-filter-by-topic-slash-route
                                  ;; Not found
                                  not-found-route]))
 

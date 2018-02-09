@@ -17,6 +17,8 @@
             [oc.web.lib.raven :as sentry]
             [goog.Uri :as guri]))
 
+(def ^:private web-endpoint ls/web-server-domain)
+
 (def ^:private storage-endpoint ls/storage-server-domain)
 
 (def ^:private auth-endpoint ls/auth-server-domain)
@@ -163,6 +165,8 @@
             (sentry/set-user-context! nil)))
         (on-complete response)))))
 
+(def ^:private web-http (partial req web-endpoint))
+
 (def ^:private storage-http (partial req storage-endpoint))
 
 (def ^:private auth-http (partial req auth-endpoint))
@@ -176,6 +180,16 @@
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
     (dispatcher/dispatch! [action body])))
+
+(defn web-app-version-check [callback]
+  (web-http http/get (str "/version/version" ls/deploy-key ".json")
+    {:heades {
+      ; required by Chrome
+      "Access-Control-Allow-Headers" "Content-Type"
+      ; custom content type
+      "content-type" "application/json"}}
+    #(when (fn? callback)
+      (callback %))))
 
 (defn api-500-test [with-response]
   (storage-http http/get (if with-response "/---error-test---" "/---500-test---")
@@ -717,7 +731,7 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :topic-name :topic-slug :attachments :board-slug])
+(def entry-keys [:headline :body :attachments :board-slug])
 
 (defn create-entry
   [entry-data create-entry-link]
@@ -891,6 +905,7 @@
       (search-http (method-for-link search-link) (relative-href search-link)
                    {:headers (headers-for-link search-link)}
                    (fn [{:keys [status success body]}]
-                     (callback {:success success
+                     (callback {:query search-query
+                                :success success
                                 :error (when-not success body)
                                 :body (when (seq body) (json->cljs body))}))))))

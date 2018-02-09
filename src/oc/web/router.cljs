@@ -73,7 +73,7 @@
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-404!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (redirect! (str "/404?path=" encoded-url))))
+    (.replace (.-location js/window) (str "/404?path=" encoded-url))))
 
 (defn redirect-500! []
   (let [win-location (.-location js/window)
@@ -83,7 +83,7 @@
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-500!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (redirect! (str "/500?path=" encoded-url))))
+    (.replace (.-location js/window) (str "/500?path=" encoded-url))))
 
 (defn history-back! []
   (timbre/info "history-back!")
@@ -123,11 +123,6 @@
   "Cookie to save the last accessed board"
   [org-slug]
   (str "last-board-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
-
-(defn last-board-filter-cookie
-  "Cookie to save the last order the user visualized a board."
-  [org-slug board-slug]
-  (str "last-filter-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name board-slug) "-" (name org-slug)))
 
 (defn show-nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."

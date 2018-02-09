@@ -1,7 +1,7 @@
 (ns oc.web.components.entry-edit
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [cuerdas.core :as s]
+            [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
@@ -13,11 +13,11 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [goog.object :as gobj]
@@ -40,31 +40,29 @@
                 (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal)))
         (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
 
-(defn dismiss-modal []
-  (dis/dispatch! [:entry-edit/dismiss]))
-
 (defn real-close [s]
   (reset! (::dismiss s) true)
-  (utils/after 180 dismiss-modal))
+  (utils/after 180 activity-actions/entry-edit-dismiss))
 
 ;; Local cache for outstanding edits
 
-(defn autosave []
-  (let [body-el (sel1 [:div.rich-body-editor])
+(defn autosave [s]
+  (let [entry-editing @(drv/get-ref s :entry-editing)
+        body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerHTML body-el)))]
-    (dis/dispatch! [:entry-save-on-exit :entry-editing cleaned-body])))
+                      (utils/clean-body-html (.-innerText body-el)))]
+    (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body)))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when @(drv/get-ref s :entry-save-on-exit)
-    (autosave)))
+    (autosave s)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
   [s turn-on?]
-  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
+  (activity-actions/entry-toggle-save-on-exit turn-on?))
 
 ;; Close dismiss handling
 
@@ -78,6 +76,7 @@
                       :solid-button-style :red
                       :solid-button-title "Cancel upload"
                       :solid-button-cb #(do
+                                          (dis/dispatch! [:entry-clear-local-cache :entry-editing])
                                           (dis/dispatch! [:alert-modal-hide])
                                           (real-close s))
                       }]
@@ -96,7 +95,9 @@
                                             (real-close s))
                         }]
         (dis/dispatch! [:alert-modal-show alert-data]))
-      (real-close s))))
+      (do
+       (dis/dispatch! [:entry-clear-local-cache :entry-editing])
+       (real-close s)))))
 
 ;; Data change handling
 
@@ -108,7 +109,7 @@
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
   (when-let [headline (rum/ref-node state "headline")]
-    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerText headline)) "__html"))]
       (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
                                                           :has-changes true})]))))
 
@@ -130,9 +131,10 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-let [headline-el (rum/ref-node state "headline")]
-      ; move cursor at the end
-      (utils/to-end-of-content-editable headline-el))))
+    (when-not (responsive/is-tablet-or-mobile?)
+      (when-let [headline-el (rum/ref-node state "headline")]
+        ; move cursor at the end
+        (utils/to-end-of-content-editable headline-el)))))
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
@@ -145,18 +147,16 @@
 (defn- is-publishable? [entry-editing]
   (seq (:board-slug entry-editing)))
 
-(defn- topic-did-change [s entry-editing topic-map]
-  (toggle-save-on-exit s true)
-  (dis/dispatch! [:input [:entry-editing] (merge entry-editing {:topic-slug (:slug topic-map)
-                                                                :topic-name (:name topic-map)
-                                                                :has-changes true})]))
+(defn trim [value]
+  (if (string? value)
+    (string/trim value)
+    value))
 
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
-                        (drv/drv :board-filters)
                         (drv/drv :editable-boards)
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
@@ -183,7 +183,6 @@
                         {:will-mount (fn [s]
                           (let [nux @(drv/get-ref s :nux)
                                 entry-editing @(drv/get-ref s :entry-editing)
-                                board-filters @(drv/get-ref s :board-filters)
                                 initial-body (if (seq (:body entry-editing))
                                                (:body entry-editing)
                                                utils/default-body)
@@ -192,25 +191,22 @@
                                                      (:headline entry-editing)
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
-                            (reset! (::initial-headline s) initial-headline)
-                            (when (and (string? board-filters)
-                                       (nil? (:topic-slug entry-editing)))
-                               (let [topic (first (filter #(= (:slug %) board-filters) (:topics-list entry-editing)))]
-                                 (when topic
-                                   (dis/dispatch! [:input [:entry-editing :topic-slug] (:slug topic)])
-                                   (dis/dispatch! [:input [:entry-editing :topic-name] (:name topic)])))))
+                            (reset! (::initial-headline s) initial-headline))
                           s)
                          :did-mount (fn [s]
                           (when-not @(drv/get-ref s :nux)
                             (utils/after 300 #(setup-headline s))
-                            (when-let [headline-el (rum/ref-node s "headline")]
-                              (utils/to-end-of-content-editable headline-el)))
+                            (when-not (responsive/is-tablet-or-mobile?)
+                              (when-let [headline-el (rum/ref-node s "headline")]
+                                (utils/to-end-of-content-editable headline-el))))
                           (reset! (::window-resize-listener s)
                            (events/listen
                             js/window
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
-                          (reset! (::autosave-timer s) (utils/every 5000 autosave))
+                          (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                          (when (and (responsive/is-tablet-or-mobile?) (js/isSafari))
+                            (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
                           s)
                          :before-render (fn [s]
                           (calc-entry-edit-modal-height s)
@@ -230,12 +226,14 @@
                               (when (not (:loading entry-editing))
                                 (reset! (::saving s) false)
                                 (when-not (:error entry-editing)
-                                  (let [redirect? (not= (:status entry-editing) "published")]
+                                  (real-close s)
+                                  (let [to-draft? (not= (:status entry-editing) "published")]
                                     ;; If it's not published already redirect to drafts board
-                                    (when redirect?
-                                      (real-close s)
-                                      (utils/after 250
-                                       #(router/nav! (oc-urls/drafts (router/current-org-slug)))))))))
+                                    (utils/after 180
+                                     #(router/nav!
+                                       (if to-draft?
+                                         (oc-urls/drafts (router/current-org-slug))
+                                         (oc-urls/board (:board-slug entry-editing)))))))))
                             (when @(::publishing s)
                               (when (not (:publishing entry-editing))
                                 (reset! (::publishing s) false)
@@ -245,7 +243,7 @@
                                     (when redirect?
                                       (real-close s)
                                       (utils/after
-                                       250
+                                       180
                                        #(router/nav!
                                           (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))))))))
                           s)
@@ -261,7 +259,7 @@
                             (events/unlistenByKey @(::window-resize-listener s))
                             (reset! (::window-resize-listener s) nil))
                           (when @(::autosave-timer s)
-                            (js/clearInterval @(::autosave-timer s))
+                            (.clearInterval js/window @(::autosave-timer s))
                             (reset! (::autosave-timer s) nil))
                           (set! (.-onbeforeunload js/window) nil)
                           s)}
@@ -278,14 +276,6 @@
         media-input (drv/react s :media-input)
         all-boards (drv/react s :editable-boards)
         entry-board (get all-boards (:board-slug entry-editing))
-        board-topics (if (seq (:topic-slug entry-editing))
-                       (distinct
-                        (vec
-                         (conj
-                          (:topics entry-board)
-                          {:slug (:topic-slug entry-editing)
-                           :name (:topic-name entry-editing)})))
-                       (:topics entry-board))
         published? (= (:status entry-editing) "published")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
@@ -294,7 +284,7 @@
                              (not (utils/event-inside? % (rum/ref-node s "entry-edit-modal"))))
                     (cancel-clicked s))}
       [:div.modal-wrapper
-        {:style {:margin-top (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px")}}
+        {:style {:margin-top (if is-mobile? "0px" (str (max 0 (/ (- wh fixed-entry-edit-modal-height) 2)) "px"))}}
         ;; Show the close button only when there are no modals shown
         (when (and (not (:media-video media-input))
                    (not (:media-chart media-input))
@@ -310,51 +300,88 @@
               [:div.mobile-header
                 [:button.mlb-reset.mobile-modal-close-bt
                   {:on-click #(cancel-clicked s)}]
-                [:div.mobile-header-title
-                  (if (:uuid entry-editing)
-                    (if published?
-                      "Edit post..."
-                      "Edit draft...")
-                    "New post...")]]
-              [:div.mobile-second-header
-                [:div.posting-in
-                  [:span
-                    (if (:uuid entry-editing)
-                      "Draft for: "
-                      "Posting in: ")]
-                  [:div.boards-dropdown-caret
-                    {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
-                     :class (when (not nux) "no-nux")}
-                    (:board-name entry-editing)
-                    (when (and (not nux) @(::show-boards-dropdown s))
-                      (dropdown-list
-                       {:items (map
-                                #(clojure.set/rename-keys % {:name :label :slug :value})
-                                (vals all-boards))
-                        :value (:board-slug entry-editing)
-                        :on-blur #(reset! (::show-boards-dropdown s) false)
-                        :on-change (fn [item]
-                                     (toggle-save-on-exit s true)
-                                     (dis/dispatch! [:input [:entry-editing :has-changes] true])
-                                     (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                     (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
-                (when-not nux
-                  (topics-dropdown
-                   (:board-slug entry-editing)
-                   board-topics
-                   {:slug (:topic-slug entry-editing)
-                    :name (:topic-name entry-editing)}
-                   #(topic-did-change s entry-editing %)))]]
+                (let [should-show-save-button? (and (not nux)
+                                                    (not @(::publishing s))
+                                                    (not published?))]
+                  [:div.mobile-header-right
+                    (let [fixed-headline (trim (:headline entry-editing))
+                          disabled? (or @(::publishing s)
+                                        (not (is-publishable? entry-editing))
+                                        (zero? (count fixed-headline)))
+                          working? (or (and published?
+                                            @(::saving s))
+                                       (and (not published?)
+                                            @(::publishing s)))]
+                      [:button.mlb-reset.mobile-header-buttons.post-button
+                        {:ref "mobile-post-btn"
+                         :on-click (fn [_]
+                                     (clean-body)
+                                     (if (and (is-publishable? entry-editing)
+                                              (not (zero? (count fixed-headline))))
+                                       (if published?
+                                         (do
+                                           (reset! (::saving s) true)
+                                           (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
+                                           (dis/dispatch! [:entry-save]))
+                                         (do
+                                           (reset! (::publishing s) true)
+                                           (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
+                                           (dis/dispatch! [:entry-publish])))
+                                       (when (zero? (count fixed-headline))
+                                         (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+                                           (when-not (.data $post-btn "bs.tooltip")
+                                             (.tooltip $post-btn
+                                              (clj->js {:container "body"
+                                                        :placement "bottom"
+                                                        :trigger "manual"
+                                                        :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                                         "<div class=\"tooltip-arrow\"></div>"
+                                                                         "<div class=\"tooltip-inner\"></div>"
+                                                                       "</div>")
+                                                        :title "A title is required in order to save or share this post."})))
+                                           (utils/after 10 #(.tooltip $post-btn "show"))
+                                           (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+                         :class (when disabled?
+                                  "disabled")}
+                        (if working?
+                          (small-loading)
+                          [:div.button-icon
+                            {:class (when disabled? "disabled")}])
+                        (if published?
+                          "Save"
+                          "Post")])
+                    (when should-show-save-button?
+                      [:div.mobile-buttons-divider-line])
+                    (when should-show-save-button?
+                      (let [disabled? (or @(::saving s)
+                                          (not (:has-changes entry-editing)))
+                            working? @(::saving s)]
+                        [:button.mlb-reset.mobile-header-buttons.save-button
+                          {:class (when disabled?
+                                    "disabled")
+                           :on-click (fn [_]
+                                      (when-not disabled?
+                                        (clean-body)
+                                        (reset! (::saving s) true)
+                                        (dis/dispatch! [:entry-save])))}
+                          (if working?
+                            (small-loading)
+                            [:div.button-icon
+                              {:class (when disabled? "disabled")}])
+                          "Save draft"]))])]]
             [:div.entry-edit-modal-header.group
               (user-avatar-image current-user-data)
               [:div.posting-in
                 [:span
                   (if (:uuid entry-editing)
-                    "Draft for "
-                    "Posting in ")]
+                    (if (= (:status entry-editing) "published")
+                      "Posted in: "
+                      "Draft for: ")
+                    "Posting in: ")]
                 [:div.boards-dropdown-caret
                   {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
-                   :class (when (not nux) "no-nux")}
+                   :class (utils/class-set {:no-nux (not nux)
+                                            :active @(::show-boards-dropdown s)})}
                   (:board-name entry-editing)
                   (when (and (not nux) @(::show-boards-dropdown s))
                     (dropdown-list
@@ -365,20 +392,39 @@
                       :on-blur #(reset! (::show-boards-dropdown s) false)
                       :on-change (fn [item]
                                    (toggle-save-on-exit s true)
+                                   (reset! (::show-boards-dropdown s) false)
                                    (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                    (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                   (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]
-              (when-not nux
-                (topics-dropdown
-                 (:board-slug entry-editing)
-                 board-topics
-                 {:slug (:topic-slug entry-editing)
-                  :name (:topic-name entry-editing)}
-                 #(topic-did-change s entry-editing %)))])
+                                   (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]])
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          (when is-mobile?
+            [:div.mobile-posting-in
+              [:span
+                (if (:uuid entry-editing)
+                  (if (= (:status entry-editing) "published")
+                    "Posted in: "
+                    "Draft for: ")
+                  "Posting in: ")]
+              [:div.boards-dropdown-caret
+                {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))
+                 :class (when (not nux) "no-nux")}
+                (:board-name entry-editing)]
+              (when (and (not nux) @(::show-boards-dropdown s))
+                (dropdown-list
+                 {:items (map
+                          #(clojure.set/rename-keys % {:name :label :slug :value})
+                          (vals all-boards))
+                  :value (:board-slug entry-editing)
+                  :on-blur #(reset! (::show-boards-dropdown s) false)
+                  :on-change (fn [item]
+                               (toggle-save-on-exit s true)
+                               (reset! (::show-boards-dropdown s) false)
+                               (dis/dispatch! [:input [:entry-editing :has-changes] true])
+                               (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
+                               (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))])
           ; Headline element
-          [:div.entry-edit-headline.emoji-autocomplete.emojiable
+          [:div.entry-edit-headline.emoji-autocomplete.emojiable.group
             {:content-editable (not nux)
              :ref "headline"
              :placeholder utils/default-headline
@@ -405,74 +451,75 @@
           [:div.entry-edit-controls.group]
         [:div.entry-edit-modal-divider
           {:class (when-not @(::show-divider-line s) "not-visible")}]
-        [:div.entry-edit-modal-footer.group
-          (when (and (not nux)
-                     (not (responsive/is-tablet-or-mobile?))
-                     (not (js/isIE)))
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                           :container-selector "div.entry-edit-modal"}))
-          (when nux
-            (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
-                        post-button-offset (.offset post-button)]
-              (carrot-tip {:step :2
-                           :circle-offset {:top -90
-                                           :left -550}
-                           :x (- (aget post-button-offset "left") 522)
-                           :y (- (aget post-button-offset "top") 20)
-                           :title "Here’s a sample post"
-                           :message "Click the green Post button to see how it works."
-                           :width 494})))
-          [:button.mlb-reset.mlb-default.form-action-bt.post-btn
-            {:ref "post-btn"
-             :on-click (fn [_]
-                         (clean-body)
-                         (if (and (is-publishable? entry-editing)
-                                  (not (zero? (count (:headline entry-editing)))))
-                           (if published?
-                             (do
-                               (reset! (::saving s) true)
-                               (dis/dispatch! [:entry-save]))
-                             (do
-                               (reset! (::publishing s) true)
-                               (dis/dispatch! [:entry-publish])))
-                           (when (zero? (count (:headline entry-editing)))
-                             (when-let [$post-btn (js/$ (rum/ref-node s "post-btn"))]
-                               (when-not (.data $post-btn "bs.tooltip")
-                                 (.tooltip $post-btn
-                                  (clj->js {:container "body"
-                                            :placement "top"
-                                            :trigger "manual"
-                                            :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                             "<div class=\"tooltip-arrow\"></div>"
-                                                             "<div class=\"tooltip-inner\"></div>"
-                                                           "</div>")
-                                            :title "A title is required in order to save or share this post."})))
-                               (utils/after 10 #(.tooltip $post-btn "show"))
-                               (utils/after 5000 #(.tooltip $post-btn "hide"))))))
-             :class (when (or @(::publishing s)
-                              (not (is-publishable? entry-editing)))
-                      "disabled")}
-            (when (or (and published?
-                           @(::saving s))
-                      (and (not published?)
-                           @(::publishing s)))
-              (small-loading))
-            (if published?
-              "Save"
-              "Post")]
-          (when-not nux
-            [:button.mlb-reset.mlb-link-black.form-action-bt
-              {:disabled (or @(::saving s)
-                             (not (:has-changes entry-editing)))
-               :on-click #(if published?
-                            (cancel-clicked s)
-                            (do
-                              (clean-body)
-                              (reset! (::saving s) true)
-                              (dis/dispatch! [:entry-save])))}
-              (when (and (not published?)
-                         @(::saving s))
+        (when-not is-mobile?
+          [:div.entry-edit-modal-footer.group
+            (when (and (not nux)
+                       (not (responsive/is-tablet-or-mobile?))
+                       (not (js/isIE)))
+              (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                             :container-selector "div.entry-edit-modal"}))
+            (when nux
+              (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
+                          post-button-offset (.offset post-button)]
+                (carrot-tip {:step :2
+                             :circle-offset {:top -90
+                                             :left -550}
+                             :x (- (aget post-button-offset "left") 522)
+                             :y (- (aget post-button-offset "top") 20)
+                             :title "Here’s a sample post"
+                             :message "Click the green Post button to see how it works."
+                             :width 494})))
+            [:button.mlb-reset.mlb-default.form-action-bt.post-btn
+              {:ref "post-btn"
+               :on-click (fn [_]
+                           (clean-body)
+                           (if (and (is-publishable? entry-editing)
+                                    (not (zero? (count (trim (:headline entry-editing))))))
+                             (if published?
+                               (do
+                                 (reset! (::saving s) true)
+                                 (dis/dispatch! [:entry-save]))
+                               (do
+                                 (reset! (::publishing s) true)
+                                 (dis/dispatch! [:entry-publish])))
+                             (when (zero? (count (trim (:headline entry-editing))))
+                               (when-let [$post-btn (js/$ (rum/ref-node s "post-btn"))]
+                                 (when-not (.data $post-btn "bs.tooltip")
+                                   (.tooltip $post-btn
+                                    (clj->js {:container "body"
+                                              :placement "top"
+                                              :trigger "manual"
+                                              :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                               "<div class=\"tooltip-arrow\"></div>"
+                                                               "<div class=\"tooltip-inner\"></div>"
+                                                             "</div>")
+                                              :title "A title is required in order to save or share this post."})))
+                                 (utils/after 10 #(.tooltip $post-btn "show"))
+                                 (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+               :class (when (or @(::publishing s)
+                                (not (is-publishable? entry-editing)))
+                        "disabled")}
+              (when (or (and published?
+                             @(::saving s))
+                        (and (not published?)
+                             @(::publishing s)))
                 (small-loading))
               (if published?
-                "Cancel"
-                "Save draft")])]]]]))
+                "Save"
+                "Post")]
+            (when-not nux
+              [:button.mlb-reset.mlb-link-black.form-action-bt
+                {:disabled (or @(::saving s)
+                               (not (:has-changes entry-editing)))
+                 :on-click #(if published?
+                              (cancel-clicked s)
+                              (do
+                                (clean-body)
+                                (reset! (::saving s) true)
+                                (dis/dispatch! [:entry-save])))}
+                (when (and (not published?)
+                           @(::saving s))
+                  (small-loading))
+                (if published?
+                  "Cancel"
+                  "Save draft")])])]]]))

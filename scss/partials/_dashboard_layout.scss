@@ -26,7 +26,7 @@ div.dashboard-layout {
       }
 
       div.board-name-container {
-        padding: 0px 24px;
+        padding: 0px 12px;
 
         @include mobile() {
           text-align: center;
@@ -34,7 +34,6 @@ div.dashboard-layout {
 
         div.board-name {
           float: left;
-          margin-left: 15px;
 
           @include mobile() {
             display: inline-block;
@@ -172,7 +171,6 @@ div.dashboard-layout {
             color: $carrot_orange;
             border-radius: 100px;
             padding: 10px 22px;
-            margin-right: 16px;
             margin-top: -3px;
             border: 2px solid transparent;
             opacity: 1;
@@ -243,7 +241,7 @@ div.dashboard-layout {
         width: 66px;
         height: 66px;
         border-radius: 33px;
-        background-color: #FA6654;
+        background-color: $carrot_orange_2;
         z-index: 1000;
         box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
         opacity: 1;

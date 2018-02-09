@@ -4,6 +4,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.stores.search :as search]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
@@ -13,6 +14,7 @@
             [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.search :refer (search-results-view)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
@@ -37,6 +39,8 @@
 (rum/defcs org-dashboard < rum/static
                            rum/reactive
                            (drv/drv :org-dashboard-data)
+                           (drv/drv search/search-key)
+                           (drv/drv search/search-active?)
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
@@ -59,7 +63,11 @@
                 is-showing-alert
                 media-input]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :7])]
+        should-show-onboard-overlay? (some #{nux} [:1 :7])
+        search-active? (drv/react s search/search-active?)
+        search-results? (pos?
+                         (count
+                          (:results (drv/react s search/search-key))))]
     ;; Show loading if
     (if (or ;; the org data are not loaded yet
             (not org-data)
@@ -111,6 +119,9 @@
           (and is-mobile?
                is-sharing-activity)
           (activity-share)
+          ;; Search results
+          (and is-mobile? search-active? (not (router/current-activity-id)))
+          (search-results-view)
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
@@ -138,6 +149,8 @@
                            is-sharing-activity))
           [:div.page
             (navbar)
-            [:div.dashboard-container
-              [:div.topic-list
-                (dashboard-layout)]]])])))
+            [:div.org-dashboard-container
+              [:div.org-dashboard-inner
+               (when-not (and is-mobile?
+                              (and search-active? search-results?))
+                 (dashboard-layout))]]])])))

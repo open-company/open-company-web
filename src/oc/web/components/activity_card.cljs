@@ -13,6 +13,7 @@
             [oc.web.lib.activity-utils :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.oc-colors :refer (get-color-by-kw)]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
@@ -21,18 +22,6 @@
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
-
-(rum/defc activity-card-empty
-  [topic read-only?]
-  [:div.activity-card.empty-state.group
-    (when-not read-only?
-      [:div.empty-state-content
-        [:img {:src (utils/cdn "/img/ML/entry_empty_state.svg")}]
-        [:div.activity-card-title
-          "This topic’s a little sparse. "
-          [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:entry-edit topic])}
-            "Add an update?"]]])])
 
 (defn- delete-clicked [e activity-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
@@ -108,7 +97,7 @@
                       @(::more-dropdown s)
                       @(::move-activity s))
 
-                      (dis/dispatch! [:activity-modal-fade-in activity-data]))))}
+                      (activity-actions/activity-modal-fade-in activity-data))))}
       ; Card header
       [:div.activity-card-head.group
         {:class "entry-card"}
@@ -152,7 +141,7 @@
                           {:on-click #(do
                                         (utils/remove-tooltips)
                                         (reset! (::more-dropdown s) false)
-                                        (dis/dispatch! [:activity-edit activity-data]))}
+                                        (activity-actions/activity-edit activity-data))}
                           "Edit"])
                       (when share-link
                         [:li
@@ -179,21 +168,9 @@
                     :boards-list all-boards
                     :dismiss-cb #(reset! (::move-activity s) false)}))]))
           (activity-attachments activity-data true)
-          ; Topic tag button
-          (when (:topic-slug activity-data)
-            (let [topic-name (or (:topic-name activity-data) (string/upper (:topic-slug activity-data)))]
-              [:div.activity-tag.on-gray
-                {:class (when is-all-posts "double-tag")
-                 :on-click #(router/nav!
-                             (oc-urls/board-filter-by-topic
-                              (router/current-org-slug)
-                              (:board-slug activity-data)
-                              (:topic-slug activity-data)))}
-                topic-name]))
           (when is-all-posts
             [:div.activity-tag.board-tag.on-gray
-              {:class (utils/class-set {:double-tag (:topic-slug activity-data)})
-               :on-click #(router/nav! (utils/get-board-url (router/current-org-slug) (:board-slug activity-data)))}
+              {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug activity-data)))}
               (:board-name activity-data)])
                 ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
                 ;;(when is-new [:div.new-tag "New"])
@@ -235,4 +212,4 @@
              :on-click (fn [e]
                          (utils/remove-tooltips)
                          (reset! (::more-dropdown s) false)
-                         (dis/dispatch! [:activity-edit activity-data]))}])]]))
+                         (activity-actions/activity-edit activity-data))}])]]))

@@ -57,6 +57,11 @@
       (dis/dispatch! [:error-banner-show utils/generic-network-error 0])))))
 
 (defn entry-point-get [org-slug]
+  (api/web-app-version-check
+    (fn [{:keys [success body status]}]
+      (when (= status 404)
+        (dispatcher/dispatch! [:error-banner-show (str "You have an older version of the Carrot web app, "
+                                                       "please refresh your browser window!")]))))
   (api/get-entry-point
    (fn [success body]
      (entry-point-get-finished success body

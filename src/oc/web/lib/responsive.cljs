@@ -82,9 +82,6 @@
   []
   (or (is-mobile-size?) (user-agent-mobile?)))
 
-(def topic-list-x-padding 20)
-(def topic-total-x-padding 32)
-(def topic-list-right-margin 36)
 (def left-navigation-sidebar-minimum-right-margin 40)
 (def left-navigation-sidebar-width 200)
 (def board-container-width 912)
@@ -102,15 +99,6 @@
 (defn can-edit? []
   "Check if it's mobile based only on the UserAgent"
   (not (user-agent-mobile?)))
-
-(defn total-layout-width-int [card-width columns-num]
-  (if (is-mobile-size?)
-    (let [win-width (ww)]
-      (- win-width 8 8))
-    (+ (* (+ card-width topic-total-x-padding) columns-num)    ; width of each column plus
-       (* topic-list-x-padding 2)
-       topic-list-right-margin
-       (if (is-tablet-or-mobile?) 0 left-navigation-sidebar-width)))) ; the left side panel with the topics list
 
 (when-not (.-_phantom js/window)
   (events/listen js/window EventType/RESIZE set-browser-type!))
