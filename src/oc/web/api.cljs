@@ -902,6 +902,7 @@
       (search-http (method-for-link search-link) (relative-href search-link)
                    {:headers (headers-for-link search-link)}
                    (fn [{:keys [status success body]}]
-                     (callback {:success success
+                     (callback {:query search-query
+                                :success success
                                 :error (when-not success body)
                                 :body (when (seq body) (json->cljs body))}))))))
