@@ -52,14 +52,14 @@
           :1-mobile
           [:div.onboard-overlay-mobile-step.step-1
             [:div.onboard-overlay-step-title
-              "Share key updates and stories"]
+              "Rise above the noise"]
             [:div.step-illustration-container-center
               [:div.step-illustration-container
                 {:style {:height (str (min 418 (- wh 138 163)) "px")}}]
               [:div.onboard-overlay-step-description
                 (str
-                 "Keep everyone aligned around "
-                 "what matters most.")]]
+                 "Share key updates and stories "
+                 "on what matters most.")]]
             [:button.mlb-reset.continue-btn
               {:on-click #(dis/dispatch! [:input [:nux] :2-mobile])
                :style {:bottom (if is-safari-mobile "120px" "78px")}}
@@ -72,7 +72,7 @@
           :2-mobile
           [:div.onboard-overlay-mobile-step.step-2
             [:div.onboard-overlay-step-title
-              "Capture reactions and questions"]
+              "Engage your team with focused discussions"]
             [:div.step-illustration-container-center
               (let [max-h 342
                     height (- wh 138 183)
@@ -86,7 +86,7 @@
               [:div.onboard-overlay-step-description
                 (str
                  "Reactions, comments and questions "
-                 "stay together with the original post.")]]
+                 "stay together.")]]
             [:button.mlb-reset.continue-btn
               {:on-click #(dis/dispatch! [:input [:nux] :3-mobile])
                :style {:bottom (if is-safari-mobile "120px" "78px")}}
@@ -99,15 +99,15 @@
           :3-mobile
           [:div.onboard-overlay-mobile-step.step-3
             [:div.onboard-overlay-step-title
-              "Find alignment company wide"]
+              "Keep everyone aligned"]
             [:div.step-illustration-container-center
               (let [margin-top (/ (- wh 115 203 201) 2)]
                 [:div.step-illustration-container
                   {:style {:margin-top (str margin-top "px")}}])
               [:div.onboard-overlay-step-description
                 (str
-                 "Welcome to Carrot. Where "
-                 "companies find alignment")]]
+                 "Teams stay in sync when the "
+                 "full picture is in one place.")]]
             [:button.mlb-reset.continue-btn
               {:on-click #(dis/dispatch! [:nux-end])
                :style {:bottom (if is-safari-mobile "120px" "78px")}}
