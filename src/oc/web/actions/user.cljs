@@ -42,8 +42,48 @@
 (defn jwt-refresh []
   (api/jwt-refresh update-jwt logout))
 
-;; Login
+;; API Entry point
+(defn entry-point-get-finished
+  ([success body] (entry-point-get-finished success body #()))
 
+  ([success body callback]
+  (let [collection (:collection body)]
+    (if success
+      (let [orgs (:items collection)]
+        (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
+          (api/get-whats-new whats-new-link))
+        (callback orgs collection)
+        (dis/dispatch! [:entry-point orgs collection]))
+      (dis/dispatch! [:error-banner-show utils/generic-network-error 0])))))
+
+(defn entry-point-get [org-slug]
+  (api/web-app-version-check
+    (fn [{:keys [success body status]}]
+      (when (= status 404)
+        (dis/dispatch! [:error-banner-show (str "You have an older version of the Carrot web app, "
+                                                "please refresh your browser window!")]))))
+  (api/get-entry-point
+   (fn [success body]
+     (entry-point-get-finished success body
+       (fn [orgs collection]
+         (if org-slug
+           (do
+             (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+               (api/get-org org-data)
+               (router/redirect-404!)))
+           (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
+             (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
+
+(defn slack-lander-check-team-redirect []
+  (utils/after 100 #(api/get-entry-point
+    (fn [success body]
+      (entry-point-get-finished success body
+        (fn [orgs collection]
+          (if (zero? (count orgs))
+            (router/nav! oc-urls/sign-up-team)
+            (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
+
+;; Login
 (defn login-with-email-finish
   [user-email success body status]
   (if success
@@ -52,7 +92,10 @@
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
           (update-jwt-cookie body)
-          (api/get-entry-point)))
+          (api/get-entry-point
+           (fn [success body] (entry-point-get-finished success body
+             (fn [orgs collection]
+               (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -65,19 +108,10 @@
   (dis/dispatch! [:login-with-email]))
 
 (defn login-with-slack [auth-url]
-  (let [current (router/get-token)
-        auth-url-with-redirect (utils/slack-link-with-state
+  (let [auth-url-with-redirect (utils/slack-link-with-state
                                  (:href auth-url)
                                  nil
-                                 "open-company-auth" oc-urls/slack-lander-check)
-        current-route (:route @router/path)]
-    (when (and (not (utils/in? current-route "login"))
-               (not (utils/in? current-route "sign-up"))
-               (not (utils/in? current-route "slack"))
-               (not (utils/in? current-route "about"))
-               (not (utils/in? current-route "home"))
-               (not (cook/get-cookie :login-redirect)))
-      (cook/set-cookie! :login-redirect current (* 60 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+                                 "open-company-auth" oc-urls/slack-lander-check)]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
@@ -97,14 +131,20 @@
   (dis/dispatch! [:auth-with-token/failed error]))
 
 (defn auth-with-token-success [token-type jwt]
-  (api/get-entry-point)
-  (api/get-auth-settings)
+  (api/get-auth-settings
+   (fn [auth-body]
+     (api/get-entry-point
+      (fn [success body]
+        (entry-point-get-finished success body)
+        (let [orgs (:items (:collection body))
+              to-org (utils/get-default-org orgs)]
+          (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))
 
 (defn auth-with-token-callback
-  [token-type success status body]
+  [token-type success body status]
   (if success
     (do
       (update-jwt body)
@@ -135,10 +175,15 @@
           (empty? (:avatar-url jwt)))
       (do
         (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-        (api/get-entry-point))
+        (api/get-entry-point entry-point-get-finished))
       (do
-        (api/get-entry-point)
-        (dis/dispatch! [:input [:email-lander-check-team-redirect] true])))
+        (api/get-entry-point
+         (fn [success body]
+           (entry-point-get-finished success body
+             (fn [orgs collection]
+               (if (zero? (count orgs))
+                 (router/nav! oc-urls/sign-up-team)
+                 (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
@@ -147,7 +192,7 @@
        (:new-user router/nux-cookie-values)
        (* 60 60 24 7))
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-      (api/get-entry-point)
+      (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
 
 (defn signup-with-email-callback
@@ -167,6 +212,13 @@
 
 (defn signup-with-email-reset-errors []
   (dis/dispatch! [:input [:signup-with-email] {}]))
+
+;;Invitation
+(defn invitation-confirmed [status]
+  (when (= status 201)
+    (api/get-entry-point entry-point-get-finished)
+    (api/get-auth-settings))
+  (dis/dispatch! [:invitation-confirmed (= status 201)]))
 
 ;; Debug
 

@@ -116,7 +116,7 @@
       (when (or (> (- now latest-entry-point) reload-time)
                 (and (router/current-org-slug)
                      (nil? (dis/org-data))))
-        (api/get-entry-point))
+        (user-actions/entry-point-get (router/current-org-slug)))
       (when (> (- now latest-auth-settings) reload-time)
         (api/get-auth-settings))))))
 
@@ -151,13 +151,6 @@
     (router/set-route! (vec (remove nil? [route-name org])) {:org org :query-params (:query-params params)}))
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
-    (when (contains? (:query-params params) :login-redirect)
-      (cook/set-cookie!
-       :login-redirect
-       (:login-redirect (:query-params params))
-       (* 60 60)
-       "/"
-       ls/jwt-cookie-domain ls/jwt-cookie-secure))
     ; remove rum component if mounted to the same node
     (rum/unmount target)
     ;; render component
@@ -268,7 +261,7 @@
        (* 60 60 24 7)))
     (if new-user
       (utils/after 100 #(router/nav! urls/sign-up-profile))
-      (dis/dispatch! [:entry-point-get {:slack-lander-check-team-redirect true}]))))
+      (user-actions/slack-lander-check-team-redirect))))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -343,7 +336,6 @@
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (cook/remove-cookie! :jwt)
-      (cook/remove-cookie! :login-redirect)
       (cook/remove-cookie! :show-login-overlay)
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (simple-handler #(onboard-wrapper :email-verified) "email-verification" target params))
@@ -360,7 +352,6 @@
         (router/redirect! urls/home))
       (when (jwt/jwt)
         (cook/remove-cookie! :jwt)
-        (cook/remove-cookie! :login-redirect)
         (cook/remove-cookie! :show-login-overlay))
       (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
 
@@ -397,8 +388,6 @@
         (do
           (pre-routing (:query-params params))
           (router/set-route! ["create-org"] {:query-params (:query-params params)})
-          (api/get-entry-point)
-          (api/get-auth-settings)
           (post-routing)
           (drv-root org-editor target))
         (router/redirect! urls/home)))
@@ -406,7 +395,6 @@
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
-      (cook/remove-cookie! :login-redirect)
       (cook/remove-cookie! :show-login-overlay)
       (router/redirect! urls/home))
 
