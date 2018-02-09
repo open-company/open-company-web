@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.activity-card :refer (activity-card)]
+            [oc.web.components.stream-view-item :refer (stream-view-item)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [goog.events :as events]
@@ -143,6 +143,8 @@
                         (drv/drv :all-posts)
                         (drv/drv :calendar)
                         (drv/drv :ap-initial-at)
+                        (drv/drv :all-posts)
+                        (drv/drv :comments-data)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -158,7 +160,7 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         {:will-mount (fn [s]
-                          (let [all-posts-data (first (:rum/args s))
+                          (let [all-posts-data @(drv/get-ref s :all-posts)
                                 sorted-items (get-sorted-items all-posts-data)
                                 year (:year all-posts-data)
                                 month (:month all-posts-data)
@@ -235,9 +237,16 @@
                                                (reset! (::scroll-to-entry s) nil)
                                                (reset! (::last-direction s) nil))))
                           s)
-                         :did-remount (fn [_ s]
-                          (let [all-posts-data (first (:rum/args s))
-                                sorted-items (get-sorted-items all-posts-data)]
+                         :before-render (fn [s]
+                          (let [all-posts-data @(drv/get-ref s :all-posts)
+                                sorted-items (get-sorted-items all-posts-data)
+                                comments-data @(drv/get-ref s :comments-data)]
+                            ;; Preload comments
+                            (for [item (vals (:fixed-items all-posts-data))]
+                              (let [activity-comments-data (get comments-data (:uuid item))]
+                                (when (and (not (:loading activity-comments-data))
+                                           (not (contains? activity-comments-data :sorted-comments)))
+                                  (dis/dispatch! [:comments-get item]))))
                             (when-not (:loading-more all-posts-data)
                               (when @(::top-loading s)
                                 (reset! (::top-loading s) false)
@@ -275,8 +284,9 @@
                           (when @(::scroll-listener s)
                             (events/unlistenByKey @(::scroll-listener s)))
                            s)}
-  [s all-posts-data]
-  (let [calendar-data (drv/react s :calendar)
+  [s]
+  (let [all-posts-data (drv/react s :all-posts)
+        calendar-data (drv/react s :calendar)
         items (get-sorted-items all-posts-data)]
     [:div.all-posts.group
       [:div.all-posts-cards
@@ -297,12 +307,7 @@
                 [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e items]
             (rum/with-key
-             (activity-card
-              e
-              (seq (:headline e))
-              (seq (:body e))
-              false
-              true)
+             (stream-view-item e)
              (str "all-posts-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading

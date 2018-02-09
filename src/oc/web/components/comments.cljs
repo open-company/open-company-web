@@ -345,26 +345,27 @@
         (set! (.-scrollTop comments-internal-scroll) (.-scrollHeight comments-internal-scroll))))))
 
 (defn load-comments-if-needed [s]
-  (let [activity-data (first (:rum/args s))]
-    (when (and (not @(::comments-requested s))
-               activity-data)
-      (reset! (::comments-requested s) true)
+  (let [activity-data (first (:rum/args s))
+        all-comments-data @(drv/get-ref s :comments-data)
+        comments-data (get all-comments-data (:uuid activity-data))]
+    (when (and (not (:loading comments-data))
+               (not (contains? comments-data :sorted-comments)))
       (utils/after 10 #(dis/dispatch! [:comments-get activity-data])))))
 
 (defn show-loading?
   [s]
-  (let [comments-data @(drv/get-ref s :activity-comments-data)]
+  (let [activity-data (first (:rum/args s))
+        comments-data (get @(drv/get-ref s :comments-data) (:uuid activity-data))]
     (and (zero? (count (:sorted-comments comments-data)))
          (or (:loading comments-data)
              (not (contains? comments-data :sorted-comments))))))
 
 ;; Rum comments component
-(rum/defcs comments < (drv/drv :activity-comments-data)
+(rum/defcs comments < (drv/drv :comments-data)
                       (drv/drv :comment-add-finish)
                       (drv/drv :add-comment-focus)
                       rum/reactive
                       rum/static
-                      (rum/local false ::comments-requested)
                       (rum/local true  ::scroll-bottom-after-render)
                       (rum/local false ::scrolled-on-add-focus)
                       (rum/local false ::initially-scrolled)
@@ -398,7 +399,7 @@
                         s)}
   [s activity-data]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
-        sorted-comments (:sorted-comments (drv/react s :activity-comments-data))
+        sorted-comments (:sorted-comments (get (drv/react s :comments-data) (:uuid activity-data)))
         add-comment-focus (drv/react s :add-comment-focus)
         show-loading (show-loading? s)]
     (if show-loading

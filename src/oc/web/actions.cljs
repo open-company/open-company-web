@@ -620,16 +620,14 @@
   (api/get-comments activity-data)
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
-        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)]
+        comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))]
     (assoc-in db (vec (conj (vec (butlast comments-key)) :loading)) true)))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
-  (let [fixed-activity-uuid (or (router/current-activity-id) (router/current-secure-activity-id))
-        comments-key (dispatcher/activity-comments-key
+  (let [comments-key (dispatcher/activity-comments-key
                       (router/current-org-slug)
-                      (router/current-board-slug) fixed-activity-uuid)
+                      (router/current-board-slug) activity-uuid)
         sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
     (-> db
       (assoc-in comments-key sorted-comments)
