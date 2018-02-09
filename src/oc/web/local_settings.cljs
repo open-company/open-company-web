@@ -5,6 +5,9 @@
 (def local-whitelist-array ["localhost" "127.0.0.1"])
 
 ;; Storage location
+(def web-server-domain "http://localhost:3559")
+
+;; Storage location
 (def storage-server-domain "http://localhost:3001")
 
 ;; Auth location

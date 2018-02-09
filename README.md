@@ -195,6 +195,8 @@ provided in the table below:
 |  :activity-delete/finish | API | Entry delete request finished, refresh the board data. |
 |  :activity-get/finish | API | Activity (secure or not) loaded from API. |
 |  :activity-modal-edit | UI | Activate editing in modal. |
+|  :activity-modal-fade-in | UI | Show the activity modal without reloading the route. |
+|  :activity-modal-fade-out | UI | Dismiss the activity modal and go back to the board. |
 |  :activity-move | UI | Move an activity from a board to another. |
 |  :activity-share-hide | UI | Hide the share modal. |
 |  :activity-share-reset | UI | Reset the shared data to start a new share. |
@@ -214,10 +216,9 @@ provided in the table below:
 |  :all-posts-get/finish | API | AP loaded. |
 |  :all-posts-more | UI | Load more posts for current AP. |
 |  :all-posts-more/finish | API | More posts loaded. |
-|  :all-posts-reset | UI | Remove AP data from the app state. |
 |  :auth-settings | API | Read the auth-settings response from the auth server and save the data in the app-state. Usually called together with :entry-point. |
 |  :auth-settings-get | UI | Start the request to load the auth-settings from the auth server. |
-|  :auth-with-token | UI | Given a topic (email reset, invitation etc..) start the token exchange to login the user. |
+|  :auth-with-token | UI | Given a scope (email reset, invitation etc..) start the token exchange to login the user. |
 |  :auth-with-token/failed | API | Token exchange failed, cleanup the app-state of the token exchange stuff. |
 |  :auth-with-token/success | API | Token exchange succeeded. Show the collect name and password overlay if it was an invitation token, load the orgs associated with the user and redirect. |
 |  :board | API | Read and save the board data from API. Call the :load-other-boards action if necessary |
@@ -250,7 +251,7 @@ provided in the table below:
 |  :first-forced-post-start | UI | Dismiss the first onboarded nux screen and open the new forced post modal. |
 |  :email-domain-team-add | UI | Add an email domain to the user team. |
 |  :email-domain-team-add/finish | API | Request to add an email domain to the team succeeded. |
-|  :entries-loaded | API | The request to load the entries of a certain topic is finished. |
+|  :entries-loaded | API | The request to load the entries topic is finished. |
 |  :entry-clear-local-cache | UI | Remove the locally saved edits for the current editing item. |
 |  :entry-edit | UI | Start editing of an existing or a new entry. |
 |  :entry-edit/dismiss | UI | Dismiss the entry editing. |
@@ -265,7 +266,6 @@ provided in the table below:
 |  :entry-save/failed | API | Save entry reuqest finish but failed. |
 |  :entry-save/finish | API | Save entry reuqest finish, refresh the board data. |
 |  :entry-toggle-save-on-exit | UI | Toggle save on exit to avoid losing edits on page unload or edit exit. |
-|  :entry-topic-change | UI | Change the topic of the given topic. |
 |  :error-banner-show | UI | Given an error message and a time, show the specified error for that time, if the time is 0 stick the message. |
 |  :input | UI | Generic input action, it's used passing in a path and the value. The value is saved at the specified path of the app-state. |
 |  :invitation-confirmed | API | Confirm invitation request succeeded. |
@@ -318,9 +318,6 @@ provided in the table below:
 |  :team-roster-loaded | API | Save the roster in the team data. |
 |  :teams-get | UI | Start the request to load the list of teams. |
 |  :teams-loaded | API | Read and save the list of teams. Start the request to load the team data or the roster if the link is not present for each team returned. |
-|  :topic | API | Read and save the content of a topic in the app-state. Async start the load of the list of entries. |
-|  :topic-add | UI | Add a new topic to the topics list of the current board. |
-|  :topic-enty | API | Read and save a topic entry in the proper place of the app-state. |
 |  :trend-bar-status | UI | Change the trend bar status, it accepts: :hidden, :collapsed, :expanded and :trending as in oc.web.components.trend-bar. |
 |  :update | UI | Generic input action, it's used passing in a path and a function to replace the value. It's like update-in and in fact it uses it. |
 |  :update-loaded | API | Read and save the data of certain update in the app-state |

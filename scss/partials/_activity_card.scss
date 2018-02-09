@@ -157,11 +157,6 @@ div.activity-card {
     background-color: $carrot_light_gray_2;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-
-    div.topic {
-      float: right;
-      @include activity-tag();
-    }
   }
 
   div.activity-card-head {

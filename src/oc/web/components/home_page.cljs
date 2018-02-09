@@ -7,16 +7,13 @@
             [oc.web.dispatcher :as dis]
             [oc.web.actions.user :as user]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
-            [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.try-it-form :refer (try-it-form)]
+            [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
-
-(defn retina-src [url]
-  {:src (utils/cdn (str url ".png"))
-   :src-set (str (utils/cdn (str url "@2x.png")) " 2x")})
 
 (rum/defcs home-page < (rum/local false ::thanks-box-top)
                        (rum/local false ::thanks-box-bottom)
@@ -39,34 +36,31 @@
       (login-overlays-handler)
 
       [:div.main.home-page
+        {:class (when (jwt/jwt) "no-get-started-button")}
         ; Hope page header
         [:section.cta.group
-          {:class (when (jwt/jwt) "no-get-started-button")}
           [:div.balloon.big-yellow]
           [:div.balloon.big-red]
           [:div.balloon.big-purple]
           [:div.balloon.big-green]
-          [:div.balloon.small-purple-face]
-          [:div.balloon.small-red]
+          [:div.balloon.small-blue]
           [:div.balloon.small-yellow-face]
-          [:div.balloon.small-yellow]
-          [:div.balloon.small-red-face]
           [:div.balloon.small-purple]
-          [:div.balloon.small-blue-face]
-          [:div.balloon.small-red-1]
-          [:div.balloon.small-yellow-1]
-          [:div.balloon.small-green-face]
+          [:div.balloon.small-red]
+          [:div.balloon.small-purple-2]
+          [:div.balloon.big-green-2]
+          [:div.balloon.small-yellow]
 
           [:h1.headline
-            "Rise above the noise"]
+            "Where teams align"]
           [:div.subheadline.big-web-only
-            "Give your team a clear view of what’s most important"]
+            "Company updates and stories that keep teams"]
           [:div.subheadline.second-line.big-web-only
-            "to keep everyone on the same page"]
+            "aligned around what matters most."]
           [:div.subheadline.mobile-only
             (str
-             "Give your team a clear view of what’s most important "
-             "to keep everyone on the same page")]
+             "Company updates and stories that keep teams "
+             "aligned around what matters most.")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
@@ -86,132 +80,25 @@
                 [:div.thanks-headline "You are Confirmed!"]
                 [:div.thanks-subheadline "Thank you for subscribing."]]])
 
-          [:video.homepage-main-animation
-            {:controls false
-             :auto-play true
-             :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
-             :loop true}
-            [:source
-              {:src (utils/cdn "/img/ML/animation.webm")
-               :type "video/webm"}]
-            [:source
-              {:src (utils/cdn "/img/ML/animation.mp4")
-               :type "video/mp4"}]
-            [:div.fallback
-              "Your browser doesn’t support this video format."]]
-          [:div.homepage-screenshot-bubble
-            "It’s never been easier to keep everyone on the same page"]]
+          shared-misc/video
 
-        [:section.second-section.group
-          [:div.why-balloon.big-red]
-          ; [:div.why-balloon.big-blue]
-          [:div.why-balloon.small-yellow]
-          [:div.why-balloon.big-purple]
-          [:div.why-balloon.small-purple]
-          [:div.why-balloon.big-yellow]
-          [:div.why-balloon.small-yellow]
-          [:div.why-balloon.big-green]
-          [:div.why-balloon.small-red]
-          [:div.why-balloon.small-purple-face]
+          shared-misc/horizontal-carousell
 
-          [:div.illustrations-title
-            [:div.why-carrot
-              "Why Carrot?"]
-            [:div.why-carrot-description
-              (str
-               "Growing teams need a place to rise above the noise of real-time conversations to see "
-               "what’s really happening across the company.")]]
+          [:div.stay-aligned-container
+            [:div.stay-aligned-icon]
+            [:div.stay-aligned-message
+              "Stay aligned around the topics that matter."]]
 
-          [:div.illustrations.group
-            [:div.illustration-container
-              [:div.illustration.illustration-1]
-              [:div.description
-                [:div.title
-                  "Visibility"]
-                [:div.subtitle
-                  (str
-                   "A bird’s-eye view of essential "
-                 "information that’s easy to read and "
-                 "creates real transparency.")]]]
-            [:div.illustration-container.right
-              [:div.illustration.illustration-2]
-              [:div.description
-                [:div.title
-                  "In context"]
-                [:div.subtitle
-                  (str
-                   "Related information stays organized to "
-                   "have the most impact. Great for current "
-                   "and new employees.")]]]
-            [:div.illustration-container
-              [:div.illustration.illustration-3]
-              [:div.description
-                [:div.title
-                  "Feedback & engagement"]
-                [:div.subtitle
-                  (str
-                   "Capture team sentiment and reactions "
-                   "to key communications. It’s fun and "
-                   "great for distributed teams too!")]]]
-            [:div.illustration-container.right
-              [:div.illustration.illustration-4]
-              [:div.description
-                [:div.title
-                  "The big picture"]
-                [:div.subtitle
-                  (str
-                   "Daily or weekly digest for email "
-                   "and Slack ensures everyone has the "
-                   "same view of what’s important.")]]]]
+          shared-misc/carrot-cards]
 
-          [:div.slack-section
-            [:div.slack-logo]
-            [:div.slack-title
-              "Did we mention our Slack integration?"]
-            [:div.slack-description
-              (str
-               "Posts are automatically shared to the right channels. Discussions about posts happen "
-               "in Slack and Carrot - everything is kept in sync.")]
-            [:button.mlb-reset.slack-btn
-              {:on-click #(router/nav! oc-urls/slack)}
-              "Learn More"]]]
-
-        [:section.third-section.group
-          [:div.illustrations-title
-            [:div.why-carrot
-              "Keep your stakeholders informed"]
-            [:div.why-carrot-description
-              "Share the latest news with your extended team."]]
-          [:div.third-section-footer.group
-            [:div.copy
-              [:div.copy-icon.copy-simplify]
-              [:div.title
-                "Simplify investor updates"]
-              [:div.description
-                (str
-                 "Create beautiful updates in a snap, and keep them "
-                 "organized in one place. Also ideal for keeping friends "
-                 "and family in the loop.")]]
-            [:div.copy-separator]
-            [:div.copy
-              [:div.copy-icon.copy-expand]
-              [:div.title
-                "Expand your network"]
-              [:div.description
-                (str
-                 "Share news with recruits, potential investors and customers to keep them "
-                 "engaged and supportive. Build trust and grow your business.")]]]]
+        shared-misc/carrot-testimonials
 
         (when-not (jwt/jwt)
-          [:section.fourth-section.group
-            [:div.above-noise-container
-              [:div.above-noise-description
-                "With Carrot, everyone’s on the same page."]
-              [:button.mlb-reset.get-started-button
-                {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (user/show-login :signup-with-slack)
-                              (router/nav! oc-urls/sign-up))}
-                "Get started for free"]]])
+          [:section.third-section
+            [:div.third-section-title
+              "Keep everyone aligned around what matters most."]
+            [:button.mlb-reset.get-started-button
+              "Get started for free"]])
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 

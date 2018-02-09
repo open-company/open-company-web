@@ -17,7 +17,7 @@
    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
    [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-   [:title "Carrot - Grow together"]
+   [:title "Grow together"]
    ;; Bootstrap - Latest compiled and minified CSS
    [:link
     {:rel "stylesheet"
@@ -84,9 +84,9 @@
            :target "_blank"}
           "Blog"]]]
     [:div.site-mobile-menu-footer
-      [:button.mlb-reset.mlb-default
+      [:button.mlb-reset.login-btn
         {:id "site-mobile-menu-login"}
-        "Log In"]
+        "Log in"]
       [:button.mlb-reset.get-started-button
         {:id "site-mobile-menu-getstarted"}
         "Get started for free"]]])
@@ -96,28 +96,26 @@
    and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-  [:nav.site-navbar
-    [:div.site-navbar-container
-      [:a.navbar-brand-center
-        {:href "/"}]
-      [:div.site-navbar-left.big-web-only
-        [:a
-          {:href "/about"}
-          "About"]
-        [:a
-          {:href "http://blog.carrot.io"}
-          "Blog"]]
-      [:div.site-navbar-right.big-web-only
-        [:a
-          {:id "site-header-signup-item"
-           :href "/sign-up"}
-          "Get Started"]
-        [:a.login
-          {:id "site-header-login-item"
-           :href "/login"}
-          "Login"]]
-      [:div.mobile-ham-menu.mobile-only
-        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
+    [:nav.site-navbar
+      [:div.site-navbar-container
+        [:a.navbar-brand-left
+          {:href "/"}]
+        [:div.site-navbar-right.big-web-only
+          [:a.login
+            {:id "site-header-login-item"
+             :href "/login"}
+              "Log in"]
+          [:a.start
+            {:id "site-header-signup-item"
+             :href "/sign-up"}
+            "Start"]]
+        [:div.site-navbar-right.mobile-only
+          [:a.start
+            {:id "site-header-mobile-signup-item"
+             :href "/sign-up"}
+              "Start"]]
+        [:div.mobile-ham-menu.mobile-only
+          {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
@@ -139,11 +137,11 @@
           [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
-        [:div.column.column-integration
+        [:div.column.column-resources
           [:div.column-title
             {:onClick (str
-                       "$('nav.navbar-bottom div.column:not(.column-integration)').removeClass('expanded');"
-                       "$('nav.navbar-bottom div.column.column-integration').toggleClass('expanded');")}
+                       "$('nav.navbar-bottom div.column:not(.column-resources)').removeClass('expanded');"
+                       "$('nav.navbar-bottom div.column.column-resources').toggleClass('expanded');")}
             "RESOURCES"]
           [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
           [:div.column-item [:a {:href "/privacy"} "Privacy Policy"]]
@@ -156,8 +154,18 @@
                "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "SUPPORT"]
-          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]]
+          ; [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
+          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
+
+        [:div.column.column-integrations
+          [:div.column-title
+            {:onClick
+              (str
+               "$('nav.navbar-bottom div.column:not(.column-integrations)').removeClass('expanded');"
+               "$('nav.navbar-bottom div.column.column-integrations').toggleClass('expanded');")}
+            "INTEGRATIONS"]
+          [:div.column-item [:a {:href "/slack"} "Slack"]]]]
       [:div.left-column
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
@@ -167,7 +175,7 @@
           [:a {:href "/login"} "Log in"]]
         [:div.small-logos
           [:a.twitter
-            {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
+            {:target "_blank" :href "https://twitter.com/carrot_hq" :title "Carrot on Twitter"}
             [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
           [:a.medium
             {:target "_blank" :href "https://blog.carrot.io" :title "Carrot on Medium"}
@@ -194,6 +202,7 @@
                 (case page
                   :index   (pages/index options)
                   :about   (pages/about options)
+                  :slack   (pages/slack options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)

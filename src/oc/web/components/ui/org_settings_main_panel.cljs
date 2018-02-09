@@ -185,12 +185,7 @@
                    :data-placement "top"}]]
               (when add-email-domain-team-error
                 [:label.error
-                  (cond
-                    (and (= add-email-domain-team-error :domain-exists)
-                         (:domain um-domain-invite))
-                    (str (:domain um-domain-invite) " was already added.")
-                    :else
-                    "An error occurred, please try again.")])]
+                  "Only company email domains are allowed."])]
             [:div.org-settings-list
               (for [team (:email-domains team-data)]
                 [:div.org-settings-list-item.group

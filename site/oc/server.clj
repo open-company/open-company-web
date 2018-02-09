@@ -16,6 +16,9 @@
 (defn about []
   (res/resource-response "/about.html" {:root "public"}))
 
+(defn slack []
+  (res/resource-response "/slack.html" {:root "public"}))
+
 (defn privacy []
   (res/resource-response "/privacy.html" {:root "public"}))
 
@@ -24,6 +27,9 @@
 
 (defn index []
   (res/resource-response "/index.html" {:root "public"}))
+
+(defn version-json []
+  (res/resource-response "/version/version.json" {:root "public"}))
 
 ; (defn index []
 ;   (res/resource-response "/index.html" {:root "public"}))
@@ -44,8 +50,10 @@
   (GET "/404" [] (not-found))
   (GET "/500" [] (server-error))
   (GET "/about" [] (about))
+  (GET "/slack" [] (slack))
   (GET "/privacy" [] (privacy))
   (GET "/terms" [] (terms))
+  (GET "/version/version.json" [] (version-json))
   (GET "/" [] (index))
   (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
   (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))

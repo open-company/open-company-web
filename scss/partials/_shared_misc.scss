@@ -1,0 +1,326 @@
+video.main-animation {
+  width: 940px;
+  margin: 85px auto 0px;
+  padding: 0;
+  z-index: 10;
+  position: relative;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
+
+  @include tablet() {
+    width: 100%;
+  }
+
+  @include mobile() {
+    display: none;
+  }
+}
+
+div.horizontal-carousell {
+  width: 100vw;
+  height: 482px;
+  margin-top: 64px;
+  margin-left: -32px;
+  z-index: 10;
+  overflow-x: auto;
+
+  @include big_web(){
+    display: none;
+  }
+
+  div.horizontal-carousell-inner {
+    width: calc(893px + 24px);
+    height: 482px;
+
+    img {
+      width: 271px;
+      height: 482px;
+      float: left;
+      display: inline;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
+    }
+
+    img.horizontal-carousell-1 {
+      margin-left: 32px;
+    }
+
+    img.horizontal-carousell-2 {
+      margin-left: 20px;
+    }
+
+    img.horizontal-carousell-3 {
+      margin-left: 20px;
+      margin-right: 32px;
+    }
+  }
+}
+
+div.cards-container {
+  max-width: 940px;
+  margin: 0px auto;
+  position: relative;
+  z-index: 2;
+
+  div.cards-row {
+    margin-top: 20px;
+
+    div.card {
+      &:not(:first-child) {
+        margin-left: 20px;
+      }
+
+      text-align: left;
+      float: left;
+      width: 300px;
+      height: 332px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.07);
+      padding: 40px;
+
+      @include tablet() {
+        float: none;
+        margin: 20px auto 0px;
+        width: 100%;
+        height: auto;
+
+        &:not(:first-child) {
+          margin: 20px auto 0px;
+        }
+      }
+
+      div.card-icon {
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      div.card-title {
+        @include avenir_M();
+        font-size: 20px;
+        color: $carrot_dark_gray;
+        width: 70%;
+
+        @include tablet() {
+          width: 100%;
+        }
+      }
+
+      div.card-content {
+        @include avenir_R();
+        font-size: 18px;
+        color: rgba($carrot_dark_gray, 0.8);
+        margin-top: 11px;
+
+        a {
+          color: $carrot_text_blue_3;
+          text-decoration: none;
+        }
+      }
+
+      &.card-1 {
+        div.card-icon {
+          width: 44px;
+          height: 41px;
+          background-size: 44px 41px;
+          @include image-2x("/img/ML/homepage_card_icon_1");
+          margin-bottom: 35px;
+        }
+      }
+
+      &.card-2 {
+        div.card-icon {
+          width: 40px;
+          height: 40px;
+          background-size: 40px 40px;
+          @include image-2x("/img/ML/homepage_card_icon_2");
+          margin-bottom: 36px;
+        }
+      }
+
+      &.card-3 {
+        div.card-icon {
+          width: 44px;
+          height: 44px;
+          background-size: 44px 44px;
+          @include image-2x("/img/ML/homepage_card_icon_3");
+          margin-bottom: 31px;
+        }
+
+        div.card-title {
+          width: 90%;
+
+          @include tablet() {
+            width: 100%;
+          }
+        }
+      }
+
+      &.card-4 {
+        div.card-icon {
+          width: 32px;
+          height: 40px;
+          background-size: 32px 40px;
+          @include image-2x("/img/ML/homepage_card_icon_4");
+          margin-bottom: 36px;
+        }
+
+        div.card-title {
+          width: 50%;
+
+          @include tablet() {
+            width: 100%;
+          }
+        }
+      }
+
+      &.card-5 {
+        div.card-icon {
+          width: 42px;
+          height: 41px;
+          background-size: 42px 41px;
+          @include image-2x("/img/ML/homepage_card_icon_5");
+          margin-bottom: 35px;
+        }
+      }
+
+      &.card-6 {
+        div.card-icon {
+          width: 40px;
+          height: 40px;
+          background-size: 40px 40px;
+          @include image-2x("/img/ML/homepage_card_icon_6");
+          margin-bottom: 36px;
+        }
+
+        div.card-title {
+          width: 43%;
+        }
+      }
+    }
+  }
+}
+
+section.testimonials-section {
+  background-color: $carrot_dark_gray;
+  text-align: center;
+  padding: 72px 0px;
+  position: relative;
+
+  @include mobile() {
+    margin-left: -32px;
+    width: 100vw;
+    padding: 72px 32px;
+  }
+
+  @include tablet() {
+    width: 100vw;
+    padding: 72px 32px;
+  }
+
+  div.balloon {
+    position: absolute;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+
+    @include tablet() {
+      display: none;
+    }
+
+    &.big-yellow-1 {
+      @include image-2x("/img/ML/balloon_big_yellow_1");
+      background-size: 135px 135px;
+      width: 135px;
+      height: 135px;
+      top: -67px;
+      left: 18.71%;
+    }
+
+    &.small-blue-1 {
+      @include image-2x("/img/ML/balloon_small_blue_1");
+      background-size: 50px 44px;
+      width: 50px;
+      height: 44px;
+      top: -87px;
+      left: 24.71%;
+    }
+  }
+
+  div.testimonials-section-title {
+    @include avenir_M();
+    color: white;
+    font-size: 38px;
+  }
+
+  div.testimonials-section-subtitle {
+    @include avenir_M();
+    font-size: 20px;
+    color: #C4C6C9;
+    margin-top: 11px;
+  }
+
+  div.testimonials-cards-container {
+    width: 1164px;
+    margin: 50px auto 0px;
+
+    @include tablet() {
+      width: 100%;
+    }
+
+    div.card {
+      float: left;
+      width: 276px;
+      background-color: white;
+      border-radius: 8px;
+      padding: 24px 26px;
+      text-align: left;
+
+      @include tablet() {
+        float: unset;
+        margin: 20px auto 0px;
+        width: 100%;
+      }
+
+      &:not(:first-child) {
+        margin-left: 20px;
+
+        @include tablet() {
+          margin: 20px auto 0px;
+        }
+      }
+
+      div.card-content {
+        @include avenir_M();
+        font-size: 16px;
+        color: rgba($carrot_dark_gray, 0.8);
+        line-height: 24px;
+      }
+
+      div.card-author {
+        margin-top: 8px;
+
+        img.card-avatar {
+          max-width: 40px;
+          max-height: 40px;
+          border-radius: 50%;
+          float: left;
+        }
+
+        div.author-name {
+          @include avenir_H();
+          font-size: 14px;
+          color: $carrot_dark_gray;
+          margin-left: 48px;
+        }
+
+        div.author-company {
+          @include avenir_M();
+          font-size: 12px;
+          color: rgba($carrot_light_gray_3, 0.5);
+          margin-left: 48px;
+        }
+      }
+    }
+  }
+}

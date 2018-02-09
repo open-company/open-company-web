@@ -1,21 +1,24 @@
 /***** About ******/
 
 div#wrap {
+  background-color: $oc_gray_8;
+
   div.main.about {
-    text-align: center;
     width: 100%;
-    background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
-    margin-top: 1px;
+
+    @include mobile() {
+      padding: 0 32px;
+    }
 
     section {
-      @include mobile_to_tablet() {
+      @include mobile_to_tablet(){
         padding: 0 32px;
       }
     }
 
     section.about-header {
-      padding-top: 88px;
-      padding-bottom: 0px;
+      padding-top: 72px;
+      padding-bottom: 80px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -30,122 +33,108 @@ div#wrap {
           display: none;
         }
 
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow");
+        &.big-red {
+          @include image-2x("/img/ML/about_balloon_big_red");
           background-size: 172px 172px;
           width: 172px;
           height: 172px;
-          top: -46px;
-          left: -57px;
+          top: 6px;
+          left: -50px;
         }
 
-        &.big-purple {
-          @include image-2x("/img/ML/balloon_big_purple");
-          background-size: 111px 111px;
-          width: 111px;
-          height: 111px;
-          top: -64px;
-          right: 118px;
-        }
-
-        &.big-red {
-          @include image-2x("/img/ML/balloon_big_red");
-          background-size: 226px 208px;
+        &.big-green {
+          @include image-2x("/img/ML/about_balloon_big_green");
+          background-size: 226px 209px;
           width: 226px;
-          height: 208px;
-          top: -82px;
-          right: -55px;
+          height: 209px;
+          top: -10px;
+          right: -81px;
         }
 
-        &.small-purple-face {
-          @include image-2x("/img/ML/balloon_small_purple_face");
+        &.small-green-face {
+          @include image-2x("/img/ML/about_balloon_small_green_face");
           background-size: 48px 48px;
           width: 48px;
           height: 48px;
-          top: 118px;
-          left: 5.78%;
+          top: 165px;
+          left: 131px;
         }
 
-        &.small-red {
-          @include image-2x("/img/ML/balloon_small_red");
-          background-size: 15px 17px;
-          width: 15px;
-          height: 17px;
-          top: 103px;
-          left: 13.71%;
+        &.small-blue {
+          @include image-2x("/img/ML/about_balloon_small_blue");
+          background-size: 67px 59px;
+          width: 67px;
+          height: 59px;
+          top: 189px;
+          right: 80px;
         }
 
-        &.small-yellow-face {
-          @include image-2x("/img/ML/balloon_small_yellow_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 119px;
-          left: 78.57%;
+        &.small-purple {
+          @include image-2x("/img/ML/about_balloon_small_purple");
+          background-size: 23px 21px;
+          width: 23px;
+          height: 21px;
+          top: 149px;
+          right: 184px;
         }
 
-        &.small-yellow {
-          @include image-2x("/img/ML/balloon_small_yellow");
-          background-size: 15px 15px;
-          width: 15px;
-          height: 15px;
-          top: 179px;
-          left: 86.36%;
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow_1");
+          background-size: 135px 135px;
+          width: 135px;
+          height: 135px;
+          top: 787px;
+          left: 50%;
+          margin-left: 226px;
         }
 
-        &.big-purple-1 {
-          @include image-2x("/img/ML/why_balloon_big_purple");
-          background-size: 110px 111px;
-          width: 110px;
-          height: 111px;
-          top: 537px;
-          left: 13.21%;
+        &.small-purple-1 {
+          @include image-2x("/img/ML/about_balloon_small_purple_1");
+          background-size: 50px 44px;
+          width: 50px;
+          height: 44px;
+          top: 869px;
+          left: 50%;
+          margin-left: 340px;
+          transform: rotate(90deg);
         }
 
-        &.small-green {
-          @include image-2x("/img/ML/balloon_small_green");
-          background-size: 35px 33px;
-          width: 35px;
-          height: 33px;
-          top: 668px;
-          left: 8.14%;
-        }
-
-        &.big-blue {
-          @include image-2x("/img/ML/balloon_big_blue");
-          background-size: 155px 154px;
-          width: 155px;
-          height: 154px;
-          top: 1339px;
-          left: 77.07%;
-        }
-
-        &.small-red-2 {
-          @include image-2x("/img/ML/balloon_small_red_2");
+        &.small-purple-2 {
+          @include image-2x("/img/ML/about_balloon_small_purple_2");
           background-size: 17px 15px;
           width: 17px;
           height: 15px;
-          top: 1354px;
-          left: 88.5%;
+          top: 1298px;
+          left: 50%;
+          margin-left: -556px;
         }
 
+        &.small-blue-1 {
+          @include image-2x("/img/ML/about_balloon_small_blue_1");
+          background-size: 47px 48px;
+          width: 47px;
+          height: 48px;
+          top: 1332px;
+          left: 50%;
+          margin-left: -539px;
+        }
       }
 
       h1.about {
         @include avenir_H();
         font-size: 48px;
         line-height: 60px;
-        color: $carrot_dark_brown_1;
-        margin: 0px auto;
+        color: $carrot_dark_gray;
+        margin: 88px auto 0px;
         padding: 0px 16px;
       }
 
       div.about-subline {
         @include avenir_R();
         font-size: 24px;
-        color: rgba($carrot_dark_brown, 0.8);
-        max-width: 744px;
-        margin: 16px auto 0px;
+        color: rgba($carrot_light_gray_3, 0.8);
+        max-width: 660px;
+        margin: 6px auto 60px;
 
         @include tablet(){
           width: 100%;
@@ -154,413 +143,222 @@ div#wrap {
         }
       }
 
-      div.paragraphs-container {
-        width: 940px;
-        border-radius: 8px;
-        background-color: white;
-        box-shadow: 0px 4px 6px 0px rgba(black, 0.07);
-        padding: 60px 40px;
-        margin: 70px auto 0px;
-        position: relative;
-        z-index: 2;
+      div.team-container{
 
-        @include tablet(){
-          width: 100%;
-          margin: 70px 0px 0px;
-          padding: 60px 16px;
-          border-radius: 0px;
+        @include tablet() {
+          margin-top: 80px;
         }
 
-        div.paragraph-title {
-          @include avenir_H();
-          font-size: 36px;
-          color: $carrot_dark_brown_1;
-          line-height: 60px;
-          margin: 0 auto;
-        }
-
-        p {
-          @include avenir_R();
-          font-size: 20px;
-          color: $carrot_dark_brown;
-          margin: 22px auto 0px;
-          text-align: left;
-          width: 800px;
-          line-height: 30px;
+        div.team-row {
+          margin: 0px auto;
+          width: 940px;
 
           @include tablet() {
             width: 100%;
-            padding: 0 16px;
-            text-align: center;
-          }
-        }
-
-        div.principles-title {
-          @include avenir_H();
-          font-size: 24px;
-          color: $carrot_dark_brown_1;
-          line-height: 36px;
-          margin: 87px auto 18px;
-        }
-
-        div.principles {
-          width: calc(100% + 80px);
-          margin-left: -40px;
-
-          @include tablet(){
-            width: 100%;
-            margin-left: 0px;
-            padding: 0px 16px;
-          }
-        }
-
-        div.principle {
-          padding: 40px;
-          height: 481px;
-
-          @include tablet(){
-            height: auto;
-            padding: 40px 0px;
+            max-width: 300px;
           }
 
-          &.left-principle {
-            float: left;
-            width: 50%;
-            border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
-            border-right: 1px solid rgba($carrot_light_gray_7, 0.5);
+          &.two-cards {
+            width: 620px;
 
-            @include tablet(){
-              border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
-              border-right: none;
-              float: unset;
+            @include tablet() {
               width: 100%;
+              max-width: 300px;
             }
-
-            div.principle-icon {
-              @include image-2x("/img/ML/about_principle_icon_1");
-              background-size: 103px 102px;
-            }
-          }
-
-          &.right-principle {
-            float: left;
-            width: 50%;
-            border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
-
-            @include tablet(){
-              border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
-              float: unset;
-              width: 100%;
-            }
-
-            div.principle-icon {
-              @include image-2x("/img/ML/about_principle_icon_2");
-              background-size: 114px 83px;
-            }
-          }
-
-          &.center-principle {
-            width: 100%;
-            border-top: 1px solid rgba($carrot_light_gray_7, 0.5);
-
-            @include tablet(){
-              float: unset;
-              width: 100%;
-            }
-
-            div.principle-icon {
-              @include image-2x("/img/ML/about_principle_icon_3");
-              background-size: 119px 96px;
-            }
-
-            div.principle-title {
-              width: 340px;
-
-              @include tablet(){
-                width: 100%;
-              }
-            }
-          }
-
-          div.principle-icon {
-            margin: 0 auto;
-            background-repeat: no-repeat;
-            background-position: center;
-            width: 119px;
-            height: 102px;
-          }
-
-          div.principle-title {
-            @include avenir_H();
-            font-size: 24px;
-            color: $carrot_dark_brown;
-            text-align: center;
-            letter-spacing: 0.17px;
-            line-height: 30px;
-            width: 300px;
-            margin: 24px auto 0px;
-
-            @include tablet(){
-              padding: 0px 16px;
-              width: 100%;
-            }
-          }
-
-          div.principle-description {
-            @include avenir_R();
-            font-size: 20px;
-            line-height: 30px;
-            color: $carrot_dark_brown;
-            text-align: left;
-            width: 390px;
-            margin: 24px auto 0px;
-
-            @include tablet(){
-              padding: 0px 16px;
-              width: 100%;
-              text-align: center;
-            }
-          }
-        }
-      }
-    }
-
-    section.about-team {
-      padding: 30px 0;
-
-      @include tablet(){
-        padding: 30px 0px 0px;
-      }
-
-      div.about-team-inner {
-        max-width: 1146px;
-        margin: 0 auto 0;
-        text-align: center;
-
-        @include tablet(){
-          width: 100%;
-        }
-
-        h1.team {
-          @include avenir_H();
-          font-size: 38px;
-          line-height: 52px;
-          color: $carrot_dark_brown_1;
-          margin-top: 35px;
-        }
-
-        div.about-team-users {
-          width: 940px;
-          margin: 16px auto;
-
-          @include tablet(){
-            width: 100%;
-            margin: 0px auto 32px;
-            padding: 0px 16px;
           }
 
           div.team-card {
-            width: 450px;
-            height: 308px;
-            border-radius: 8px;
+            display: inline-block;
+            margin-left: 20px;
+            margin-top: 20px;
+            padding: 40px 50px;
             background-color: white;
-            box-shadow: 0 4px 6px 0 rgba(black, 0.07);
-            padding: 40px;
+            box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+            text-align: center;
+            width: 300px;
+            height: 252px;
+            position: relative;
+            z-index: 2;
 
-            @include tablet(){
+            @include tablet() {
+              display: block;
               width: 100%;
-              height: auto;
-              margin-top: 24px;
-              margin-bottom: 0px;
+              max-width: 300px;
+              margin-left: 0px;
+              margin-top: 20px;
             }
 
-            &:nth-child(2) {
-              margin-top: 40px;
-
-              @include tablet(){
-                margin-top: 24px;
-              }
+            &:first-child {
+              margin-left: 0px;
             }
 
-            &.new-member {
-              div.team-avatar {
-                background-image: cdnUrl("/img/ML/happy_face_yellow.svg");
-              }
+            &.iacopo-carraro div.user-avatar {
+              @include image-2x("/img/ML/about_team_iacopo_carraro");
             }
 
-            div.team-avatar {
-              background-size: 100px 100px;
+            &.sean-johnson div.user-avatar {
+              @include image-2x("/img/ML/about_team_sean_johnson");
+            }
+
+            &.stuart-levinson div.user-avatar {
+              @include image-2x("/img/ML/about_team_stuart_levinson");
+            }
+
+            &.ryan-le-roux div.user-avatar {
+              @include image-2x("/img/ML/about_team_ryan_le_roux");
+            }
+
+            &.nathan-zorn div.user-avatar {
+              @include image-2x("/img/ML/about_team_nathan_zorn");
+            }
+
+            div.user-avatar {
+              background-size: 72px 72px;
+              width: 72px;
+              height: 72px;
               background-repeat: no-repeat;
-              width: 100px;
-              height: 100px;
-              margin: 0 auto;
-
-              img {
-                max-width: 100px;
-                max-height: 100px;
-                border-radius: 50px;
-              }
+              background-position: center;
+              margin: 0px auto;
             }
 
-            div.team-member {
-              margin: 16px auto 0px;
-              text-align: center;
+            div.user-name {
+              @include avenir_M();
+              font-size: 20px;
+              color: $carrot_dark_gray;
+              margin-top: 16px;
+            }
 
-              div.team-name {
-                @include avenir_H();
-                font-size: 26px;
-                letter-spacing: 0.18px;
-                color: $carrot_dark_brown;
-              }
+            div.user-position {
+              @include avenir_R();
+              font-size: 18px;
+              color: rgba($carrot_light_gray_3, 0.8);
+              line-height: 27px;
+            }
 
-              div.team-title {
-                @include avenir_R();
-                font-size: 20px;
-                line-height: 30px;
-                color: rgba($carrot_dark_brown, 0.8);
-              }
+            a.linkedin-link {
+              display: block;
+              margin: 0px auto;
+              @include image-2x("/img/ML/about_linkedin_icon");
+              width: 20px;
+              height: 20px;
+              background-size: 20px 20px;
+              background-repeat: no-repeat;
+              background-position: center;
+              margin-top: 16px;
+            }
+          }
+        }
+      }
 
-              div.team-media-links {
-                height: 24px;
-                text-align: center;
+      div.other-cards.group {
+        width: 940px;
+        margin: 80px auto;
 
-                a {
-                  width: 24px;
-                  height: 24px;
-                  display: block;
-                  margin: 8px auto 0px;
+        @include tablet() {
+          margin: 40px auto;
+          width: 100%;
+          max-width: 300px;
+        }
 
-                  &.linkedin {
-                    background-image: cdnUrl("/img/ML/about_linkedin.svg");
-                    background-size: 24px 24px;
-                    background-repeat: no-repeat;
-                  }
+        div.other-card {
+          margin-left: 40px;
+          background-color: transparent;
+          border-radius: 8px;
+          border: 1px solid #EAE9E4;
+          padding: 40px;
+          text-align: center;
+          width: 450px;
+          height: 296px;
+          display: inline-block;
+
+          @include tablet() {
+            display: block;
+            margin-left: 0px;
+            height: auto;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+          }
+
+          &:first-child {
+            margin-left: 0px;
+          }
+
+          &.heart-card {
+            div.card-icon {
+              width: 40px;
+              height: 37px;
+              background-size: 40px 37px;
+              @include image-2x("/img/ML/about_heart_icon");
+            }
+          }
+
+          &.oss-card {
+            div.card-icon {
+              width: 40px;
+              height: 44px;
+              background-size: 40px 44px;
+              @include image-2x("/img/ML/about_oss_icon");
+            }
+
+            a.card-button {
+              @include tablet(){
+                @include tablet() {
+                  width: calc(100% + 32px);
+                  margin-left: -16px;
                 }
               }
             }
           }
 
-          div.column-left {
-            float: left;
-
-            @include tablet(){
-              float: unset;
-            }
+          div.card-icon {
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px auto;
           }
 
-          div.column-right {
-            float: right;
-
-            @include tablet(){
-              float: unset;
-            }
+          div.card-title {
+            @include avenir_M();
+            font-size: 20px;
+            color: $carrot_dark_gray;
+            margin-top: 16px;
           }
 
-          div.column-center {
-            margin: 40px auto 0px;
-
-            @include tablet(){
-              margin: 0px;
-            }
-
-            div.team-card {
-              margin: 0 auto;
-
-              @include tablet(){
-                margin: 24px auto 0px;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    section.about-footer {
-      width: 100%;
-      margin: 0 auto;
-      padding: 0px 60px;
-      background-color: $carrot_light_yellow_1;
-
-      @include mobile(){
-        padding: 32px 32px;
-      }
-
-      div.block {
-        width: 50%;
-        text-align: center;
-        padding: 77px 0px;
-
-        @include mobile(){
-          width: 100%;
-          padding: 40px 0px;
-        }
-
-        &:first-child {
-          border-right: 1px solid rgba($carrot_dark_brown, 0.2);
-
-          @include mobile(){
-            border-right: none;
-            border-bottom: 1px solid rgba($carrot_dark_brown, 0.2);
-          }
-        }
-
-        div.block-title {
-          @include avenir_H();
-          font-size: 26px;
-          letter-spacing: 0.18px;
-          color: $carrot_dark_brown;
-        }
-
-        div.block-description {
-          opacity: 0.8;
-          @include avenir_R();
-          font-size: 20px;
-          color: $carrot_dark_brown;
-          margin: 24px auto 0px;
-          max-width: 417px;
-        }
-
-        a.link {
-          border-radius: 100px;
-          background-color: #FFD24A;
-          @include avenir_H();
-          font-size: 18px;
-          text-align: center;
-          color: $carrot_dark_brown;
-          height: 48px;
-          display: inline-block;
-          margin: 24px auto 0px;
-          padding: 12px 32px;
-        }
-
-        &.join-us {
-          float: left;
-
-          @include mobile(){
-            float: unset;
-          }
-        }
-
-        &.open-source {
-          float: right;
-
-          @include mobile(){
-            float: unset;
+          div.card-content {
+            @include avenir_R();
+            font-size: 18px;
+            color: rgba($carrot_light_gray_3, 0.8);
+            margin-top: 16px;
           }
 
-          a.link {
-            @include mobile(){
-              padding: 14px 32px;
-              font-size: 16px;
+          a.card-button {
+            width: 240px;
+            height: 40px;
+            @include avenir_M();
+            font-size: 16px;
+            color: $carrot_green_2;
+            background-color: $carrot_green_3;
+            border-radius: 100px;
+            display: block;
+            padding: 10px 16px;
+            margin: 16px auto 0px;
+
+            @include tablet() {
+              width: 100%;
             }
           }
         }
       }
-    }
 
-    section.fourth-section {
-      @include mobile(){
-        padding: 60px 32px;
+      div.about-alignment {
+        @include avenir_M();
+        font-size: 34px;
+        color: $carrot_dark_gray;
+        margin: 80px auto 0px;
+      }
+
+      button.get-started-button.bottom-button {
+        margin-top: 20px;
       }
     }
   }

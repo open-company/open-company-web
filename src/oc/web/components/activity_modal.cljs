@@ -13,66 +13,54 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.topics-dropdown :refer (topics-dropdown)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.comments :refer (comments)]))
 
 ;; Unsaved edits handling
 
-(defn autosave []
-  (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (let [cleaned-body (when body-el
-                        (utils/clean-body-html (.-innerHTML body-el)))]
-      (dis/dispatch! [:entry-save-on-exit :modal-editing-data cleaned-body]))))
+(defn autosave [s]
+  (when s
+    (when-let [body-el (sel1 [:div.rich-body-editor])]
+      (let [modal-data @(drv/get-ref s :modal-data)
+            activity-data (:modal-editing-data modal-data)
+            cleaned-body (when body-el
+                          (utils/clean-body-html (.-innerHTML body-el)))]
+        (activity-actions/entry-save-on-exit :modal-editing-data activity-data cleaned-body)))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
   [s]
   (when (:entry-save-on-exit @(drv/get-ref s :modal-data))
-    (autosave)))
+    (autosave s)))
 
 (defn toggle-save-on-exit
   "Enable and disable save current edit."
   [s turn-on?]
-  (dis/dispatch! [:entry-toggle-save-on-exit turn-on?]))
+  (activity-actions/entry-toggle-save-on-exit turn-on?))
 
 ;; Modal dismiss handling
 
-(defn dismiss-modal [s board-filters]
-  (let [org (router/current-org-slug)
-        board (router/current-board-slug)
-        modal-data @(drv/get-ref s :modal-data)
-        current-board-filters (:board-filters modal-data)]
-    (router/nav!
-      (if (string? board-filters)
-        (oc-urls/board-filter-by-topic org board board-filters)
-        (if (:from-all-posts @router/path)
-          (oc-urls/all-posts org)
-          (if (string? current-board-filters)
-            (oc-urls/board-filter-by-topic org board current-board-filters)
-            (if (= current-board-filters :by-topic)
-              (oc-urls/board-sort-by-topic org board)
-              (oc-urls/board org board))))))))
+(defn dismiss-modal [s]
+  (let [modal-data @(drv/get-ref s :modal-data)
+        activity-data (:activity-data modal-data)]
+    (activity-actions/activity-modal-fade-out (:board-slug activity-data))))
 
-(defn close-clicked [s & [board-filters]]
+(defn close-clicked [s]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :modal-data))]
-    (if (:from-all-posts @router/path)
-      ;; Remove AP data from the DB to avoid showing results before loading and results again
-      (when (and (not (string? board-filters))
-                 ap-initial-at)
-        (dis/dispatch! [:all-posts-reset]))
+    (when-not (:from-all-posts @router/path)
       ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
       (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
   (reset! (::dismiss s) true)
-  (utils/after 180 #(dismiss-modal s board-filters)))
+  (utils/after 180 #(dismiss-modal s)))
 
 ;; Delete handling
 
@@ -85,7 +73,7 @@
                     :solid-button-title "Yes"
                     :solid-button-cb #(let [org-slug (router/current-org-slug)
                                             board-slug (router/current-board-slug)
-                                            board-url (utils/get-board-url org-slug board-slug)]
+                                            board-url (oc-urls/board org-slug board-slug)]
                                        (router/nav! board-url)
                                        (dis/dispatch! [:activity-delete activity-data])
                                        (dis/dispatch! [:alert-modal-hide]))
@@ -134,9 +122,11 @@
 
 (defn- real-start-editing [state & [focus]]
   (when-not (responsive/is-tablet-or-mobile?)
-    (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true])
+    (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) true)
     (utils/after 100 #(setup-headline state))
-    (reset! (::autosave-timer state) (utils/every 5000 autosave))
+    (when @(::autosave-timer state)
+      (.clearInterval js/window @(::autosave-timer state)))
+    (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
     (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
     (when focus
       (utils/after 1000
@@ -154,9 +144,9 @@
   (save-on-exit? state)
   (toggle-save-on-exit state false)
   (reset! (::edited-data-loaded state) false)
-  (js/clearInterval @(::autosave-timer state))
+  (.clearInterval js/window @(::autosave-timer state))
   (reset! (::autosave-timer state) nil)
-  (dis/dispatch! [:activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false])
+  (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :modal-data)) false)
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
     (reset! (::headline-input-listener state) nil)))
@@ -231,18 +221,6 @@
         (reset! (::initial-body s) initial-body)
         (reset! (::initial-headline s) initial-headline)
         (reset! (::edited-data-loaded s) true)))))
-
-(defn topic-did-change [s editing topic-map]
-  (let [activity-data (:activity-data @(drv/get-ref s :modal-data))]
-    (if editing
-      (do
-        (dis/dispatch! [:update [:modal-editing-data] #(merge % {:topic-slug (:slug topic-map)
-                                                                 :topic-name (:name topic-map)
-                                                                 :has-changes true})])
-        (toggle-save-on-exit s true))
-      (dis/dispatch! [:entry-topic-change (merge activity-data
-                                           {:topic-slug (:slug topic-map)
-                                            :topic-name (:name topic-map)})]))))
 
 (rum/defcs activity-modal < rum/reactive
                             ;; Derivatives
@@ -336,10 +314,6 @@
                                 js/window
                                 EventType/RESIZE
                                 #(modal-height-did-change s true)))
-                              (let [modal-data @(drv/get-ref s :modal-data)]
-                                (when (:modal-editing modal-data)
-                                  (utils/after 1000
-                                    #(real-start-editing s :headline))))
                               (setup-editing-data s)
                               s)
                              :after-render (fn [s]
@@ -439,7 +413,7 @@
                            [:li.no-editing
                              {:on-click #(do
                                           (reset! (::showing-dropdown s) false)
-                                          (dis/dispatch! [:activity-edit activity-data]))}
+                                          (activity-actions/activity-edit activity-data))}
                              "Edit"])
                           (when (and is-mobile?
                                      share-link)
@@ -465,17 +439,9 @@
                       (activity-move {:activity-data activity-data
                                       :boards-list all-boards
                                       :dismiss-cb #(reset! (::move-activity s) false)
-                                      :on-change #(close-clicked s nil)}))]))
+                                      :on-change #(close-clicked s)}))]))
               (when-not is-mobile?
-                (activity-attachments activity-data false))
-              (let [topics (distinct (:entry-edit-topics modal-data))
-                    entry-data (if editing (:modal-editing-data modal-data) activity-data)]
-                (topics-dropdown
-                 (:board-slug entry-data)
-                 topics
-                 {:slug (:topic-slug entry-data)
-                  :name (:topic-name entry-data)}
-                 #(topic-did-change s editing %)))]]
+                (activity-attachments activity-data false))]]
           [:div.activity-modal-columns
             ;; Left column
             [:div.activity-left-column

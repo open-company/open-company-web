@@ -13,11 +13,6 @@
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.search :refer (search-box)]))
 
-(defn- share-new-tooltip [team-id]
-  (if (jwt/team-has-bot? team-id)
-    "Select topics to share by Slack, email or link."
-    "Select topics to share by email or link."))
-
 (rum/defcs navbar < rum/reactive
                      (drv/drv :navbar-data)
                      {:did-mount (fn [s]
@@ -54,7 +49,8 @@
               [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
                 {:on-click #(do
                               (dis/dispatch! [:input [:mobile-menu-open] false])
-                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]]
+                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]
+             (search-box)]
             [:div.nav.navbar-nav.navbar-left
               (search-box)])
           [:div.nav.navbar-nav.navbar-center
