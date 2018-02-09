@@ -52,7 +52,7 @@
           [:div.balloon.small-yellow]
 
           [:h1.headline
-            "Grow together"]
+            "Where teams align"]
           [:div.subheadline.big-web-only
             "Company updates and stories that keep teams"]
           [:div.subheadline.second-line.big-web-only
@@ -87,7 +87,7 @@
           [:div.stay-aligned-container
             [:div.stay-aligned-icon]
             [:div.stay-aligned-message
-              "Stay aligned around topics that matter."]]
+              "Stay aligned around the topics that matter."]]
 
           shared-misc/carrot-cards]
 

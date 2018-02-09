@@ -175,7 +175,7 @@
           [:a {:href "/login"} "Log in"]]
         [:div.small-logos
           [:a.twitter
-            {:target "_blank" :href "https://twitter.com/CarrotBuzz" :title "Carrot on Twitter"}
+            {:target "_blank" :href "https://twitter.com/carrot_hq" :title "Carrot on Twitter"}
             [:img {:src (pages/cdn "/img/ML/home_page_twitter.svg")}]]
           [:a.medium
             {:target "_blank" :href "https://blog.carrot.io" :title "Carrot on Medium"}

@@ -133,8 +133,8 @@
           (str
             "Carrot measures team "
             "engagement so leaders "
-            "can actually see if their "
-            "teams are aligned or not.")]]
+            "can see if their teams "
+            "are aligned.")]]
       [:div.card.card-6
         [:div.card-icon]
         [:div.card-title
@@ -235,7 +235,7 @@
         [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Grow together"]
+          "Where teams align"]
         [:div.subheadline.big-web-only
           "Company updates and stories that keep teams"]
         [:div.subheadline.second-line.big-web-only
@@ -263,7 +263,7 @@
         [:div.stay-aligned-container
           [:div.stay-aligned-icon]
           [:div.stay-aligned-message
-            "Stay aligned around topics that matter."]]
+            "Stay aligned around the topics that matter."]]
 
         carrot-cards]
 
@@ -352,7 +352,7 @@
         [:div.carrot-plus-slack]
 
         [:h1.slack
-          "Grow together"]
+          "Rise above the noise"]
 
         [:div.slack-subline-container
           [:div.slack-subline
