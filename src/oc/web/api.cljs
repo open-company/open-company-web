@@ -673,18 +673,14 @@
                                                          :body (when (seq body) (json->cljs body))
                                                          :activity-uuid (:uuid activity-data)}])))))))
 
-(defn add-comment [activity-data comment-body]
+(defn add-comment [activity-data comment-body callback]
   (when (and activity-data comment-body)
     (let [add-comment-link (utils/link-for (:links activity-data) "create" "POST")
           json-data (cljs->json {:body comment-body})]
       (interaction-http (method-for-link add-comment-link) (relative-href add-comment-link)
         {:headers (headers-for-link add-comment-link)
          :json-params json-data}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:comment-add/finish {:success success
-                                                      :error (when-not success body)
-                                                      :body (when (seq body) (json->cljs body))
-                                                      :activity-data activity-data}]))))))
+        callback))))
 
 (defn delete-comment
   [activity-uuid comment-data]

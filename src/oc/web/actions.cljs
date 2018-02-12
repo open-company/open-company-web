@@ -647,11 +647,6 @@
                                                         :user-id (jwt/get-key :user-id)}})]
     (assoc-in db comments-key new-comments-data)))
 
-(defmethod dispatcher/action :comment-add/finish
-  [db [_ {:keys [activity-data]}]]
-  (api/get-comments activity-data)
-  (assoc db :comment-add-finish true))
-
 (defmethod dispatcher/action :comment-delete
   [db [_ activity-uuid comment-data]]
   (api/delete-comment activity-uuid comment-data)
