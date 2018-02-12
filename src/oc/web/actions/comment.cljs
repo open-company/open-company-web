@@ -25,3 +25,12 @@
                                            :error (when-not success body)
                                            :body (when (seq body) (json->cljs body))
                                            :activity-data activity-data}]))))
+
+(defn get-comments [activity-data]
+  (dis/dispatch! [:comments-get activity-data])
+  (api/get-comments activity-data
+    (fn [{:keys [status success body]}]
+      (dis/dispatch! [:comments-get/finish {:success success
+                                            :error (when-not success body)
+                                            :body (when (seq body) (json->cljs body))
+                                            :activity-uuid (:uuid activity-data)}]))))

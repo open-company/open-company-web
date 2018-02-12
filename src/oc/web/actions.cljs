@@ -615,24 +615,6 @@
   [db [_]]
   (assoc db :edit-user-profile-failed true))
 
-(defmethod dispatcher/action :comments-get
-  [db [_ activity-data]]
-  (api/get-comments activity-data)
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))]
-    (assoc-in db (vec (conj (vec (butlast comments-key)) :loading)) true)))
-
-(defmethod dispatcher/action :comments-get/finish
-  [db [_ {:keys [success error body activity-uuid]}]]
-  (let [comments-key (dispatcher/activity-comments-key
-                      (router/current-org-slug)
-                      (router/current-board-slug) activity-uuid)
-        sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
-    (-> db
-      (assoc-in comments-key sorted-comments)
-      (assoc-in (vec (conj (vec (butlast comments-key)) :loading)) false))))
-
 (defmethod dispatcher/action :comment-add
   [db [_ activity-data comment-body]]
   (api/add-comment activity-data comment-body)

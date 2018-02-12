@@ -661,17 +661,13 @@
               (router/nav! (oc-urls/org (router/current-org-slug)))
               (.reload (.-location js/window)))))))))
 
-(defn get-comments [activity-data]
+(defn get-comments [activity-data callback]
   (when activity-data
     (let [comments-link (utils/link-for (:links activity-data) "comments")]
       (when comments-link
         (interaction-http (method-for-link comments-link) (relative-href comments-link)
           {:headers (headers-for-link comments-link)}
-          (fn [{:keys [status success body]}]
-            (dispatcher/dispatch! [:comments-get/finish {:success success
-                                                         :error (when-not success body)
-                                                         :body (when (seq body) (json->cljs body))
-                                                         :activity-uuid (:uuid activity-data)}])))))))
+          callback)))))
 
 (defn add-comment [activity-data comment-body callback]
   (when (and activity-data comment-body)

@@ -7,9 +7,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.stream-view-item :refer (stream-view-item)]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
+            [oc.web.components.stream-view-item :refer (stream-view-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
@@ -246,7 +247,7 @@
                               (let [activity-comments-data (get comments-data (:uuid item))]
                                 (when (and (not (:loading activity-comments-data))
                                            (not (contains? activity-comments-data :sorted-comments)))
-                                  (dis/dispatch! [:comments-get item]))))
+                                  (comment-actions/get-comments item))))
                             (when-not (:loading-more all-posts-data)
                               (when @(::top-loading s)
                                 (reset! (::top-loading s) false)

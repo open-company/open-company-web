@@ -10,6 +10,7 @@
             [oc.web.utils.comment :as cu]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.comment-reactions :as comment-reactions]
@@ -194,7 +195,7 @@
         comments-data (get all-comments-data (:uuid activity-data))]
     (when (and (not (:loading comments-data))
                (not (contains? comments-data :sorted-comments)))
-      (utils/after 10 #(dis/dispatch! [:comments-get activity-data])))))
+      (utils/after 10 #(comment-actions/get-comments activity-data)))))
 
 (defn show-loading?
   [s]
