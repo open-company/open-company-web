@@ -1,4 +1,4 @@
-(ns oc.web.lib.activity-utils
+(ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
