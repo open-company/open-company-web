@@ -626,7 +626,7 @@
           [:div#oc-loading]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
-          ;; Gooogle Analytics autotrack
+          ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
@@ -755,7 +755,11 @@
              :type "text/javascript"
              :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
              :crossorigin "anonymous"}]
+          ;; Google Analytics
+          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
+          (google-analytics-init)
           ;; Compiled oc.min.js from our CDN
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
-          [:script {:src (cdn "/oc_assets.js")}]]})
+          [:script {:src (cdn "/oc_assets.js")}]
+          (google-analytics-init)]})
