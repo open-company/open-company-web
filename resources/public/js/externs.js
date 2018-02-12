@@ -114,4 +114,3 @@ rangy.restoreSelection = function(){};
 rangy.getSelection = function(){};
 // jwt_decode
 var jwt_decode = function(){};
-
