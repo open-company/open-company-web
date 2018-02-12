@@ -8,11 +8,14 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.add-comment :refer (add-comment)]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (reactions-summary)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]))
 
 (defn- delete-clicked [e activity-data]
@@ -44,11 +47,21 @@
                               (drv/drv :org-data)
                               (drv/drv :stream-view-expanded-item)
                               (drv/drv :add-comment-focus)
+                              (drv/drv :comments-data)
                               ;; Locals
                               (rum/local false ::more-dropdown)
                               (rum/local false ::move-activity)
                               (rum/local nil ::window-click)
-                              {:did-mount (fn [s]
+                              {:before-render (fn [s]
+                                (let [activity-data (first (:rum/args s))
+                                      all-comments-data @(drv/get-ref s :comments-data)
+                                      comments-data (get all-comments-data (:uuid activity-data))]
+                                  ;; Preload comments
+                                  (when (and (not (:loading comments-data))
+                                             (not (contains? comments-data :sorted-comments)))
+                                    (comment-actions/get-comments activity-data)))
+                                s)
+                               :did-mount (fn [s]
                                 (let [activity-data (first (:rum/args s))
                                       activity-card-class (str "div.activity-card-" (:uuid activity-data))]
                                   (reset! (::window-click s)
@@ -153,8 +166,14 @@
                 "Continue reading"])]
           (activity-attachments activity-data true)
           [:div.stream-item-reactions.group
-            (reactions-summary activity-data)]]
+            (reactions activity-data)]]
         [:div.stream-body-right
           [:div.stream-body-comments
             {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
+            (let [all-comments-data (drv/react s :comments-data)
+                  comments-data (get all-comments-data (:uuid activity-data))
+                  loading? (:loading comments-data)]
+              (if loading?
+                (small-loading)
+                (stream-comments (:sorted-comments comments-data))))
             (add-comment activity-data)]]]]))
