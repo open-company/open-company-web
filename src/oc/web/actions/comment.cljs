@@ -7,20 +7,28 @@
             [oc.web.actions :as actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
-(defn add-comment-focus []
-  (dis/dispatch! [:add-comment-focus true]))
+(defn add-comment-focus [activity-data]
+  (dis/dispatch! [:add-comment-focus activity-data]))
 
 (defn add-comment-blur []
-  (dis/dispatch! [:add-comment-focus false]))
+  (dis/dispatch! [:add-comment-focus nil]))
+
+(defn get-comments-finished [activity-data {:keys [status success body]}]
+  (dis/dispatch! [:comments-get/finish {:success success
+                                        :error (when-not success body)
+                                        :body (when (seq body) (json->cljs body))
+                                        :activity-uuid (:uuid activity-data)}]))
 
 (defn add-comment [activity-data comment-body]
+  (add-comment-blur)
   ;; Add the comment to the app-state to show it immediately
   (dis/dispatch! [:comment-add activity-data comment-body])
   (api/add-comment activity-data comment-body
     ;; Once the comment api request is finished refresh all the comments, no matter
     ;; if it worked or not
     (fn [{:keys [status success body]}]
-      (api/get-comments activity-data)
+      (api/get-comments activity-data
+       #(get-comments-finished activity-data %))
       (dis/dispatch! [:comment-add/finish {:success success
                                            :error (when-not success body)
                                            :body (when (seq body) (json->cljs body))
@@ -29,8 +37,11 @@
 (defn get-comments [activity-data]
   (dis/dispatch! [:comments-get activity-data])
   (api/get-comments activity-data
+   #(get-comments-finished activity-data %)))
+
+(defn delete-comment [activity-data comment-data]
+  (dis/dispatch! [:comment-delete (:uuid activity-data) comment-data])
+  (api/delete-comment (:uuid activity-data) comment-data
     (fn [{:keys [status success body]}]
-      (dis/dispatch! [:comments-get/finish {:success success
-                                            :error (when-not success body)
-                                            :body (when (seq body) (json->cljs body))
-                                            :activity-uuid (:uuid activity-data)}]))))
+      (api/get-comments activity-data
+       #(get-comments-finished activity-data %)))))

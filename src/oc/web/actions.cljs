@@ -13,6 +13,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.user-cache :as uc]
+            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.lib.ws-change-client :as ws-cc]
@@ -615,43 +616,6 @@
   [db [_]]
   (assoc db :edit-user-profile-failed true))
 
-(defmethod dispatcher/action :comment-add
-  [db [_ activity-data comment-body]]
-  (api/add-comment activity-data comment-body)
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))
-        comments-data (get-in db comments-key)
-        new-comments-data (conj comments-data {:body comment-body
-                                               :created-at (utils/as-of-now)
-                                               :author {:name (jwt/get-key :name)
-                                                        :avatar-url (jwt/get-key :avatar-url)
-                                                        :user-id (jwt/get-key :user-id)}})]
-    (assoc-in db comments-key new-comments-data)))
-
-(defmethod dispatcher/action :comment-delete
-  [db [_ activity-uuid comment-data]]
-  (api/delete-comment activity-uuid comment-data)
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        item-uuid (:uuid comment-data)
-        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
-        comments-data (get-in db comments-key)
-        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
-    (assoc-in db comments-key new-comments-data)))
-
-(defmethod dispatcher/action :comment-delete/finish
-  [db [_ {:keys [success activity-uuid]}]]
-  (if success
-    db
-    (let [org-slug (router/current-org-slug)
-          board-slug (router/current-board-slug)
-          board-key (dispatcher/board-data-key org-slug board-slug)
-          board-data (get-in db board-key)
-          activity-data (get-in board-data [:fixed-items activity-uuid])]
-      (api/get-comments activity-data)
-      db)))
-
 (defmethod dispatcher/action :ws-interaction/comment-delete
   [db [_ comment-data]]
   (let [; Get the current router data
@@ -788,7 +752,12 @@
         activity-data (get-in board-data [:fixed-items activity-uuid])
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
         comments-data (get-in db comments-key)]
-    (api/get-comments activity-data)
+    (api/get-comments activity-data
+     (fn [{:keys [success status body]}]
+       (dispatcher/dispatch! [:comments-get/finish {:success success
+                                                    :error (when-not success body)
+                                                    :body (when (seq body) (json->cljs body))
+                                                    :activity-uuid (:uuid activity-data)}])))
     (assoc-in db comments-key comments-data)))
 
 (defmethod dispatcher/action :reaction-toggle/finish

@@ -42,3 +42,13 @@
     (-> db
       (assoc-in comments-key sorted-comments)
       (assoc-in (vec (conj (vec (butlast comments-key)) :loading)) false))))
+
+(defmethod dispatcher/action :comment-delete
+  [db [_ activity-uuid comment-data]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        item-uuid (:uuid comment-data)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
+    (assoc-in db comments-key new-comments-data)))

@@ -679,15 +679,12 @@
         callback))))
 
 (defn delete-comment
-  [activity-uuid comment-data]
+  [activity-uuid comment-data callback]
   (when comment-data
     (let [comment-link (utils/link-for (:links comment-data) "delete")]
       (interaction-http (method-for-link comment-link) (relative-href comment-link)
         {:headers (headers-for-link comment-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch!
-           [:comment-delete/finish
-            {:success success :activity-uuid activity-uuid}]))))))
+        callback))))
 
 (defn save-comment
   [comment-data new-data]
