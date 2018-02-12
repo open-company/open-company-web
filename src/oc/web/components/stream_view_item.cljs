@@ -31,27 +31,16 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
-(defn- expand-item [activity-data]
-  (dis/dispatch! [:input [:stream-view-expanded-item] (:uuid activity-data)]))
-
-(defn- collapse-item [activity-data]
-  (dis/dispatch! [:input [:stream-view-expanded-item] nil]))
-
-(defn toggle-item [s activity-data]
-  (if (= @(drv/get-ref s :stream-view-expanded-item) (:uuid activity-data))
-    (collapse-item activity-data)
-    (expand-item activity-data)))
-
 (rum/defcs stream-view-item < rum/reactive
                               ;; Derivatives
                               (drv/drv :org-data)
-                              (drv/drv :stream-view-expanded-item)
                               (drv/drv :add-comment-focus)
                               (drv/drv :comments-data)
                               ;; Locals
                               (rum/local false ::more-dropdown)
                               (rum/local false ::move-activity)
                               (rum/local nil ::window-click)
+                              (rum/local false ::expanded)
                               {:before-render (fn [s]
                                 (let [activity-data (first (:rum/args s))
                                       all-comments-data @(drv/get-ref s :comments-data)
@@ -83,7 +72,7 @@
         edit-link (utils/link-for (:links activity-data) "partial-update")
         delete-link (utils/link-for (:links activity-data) "delete")
         share-link (utils/link-for (:links activity-data) "share")
-        expanded? (= (drv/react s :stream-view-expanded-item) (:uuid activity-data))]
+        expanded? @(::expanded s)]
     [:div.stream-view-item
       {:class (str "stream-view-item-" (:uuid activity-data))}
       [:div.stream-view-item-header
@@ -162,7 +151,7 @@
               {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]
             (when-not expanded?
               [:button.mlb-reset.expand-button
-                {:on-click #(toggle-item s activity-data)}
+                {:on-click #(reset! (::expanded s) true)}
                 "Continue reading"])]
           (activity-attachments activity-data true)
           [:div.stream-item-reactions.group
