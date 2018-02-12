@@ -17,6 +17,88 @@ div.stream-view-item {
 
       @include activity-author(40);
     }
+
+    div.more-button {
+      float: right;
+      position: relative;
+      margin-right: -6px;
+
+      button.more-ellipsis {
+        width: 24px;
+        height: 24px;
+        padding: 2px 10px;
+        display: block;
+        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+        background-position: center;
+        background-size: 4px 20px;
+        background-repeat: no-repeat;
+      }
+
+      div.activity-move {
+        position: absolute;
+        top: 36px;
+        left: unset;
+        right: -10px;
+
+        @include mobile() {
+          right: -10px;
+        }
+      }
+
+      div.activity-more-dropdown-menu {
+        position: absolute;
+        top: 36px;
+        right: -10px;
+        left: calc(100% - 100px + 10px);
+        min-width: 100px;
+        height: auto;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        background-color: transparent;
+        overflow: visible;
+        z-index: 100;
+
+        div.triangle {
+          position: absolute;
+          top: -7px;
+          left: calc(100% - 30px);
+          background-color: white;
+          border-top: 1px solid rgba(177,184,192,0.50);
+          border-left: 1px solid rgba(177,184,192,0.50);
+          transform: rotate(45deg);
+          width: 15px;
+          height: 15px;
+        }
+
+        ul.activity-card-more-menu {
+          background-color: white;
+          border: 1px solid rgba(177,184,192,0.50);
+          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+          border-radius: 5px;
+          margin: 0px;
+          padding: 10px 13px 6px 8px;
+          min-height: 50px;
+          list-style-type: none;
+          width: 100%;
+
+          li {
+            padding: 3px 8px;
+            @include avenir_M();
+            font-size: 14px;
+            color: $carrot_light_gray_3;
+            cursor: pointer;
+            background-color: transparent;
+
+            @include big_web() {
+              &:hover {
+                background-color: rgba($carrot_light_gray_4, 0.2);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   div.stream-view-item-body {
@@ -33,6 +115,9 @@ div.stream-view-item {
       flex-shrink: 0;
       flex-basis: 506px;
       width: 506px;
+      min-height: 300px;
+      position: relative;
+      padding-bottom: 42px;
 
       span.posted-in {
         @include avenir_M();
@@ -48,19 +133,63 @@ div.stream-view-item {
         color: $deep_navy;
       }
 
-      div.stream-item-body {
-        margin-top: 8px;
-        @include activity-body(18);
-        @include avenir_BOOK();
-        color: $deep_navy;
+      div.stream-item-body-container {
 
-        * {
+        &.collapsed {
+          div.stream-item-body {
+            max-height: 226px;
+            overflow: hidden;
+            position: relative;
+
+            &:after {
+              $gradient_base_color: white;
+              content: "";
+              position: absolute;
+              height: 48px;
+              bottom: 0px;
+              left: 0px;
+              right: 0px;
+              z-index: 10;
+              pointer-events: none;
+              background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
+              background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
+              background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
+              background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
+              background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
+              background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$gradient_base_color}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+            }
+          }
+
+          button.expand-button {
+            margin-top: 16px;
+            width: 100%;
+            height: 40px;
+            border-radius: 100px;
+            border: 2px solid $feint_emerald;
+            color: $carrot_green;
+            @include avenir_M();
+            font-size: 16px;
+            text-align: center;
+          }
+        }
+
+        div.stream-item-body {
+          margin-top: 8px;
+          @include activity-body(18);
+          @include avenir_BOOK();
           color: $deep_navy;
+
+          * {
+            color: $deep_navy;
+          }
         }
       }
 
       div.stream-item-reactions {
         margin-top: 16px;
+        position: absolute;
+        bottom: 16px;
       }
     }
 
@@ -69,6 +198,7 @@ div.stream-view-item {
       flex-shrink: 0;
       flex-basis: 356px;
       width: 356px;
+      min-height: 300px;
 
       div.comments {
         div.vertical-line {
