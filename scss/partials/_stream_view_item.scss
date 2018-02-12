@@ -113,11 +113,12 @@ div.stream-view-item {
     div.stream-body-left {
       flex-grow: 0;
       flex-shrink: 0;
-      flex-basis: 506px;
-      width: 506px;
+      flex-basis: 470px;
+      width: 470px;
       min-height: 300px;
       position: relative;
-      padding-bottom: 42px;
+      padding-bottom: 32px;
+      margin-right: 36px;
 
       span.posted-in {
         @include avenir_M();
@@ -189,16 +190,18 @@ div.stream-view-item {
       div.stream-item-reactions {
         margin-top: 16px;
         position: absolute;
-        bottom: 16px;
+        bottom: 0px;
       }
     }
 
     div.stream-body-right {
       flex-grow: 0;
       flex-shrink: 0;
-      flex-basis: 356px;
-      width: 356px;
+      flex-basis: 320px;
+      width: 320px;
       min-height: 300px;
+      position: relative;
+      margin-left: 36px;
 
       div.comments {
         div.vertical-line {
@@ -216,6 +219,45 @@ div.stream-view-item {
             padding: 20px 16px 18px 7px;
             &:before {
               display: none;
+            }
+          }
+        }
+      }
+
+      div.stream-body-comments {
+        padding-bottom: 70px;
+        height: 100%;
+
+        &.add-comment-expanded {
+          padding-bottom: 152px;
+        }
+      }
+
+      div.add-comment-box-container {
+        bottom: 0px;
+        position: absolute;
+
+        div.add-comment-box {
+
+          button.emoji-button {
+            background-size: 16px 16px;
+            background-position: 50% 70%;
+            opacity: 0.7;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+
+          div.add-comment-internal{
+            position: relative;
+
+            div.add-comment {
+              width: 250px;
+
+              &.show-buttons {
+                width: 100%;
+              }
             }
           }
         }

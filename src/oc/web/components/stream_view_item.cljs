@@ -8,7 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.comments :refer (comments)]
+            [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -43,6 +43,7 @@
                               ;; Derivatives
                               (drv/drv :org-data)
                               (drv/drv :stream-view-expanded-item)
+                              (drv/drv :add-comment-focus)
                               ;; Locals
                               (rum/local false ::more-dropdown)
                               (rum/local false ::move-activity)
@@ -154,4 +155,6 @@
           [:div.stream-item-reactions.group
             (reactions-summary activity-data)]]
         [:div.stream-body-right
-          (comments activity-data)]]]))
+          [:div.stream-body-comments
+            {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
+            (add-comment activity-data)]]]]))
