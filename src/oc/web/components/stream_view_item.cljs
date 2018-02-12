@@ -171,9 +171,6 @@
           [:div.stream-body-comments
             {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
             (let [all-comments-data (drv/react s :comments-data)
-                  comments-data (get all-comments-data (:uuid activity-data))
-                  loading? (:loading comments-data)]
-              (if loading?
-                (small-loading)
-                (stream-comments (:sorted-comments comments-data))))
+                  comments-data (get all-comments-data (:uuid activity-data))]
+              (stream-comments (:sorted-comments comments-data)))
             (add-comment activity-data)]]]]))

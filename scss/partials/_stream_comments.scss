@@ -1,10 +1,25 @@
 div.stream-comments {
   width: 100%;
+  height: 100%;
+
+  div.stream-comments-empty {
+    @include image-2x("/img/ML/no_comments_sleep");
+    background-size: 69px 75px;
+    width: 69px;
+    height: 75px;
+    background-repeat: no-repeat;
+    margin-top: -37px;
+    margin-left: -35px;
+    top: 50%;
+    left: 50%;
+    position: relative;
+  }
 
   div.stream-comment {
     border: 1px solid rgba($deep_tan, 0.7);
     border-radius: 6px;
     padding: 16px;
+    background-color: white;
 
     div.stream-comment-header {
       height: 32px;
