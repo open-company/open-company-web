@@ -53,12 +53,7 @@
    [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
    [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
    [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
-   [:script (str
-             "CarrotGA.init("
-             (or (env :ga-version) false)
-             ","
-             (or (env :ga-tracking-id) false)
-             ")")]
+   (pages/google-analytics-init)
    ;; Bootstrap JavaScript //getf.com/
    [:script
      {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"

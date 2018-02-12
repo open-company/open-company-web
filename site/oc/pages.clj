@@ -3,6 +3,15 @@
             [oc.privacy :as privacy]
             [environ.core :refer (env)]))
 
+(defn google-analytics-init []
+  [:script (let [ga-version (if (env :ga-version)
+                              (str "'" (env :ga-version) "'")
+                              false)
+                 ga-tracking-id (if (env :ga-tracking-id)
+                                  (str "'" (env :ga-tracking-id) "'")
+                                  false)]
+             (str "CarrotGA.init(" ga-version "," ga-tracking-id ");"))])
+
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
@@ -621,11 +630,7 @@
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
-          [:script (str "CarrotGA.init("
-                        (or (env :ga-version) false)
-                        ","
-                        (or (env :ga-tracking-id) false)
-                        ")")]
+          (google-analytics-init)
           ;; JWT decode library
           [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; Custom Tooltips
