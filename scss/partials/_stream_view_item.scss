@@ -159,7 +159,7 @@ div.stream-view-item {
           @include avenir_BOOK();
           color: $deep_navy;
           line-height: 30px;
-          max-height: 226px;
+          max-height: 400px;
           transition: max-height 5s ease-out;
           overflow: hidden;
           position: relative;
@@ -217,7 +217,7 @@ div.stream-view-item {
       position: relative;
       padding: 18px 20px 18px 36px;
       background-color: #FDFCFB;
-      max-height: 404px;
+      max-height: 578px;
       transition: max-height 5s ease-out;
 
       &.expanded {
