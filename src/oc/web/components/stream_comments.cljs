@@ -1,27 +1,44 @@
 (ns oc.web.components.stream-comments
   (:require [rum.core :as rum]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.comment :as cu]
             [oc.web.actions.comment :as comment-actions]))
 
-(rum/defcs stream-comments < rum/static
+(defn scroll-to-bottom [s]
+  (let [scrolling-node (rum/ref-node s "stream-comments-inner")]
+    (set! (.-scrollTop scrolling-node) (.-scrollHeight scrolling-node))))
+
+(rum/defcs stream-comments < rum/reactive
+                             (drv/drv :add-comment-focus)
                              (rum/local false ::bottom-gradient)
+                             (rum/local false ::last-focused-state)
                              {:did-mount (fn [s]
-                              (let [scrolling-node (rum/ref-node s "stream-comments-inner")]
-                                (set! (.-scrollTop scrolling-node) (.-scrollHeight scrolling-node)))
-                              s)
+                               (scroll-to-bottom s)
+                               s)
+                              :before-render (fn [s]
+                               (let [activity-uuid (:uuid (first (:rum/args s)))
+                                     focused-uuid @(drv/get-ref s :add-comment-focus)]
+                                  (if (and (= focused-uuid activity-uuid)
+                                           (not @(::last-focused-state s)))
+                                    (do
+                                     (reset! (::last-focused-state s) true)
+                                     (scroll-to-bottom s))
+                                    (reset! (::last-focused-state s) false)))
+                               s)
                               :after-render (fn [s]
                               (let [scrolling-node (rum/ref-node s "stream-comments-inner")
                                     scrolls (> (.-scrollHeight scrolling-node) (.-clientHeight scrolling-node))]
                                 (compare-and-set! (::bottom-gradient s) (not scrolls) scrolls))
                               s)}
   [s activity-data comments-data]
-  (js/console.log "stream-comments/render" (:uuid activity-data))
   [:div.stream-comments
     {:class (utils/class-set {:bottom-gradient @(::bottom-gradient s)})}
     [:div.stream-comments-inner
       {:ref "stream-comments-inner"}
       (if (pos? (count comments-data))
-        (for [comment-data comments-data]
+        (for [comment-data comments-data
+              :let [read-only-reaction (cu/is-own-comment? comment-data)]]
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data))}
             [:div.stream-comment-header.group
@@ -36,11 +53,12 @@
               [:div.stream-comment-body
                 {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))}]]
             [:div.stream-comment-footer.group
-              (let [reaction-data (first (:reactions comment-data))]
+              (let [reaction-data (first (:reactions comment-data))
+                    can-react? (and (not read-only-reaction)
+                                    (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"]))]
                 [:div.stream-comment-reaction
                   {:class (utils/class-set {:reacted (:reacted reaction-data)
-                                            :can-react (utils/link-for (:links reaction-data) "react" 
-                                                        ["PUT" "DELETE"])})}
+                                            :can-react can-react?})}
                     [:div.stream-comment-reaction-icon
                       {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data reaction-data
                         (not (:reacted reaction-data)))}]
