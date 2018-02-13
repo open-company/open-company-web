@@ -356,9 +356,9 @@
 
         [:div.slack-subline-container
           [:div.slack-subline
-            "Focused communication that keeps teams aligned"]
+            "Company updates and stories that keep teams "]
           [:div.slack-subline
-            "around what matters most."]]
+            "aligned around what matters most."]]
 
         [:div.sigin-with-slack-container
           [:button.signin-with-slack.mlb-reset
