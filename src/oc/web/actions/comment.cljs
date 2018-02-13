@@ -45,3 +45,10 @@
     (fn [{:keys [status success body]}]
       (api/get-comments activity-data
        #(get-comments-finished activity-data %)))))
+
+(defn comment-reaction-toggle
+  [activity-data comment-data reaction-data reacting?]
+  (dis/dispatch! [:comment-reaction-toggle])
+  (api/toggle-reaction reaction-data reacting?
+    (fn [{:keys [status success body]}]
+      (get-comments activity-data))))
