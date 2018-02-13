@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.reactions :as reactions]
+            [oc.web.actions.comment :as comment-actions]
             [cljsjs.web-animations]))
 
 (defn- read-only?
@@ -13,7 +14,7 @@
   (= (jwt/user-id) (:user-id (:author item-data))))
 
 (rum/defcs comment-reactions
-  [s item-data]
+  [s activity-data item-data]
   (when (seq (:reactions item-data))
     (let [reactions-data (:reactions item-data)
           reactions-loading (:reactions-loading item-data)
@@ -39,7 +40,7 @@
                                     (not (js/isEdge))
                                     (not (js/isIE)))
                            (reactions/animate-reaction e s))
-                         (dis/dispatch! [:comment-reaction-toggle item-data r (not reacted)])))}
+                         (comment-actions/comment-reaction-toggle item-data r (not reacted))))}
           [:div.reaction
             {:class (utils/class-set {:no-reactions (not (pos? (:count r)))})}
             (:reaction r)]

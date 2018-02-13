@@ -112,7 +112,7 @@
                             (events/unlistenByKey
                              @(::window-click s)))
                           }
-  [s c]
+  [s activity-data c]
   (let [author (:author c)
         is-emoji-comment? (is-emoji (:body c))
         is-owner? (= (-> c :author :user-id) (jwt/user-id))
@@ -147,7 +147,7 @@
                   editable)
           [:div.comment-footer-container.group
             (when should-show-comment-reaction?
-              (comment-reactions/comment-reactions c))
+              (comment-reactions/comment-reactions activity-data c))
             (when @(::editing? s)
               [:div.save-cancel-edit-buttons
                 [:button.mlb-reset.mlb-link-green
@@ -272,7 +272,7 @@
                                (reset! (::scroll-bottom-after-render s) false))
                              (.data comments-internal-scroll "lastScrollTop" (.scrollTop comments-internal-scroll))))}
               (for [c sorted-comments]
-                (rum/with-key (comment-row c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
+                (rum/with-key (comment-row activity-data c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
               [:div.bottom-gradient.bottom-left]
               [:div.line-bottom-gradient]
               [:div.bottom-gradient.bottom-right]]
