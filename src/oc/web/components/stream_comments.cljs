@@ -28,7 +28,7 @@
                                s)
                               :after-render (fn [s]
                               (let [scrolling-node (rum/ref-node s "stream-comments-inner")
-                                    scrolls (> (.-scrollHeight scrolling-node) (.-clientHeight scrolling-node))]
+                                    scrolls (> (.-scrollHeight scrolling-node) (+ (.-clientHeight scrolling-node) 16))]
                                 (compare-and-set! (::bottom-gradient s) (not scrolls) scrolls))
                               s)}
   [s activity-data comments-data]
@@ -59,7 +59,7 @@
                 [:div.stream-comment-reaction
                   {:class (utils/class-set {:reacted (:reacted reaction-data)
                                             :can-react can-react?})}
-                    (when (or (pos? (:count comment-data))
+                    (when (or (pos? (:count reaction-data))
                               can-react?)
                       [:div.stream-comment-reaction-icon
                         {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data reaction-data
