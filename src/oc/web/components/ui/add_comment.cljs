@@ -36,7 +36,6 @@
                          (rum/local nil ::blur-listener)
                          {:did-mount (fn [s]
                            (utils/after 2500 #(js/emojiAutocomplete))
-                           (comment-actions/add-comment-blur)
                            (let [add-comment-node (rum/ref-node s "add-comment")
                                  medium-editor (cu/setup-medium-editor add-comment-node)]
                              (reset! (::medium-editor s) medium-editor)
