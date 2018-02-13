@@ -151,10 +151,9 @@
             {:class (if expanded? "expanded" "collapsed")}
             [:div.stream-item-body
               {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]
-            (when-not expanded?
-              [:button.mlb-reset.expand-button
-                {:on-click #(reset! (::expanded s) true)}
-                "Continue reading"])]
+            [:button.mlb-reset.expand-button
+              {:on-click #(reset! (::expanded s) true)}
+              "Continue reading"]]
           (activity-attachments activity-data true)
           [:div.stream-item-reactions.group
             (reactions activity-data)]]
