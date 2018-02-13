@@ -31,6 +31,14 @@
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
 
+(defn should-show-continue-reading? [s]
+  (when-not @(::expanded s)
+    (let [item-body (rum/ref-node s "item-body")
+          dom-node (rum/dom-node s)]
+      (if (> (.-clientHeight item-body) 400)
+        (.add (.-classList dom-node) "show-continue-reading")
+        (.remove (.-classList dom-node) "show-continue-reading")))))
+
 (rum/defcs stream-view-item < rum/reactive
                               ;; Derivatives
                               (drv/drv :org-data)
@@ -62,6 +70,9 @@
                                               (not (utils/event-inside? e (rum/ref-node s "activity-move-container"))))
                                      (reset! (::more-dropdown s) false)))))
                                 s)
+                               :after-render (fn [s]
+                                (should-show-continue-reading? s)
+                                s)
                                :will-unmount (fn [s]
                                 (events/unlistenByKey @(::window-click s))
                                 s)}
@@ -73,7 +84,8 @@
         share-link (utils/link-for (:links activity-data) "share")
         expanded? @(::expanded s)]
     [:div.stream-view-item
-      {:class (str "stream-view-item-" (:uuid activity-data))}
+      {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
+                                :expanded expanded?})}
       [:div.stream-view-item-header
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))
@@ -148,9 +160,10 @@
           [:div.stream-item-headline
             {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-item-body-container
-            {:class (if expanded? "expanded" "collapsed")}
             [:div.stream-item-body
-              {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]
+              [:div.stream-item-body-inner
+                {:ref "item-body"
+                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
             [:button.mlb-reset.expand-button
               {:on-click #(reset! (::expanded s) true)}
               "Continue reading"]]

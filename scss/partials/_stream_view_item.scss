@@ -2,6 +2,26 @@ div.stream-view-item {
   width: 932px;
   margin-top: 16px;
 
+  &:not(.expanded).show-continue-reading {
+    div.stream-view-item-body {
+      div.stream-body-left {
+        div.stream-item-body-container {
+          div.stream-item-body {
+            overflow: hidden;
+            max-height: 400px;
+            &:after {
+              display: block;
+            }
+          }
+
+          button.expand-button {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+
   div.stream-view-item-header {
     height: 72px;
     background-color: $light_tan;
@@ -115,7 +135,7 @@ div.stream-view-item {
       flex-shrink: 0;
       flex-basis: 505px;
       width: 505px;
-      min-height: 300px;
+      // min-height: 300px;
       position: relative;
       padding-top: 18px;
       padding-bottom: 48px;
@@ -139,32 +159,12 @@ div.stream-view-item {
 
       div.stream-item-body-container {
 
-        &.expanded {
-          div.stream-item-body {
-            max-height: initial;
-
-            &:after {
-              display: none;
-            }
-          }
-
-          button.expand-button {
-            display: none;
-          }
-        }
-
         div.stream-item-body {
-          margin-top: 8px;
-          @include activity-body(18);
-          @include avenir_BOOK();
-          color: $deep_navy;
-          line-height: 30px;
-          max-height: 400px;
-          transition: max-height 5s ease-out;
-          overflow: hidden;
           position: relative;
+          transition: max-height 5s ease-out;
 
           &:after {
+            display: none;
             $gradient_base_color: white;
             content: "";
             position: absolute;
@@ -183,8 +183,16 @@ div.stream-view-item {
             filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$gradient_base_color}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
           }
 
-          * {
+          div.stream-item-body-inner {
+            margin-top: 8px;
+            @include activity-body(18);
+            @include avenir_BOOK();
             color: $deep_navy;
+            line-height: 30px;
+
+            * {
+              color: $deep_navy;
+            }
           }
         }
 
@@ -198,6 +206,7 @@ div.stream-view-item {
           @include avenir_M();
           font-size: 16px;
           text-align: center;
+          display: none;
         }
       }
 
