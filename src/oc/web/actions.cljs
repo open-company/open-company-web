@@ -667,26 +667,30 @@
           (assoc-in db comments-key new-comments-data))
         db))))
 
+(defn handle-reaction-to-entry
+  [db activity-data reaction-data]
+  (let [board-key (dispatcher/current-board-key)
+        board-data (get-in db board-key)
+        old-reactions-loading (or (:reactions-loading activity-data) [])
+        next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
+        updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)
+        activity-key (concat board-key [:fixed-items (:uuid activity-data)])]
+    (assoc-in db activity-key updated-activity-data)))
+
 (defmethod dispatcher/action :activity-reaction-toggle
   [db [_ activity-data reaction-data reacting?]]
   (let [activity-uuid (:uuid activity-data)]
-    (api/toggle-reaction activity-data reaction-data reacting?
+    (api/toggle-reaction reaction-data reacting?
       (fn [{:keys [status success body]}]
         (dispatcher/dispatch!
          [:activity-reaction-toggle/finish
           activity-data
           (:reaction reaction-data)
           (when success (json->cljs body))])))
-    (let [board-key (dispatcher/current-board-key)
-          board-data (get-in db board-key)
-          old-reactions-loading (or (:reactions-loading activity-data) [])
-          next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
-          updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)
-          activity-key (concat board-key [:fixed-items activity-uuid])]
-      (assoc-in db activity-key updated-activity-data))))
+    (handle-reaction-to-entry db activity-data reaction-data)))
 
-(defmethod dispatcher/action :activity-reaction-toggle/finish
-  [db [_ activity-data reaction reaction-data]]
+(defn handle-reaction-to-entry-finish
+  [db activity-data reaction reaction-data]
   (let [board-data (get-in db (dispatcher/current-board-key))
         activity-uuid (:uuid activity-data)
         next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)
@@ -705,6 +709,10 @@
                                    (assoc :reactions-loading next-reactions-loading)
                                    (assoc-in [:reactions fixed-reaction-idx] next-reaction-data))]
         (assoc-in db activity-key updated-activity-data)))))
+
+(defmethod dispatcher/action :activity-reaction-toggle/finish
+  [db [_ activity-data reaction reaction-data]]
+  (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
