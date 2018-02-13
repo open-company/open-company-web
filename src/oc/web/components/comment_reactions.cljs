@@ -40,7 +40,7 @@
                                     (not (js/isEdge))
                                     (not (js/isIE)))
                            (reactions/animate-reaction e s))
-                         (comment-actions/comment-reaction-toggle item-data r (not reacted))))}
+                         (comment-actions/comment-reaction-toggle activity-data item-data r (not reacted))))}
           [:div.reaction
             {:class (utils/class-set {:no-reactions (not (pos? (:count r)))})}
             (:reaction r)]
