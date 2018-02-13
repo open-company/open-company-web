@@ -2,6 +2,7 @@
   (:require [cljsjs.medium-editor]
             [goog.object :as gobj]
             [cuerdas.core :as string]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]))
 
 (defn setup-medium-editor [comment-node]
@@ -47,3 +48,7 @@
         final-text (.trim (.text final-node))]
     (when (pos? (count final-text))
       (string/trim (.html final-node)))))
+
+(defn- is-own-comment?
+  [comment-data]
+  (= (jwt/user-id) (:user-id (:author comment-data))))
