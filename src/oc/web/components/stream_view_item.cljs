@@ -51,17 +51,16 @@
                                     (comment-actions/get-comments activity-data)))
                                 s)
                                :did-mount (fn [s]
-                                (let [activity-data (first (:rum/args s))
-                                      activity-card-class (str "div.activity-card-" (:uuid activity-data))]
-                                  (reset! (::window-click s)
-                                   (events/listen
-                                    js/window
-                                    EventType/CLICK
-                                    (fn [e]
-                                      (when (and
-                                             (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
-                                             (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
-                                        (reset! (::more-dropdown s) false))))))
+                                (reset! (::window-click s)
+                                 (events/listen
+                                  js/window
+                                  EventType/CLICK
+                                  (fn [e]
+                                   (when (and (or @(::more-dropdown s)
+                                                  @(::move-activity s))
+                                              (not (utils/event-inside? e (rum/ref-node s "more-button")))
+                                              (not (utils/event-inside? e (rum/ref-node s "activity-move-container"))))
+                                     (reset! (::more-dropdown s) false)))))
                                 s)
                                :will-unmount (fn [s]
                                 (events/unlistenByKey @(::window-click s))
@@ -94,6 +93,7 @@
                             #(not= (:slug %) utils/default-drafts-board-slug)
                             (:boards (drv/react s :org-data)))]
             [:div.more-button
+              {:ref "more-button"}
               [:button.mlb-reset.more-ellipsis
                 {:type "button"
                  :on-click (fn [e]
@@ -135,11 +135,13 @@
                                       (delete-clicked % activity-data))}
                         "Delete"])]])
               (when @(::move-activity s)
-                (activity-move
-                 {:activity-data activity-data
-                  :boards-list all-boards
-                  :dismiss-cb #(reset! (::move-activity s) false)}))]))]
-      [:div.stream-view-item-body
+                [:div.activity-move-container
+                  {:ref "activity-move-container"}
+                  (activity-move
+                   {:activity-data activity-data
+                    :boards-list all-boards
+                    :dismiss-cb #(reset! (::move-activity s) false)})])]))]
+      [:div.stream-view-item-body.group
         [:div.stream-body-left
           [:span.posted-in
             {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}]
@@ -157,9 +159,11 @@
           [:div.stream-item-reactions.group
             (reactions activity-data)]]
         [:div.stream-body-right
+          {:class (when expanded? "expanded")}
           [:div.stream-body-comments
             {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
             (let [all-comments-data (drv/react s :comments-data)
                   comments-data (get all-comments-data (:uuid activity-data))]
-              (stream-comments (:sorted-comments comments-data)))
+              (rum/with-key (stream-comments activity-data (:sorted-comments comments-data))
+               (str "stream-comments-" (:uuid activity-data) "-" (count comments-data))))
             (add-comment activity-data)]]]]))
