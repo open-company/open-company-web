@@ -2,6 +2,10 @@ div.stream-view-item {
   width: 932px;
   margin-top: 16px;
 
+  @include mobile() {
+    width: 100%;
+  }
+
   &:not(.expanded).show-continue-reading {
     div.stream-view-item-body {
       div.stream-body-left {
@@ -28,6 +32,11 @@ div.stream-view-item {
     padding: 18px 24px;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
+
+    @include mobile() {
+      border-top-left-radius: 0px;
+      border-top-right-radius: 0px;
+    }
 
     div.stream-header-head-author {
       float: left;
@@ -89,6 +98,10 @@ div.stream-view-item {
           transform: rotate(45deg);
           width: 15px;
           height: 15px;
+
+          @include mobile() {
+            display: none;
+          }
         }
 
         ul.activity-card-more-menu {
@@ -130,6 +143,13 @@ div.stream-view-item {
     border-bottom-right-radius: 6px;
     background-color: white;
 
+    @include mobile() {
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+      display: block;
+      flex-direction: unset;
+    }
+
     div.stream-body-left {
       flex-grow: 0;
       flex-shrink: 0;
@@ -137,11 +157,15 @@ div.stream-view-item {
       width: 505px;
       // min-height: 300px;
       position: relative;
-      padding-top: 18px;
-      padding-bottom: 48px;
-      margin-bottom: 18px;
-      padding-left: 36px;
-      margin-right: 36px;
+      padding: 18px 0px 48px 36px;
+      margin: 0px 36px 18px 0px;
+
+      @include mobile() {
+        width: 100%;
+        flex-basis: unset;
+        padding: 24px;
+        margin: 0px;
+      }
 
       span.posted-in {
         @include avenir_M();
@@ -194,7 +218,7 @@ div.stream-view-item {
               color: $deep_navy;
             }
 
-            div.carrot-no-preview {
+            div.carrot-no-preview, a.carrot-no-preview {
               display: none;
             }
           }
@@ -211,6 +235,10 @@ div.stream-view-item {
           font-size: 16px;
           text-align: center;
           display: none;
+
+          @include mobile() {
+            margin-bottom: 16px;
+          }
         }
       }
 
@@ -218,6 +246,11 @@ div.stream-view-item {
         margin-top: 16px;
         position: absolute;
         bottom: 0px;
+
+        @include mobile() {
+          position: relative;
+          bottom: unset;
+        }
       }
     }
 

@@ -153,7 +153,7 @@
                     :boards-list all-boards
                     :dismiss-cb #(reset! (::move-activity s) false)})])]))]
       [:div.stream-view-item-body.group
-        [:div.stream-body-left
+        [:div.stream-body-left.group
           [:span.posted-in
             {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}]
           [:div.stream-item-headline
@@ -166,13 +166,15 @@
             [:button.mlb-reset.expand-button
               {:on-click #(reset! (::expanded s) true)}
               "Continue reading"]]
-          (stream-view-attachments activity-data)
+          (when-not is-mobile?
+            (stream-view-attachments activity-data))
           [:div.stream-item-reactions.group
             (reactions activity-data)]]
-        [:div.stream-body-right
-          {:class (when expanded? "expanded")}
-          [:div.stream-body-comments
-            {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-            (rum/with-key (stream-comments activity-data comments-data)
-             (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
-            (add-comment activity-data)]]]]))
+        (when-not is-mobile?
+          [:div.stream-body-right
+            {:class (when expanded? "expanded")}
+            [:div.stream-body-comments
+              {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
+              (rum/with-key (stream-comments activity-data comments-data)
+               (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
+              (add-comment activity-data)]])]]))
