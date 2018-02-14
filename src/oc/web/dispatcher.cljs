@@ -198,11 +198,6 @@
    :comments-data       [[:base :org-slug :board-slug]
                          (fn [base org-slug board-slug]
                            (get-in base (comments-key org-slug board-slug)))]
-   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid]
-                            (fn [base org-slug board-slug activity-uuid]
-                              (get-in
-                               base
-                               (comments-key org-slug board-slug)))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
