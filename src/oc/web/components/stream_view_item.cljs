@@ -16,7 +16,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.activity-attachments :refer (activity-attachments)]))
+            [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
 
 (defn- delete-clicked [e activity-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
@@ -166,7 +166,7 @@
             [:button.mlb-reset.expand-button
               {:on-click #(reset! (::expanded s) true)}
               "Continue reading"]]
-          (activity-attachments activity-data true)
+          (stream-view-attachments activity-data)
           [:div.stream-item-reactions.group
             (reactions activity-data)]]
         [:div.stream-body-right

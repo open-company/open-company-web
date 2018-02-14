@@ -193,6 +193,10 @@ div.stream-view-item {
             * {
               color: $deep_navy;
             }
+
+            div.carrot-no-preview {
+              display: none;
+            }
           }
         }
 

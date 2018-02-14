@@ -74,7 +74,7 @@
                           (events/unlistenByKey @(::window-click s))
                           s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
-  (let [attachments (utils/get-attachments-from-body (:body activity-data))
+  (let [attachments (au/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)]

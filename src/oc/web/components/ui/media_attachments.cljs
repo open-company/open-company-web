@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [clojure.contrib.humanize :refer (filesize)]))
 
 (rum/defc media-attachment < rum/static
@@ -9,7 +10,7 @@
   [:a.media-attachment.group
     {:href (:file-url attachment)
      :target "_blank"}
-    [:i.file-mimetype.fa {:class (utils/icon-for-mimetype (:file-type attachment))}]
+    [:i.file-mimetype.fa {:class (au/icon-for-mimetype (:file-type attachment))}]
     [:label.media-attachment-title (:file-name attachment)]
     (let [prefix (if (:created-at attachment)
                     (str (utils/date-string (utils/js-date (:created-at attachment))) " - ")
