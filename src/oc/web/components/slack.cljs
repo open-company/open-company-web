@@ -76,11 +76,10 @@
             [:h1.slack
               "Rise above the noise"]
 
-            [:div.slack-subline-container
-              [:div.slack-subline
-                (str
-                  "Company updates and stories that keep teams "
-                  "aligned around what matters most.")]]
+            [:div.slack-subline
+              (str
+                "Focused communication that keeps teams "
+                "aligned without interruptions.")]
 
             (get-started-button auth-settings true)
 

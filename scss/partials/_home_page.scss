@@ -233,7 +233,7 @@ div#wrap {
       }
 
       h1.headline {
-        font-size: 48px;
+        font-size: 40px;
         @include avenir_H();
         color: $carrot_dark_brown_1;
         padding: 0 16px;
@@ -245,6 +245,7 @@ div#wrap {
 
         @include mobile() {
           padding: 0px;
+          font-size: 48px;
         }
       }
 
