@@ -39,6 +39,14 @@
   (api/get-comments activity-data
    #(get-comments-finished activity-data %)))
 
+(defn get-comments-if-needed [activity-data all-comments-data]
+  (let [activity-uuid (:uuid activity-data)
+        comments-data (get all-comments-data activity-uuid)]
+    (when (or (nil? comments-data)
+              (and (not (:loading comments-data))
+                   (not (contains? comments-data :sorted-comments))))
+      (get-comments activity-data))))
+
 (defn delete-comment [activity-data comment-data]
   (dis/dispatch! [:comment-delete (:uuid activity-data) comment-data])
   (api/delete-comment (:uuid activity-data) comment-data
