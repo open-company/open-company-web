@@ -191,11 +191,8 @@
 
 (defn load-comments-if-needed [s]
   (let [activity-data (first (:rum/args s))
-        all-comments-data @(drv/get-ref s :comments-data)
-        comments-data (get all-comments-data (:uuid activity-data))]
-    (when (and (not (:loading comments-data))
-               (not (contains? comments-data :sorted-comments)))
-      (utils/after 10 #(comment-actions/get-comments activity-data)))))
+        all-comments-data @(drv/get-ref s :comments-data)]
+    (comment-actions/get-comments-if-needed activity-data all-comments-data)))
 
 (defn show-loading?
   [s]
@@ -215,7 +212,7 @@
                       (rum/local false ::scrolled-on-add-focus)
                       (rum/local false ::initially-scrolled)
                       {:will-mount (fn [s]
-                        (comment-actions/get-comments (first (:rum/args s)))
+                        (load-comments-if-needed s)
                         s)
                        :did-mount (fn [s]
                         (when-not (responsive/is-tablet-or-mobile?)
