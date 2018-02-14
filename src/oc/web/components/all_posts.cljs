@@ -145,7 +145,6 @@
                         (drv/drv :calendar)
                         (drv/drv :ap-initial-at)
                         (drv/drv :all-posts)
-                        (drv/drv :comments-data)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -240,14 +239,7 @@
                           s)
                          :before-render (fn [s]
                           (let [all-posts-data @(drv/get-ref s :all-posts)
-                                sorted-items (get-sorted-items all-posts-data)
-                                comments-data @(drv/get-ref s :comments-data)]
-                            ;; Preload comments
-                            (for [item (vals (:fixed-items all-posts-data))]
-                              (let [activity-comments-data (get comments-data (:uuid item))]
-                                (when (and (not (:loading activity-comments-data))
-                                           (not (contains? activity-comments-data :sorted-comments)))
-                                  (comment-actions/get-comments item))))
+                                sorted-items (get-sorted-items all-posts-data)]
                             (when-not (:loading-more all-posts-data)
                               (when @(::top-loading s)
                                 (reset! (::top-loading s) false)
@@ -284,7 +276,7 @@
                          :will-unmount (fn [s]
                           (when @(::scroll-listener s)
                             (events/unlistenByKey @(::scroll-listener s)))
-                           s)}
+                          s)}
   [s]
   (let [all-posts-data (drv/react s :all-posts)
         calendar-data (drv/react s :calendar)
