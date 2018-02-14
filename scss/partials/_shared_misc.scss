@@ -1,5 +1,7 @@
-video.main-animation {
-  width: 940px;
+div.main-animation-container {
+  width: 939px;
+  height: 771px;
+  overflow: hidden;
   margin: 85px auto 0px;
   padding: 0;
   z-index: 10;
@@ -10,9 +12,17 @@ video.main-animation {
   @include tablet() {
     width: 100%;
   }
+  video.main-animation {
+    width: 940px;
+    height: 771px;
 
-  @include mobile() {
-    display: none;
+    @include tablet() {
+      width: 100%;
+    }
+
+    @include mobile() {
+      display: none;
+    }
   }
 }
 

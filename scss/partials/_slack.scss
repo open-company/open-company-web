@@ -247,24 +247,21 @@ div#wrap {
         padding: 0px 16px;
       }
 
-      div.slack-subline-container {
+      div.slack-subline {
         margin-top: 6px;
+        @include avenir_R();
+        font-size: 24px;
+        line-height: 30px;
+        color: rgba($carrot_light_gray_3, 0.8);
+        max-width: 744px;
+        margin: 0px auto;
+        width: 540px;
+        text-align: center;
 
-        div.slack-subline {
-          @include avenir_R();
-          font-size: 24px;
-          line-height: 30px;
-          color: rgba($carrot_light_gray_3, 0.8);
-          max-width: 744px;
-          margin: 0px auto;
-          width: 580px;
-          text-align: center;
-
-          @include tablet(){
-            width: 100%;
-            margin: 16px auto 0;
-            padding: 0 16px;
-          }
+        @include tablet(){
+          width: 100%;
+          margin: 16px auto 0;
+          padding: 0 16px;
         }
       }
 

@@ -3,6 +3,15 @@
             [oc.privacy :as privacy]
             [environ.core :refer (env)]))
 
+(defn google-analytics-init []
+  [:script (let [ga-version (if (env :ga-version)
+                              (str "'" (env :ga-version) "'")
+                              false)
+                 ga-tracking-id (if (env :ga-tracking-id)
+                                  (str "'" (env :ga-tracking-id) "'")
+                                  false)]
+             (str "CarrotGA.init(" ga-version "," ga-tracking-id ");"))])
+
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
@@ -61,20 +70,21 @@
          :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_3@2x.png") " 2x")}]]])
 
 (def desktop-video
-  [:video.main-animation
-    {:controls false
-     :autoPlay true
-     :poster (cdn "/img/ML/new_homepage_screenshot.png")
-     :onClick "this.play();"
-     :loop true}
-    [:source
-      {:src (cdn "/img/ML/animation.webm")
-       :type "video/webm"}]
-    [:source
-      {:src (cdn "/img/ML/animation.mp4")
-       :type "video/mp4"}]
-    [:div.fallback
-      "Your browser doesn´t support this video format."]])
+  [:div.main-animation-container
+    [:video.main-animation
+      {:controls false
+       :autoPlay true
+       :poster (cdn "/img/ML/new_homepage_screenshot.png")
+       :onClick "this.play();"
+       :loop true}
+      [:source
+        {:src (cdn "/img/ML/animation.webm")
+         :type "video/webm"}]
+      [:source
+        {:src (cdn "/img/ML/animation.mp4")
+         :type "video/mp4"}]
+      [:div.fallback
+        "Your browser doesn´t support this video format."]]])
 
 (def carrot-cards
   [:div.cards-container
@@ -235,15 +245,15 @@
         [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Where teams align"]
+          "Stay aligned without interruptions"]
         [:div.subheadline.big-web-only
-          "Company updates and stories that keep teams"]
+          "Focused communication that keeps teams aligned"]
         [:div.subheadline.second-line.big-web-only
-          "aligned around what matters most."]
+          "around what matters most."]
         [:div.subheadline.mobile-only
           (str
-           "Company updates and stories that keep teams "
-           "aligned around what matters most.")]
+            "Focused communication that keeps teams aligned "
+            "around what matters most.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -354,11 +364,10 @@
         [:h1.slack
           "Rise above the noise"]
 
-        [:div.slack-subline-container
-          [:div.slack-subline
-            "Company updates and stories that keep teams"]
-          [:div.slack-subline
-            "aligned around what matters most."]]
+        [:div.slack-subline
+          (str
+            "Focused communication that keeps teams "
+            "aligned without interruptions.")]
 
         [:div.sigin-with-slack-container
           [:button.signin-with-slack.mlb-reset
@@ -617,6 +626,11 @@
           [:div#oc-loading]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
+          ;; Google Analytics
+          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
+          [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
+          [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
+          (google-analytics-init)
           ;; JWT decode library
           [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; Custom Tooltips
@@ -741,7 +755,10 @@
              :type "text/javascript"
              :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
              :crossorigin "anonymous"}]
+          ;; Google Analytics
+          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
           ;; Compiled oc.min.js from our CDN
           [:script {:src (cdn "/oc.js")}]
-          ;; Compiled assents
-          [:script {:src (cdn "/oc_assets.js")}]]})
+          ;; Compiled assets
+          [:script {:src (cdn "/oc_assets.js")}]
+          (google-analytics-init)]})
