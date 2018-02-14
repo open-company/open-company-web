@@ -244,15 +244,15 @@
         [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Where teams align"]
+          "Stay aligned without interruptions"]
         [:div.subheadline.big-web-only
-          "Company updates and stories that keep teams"]
+          "Focused communication that keeps teams aligned"]
         [:div.subheadline.second-line.big-web-only
-          "aligned around what matters most."]
+          "around what matters most."]
         [:div.subheadline.mobile-only
           (str
-           "Company updates and stories that keep teams "
-           "aligned around what matters most.")]
+            "Focused communication that keeps teams aligned "
+            "around what matters most.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -363,11 +363,10 @@
         [:h1.slack
           "Rise above the noise"]
 
-        [:div.slack-subline-container
-          [:div.slack-subline
-            "Company updates and stories that keep teams"]
-          [:div.slack-subline
-            "aligned around what matters most."]]
+        [:div.slack-subline
+          (str
+            "Focused communication that keeps teams "
+            "aligned without interruptions.")]
 
         [:div.sigin-with-slack-container
           [:button.signin-with-slack.mlb-reset
