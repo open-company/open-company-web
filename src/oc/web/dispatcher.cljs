@@ -48,7 +48,7 @@
     (vec (concat board-key [:fixed-items activity-uuid]))))
 
 (defn comments-key [org-slug board-slug]
-  (vec (conj (board-key org-slug board-slug) :comments-data)))
+  (vec (conj (board-data-key org-slug board-slug) :comments)))
 
 (defn activity-comments-key [org-slug board-slug activity-uuid]
   (vec (conj (comments-key org-slug board-slug) activity-uuid :sorted-comments)))
@@ -196,10 +196,10 @@
                           (fn [base org-slug secure-id]
                             (get-in base (secure-activity-key org-slug secure-id)))]
    :comments-data       [[:base :org-slug :board-slug]
-                        (fn [base org-slug board-slug]
-                          (get-in base (comments-key org-slug board-slug)))]
-   :activity-comments-data [[:base :org-slug :board-slug]
-                           (fn [base org-slug board-slug]
+                         (fn [base org-slug board-slug]
+                           (get-in base (comments-key org-slug board-slug)))]
+   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid]
+                            (fn [base org-slug board-slug activity-uuid]
                               (get-in
                                base
                                (comments-key org-slug board-slug)))]
@@ -517,8 +517,8 @@
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
 (set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
-(set! (.-OCWebPrintCommentsData js/window) print-activity-comments-data)
-(set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintStoryEditingData js/window) print-story-editing-data)
 (set! (.-OCWebPrintWhatsNewData js/window) print-whats-new-data)
