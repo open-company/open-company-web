@@ -70,20 +70,21 @@
          :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_3@2x.png") " 2x")}]]])
 
 (def desktop-video
-  [:video.main-animation
-    {:controls false
-     :autoPlay true
-     :poster (cdn "/img/ML/new_homepage_screenshot.png")
-     :onClick "this.play();"
-     :loop true}
-    [:source
-      {:src (cdn "/img/ML/animation.webm")
-       :type "video/webm"}]
-    [:source
-      {:src (cdn "/img/ML/animation.mp4")
-       :type "video/mp4"}]
-    [:div.fallback
-      "Your browser doesn´t support this video format."]])
+  [:div.main-animation-container
+    [:video.main-animation
+      {:controls false
+       :autoPlay true
+       :poster (cdn "/img/ML/new_homepage_screenshot.png")
+       :onClick "this.play();"
+       :loop true}
+      [:source
+        {:src (cdn "/img/ML/animation.webm")
+         :type "video/webm"}]
+      [:source
+        {:src (cdn "/img/ML/animation.mp4")
+         :type "video/mp4"}]
+      [:div.fallback
+        "Your browser doesn´t support this video format."]]])
 
 (def carrot-cards
   [:div.cards-container

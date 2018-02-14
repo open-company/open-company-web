@@ -4,19 +4,20 @@
             [oc.web.lib.utils :as utils]))
 
 (def video
-  [:video.main-animation
-    {:controls false
-     :auto-play true
-     :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
-     :loop true}
-    [:source
-      {:src (utils/cdn "/img/ML/animation.webm")
-       :type "video/webm"}]
-    [:source
-      {:src (utils/cdn "/img/ML/animation.mp4")
-       :type "video/mp4"}]
-    [:div.fallback
-      "Your browser doesn’t support this video format."]])
+  [:div.main-animation-container
+    [:video.main-animation
+      {:controls false
+       :auto-play true
+       :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
+       :loop true}
+      [:source
+        {:src (utils/cdn "/img/ML/animation.webm")
+         :type "video/webm"}]
+      [:source
+        {:src (utils/cdn "/img/ML/animation.mp4")
+         :type "video/mp4"}]
+      [:div.fallback
+        "Your browser doesn’t support this video format."]]])
 
 (def horizontal-carousell
   [:div.horizontal-carousell
