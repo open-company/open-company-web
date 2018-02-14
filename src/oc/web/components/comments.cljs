@@ -215,7 +215,7 @@
                       (rum/local false ::scrolled-on-add-focus)
                       (rum/local false ::initially-scrolled)
                       {:will-mount (fn [s]
-                        (load-comments-if-needed s)
+                        (comment-actions/get-comments (first (:rum/args s)))
                         s)
                        :did-mount (fn [s]
                         (when-not (responsive/is-tablet-or-mobile?)
@@ -244,7 +244,8 @@
                         s)}
   [s activity-data]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
-        sorted-comments (:sorted-comments (get (drv/react s :comments-data) (:uuid activity-data)))
+        sorted-comments (or (:sorted-comments (get (drv/react s :comments-data) (:uuid activity-data)))
+                            (:comments activity-data))
         add-comment-focus (drv/react s :add-comment-focus)
         show-loading (show-loading? s)]
     (if show-loading
