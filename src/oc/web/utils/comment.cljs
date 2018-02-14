@@ -2,8 +2,17 @@
   (:require [cljsjs.medium-editor]
             [goog.object :as gobj]
             [cuerdas.core :as string]
+            [defun.core :refer (defun)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]))
+
+(defun sort-comments
+  ([comments :guard nil?]
+   [])
+  ([comments :guard map?]
+   (sort-comments (vals comments)))
+  ([comments :guard sequential?]
+   (vec (sort-by :created-at comments))))
 
 (defn setup-medium-editor [comment-node]
   (let [config {:toolbar false
