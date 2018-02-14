@@ -49,16 +49,7 @@
                               (rum/local false ::move-activity)
                               (rum/local nil ::window-click)
                               (rum/local false ::expanded)
-                              {:before-render (fn [s]
-                                (let [activity-data (first (:rum/args s))
-                                      all-comments-data @(drv/get-ref s :comments-data)
-                                      comments-data (get all-comments-data (:uuid activity-data))]
-                                  ;; Preload comments
-                                  (when (and (not (:loading comments-data))
-                                             (not (contains? comments-data :sorted-comments)))
-                                    (comment-actions/get-comments activity-data)))
-                                s)
-                               :did-mount (fn [s]
+                              {:did-mount (fn [s]
                                 (reset! (::window-click s)
                                  (events/listen
                                   js/window
@@ -72,6 +63,8 @@
                                 s)
                                :after-render (fn [s]
                                 (should-show-continue-reading? s)
+                                (comment-actions/get-comments-if-needed (first (:rum/args s))
+                                 @(drv/get-ref s :comments-data))
                                 s)
                                :will-unmount (fn [s]
                                 (events/unlistenByKey @(::window-click s))
@@ -82,7 +75,13 @@
         edit-link (utils/link-for (:links activity-data) "partial-update")
         delete-link (utils/link-for (:links activity-data) "delete")
         share-link (utils/link-for (:links activity-data) "share")
-        expanded? @(::expanded s)]
+        expanded? @(::expanded s)
+        ;; Fallback to the activity inline comments if we didn't load
+        ;; the full comments just yet
+        comments-data (or (-> (drv/react s :comments-data)
+                              (get (:uuid activity-data))
+                              :sorted-comments)
+                          (:comments activity-data))]
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
@@ -174,8 +173,6 @@
           {:class (when expanded? "expanded")}
           [:div.stream-body-comments
             {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-            (let [all-comments-data (drv/react s :comments-data)
-                  comments-data (get all-comments-data (:uuid activity-data))]
-              (rum/with-key (stream-comments activity-data (:sorted-comments comments-data))
-               (str "stream-comments-" (:uuid activity-data) "-" (count comments-data))))
+            (rum/with-key (stream-comments activity-data comments-data)
+             (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
             (add-comment activity-data)]]]]))
