@@ -266,7 +266,7 @@ section.testimonials-section {
   div.testimonials-section-subtitle {
     @include avenir_M();
     font-size: 20px;
-    color: #C4C6C9;
+    color: $light_ui_grey;
     margin-top: 11px;
   }
 
