@@ -29,6 +29,10 @@ div.stream-comments {
     overflow-y: auto;
     padding-right: 16px;
 
+    @include mobile() {
+      padding-right: 0px;
+    }
+
     div.stream-comments-empty {
       @include image-2x("/img/ML/no_comments_sleep");
       background-size: 69px 75px;
@@ -40,6 +44,10 @@ div.stream-comments {
       top: 50%;
       left: 50%;
       position: relative;
+
+      @include mobile() {
+        display: none;
+      }
     }
 
     div.stream-comment {
