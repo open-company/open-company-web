@@ -10,8 +10,18 @@ div.stream-view-attachments {
   }
 
   div.stream-view-attachments-content {
-    height: 58px;
+    height: 63px;
     padding-bottom: 8px;
+
+    @include mobile() {
+      overflow-x: auto;
+      overflow-y: hidden;
+      width: 100%;
+      display: flex;
+      // add some space for the scroler
+      height: 74px;
+      padding-bottom: 8px;
+    }
 
     a.stream-view-attachments-item {
       display: inline-block;
@@ -22,6 +32,11 @@ div.stream-view-attachments {
       padding: 9px 18px;
       margin-top: 12px;
       width: 100%;
+
+      @include mobile() {
+        flex-grow: 1;
+        width: 100%;
+      }
 
       &:hover {
         box-shadow: 0px 2px 4px 0px rgba($deep_tan, 1);
@@ -35,8 +50,16 @@ div.stream-view-attachments {
       &.double-line {
         width: calc(50% - 8px);
 
+        @include mobile() {
+          width: 200px;
+        }
+
         div.attachment-content {
           width: 148px;
+
+          @include mobile() {
+            width: calc(100% - 40px);
+          }
         }
       }
 
@@ -66,6 +89,10 @@ div.stream-view-attachments {
         margin-left: 8px;
         height: 32px;
         width: 390px;
+
+        @include mobile() {
+          width: calc(100% - 40px);
+        }
 
         div.attachment-name {
           @include avenir_M();

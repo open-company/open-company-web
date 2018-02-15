@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
+            [oc.web.lib.responsive :as responsive]
             [clojure.contrib.humanize :refer (filesize)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -9,7 +10,8 @@
 (rum/defcs stream-view-attachments < (rum/local false ::attachments-dropdown)
   [s activity-data]
   (let [attachments (au/get-attachments-from-body (:body activity-data))
-        atc-num (count attachments)]
+        atc-num (count attachments)
+        ww (responsive/ww)]
     (when (pos? atc-num)
       [:div.stream-view-attachments
         [:div.stream-view-attachments-title
