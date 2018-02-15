@@ -13,119 +13,38 @@ div.carrot-tip-container {
     bottom: 0px;
   }
 
-  &.step-2 {
-    pointer-events: none;
-
-    @include mobile() {
-      width: 100vw;
-      height: 100vh;
-      top: 0px;
-      left: 0px;
-      bottom: 0px;
-    }
+  &.step-4 {
 
     div.carrot-tip {
       width: 494px;
 
-      @include mobile() {
-        bottom: 100px;
-      }
-
       div.carrot-tip-inner {
 
         div.carrot-tip-title {
           width: 314px;
-
-          @include mobile() {
-            width: 300px;
-          }
         }
 
         div.carrot-tip-description {
           width: 314px;
-
-          @include mobile() {
-            width: 300px;
-          }
         }
       }
     }
   }
 
-  &.step-3 {
-    pointer-events: none;
-
-    @include mobile() {
-      width: 100%;
-      height: 100vh;
-      position: absolute;
-    }
+  &.step-5 {
 
     div.carrot-tip{
-
-      @include mobile() {
-        width: 100%;
-        height: auto;
-        bottom: 150px;
-        top: unset;
-      }
-
-      div.balloons-background {
-        width: 189px;
-        height: 84px;
-        overflow: hidden;
-        @include image-2x("/img/ML/carrot_tip_bg_2");
-        background-size: 189px;
-        bottom: 0px;
-        right: -20px;
-        overflow: hidden;
-
-        @include mobile() {
-          display: none;
-        }
-      }
-
-      div.carrot-tip-inner {
+      div.carrot-tip-step {
+        left: 200px;
       }
     }
   }
 
-  &.step-4 {
-    @include mobile() {
-      width: 100%;
-      height: 100%;
-      position: fixed;
-      top: 0px;
-      left: 0px;
-    }
-
+  &.step-6 {
     div.carrot-tip{
-
-      @include mobile() {
-        width: 100%;
-        height: auto;
-        bottom: 0px;
-      }
 
       div.carrot-tip-step {
-        right: unset;
-        left: 150px;
-        bottom: 30px;
-      }
-
-      div.carrot-tip-inner {
-
-        div.carrot-tip-description {
-          margin-top: 12px;
-        }
-
-        div.carrot-tip-title {
-          margin-top: 0px;
-        }
-
-        button.next-button {
-          margin-top: 20px;
-        }
+        left: 180px;
       }
     }
   }
@@ -133,39 +52,20 @@ div.carrot-tip-container {
   div.carrot-tip-background {
     width: 100%;
     height: 100%;
-
-    @include mobile() {
-      position: absolute;
-      position: fixed;
-      top: 0px;
-      left: 0px;
-    }
   }
 
   div.carrot-tip {
     position: absolute;
     padding: 27px 40px;
 
-    @include mobile() {
-      width: 100%;
-      background-color: transparent;
-      position: absolute;
-      padding: 24px;
-    }
-
     div.carrot-tip-step {
       position: absolute;
-      left: 40px;
-      bottom: 0px;
+      left: 150px;
+      bottom: 30px;
       color: rgba(white, 0.5);
       @include avenir_H();
       font-size: 14px;
       line-height: 24px;
-
-      @include mobile() {
-        left: 24px;
-        bottom: -8px;
-      }
     }
 
     div.carrot-tip-inner {
@@ -183,10 +83,7 @@ div.carrot-tip-container {
         font-size: 18px;
         color: white;
         line-height: 24px;
-
-        @include mobile() {
-          margin-top: 8px;
-        }
+        margin-top: 12px;
 
         &.second {
           margin-top: 16px;
@@ -202,6 +99,7 @@ div.carrot-tip-container {
         @include avenir_H();
         font-size: 14px;
         border-radius: 100px;
+        margin-top: 20px;
 
         &.left {
           float: left;
