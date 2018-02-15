@@ -16,6 +16,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.interactions-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
 
 (defn- delete-clicked [e activity-data]
@@ -49,6 +50,7 @@
                               (rum/local false ::move-activity)
                               (rum/local nil ::window-click)
                               (rum/local false ::expanded)
+                              (rum/local false ::mobile-show-comments)
                               {:did-mount (fn [s]
                                 (reset! (::window-click s)
                                  (events/listen
@@ -166,9 +168,23 @@
             [:button.mlb-reset.expand-button
               {:on-click #(reset! (::expanded s) true)}
               "Continue reading"]]
-          (when-not is-mobile?
-            (stream-view-attachments activity-data))
+          (when (and is-mobile?
+                     @(::mobile-show-comments s))
+            [:div.stream-mobile-comments
+              {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
+              (rum/with-key (stream-comments activity-data comments-data)
+               (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
+              (add-comment activity-data)])
+          (stream-view-attachments activity-data)
           [:div.stream-item-reactions.group
+            (when-not @(::mobile-show-comments s)
+              [:div.stream-mobile-comments-summary
+                {:on-click #(do
+                              (utils/event-stop %)
+                              (reset! (::mobile-show-comments s) true))}
+                (if (zero? (count comments-data))
+                  [:div.zero-comments "Reply"]
+                  (comments-summary activity-data false))])
             (reactions activity-data)]]
         (when-not is-mobile?
           [:div.stream-body-right
