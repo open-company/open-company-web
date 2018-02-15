@@ -13,7 +13,6 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.interactions-summary :refer (comments-summary)]
