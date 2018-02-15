@@ -259,23 +259,32 @@ div.onboard-overlay-container {
       height: 100%;
       padding: 24px 40px;
       position: relative;
+      border-radius: 12px;
+
+      @include mobile() {
+        border-radius: 0px;
+      }
 
       div.onboard-overlay-step-title {
         @include avenir_H();
         font-size: 32px;
-        max-width: 300px;
         margin: 0px auto;
+
+        @include mobile() {
+          max-width: 300px;
+        }
       }
 
       div.step-illustration-container-center {
         div.step-illustration-container {
           width: 280px;
-          height: 297px;
+          height: 270px;
           overflow: hidden;
           background-position: 0px 0px;
           background-repeat: no-repeat;
           position: relative;
           margin: 16px auto;
+          max-height: 270px;
 
           &:after {
             // Gradient
@@ -296,14 +305,15 @@ div.onboard-overlay-container {
           line-height: 26px;
           font-size: 18px;
           text-align: center;
-          max-width: 300px;
           margin: 0px auto;
+
+          @include mobile() {
+            max-width: 300px;
+          }
         }
       }
 
       button.continue-btn {
-        position: absolute;
-        bottom: 78px;
         width: 280px;
         height: 40px;
         border-radius: 100px;
@@ -313,17 +323,28 @@ div.onboard-overlay-container {
         font-size: 16px;
         text-align: center;
         padding: 8px 28px;
-        left: 50%;
-        margin-left: -140px;
+        margin: 32px auto 0px;
+
+        @include mobile() {
+          position: absolute;
+          bottom: 78px;
+          left: 50%;
+          margin-left: -140px;
+        }
       }
 
       div.steps-dot-container {
-        bottom: 48px;
         height: 8px;
         width: 40px;
-        position: absolute;
-        left: 50%;
-        margin-left: -20px;
+        margin: 24px auto 0px;
+        position: relative;
+
+        @include mobile() {
+          position: absolute;
+          bottom: 48px;
+          left: 50%;
+          margin-left: -20px;
+        }
 
         div.step-dot {
           position: absolute;
@@ -434,7 +455,10 @@ div.onboard-overlay-container {
             @include image-2x("/img/ML/mobile_nux_il_3");
             background-size: 263px 231px;
             width: 263px;
-            height: 231px;
+
+            @include mobile() {
+              height: 231px;
+            }
 
             &:after {
               display: none;
