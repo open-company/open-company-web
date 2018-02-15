@@ -161,14 +161,11 @@
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
-                                (if nux
-                                  (when (= nux :2)
-                                    (dis/dispatch! [:first-forced-post-start]))
-                                  (if (or is-drafts-board is-all-posts)
-                                    (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
-                                    (let [entry-data {:board-slug (:slug board-data)
-                                                      :board-name (:name board-data)}]
-                                      (activity-actions/entry-edit entry-data)))))}
+                                (if (or is-drafts-board is-all-posts)
+                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                  (let [entry-data {:board-slug (:slug board-data)
+                                                    :board-name (:name board-data)}]
+                                    (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "New Post"]]
@@ -228,17 +225,14 @@
                      :title "Start a new post"
                      :on-click (fn [_]
                                 (utils/remove-tooltips)
-                                (if nux
-                                  (when (= nux :2)
-                                    (dis/dispatch! [:first-forced-post-start]))
-                                  (if (or is-drafts-board
-                                          is-all-posts)
-                                    (reset!
-                                     (::show-floating-boards-dropdown s)
-                                     (not @(::show-floating-boards-dropdown s)))
-                                    (let [entry-data {:board-slug (:slug board-data)
-                                                      :board-name (:name board-data)}]
-                                      (activity-actions/entry-edit entry-data)))))}
+                                (if (or is-drafts-board
+                                        is-all-posts)
+                                  (reset!
+                                   (::show-floating-boards-dropdown s)
+                                   (not @(::show-floating-boards-dropdown s)))
+                                  (let [entry-data {:board-slug (:slug board-data)
+                                                    :board-name (:name board-data)}]
+                                    (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]]
                   (when @(::show-floating-boards-dropdown s)
                     (dropdown-list
