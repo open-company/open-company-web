@@ -42,7 +42,7 @@
   [org-data board-data nux]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)]
     (case nux
-      :2
+      :4
       (let [create-link (utils/link-for (:links org-data) "create")]
         (carrot-tip {:step nux
                      :title "Update your team"
@@ -50,27 +50,32 @@
                                "Click the compose button to add "
                                "updates, announcements and plans "
                                "that keep your team aligned.")
-                     :step-label "1 of 4"
-                     :width 432}))
-      :3
+                     :step-label "1 of 3"
+                     :button-title "Cool"
+                     :button-position "left"
+                     :on-next-click #(dis/dispatch! [:input [:nux] :5])}))
+      :5
       (carrot-tip {:step nux
-                   :title "Post your updates"
-                   :message "Click the post button to create a sample update we wrote for you. Don't worry, you can delete it later."
-                   :step-label "2 of 4"
-                   :width 494})
-      :4
-      (carrot-tip {:step nux
-                   :title "Success!"
+                   :title "Boards keep posts organized"
                    :message (str
-                             "Now your team will be able to react, "
-                             "comment and ask questions. We "
-                             "keep it all together in one place so "
-                             "it's easy to read anytime.")
-                   :step-label "3 of 4"
-                   :width 432
-                   :button-title "Cool"
+                             "You can add high-level boards like "
+                             "All-hands, Strategy, and Who We Are; or "
+                             "group-level boards like Sales, Marketing and "
+                             "Design.")
+                   :step-label "2 of 3"
+                   :button-title "Ok, got it"
                    :button-position "left"
-                   :on-next-click #(dis/dispatch! [:input [:nux] :5])}))))
+                   :on-next-click #(dis/dispatch! [:input [:nux] :6])})
+      :6
+      (carrot-tip {:step nux
+                   :title "Invite your teammates"
+                   :message (str
+                             "The best way to keep your team aligned? Invite "
+                             "them to join you on Carrot!")
+                   :step-label "3 of 3"
+                   :button-title "Let's go"
+                   :button-position "left"
+                   :on-next-click #(dis/dispatch! [:nux-end])}))))
 
 (rum/defcs org-dashboard < rum/static
                            rum/reactive
@@ -99,7 +104,7 @@
                 is-showing-alert
                 media-input]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :1-mobile :2-mobile :3-mobile :5])
+        should-show-onboard-overlay? (some #{nux} [:1 :2 :3])
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
@@ -180,7 +185,7 @@
                    (:media-chart media-input))
           (media-chart-modal))
         ;; Show onboard overlay
-        (when (some #{nux} [:2 :3 :4])
+        (when (some #{nux} [:4 :5 :6])
           (nux-steps org-data board-data nux))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
