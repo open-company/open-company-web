@@ -196,7 +196,6 @@ div.stream-view-item {
             bottom: 0px;
             left: 0px;
             right: 0px;
-            z-index: 10;
             pointer-events: none;
             background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
             background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
