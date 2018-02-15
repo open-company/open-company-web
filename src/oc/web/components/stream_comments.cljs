@@ -16,7 +16,10 @@
                              {:did-mount (fn [s]
                                (scroll-to-bottom s)
                                s)
-                              :before-render (fn [s]
+                              :after-render (fn [s]
+                               (let [scrolling-node (rum/ref-node s "stream-comments-inner")
+                                     scrolls (> (.-scrollHeight scrolling-node) (+ (.-clientHeight scrolling-node) 16))]
+                                 (compare-and-set! (::bottom-gradient s) (not scrolls) scrolls))
                                (let [activity-uuid (:uuid (first (:rum/args s)))
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
                                      current-local-state @(::last-focused-state s)
@@ -25,11 +28,6 @@
                                     (reset! (::last-focused-state s) is-self-focused?)
                                     (when is-self-focused?
                                       (scroll-to-bottom s))))
-                               s)
-                              :after-render (fn [s]
-                               (let [scrolling-node (rum/ref-node s "stream-comments-inner")
-                                     scrolls (> (.-scrollHeight scrolling-node) (+ (.-clientHeight scrolling-node) 16))]
-                                 (compare-and-set! (::bottom-gradient s) (not scrolls) scrolls))
                                s)}
   [s activity-data comments-data]
   (let [sorted-comments (cu/sort-comments comments-data)]
