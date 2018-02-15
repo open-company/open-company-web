@@ -153,16 +153,13 @@ div.stream-view-item {
     div.stream-body-left {
       flex-grow: 0;
       flex-shrink: 0;
-      flex-basis: 505px;
       width: 505px;
-      // min-height: 300px;
       position: relative;
       padding: 18px 0px 48px 36px;
       margin: 0px 36px 18px 0px;
 
       @include mobile() {
         width: 100%;
-        flex-basis: unset;
         padding: 24px;
         margin: 0px;
       }
@@ -185,7 +182,6 @@ div.stream-view-item {
 
         div.stream-item-body {
           position: relative;
-          transition: max-height 5s ease-out;
 
           &:after {
             display: none;
@@ -288,14 +284,12 @@ div.stream-view-item {
     div.stream-body-right {
       flex-grow: 0;
       flex-shrink: 0;
-      flex-basis: 392px;
       width: 392px;
       min-height: 300px;
       position: relative;
       padding: 18px 20px 18px 36px;
       background-color: #FDFCFB;
-      max-height: 578px;
-      transition: max-height 5s ease-out;
+      max-height: 705px;
 
       &.expanded {
         max-height: initial;
