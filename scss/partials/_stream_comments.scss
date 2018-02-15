@@ -107,10 +107,10 @@ div.stream-comments {
       }
 
       div.stream-comment-footer {
-        height: 17px;
-        margin-top: 8px;
 
         div.stream-comment-reaction {
+          padding-top: 8px;
+          height: 25px;
           @include avenir_M();
           font-size: 12px;
           color: $ui_grey;
