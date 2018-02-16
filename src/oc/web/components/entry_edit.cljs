@@ -175,6 +175,7 @@
                         (rum/local false ::show-boards-dropdown)
                         (rum/local false ::window-resize-listener)
                         (rum/local nil ::autosave-timer)
+                        (rum/local false ::show-legend)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -408,4 +409,10 @@
             [:div.entry-edit-controls.group]]
           [:div.entry-edit-modal-footer
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                           :container-selector "div.entry-edit-modal"})]]]]))
+                           :container-selector "div.entry-edit-modal"})
+            [:div.entry-edit-legend-container
+              {:on-mouse-enter #(reset! (::show-legend s) true)
+               :on-mouse-leave #(reset! (::show-legend s) false)}
+              [:div.entry-edit-legend-trigger]
+              (when @(::show-legend s)
+                [:div.entry-edit-legend-image])]]]]]))
