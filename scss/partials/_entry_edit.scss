@@ -6,9 +6,11 @@ div.entry-edit-modal-container {
   position: fixed;
   top: 0px;
   left: 0px;
-  background-color: $carrot_modal_bg;
+  background-color: $oc_gray_8;
   z-index: #{$navbar_zindex + 105};
   transition: opacity 180ms ease-in;
+  overflow-y: auto;
+  overflow-x: visible;
 
   @include mobile() {
     position: relative;
@@ -23,11 +25,137 @@ div.entry-edit-modal-container {
     opacity: 1;
   }
 
+  div.entry-edit-modal-header {
+    height: 64px;
+    background-color: white;
+    width: 100vw;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    box-shadow: 0px 2px 6px 0px rgba($deep_tan,0.5);
+    padding: 20px 24px;
+
+    @include mobile() {
+      box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.12);
+    }
+
+    button.mobile-modal-close-bt {
+      @include image-2x("/img/ML/mobile_modal_close");
+      width: 24px;
+      height: 24px;
+      background-repeat: no-repeat;
+      background-size: 14px 14px;
+      background-position: 5px 5px;
+      position: absolute;
+      top: 20px;
+      left: 18px;
+    }
+
+    div.entry-edit-modal-header-right {
+      position: absolute;
+      top: 12px;
+      right: 24px;
+      max-width: 80%;
+
+      @include mobile() {
+        top: 20px;
+      }
+
+      div.mobile-buttons-divider-line {
+        display: none;
+
+        @include mobile() {
+          float: right;
+          width: 1px;
+          background-color: #D8DBDF;
+          height: 16px;
+          margin: 4px 24px 0px 12px;
+        }
+      }
+
+      button.header-buttons {
+        height: 40px;
+        @include avenir_H();
+        font-size: 14px;
+        float: right;
+        color: $carrot_green;
+        margin: 0px;
+
+        &.post-button {
+          border-radius: 100px;
+          background-color: $coral;
+          color: $carrot_orange;
+          padding: 0px 32px;
+          margin-left: 24px;
+        }
+
+        @include mobile() {
+          height: 24px;
+          font-size: 15px;
+          line-height: 24px;
+          position: relative;
+          padding: 2px 12px 0px 32px;
+          border-radius: 0px;
+          color: $carrot_green;
+
+          &.disabled {
+            color: $carrot_light_gray_3;
+            opacity: 1;
+          }
+
+          div.button-icon {
+            position: absolute;
+            top: 2px;
+            left: 0px;
+            width: 20px;
+            height: 20px;
+            background-repeat: no-repeat;
+            background-color: transparent;
+            background-position: center;
+          }
+
+          &.post-button {
+            margin-left: 0px;
+            background-color: transparent;
+            padding: 2px 12px 0px 32px;
+            color: $carrot_green;
+
+            &.disabled {
+              div.button-icon {
+                @include image-2x("/img/ML/entry_post_button_icon");
+              }
+            }
+
+            div.button-icon {
+              @include image-2x("/img/ML/entry_post_button_icon_green");
+              background-size: 20px 20px;
+            }
+          }
+
+          &.save-button {
+            &.disabled {
+              div.button-icon {
+                @include image-2x("/img/ML/entry_save_button_icon");
+              }
+            }
+
+            div.button-icon {
+              @include image-2x("/img/ML/entry_save_button_icon_green");
+              background-size: 20px 20px;
+            }
+          }
+        }
+      }
+    }
+  }
+
   div.modal-wrapper {
     width: #{672 + 20 +8}px;
     min-height: 330px;
     max-height: 100vh;
-    margin: 0px auto 50px;
+    margin: 104px auto 50px;
     position: relative;
 
     @include mobile() {
@@ -56,125 +184,26 @@ div.entry-edit-modal-container {
         height: initial;
       }
 
-      div.entry-edit-modal-header-mobile {
-        display: none;
-
-        @include tablet() {
-          display: block;
-          height: 64px;
-          background-color: white;
-          width: 100vw;
-          position: fixed;
-          top: 0px;
-          left: 0px;
-          right: 0px;
-          z-index: 1;
-          box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.12);
-
-          div.mobile-header {
-            height: 64px;
-            padding: 20px 24px;
-
-            button.mobile-modal-close-bt {
-              @include image-2x("/img/ML/mobile_modal_close");
-              width: 24px;
-              height: 24px;
-              background-repeat: no-repeat;
-              background-size: 14px 14px;
-              background-position: 5px 5px;
-              position: absolute;
-              top: 20px;
-              left: 18px;
-            }
-
-            div.mobile-header-right {
-              position: absolute;
-              top: 20px;
-              right: 24px;
-              max-width: 80%;
-
-              div.mobile-buttons-divider-line {
-                float: right;
-                width: 1px;
-                background-color: #D8DBDF;
-                height: 16px;
-                margin: 4px 24px 0px 12px;
-              }
-
-              button.mobile-header-buttons {
-                height: 24px;
-                @include avenir_H();
-                font-size: 15px;
-                color: $carrot_green_2;
-                line-height: 24px;
-                padding: 2px 12px 0px 32px;
-                float: right;
-                position: relative;
-                margin: 0px;
-
-                &.disabled {
-                  color: $carrot_light_gray_3;
-                  opacity: 1;
-                }
-
-                div.button-icon {
-                  position: absolute;
-                  top: 2px;
-                  left: 0px;
-                  width: 20px;
-                  height: 20px;
-                  background-repeat: no-repeat;
-                  background-color: transparent;
-                  background-position: center;
-                }
-
-                &.post-button {
-                  &.disabled {
-                    div.button-icon {
-                      @include image-2x("/img/ML/entry_post_button_icon");
-                    }
-                  }
-
-                  div.button-icon {
-                    @include image-2x("/img/ML/entry_post_button_icon_green");
-                    background-size: 20px 20px;
-                  }
-                }
-
-                &.save-button {
-                  &.disabled {
-                    div.button-icon {
-                      @include image-2x("/img/ML/entry_save_button_icon");
-                    }
-                  }
-
-                  div.button-icon {
-                    @include image-2x("/img/ML/entry_save_button_icon_green");
-                    background-size: 20px 20px;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      div.entry-edit-modal-header{
-        height: 72px;
+      div.entry-edit-modal-headline {
+        height: 88px;
         width: 100%;
-        background-color: $carrot_light_gray_2;
-        padding: 20px 24px 20px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
+        padding: 28px 41px;
+        border-bottom: 1px solid rgba($deep_tan, 0.3);
 
         @include mobile() {
-          display: none;
+          height: 48px;
+          padding: 0px;
+          border-bottom: none;
         }
 
         @include user-profile(32);
 
         div.user-avatar-img-container {
           float: left;
+
+          @include mobile() {
+            display: none;
+          }
         }
 
         div.posting-in {
@@ -185,106 +214,24 @@ div.entry-edit-modal-container {
           margin-top: 5px;
           margin-left: 16px;
 
-          span {
-            float: left;
+          @include mobile() {
+            font-size: 15px;
+            color: $carrot_text_blue_3;
+            background-color: $carrot_light_blue_2;
+            height: 48px;
+            padding: 14px 24px 0px;
+            float: none;
+            margin-top: 64px;
+            margin-left: 0px;
 
-            @include mobile() {
-              display: none;
-            }
-          }
+            &.active {
+              background-color: $carrot_text_blue_3;
 
-          div.boards-dropdown-caret {
-
-            div.dropdown-list-container {
-              top: 20px;
-              left: -44px;
-              width: 200px;
-            }
-          }
-        }
-      }
-
-      div.boards-dropdown-caret {
-        @include avenir_H();
-        color: $carrot_dark_gray;
-        float: left;
-        margin-left: 6px;
-        cursor: pointer;
-        position: relative;
-
-        @include mobile() {
-          color: $carrot_green;
-        }
-
-        &.no-nux::after {
-          float: right;
-          content: "";
-          background-image: cdnUrl("/img/ML/board_settings.svg");
-          background-size: 8px 8px;
-          background-repeat: no-repeat;
-          background-position: 0px 9px;
-          width: 20px;
-          height: 20px;
-          margin-top: -3px;
-          margin-left: 6px;
-          opacity: 0.8;
-
-          &:hover {
-            opacity: 1;
-          }
-        }
-      }
-
-      div.entry-edit-modal-divider {
-        width: 100%;
-        margin: 0px;
-        height: 1px;
-        background-color: $carrot_light_gray_1;
-        opacity: 0.3;
-
-        @include mobile() {
-          display: none;
-        }
-
-        &.not-visible {
-          opacity: 0;
-        }
-      }
-
-      div.entry-edit-modal-body {
-        margin: 0px;
-        padding: 0px 50px 24px 72px;
-        overflow-y: auto;
-        overflow-x: visible;
-        max-height: calc(100vh - 72px - 88px - 1px);
-        width: calc(100% + 22px);
-        margin-left: -22px;
-
-        @include tablet() {
-          min-height: 100vh;
-          max-height: initial;
-          padding: 64px 0px 0px;
-          width: 100%;
-          margin: 0px;
-        }
-
-        div.mobile-posting-in {
-          @include avenir_M();
-          font-size: 15px;
-          color: $carrot_text_blue_3;
-          // height: 112px;
-          // padding: 78px 24px 0px;
-          height: 48px;
-          padding: 14px 24px 0px;
-          background-color: $carrot_light_blue_2;
-
-          &.active {
-            background-color: $carrot_text_blue_3;
-
-            div.boards-dropdown-caret.no-nux {
-              color: white;
-              &:after {
-                background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
+              div.boards-dropdown-caret {
+                color: white;
+                &:after {
+                  background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
+                }
               }
             }
           }
@@ -293,37 +240,102 @@ div.entry-edit-modal-container {
             float: left;
           }
 
-          div.boards-dropdown-caret.no-nux {
-            @include avenir_H();
-            color: $carrot_text_blue_3;
+          div.boards-dropdown-caret {
+            @include avenir_M();
+            color: $carrot_green;
+            float: left;
+            margin-left: 6px;
+            cursor: pointer;
+            position: relative;
+
+            label.board-name {
+              @include avenir_M();
+              color: $carrot_green;
+              margin-bottom: 0px;
+              cursor: pointer;
+
+              @include mobile() {
+                @include avenir_H();
+                color: $carrot_text_blue_3;
+              }
+            }
 
             &:after {
-              width: 8px 5px;
-              background-size: 8px 5px;
-              background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
+              float: right;
+              content: "";
+              background-image: cdnUrl("/img/ML/board_settings.svg");
+              background-size: 8px 8px;
+              background-repeat: no-repeat;
+              background-position: center;
+              background-color: $deep_tan;
+              border-radius: 10px;
+              width: 20px;
+              height: 20px;
+              margin-top: 0px;
+              margin-left: 6px;
+              opacity: 0.8;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+
+            @include mobile() {
+
+              &:after {
+                width: 8px 5px;
+                margin-top: -3px;
+                background-size: 8px 5px;
+                background-position: 0px 9px;
+                background-color: transparent;
+                background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
+              }
+            }
+
+            div.dropdown-list-container {
+              top: 32px;
+              left: 50%;
+              margin-left: -100px;
+              width: 200px;
+
+              @include mobile() {
+                width: 100vw;
+                height: calc(100vh - 64px - 48px);
+                top: 34px;
+                left: 0px;
+                text-align: left;
+                background-color: white;
+
+                div.triangle {
+                  display: none;
+                }
+
+                div.dropdown-list-content {
+                  border: none;
+                  border-radius: 0px;
+                  padding: 24px;
+                  margin: 0px;
+                  box-shadow: none;
+                }
+              }
             }
           }
+        }
+      }
 
-          div.dropdown-list-container {
-            width: 100vw;
-            height: calc(100vh - 64px - 48px);
-            top: 112px;
-            left: 0px;
-            text-align: left;
-            background-color: white;
+      div.entry-edit-modal-body {
+        margin: 0px;
+        padding: 0px 42px 24px 42px;
+        width: calc(100% + 22px);
+        border-bottom: 1px solid rgba($deep_tan, 0.3);
 
-            div.triangle {
-              display: none;
-            }
-
-            div.dropdown-list-content {
-              border: none;
-              border-radius: 0px;
-              padding: 24px;
-              margin: 0px;
-              box-shadow: none;
-            }
-          }
+        @include mobile() {
+          min-height: 100vh;
+          max-height: initial;
+          padding: 0px;
+          width: 100%;
+          margin: 0px;
+          border-bottom: none;
         }
 
         div.entry-edit-headline {
@@ -336,7 +348,7 @@ div.entry-edit-modal-container {
           color: $carrot_dark_gray;
           white-space: pre-wrap;
           word-wrap: break-word;
-          margin-top: 24px;
+          margin-top: 35px;
           min-height: 26px;
 
           @include tablet() {
@@ -371,7 +383,7 @@ div.entry-edit-modal-container {
 
           div.medium-editor-media-picker {
             margin-top: 0px;
-            margin-left: -50px;
+            margin-left: -42px;
             top: 0px;
           }
 
@@ -381,7 +393,7 @@ div.entry-edit-modal-container {
             color: $carrot_dark_gray;
             @include avenir_R();
             font-size: 16px;
-            margin: 24px 0;
+            margin: 15px 0;
             cursor: text;
             min-height: 85px;
             white-space: pre-wrap;
@@ -432,7 +444,7 @@ div.entry-edit-modal-container {
       }
 
       div.entry-edit-modal-footer {
-        height: 40px;
+        height: 26px;
         margin: 16px 36px 32px;
         position: relative;
 
@@ -440,44 +452,12 @@ div.entry-edit-modal-container {
           margin: 16px;
         }
 
-        div.tooltip {
-          max-width: 170px;
-        }
-
         div.emoji-picker {
           float: left;
-          margin-top: 4px;
 
           @include mobile() {
             display: none;
           }
-        }
-
-        button.attachment {
-          float: left;
-          margin: 0 15px 0 0;
-          padding: 9px 0 0 0;
-          font-size: 22px;
-          height: 40px;
-          opacity: 0.8;
-          color: $oc_gray_7;
-          transform: rotate(90deg);
-
-          @include mobile() {
-            display: none;
-          }
-
-          &:hover {
-            opacity: 1;
-          }
-        }
-
-        button.form-action-bt {
-          margin-left: 15px;
-          float: right;
-          height: 40px;
-          width: auto;
-          min-width: 90px;
         }
       }
     }
