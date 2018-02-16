@@ -120,33 +120,29 @@
     [:div.emoji-picker
       {:ref "emoji-picker"
        :style {:width (str width "px")
-               :height (str height "px")}}
+               :height (str height "px")}
+       :on-mouse-enter #(when (or force-enabled (not @(::disabled s)))
+                          (save-caret-position s)
+                          (reset! visible true))
+       :on-mouse-leave #(do
+                          (remove-markers s)
+                          (reset! visible false))}
       [:button.emoji-button.btn-reset
         {:type "button"
          :title "Insert emoji"
-         :data-placement "top"
-         :data-container "body"
-         :data-toggle "tooltip"
-         :disabled (and (not force-enabled) @(::disabled s))
-         :on-mouse-down #(when (or force-enabled (not @(::disabled s)))
-                           (save-caret-position s)
-                             (let [vis (and (or force-enabled
-                                                @caret-pos)
-                                            (not @visible))]
-                               (reset! visible vis)))}]
+         :disabled (and (not force-enabled) @(::disabled s))}]
       [:div.picker-container
         {:class (utils/class-set {position true
                                   :preloading (not @(::preloaded s))
                                   :visible @visible})}
-        (when-not (utils/is-test-env?)
-          (react-utils/build (.-Picker js/EmojiMart)
-           {:native true
-            :onClick (fn [emoji event]
-                      (let [add-emoji? (boolean @(::caret-pos s))]
-                         (when add-emoji?
-                           (replace-with-emoji caret-pos emoji)
-                           (remove-markers s)
-                           (.focus @last-active-element))
-                         (reset! visible false)
-                         (when (fn? add-emoji-cb)
-                           (add-emoji-cb @last-active-element emoji add-emoji?))))}))]]))
+        (react-utils/build (.-Picker js/EmojiMart)
+         {:native true
+          :onClick (fn [emoji event]
+                    (let [add-emoji? (boolean @(::caret-pos s))]
+                       (when add-emoji?
+                         (replace-with-emoji caret-pos emoji)
+                         (remove-markers s)
+                         (.focus @last-active-element))
+                       (reset! visible false)
+                       (when (fn? add-emoji-cb)
+                         (add-emoji-cb @last-active-element emoji add-emoji?))))})]]))
