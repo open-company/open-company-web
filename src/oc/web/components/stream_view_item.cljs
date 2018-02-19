@@ -182,7 +182,8 @@
                               (utils/event-stop %)
                               (reset! (::mobile-show-comments s) true))}
                 (if (zero? (count comments-data))
-                  [:div.zero-comments "Reply"]
+                  (when is-mobile?
+                    [:div.zero-comments "Reply"])
                   (comments-summary activity-data false))])
             (reactions activity-data)]]
         (when-not is-mobile?
