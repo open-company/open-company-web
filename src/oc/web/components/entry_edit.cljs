@@ -15,6 +15,7 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
+            [oc.web.components.ui.multi-picker :refer (multi-picker)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -408,6 +409,7 @@
             ; Bottom controls
             [:div.entry-edit-controls.group]]
           [:div.entry-edit-modal-footer
+            (multi-picker)
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :container-selector "div.entry-edit-modal"})
             [:div.entry-edit-legend-container

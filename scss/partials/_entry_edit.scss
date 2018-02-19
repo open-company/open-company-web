@@ -444,15 +444,27 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-footer {
         height: 20px;
-        margin: 16px 36px 32px;
+        margin: 28px 36px;
         position: relative;
 
         @include mobile() {
           display: none;
         }
 
+        div.multi-picker-container {
+          float: left;
+
+          button.multi-picker-btn {
+            height: 28px;
+            padding-top: 8px;
+            margin-top: -8px;
+            background-position: 0px 8px;
+          }
+        }
+
         div.emoji-picker {
           float: left;
+          margin-left: 16px;
 
           button.emoji-button {
             width: 20px;
