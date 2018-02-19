@@ -18,7 +18,7 @@
                                s)
                               :after-render (fn [s]
                                (let [scrolling-node (rum/ref-node s "stream-comments-inner")
-                                     scrolls (> (.-scrollHeight scrolling-node) (+ (.-clientHeight scrolling-node) 16))]
+                                     scrolls (> (.-scrollHeight scrolling-node) (.-clientHeight scrolling-node))]
                                  (compare-and-set! (::bottom-gradient s) (not scrolls) scrolls))
                                (let [activity-uuid (:uuid (first (:rum/args s)))
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
