@@ -14,7 +14,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -203,6 +202,8 @@
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                          (when (responsive/is-tablet-or-mobile?)
+                            (set! (.-scrollTop (.-body js/document)) 0))
                           (when (and (responsive/is-tablet-or-mobile?) (js/isSafari))
                             (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
                           s)
