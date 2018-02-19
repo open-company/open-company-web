@@ -1309,7 +1309,7 @@
   (when (and emoji
              (utils/link-for (:links activity-data) "react"))
     (api/react-from-picker activity-data emoji))
-   (handle-reaction-to-entry db (:uuid activity-data) {:reaction emoji :count 1 :reacted true :links [] :authors []}))
+  (handle-reaction-to-entry db activity-data {:reaction emoji :count 1 :reacted true :links [] :authors []}))
 
 (defmethod dispatcher/action :react-from-picker/finish
   [db [_ {:keys [status activity-data reaction reaction-data]}]]
