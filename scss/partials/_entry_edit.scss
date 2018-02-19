@@ -444,7 +444,7 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-footer {
         height: 20px;
-        margin: 16px 36px 32px;
+        margin: 28px 36px;
         position: relative;
 
         @include mobile() {
@@ -456,9 +456,13 @@ div.entry-edit-modal-container {
 
           button.emoji-button {
             width: 20px;
-            height: 28px;
-            margin-top: -8px;
-            background-position: 0px 8px;
+            height: 20px;
+            background-position: 0px 0px;
+            padding: 0px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            cursor: pointer;
           }
 
           @include mobile() {
@@ -475,14 +479,14 @@ div.entry-edit-modal-container {
           margin-left: 16px;
           position: relative;
 
-          div.entry-edit-legend-trigger {
+          button.entry-edit-legend-trigger {
             width: 20px;
-            height: 28px;
+            height: 20px;
             @include image-2x("/img/ML/new_post_legend_button");
             background-repeat: no-repeat;
             background-size: 20px 20px;
-            background-position: 0px 8px;
-            margin-top: -8px;
+            background-position: 0px 0px;
+            cursor: pointer;
           }
 
           div.entry-edit-legend-image {
