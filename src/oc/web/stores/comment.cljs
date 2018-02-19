@@ -30,18 +30,20 @@
   [db [_ activity-data]]
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))]
-    (assoc-in db (vec (conj (vec (butlast comments-key)) :loading)) true)))
+        comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))
+        pre-comments-key (vec (butlast comments-key))]
+    (assoc-in db (vec (conj pre-comments-key :loading)) true)))
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error body activity-uuid]}]]
   (let [comments-key (dispatcher/activity-comments-key
                       (router/current-org-slug)
                       (router/current-board-slug) activity-uuid)
-        sorted-comments (vec (sort-by :created-at (:items (:collection body))))]
+        sorted-comments (vec (sort-by :created-at (:items (:collection body))))
+        pre-comments-key (vec (butlast comments-key))]
     (-> db
       (assoc-in comments-key sorted-comments)
-      (assoc-in (vec (conj (vec (butlast comments-key)) :loading)) false))))
+      (assoc-in (vec (conj pre-comments-key :loading)) false))))
 
 (defmethod dispatcher/action :comment-delete
   [db [_ activity-uuid comment-data]]
