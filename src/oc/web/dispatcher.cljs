@@ -23,7 +23,7 @@
   (vec (conj (org-key org-slug) :boards)))
 
 (defn all-posts-key [org-slug]
-  (vec (conj (boards-key org-slug) :all-posts)))
+  (vec (concat (boards-key org-slug) [:all-posts :board-data])))
 
 (defn calendar-key [org-slug]
   (vec (conj (org-key org-slug) :calendar)))
@@ -48,7 +48,7 @@
     (vec (concat board-key [:fixed-items activity-uuid]))))
 
 (defn comments-key [org-slug board-slug]
-  (vec (conj (board-data-key org-slug board-slug) :comments)))
+  (vec (conj (board-key org-slug board-slug) :comments)))
 
 (defn activity-comments-key [org-slug board-slug activity-uuid]
   (vec (conj (comments-key org-slug board-slug) activity-uuid :sorted-comments)))
