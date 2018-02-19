@@ -374,7 +374,7 @@
                     "Draft for: ")
                   "Posting in: ")]
               [:div.boards-dropdown-caret
-                [:label.board-name
+                [:div.board-name
                   {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
                   (:board-name entry-editing)]
                 (when @(::show-boards-dropdown s)
