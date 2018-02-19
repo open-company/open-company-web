@@ -63,11 +63,14 @@
                                  rum/reactive
                                  rum/static
                                  (rum/local default-page-size ::page-size)
+                                 {:before-render (fn [s]
+                                  (when (and (not @(drv/get-ref s store/search-active?))
+                                             (not= @(::page-size s) default-page-size))
+                                    (reset! (::page-size s) default-page-size))
+                                  s)}
   [s]
   (let [search-results (drv/react s store/search-key)
         search-active? (drv/react s store/search-active?)]
-    (when (and (not search-active?) (= @(::page-size s) default-page-size))
-      (reset! (::page-size s) default-page-size))
     [:div.search-results {:ref "results"
                           :class (when (not search-active?) "inactive")}
       (when-not (responsive/is-mobile-size?) (results-header search-results))
@@ -116,13 +119,11 @@
                              js/window
                              EventType/CLICK
                              (fn [e]
-                               (when (not
-                                      (utils/event-inside? e
-                                        (sel1 [:div.search-box])))
-                                 (do
-                                   (.stopPropagation e)
-                                   (search-inactive s)))
-                               e)))
+                               (when (and @(::search-clicked? s)
+                                          (not
+                                           (utils/event-inside? e
+                                             (sel1 [:div.search-box]))))
+                                 (search-inactive s)))))
                           s)
                          :will-unmount (fn [s]
                            (when @(::window-click s)
