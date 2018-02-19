@@ -65,36 +65,37 @@
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
-                 s)
-   :did-mount (fn [s] (when-not (utils/is-test-env?)
-                        (utils/after 1500 #(reset! (::preloaded s) true))
-                        (let [click-listener (events/listen
-                                              js/window
-                                              EventType/CLICK
-                                              (partial on-click-out s))
-                              focusin (events/listen
-                                       js/document
-                                       EventType/FOCUSIN
-                                       (partial check-focus s))
-                              focusout (events/listen
-                                        js/document
-                                        EventType/FOCUSOUT
-                                        (partial check-focus s))
-                              ff-click (when js/isFireFox
-                                         (events/listen
-                                          js/window
-                                          EventType/CLICK
-                                          (partial check-focus s)))
-                              ff-keypress (when js/isFireFox
-                                            (events/listen
-                                             js/window
-                                             EventType/KEYPRESS
-                                             (partial check-focus s)))]
-                          (merge s {::click-listener click-listener
-                                    ::focusin-listener focusin
-                                    ::focusout-listener focusout
-                                    ::ff-window-click ff-click
-                                    ::ff-keypress ff-keypress}))))
+                 (utils/after 1500 #(reset! (::preloaded s) true))
+                 (let [click-listener (events/listen
+                                       js/window
+                                       EventType/CLICK
+                                       (partial on-click-out s))
+                       focusin (events/listen
+                                js/document
+                                EventType/FOCUSIN
+                                (partial check-focus s))
+                       focusout (events/listen
+                                 js/document
+                                 EventType/FOCUSOUT
+                                 (partial check-focus s))
+                       ff-click (when js/isFireFox
+                                  (events/listen
+                                   js/window
+                                   EventType/CLICK
+                                   (partial check-focus s)))
+                       ff-keypress (when js/isFireFox
+                                     (events/listen
+                                      js/window
+                                      EventType/KEYPRESS
+                                      (partial check-focus s)))]
+                   (merge s {::click-listener click-listener
+                             ::focusin-listener focusin
+                             ::focusout-listener focusout
+                             ::ff-window-click ff-click
+                             ::ff-keypress ff-keypress})))
+   :did-mount (fn [s]
+                (utils/after 100 #(check-focus s nil))
+                s)
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
@@ -120,29 +121,33 @@
     [:div.emoji-picker
       {:ref "emoji-picker"
        :style {:width (str width "px")
-               :height (str height "px")}
-       :on-mouse-enter #(when (or force-enabled (not @(::disabled s)))
-                          (save-caret-position s)
-                          (reset! visible true))
-       :on-mouse-leave #(do
-                          (remove-markers s)
-                          (reset! visible false))}
+               :height (str height "px")}}
       [:button.emoji-button.btn-reset
         {:type "button"
          :title "Insert emoji"
-         :disabled (and (not force-enabled) @(::disabled s))}]
+         :data-placement "top"
+         :data-container "body"
+         :data-toggle "tooltip"
+         :disabled (and (not force-enabled) @(::disabled s))
+         :on-mouse-down #(when (or force-enabled (not @(::disabled s)))
+                           (save-caret-position s)
+                             (let [vis (and (or force-enabled
+                                                @caret-pos)
+                                            (not @visible))]
+                               (reset! visible vis)))}]
       [:div.picker-container
         {:class (utils/class-set {position true
                                   :preloading (not @(::preloaded s))
                                   :visible @visible})}
-        (react-utils/build (.-Picker js/EmojiMart)
-         {:native true
-          :onClick (fn [emoji event]
-                    (let [add-emoji? (boolean @(::caret-pos s))]
-                       (when add-emoji?
-                         (replace-with-emoji caret-pos emoji)
-                         (remove-markers s)
-                         (.focus @last-active-element))
-                       (reset! visible false)
-                       (when (fn? add-emoji-cb)
-                         (add-emoji-cb @last-active-element emoji add-emoji?))))})]]))
+        (when-not (utils/is-test-env?)
+          (react-utils/build (.-Picker js/EmojiMart)
+           {:native true
+            :onClick (fn [emoji event]
+                      (let [add-emoji? (boolean @(::caret-pos s))]
+                         (when add-emoji?
+                           (replace-with-emoji caret-pos emoji)
+                           (remove-markers s)
+                           (.focus @last-active-element))
+                         (reset! visible false)
+                         (when (fn? add-emoji-cb)
+                           (add-emoji-cb @last-active-element emoji add-emoji?))))}))]]))

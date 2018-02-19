@@ -1,4 +1,5 @@
 (ns oc.web.components.org-dashboard
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
@@ -12,6 +13,7 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.board-edit :refer (board-edit)]
+            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
@@ -35,6 +37,45 @@
                                board-data
                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
          (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))))
+
+(defn nux-steps
+  [org-data board-data nux]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)]
+    (case nux
+      :4
+      (let [create-link (utils/link-for (:links org-data) "create")]
+        (carrot-tip {:step nux
+                     :title "Update your team"
+                     :message (str
+                               "Click the compose button to add "
+                               "updates, announcements and plans "
+                               "that keep your team aligned.")
+                     :step-label "1 of 3"
+                     :button-title "Cool"
+                     :button-position "left"
+                     :on-next-click #(dis/dispatch! [:input [:nux] :5])}))
+      :5
+      (carrot-tip {:step nux
+                   :title "Boards keep posts organized"
+                   :message (str
+                             "You can add high-level boards like "
+                             "All-hands, Strategy, and Who We Are; or "
+                             "group-level boards like Sales, Marketing and "
+                             "Design.")
+                   :step-label "2 of 3"
+                   :button-title "Ok, got it"
+                   :button-position "left"
+                   :on-next-click #(dis/dispatch! [:input [:nux] :6])})
+      :6
+      (carrot-tip {:step nux
+                   :title "Invite your teammates"
+                   :message (str
+                             "The best way to keep your team aligned? Invite "
+                             "them to join you on Carrot!")
+                   :step-label "3 of 3"
+                   :button-title "Let's go"
+                   :button-position "left"
+                   :on-next-click #(dis/dispatch! [:nux-end])}))))
 
 (rum/defcs org-dashboard < rum/static
                            rum/reactive
@@ -63,7 +104,7 @@
                 is-showing-alert
                 media-input]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :7])
+        should-show-onboard-overlay? (some #{nux} [:1 :2 :3])
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
@@ -98,7 +139,7 @@
                                                   (router/current-activity-id))})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (cond
-          (some #{nux} [:1 :7])
+          should-show-onboard-overlay?
           (onboard-overlay nux)
           ;; Org settings
           org-settings-data
@@ -143,9 +184,13 @@
         (when (and media-input
                    (:media-chart media-input))
           (media-chart-modal))
+        ;; Show onboard overlay
+        (when (some #{nux} [:4 :5 :6])
+          (nux-steps org-data board-data nux))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing
+                           should-show-onboard-overlay?
                            is-sharing-activity))
           [:div.page
             (navbar)

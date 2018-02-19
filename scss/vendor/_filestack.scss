@@ -58,11 +58,13 @@ div.fsp-picker {
       background-color: white;
       box-shadow: none;
 
-      &:hover {
-        width: 50px !important;
-        box-shadow: none;
-        border: inherit;
-      }
+      @include big_web() {
+        &:hover {
+          width: 50px !important;
+          box-shadow: none;
+          border: inherit;
+        }
+      }      
 
       div.fsp-source-list {
         .fsp-source-list__item--active {

@@ -1078,14 +1078,14 @@
         (update-in [:entry-editing] dissoc :publishing)
         (dissoc :entry-toggle-save-on-exit)
         ;; Progress the NUX
-        (assoc :nux (when (= (:nux db) :2) :3))))))
+        (assoc :nux (when (= (:nux db) :3) :4))))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
   (-> db
     (update-in [:entry-editing] dissoc :publishing)
     (update-in [:entry-editing] assoc :error true)
-    (assoc :nux (when (= (:nux db) :2) :4))))
+    (assoc :nux (when (= (:nux db) :3) :5))))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -1453,15 +1453,17 @@
               "<p>It’s tough to keep everyone on the same page. Important information is "
               "missed or lost, so everyone has a different idea of what’s important. Let’s fix "
               "that!</p>"
-              "<p>Carrot makes key announcements, updates and plans visible and interactive, so we "
-              "can all stay on the same page.</p>")
+              (if (responsive/is-tablet-or-mobile?)
+                "<p>Carrot makes key announcements, updates and plans visible and interactive.</p>"
+                (str
+                 "<p>Carrot makes key announcements, updates and plans visible and interactive, so we "
+                 "can all stay on the same page.</p>")))
         entry-editing {:headline headline
                        :body body
                        :has-changes true
                        :board-name (:name current-board)
                        :board-slug (:slug current-board)}]
-    (merge db {:entry-editing entry-editing
-               :nux :2})))
+    (merge db {:entry-editing entry-editing})))
 
 (defmethod dispatcher/action :private-board-user-add
   [db [_ user user-type]]

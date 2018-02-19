@@ -12,6 +12,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.user :as user-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image default-avatar-url)]
             [goog.dom :as gdom]
@@ -43,18 +44,38 @@
         auth-settings (drv/react s :auth-settings)]
     [:div.onboard-lander.lander
       [:div.main-cta
+        [:button.mlb-reset.top-back-button
+          {:on-touch-start identity
+           :on-click #(router/history-back!)
+           :aria-label "Back"}]
         [:div.title.main-lander
-          "Welcome!"]]
+          "Welcome!"]
+        [:button.top-continue
+          {:class (when (or (not (utils/valid-email? @(::email s)))
+                            (<= (count @(::pswd s)) 7))
+                    "disabled")
+           :on-touch-start identity
+           :on-click #(if (or (not (utils/valid-email? @(::email s)))
+                              (<= (count @(::pswd s)) 7))
+                        (do
+                          (when (not (utils/valid-email? @(::email s)))
+                            (reset! (::email-error s) true))
+                          (when (<= (count @(::pswd s)) 7)
+                            (reset! (::password-error s) true)))
+                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
+           :aria-label "Continue"}]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
-          {:on-click #(do
+          {:on-touch-start identity
+           :on-click #(do
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
                          (user-actions/login-with-slack auth-link)))}
           [:div.signup-with-slack-content
             "Sign Up with "
-            [:div.slack-blue-icon]]]
+            [:div.slack-blue-icon
+              {:aria-label "slack"}]]]
         [:div.or-with-email
           [:div.or-with-email-line]
           [:div.or-with-email-copy
@@ -106,6 +127,7 @@
             {:class (when (or (not (utils/valid-email? @(::email s)))
                               (<= (count @(::pswd s)) 7))
                       "disabled")
+             :on-touch-start identity
              :on-click #(if (or (not (utils/valid-email? @(::email s)))
                                 (<= (count @(::pswd s)) 7))
                           (do
@@ -151,15 +173,26 @@
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.title.about-yourself
-          "Tell us a bit about yourself…"]
-        (when (:error edit-user-profile)
-          [:div.subtitle.error
-            "An error occurred while saving your data, please try again"])]
+          "Tell us about yourself"]
+        (let [top-continue-disabled (or (and (empty? (:first-name user-data))
+                                             (empty? (:last-name user-data)))
+                                        (empty? (:avatar-url user-data)))]
+          [:button.top-continue
+            {:class (when top-continue-disabled
+                      "disabled")
+             :on-touch-start identity
+             :on-click #(when-not top-continue-disabled
+                          (reset! (::saving s) true)
+                          (dis/dispatch! [:user-profile-save]))
+             :aria-label "Continue"}])]
+      (when (:error edit-user-profile)
+        [:div.subtitle.error
+          "An error occurred while saving your data, please try again"])
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container
+          [:div.logo-upload-container.group
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
@@ -194,6 +227,7 @@
             {:disabled (or (and (empty? (:first-name user-data))
                                 (empty? (:last-name user-data)))
                            (empty? (:avatar-url user-data)))
+             :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
                           (dis/dispatch! [:user-profile-save]))}
@@ -215,7 +249,8 @@
          [:input
           [:org-editing]
           first-team])
-        (when-not (:logo-height first-team)
+        (when (and (not (zero? (count (:logo-url first-team))))
+                   (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
             (set! (.-onload img)
              #(do
@@ -259,7 +294,20 @@
     [:div.onboard-lander.lander-team
       [:div.main-cta
         [:div.title.company-setup
-          "Your team…"]]
+          "Your company"]
+        (let [top-continue-disabled (< (count (clean-org-name (:name org-editing))) 3)]
+          [:button.top-continue
+            {:class (when top-continue-disabled "disabled")
+             :on-touch-start identity
+             :on-click #(when-not top-continue-disabled
+                          (let [org-name (clean-org-name (:name org-editing))]
+                            (dis/dispatch! [:input [:org-editing :name] org-name])
+                            (if (and (seq org-name)
+                                     (> (count org-name) 2))
+                              ;; Create org and show setup screen
+                              (dis/dispatch! [:org-create])
+                              (dis/dispatch! [:input [:org-editing :error] true]))))
+             :aria-label "Continue"}])]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -310,6 +358,7 @@
                           (merge org-editing {:error nil :name (.. % -target -value)})])}]
           [:button.continue
             {:class (when (< (count (clean-org-name (:name org-editing))) 3) "disabled")
+             :on-touch-start identity
              :on-click #(let [org-name (clean-org-name (:name org-editing))]
                           (dis/dispatch! [:input [:org-editing :name] org-name])
                           (if (and (seq org-name)
@@ -371,7 +420,8 @@
             {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
              :on-click #(if (< (count (:pswd collect-pswd)) 8)
                           (reset! (::password-error s) true)
-                          (dis/dispatch! [:pswd-collect]))}
+                          (dis/dispatch! [:pswd-collect]))
+             :on-touch-start identity}
             "Continue"]]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive
@@ -449,6 +499,7 @@
             {:disabled (or (and (empty? (:first-name user-data))
                                 (empty? (:last-name user-data)))
                            (empty? (:avatar-url user-data)))
+             :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
                           (dis/dispatch! [:user-profile-save]))}
@@ -530,7 +581,8 @@
                                (* 60 60 24 7))
                               (router/nav! oc-urls/confirm-invitation-profile))
                             (router/nav! (oc-urls/org (:slug org))))
-                          (router/nav! oc-urls/login)))}
+                          (router/nav! oc-urls/login)))
+           :on-touch-start identity}
           "Get Started"]]
       :else
       [:div.onboard-email-container.small.dot-animation

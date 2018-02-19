@@ -27,19 +27,14 @@
                                                         :board-name (:name board-data)})}
               "Add one?"])])
       [:img.empty-board-image
-        {:src (utils/cdn (if mobile?
-                           "/img/ML/mobile_empty_board.png"
-                           "/img/ML/empty_board.svg"))
-         :srcSet (when mobile?
-                    (str (utils/cdn "/img/ML/mobile_empty_board@2x.png") "  2x"))
+        {:src (utils/cdn "/img/ML/empty_board.svg")
          :style {:width (str (if mobile? (- ww 24 24) 416) "px")
                  :height (str (if mobile? (* (- ww 24 24) (:ratio mobile-image-size)) 424) "px")
                  :max-width (str (if mobile? (:width mobile-image-size) 416) "px")
                  :max-height (str (if mobile? (:height mobile-image-size) 424) "px")}}]
       (when mobile?
-        (let [empty-board-copy (str "Shoot, looks like there aren’t any posts in " (:name board-data) " yet....")]
-          [:div.empty-board-footer
-            {:dangerouslySetInnerHTML (utils/emojify empty-board-copy)}]))
+        [:div.empty-board-footer
+          "Add a team update, announcement, or story to get started."])
       (when false ;; mobile?
         [:button.mlb-reset.empty-board-create-first-post
           [:div.empty-board-first-post-container

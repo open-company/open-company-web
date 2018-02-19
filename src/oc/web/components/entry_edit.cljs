@@ -14,7 +14,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -175,6 +174,7 @@
                         (rum/local false ::publishing)
                         (rum/local false ::show-boards-dropdown)
                         (rum/local false ::window-resize-listener)
+                        (rum/local false ::window-click-listener)
                         (rum/local nil ::autosave-timer)
                         (rum/local false ::show-legend)
                         ;; Mixins
@@ -203,7 +203,14 @@
                             js/window
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
+                          (reset! (::window-click-listener s)
+                           (events/listen js/window EventType/CLICK
+                            #(when (and @(::show-legend s)
+                                        (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
+                                (reset! (::show-legend s) false))))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                          (when (responsive/is-tablet-or-mobile?)
+                            (set! (.-scrollTop (.-body js/document)) 0))
                           (when (and (responsive/is-tablet-or-mobile?) (js/isSafari))
                             (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
                           s)
@@ -257,6 +264,9 @@
                           (when @(::window-resize-listener s)
                             (events/unlistenByKey @(::window-resize-listener s))
                             (reset! (::window-resize-listener s) nil))
+                          (when @(::window-click-listener s)
+                            (events/unlistenByKey @(::window-click-listener s))
+                            (reset! (::window-click-listener s) nil))
                           (when @(::autosave-timer s)
                             (.clearInterval js/window @(::autosave-timer s))
                             (reset! (::autosave-timer s) nil))
@@ -365,7 +375,7 @@
                     "Draft for: ")
                   "Posting in: ")]
               [:div.boards-dropdown-caret
-                [:label.board-name
+                [:div.board-name
                   {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
                   (:board-name entry-editing)]
                 (when @(::show-boards-dropdown s)
@@ -411,10 +421,17 @@
           [:div.entry-edit-modal-footer
             (multi-picker)
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :width 20
+                           :height 20
                            :container-selector "div.entry-edit-modal"})
             [:div.entry-edit-legend-container
-              {:on-mouse-enter #(reset! (::show-legend s) true)
-               :on-mouse-leave #(reset! (::show-legend s) false)}
-              [:div.entry-edit-legend-trigger]
+              {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))
+               :ref "legend-container"}
+              [:button.mlb-reset.entry-edit-legend-trigger
+                {:aria-label "Keyboard shortcuts"
+                 :title "Shortcuts"
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"}]
               (when @(::show-legend s)
                 [:div.entry-edit-legend-image])]]]]]))
