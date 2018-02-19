@@ -129,6 +129,41 @@
   ;; render component
   (drv-root home-page target))
 
+(defn check-nux [query-params]
+  (let [nux-setup-time 3000
+        has-at-param (contains? query-params :at)
+        nux-cookie (cook/get-cookie
+                    (router/show-nux-cookie
+                     (jwt/get-key :user-id)))
+        show-nux (and (not (:show-login-overlay @dis/app-state))
+                      (jwt/jwt)
+                      (or (some #(= % nux-cookie) (vals router/nux-cookie-values))
+                          (contains? query-params :show-nux-again-please)))
+        loading (or (and ;; if is board page
+                         (not (contains? query-params :ap))
+                         ;; if the board data are not present
+                         (not (:fixed-items (dis/board-data))))
+                         ;; if the all-posts data are not preset
+                    (and (contains? query-params :ap)
+                         ;; this latter is used when displaying modal over AP
+                         (not (:fixed-items (dis/all-posts-data)))))
+        org-settings (if (and (contains? query-params :org-settings)
+                              (#{:main :team :invite} (keyword (:org-settings query-params))))
+                       (keyword (:org-settings query-params))
+                       (when (contains? query-params :access)
+                         :main))
+        next-app-state {:nux (when show-nux :1)
+                        :loading loading
+                        :ap-initial-at (when has-at-param (:at query-params))
+                        :org-settings org-settings
+                        :nux-loading (cook/get-cookie :nux)
+                        :nux-end nil}]
+        (utils/after 1 #(swap! dis/app-state merge next-app-state))
+        (utils/after nux-setup-time
+         #(do
+           (cook/remove-cookie! :nux)
+           (swap! dis/app-state assoc :nux-end true)))))
+
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org (:params params))
@@ -140,6 +175,7 @@
     ;; load data from api
     (when-not (dis/org-data)
       (swap! dis/app-state merge {:loading true}))
+    (check-nux query-params)
     (post-routing)
     ;; render component
     (drv-root component target)))
@@ -155,8 +191,6 @@
     (rum/unmount target)
     ;; render component
     (drv-root component target)))
-
-(def default-nux-setup-time 3000)
 
 ;; Component specific to a board
 (defn board-handler [route target component params]
@@ -177,37 +211,7 @@
       :activity entry
       :query-params query-params
       :from-all-posts (or has-at-param (contains? query-params :ap))})
-    (let [nux-cookie (cook/get-cookie
-                      (router/show-nux-cookie
-                       (jwt/get-key :user-id)))
-          show-nux (and (not (:show-login-overlay @dis/app-state))
-                        (jwt/jwt)
-                        (or (some #(= % nux-cookie) (vals router/nux-cookie-values))
-                            (contains? query-params :show-nux-again-please)))
-          loading (or (and ;; if is board page
-                           (not (contains? query-params :ap))
-                           ;; if the board data are not present
-                           (not (:fixed-items (dis/board-data))))
-                           ;; if the all-posts data are not preset
-                      (and (contains? query-params :ap)
-                           ;; this latter is used when displaying modal over AP
-                           (not (:fixed-items (dis/all-posts-data)))))
-          org-settings (if (and (contains? query-params :org-settings)
-                                (#{:main :team :invite} (keyword (:org-settings query-params))))
-                         (keyword (:org-settings query-params))
-                         (when (contains? query-params :access)
-                           :main))
-          next-app-state {:nux (when show-nux :1)
-                          :loading loading
-                          :ap-initial-at (when has-at-param (:at query-params))
-                          :org-settings org-settings
-                          :nux-loading (cook/get-cookie :nux)
-                          :nux-end nil}]
-      (utils/after 1 #(swap! dis/app-state merge next-app-state))
-      (utils/after default-nux-setup-time
-       #(do
-         (cook/remove-cookie! :nux)
-         (swap! dis/app-state assoc :nux-end true))))
+    (check-nux query-params)
     (post-routing)
     ;; render component
     (drv-root component target)))

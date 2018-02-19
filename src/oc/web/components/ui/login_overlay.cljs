@@ -58,7 +58,20 @@
                                 (.focus (sel1 [:input.email]))
                                 s)}
   [state]
-  (let [auth-settings (drv/react state :auth-settings)]
+  (let [auth-settings (drv/react state :auth-settings)
+        login-disabled (and auth-settings
+                           (not (nil?
+                            (utils/link-for
+                             (:links auth-settings)
+                             "authenticate"
+                             "GET"
+                             {:auth-source "email"}))))
+        login-action #(when-not login-disabled
+                        (let [login-with-email (:login-with-email @dis/app-state)
+                              email (:email login-with-email)
+                              pswd (:pswd login-with-email)]
+                          (.preventDefault %)
+                          (user-actions/login-with-email email pswd)))]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
       ;; Close X button
@@ -68,17 +81,27 @@
       [:div.login-overlay.login-with-email.group
         {:on-click #(utils/event-stop %)}
         [:div.login-overlay-cta.group
-          [:div.sign-in-cta "Sign In"]]
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+             :on-click #(router/history-back!)
+             :aria-label "Back"}]
+          [:div.sign-in-cta "Sign In"]
+          [:button.mlb-reset.top-continue
+            {:aria-label "Login"
+             :class (when login-disabled "disabled")
+             :on-click login-action}]]
         ;; Slack button
         [:button.mlb-reset.signin-with-slack
           {:on-click #(do
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
-                         (user-actions/login-with-slack auth-link)))}
+                         (user-actions/login-with-slack auth-link)))
+           :on-touch-start identity}
           [:div.signin-with-slack-content
             "Sign In with "
-            [:div.slack-blue-icon]]]
+            [:div.slack-blue-icon
+              {:aria-label "slack"}]]]
         ;; Or with email
         [:div.or-with-email
           [:div.or-with-email-line]
@@ -137,18 +160,9 @@
                 [:a {:on-click #(user-actions/show-login :password-reset)} "Forgot Password?"]]]
             ;; Login button
             [:button.mlb-reset.mlb-default.continue
-              {:disabled (or (not auth-settings)
-                             (nil?
-                              (utils/link-for
-                               (:links auth-settings)
-                               "authenticate"
-                               "GET"
-                               {:auth-source "email"})))
-               :on-click #(let [login-with-email (:login-with-email @dis/app-state)
-                                email (:email login-with-email)
-                                pswd (:pswd login-with-email)]
-                            (.preventDefault %)
-                            (user-actions/login-with-email email pswd))}
+              {:class (when login-disabled "disabled")
+               :on-touch-start identity
+               :on-click login-action}
               "Sign In"]]]
         ;; Link to signup
         [:div.footer-link
@@ -210,11 +224,13 @@
               [:div.group
                 [:button.mlb-reset.mlb-default.continue
                   {:on-click #(dis/dispatch! [:password-reset])
-                   :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))}
+                   :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))
+                   :on-touch-start identity}
                   "Reset Password"]
                 [:button.mlb-reset.mlb-link-black
                   {:on-click #(user-actions/show-login nil)
-                   :disabled (not auth-settings)}
+                   :disabled (not auth-settings)
+                   :on-touch-start identity}
                   "Cancel"]])]]]]))
 
 (rum/defcs collect-name-password < rum/reactive
@@ -292,6 +308,7 @@
               {:disabled (or (and (s/blank? (:firstname (:collect-name-pswd (rum/react dis/app-state))))
                                   (s/blank? (:lastname (:collect-name-pswd (rum/react dis/app-state)))))
                              (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 8))
+               :on-touch-start identity
                :on-click #(do
                             (utils/event-stop %)
                             (dis/dispatch! [:name-pswd-collect]))}
@@ -348,7 +365,8 @@
               {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                :on-click #(do
                             (utils/event-stop %)
-                            (dis/dispatch! [:pswd-collect true]))}
+                            (dis/dispatch! [:pswd-collect true]))
+               :on-touch-start identity}
               "Let Me In"]]]]]))
 
 (rum/defcs login-overlays-handler < rum/static

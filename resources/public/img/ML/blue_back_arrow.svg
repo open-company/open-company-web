@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="19px" height="15px" viewBox="0 0 19 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="About-you-(m)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-31.000000, -32.000000)">
+        <g id="icon" transform="translate(40.500000, 39.500000) scale(-1, 1) translate(-40.500000, -39.500000) translate(31.000000, 32.000000)" fill="#4C67FC">
+            <rect id="Rectangle-3" x="0" y="6" width="16" height="2"></rect>
+            <g id="&gt;" transform="translate(11.071068, 7.071068) rotate(-45.000000) translate(-11.071068, -7.071068) translate(6.071068, 2.071068)">
+                <rect id="Rectangle-4" x="8" y="0" width="2" height="10"></rect>
+                <rect id="Rectangle-5" x="0" y="8" width="10" height="2"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

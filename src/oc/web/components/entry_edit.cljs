@@ -14,7 +14,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -194,17 +193,22 @@
                             (reset! (::initial-headline s) initial-headline))
                           s)
                          :did-mount (fn [s]
-                          (when-not @(drv/get-ref s :nux)
-                            (utils/after 300 #(setup-headline s))
-                            (when-not (responsive/is-tablet-or-mobile?)
-                              (when-let [headline-el (rum/ref-node s "headline")]
-                                (utils/to-end-of-content-editable headline-el))))
+                          (let [nux @(drv/get-ref s :nux)]
+                            (when (= nux :2)
+                              (dis/dispatch! [:input [:nux] :3]))
+                            (when-not nux
+                              (utils/after 300 #(setup-headline s))
+                              (when-not (responsive/is-tablet-or-mobile?)
+                                (when-let [headline-el (rum/ref-node s "headline")]
+                                  (utils/to-end-of-content-editable headline-el)))))
                           (reset! (::window-resize-listener s)
                            (events/listen
                             js/window
                             EventType/RESIZE
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                          (when (responsive/is-tablet-or-mobile?)
+                            (set! (.-scrollTop (.-body js/document)) 0))
                           (when (and (responsive/is-tablet-or-mobile?) (js/isSafari))
                             (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
                           s)
@@ -458,17 +462,6 @@
                        (not (js/isIE)))
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                              :container-selector "div.entry-edit-modal"}))
-            (when nux
-              (when-let* [post-button (js/$ "div.entry-edit-modal button.post-btn")
-                          post-button-offset (.offset post-button)]
-                (carrot-tip {:step :2
-                             :circle-offset {:top -90
-                                             :left -550}
-                             :x (- (aget post-button-offset "left") 522)
-                             :y (- (aget post-button-offset "top") 20)
-                             :title "Here’s a sample post"
-                             :message "Click the green Post button to see how it works."
-                             :width 494})))
             [:button.mlb-reset.mlb-default.form-action-bt.post-btn
               {:ref "post-btn"
                :on-click (fn [_]

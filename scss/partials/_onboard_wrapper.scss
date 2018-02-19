@@ -60,7 +60,24 @@ div.onboard-wrapper-container {
       @include mobile(){
         flex: unset;
         width: 100%;
-        position: relative;
+        position: unset;
+      }
+
+      button.mobile-blue-back {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          width: 19px;
+          height: 15px;
+          position: absolute;
+          top: 25px;
+          left: 24px;
+          background-image: cdnUrl("/img/ML/black_back_arrow.svg");
+          background-size: 19px 15px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
       }
     }
   }
@@ -105,7 +122,7 @@ div.onboard-email-container {
     margin-top: 16px;
     width: 170px;
     height: 42px;
-    background-color: #4D67FC;
+    background-color: $sea_blue;
     color: white;
     @include avenir_H();
     font-size: 16px;
@@ -114,7 +131,7 @@ div.onboard-email-container {
     border: none;
 
     &.disabled {
-      opacity: 0.8;
+      background-color: $light_ui_grey;
     }
   }
 }
@@ -124,30 +141,116 @@ div.onboard-lander {
 
   div.main-cta {
 
+    @include mobile() {
+      margin-top: 0px;
+      height: 64px;
+      text-align: center;
+      width: 100%;
+      box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+    }
+
     div.title {
-      margin-top: 64px;
       @include avenir_H();
       font-size: 32px;
       color: $carrot_dark_brown_1;
       letter-spacing: auto;
       line-height: 44px;
       margin-top: 80px;
+
+      @include mobile() {
+        margin-top: 0px;
+        padding-top: 21px;
+        @include avenir_H();
+        font-size: 18px;
+        color: $carrot_dark_gray;
+        height: 45px;
+        line-height: 25px;
+        width: 200px;
+        margin: 0 auto;
+      }
     }
 
-    div.subtitle {
-      @include avenir_R();
-      font-size: 16px;
-      color: $oc_gray_7;
-      margin-top: 16px;
+    button.top-back-button {
+      display: none;
 
-      &.error {
-        color: $carrot_orange;
-      }
+      @include tablet(){
+        display: block;
+        float: left;
+        height: 40px;
+        width: 40px;
+        background-color: white;
+        background-image: cdnUrl("/img/ML/gray_back_x.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+        padding: 0px;
+        position: absolute;
+        top: 12px;
+        left: 24px;
+      } 
+    }
 
-      span.email-address {
+    button.top-continue {
+      display: none;
+
+      @include tablet(){
+        display: block;
+        float: right;
         @include avenir_H();
-        color: $oc_gray_7;
+        font-size: 15px;
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        background-color: $sea_blue;
+        background-image: cdnUrl("/img/ML/white_continue_arrow.svg");
+        background-size: 14px 19px;
+        background-position: center;
+        background-repeat: no-repeat;
+        outline: none;
+        border: none;
+        padding: 0px;
+        position: absolute;
+        top: 12px;
+        right: 24px;
+
+        &.disabled {
+          background-color: $light_ui_grey;
+        }
       }
+    }
+
+    button.continue {
+      margin-top: 16px;
+      width: 170px;
+      height: 42px;
+      background-color: $sea_blue;
+      color: white;
+      @include avenir_H();
+      font-size: 16px;
+      border-radius: 4px;
+      outline: none;
+      border: none;
+
+      &.disabled {
+        background-color: $light_ui_grey;
+      }
+    }
+  }
+
+  div.subtitle {
+    @include avenir_R();
+    font-size: 16px;
+    color: $oc_gray_7;
+    margin-top: 16px;
+    padding: 0px 24px;
+
+    &.error {
+      color: $carrot_orange;
+    }
+
+    span.email-address {
+      @include avenir_H();
+      color: $oc_gray_7;
     }
   }
 
@@ -165,15 +268,22 @@ div.onboard-lander {
       width: 340px;
       height: 48px;
       margin-top: 52px;
-      background-color: rgba($carrot_text_blue, 0.1);
+      border: 2px solid $chalk_blue;
+      color: $sea_blue;
       border-radius: 100px;
       text-align: center;
+
+      div.signup-with-slack-content {
+        div.slack-blue-icon {
+          @include image-2x("/img/ML/slack_blue_icon");
+        }
+      }
 
       div.signup-with-slack-content {
         @include avenir_H();
         font-size: 18px;
         color: $carrot_text_blue;
-        width: 180px;
+        width: 184px;
         margin: 4px auto 0px;
 
         div.slack-blue-icon {
@@ -183,6 +293,7 @@ div.onboard-lander {
           background-repeat: no-repeat;
           background-size: 70px 21px;
           float: right;
+          margin-left: 4px;
         }
       }
 
@@ -236,6 +347,12 @@ div.onboard-lander {
       min-height: 80px;
       cursor: pointer;
 
+      @include mobile() {
+        width: 100%;
+        margin: 32px auto;
+        text-align: center;
+      }
+
       &:hover {
         div.add-picture-link {
           text-decoration: underline;
@@ -245,11 +362,17 @@ div.onboard-lander {
       &.org-logo {
         width: 340px;
 
+        @include mobile() {
+          max-width: 100%;
+          text-align: center;
+        }
+
         div.org-avatar.missing-logo {
           position: relative;
           width: 80px;
           height: 80px;
-          background-color: rgba($carrot_text_blue, 0.3);
+          background-color: transparent;
+          border: 2px solid $carrot_light_blue_2;
           border-radius: 40px;
 
           &:after {
@@ -269,6 +392,11 @@ div.onboard-lander {
           @include org-avatar(80);
           margin-right: 10px;
 
+          @include mobile() {
+            float: unset;
+            margin: 0px auto 16px;
+          }
+
           div.org-avatar-container {
             img.org-avatar-img {
               max-width: 340px;
@@ -279,16 +407,32 @@ div.onboard-lander {
         div.add-picture-link {
           margin-left: 0px;
           margin-top: 10px;
+
+          @include mobile() {
+            margin-top: 0px;
+            text-align: center;
+            width: 100%;
+          }
         }
 
         div.add-picture-link-subtitle {
           margin-left: 0px;
           margin-top: 10px;
+
+          @include mobile() {
+            text-align: center;
+            width: 100%;
+          }
         }
       }
 
       div.user-avatar-img-container {
         float: left;
+
+        @include mobile() {
+          float: unset;
+          margin: 0px auto;
+        }
       }
 
       @include user-profile(82);
@@ -296,11 +440,17 @@ div.onboard-lander {
       div.add-picture-link {
         @include avenir_H();
         font-size: 14px;
-        color: $carrot_text_blue;
+        color: $carrot_green_2;
         float: left;
         margin-left: 24px;
         margin-top: 16px;
         width: 220px;
+
+        @include mobile() {
+          text-align: center;
+          width: 100%;
+          margin-left: 0px;
+        }
       }
 
       div.add-picture-link-subtitle {
@@ -311,6 +461,12 @@ div.onboard-lander {
         margin-left: 24px;
         margin-top: 12px;
         width: 220px;
+
+        @include mobile() {
+          text-align: center;
+          width: 100%;
+          margin-left: 0px;
+        }
       }
     }
 
@@ -401,14 +557,18 @@ div.onboard-lander {
       border: none;
       width: 100%;
       height: 48px;
-      background-color: #4D67FC;
+      background-color: $sea_blue;
       color: white;
       @include avenir_H();
       font-size: 16px;
       border-radius: 100px;
 
       &.disabled {
-        opacity: 0.8;
+        background-color: $light_ui_grey;
+      }
+
+      @include mobile() {
+        margin-bottom: 32px;
       }
     }
   }
@@ -417,6 +577,10 @@ div.onboard-lander {
     div.onboard-form {
       button.continue {
         margin-top: 108px;
+
+        @include mobile() {
+          margin-top: 32px;
+        }
       }
     }
   }
