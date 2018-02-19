@@ -64,7 +64,7 @@
                                  rum/static
                                  (rum/local default-page-size ::page-size)
                                  {:before-render (fn [s]
-                                  (when (and (not search-active?)
+                                  (when (and (not @(drv/get-ref s store/search-active?))
                                              (not= @(::page-size s) default-page-size))
                                     (reset! (::page-size s) default-page-size))
                                   s)}
@@ -119,7 +119,7 @@
                              js/window
                              EventType/CLICK
                              (fn [e]
-                               (when (and @(drv/get-ref s store/search-active?)
+                               (when (and @(::search-clicked? s)
                                           (not
                                            (utils/event-inside? e
                                              (sel1 [:div.search-box]))))
