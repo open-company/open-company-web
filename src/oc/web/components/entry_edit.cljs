@@ -152,6 +152,8 @@
     (string/trim value)
     value))
 
+(def default-multi-picker-button-id "entry-edit-multi-picker")
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
@@ -407,19 +409,21 @@
                                (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
                :dangerouslySetInnerHTML @(::initial-headline s)}]
             (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker false
+                               :save-position-click-element-id default-multi-picker-button-id
                                :initial-body @(::initial-body s)
                                :show-placeholder (not (contains? entry-editing :links))
                                :show-h2 true
                                :dispatch-input-key :entry-editing
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video" "chart" "attachment"]
+                               :media-config ["photo" "video" "attachment"]
                                :classes "emoji-autocomplete emojiable"})
             [:div.entry-edit-controls-right]
             ; Bottom controls
             [:div.entry-edit-controls.group]]
           [:div.entry-edit-modal-footer
-            (multi-picker)
+            (multi-picker default-multi-picker-button-id)
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 20
                            :height 20
