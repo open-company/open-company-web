@@ -1,5 +1,5 @@
 div.stream-view-attachments {
-  margin-top: 16px;
+  margin-top: 32px;
   height: 88px;
   width: 100%;
 
@@ -10,17 +10,12 @@ div.stream-view-attachments {
   }
 
   div.stream-view-attachments-content {
-    height: 63px;
-    padding-bottom: 8px;
 
     @include mobile() {
       overflow-x: auto;
       overflow-y: hidden;
       width: 100%;
       display: flex;
-      // add some space for the scroler
-      height: 74px;
-      padding-bottom: 8px;
     }
 
     a.stream-view-attachments-item {
@@ -30,7 +25,7 @@ div.stream-view-attachments {
       border: 1px solid rgba($deep_tan, 0.7);
       background-color: white;
       padding: 9px 18px;
-      margin-top: 12px;
+      margin-top: 8px;
       width: 100%;
 
       @include mobile() {
@@ -55,7 +50,7 @@ div.stream-view-attachments {
         }
 
         div.attachment-content {
-          width: 148px;
+          width: 146px;
 
           @include mobile() {
             width: calc(100% - 40px);
@@ -88,7 +83,7 @@ div.stream-view-attachments {
         float: left;
         margin-left: 8px;
         height: 32px;
-        width: 390px;
+        width: 384px;
 
         @include mobile() {
           width: calc(100% - 40px);

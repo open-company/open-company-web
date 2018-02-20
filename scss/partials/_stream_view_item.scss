@@ -29,7 +29,7 @@ div.stream-view-item {
   div.stream-view-item-header {
     height: 72px;
     background-color: $light_tan;
-    padding: 18px 24px;
+    padding: 20px 24px;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
 
@@ -44,7 +44,7 @@ div.stream-view-item {
       padding-right: 20px;
       overflow: hidden;
 
-      @include activity-author(40);
+      @include activity-author(32);
     }
 
     div.more-button {
@@ -155,8 +155,8 @@ div.stream-view-item {
       flex-shrink: 0;
       width: 505px;
       position: relative;
-      padding: 18px 0px 48px 36px;
-      margin: 0px 36px 18px 0px;
+      padding: 40px 0px 48px 40px;
+      margin: 0px 40px 40px 0px;
 
       @include mobile() {
         width: 100%;
@@ -171,7 +171,7 @@ div.stream-view-item {
       }
 
       div.stream-item-headline {
-        margin-top: 8px;
+        margin-top: 24px;
         @include activity-title();
         @include avenir_H();
         font-size: 22px;
@@ -203,11 +203,15 @@ div.stream-view-item {
           }
 
           div.stream-item-body-inner {
-            margin-top: 8px;
+            margin-top: 32px;
             @include activity-body(18);
             @include avenir_BOOK();
             color: $deep_navy;
             line-height: 30px;
+
+            p:not(:last-child) {
+              margin: 0 0 32px;
+            }
 
             * {
               color: $deep_navy;
@@ -220,7 +224,7 @@ div.stream-view-item {
         }
 
         button.expand-button {
-          margin-top: 16px;
+          margin-top: 24px;
           width: 100%;
           height: 40px;
           border-radius: 100px;
@@ -270,7 +274,7 @@ div.stream-view-item {
       }
 
       div.stream-item-reactions {
-        margin-top: 16px;
+        margin-top: 32px;
         position: absolute;
         bottom: 0px;
 
@@ -284,12 +288,12 @@ div.stream-view-item {
     div.stream-body-right {
       flex-grow: 0;
       flex-shrink: 0;
-      width: 392px;
+      width: 387px;
       min-height: 300px;
       position: relative;
-      padding: 18px 20px 18px 36px;
+      padding: 32px 12px 40px 36px;
       background-color: #FDFCFB;
-      max-height: 705px;
+      max-height: 789px;
 
       &.expanded {
         max-height: initial;
@@ -305,10 +309,10 @@ div.stream-view-item {
       }
 
       div.add-comment-box-container {
-        bottom: 18px;
-        width: calc(100% - 72px);
+        bottom: 40px;
+        width: calc(100% - 76px);
         position: absolute;
-        margin-right: 16px;
+        margin-right: 20px;
 
         div.add-comment-box {
 
