@@ -22,6 +22,7 @@
 (defn query
   "Use the search service to query for results."
   [search-query]
+  (dispatcher/dispatch! [:search-query-set search-query])
   (if (> (count search-query) 1)
     (do
       (active)
