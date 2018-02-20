@@ -4,7 +4,7 @@
             [oc.web.dispatcher :as dispatcher]))
 
 (def lastsearch (atom nil))
-(def savedsearch (atom nil))
+(def savedsearch (atom ""))
 
 (defonce search-key :search-results)
 (defonce search-active? :search-active)
@@ -37,7 +37,7 @@
   (let [total-hits (:total body)
         results (vec (sort-by #(:created-at (:_source %)) (:hits body)))]
     (when success
-      (reset! savedsearch nil)
+      (reset! savedsearch "")
       (reset! lastsearch query))
     (if success
       (assoc db search-key {:count total-hits :results (cleanup-uuid results)})
@@ -53,8 +53,8 @@
 
 (defmethod dispatcher/action :search-reset
   [db [_]]
-  (reset! lastsearch nil)
-  (reset! savedsearch nil)
+  (reset! lastsearch "")
+  (reset! savedsearch "")
   (-> db
       (assoc search-active? false)
       (assoc search-key [])))
