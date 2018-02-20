@@ -24,7 +24,7 @@
     [cljsjs/react "16.2.0-3"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [cljsjs/react-dom "16.2.0-3"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
     [rum "0.11.2" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
-    [org.martinklepsch/derivatives "0.3.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
+    [org.martinklepsch/derivatives "0.3.1"] ; Chains of derived data https://github.com/martinklepsch/derivatives
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     
     ;; ClojureScript libraries
