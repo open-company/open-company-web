@@ -12,6 +12,10 @@
 (defn search-results []
   (get-in @dispatcher/app-state search-key))
 
+(defn saved-search []
+  (let [tmp @savedsearch]
+    (reset! savedsearch "")
+    tmp))
 
 (defn should-display []
   " If the user is anonymous or not part of the orginization
@@ -60,9 +64,4 @@
 (defmethod dispatcher/action :search-result-clicked
   [db [_]]
   (reset! savedsearch @lastsearch)
-  db)
-
-(defmethod dispatcher/action :search-query-set
-  [db [_ search-query]]
-  (reset! lastsearch search-query)
   db)
