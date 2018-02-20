@@ -72,6 +72,7 @@
     [com.cemerick/piggieback "0.2.2"  :scope "test"]
     [weasel                  "0.7.0"  :scope "test"]
     [org.clojure/tools.nrepl "0.2.13" :scope "test"]
+    [cljsjs/babel-polyfill "6.20.0-2" :scope "test"]
     ;; ------------------------------------------------
 
 ])
@@ -154,8 +155,8 @@
                           'test.oc.web.components.ui.user-avatar]
              :cljs-opts {:optimizations :whitespace
                          :foreign-libs [{:provides ["cljsjs.react"]
-                                         :file "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/react-with-addons.js"
-                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/react-with-addons.min.js"}
+                                         :file "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/cjs/react.development.js"
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/cjs/react.development.js"}
                                         {:provides ["cljsjs.raven"]
                                          :file "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.17.0/raven.min.js"
                                          :file-min "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.17.0/raven.min.js"}]}))
