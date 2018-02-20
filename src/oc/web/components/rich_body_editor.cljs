@@ -16,6 +16,8 @@
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]))
 
+(def rich-body-editor-state (atom nil))
+
 ;; Attachment
 
 (defn media-attachment-dismiss-picker
@@ -65,16 +67,21 @@
   (attachment-upload-failed-cb state editable))
 
 (defn add-attachment [s editable]
-  (reset! (::media-attachment s) true)
-  (iu/upload!
-   nil
-   (partial attachment-upload-success-cb s editable)
-   nil
-   (partial attachment-upload-error-cb s editable)
-   (fn []
-     (utils/after 400 #(media-attachment-dismiss-picker s editable)))))
+  (let [editable (or editable @(::editor s))]
+    (reset! (::media-attachment s) true)
+    (iu/upload!
+     nil
+     (partial attachment-upload-success-cb s editable)
+     nil
+     (partial attachment-upload-error-cb s editable)
+     (fn []
+       (utils/after 400 #(media-attachment-dismiss-picker s editable)))))
 
 ;; Chart
+
+(defn add-chart [s]
+  (dis/dispatch! [:input [:media-input :media-chart] true])
+  (reset! (::media-chart s) true))
 
 (defn get-chart-thumbnail [chart-id oid]
   (str
@@ -99,6 +106,10 @@
       (.addChart editable chart-proxy-uri chart-id chart-thumbnail))))
 
 ;; Video
+
+(defn add-video [s]
+  (dis/dispatch! [:input [:media-input :media-video] true])
+  (reset! (::media-video s) true))
 
 (defn get-video-thumbnail [video]
   (cond
@@ -169,55 +180,56 @@
     (.addPhoto editable nil nil nil nil)))
 
 (defn add-photo [s editable]
-  (reset! (::media-photo s) true)
-  (let [props (first (:rum/args s))
-        upload-progress-cb (:upload-progress-cb props)]
-    (iu/upload! {:accept "image/*"}
-     ;; success-cb
-     (fn [res]
-       (reset! (::media-photo-did-success s) true)
-       (let [url (gobj/get res "url")
-             img   (gdom/createDom "img")]
-         (set! (.-onload img) #(img-on-load s editable url img))
-         (set! (.-onerror img) #(img-on-load s editable nil nil))
-         (set! (.-className img) "hidden")
-         (gdom/append (.-body js/document) img)
-         (set! (.-src img) url)
-         (reset! (::media-photo s) {:res res :url url})
-         ;; if the image is a vector image
-         (if (or (= (string/lower (gobj/get res "mimetype")) "image/svg+xml")
-                 (string/ends-with? (string/lower (gobj/get res "filename")) ".svg"))
-           ;l use the same url for the thumbnail since the size doesn't matter
-           (do
-             (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
-             (media-photo-add-if-finished s editable))
-           ;; else create the thumbnail
-           (iu/thumbnail! url
-            (fn [thumbnail-url]
-              (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
-              (media-photo-add-if-finished s editable))
-            (fn [res progress])
-            (fn [res err]
-              (media-photo-add-error s))))))
-     ;; progress-cb
-     (fn [res progress])
-     ;; error-cb
-     (fn [err]
-       (media-photo-add-error s))
-     ;; close-cb
-     (fn []
-       ;; Delay the check because this is called on cancel but also on success
-       (utils/after 1000 #(media-photo-dismiss-picker s editable)))
-     ;; finished-cb
-     (fn [res])
-     ;; selected-cb
-     (fn [res]
-       (reset! (::upload-lock s) true)
-       (upload-progress-cb true))
-     ;; started-cb
-     (fn [res]
-       (reset! (::upload-lock s) true)
-       (upload-progress-cb true)))))
+  (let [editable (or editable @(::editor s))]
+    (reset! (::media-photo s) true)
+    (let [props (first (:rum/args s))
+          upload-progress-cb (:upload-progress-cb props)]
+      (iu/upload! {:accept "image/*"}
+       ;; success-cb
+       (fn [res]
+         (reset! (::media-photo-did-success s) true)
+         (let [url (gobj/get res "url")
+               img   (gdom/createDom "img")]
+           (set! (.-onload img) #(img-on-load s editable url img))
+           (set! (.-onerror img) #(img-on-load s editable nil nil))
+           (set! (.-className img) "hidden")
+           (gdom/append (.-body js/document) img)
+           (set! (.-src img) url)
+           (reset! (::media-photo s) {:res res :url url})
+           ;; if the image is a vector image
+           (if (or (= (string/lower (gobj/get res "mimetype")) "image/svg+xml")
+                   (string/ends-with? (string/lower (gobj/get res "filename")) ".svg"))
+             ;l use the same url for the thumbnail since the size doesn't matter
+             (do
+               (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
+               (media-photo-add-if-finished s editable))
+             ;; else create the thumbnail
+             (iu/thumbnail! url
+              (fn [thumbnail-url]
+                (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
+                (media-photo-add-if-finished s editable))
+              (fn [res progress])
+              (fn [res err]
+                (media-photo-add-error s))))))
+       ;; progress-cb
+       (fn [res progress])
+       ;; error-cb
+       (fn [err]
+         (media-photo-add-error s))
+       ;; close-cb
+       (fn []
+         ;; Delay the check because this is called on cancel but also on success
+         (utils/after 1000 #(media-photo-dismiss-picker s editable)))
+       ;; finished-cb
+       (fn [res])
+       ;; selected-cb
+       (fn [res]
+         (reset! (::upload-lock s) true)
+         (upload-progress-cb true))
+       ;; started-cb
+       (fn [res]
+         (reset! (::upload-lock s) true)
+         (upload-progress-cb true))))))
 
 ;; Picker cb
 
@@ -226,9 +238,9 @@
     (= type "photo")
     (add-photo s editable)
     (= type "video")
-    (do (dis/dispatch! [:input [:media-input :media-video] true]) (reset! (::media-video s) true))
+    (add-video s)
     (= type "chart")
-    (do (dis/dispatch! [:input [:media-input :media-chart] true]) (reset! (::media-chart s) true))
+    (add-chart s)
     (= type "attachment")
     (add-attachment s editable)))
 
@@ -246,6 +258,8 @@
         media-config (:media-config options)
         body-el (rum/ref-node s "body")
         media-picker-opts {:buttons (clj->js media-config)
+                           :useInlinePlusButton (:use-inline-media-picker options)
+                           :saveSelectionClickElementId (:save-position-click-element-id options)
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
@@ -319,7 +333,10 @@
                                ;; Image upload lock
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
-                               {:did-mount (fn [s]
+                               {:init (fn [s]
+                                 (reset! rich-body-editor-state s)
+                                 s)
+                                :did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)
                                      (utils/after 300 #(do
@@ -357,7 +374,14 @@
                                  (when @(::editor s)
                                    (.destroy @(::editor s)))
                                  s)}
-  [s {:keys [initial-body nux on-change classes show-placeholder upload-progress-cb]}]
+  [s {:keys [initial-body
+             nux
+             on-change
+             classes
+             show-placeholder
+             upload-progress-cb
+             use-inline-media-picker
+             save-position-click-element-id]}]
   [:div.rich-body-editor-container
     [:div.rich-body-editor
       {:ref "body"
