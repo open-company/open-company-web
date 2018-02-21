@@ -66,6 +66,8 @@ MediaPicker.addPhoto = function(){};
 MediaPicker.addVideo = function(){};
 MediaPicker.addChart = function(){};
 MediaPicker.addAttachment = function(){};
+MediaPicker.saveSelection = function(){};
+MediaPicker.removeSelection = function(){};
 // MediumEditorCustomBold
 var CustomBold = function(){};
 // Tooltip http://darsa.in/tooltip/
