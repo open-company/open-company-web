@@ -1,7 +1,10 @@
 div.stream-view-attachments {
   margin-top: 32px;
-  height: 88px;
   width: 100%;
+
+  @include mobile() {
+    height: 88px;
+  }
 
   div.stream-view-attachments-title {
     @include avenir_H();

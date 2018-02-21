@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -82,7 +83,9 @@
         comments-data (or (-> (drv/react s :comments-data)
                               (get (:uuid activity-data))
                               :sorted-comments)
-                          (:comments activity-data))]
+                          (:comments activity-data))
+        activity-attachments (au/get-attachments-from-body (:body activity-data))]
+    (js/console.log "stream-view-item/render" activity-attachments)
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
@@ -155,6 +158,14 @@
                     :dismiss-cb #(reset! (::move-activity s) false)})])]))]
       [:div.stream-view-item-body.group
         [:div.stream-body-left.group
+          {:style {:padding-bottom (when-not is-mobile?
+                                     (let [initial-padding 48
+                                           attachments-num (count activity-attachments)
+                                           attachments-height (* (js/Math.ceil (/ attachments-num 2)) 65)
+                                           total-padding (+ initial-padding
+                                                          (when (pos? attachments-num)
+                                                            (+ 32 20 attachments-height)))]
+                                     (str total-padding "px")))}}
           [:span.posted-in
             {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}]
           [:div.stream-item-headline
@@ -174,7 +185,7 @@
               (rum/with-key (stream-comments activity-data comments-data)
                (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
               (add-comment activity-data)])
-          (stream-view-attachments activity-data)
+          (stream-view-attachments activity-attachments)
           [:div.stream-item-reactions.group
             (when-not @(::mobile-show-comments s)
               [:div.stream-mobile-comments-summary.group
