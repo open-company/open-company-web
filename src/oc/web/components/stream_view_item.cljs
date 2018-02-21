@@ -10,6 +10,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.utils.activity :as au]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
