@@ -21,10 +21,10 @@
     ;; Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes access
     ;; and some change to omcljs/om to not use createClass anymore. See React docs for more info.
-    [cljsjs/react "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [cljsjs/react-dom "15.4.2-2"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [rum "0.10.8" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
-    [org.martinklepsch/derivatives "0.3.0"] ; Chains of derived data https://github.com/martinklepsch/derivatives
+    [cljsjs/react "16.2.0-3"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react-dom "16.2.0-3"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [rum "0.11.2" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [org.martinklepsch/derivatives "0.3.1"] ; Chains of derived data https://github.com/martinklepsch/derivatives
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
     
     ;; ClojureScript libraries
@@ -72,6 +72,7 @@
     [com.cemerick/piggieback "0.2.2"  :scope "test"]
     [weasel                  "0.7.0"  :scope "test"]
     [org.clojure/tools.nrepl "0.2.13" :scope "test"]
+    [cljsjs/babel-polyfill "6.20.0-2" :scope "test"]
     ;; ------------------------------------------------
 
 ])
@@ -154,8 +155,8 @@
                           'test.oc.web.components.ui.user-avatar]
              :cljs-opts {:optimizations :whitespace
                          :foreign-libs [{:provides ["cljsjs.react"]
-                                         :file "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.js"
-                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.min.js"}
+                                         :file "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/cjs/react.development.js"
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/cjs/react.development.js"}
                                         {:provides ["cljsjs.raven"]
                                          :file "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.17.0/raven.min.js"
                                          :file-min "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.17.0/raven.min.js"}]}))
