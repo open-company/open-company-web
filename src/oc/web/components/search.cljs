@@ -104,14 +104,15 @@
                         (rum/local nil ::window-click)
                         (rum/local false ::search-clicked?)
                         {:after-render (fn [s]
-                                         (when (and
-                                                (pos?
-                                                 (count @store/savedsearch))
-                                                (not
-                                                 @(::search-clicked? s)))
-                                           (.focus
-                                            (rum/ref-node s "search-input")))
-                                         s)
+                          (let [search-input (rum/ref-node s "search-input")]
+                            (when (and
+                                   (pos?
+                                    (count @store/savedsearch))
+                                   (not
+                                    @(::search-clicked? s)))
+                              (set! (.-value search-input) (store/saved-search))
+                              (.focus search-input)))
+                            s)
                          :will-mount (fn [s]
                           (search/inactive)
                           (reset! (::window-click s)
@@ -141,7 +142,6 @@
           {:class (when (not @(::search-clicked? s)) "inactive")
            :ref "search-input"
            :placeholder (when-not (responsive/is-mobile-size?) "Search")
-           :value @store/lastsearch
            :on-click #(reset! (::search-clicked? s) true)
            :on-blur #(when (responsive/is-mobile-size?)
                        (set! (.-placehoder (.-target %)) ""))
