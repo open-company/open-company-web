@@ -98,7 +98,9 @@ function PlaceCaretAtEnd(el) {
 
     destroy: function(){
       this.removeSelection();
-      this.pickerElement.parentNode.removeChild(this.pickerElement);
+      if (this.useInlinePlusButton) {
+        this.pickerElement.parentNode.removeChild(this.pickerElement);
+      }
       this.pickerElement = undefined;
       this.mainButton = undefined;
       this.mediaButtonsContainer = undefined;
