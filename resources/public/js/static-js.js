@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
         your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt),
         user_avatar = decoded_jwt["avatar-url"];
     signupButton.attr("href", your_board_url);
-    signupButton.html("<span><img class=\"user-avatar\" src=\"" + user_avatar + "\" /><span>Go to team</span></span>");
+    signupButton.html("<span><img class=\"user-avatar\" src=\"" + user_avatar + "\" /><span>Your digest</span></span>");
 
     var mobileSignupButton = $("#site-header-mobile-signup-item");
     mobileSignupButton.removeClass("start");
