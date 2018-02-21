@@ -120,7 +120,7 @@
                                           (not (js/isEdge))
                                           (not (js/isIE)))
                                  (animate-reaction e s))
-                               (dis/dispatch! [:reaction-toggle entry-data r (not reacted)])))}
+                               (dis/dispatch! [:activity-reaction-toggle entry-data r (not reacted)])))}
                 [:span.reaction
                   {:class (when (pos? (:count r)) "has-count")}
                   (:reaction r)]

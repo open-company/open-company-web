@@ -35,7 +35,7 @@
   [s entry-data show-zero-comments?]
   (let [all-comments-data (drv/react s :comments-data)
         _comments-data (get all-comments-data (:uuid entry-data))
-        comments-data (when (sequential? _comments-data) _comments-data)
+        comments-data (:sorted-comments _comments-data)
         comments-link (utils/link-for (:links entry-data) "comments")
         has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
         comments-authors (if has-comments-data

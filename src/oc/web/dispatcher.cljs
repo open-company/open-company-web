@@ -23,7 +23,7 @@
   (vec (conj (org-key org-slug) :boards)))
 
 (defn all-posts-key [org-slug]
-  (vec (conj (boards-key org-slug) :all-posts)))
+  (vec (concat (boards-key org-slug) [:all-posts :board-data])))
 
 (defn calendar-key [org-slug]
   (vec (conj (org-key org-slug) :calendar)))
@@ -48,7 +48,7 @@
     (vec (concat board-key [:fixed-items activity-uuid]))))
 
 (defn comments-key [org-slug board-slug]
-  (vec (conj (board-key org-slug board-slug) :comments-data)))
+  (vec (conj (board-key org-slug board-slug) :comments)))
 
 (defn activity-comments-key [org-slug board-slug activity-uuid]
   (vec (conj (comments-key org-slug board-slug) activity-uuid :sorted-comments)))
@@ -196,14 +196,8 @@
                           (fn [base org-slug secure-id]
                             (get-in base (secure-activity-key org-slug secure-id)))]
    :comments-data       [[:base :org-slug :board-slug]
-                        (fn [base org-slug board-slug]
-                          (get-in base (comments-key org-slug board-slug)))]
-   :activity-comments-data [[:base :org-slug :board-slug :activity-uuid :secure-id]
-                           (fn [base org-slug board-slug activity-uuid secure-id]
-                              (get-in
-                               base
-                               (butlast
-                                (activity-comments-key org-slug board-slug (or activity-uuid secure-id)))))]
+                         (fn [base org-slug board-slug]
+                           (get-in base (comments-key org-slug board-slug)))]
    :trend-bar-status    [[:base]
                           (fn [base]
                             (:trend-bar-status base))]
@@ -518,8 +512,8 @@
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
 (set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
-(set! (.-OCWebPrintCommentsData js/window) print-activity-comments-data)
-(set! (.-OCWebPrintActivityCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintCommentsData js/window) print-comments-data)
+(set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintStoryEditingData js/window) print-story-editing-data)
 (set! (.-OCWebPrintWhatsNewData js/window) print-whats-new-data)

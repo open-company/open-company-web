@@ -2,7 +2,7 @@ $picker_height: 421;
 $picker_width: 338;
 
 div.emoji-picker {
-  z-index: 1234;
+  z-index: #{$navbar_zindex - 1};
   position: relative;
 
   button.emoji-button{

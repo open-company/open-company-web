@@ -1,13 +1,14 @@
 (ns oc.web.components.ui.activity-attachments
   (:require [rum.core :as rum]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [clojure.contrib.humanize :refer (filesize)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
 (rum/defcs activity-attachments < (rum/local false ::attachments-dropdown)
   [s activity-data small-version?]
-  (let [attachments (utils/get-attachments-from-body (:body activity-data))]
+  (let [attachments (au/get-attachments-from-body (:body activity-data))]
     (when (pos? (count attachments))
       [:div.activity-attachments
         {:class (utils/class-set {:small-version small-version?})
@@ -42,7 +43,7 @@
                   (when-not small-version?
                     [:div.file-icon
                       [:i.fa
-                        {:class (utils/icon-for-mimetype (:mimetype atch))}]])
+                        {:class (au/icon-for-mimetype (:mimetype atch))}]])
                   [:div.file-title
                     (:name atch)]
                   (when-not small-version?
