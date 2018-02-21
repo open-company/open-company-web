@@ -1,0 +1,158 @@
+div.stream-comments {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &.bottom-gradient:after {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 16px;
+    height: 32px;
+    z-index: 10;
+    pointer-events: none;
+    $gradient_base_color: #FDFCFB;
+    background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
+    background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
+  }
+
+  div.stream-comments-inner {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 20px;
+
+    @include mobile() {
+      padding-right: 0px;
+    }
+
+    div.stream-comments-empty {
+      @include image-2x("/img/ML/no_comments_sleep");
+      background-size: 69px 75px;
+      width: 69px;
+      height: 75px;
+      background-repeat: no-repeat;
+      margin-top: -37px;
+      margin-left: -35px;
+      top: 50%;
+      left: 50%;
+      position: relative;
+
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    div.stream-comment {
+      border: 1px solid rgba($deep_tan, 0.7);
+      border-radius: 6px;
+      padding: 16px;
+      background-color: white;
+      margin-bottom: 8px;
+
+      div.stream-comment-header {
+        height: 32px;
+
+        div.stream-comment-author-avatar {
+          float: left;
+          width: 32px;
+          height: 32px;
+          background-position: 50%;
+          background-size: 32px 32px;
+          border-radius: 50%;
+          background-repeat: no-repeat;
+        }
+
+        div.stream-comment-author-right {
+          float: left;
+          margin-left: 16px;
+
+          div.stream-comment-author-name {
+            @include avenir_H();
+            font-size: 12px;
+            color: $deep_navy;
+          }
+
+          div.stream-comment-author-timestamp {
+            @include avenir_M();
+            font-size: 12px;
+            color: $ui_grey;
+            opacity: 0.5;
+          }
+        }
+      }
+
+      div.stream-comment-content {
+        text-align: left;
+        margin-top: 8px;
+
+        div.stream-comment-body {
+          @include avenir_BOOK();
+          font-size: 14px;
+          color: $deep_navy;
+
+          margin-bottom: 0px;
+
+          &>*:last-child {
+            margin-bottom: 0px;
+          }
+        }
+      }
+
+      div.stream-comment-footer {
+
+        div.stream-comment-reaction {
+          padding-top: 8px;
+          height: 25px;
+          @include avenir_M();
+          font-size: 12px;
+          color: $ui_grey;
+          float: left;
+
+          &.can-react {
+            cursor: pointer;
+          }
+
+          &.reacted {
+            color: $carrot_green;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_reaction_green.svg");
+            }
+          }
+
+          &.reacted.can-react:hover div.stream-comment-reaction-icon {
+            background-image: cdnUrl("/img/ML/comment_reaction_grey.svg");
+          }
+
+          &.can-react:hover div.stream-comment-reaction-icon {
+            background-image: cdnUrl("/img/ML/comment_reaction_green.svg");
+          }
+
+          div.stream-comment-reaction-icon {
+            float: left;
+            width: 14px;
+            height: 14px;
+            background-repeat: no-repeat;
+            background-image: cdnUrl("/img/ML/comment_reaction_grey.svg");
+            background-size: 14px 14px;
+            background-position: center;
+          }
+
+          div.stream-comment-reaction-count {
+            float: left;
+            margin-left: 6px;
+            margin-top: 2px;
+          }
+        }
+      }
+    }
+  }
+}

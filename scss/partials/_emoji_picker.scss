@@ -2,27 +2,22 @@ $picker_height: 421;
 $picker_width: 338;
 
 div.emoji-picker {
-  z-index: 1234;
+  z-index: #{$navbar_zindex - 1};
   position: relative;
 
   button.emoji-button{
     padding: 1px 0 0 0;
     width: 25px;
     height: 24px;
-    background-image: cdnUrl("/img/ML/emoji2x.png");
-    background-size: 25px 24px;
+    @include image-2x("/img/ML/new_post_emoji_button");
+    background-size: 20px 20px;
+    background-position: center;
     background-position: 50%;
     background-repeat: no-repeat;
     opacity: 0.8;
 
-    img {
-      width: 25px;
-      height: 24px;
-    }
-
     &:hover {
       opacity: 1;
-      background-image: cdnUrl("/img/ML/emoji_blue2x.png");
     }
 
     &:disabled {
@@ -49,7 +44,7 @@ div.emoji-picker {
     }
 
     &.top {
-      top: -#{$picker_height + 10}px;
+      top: -#{$picker_height + 8}px;
     }
 
     &.bottom {
@@ -58,17 +53,12 @@ div.emoji-picker {
   }
 }
 
-// Override emojione-picker.css
-
-.emoji-dialog span.emojione {
-  width: 64px;
-  height: 64px;
-  zoom: 0.35;
-  -moz-transform: scale(0.35);
-}
-
+// Override emoji-mart.css
 
 div.emoji-mart {
+  border: 1px solid rgba($deep_tan, 0.7);
+  box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
+  border-radius: 6px;
   div.emoji-mart-preview {
     div.emoji-mart-preview-data span.emoji-mart-title-label {
       display: none;

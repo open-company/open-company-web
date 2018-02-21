@@ -6,6 +6,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
@@ -48,7 +49,7 @@
             createdat (utils/js-date)
             prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
             subtitle (str prefix (filesize size :binary false :format "%.2f" ))
-            icon (utils/icon-for-mimetype mimetype)
+            icon (au/icon-for-mimetype mimetype)
             attachment-data {:fileName filename
                              :fileType mimetype
                              :fileSize size

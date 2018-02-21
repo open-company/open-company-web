@@ -9,10 +9,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
-            [oc.web.lib.activity-utils :as au]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -76,7 +75,7 @@
                           (events/unlistenByKey @(::window-click s))
                           s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
-  (let [attachments (utils/get-attachments-from-body (:body activity-data))
+  (let [attachments (au/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)

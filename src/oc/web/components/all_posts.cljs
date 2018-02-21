@@ -7,9 +7,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.activity-card :refer (activity-card)]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
+            [oc.web.components.stream-view-item :refer (stream-view-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
@@ -59,28 +60,6 @@
                (first ens))
         en))))
 
-; (defn element-is-visible
-;   "Check if the element is in the visible portion of the page, considered the page scroll."
-;   [el]
-;   (let [el-offset-top (.-top (.offset (js/$ el))) ; plus parent top offset
-;         body-scroll (.-scrollTop (.-body js/document))]
-;     (>= (- el-offset-top body-scroll) 0)))
-
-; (defn get-first-visible-entry
-;   "Given the list of items rendered, get the first visible entry counting the page scroll."
-;   [items]
-;   (when (pos? (count items))
-;     (loop [ens items
-;            en (first items)]
-;       (let [el (sel1 [(str "div.activity-card-" (:uuid en))])]
-;         ;; Do not loop if there are no more items or if found the first visible entry
-;         (if (or (zero? (count ens))
-;                 (and el
-;                      (element-is-visible el)))
-;           en
-;           (recur (vec (rest ens))
-;                  (first (vec (rest ens)))))))))
-
 (defn compare-activities [act-1 act-2]
   (let [time-1 (get-activity-date act-1)
         time-2 (get-activity-date act-2)]
@@ -88,18 +67,6 @@
 
 (defn get-sorted-items [all-posts-data]
   (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))
-
-; (defn highlight-calendar
-;   "Highlight the current visible entry year and month in the calendar."
-;   [s]
-;   ;; When we are not retrieving calendar and not waiting to scroll to an entry
-;   (when (and (not @(::retrieving-calendar s))
-;              (not @(::scroll-to-entry s)))
-;     (let [items-batch (get-sorted-items (first (:rum/args s)))
-;           first-visible-entry (get-first-visible-entry items-batch)
-;           js-date (utils/js-date (get-activity-date first-visible-entry))]
-;       (reset! (::selected-year s) (.getFullYear js-date))
-;       (reset! (::selected-month s) (inc (.getMonth js-date))))))
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -131,9 +98,6 @@
       ;; if the user is close to the bottom margin, load more results if there is a link
       (dis/dispatch! [:all-posts-more @(::has-prev s) :down])
       (reset! (::has-prev s) false)))
-  ; ;; Highlight the right year/month
-  ; (when @(:first-render-done s)
-  ;   (highlight-calendar s))
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
@@ -141,7 +105,6 @@
                         rum/reactive
                         ;; Derivatives
                         (drv/drv :all-posts)
-                        (drv/drv :calendar)
                         (drv/drv :ap-initial-at)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
@@ -158,7 +121,7 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         {:will-mount (fn [s]
-                          (let [all-posts-data (first (:rum/args s))
+                          (let [all-posts-data @(drv/get-ref s :all-posts)
                                 sorted-items (get-sorted-items all-posts-data)
                                 year (:year all-posts-data)
                                 month (:month all-posts-data)
@@ -229,14 +192,14 @@
                           s)
                          :after-render (fn [s]
                           (when-let [scroll-to @(::scroll-to-entry s)]
-                            (when-let [entry-el (sel1 [(str "div.activity-card-" (:uuid scroll-to))])]
-                              (utils/scroll-to-element entry-el 80 0))
+                            (when-let [entry-el (sel1 [(str "div.stream-view-item-" (:uuid scroll-to))])]
+                              (utils/scroll-to-element entry-el 0 0))
                             (utils/after 100 #(do
                                                (reset! (::scroll-to-entry s) nil)
                                                (reset! (::last-direction s) nil))))
                           s)
-                         :did-remount (fn [_ s]
-                          (let [all-posts-data (first (:rum/args s))
+                         :before-render (fn [s]
+                          (let [all-posts-data @(drv/get-ref s :all-posts)
                                 sorted-items (get-sorted-items all-posts-data)]
                             (when-not (:loading-more all-posts-data)
                               (when @(::top-loading s)
@@ -249,11 +212,8 @@
                             (when @(::retrieving-calendar s)
                               (reset! (::retrieving-calendar s) false)
                               ;; Scroll to the first entry of the selected month if any
-                              (let [calendar-data @(drv/get-ref s :calendar)
-                                    year @(::selected-year s)
-                                    month (or
-                                           @(::selected-month s)
-                                           (:month (first (filter #(= (:year %) year) calendar-data))))
+                              (let [year @(::selected-year s)
+                                    month @(::selected-month s)
                                     first-available-entry (get-first-available-entry
                                                            sorted-items
                                                            @(::selected-year s)
@@ -274,9 +234,9 @@
                          :will-unmount (fn [s]
                           (when @(::scroll-listener s)
                             (events/unlistenByKey @(::scroll-listener s)))
-                           s)}
-  [s all-posts-data]
-  (let [calendar-data (drv/react s :calendar)
+                          s)}
+  [s]
+  (let [all-posts-data (drv/react s :all-posts)
         items (get-sorted-items all-posts-data)]
     [:div.all-posts.group
       [:div.all-posts-cards
@@ -297,54 +257,11 @@
                 [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e items]
             (rum/with-key
-             (activity-card
-              e
-              (seq (:headline e))
-              (seq (:body e))
-              false
-              true)
+             (stream-view-item e)
              (str "all-posts-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
         (when (and @(::show-all-caught-up-message s)
                    (responsive/is-mobile-size?))
-          (all-caught-up))]
-      [:div.all-posts-nav
-        ; [:div.all-posts-nav-inner
-        ;   (for [year (vec (reverse (sort-by :year calendar-data)))
-        ;         :let [selected (= @(::selected-year s) (:year year))]]
-        ;     [:div.group
-        ;       {:key (str "calendar-" (:year year))}
-        ;       [:div.nav-year
-        ;         {:on-click #(let [link (utils/link-for (:links year) "self")
-        ;                           month (:month (first (:months year)))]
-        ;                       (reset! (::selected-year s) (:year year))
-        ;                       (reset! (::selected-month s) month)
-        ;                       (reset! (::scroll-to-entry s) false)
-        ;                       (reset! (::retrieving-calendar s) (str (:year year)))
-        ;                       (dis/dispatch! [:all-posts-calendar {:link link :year (:year year) :month month}]))
-        ;          :class (when selected "selected")}
-        ;         [:span.calendar-label (:year year)]
-        ;         (when (= @(::retrieving-calendar s) (str (:year year)))
-        ;           [:span.retrieving "Retrieving..."])]
-        ;       (when selected
-        ;         (for [month (vec (reverse (sort-by :month (:months year))))]
-        ;           [:div.nav-month
-        ;             {:key (str "year-" (:year month) "-month-" (:month month))
-        ;              :class (utils/class-set {:selected (and (= @(::selected-year s) (:year month))
-        ;                                                      (= @(::selected-month s) (:month month)))})
-        ;              :on-click #(let [link (utils/link-for (:links month) "self")]
-        ;                           (reset! (::selected-year s) (:year month))
-        ;                           (reset! (::selected-month s) (:month month))
-        ;                           (reset! (::scroll-to-entry s) false)
-        ;                           (reset! (::retrieving-calendar s) (str (:year month) (:month month)))
-        ;                           (dis/dispatch!
-        ;                            [:all-posts-calendar
-        ;                             {:link link
-        ;                              :year (:year month)
-        ;                              :month (:month month)}]))}
-        ;             [:span.calendar-label (utils/full-month-string (:month month))]
-        ;             (when (= @(::retrieving-calendar s) (str (:year month) (:month month)))
-        ;               [:span.retrieving "Retrieving..."])]))])]
-          ]]))
+          (all-caught-up))]]))

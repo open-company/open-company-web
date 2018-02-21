@@ -816,44 +816,6 @@
     (when (seq user-id) (str user-id ":"))
     redirect)))
 
-(defn icon-for-mimetype
-  "Thanks to https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922"
-  [mimetype]
-  (case (s/lower mimetype)
-    ;; Media
-    "image" "fa-file-image-o"
-    "image/png" "fa-file-image-o"
-    "image/bmp" "fa-file-image-o"
-    "image/jpg" "fa-file-image-o"
-    "image/jpeg" "fa-file-image-o"
-    "image/gif" "fa-file-image-o"
-    ".jpg" "fa-file-image-o"
-    "audio" "fa-file-audio-o"
-    "video" "fa-file-video-o"
-    ;; Documents
-    "application/pdf" "fa-file-pdf-o"
-    "application/msword" "fa-file-word-o",
-    "application/vnd.ms-word" "fa-file-word-o",
-    "application/vnd.oasis.opendocument.text" "fa-file-word-o",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml" "fa-file-word-o",
-    "application/vnd.ms-excel" "fa-file-excel-o",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml" "fa-file-excel-o",
-    "application/vnd.oasis.opendocument.spreadsheet" "fa-file-excel-o",
-    "application/vnd.ms-powerpoint" "fa-file-powerpoint-o",
-    "application/vnd.openxmlformats-officedocument.presentationml" "fa-file-powerpoint-o",
-    "application/vnd.oasis.opendocument.presentation" "fa-file-powerpoint-o",
-    "text/plain" "fa-file-text-o",
-    "text/html" "fa-file-code-o",
-    "application/json" "fa-file-code-o",
-    ;; Archives
-    "application/gzip" "fa-file-archive-o",
-    "application/zip" "fa-file-archive-o",
-    ;; Code
-    "text/css" "fa-file-code-o"
-    "text/php" "fa-file-code-o"
-    ;; Generic case
-    "fa-file"))
-
 (def generic-network-error
  "There may be a problem with your network, or with our servers. Please try again later.")
 
@@ -1083,20 +1045,6 @@
         cleaned-html (.html $container)
         _ (.detach $container)]
     (emoji-images-to-unicode (gobj/get (emojify cleaned-html) "__html"))))
-
-(defn get-attachments-from-body [body]
-  (let [$body (.html (js/$ "<div/>") body)
-        attachments (js/$ "a.media-attachment" $body)
-        atch-map (atom [])]
-    (.each attachments (fn [idx item]
-      (let [$item (js/$ item)]
-        (reset! atch-map (vec (conj @atch-map {:name (.data $item "name")
-                                               :size (.data $item "size")
-                                               :mimetype (.data $item "mimetype")
-                                               :author (.data $item "author")
-                                               :createdat (.data $item "createdat")
-                                               :url (.attr $item "href")}))))))
-    @atch-map))
 
 (defn your-boards-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
