@@ -281,6 +281,11 @@ div.stream-view-item {
         @include mobile() {
           position: relative;
           bottom: unset;
+
+          div.stream-mobile-comments-summary {
+            float: unset;
+            margin-bottom: 16px;
+          }
         }
       }
     }

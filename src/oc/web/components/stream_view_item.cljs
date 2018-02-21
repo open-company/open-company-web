@@ -177,7 +177,7 @@
           (stream-view-attachments activity-data)
           [:div.stream-item-reactions.group
             (when-not @(::mobile-show-comments s)
-              [:div.stream-mobile-comments-summary
+              [:div.stream-mobile-comments-summary.group
                 {:on-click #(do
                               (utils/event-stop %)
                               (reset! (::mobile-show-comments s) true))}
