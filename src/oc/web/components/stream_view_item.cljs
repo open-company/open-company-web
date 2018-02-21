@@ -82,7 +82,8 @@
         comments-data (or (-> (drv/react s :comments-data)
                               (get (:uuid activity-data))
                               :sorted-comments)
-                          (:comments activity-data))]
+                          (:comments activity-data))
+        activity-attachments (au/get-attachments-from-body (:body activity-data))]
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
