@@ -1,5 +1,7 @@
 div.multi-picker-container {
   position: relative;
+  width: 20px;
+  height: 20px;
 
   button.multi-picker-btn {
     width: 20px;
@@ -10,6 +12,9 @@ div.multi-picker-container {
     background-repeat: no-repeat;
     padding: 0px;
     margin: 0px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
   }
 
   div.multi-picker {
