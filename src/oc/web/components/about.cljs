@@ -39,8 +39,38 @@
           [:h1.about "About us"]
           [:div.about-subline
             (str
-             "Carrot is a communication platform that inspires "
-             "transparency and team alignment.")]
+             "Carrot is a company digest that creates "
+             "transparency and alignment.")]
+          [:div.about-copy
+            [:p
+              (str
+               "It may seem counterintuitive that teams "
+               "are struggling to stay on the same page "
+               "given the ubiquity of workplace chat, but "
+               "alignment is a real problem for growing "
+               "and distributed teams.")]
+            [:p
+              (str
+               "Chat might be ideal for fast and spontaneous "
+               "conversations in the moment, but it gets "
+               "noisy and drowns out important information "
+               "and follow-on discussions that teams need "
+               "to stay aligned over time.")]
+            [:p
+              (str
+               "Carrot is a team digest where everyone can "
+               "read and react to important information - "
+               "like company updates, announcements, "
+               "strategic plans, and stories - without "
+               "worrying they missed it in chat.")]
+            [:p
+              (str
+               "Carrot creates transparency and alignment "
+               "by making sure everyone can see what matters "
+               "most and can get caught up anytime.")]
+            [:p
+              (str
+               "Let’s Carrot!")]]
 
           [:div.team-container
             [:div.team-row.group.three-cards

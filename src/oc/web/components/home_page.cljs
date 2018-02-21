@@ -52,15 +52,9 @@
           [:div.balloon.small-yellow]
 
           [:h1.headline
-            "Stay aligned without interruptions"]
-          [:div.subheadline.big-web-only
-            "Focused communication that keeps teams aligned "]
-          [:div.subheadline.second-line.big-web-only
-            "around what matters most."]
-          [:div.subheadline.mobile-only
-            (str
-             "Focused communication that keeps teams aligned "
-             "around what matters most.")]
+            "Carrot, your team digest."]
+          [:div.subheadline
+            "Keep everyone aligned around what matters most."]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))

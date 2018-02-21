@@ -245,15 +245,9 @@
         [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Stay aligned without interruptions"]
-        [:div.subheadline.big-web-only
-          "Focused communication that keeps teams aligned"]
-        [:div.subheadline.second-line.big-web-only
-          "around what matters most."]
-        [:div.subheadline.mobile-only
-          (str
-            "Focused communication that keeps teams aligned "
-            "around what matters most.")]
+          "Carrot, your team digest."]
+        [:div.subheadline
+          "Keep everyone aligned around what matters most."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -439,6 +433,36 @@
           (str
            "Carrot is a communication platform that inspires "
            "transparency and team alignment.")]
+        [:div.about-copy
+          [:p
+            (str
+             "It may seem counterintuitive that teams "
+             "are struggling to stay on the same page "
+             "given the ubiquity of workplace chat, but "
+             "alignment is a real problem for growing "
+             "and distributed teams.")]
+          [:p
+            (str
+             "Chat might be ideal for fast and spontaneous "
+             "conversations in the moment, but it gets "
+             "noisy and drowns out important information "
+             "and follow-on discussions that teams need "
+             "to stay aligned over time.")]
+          [:p
+            (str
+             "Carrot is a team digest where everyone can "
+             "read and react to important information - "
+             "like company updates, announcements, "
+             "strategic plans, and stories - without "
+             "worrying they missed it in chat.")]
+          [:p
+            (str
+             "Carrot creates transparency and alignment "
+             "by making sure everyone can see what matters "
+             "most and can get caught up anytime.")]
+          [:p
+            (str
+             "Let’s Carrot!")]]
         [:div.team-container
           [:div.team-row.group.three-cards
             [:div.team-card.iacopo-carraro
