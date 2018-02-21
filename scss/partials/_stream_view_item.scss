@@ -164,6 +164,11 @@ div.stream-view-item {
         margin: 0px;
       }
 
+      div.stream-view-attachments {
+        position: absolute;
+        bottom: 64px;
+      }
+
       span.posted-in {
         @include avenir_M();
         font-size: 14px;

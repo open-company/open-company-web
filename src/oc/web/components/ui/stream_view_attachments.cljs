@@ -8,9 +8,8 @@
             [goog.events.EventType :as EventType]))
 
 (rum/defcs stream-view-attachments < (rum/local false ::attachments-dropdown)
-  [s activity-data]
-  (let [attachments (au/get-attachments-from-body (:body activity-data))
-        atc-num (count attachments)
+  [s attachments]
+  (let [atc-num (count attachments)
         ww (responsive/ww)]
     (when (pos? atc-num)
       [:div.stream-view-attachments
@@ -26,7 +25,7 @@
                                   (when size
                                     (str "- " (filesize size :binary false :format "%.2f"))))]]
             [:a.stream-view-attachments-item.group
-              {:class (when (> (count attachments) 1) "double-line")
+              {:class (when (> atc-num 1) "double-line")
                :key (str "attachment-" size "-" (:url atch))
                :href (:url atch)
                :target "_blank"}
