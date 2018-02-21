@@ -59,14 +59,14 @@
                                 s)}
   [state]
   (let [auth-settings (drv/react state :auth-settings)
-        login-disabled (and auth-settings
+        login-enabled (and auth-settings
                            (not (nil?
                             (utils/link-for
                              (:links auth-settings)
                              "authenticate"
                              "GET"
                              {:auth-source "email"}))))
-        login-action #(when-not login-disabled
+        login-action #(when login-enabled
                         (let [login-with-email (:login-with-email @dis/app-state)
                               email (:email login-with-email)
                               pswd (:pswd login-with-email)]
@@ -88,7 +88,7 @@
           [:div.sign-in-cta "Sign In"]
           [:button.mlb-reset.top-continue
             {:aria-label "Login"
-             :class (when login-disabled "disabled")
+             :class (when-not login-enabled "disabled")
              :on-click login-action}]]
         ;; Slack button
         [:button.mlb-reset.signin-with-slack
@@ -160,7 +160,7 @@
                 [:a {:on-click #(user-actions/show-login :password-reset)} "Forgot Password?"]]]
             ;; Login button
             [:button.mlb-reset.mlb-default.continue
-              {:class (when login-disabled "disabled")
+              {:class (when-not login-enabled "disabled")
                :on-touch-start identity
                :on-click login-action}
               "Sign In"]]]
