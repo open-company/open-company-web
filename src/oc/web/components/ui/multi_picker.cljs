@@ -1,27 +1,46 @@
 (ns oc.web.components.ui.multi-picker
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
-            [oc.web.components.rich-body-editor :as rich-body-editor]))
+            [oc.web.lib.utils :as utils]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]))
 
 (rum/defcs multi-picker < rum/static
                           (rum/local false ::show-menu)
-  [s picker-button-id]
+                          (rum/local nil ::window-click-listener)
+                          {:will-mount (fn [s]
+                            (reset! (::window-click-listener s)
+                             (events/listen js/window EventType/CLICK
+                              #(when (and @(::show-menu s)
+                                          (not (utils/event-inside? % (rum/dom-node s))))
+                                 (reset! (::show-menu s) false))))
+                            s)
+                           :will-unmount (fn [s]
+                            (when @(::window-click-listener s)
+                              (events/unlistenByKey @(::window-click-listener s))
+                              (reset! (::window-click-listener s) nil))
+                            s)}
+  [s {:keys [toggle-button-id add-photo-cb add-video-cb add-attachment-cb]}]
   [:div.multi-picker-container
     [:button.mlb-reset.multi-picker-btn
       {:aria-label "show multi picker"
-       :id picker-button-id
+       :data-toggle "tooltip"
+       :data-placement "top"
+       :data-container "body"
+       :title "Add media and attachments"
+       :id toggle-button-id
        :on-click #(swap! (::show-menu s) not)}]
     (when @(::show-menu s)
       [:div.multi-picker
         [:button.mlb-reset.multi-picker-choice.choice-images
-          {:on-click #(rich-body-editor/add-photo @rich-body-editor/rich-body-editor-state nil)}
+          {:on-click #(add-photo-cb %)}
           [:div.multi-picker-choice-icon]
           "Images"]
         [:button.mlb-reset.multi-picker-choice.choice-media
-          {:on-click #(rich-body-editor/add-video @rich-body-editor/rich-body-editor-state)}
+          {:on-click #(add-video-cb %)}
           [:div.multi-picker-choice-icon]
           "Media"]
         [:button.mlb-reset.multi-picker-choice.choice-attachment
-          {:on-click #(rich-body-editor/add-attachment @rich-body-editor/rich-body-editor-state nil)}
+          {:on-click #(add-attachment-cb %)}
           [:div.multi-picker-choice-icon]
           "Attachment"]])])
