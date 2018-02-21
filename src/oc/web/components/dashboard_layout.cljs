@@ -190,7 +190,7 @@
               ;; All Posts
               is-all-posts
               (rum/with-key
-               (all-posts all-posts-data)
+               (all-posts)
                (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
               ;; Empty board
               empty-board?

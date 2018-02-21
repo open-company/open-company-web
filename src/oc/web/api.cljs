@@ -661,41 +661,30 @@
               (router/nav! (oc-urls/org (router/current-org-slug)))
               (.reload (.-location js/window)))))))))
 
-(defn get-comments [activity-data]
+(defn get-comments [activity-data callback]
   (when activity-data
     (let [comments-link (utils/link-for (:links activity-data) "comments")]
       (when comments-link
         (interaction-http (method-for-link comments-link) (relative-href comments-link)
           {:headers (headers-for-link comments-link)}
-          (fn [{:keys [status success body]}]
-            (dispatcher/dispatch! [:comments-get/finish {:success success
-                                                         :error (when-not success body)
-                                                         :body (when (seq body) (json->cljs body))
-                                                         :activity-uuid (:uuid activity-data)}])))))))
+          callback)))))
 
-(defn add-comment [activity-data comment-body]
+(defn add-comment [activity-data comment-body callback]
   (when (and activity-data comment-body)
     (let [add-comment-link (utils/link-for (:links activity-data) "create" "POST")
           json-data (cljs->json {:body comment-body})]
       (interaction-http (method-for-link add-comment-link) (relative-href add-comment-link)
         {:headers (headers-for-link add-comment-link)
          :json-params json-data}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:comment-add/finish {:success success
-                                                      :error (when-not success body)
-                                                      :body (when (seq body) (json->cljs body))
-                                                      :activity-data activity-data}]))))))
+        callback))))
 
 (defn delete-comment
-  [activity-uuid comment-data]
+  [activity-uuid comment-data callback]
   (when comment-data
     (let [comment-link (utils/link-for (:links comment-data) "delete")]
       (interaction-http (method-for-link comment-link) (relative-href comment-link)
         {:headers (headers-for-link comment-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch!
-           [:comment-delete/finish
-            {:success success :activity-uuid activity-uuid}]))))))
+        callback))))
 
 (defn save-comment
   [comment-data new-data]
@@ -708,18 +697,13 @@
         (fn [_])))))
 
 (defn toggle-reaction
-  [item-data reaction-data reacting?]
-  (when (and item-data reaction-data)
+  [reaction-data reacting? callback]
+  (when reaction-data
     (let [link-method (if reacting? "PUT" "DELETE")
           reaction-link (utils/link-for (:links reaction-data) "react" link-method)]
       (interaction-http (method-for-link reaction-link) (relative-href reaction-link)
         {:headers (headers-for-link reaction-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch!
-           [:reaction-toggle/finish
-            item-data
-            (:reaction reaction-data)
-            (when success (json->cljs body))]))))))
+        callback))))
 
 (defn get-entry
   [entry-data]

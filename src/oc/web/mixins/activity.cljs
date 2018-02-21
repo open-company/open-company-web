@@ -1,7 +1,7 @@
 (ns oc.web.mixins.activity
   (:require [rum.core :as rum]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.activity-utils :as au]))
+            [oc.web.utils.activity :as au]))
 
 (def truncate-body-mixin
   {:init (fn [s]

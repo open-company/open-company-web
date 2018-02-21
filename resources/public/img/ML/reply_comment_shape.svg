@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M30,25 L30,31 L24,31 C20.6862915,31 18,28.3137085 18,25 C18,21.6862915 20.6862915,19 24,19 C27.3137085,19 30,21.6862915 30,25 Z" id="path-1"></path>
+    </defs>
+    <g id="All-Posts-Expanded-Mobile" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-40.000000, -1413.000000)" opacity="0.5">
+        <g id="Group-24" transform="translate(24.000000, 1396.000000)">
+            <g id="Combined-Shape">
+                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                <path stroke="#898D93" stroke-width="2" d="M31,25 L31,32 L24,32 C20.1340068,32 17,28.8659932 17,25 C17,21.1340068 20.1340068,18 24,18 C27.8659932,18 31,21.1340068 31,25 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg>
