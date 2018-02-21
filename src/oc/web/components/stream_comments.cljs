@@ -13,10 +13,7 @@
                              (drv/drv :add-comment-focus)
                              (rum/local false ::bottom-gradient)
                              (rum/local false ::last-focused-state)
-                             {:did-mount (fn [s]
-                               (scroll-to-bottom s)
-                               s)
-                              :after-render (fn [s]
+                             {:after-render (fn [s]
                                (let [scrolling-node (rum/ref-node s "stream-comments-inner")
                                      scrolls (> (.-scrollHeight scrolling-node) (.-clientHeight scrolling-node))]
                                  (compare-and-set! (::bottom-gradient s) (not scrolls) scrolls))
