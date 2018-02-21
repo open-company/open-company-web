@@ -14,7 +14,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.multi-picker :refer (multi-picker)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -50,7 +49,7 @@
   (let [entry-editing @(drv/get-ref s :entry-editing)
         body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerText body-el)))]
+                      (utils/clean-body-html (.-innerHTML body-el)))]
     (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body)))
 
 (defn save-on-exit?
@@ -151,8 +150,6 @@
   (if (string? value)
     (string/trim value)
     value))
-
-(def default-multi-picker-button-id "entry-edit-multi-picker")
 
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
@@ -410,7 +407,7 @@
                :dangerouslySetInnerHTML @(::initial-headline s)}]
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker false
-                               :save-position-click-element-id default-multi-picker-button-id
+                               :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
                                :initial-body @(::initial-body s)
                                :show-placeholder (not (contains? entry-editing :links))
                                :show-h2 true
@@ -423,7 +420,8 @@
             ; Bottom controls
             [:div.entry-edit-controls.group]]
           [:div.entry-edit-modal-footer
-            (multi-picker default-multi-picker-button-id)
+            [:div.entry-edit-footer-multi-picker
+              {:id "entry-edit-footer-multi-picker"}]
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 20
                            :height 20
