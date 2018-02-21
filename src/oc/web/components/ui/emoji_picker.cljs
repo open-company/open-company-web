@@ -65,36 +65,37 @@
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
-                 s)
-   :did-mount (fn [s] (when-not (utils/is-test-env?)
-                        (utils/after 1500 #(reset! (::preloaded s) true))
-                        (let [click-listener (events/listen
-                                              js/window
-                                              EventType/CLICK
-                                              (partial on-click-out s))
-                              focusin (events/listen
-                                       js/document
-                                       EventType/FOCUSIN
-                                       (partial check-focus s))
-                              focusout (events/listen
-                                        js/document
-                                        EventType/FOCUSOUT
-                                        (partial check-focus s))
-                              ff-click (when js/isFireFox
-                                         (events/listen
-                                          js/window
-                                          EventType/CLICK
-                                          (partial check-focus s)))
-                              ff-keypress (when js/isFireFox
-                                            (events/listen
-                                             js/window
-                                             EventType/KEYPRESS
-                                             (partial check-focus s)))]
-                          (merge s {::click-listener click-listener
-                                    ::focusin-listener focusin
-                                    ::focusout-listener focusout
-                                    ::ff-window-click ff-click
-                                    ::ff-keypress ff-keypress}))))
+                 (utils/after 1500 #(reset! (::preloaded s) true))
+                 (let [click-listener (events/listen
+                                       js/window
+                                       EventType/CLICK
+                                       (partial on-click-out s))
+                       focusin (events/listen
+                                js/document
+                                EventType/FOCUSIN
+                                (partial check-focus s))
+                       focusout (events/listen
+                                 js/document
+                                 EventType/FOCUSOUT
+                                 (partial check-focus s))
+                       ff-click (when js/isFireFox
+                                  (events/listen
+                                   js/window
+                                   EventType/CLICK
+                                   (partial check-focus s)))
+                       ff-keypress (when js/isFireFox
+                                     (events/listen
+                                      js/window
+                                      EventType/KEYPRESS
+                                      (partial check-focus s)))]
+                   (merge s {::click-listener click-listener
+                             ::focusin-listener focusin
+                             ::focusout-listener focusout
+                             ::ff-window-click ff-click
+                             ::ff-keypress ff-keypress})))
+   :did-mount (fn [s]
+                (utils/after 100 #(check-focus s nil))
+                s)
    :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
                          (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
