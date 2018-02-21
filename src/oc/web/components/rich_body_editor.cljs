@@ -10,13 +10,12 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.multi-picker :refer (multi-picker)]
             [cljsjs.medium-editor]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]))
-
-(def rich-body-editor-state (atom nil))
 
 ;; Attachment
 
@@ -66,8 +65,14 @@
 (defn attachment-upload-error-cb [state editable res error]
   (attachment-upload-failed-cb state editable))
 
+(defn get-media-picker-extension [s]
+  (let [body-el (rum/ref-node s "body")
+        editor (js/MediumEditor.getEditorFromElement body-el)
+        media-picker-ext (.getExtensionByName editor "media-picker")]
+    media-picker-ext))
+
 (defn add-attachment [s editable]
-  (let [editable (or editable @(::editor s))]
+  (let [editable (or editable (get-media-picker-extension s))]
     (reset! (::media-attachment s) true)
     (iu/upload!
      nil
@@ -75,7 +80,7 @@
      nil
      (partial attachment-upload-error-cb s editable)
      (fn []
-       (utils/after 400 #(media-attachment-dismiss-picker s editable)))))
+       (utils/after 400 #(media-attachment-dismiss-picker s editable))))))
 
 ;; Chart
 
@@ -180,7 +185,7 @@
     (.addPhoto editable nil nil nil nil)))
 
 (defn add-photo [s editable]
-  (let [editable (or editable @(::editor s))]
+  (let [editable (or editable (get-media-picker-extension s))]
     (reset! (::media-photo s) true)
     (let [props (first (:rum/args s))
           upload-progress-cb (:upload-progress-cb props)]
@@ -251,6 +256,8 @@
         on-change (:on-change options)]
     (on-change)))
 
+(def default-mutli-picker-button-id "entry-edit-multi-picker-bt")
+
 (defn- setup-editor [s]
   (let [options (first (:rum/args s))
         mobile-editor (responsive/is-tablet-or-mobile?)
@@ -259,7 +266,7 @@
         body-el (rum/ref-node s "body")
         media-picker-opts {:buttons (clj->js media-config)
                            :useInlinePlusButton (:use-inline-media-picker options)
-                           :saveSelectionClickElementId (:save-position-click-element-id options)
+                           :saveSelectionClickElementId default-mutli-picker-button-id
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
@@ -320,6 +327,12 @@
     ; (js/recursiveAttachPasteListener body-el #(body-on-change s))
     ))
 
+(defn toggle-menu-cb [s show?]
+  (when-let [editable @(::editor s)]
+    (if show?
+      (.saveSelection editable)
+      (.removeSelection editable))))
+
 (rum/defcs rich-body-editor  < rum/reactive
                                (rum/local false ::did-change)
                                (rum/local nil ::editor)
@@ -333,10 +346,7 @@
                                ;; Image upload lock
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
-                               {:init (fn [s]
-                                 (reset! rich-body-editor-state s)
-                                 s)
-                                :did-mount (fn [s]
+                               {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)
                                      (utils/after 300 #(do
@@ -380,9 +390,17 @@
              classes
              show-placeholder
              upload-progress-cb
-             use-inline-media-picker
-             save-position-click-element-id]}]
+             multi-picker-container-selector]}]
   [:div.rich-body-editor-container
+    (when multi-picker-container-selector
+      (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]
+        (rum/portal
+         (multi-picker
+          {:toggle-button-id default-mutli-picker-button-id
+           :add-photo-cb #(add-photo s nil)
+           :add-video-cb #(add-video s)
+           :add-attachment-cb #(add-attachment s nil)})
+         multi-picker-container)))
     [:div.rich-body-editor
       {:ref "body"
        :content-editable (not nux)
