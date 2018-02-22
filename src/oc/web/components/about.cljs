@@ -39,38 +39,37 @@
           [:h1.about "About us"]
           [:div.about-subline
             (str
-             "Carrot is a company digest that creates "
-             "transparency and alignment.")]
+             "A company digest that keeps everyone "
+             "informed and aligned with less noise.")]
           [:div.about-copy
             [:p
               (str
-               "It may seem counterintuitive that teams "
-               "are struggling to stay on the same page "
-               "given the ubiquity of workplace chat, but "
-               "alignment is a real problem for growing "
-               "and distributed teams.")]
+               "Workplace chat is everywhere, and "
+               "yet teams are still struggling to "
+               "stay on the same page - especially "
+               "growing or distributed teams.")]
             [:p
               (str
-               "Chat might be ideal for fast and spontaneous "
-               "conversations in the moment, but it gets "
-               "noisy and drowns out important information "
-               "and follow-on discussions that teams need "
-               "to stay aligned over time.")]
+               "Chat might be ideal for fast and "
+               "spontaneous conversations in the moment, "
+               "but it gets noisy and drowns out "
+               "important information and follow-on "
+               "discussions that teams need to stay "
+               "aligned over time.")]
             [:p
               (str
-               "Carrot is a team digest where everyone can "
-               "read and react to important information - "
-               "like company updates, announcements, "
-               "strategic plans, and stories - without "
-               "worrying they missed it in chat.")]
+               "Carrot is a team digest that gives "
+               "everyone time to read and react to "
+               "important information without worrying "
+               "they missed it.")]
             [:p
               (str
-               "Carrot creates transparency and alignment "
-               "by making sure everyone can see what matters "
-               "most and can get caught up anytime.")]
+               "When it’s this easy to see what matters "
+               "most, teams can stay informed and aligned "
+               "with less noise.")]
             [:p
               (str
-               "Let’s Carrot!")]]
+               "Carrot on!")]]
 
           [:div.team-container
             [:div.team-row.group.three-cards

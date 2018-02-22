@@ -52,9 +52,11 @@
           [:div.balloon.small-yellow]
 
           [:h1.headline
-            "Carrot, your team digest."]
+            "Better informed, less noise."]
           [:div.subheadline
-            "Keep everyone aligned around what matters most."]
+            (str
+             "Carrot is a company digest that keeps everyone "
+             "aligned around what matters most.")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))

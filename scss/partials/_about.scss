@@ -133,25 +133,30 @@ div#wrap {
         @include avenir_R();
         font-size: 24px;
         color: rgba($carrot_light_gray_3, 0.8);
-        max-width: 660px;
+        max-width: 480px;
         margin: 6px auto 32px;
 
         @include tablet(){
           width: 100%;
-          margin: 16px auto 0;
-          padding: 0 16px;
+          margin: 16px auto 32px;
+          padding: 0;
         }
       }
 
       div.about-copy {
-        max-width: 660px;
+        max-width: 560px;
         margin: 0px auto 60px;
+
+        @include mobile() {
+          margin: 0px auto 88px;
+        }
 
         p {
           @include avenir_R();
-          font-size: 16px;
+          font-size: 18px;
           color: $ui_grey;
           margin-bottom: 16px;
+          text-align: left;
         }
       }
 
