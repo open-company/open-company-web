@@ -99,7 +99,7 @@
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
-                            (> (count (:boards org-data)) 1))
+                            (utils/link-for (:links org-data) "activity"))
         show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
                                    create-link)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
