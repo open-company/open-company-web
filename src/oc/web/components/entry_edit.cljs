@@ -286,10 +286,7 @@
         published? (= (:status entry-editing) "published")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})
-       :on-click #(when (and (not (:has-changes entry-editing))
-                             (not (utils/event-inside? % (rum/ref-node s "entry-edit-modal"))))
-                    (cancel-clicked s))}
+                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.entry-edit-modal-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(cancel-clicked s)}]
