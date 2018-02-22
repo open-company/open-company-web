@@ -1050,7 +1050,9 @@
 
 (defn your-boards-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
-    (if-let [board-slug (cook/get-cookie (router/last-board-cookie org-slug))]
+    (if-let [board-slug "all-posts"]
+      ;; Repalce all-posts above with the following to go back to the last visited board
+      ;; (cook/get-cookie (router/last-board-cookie org-slug))]
       (oc-urls/board org-slug board-slug)
       (oc-urls/org org-slug))
     oc-urls/login))
