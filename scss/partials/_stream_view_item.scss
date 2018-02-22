@@ -301,28 +301,29 @@ div.stream-view-item {
       width: 387px;
       min-height: 300px;
       position: relative;
-      padding: 32px 12px 40px 36px;
+      padding: 32px 20px 40px 32px;
       background-color: #FDFCFB;
-      max-height: 789px;
+      max-height: 802px;
+      border-bottom-right-radius: 6px;
 
       &.expanded {
         max-height: initial;
       }
 
       div.stream-body-comments {
-        padding-bottom: 70px;
+        padding-bottom: 68px;
         height: 100%;
 
         &.add-comment-expanded {
-          padding-bottom: 152px;
+          padding-bottom: 142px;
         }
       }
 
       div.add-comment-box-container {
         bottom: 40px;
-        width: calc(100% - 76px);
+        width: calc(100% - 64px);
         position: absolute;
-        margin-right: 20px;
+        margin-right: 12px;
 
         div.add-comment-box {
 

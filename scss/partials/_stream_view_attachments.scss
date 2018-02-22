@@ -1,6 +1,6 @@
 div.stream-view-attachments {
   margin-top: 32px;
-  width: 100%;
+  width: calc(100% - 40px);
 
   @include mobile() {
     height: 88px;

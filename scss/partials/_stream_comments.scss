@@ -27,10 +27,17 @@ div.stream-comments {
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    padding-right: 20px;
+    padding-right: 12px;
 
     @include mobile() {
       padding-right: 0px;
+    }
+
+    div.stream-comments-title {
+      @include avenir_H();
+      font-size: 14px;
+      color: $carrot_dark_gray;
+      margin-bottom: 24px;
     }
 
     div.stream-comments-empty {

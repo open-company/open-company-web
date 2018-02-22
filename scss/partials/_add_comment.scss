@@ -31,7 +31,7 @@ div.add-comment-box-container {
     right: 0;
     bottom: 0px;
     width: 100%;
-    padding: 10px 12px;
+    padding: 16px;
 
     @include mobile(){
       margin-bottom: 16px;
@@ -41,7 +41,7 @@ div.add-comment-box-container {
     div.emoji-picker {
       position: absolute;
       right: 16px;
-      top: 7px;
+      top: 9px;
 
       @include mobile() {
         display: none;
@@ -54,25 +54,44 @@ div.add-comment-box-container {
 
     div.add-comment-internal{
       position: relative;
+      padding-left: 24px;
+
+      &:before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        background-image: cdnUrl("/img/ML/reply_comment_shape.svg");
+        background-size: 16px 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
 
       div.add-comment {
         resize: none;
         width: 218px;
         border: none;
         outline: none;
-        @include avenir_M();
-        background-color: transparent;
-        color: $carrot_light_gray_3;
+        @include avenir_BOOK();
+        color: $deep_navy;
         font-size: 14px;
         cursor: text;
-        margin: 2px 0px;
+        margin: 0px;
         overflow-y: auto;
         overflow-x: hidden;
-        height: 20px;
+        height: 16px;
         min-height: initial;
         white-space: pre-wrap;
         word-wrap: break-word;
-        padding-right: 16px;
+        padding-right: 32px;
+        padding-top: 4px;
+
+        &.medium-editor-placeholder:after {
+          @include avenir_M();
+          color: rgba($ui_grey, 0.5);
+        }
 
         @include mobile() {
           width: 100%;
@@ -82,6 +101,7 @@ div.add-comment-box-container {
 
         &.show-buttons {
           height: 58px;
+          padding-top: 0px;
 
           @include mobile() {
             height: auto;
@@ -103,6 +123,8 @@ div.add-comment-box-container {
       }
 
       div.add-comment-footer {
+        height: 16px;
+        margin-top: 24px;
 
         div.reply-button-container {
           float: right;
@@ -112,13 +134,8 @@ div.add-comment-box-container {
             @include avenir_H();
             font-size: 14px;
             height: 32px;
-            width: 59px;
-
-            @include big_web() {
-              &:hover {
-                color: white;
-              }
-            }
+            margin-top: -16px;
+            padding: 16px 0px 0px 16px;
           }
         }
       }
@@ -128,8 +145,8 @@ div.add-comment-box-container {
       padding: 16px;
 
       div.emoji-picker {
-        right: 80px;
-        bottom: 16px;
+        right: 60px;
+        bottom: 7px;
         top: unset;
       }
     }

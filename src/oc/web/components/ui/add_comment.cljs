@@ -94,13 +94,13 @@
         (when add-comment-focus
           [:div.add-comment-footer.group
             [:div.reply-button-container
-              [:button.mlb-reset.mlb-default.reply-btn
+              [:button.mlb-reset.reply-btn
                 {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                   comment-body (cu/add-comment-content add-comment-div)]
                               (comment-actions/add-comment activity-data comment-body)
                               (set! (.-innerHTML add-comment-div) "<p><br/></p>"))
                  :disabled @(::add-button-disabled s)}
-                "Add"]]])]
+                "Post"]]])]
        (when (and (not (js/isIE))
                   (not (responsive/is-tablet-or-mobile?)))
          (emoji-picker {:width 32
