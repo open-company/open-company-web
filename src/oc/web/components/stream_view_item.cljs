@@ -177,6 +177,7 @@
             [:button.mlb-reset.expand-button
               {:on-click #(reset! (::expanded s) true)}
               "Continue reading"]]
+          (stream-view-attachments activity-attachments)
           (when (and is-mobile?
                      @(::mobile-show-comments s))
             [:div.stream-mobile-comments
@@ -184,10 +185,9 @@
               (rum/with-key (stream-comments activity-data comments-data)
                (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
               (add-comment activity-data)])
-          (stream-view-attachments activity-attachments)
           [:div.stream-item-reactions.group
             (when-not @(::mobile-show-comments s)
-              [:div.stream-mobile-comments-summary.group
+              [:div.stream-mobile-comments-summary
                 {:on-click #(do
                               (utils/event-stop %)
                               (reset! (::mobile-show-comments s) true))}

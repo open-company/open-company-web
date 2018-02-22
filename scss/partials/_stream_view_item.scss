@@ -160,13 +160,18 @@ div.stream-view-item {
 
       @include mobile() {
         width: 100%;
-        padding: 24px;
+        padding: 32px 24px;
         margin: 0px;
       }
 
       div.stream-view-attachments {
         position: absolute;
         bottom: 64px;
+
+        @include mobile() {
+          position: relative;
+          bottom: unset;
+        }
       }
 
       span.posted-in {
@@ -181,6 +186,10 @@ div.stream-view-item {
         @include avenir_H();
         font-size: 22px;
         color: $deep_navy;
+
+        @include mobile() {
+          margin-top: 16px;
+        }
       }
 
       div.stream-item-body-container {
@@ -239,20 +248,25 @@ div.stream-view-item {
           font-size: 16px;
           text-align: center;
           display: none;
-
-          @include mobile() {
-            margin-bottom: 16px;
-          }
         }
       }
 
       div.stream-mobile-comments {
         background-color: #FDFCFB;
+
+        @include mobile() {
+          background-color: transparent;
+          margin-top: 32px;
+        }
       }
 
       div.stream-mobile-comments-summary {
         margin-right: 16px;
         float: left;
+
+        @include mobile() {
+          margin-right: 24px;
+        }
 
         div.zero-comments {
           padding-left: 20px;
@@ -287,9 +301,8 @@ div.stream-view-item {
           position: relative;
           bottom: unset;
 
-          div.stream-mobile-comments-summary {
-            float: unset;
-            margin-bottom: 16px;
+          div.reactions {
+            float: left;
           }
         }
       }

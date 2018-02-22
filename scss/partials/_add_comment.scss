@@ -34,7 +34,6 @@ div.add-comment-box-container {
     padding: 16px;
 
     @include mobile(){
-      margin-bottom: 16px;
       box-shadow: none;
     }
 
@@ -96,7 +95,8 @@ div.add-comment-box-container {
         @include mobile() {
           width: 100%;
           resize: vertical;
-          height: auto;
+          padding-top: 1px;
+          padding-right: 0px;
         }
 
         &.show-buttons {

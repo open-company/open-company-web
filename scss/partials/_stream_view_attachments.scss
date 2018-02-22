@@ -3,7 +3,7 @@ div.stream-view-attachments {
   width: calc(100% - 40px);
 
   @include mobile() {
-    height: 88px;
+    width: 100%;
   }
 
   div.stream-view-attachments-title {
