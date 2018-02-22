@@ -40,7 +40,8 @@
 
 (defn nux-steps
   [org-data board-data nux]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        is-admin? (jwt/is-admin? (:team-id org-data))]
     (case nux
       :4
       (let [create-link (utils/link-for (:links org-data) "create")]
@@ -50,7 +51,7 @@
                                "Click the compose button to add "
                                "updates, announcements and plans "
                                "that keep your team aligned.")
-                     :step-label "1 of 3"
+                     :step-label (str "1 of " (if is-admin? "3" "2"))
                      :button-title "Cool"
                      :button-position "left"
                      :on-next-click #(dis/dispatch! [:input [:nux] :5])}))
@@ -62,10 +63,12 @@
                              "All-hands, Strategy, and Who We Are; or "
                              "group-level boards like Sales, Marketing and "
                              "Design.")
-                   :step-label "2 of 3"
+                   :step-label (str "2 of " (if is-admin? "3" "2"))
                    :button-title "Ok, got it"
                    :button-position "left"
-                   :on-next-click #(dis/dispatch! [:input [:nux] :6])})
+                   :on-next-click #(if is-admin?
+                                    (dis/dispatch! [:input [:nux] :6])
+                                    (dis/dispatch! [:nux-end]))})
       :6
       (carrot-tip {:step nux
                    :title "Invite your teammates"
