@@ -248,8 +248,8 @@
           "Better informed, less noise."]
         [:div.subheadline
           (str
-           "Carrot is a company digest that keeps everyone "
-           "aligned around what matters most.")]
+            "Your company digest keeps everyone aligned "
+            "around what matters most.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -433,7 +433,7 @@
         [:h1.about "About us"]
         [:div.about-subline
           (str
-           "A company digest that keeps everyone "
+           "Carrot is a company digest that keeps busy teams "
            "informed and aligned with less noise.")]
         [:div.about-copy
           [:p
@@ -452,15 +452,15 @@
              "aligned over time.")]
           [:p
             (str
-             "Carrot is a team digest that gives "
+             "Carrot is a company digest that gives "
              "everyone time to read and react to "
              "important information without worrying "
              "they missed it.")]
           [:p
             (str
              "When it’s this easy to see what matters "
-             "most, teams can stay informed and aligned "
-             "with less noise.")]
+             "most, busy teams stay informed and "
+             "aligned with less noise.")]
           [:p
             (str
              "Carrot on!")]]

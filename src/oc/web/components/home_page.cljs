@@ -55,8 +55,8 @@
             "Better informed, less noise."]
           [:div.subheadline
             (str
-             "Carrot is a company digest that keeps everyone "
-             "aligned around what matters most.")]
+             "Your company digest keeps everyone aligned "
+             "around what matters most.")]
           ; (when (and (not @(::confirm s))
           ;            (not @(::thanks-box-top s)))
           ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
