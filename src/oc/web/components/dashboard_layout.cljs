@@ -168,7 +168,7 @@
                                     (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
-                      "New Post"]]
+                      "Compose"]]
                   (when @(::show-top-boards-dropdown s)
                     (dropdown-list
                      {:items (map

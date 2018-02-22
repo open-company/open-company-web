@@ -170,12 +170,13 @@ div.dashboard-layout {
             background-color: $carrot_orange_light;
             color: $carrot_orange;
             border-radius: 100px;
-            padding: 10px 22px;
+            padding: 8px 24px;
             margin-top: -3px;
             border: 2px solid transparent;
             opacity: 1;
             transition: 0ms;
             cursor: pointer;
+            position: relative;
 
             // Remove to show settings button on mobile
             @include mobile() {
@@ -206,9 +207,9 @@ div.dashboard-layout {
               background-size: 14px 14px;
               width: 14px;
               height: 14px;
-              margin: 3px 6px 0px 0px;
-              padding: 0;
-              float: left;
+              position: absolute;
+              top: 13px;
+              left: 24px;
               cursor: pointer;
             }
 
@@ -216,7 +217,9 @@ div.dashboard-layout {
               @include avenir_H();
               font-size: 16px;
               color: $carrot_orange;
-              float: left;
+              position: absolute;
+              left: 46px;
+              top: 8px;
               cursor: pointer;
             }
           }
