@@ -425,6 +425,8 @@
         [:div.balloon.small-green-face]
         [:div.balloon.small-blue]
         [:div.balloon.small-purple]
+        [:div.balloon.big-purple]
+        [:div.balloon.small-yellow]
         [:div.balloon.big-yellow]
         [:div.balloon.small-purple-1]
         [:div.balloon.small-purple-2]
@@ -463,7 +465,7 @@
              "aligned with less noise.")]
           [:p
             (str
-             "Carrot on!")]]
+             "- The Carrot team")]]
         [:div.team-container
           [:div.team-row.group.three-cards
             [:div.team-card.iacopo-carraro
