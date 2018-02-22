@@ -63,7 +63,9 @@ function OCStaticGetYourBoardsUrl (decoded_jwt) {
       if ( user_id ) {
         org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id));
         if ( org_slug ) {
-          board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
+          board_slug = "all-posts";
+          // Replace all-posts above withe the following to go back to the last visited board
+          // OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
           if ( board_slug ){
             your_board_url = "/" + org_slug + "/" + board_slug;
           } else {
