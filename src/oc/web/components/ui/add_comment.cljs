@@ -83,24 +83,22 @@
   (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box-container
-      ; [:div.add-comment-label "Add comment"]
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
-       [:div.add-comment-internal
-         [:div.add-comment.emoji-autocomplete.emojiable
+        [:div.add-comment-internal
+          [:div.add-comment.emoji-autocomplete.emojiable
            {:ref "add-comment"
-            :content-editable true
-            :class (utils/class-set {:show-buttons add-comment-focus})}]
+            :content-editable true}]
         (when add-comment-focus
           [:div.add-comment-footer.group
             [:div.reply-button-container
-              [:button.mlb-reset.mlb-default.reply-btn
+              [:button.mlb-reset.reply-btn
                 {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                   comment-body (cu/add-comment-content add-comment-div)]
                               (comment-actions/add-comment activity-data comment-body)
                               (set! (.-innerHTML add-comment-div) "<p><br/></p>"))
                  :disabled @(::add-button-disabled s)}
-                "Add"]]])]
+                "Post"]]])]
        (when (and (not (js/isIE))
                   (not (responsive/is-tablet-or-mobile?)))
          (emoji-picker {:width 32
