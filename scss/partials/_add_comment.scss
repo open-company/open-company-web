@@ -8,19 +8,6 @@ div.add-comment-box-container {
     position: relative;
   }
 
-  div.add-comment-label {
-    height: 14px;
-    @include avenir_H();
-    font-size: 12px;
-    line-height: 14px;
-    margin-bottom: 8px;
-    color: $carrot_light_gray_3;
-
-    @include mobile() {
-      display: none;
-    }
-  }
-
   div.add-comment-box {
     background-color: white;
     border-radius: 4px;
@@ -48,6 +35,37 @@ div.add-comment-box-container {
 
       div.picker-container {
         right: -92px !important;
+      }
+    }
+
+    &.show-buttons {
+      div.emoji-picker {
+
+      }
+
+      div.add-comment-internal {
+        padding: 0px;
+
+        &:before {
+          display: none;
+        }
+
+        div.emoji-picker {
+          right: 60px;
+          bottom: 7px;
+          top: unset;
+        }
+
+        div.add-comment {
+          height: 58px;
+          padding-top: 0px;
+          padding-right: 0px;
+          margin-right: 0px;
+
+          @include mobile() {
+            height: auto;
+          }
+        }
       }
     }
 
@@ -97,15 +115,6 @@ div.add-comment-box-container {
           padding-right: 0px;
         }
 
-        &.show-buttons {
-          height: 58px;
-          padding-top: 0px;
-
-          @include mobile() {
-            height: auto;
-          }
-        }
-
         .emojione {
           @include emoji-size(13);
         }
@@ -136,16 +145,6 @@ div.add-comment-box-container {
             padding: 16px 0px 0px 16px;
           }
         }
-      }
-    }
-
-    &.show-buttons {
-      padding: 16px;
-
-      div.emoji-picker {
-        right: 60px;
-        bottom: 7px;
-        top: unset;
       }
     }
   }

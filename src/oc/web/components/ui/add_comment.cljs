@@ -83,14 +83,12 @@
   (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box-container
-      ; [:div.add-comment-label "Add comment"]
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
-       [:div.add-comment-internal
-         [:div.add-comment.emoji-autocomplete.emojiable
+        [:div.add-comment-internal
+          [:div.add-comment.emoji-autocomplete.emojiable
            {:ref "add-comment"
-            :content-editable true
-            :class (utils/class-set {:show-buttons add-comment-focus})}]
+            :content-editable true}]
         (when add-comment-focus
           [:div.add-comment-footer.group
             [:div.reply-button-container

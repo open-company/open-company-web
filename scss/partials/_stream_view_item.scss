@@ -340,6 +340,21 @@ div.stream-view-item {
 
         div.add-comment-box {
 
+          &.show-buttons {
+            div.add-comment-internal {
+              div.emoji-picker {
+                top: unset;
+                bottom: 9px;
+                right: 60px;
+                left: unset;
+              }
+
+              div.add-comment {
+                width: 100%;
+              }
+            }
+          }
+
           button.emoji-button {
             background-size: 16px 16px;
             background-position: 50% 70%;
@@ -352,14 +367,6 @@ div.stream-view-item {
 
           div.add-comment-internal{
             position: relative;
-
-            div.add-comment {
-              width: 250px;
-
-              &.show-buttons {
-                width: 100%;
-              }
-            }
           }
         }
       }
