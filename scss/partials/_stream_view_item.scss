@@ -275,8 +275,13 @@ div.stream-view-item {
 
       div.stream-item-reactions {
         margin-top: 32px;
+        height: 32px;
         position: absolute;
         bottom: 0px;
+
+        div.reactions {
+          margin-top: 3px;
+        }
 
         @include mobile() {
           position: relative;
