@@ -14,7 +14,7 @@ div.reactions {
       position: relative;
       height: 26px;
       cursor: default;
-      padding: 4px 2px;
+      padding: 4px;
       @include avenir_H();
       border: 1px solid #ECECEC;
       box-shadow: none;
@@ -31,7 +31,8 @@ div.reactions {
       span.reaction {
         position: relative;
         float: left;
-        font-size: 14px;
+        font-size: 15px;
+        margin-left: 2px;
       }
 
       div.count {
@@ -40,6 +41,7 @@ div.reactions {
         min-width: 14px;
         height: 15px;
         text-align: center;
+        margin-left: -1px;
       }
 
       &.can-react {
@@ -47,10 +49,12 @@ div.reactions {
 
         @include big_web() {
           &.reacted:hover {
+            border: 1px solid $carrot_green;
             box-shadow: 0px 2px 4px 0px rgba($feint_emerald, 0.07);
           }
 
           &:hover {
+            border: 1px solid $light_ui_grey;
             box-shadow: 0px 2px 4px 0px rgba(black, 0.07);
           }
         }
@@ -67,23 +71,31 @@ div.reactions {
 
       &.reaction-picker {
         box-shadow: none;
-        opacity: 0.6;
 
-        &:hover {
-          box-shadow: 0px 2px 4px 0px rgba(black, 0.07);
-          opacity: 1;
-          background-color: transparent;
-          border: 1px solid #ECECEC;
+        div.count {
+          color: $light_ui_grey;
+        }
 
-          div.count {
-            color: $ui_grey;
+        @include big_web() {
+          &:hover {
+            box-shadow: 0px 2px 4px 0px rgba(black, 0.07);
+            background-color: transparent;
+            border: 1px solid $light_ui_grey;
+
+            span.reaction {
+              background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
+            }
+
+            div.count {
+              color: $ui_grey;
+            }
           }
         }
 
         span.reaction {
           width: 16px;
           height: 16px;
-          @include image-2x("/img/ML/new_post_emoji_button");
+          background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
