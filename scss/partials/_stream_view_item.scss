@@ -181,7 +181,7 @@ div.stream-view-item {
       }
 
       div.stream-item-headline {
-        margin-top: 24px;
+        margin-top: 16px;
         @include activity-title();
         @include avenir_H();
         font-size: 22px;
@@ -217,14 +217,14 @@ div.stream-view-item {
           }
 
           div.stream-item-body-inner {
-            margin-top: 32px;
+            margin-top: 24px;
             @include activity-body(18);
             @include avenir_BOOK();
             color: $deep_navy;
             line-height: 30px;
 
             p:not(:last-child) {
-              margin: 0 0 32px;
+              margin: 0 0 24px;
             }
 
             * {
@@ -256,7 +256,7 @@ div.stream-view-item {
 
         @include mobile() {
           background-color: transparent;
-          margin-top: 32px;
+          margin-top: 24px;
         }
       }
 
@@ -293,7 +293,7 @@ div.stream-view-item {
       }
 
       div.stream-item-reactions {
-        margin-top: 32px;
+        margin-top: 24px;
         position: absolute;
         bottom: 0px;
 
