@@ -116,7 +116,8 @@
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
           [:div.board-container.group
-            {:style board-container-style}
+            {:class (when is-all-posts "all-posts-container")
+             :style board-container-style}
             ;; Board name row: board name, settings button and say something button
             [:div.board-name-container.group
               ;; Board name and settings button
