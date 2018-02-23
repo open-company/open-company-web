@@ -136,23 +136,24 @@
                                                 @caret-pos)
                                             (not @visible))]
                                (reset! visible vis)))}]
-      [:div.picker-container
-        {:class (utils/class-set {position true
-                                  :preloading (not @(::preloaded s))
-                                  :visible @visible})}
-        (when-not (utils/is-test-env?)
-          (react-utils/build (.-Picker js/EmojiMart)
-           {:native true
-            :onClick (fn [emoji event]
-                      (when (and default-field-selector
-                                 (not @(::caret-pos s)))
-                        (utils/to-end-of-content-editable (.querySelector js/document default-field-selector))
-                        (save-caret-position s))
-                      (let [add-emoji? (boolean @(::caret-pos s))]
-                         (when add-emoji?
-                           (replace-with-emoji caret-pos emoji)
-                           (remove-markers s)
-                           (.focus @last-active-element))
-                         (reset! visible false)
-                         (when (fn? add-emoji-cb)
-                           (add-emoji-cb @last-active-element emoji add-emoji?))))}))]]))
+     (when @visible
+       [:div.picker-container
+         {:class (utils/class-set {position true
+                                   :preloading (not @(::preloaded s))
+                                   :visible @visible})}
+         (when-not (utils/is-test-env?)
+           (react-utils/build (.-Picker js/EmojiMart)
+             {:native true
+              :onClick (fn [emoji event]
+                         (when (and default-field-selector
+                                    (not @(::caret-pos s)))
+                           (utils/to-end-of-content-editable (.querySelector js/document default-field-selector))
+                           (save-caret-position s))
+                         (let [add-emoji? (boolean @(::caret-pos s))]
+                           (when add-emoji?
+                             (replace-with-emoji caret-pos emoji)
+                             (remove-markers s)
+                             (.focus @last-active-element))
+                           (reset! visible false)
+                           (when (fn? add-emoji-cb)
+                             (add-emoji-cb @last-active-element emoji add-emoji?))))}))])]))
