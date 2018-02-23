@@ -12,16 +12,17 @@ div.main-animation-container {
   @include tablet() {
     width: 100%;
   }
+
+  @include mobile() {
+    display: none;
+  }
+
   video.main-animation {
     width: 940px;
     height: 771px;
 
     @include tablet() {
       width: 100%;
-    }
-
-    @include mobile() {
-      display: none;
     }
   }
 }

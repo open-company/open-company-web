@@ -63,7 +63,9 @@ function OCStaticGetYourBoardsUrl (decoded_jwt) {
       if ( user_id ) {
         org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id));
         if ( org_slug ) {
-          board_slug = OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
+          board_slug = "all-posts";
+          // Replace all-posts above withe the following to go back to the last visited board
+          // OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
           if ( board_slug ){
             your_board_url = "/" + org_slug + "/" + board_slug;
           } else {
@@ -107,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
         your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt),
         user_avatar = decoded_jwt["avatar-url"];
     signupButton.attr("href", your_board_url);
-    signupButton.html("<span><img class=\"user-avatar\" src=\"" + user_avatar + "\" /><span>Go to team</span></span>");
+    signupButton.html("<span><img class=\"user-avatar\" src=\"" + user_avatar + "\" /><span>Your digest</span></span>");
 
     var mobileSignupButton = $("#site-header-mobile-signup-item");
     mobileSignupButton.removeClass("start");
