@@ -31,6 +31,8 @@
           [:div.balloon.small-green-face]
           [:div.balloon.small-blue]
           [:div.balloon.small-purple]
+          [:div.balloon.big-purple]
+          [:div.balloon.small-yellow]
           [:div.balloon.big-yellow]
           [:div.balloon.small-purple-1]
           [:div.balloon.small-purple-2]
@@ -39,8 +41,37 @@
           [:h1.about "About us"]
           [:div.about-subline
             (str
-             "Carrot is a communication platform that inspires "
-             "transparency and team alignment.")]
+             "Carrot is a company digest that keeps busy teams "
+             "informed and aligned with less noise.")]
+          [:div.about-copy
+            [:p
+              (str
+               "Workplace chat is everywhere, and "
+               "yet teams are still struggling to "
+               "stay on the same page - especially "
+               "growing or distributed teams.")]
+            [:p
+              (str
+               "Chat might be ideal for fast and "
+               "spontaneous conversations in the moment, "
+               "but it gets noisy and drowns out "
+               "important information and follow-on "
+               "discussions that teams need to stay "
+               "aligned over time.")]
+            [:p
+              (str
+               "Carrot is a company digest that gives "
+               "everyone time to read and react to "
+               "important information without worrying "
+               "they missed it.")]
+            [:p
+              (str
+               "When it’s this easy to see what matters "
+               "most, busy teams stay informed and "
+               "aligned with less noise.")]
+            [:p
+              (str
+               "- The Carrot team")]]
 
           [:div.team-container
             [:div.team-row.group.three-cards
