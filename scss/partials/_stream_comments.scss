@@ -27,10 +27,17 @@ div.stream-comments {
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    padding-right: 20px;
+    padding-right: 12px;
 
     @include mobile() {
       padding-right: 0px;
+    }
+
+    div.stream-comments-title {
+      @include avenir_H();
+      font-size: 14px;
+      color: $carrot_dark_gray;
+      margin-bottom: 24px;
     }
 
     div.stream-comments-empty {
@@ -97,6 +104,13 @@ div.stream-comments {
           @include avenir_BOOK();
           font-size: 14px;
           color: $deep_navy;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+
+          * {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+          }
 
           margin-bottom: 0px;
 
@@ -124,16 +138,24 @@ div.stream-comments {
             color: $carrot_green;
 
             div.stream-comment-reaction-icon {
-              background-image: cdnUrl("/img/ML/comment_reaction_green.svg");
+              background-image: cdnUrl("/img/ML/comment_agree_on.svg");
             }
           }
 
-          &.reacted.can-react:hover div.stream-comment-reaction-icon {
-            background-image: cdnUrl("/img/ML/comment_reaction_grey.svg");
+          &.reacted.can-react:hover {
+            color: $deep_navy;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_on_hover.svg");
+            }
           }
 
-          &.can-react:hover div.stream-comment-reaction-icon {
-            background-image: cdnUrl("/img/ML/comment_reaction_green.svg");
+          &.can-react:hover {
+            color: $carrot_green;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_off_hover.svg");
+            }
           }
 
           div.stream-comment-reaction-icon {
@@ -141,7 +163,7 @@ div.stream-comments {
             width: 14px;
             height: 14px;
             background-repeat: no-repeat;
-            background-image: cdnUrl("/img/ML/comment_reaction_grey.svg");
+            background-image: cdnUrl("/img/ML/comment_agree_off.svg");
             background-size: 14px 14px;
             background-position: center;
           }

@@ -116,7 +116,8 @@
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
           [:div.board-container.group
-            {:style board-container-style}
+            {:class (when is-all-posts "all-posts-container")
+             :style board-container-style}
             ;; Board name row: board name, settings button and say something button
             [:div.board-name-container.group
               ;; Board name and settings button
@@ -168,7 +169,7 @@
                                     (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
-                      "New Post"]]
+                      "Compose"]]
                   (when @(::show-top-boards-dropdown s)
                     (dropdown-list
                      {:items (map
@@ -189,9 +190,7 @@
               (empty-org)
               ;; All Posts
               is-all-posts
-              (rum/with-key
-               (all-posts)
-               (str "all-posts-" (clojure.string/join (keys (:fixed-items all-posts-data)))))
+              (all-posts)
               ;; Empty board
               empty-board?
               (empty-board)
