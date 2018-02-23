@@ -760,10 +760,6 @@
               with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
           ;; Refresh the entry data to get the new links to interact with
           (api/get-entry entry-data)
-          ; ;; Animate the comments count if we don't have already the same number of comments locally
-          ; (when (not= (count all-old-comments-data) (count new-comments-data))
-          ;   (utils/pulse-comments-count fixed-activity-uuid))
-          ; Update the local state with the new comments list
           (-> db
               (assoc-in comments-key sorted-comments-data)
               (assoc-in (vec (concat board-key [:fixed-items fixed-activity-uuid])) with-authors)))
@@ -817,9 +813,6 @@
           ;; to get the new links to interact with
           (when is-current-user
             (api/get-entry entry-data))
-          ; ;; Animate the interaction count
-          ; (when (not= (:count (get old-reactions-data reaction-idx)) (:count interaction-data))
-          ;   (utils/pulse-reaction-count fixed-activity-uuid (:reaction reaction-data)))
           ; Update the entry in the local state with the new reaction
           (assoc-in db entry-key updated-entry-data))
         ;; the entry is not present, refresh the full board

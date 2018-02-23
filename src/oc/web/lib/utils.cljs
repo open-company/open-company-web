@@ -20,7 +20,6 @@
             [cuerdas.core :as s]
             [cljsjs.emojione] ; pulled in for cljsjs externs
             [defun.core :refer (defun)]
-            [cljsjs.web-animations]
             [cljs.reader :as reader])
   (:import  [goog.i18n NumberFormat]))
 
@@ -833,25 +832,6 @@
   (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
     (let [component (:rum/react-component s)]
       (js/ReactDOM.findDOMNode component))))
-
-(defn pulse-animation [el]
-  (.animate el
-    #js {:transform #js ["scale(1)" "scale(1.5)" "scale(2)" "scale(1.5)" "scale(1)"]}
-    #js {:fill "forwards"
-         :duration 500
-         :iterations 3}))
-
-(defn pulse-reaction-count
-  [activity-uuid reaction]
-  (let [selector (str "div.reaction-" activity-uuid "-" reaction)]
-    (when-let [el (sel1 [(keyword selector)])]
-      (pulse-animation el))))
-
-(defn pulse-comments-count
-  [activity-uuid]
-  (let [selector (str "div.comments-count-" activity-uuid )]
-    (when-let [el (sel1 [(keyword selector)])]
-      (pulse-animation el))))
 
 (defn cdn [img-src & [no-deploy-folder]]
   (let [use-cdn? (empty? ls/cdn-url)
