@@ -35,7 +35,8 @@
     {:class (utils/class-set {:will-appear @(::dismiss s)
                               :appear (not @(::dismiss s))})}
     [:div.onboard-overlay
-      (let [is-mobile? (responsive/is-tablet-or-mobile?)
+      (let [create-board-link (utils/link-for (:links (dis/org-data)) "create")
+            is-mobile? (responsive/is-tablet-or-mobile?)
             is-safari-mobile (and is-mobile?
                                   (js/isSafari))
             wh @(::wh s)]
@@ -114,7 +115,8 @@
                  "The full picture in one place "
                  "keeps everyone in sync.")]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(if is-mobile?
+              {:on-click #(if (or is-mobile?
+                                  (not create-board-link))
                             (dis/dispatch! [:nux-end])
                             (dis/dispatch! [:input [:nux] :4]))
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
