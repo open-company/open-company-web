@@ -183,8 +183,7 @@
                      @(::mobile-show-comments s))
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (rum/with-key (stream-comments activity-data comments-data)
-               (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
+              (stream-comments activity-data comments-data)
               (add-comment activity-data)])
           [:div.stream-item-reactions.group
             (when (and is-mobile?
