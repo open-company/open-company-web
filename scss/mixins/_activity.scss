@@ -136,6 +136,8 @@ $h2_top_margin: 20;
   @include avenir_R();
   font-size: #{$font-size}px;
   color: $carrot_dark_gray;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 
   * {
     color: $carrot_dark_gray;
