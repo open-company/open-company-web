@@ -160,8 +160,18 @@ div.stream-view-item {
 
       @include mobile() {
         width: 100%;
-        padding: 24px;
+        padding: 32px 24px;
         margin: 0px;
+      }
+
+      div.stream-view-attachments {
+        position: absolute;
+        bottom: 64px;
+
+        @include mobile() {
+          position: relative;
+          bottom: unset;
+        }
       }
 
       span.posted-in {
@@ -171,11 +181,15 @@ div.stream-view-item {
       }
 
       div.stream-item-headline {
-        margin-top: 24px;
+        margin-top: 16px;
         @include activity-title();
         @include avenir_H();
         font-size: 22px;
         color: $deep_navy;
+
+        @include mobile() {
+          margin-top: 16px;
+        }
       }
 
       div.stream-item-body-container {
@@ -203,14 +217,14 @@ div.stream-view-item {
           }
 
           div.stream-item-body-inner {
-            margin-top: 32px;
+            margin-top: 24px;
             @include activity-body(18);
             @include avenir_BOOK();
             color: $deep_navy;
             line-height: 30px;
 
             p:not(:last-child) {
-              margin: 0 0 32px;
+              margin: 0 0 24px;
             }
 
             * {
@@ -234,20 +248,25 @@ div.stream-view-item {
           font-size: 16px;
           text-align: center;
           display: none;
-
-          @include mobile() {
-            margin-bottom: 16px;
-          }
         }
       }
 
       div.stream-mobile-comments {
         background-color: #FDFCFB;
+
+        @include mobile() {
+          background-color: transparent;
+          margin-top: 24px;
+        }
       }
 
       div.stream-mobile-comments-summary {
         margin-right: 16px;
         float: left;
+
+        @include mobile() {
+          margin-right: 24px;
+        }
 
         div.zero-comments {
           padding-left: 20px;
@@ -274,7 +293,7 @@ div.stream-view-item {
       }
 
       div.stream-item-reactions {
-        margin-top: 32px;
+        margin-top: 24px;
         position: absolute;
         bottom: 0px;
 
@@ -282,9 +301,8 @@ div.stream-view-item {
           position: relative;
           bottom: unset;
 
-          div.stream-mobile-comments-summary {
-            float: unset;
-            margin-bottom: 16px;
+          div.reactions {
+            float: left;
           }
         }
       }
@@ -296,51 +314,62 @@ div.stream-view-item {
       width: 387px;
       min-height: 300px;
       position: relative;
-      padding: 32px 12px 40px 36px;
+      padding: 32px 20px 40px 32px;
       background-color: #FDFCFB;
-      max-height: 789px;
+      max-height: 685px;
+      border-bottom-right-radius: 6px;
 
       &.expanded {
         max-height: initial;
       }
 
       div.stream-body-comments {
-        padding-bottom: 70px;
+        padding-bottom: 68px;
         height: 100%;
 
         &.add-comment-expanded {
-          padding-bottom: 152px;
+          padding-bottom: 142px;
         }
       }
 
       div.add-comment-box-container {
         bottom: 40px;
-        width: calc(100% - 76px);
+        width: calc(100% - 64px);
         position: absolute;
-        margin-right: 20px;
+        margin-right: 12px;
 
         div.add-comment-box {
 
-          button.emoji-button {
-            background-size: 16px 16px;
-            background-position: 50% 70%;
-            opacity: 0.7;
+          &.show-buttons {
+            div.emoji-picker {
+              top: unset;
+              bottom: 9px;
+              right: 60px;
+              left: unset;
+            }
 
-            &:hover {
-              opacity: 1;
+            div.add-comment-internal {
+
+              div.add-comment {
+                width: 100%;
+              }
+            }
+          }
+
+          div.emoji-picker {
+            button.emoji-button {
+              background-size: 16px 16px;
+              background-position: 50% 70%;
+              opacity: 0.7;
+
+              &:hover {
+                opacity: 1;
+              }
             }
           }
 
           div.add-comment-internal{
             position: relative;
-
-            div.add-comment {
-              width: 250px;
-
-              &.show-buttons {
-                width: 100%;
-              }
-            }
           }
         }
       }

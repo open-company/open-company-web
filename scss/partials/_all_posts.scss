@@ -1,5 +1,5 @@
 div.all-posts {
-  width: 895px;
+  width: 932px;
   margin-left: 16px;
 
   @include mobile() {
@@ -9,7 +9,6 @@ div.all-posts {
 
   div.all-posts-cards {
     float: left;
-    width: 617px;
 
     @include mobile() {
       width: 100%;
@@ -68,7 +67,6 @@ div.all-posts {
       }
 
       div.activity-card.all-posts-card {
-        width: 617px;
         max-height: initial;
         margin: 0px 0px 20px 0px;
 

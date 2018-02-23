@@ -60,7 +60,12 @@
         ; Comments count
         [:div.is-comments-summary
           {:class (str "comments-count-" (:uuid entry-data))}
-          (str comments-count " comment" (when (or (zero? comments-count) (> comments-count 1)) "s"))]])))
+          (str comments-count
+            (when-not (responsive/is-mobile-size?)
+              (str
+               " comment"
+               (when (or (zero? comments-count) (> comments-count 1))
+                 "s"))))]])))
 
 (rum/defcs interactions-summary < rum/static
   [s entry-data show-zero-comments?]

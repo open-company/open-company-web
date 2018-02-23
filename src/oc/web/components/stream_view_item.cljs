@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -157,6 +158,14 @@
                     :dismiss-cb #(reset! (::move-activity s) false)})])]))]
       [:div.stream-view-item-body.group
         [:div.stream-body-left.group
+          {:style {:padding-bottom (when-not is-mobile?
+                                     (let [initial-padding 64
+                                           attachments-num (count activity-attachments)
+                                           attachments-height (* (js/Math.ceil (/ attachments-num 2)) 65)
+                                           total-padding (+ initial-padding
+                                                          (when (pos? attachments-num)
+                                                            (+ 32 20 attachments-height)))]
+                                     (str total-padding "px")))}}
           [:span.posted-in
             {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}]
           [:div.stream-item-headline
@@ -169,17 +178,17 @@
             [:button.mlb-reset.expand-button
               {:on-click #(reset! (::expanded s) true)}
               "Continue reading"]]
+          (stream-view-attachments activity-attachments)
           (when (and is-mobile?
                      @(::mobile-show-comments s))
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (rum/with-key (stream-comments activity-data comments-data)
-               (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
+              (stream-comments activity-data comments-data)
               (add-comment activity-data)])
-          (stream-view-attachments activity-data)
           [:div.stream-item-reactions.group
-            (when-not @(::mobile-show-comments s)
-              [:div.stream-mobile-comments-summary.group
+            (when (and is-mobile?
+                       (not @(::mobile-show-comments s)))
+              [:div.stream-mobile-comments-summary
                 {:on-click #(do
                               (utils/event-stop %)
                               (reset! (::mobile-show-comments s) true))}
