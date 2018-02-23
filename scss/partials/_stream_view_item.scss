@@ -341,13 +341,14 @@ div.stream-view-item {
         div.add-comment-box {
 
           &.show-buttons {
+            div.emoji-picker {
+              top: unset;
+              bottom: 9px;
+              right: 60px;
+              left: unset;
+            }
+
             div.add-comment-internal {
-              div.emoji-picker {
-                top: unset;
-                bottom: 9px;
-                right: 60px;
-                left: unset;
-              }
 
               div.add-comment {
                 width: 100%;
@@ -355,13 +356,15 @@ div.stream-view-item {
             }
           }
 
-          button.emoji-button {
-            background-size: 16px 16px;
-            background-position: 50% 70%;
-            opacity: 0.7;
+          div.emoji-picker {
+            button.emoji-button {
+              background-size: 16px 16px;
+              background-position: 50% 70%;
+              opacity: 0.7;
 
-            &:hover {
-              opacity: 1;
+              &:hover {
+                opacity: 1;
+              }
             }
           }
 
