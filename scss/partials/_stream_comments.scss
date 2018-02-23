@@ -142,12 +142,20 @@ div.stream-comments {
             }
           }
 
-          &.reacted.can-react:hover div.stream-comment-reaction-icon {
-            background-image: cdnUrl("/img/ML/comment_agree_on_hover.svg");
+          &.reacted.can-react:hover {
+            color: $deep_navy;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_on_hover.svg");
+            }
           }
 
-          &.can-react:hover div.stream-comment-reaction-icon {
-            background-image: cdnUrl("/img/ML/comment_agree_off_hover.svg");
+          &.can-react:hover {
+            color: $carrot_green;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_off_hover.svg");
+            }
           }
 
           div.stream-comment-reaction-icon {
