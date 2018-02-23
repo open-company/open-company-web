@@ -36,8 +36,7 @@
           [:div.stream-comments-title
             (str (count comments-data) " Response" (when (> (count comments-data) 1) "s"))])
         (if (pos? (count comments-data))
-          (for [comment-data sorted-comments
-                :let [read-only-reaction (cu/is-own-comment? comment-data)]]
+          (for [comment-data sorted-comments]
             [:div.stream-comment
               {:key (str "stream-comment-" (:created-at comment-data))}
               [:div.stream-comment-header.group
@@ -53,8 +52,7 @@
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))}]]
               [:div.stream-comment-footer.group
                 (let [reaction-data (first (:reactions comment-data))
-                      can-react? (and (not read-only-reaction)
-                                      (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"]))]
+                      can-react? (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"])]
                   (when (or can-react?
                             (pos? (:count reaction-data)))
                     [:div.stream-comment-reaction
