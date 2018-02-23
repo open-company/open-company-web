@@ -85,7 +85,6 @@ div.add-comment-box-container {
         white-space: pre-wrap;
         word-wrap: break-word;
         padding-right: 32px;
-        padding-top: 4px;
 
         &.medium-editor-placeholder:after {
           @include avenir_M();
@@ -95,7 +94,6 @@ div.add-comment-box-container {
         @include mobile() {
           width: 100%;
           resize: vertical;
-          padding-top: 1px;
           padding-right: 0px;
         }
 
