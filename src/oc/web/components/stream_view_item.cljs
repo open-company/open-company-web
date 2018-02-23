@@ -186,7 +186,8 @@
                (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
               (add-comment activity-data)])
           [:div.stream-item-reactions.group
-            (when-not @(::mobile-show-comments s)
+            (when (and is-mobile?
+                       (not @(::mobile-show-comments s)))
               [:div.stream-mobile-comments-summary
                 {:on-click #(do
                               (utils/event-stop %)
