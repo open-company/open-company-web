@@ -66,10 +66,7 @@
               (str
                "When it’s this easy to see what matters "
                "most, busy teams stay informed and "
-               "aligned with fewer distractions.")]
-            [:p
-              (str
-               "- The Carrot team")]]
+               "aligned with fewer distractions.")]]
 
           [:div.team-container
             [:div.team-row.group.three-cards
