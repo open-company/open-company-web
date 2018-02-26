@@ -121,7 +121,7 @@
       [:div.card.card-4
         [:div.card-icon]
         [:div.card-title
-          "Stay aligned"]
+          "Stay informed and aligned"]
         [:div.card-content
           (str
             "Get up to speed quickly with the "
@@ -260,7 +260,7 @@
         [:div.stay-aligned-container
           [:div.stay-aligned-icon]
           [:div.stay-aligned-message
-            "Stay aligned around the topics that matter."]]
+            "Your company digest keeps everyone informed and aligned."]]
 
         carrot-cards]
 
