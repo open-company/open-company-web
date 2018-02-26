@@ -104,14 +104,15 @@
                         (rum/local nil ::window-click)
                         (rum/local false ::search-clicked?)
                         {:after-render (fn [s]
-                                         (when (and
-                                                (pos?
-                                                 (count @store/savedsearch))
-                                                (not
-                                                 @(::search-clicked? s)))
-                                           (.focus
-                                            (rum/ref-node s "search-input")))
-                                         s)
+                          (let [search-input (rum/ref-node s "search-input")]
+                            (when (and
+                                   (pos?
+                                    (count @store/savedsearch))
+                                   (not
+                                    @(::search-clicked? s)))
+                              (set! (.-value search-input) (store/saved-search))
+                              (.focus search-input)))
+                            s)
                          :will-mount (fn [s]
                           (search/inactive)
                           (reset! (::window-click s)
@@ -141,19 +142,16 @@
           {:class (when (not @(::search-clicked? s)) "inactive")
            :ref "search-input"
            :placeholder (when-not (responsive/is-mobile-size?) "Search")
-           :value @store/savedsearch
            :on-click #(reset! (::search-clicked? s) true)
            :on-blur #(when (responsive/is-mobile-size?)
-                       (set! (.-placehoder (rum/ref-node s "search-input")) ""))
-           :on-focus #(let [search-input (rum/ref-node s "search-input")
+                       (set! (.-placehoder (.-target %)) ""))
+           :on-focus #(let [search-input (.-target %)
                             search-query (.-value search-input)]
                         (reset! (::search-clicked? s) true)
                         (when (and (responsive/is-mobile-size?) (zero? (count search-query)))
                           (set! (.-placeholder search-input) "Search"))
                         (search/query search-query))
-           :on-key-down #(when (= "Enter" (.-key %)) (.preventDefault %))
-           :on-change #(search/query
-                        (.-value (rum/ref-node s "search-input")))
+           :on-change #(search/query (.-value (.-target %)))
            }]
        [:div.triangle {:class (when-not search-active? "inactive")}]
        (when-not (responsive/is-mobile-size?)(search-results-view))])))

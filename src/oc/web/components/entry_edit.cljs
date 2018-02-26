@@ -49,7 +49,7 @@
   (let [entry-editing @(drv/get-ref s :entry-editing)
         body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerText body-el)))]
+                      (utils/clean-body-html (.-innerHTML body-el)))]
     (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body)))
 
 (defn save-on-exit?
@@ -291,10 +291,7 @@
         published? (= (:status entry-editing) "published")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})
-       :on-click #(when (and (not (:has-changes entry-editing))
-                             (not (utils/event-inside? % (rum/ref-node s "entry-edit-modal"))))
-                    (cancel-clicked s))}
+                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.entry-edit-modal-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(cancel-clicked s)}]
@@ -411,21 +408,26 @@
                                (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
                :dangerouslySetInnerHTML @(::initial-headline s)}]
             (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker false
+                               :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
                                :initial-body @(::initial-body s)
                                :show-placeholder (not (contains? entry-editing :links))
                                :show-h2 true
                                :dispatch-input-key :entry-editing
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video" "chart" "attachment"]
+                               :media-config ["photo" "video" "attachment"]
                                :classes "emoji-autocomplete emojiable"})
             [:div.entry-edit-controls-right]
             ; Bottom controls
             [:div.entry-edit-controls.group]]
           [:div.entry-edit-modal-footer
+            [:div.entry-edit-footer-multi-picker
+              {:id "entry-edit-footer-multi-picker"}]
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 20
                            :height 20
+                           :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                            :container-selector "div.entry-edit-modal"})
             [:div.entry-edit-legend-container
               {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))

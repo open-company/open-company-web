@@ -453,8 +453,13 @@ div.entry-edit-modal-container {
           display: none;
         }
 
+        div.entry-edit-footer-multi-picker {
+          float: left;
+        }
+
         div.emoji-picker {
           float: left;
+          margin-left: 16px;
 
           button.emoji-button {
             width: 20px;
