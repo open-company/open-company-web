@@ -6,6 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
+            [oc.web.actions.reaction :as reaction-actions]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]
@@ -101,13 +102,12 @@
                                           (not (js/isIE)))
                                  ;;TODO: animate reaction
                                  )
-                               (dis/dispatch! [:activity-reaction-toggle entry-data r (not reacted)])))}
+                               (reaction-actions/reaction-toggle entry-data r (not reacted))))}
                 [:span.reaction
                   {:class (when (pos? (:count r)) "has-count")}
                   (:reaction r)]
                 [:div.count
-                  (when (pos? (:count r))
-                    (:count r))]]))
+                  (:count r)]]))
           (when should-show-picker?
             [:button.reaction-btn.btn-reset.can-react.reaction-picker
               {:key (str "reaction-" (:uuid entry-data) "-picker")
@@ -125,5 +125,5 @@
               {:native true
                :onClick (fn [emoji event]
                           (when (can-pick-reaction (gobj/get emoji "native") reactions-data)
-                            (dis/dispatch! [:react-from-picker entry-data (gobj/get emoji "native")]))
+                            (reaction-actions/react-from-picker entry-data (gobj/get emoji "native")))
                           (reset! (::show-picker s) false))}))]])))
