@@ -50,9 +50,6 @@
          (not container-node)
          (not (.contains container-node active-element))))))
 
-(defn preload-url []
-  (.backgroundImageFn (.-defaultProps (.-Emoji js/EmojiMart)) "apple" 64))
-
 ;; ===== D3 Chart Component =====
 
 ;; Render an emoji button that reveal a picker for emoji.
@@ -139,7 +136,7 @@
                                                 @caret-pos)
                                             (not @visible))]
                                (reset! visible vis)))}]
-     (if @visible
+     (when @visible
        [:div.picker-container
          {:class (utils/class-set {position true
                                    :preloading (not @(::preloaded s))
@@ -159,5 +156,4 @@
                              (.focus @last-active-element))
                            (reset! visible false)
                            (when (fn? add-emoji-cb)
-                             (add-emoji-cb @last-active-element emoji add-emoji?))))}))]
-       [:img {:src (preload-url) :style {:display "none"}}])]))
+                             (add-emoji-cb @last-active-element emoji add-emoji?))))}))])]))
