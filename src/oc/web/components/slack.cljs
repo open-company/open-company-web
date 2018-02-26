@@ -78,8 +78,8 @@
 
             [:div.slack-subline
               (str
-                "Focused communication that keeps teams "
-                "aligned without interruptions.")]
+               "Slack keeps your team connected in the moment. "
+               "Carrot keeps it aligned over time.")]
 
             (get-started-button auth-settings true)
 
@@ -92,9 +92,10 @@
                 "Designed for Slack"]
               [:div.designed-for-content
                 (str
-                 "Slack is fun and awesome for real-time work, but gets noisy. "
-                 "With Carrot, leaders rise above the noise "
-                 "to keep everyone on the same page.")]]
+                 "Slack is fun and awesome for real-time work, "
+                 "but gets noisy. With Carrot, what matters most "
+                 "rises above the noise to keep everyone "
+                 "on the same page.")]]
 
             shared-misc/carrot-cards]
 
@@ -103,9 +104,7 @@
           (when-not (jwt/jwt)
             [:section.third-section
               [:div.third-section-title
-                (str
-                 "Slack keeps your team connected in the moment. "
-                 "Carrot keeps it aligned over time.")]
+                "Keep everyone aligned around what matters most."]
               (get-started-button auth-settings)])
 
           ]]

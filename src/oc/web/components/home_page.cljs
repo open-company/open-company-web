@@ -83,7 +83,7 @@
           [:div.stay-aligned-container
             [:div.stay-aligned-icon]
             [:div.stay-aligned-message
-              "Stay aligned around the topics that matter."]]
+              "Your company digest keeps everyone informed and aligned."]]
 
           shared-misc/carrot-cards]
 
