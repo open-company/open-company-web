@@ -249,11 +249,13 @@
                                       (real-close s)
                                       (utils/after
                                        180
-                                       #(let [from-ap (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
+                                       #(let [from-ap (or (:from-all-posts @router/path)
+                                                       (= (router/current-board-slug) "all-posts"))]
                                           (router/nav!
                                             (if from-ap
                                               (oc-urls/all-posts (router/current-org-slug))
-                                              (oc-urls/board (router/current-org-slug) (:board-slug entry-editing))))))))))))
+                                              (oc-urls/board (router/current-org-slug)
+                                               (:board-slug entry-editing))))))))))))
                           s)
                          :after-render  (fn [s] (should-show-divider-line s) s)
                          :will-unmount (fn [s]

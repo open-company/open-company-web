@@ -266,7 +266,8 @@
                              (reset! (::scroll-bottom-after-render s) false))
                            (.data comments-internal-scroll "lastScrollTop" (.scrollTop comments-internal-scroll))))}
             (for [c sorted-comments]
-              (rum/with-key (comment-row activity-data c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
+              (rum/with-key (comment-row activity-data c)
+               (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
             [:div.bottom-gradient.bottom-left]
             [:div.line-bottom-gradient]
             [:div.bottom-gradient.bottom-right]]

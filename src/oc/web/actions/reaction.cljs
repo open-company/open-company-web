@@ -7,7 +7,8 @@
             [oc.web.lib.json :refer (json->cljs)]))
 
 (defn react-from-picker [activity-data emoji]
-  (dis/dispatch! [:handle-reaction-to-entry activity-data {:reaction emoji :count 1 :reacted true :links [] :authors []}])
+  (dis/dispatch! [:handle-reaction-to-entry activity-data
+   {:reaction emoji :count 1 :reacted true :links [] :authors []}])
   (when (and emoji
              (utils/link-for (:links activity-data) "react"))
     (api/react-from-picker activity-data emoji
