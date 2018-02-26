@@ -67,10 +67,9 @@
      (entry-point-get-finished success body
        (fn [orgs collection]
          (if org-slug
-           (do
-             (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-               (api/get-org org-data)
-               (router/redirect-404!)))
+           (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+             (api/get-org org-data)
+             (router/redirect-404!))
            (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
@@ -176,14 +175,13 @@
       (do
         (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
         (api/get-entry-point entry-point-get-finished))
-      (do
-        (api/get-entry-point
-         (fn [success body]
-           (entry-point-get-finished success body
-             (fn [orgs collection]
-               (if (zero? (count orgs))
-                 (router/nav! oc-urls/sign-up-team)
-                 (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
+      (api/get-entry-point
+       (fn [success body]
+         (entry-point-get-finished success body
+           (fn [orgs collection]
+             (if (zero? (count orgs))
+               (router/nav! oc-urls/sign-up-team)
+               (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
