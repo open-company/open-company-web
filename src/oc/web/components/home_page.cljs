@@ -83,7 +83,7 @@
           [:div.stay-aligned-container
             [:div.stay-aligned-icon]
             [:div.stay-aligned-message
-              "Your company digest keeps everyone informed and aligned."]]
+              "Rise above the noise."]]
 
           shared-misc/carrot-cards]
 
