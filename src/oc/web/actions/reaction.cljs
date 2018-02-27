@@ -9,10 +9,14 @@
 (defn react-from-picker [activity-data emoji]
   (dis/dispatch! [:handle-reaction-to-entry activity-data
    {:reaction emoji :count 1 :reacted true :links [] :authors []}])
+  ;; Some times emoji.native coming from EmojiMart is null
+  ;; so we need to avoid posting empty emojis
   (when (and emoji
              (utils/link-for (:links activity-data) "react"))
     (api/react-from-picker activity-data emoji
       (fn [{:keys [status success body]}]
+        ;; Refresh the full entry after the reaction finished
+        ;; in the meantime update the local state with the result.
         (api/get-entry activity-data)
         (dis/dispatch!
          [:react-from-picker/finish
