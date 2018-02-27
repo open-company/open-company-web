@@ -49,7 +49,7 @@
                          rum/reactive
                          (drv/drv :current-user-data)
   [s {:keys [classes click-cb disable-menu]}]
-  (let [not-mobile? (not (responsive/is-mobile-size?))]
+  (let [not-mobile? (not (responsive/is-tablet-or-mobile?))]
     [:button.user-avatar-button.group
       {:type "button"
        :class (str classes)
@@ -58,4 +58,4 @@
        :on-click (when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image (drv/react s :current-user-data))]))
+      (user-avatar-image (drv/react s :current-user-data) not-mobile?)]))
