@@ -125,5 +125,5 @@
                {:native true
                 :onClick (fn [emoji event]
                            (when (can-pick-reaction (gobj/get emoji "native") reactions-data)
-                             (dis/dispatch! [:react-from-picker entry-data (gobj/get emoji "native")]))
+                             (reaction-actions/react-from-picker entry-data (gobj/get emoji "native")))
                            (reset! (::show-picker s) false))}))])])))
