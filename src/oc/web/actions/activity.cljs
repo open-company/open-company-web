@@ -67,10 +67,7 @@
 
 (defn activity-edit
   [activity-data]
-  (if (or (responsive/is-tablet-or-mobile?)
-          (not= (:status activity-data) "published"))
-    (load-cached-item activity-data :entry-editing)
-    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate])))))
+  (load-cached-item activity-data :entry-editing))
 
 (defn entry-edit-dismiss
   []
