@@ -7,8 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.components.reactions :as reactions]
-            [oc.web.actions.comment :as comment-actions]
-            [cljsjs.web-animations]))
+            [oc.web.actions.comment :as comment-actions]))
 
 (rum/defcs comment-reactions
   [s activity-data item-data]
@@ -32,11 +31,6 @@
                                     :can-react (not read-only-reaction)})
            :on-click (fn [e]
                        (when (and (not is-loading) (not read-only-reaction))
-                         (when (and (not (:reacted r))
-                                    (not (js/isSafari))
-                                    (not (js/isEdge))
-                                    (not (js/isIE)))
-                           (reactions/animate-reaction e s))
                          (comment-actions/comment-reaction-toggle activity-data item-data r (not reacted))))}
           [:div.reaction
             {:class (utils/class-set {:no-reactions (not (pos? (:count r)))})}
