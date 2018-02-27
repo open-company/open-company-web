@@ -40,9 +40,7 @@
 
           [:h1.about "About us"]
           [:div.about-subline
-            (str
-             "Carrot is a company digest that keeps busy teams "
-             "informed and aligned with less noise.")]
+            "We believe real transparency and alignment requires focused communication."]
           [:div.about-copy
             [:p
               (str
@@ -68,10 +66,7 @@
               (str
                "When it’s this easy to see what matters "
                "most, busy teams stay informed and "
-               "aligned with less noise.")]
-            [:p
-              (str
-               "- The Carrot team")]]
+               "aligned with fewer distractions.")]]
 
           [:div.team-container
             [:div.team-row.group.three-cards

@@ -19,11 +19,23 @@ div.dashboard-layout {
       background-color: $oc_gray_8;
       position: relative;
 
+      @include mobile() {
+        width: 100%;
+      }
+
       &.all-posts-container {
         width: 948px;
 
+        @include mobile() {
+          width: 100%;
+        }
+
         div.board-name-container {
           padding: 0px 0px 0px 12px;
+
+          @include mobile() {
+            padding: 0px;
+          }
         }
       }
 

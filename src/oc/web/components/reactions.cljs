@@ -6,32 +6,13 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
-            [cljsjs.web-animations]
+            [oc.web.actions.reaction :as reaction-actions]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]))
-
-(defn animate-reaction [e s]
-  (when-let* [target (.-currentTarget e)
-              span-reaction (sel1 target :span.reaction)]
-    (doseq [i (range 5)]
-      (let [cloned-el (.cloneNode span-reaction true)
-            translate-y {:transform #js ["translateY(0px)" "translateY(-80px)"]
-                         :opacity #js [1 0]}
-            v (+ 7 (* 3 (int (rand 4))))]
-        (set! (.-opacity (.-style cloned-el)) 0)
-        (set! (.-position (.-style cloned-el)) "absolute")
-        (set! (.-left (.-style cloned-el)) (str v "px"))
-        (set! (.-top (.-style cloned-el)) "2px")
-        (.appendChild (.-parentElement span-reaction) cloned-el)
-        (.animate
-         cloned-el
-         (clj->js translate-y)
-         (clj->js {:duration 800 :delay (* 150 i) :fill "forwards" :easing "ease-out"}))
-        (utils/after (+ 800 200 (* 4 150)) #(.removeChild (.-parentNode cloned-el) cloned-el))))))
 
 (defn can-pick-reaction
   "Given an emoji and the list of the current reactions
@@ -119,23 +100,22 @@
                                           (not (js/isSafari))
                                           (not (js/isEdge))
                                           (not (js/isIE)))
-                                 (animate-reaction e s))
-                               (dis/dispatch! [:activity-reaction-toggle entry-data r (not reacted)])))}
+                                 ;;TODO: animate reaction
+                                 )
+                               (reaction-actions/reaction-toggle entry-data r (not reacted))))}
                 [:span.reaction
                   {:class (when (pos? (:count r)) "has-count")}
                   (:reaction r)]
                 [:div.count
-                  (when (pos? (:count r))
-                    (:count r))]]))
+                  (:count r)]]))
           (when should-show-picker?
             [:button.reaction-btn.btn-reset.can-react.reaction-picker
               {:key (str "reaction-" (:uuid entry-data) "-picker")
                :on-click #(reset! (::show-picker s) (not @(::show-picker s)))}
-              [:span.reaction "😀"]
+              [:span.reaction]
               [:div.count "+"]])]
        (when @(::show-picker s)
          [:div.reactions-picker-container
-           {:class (utils/class-set {:visible @(::show-picker s)})}
            (when (responsive/is-tablet-or-mobile?)
              [:button.mlb-reset.dismiss-mobile-picker
                {:on-click #(reset! (::show-picker s) false)}

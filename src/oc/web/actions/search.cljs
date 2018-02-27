@@ -31,5 +31,3 @@
 (defn result-clicked [url]
   (dispatcher/dispatch! [:search-result-clicked])
   (utils/after 10 (router/nav! url)))
-
-

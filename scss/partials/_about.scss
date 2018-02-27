@@ -104,7 +104,7 @@ div#wrap {
           background-size: 135px 135px;
           width: 135px;
           height: 135px;
-          top: 1557px;
+          top: 1587px;
           left: 50%;
           margin-left: 226px;
         }
@@ -114,7 +114,7 @@ div#wrap {
           background-size: 50px 44px;
           width: 50px;
           height: 44px;
-          top: 1639px;
+          top: 1669px;
           left: 50%;
           margin-left: 340px;
           transform: rotate(90deg);
@@ -151,10 +151,10 @@ div#wrap {
       }
 
       div.about-subline {
-        @include avenir_R();
-        font-size: 24px;
-        color: rgba($carrot_light_gray_3, 0.8);
-        max-width: 480px;
+        @include avenir_M();
+        font-size: 34px;
+        color: $deep_navy;
+        max-width: 700px;
         margin: 6px auto 32px;
 
         @include tablet(){
@@ -312,7 +312,7 @@ div#wrap {
 
         div.other-card {
           margin-left: 40px;
-          background-color: transparent;
+          background-color: $oc_gray_8;
           border-radius: 8px;
           border: 1px solid #EAE9E4;
           padding: 40px;
@@ -320,6 +320,8 @@ div#wrap {
           width: 450px;
           height: 296px;
           display: inline-block;
+          position: relative;
+          z-index: 2;
 
           @include tablet() {
             display: block;

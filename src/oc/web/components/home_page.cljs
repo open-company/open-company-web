@@ -83,7 +83,7 @@
           [:div.stay-aligned-container
             [:div.stay-aligned-icon]
             [:div.stay-aligned-message
-              "Stay aligned around the topics that matter."]]
+              "Rise above the noise."]]
 
           shared-misc/carrot-cards]
 
