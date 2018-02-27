@@ -8,9 +8,18 @@ div.fullscreen-post-container {
   z-index: #{$navbar_zindex + 100};
   overflow-y: auto;
   height: 100vh;
+  transition: opacity 180ms ease-in;
 
   @include mobile() {
     width: 100%;
+  }
+
+  &.will-appear {
+    opacity: 0;
+  }
+
+  &.appear {
+    opacity: 1;
   }
 
   div.fullscreen-post-header {
