@@ -78,12 +78,33 @@ div#wrap {
           right: 184px;
         }
 
+        &.big-purple {
+          @include image-2x("/img/ML/balloon_big_purple");
+          background-size: 201px 172px;
+          width: 201px;
+          height: 172px;
+          top: 926px;
+          left: 50%;
+          margin-left: -557px;
+          transform: rotate(210deg);
+        }
+
+        &.small-yellow {
+          @include image-2x("/img/ML/balloon_small_yellow");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 893px;
+          left: 50%;
+          margin-left: -512px;
+        }
+
         &.big-yellow {
           @include image-2x("/img/ML/balloon_big_yellow_1");
           background-size: 135px 135px;
           width: 135px;
           height: 135px;
-          top: 787px;
+          top: 1587px;
           left: 50%;
           margin-left: 226px;
         }
@@ -93,7 +114,7 @@ div#wrap {
           background-size: 50px 44px;
           width: 50px;
           height: 44px;
-          top: 869px;
+          top: 1669px;
           left: 50%;
           margin-left: 340px;
           transform: rotate(90deg);
@@ -104,7 +125,7 @@ div#wrap {
           background-size: 17px 15px;
           width: 17px;
           height: 15px;
-          top: 1298px;
+          top: 2068px;
           left: 50%;
           margin-left: -556px;
         }
@@ -114,7 +135,7 @@ div#wrap {
           background-size: 47px 48px;
           width: 47px;
           height: 48px;
-          top: 1332px;
+          top: 2102px;
           left: 50%;
           margin-left: -539px;
         }
@@ -130,16 +151,48 @@ div#wrap {
       }
 
       div.about-subline {
-        @include avenir_R();
-        font-size: 24px;
-        color: rgba($carrot_light_gray_3, 0.8);
-        max-width: 660px;
-        margin: 6px auto 60px;
+        @include avenir_M();
+        font-size: 34px;
+        color: $deep_navy;
+        max-width: 700px;
+        margin: 6px auto 32px;
 
         @include tablet(){
           width: 100%;
-          margin: 16px auto 0;
-          padding: 0 16px;
+          margin: 16px auto 32px;
+          padding: 0;
+        }
+      }
+
+      div.about-copy {
+        width: 940px;
+        margin: 60px auto;
+        background-color: white;
+        box-shadow: 0px 4px 6px 0px rgba(black, 0.12);
+        border-radius: 8px;
+        padding: 80px 120px;
+        position: relative;
+        z-index: 1;
+
+        @include tablet() {
+          margin: 80px auto;
+          width: 100%;
+          padding: 32px 40px;
+        }
+
+        p {
+          @include avenir_R();
+          font-size: 24px;
+          color: $deep_navy;
+          text-align: left;
+
+          @include tablet() {
+            font-size: 20px;
+          }
+
+          &:not(:last-child) {
+            margin-bottom: 32px;
+          }
         }
       }
 
@@ -155,7 +208,6 @@ div#wrap {
 
           @include tablet() {
             width: 100%;
-            max-width: 300px;
           }
 
           &.two-cards {
@@ -163,7 +215,6 @@ div#wrap {
 
             @include tablet() {
               width: 100%;
-              max-width: 300px;
             }
           }
 
@@ -179,11 +230,11 @@ div#wrap {
             height: 252px;
             position: relative;
             z-index: 2;
+            border-radius: 8px;
 
             @include tablet() {
               display: block;
               width: 100%;
-              max-width: 300px;
               margin-left: 0px;
               margin-top: 20px;
             }
@@ -257,12 +308,11 @@ div#wrap {
         @include tablet() {
           margin: 40px auto;
           width: 100%;
-          max-width: 300px;
         }
 
         div.other-card {
           margin-left: 40px;
-          background-color: transparent;
+          background-color: $oc_gray_8;
           border-radius: 8px;
           border: 1px solid #EAE9E4;
           padding: 40px;
@@ -270,13 +320,14 @@ div#wrap {
           width: 450px;
           height: 296px;
           display: inline-block;
+          position: relative;
+          z-index: 2;
 
           @include tablet() {
             display: block;
             margin-left: 0px;
             height: auto;
             width: 100%;
-            max-width: 300px;
             margin-top: 20px;
           }
 

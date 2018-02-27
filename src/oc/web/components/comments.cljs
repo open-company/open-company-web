@@ -245,36 +245,33 @@
                             (:comments activity-data))
         add-comment-focus (drv/react s :add-comment-focus)
         show-loading (show-loading? s)]
-    (if show-loading
-      [:div.comments.loading
+    [:div.comments
+      [:div.top-gradient.top-left]
+      [:div.line-top-gradient]
+      [:div.top-gradient.top-right]
+      [:div.comments-internal
+        {:class (utils/class-set {:add-comment-focus add-comment-focus
+                                  :empty (zero? (count sorted-comments))})}
         [:div.vertical-line]
-        (small-loading {:class "small-loading"})]
-      [:div.comments
-        [:div.top-gradient.top-left]
-        [:div.line-top-gradient]
-        [:div.top-gradient.top-right]
-        [:div.comments-internal
-          {:class (utils/class-set {:add-comment-focus add-comment-focus
-                                    :empty (zero? (count sorted-comments))})}
-          [:div.vertical-line]
-          (if (pos? (count sorted-comments))
-            [:div.comments-internal-scroll
-             {:ref "comments-internal-scroll"
-              :on-scroll (fn [e]
-                           (let [comments-internal-scroll (js/$ ".comments-internal-scroll")]
-                             ;; when a user scrolls up,
-                             ;; turn off the scroll to bottom after render
-                             (when (and (> (.data comments-internal-scroll "lastScrollTop")
-                                           (.scrollTop comments-internal-scroll))
-                                        @(::scroll-bottom-after-render s))
-                               (reset! (::scroll-bottom-after-render s) false))
-                             (.data comments-internal-scroll "lastScrollTop" (.scrollTop comments-internal-scroll))))}
-              (for [c sorted-comments]
-                (rum/with-key (comment-row activity-data c) (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
-              [:div.bottom-gradient.bottom-left]
-              [:div.line-bottom-gradient]
-              [:div.bottom-gradient.bottom-right]]
-            [:div.comments-internal-empty
-              [:div.no-comments-placeholder]
-              [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]])
-          (add-comment activity-data)]])))
+        (if (pos? (count sorted-comments))
+          [:div.comments-internal-scroll
+           {:ref "comments-internal-scroll"
+            :on-scroll (fn [e]
+                         (let [comments-internal-scroll (js/$ ".comments-internal-scroll")]
+                           ;; when a user scrolls up,
+                           ;; turn off the scroll to bottom after render
+                           (when (and (> (.data comments-internal-scroll "lastScrollTop")
+                                         (.scrollTop comments-internal-scroll))
+                                      @(::scroll-bottom-after-render s))
+                             (reset! (::scroll-bottom-after-render s) false))
+                           (.data comments-internal-scroll "lastScrollTop" (.scrollTop comments-internal-scroll))))}
+            (for [c sorted-comments]
+              (rum/with-key (comment-row activity-data c)
+               (str "activity-" (:uuid activity-data) "-comment-" (:created-at c))))
+            [:div.bottom-gradient.bottom-left]
+            [:div.line-bottom-gradient]
+            [:div.bottom-gradient.bottom-right]]
+          [:div.comments-internal-empty
+            [:div.no-comments-placeholder]
+            [:div.no-comments-message "No comments yet. Jump in and let everyone know what you think!"]])
+        (add-comment activity-data)]]))

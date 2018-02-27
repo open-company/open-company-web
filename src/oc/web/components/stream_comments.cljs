@@ -13,10 +13,7 @@
                              (drv/drv :add-comment-focus)
                              (rum/local false ::bottom-gradient)
                              (rum/local false ::last-focused-state)
-                             {:did-mount (fn [s]
-                               (scroll-to-bottom s)
-                               s)
-                              :after-render (fn [s]
+                             {:after-render (fn [s]
                                (let [scrolling-node (rum/ref-node s "stream-comments-inner")
                                      scrolls (> (.-scrollHeight scrolling-node) (.-clientHeight scrolling-node))]
                                  (compare-and-set! (::bottom-gradient s) (not scrolls) scrolls))
@@ -35,9 +32,11 @@
       {:class (utils/class-set {:bottom-gradient @(::bottom-gradient s)})}
       [:div.stream-comments-inner
         {:ref "stream-comments-inner"}
+        (when (pos? (count comments-data))
+          [:div.stream-comments-title
+            (str (count comments-data) " Response" (when (> (count comments-data) 1) "s"))])
         (if (pos? (count comments-data))
-          (for [comment-data sorted-comments
-                :let [read-only-reaction (cu/is-own-comment? comment-data)]]
+          (for [comment-data sorted-comments]
             [:div.stream-comment
               {:key (str "stream-comment-" (:created-at comment-data))}
               [:div.stream-comment-header.group
@@ -53,8 +52,7 @@
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))}]]
               [:div.stream-comment-footer.group
                 (let [reaction-data (first (:reactions comment-data))
-                      can-react? (and (not read-only-reaction)
-                                      (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"]))]
+                      can-react? (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"])]
                   (when (or can-react?
                             (pos? (:count reaction-data)))
                     [:div.stream-comment-reaction
@@ -63,8 +61,8 @@
                         (when (or (pos? (:count reaction-data))
                                   can-react?)
                           [:div.stream-comment-reaction-icon
-                            {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data reaction-data
-                              (not (:reacted reaction-data)))}])
+                            {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
+                              reaction-data (not (:reacted reaction-data)))}])
                         (when (pos? (:count reaction-data))
                           [:div.stream-comment-reaction-count
                             (:count reaction-data)])]))]])

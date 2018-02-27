@@ -20,7 +20,6 @@
             [cuerdas.core :as s]
             [cljsjs.emojione] ; pulled in for cljsjs externs
             [defun.core :refer (defun)]
-            [cljsjs.web-animations]
             [cljs.reader :as reader])
   (:import  [goog.i18n NumberFormat]))
 
@@ -834,25 +833,6 @@
     (let [component (:rum/react-component s)]
       (js/ReactDOM.findDOMNode component))))
 
-(defn pulse-animation [el]
-  (.animate el
-    #js {:transform #js ["scale(1)" "scale(1.5)" "scale(2)" "scale(1.5)" "scale(1)"]}
-    #js {:fill "forwards"
-         :duration 500
-         :iterations 3}))
-
-(defn pulse-reaction-count
-  [activity-uuid reaction]
-  (let [selector (str "div.reaction-" activity-uuid "-" reaction)]
-    (when-let [el (sel1 [(keyword selector)])]
-      (pulse-animation el))))
-
-(defn pulse-comments-count
-  [activity-uuid]
-  (let [selector (str "div.comments-count-" activity-uuid )]
-    (when-let [el (sel1 [(keyword selector)])]
-      (pulse-animation el))))
-
 (defn cdn [img-src & [no-deploy-folder]]
   (let [use-cdn? (empty? ls/cdn-url)
         cdn (if use-cdn? "" (str "/" ls/cdn-url))
@@ -1023,10 +1003,12 @@
 
 ;; Get the board to show counting the last accessed and the last created
 
-(def default-board "welcome")
+(def default-board "all-posts")
 
 (defn get-default-board [org-data]
-  (let [last-board-slug (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
+  (let [last-board-slug default-board]
+    ; Replace default-board with the following to go back to the last visited board
+    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
     (if (and (= last-board-slug "all-posts")
              (link-for (:links org-data) "activity"))
       {:slug "all-posts"}
@@ -1048,7 +1030,9 @@
 
 (defn your-boards-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
-    (if-let [board-slug (cook/get-cookie (router/last-board-cookie org-slug))]
+    (if-let [board-slug "all-posts"]
+      ;; Repalce all-posts above with the following to go back to the last visited board
+      ;; (cook/get-cookie (router/last-board-cookie org-slug))]
       (oc-urls/board org-slug board-slug)
       (oc-urls/org org-slug))
     oc-urls/login))

@@ -92,49 +92,41 @@
       [:div.card.card-1
         [:div.card-icon]
         [:div.card-title
-          (str
-           "Highlight what’s "
-           "important")]
+          "Say what’s important "]
         [:div.card-content
           (str
-            "Elevate key updates above "
-            "the noise so they won’t be "
-            "missed. It’s perfect for "
-            "distributed teams, too.")]]
+            "Space to write more "
+            "than a quick chat - like "
+            "key updates, announcements, "
+            "plans, and stories.")]]
       [:div.card.card-2
         [:div.card-icon]
         [:div.card-title
-          (str
-            "Cross-team "
-            "awareness")]
+          "Read without interruptions"]
         [:div.card-content
           (str
-            "See what's happening across "
-            "the company so teams stay "
-            "in sync.")]]
+            "Stay in sync without worrying "
+            "you missed something important "
+            "in a fast-moving conversation.")]]
       [:div.card.card-3
         [:div.card-icon]
         [:div.card-title
-          (str
-            "Focused, topic-based "
-            "conversations")]
+          "Focused, topic-based discussion"]
         [:div.card-content
           (str
-            "Capture team reactions, "
-            "comments and questions "
-            "together in one place.")]]]
+            "Keep team reactions, comments "
+            "and questions together in one "
+            "place for better context.")]]]
     [:div.cards-row.group
       [:div.card.card-4
         [:div.card-icon]
         [:div.card-title
-          (str
-            "The whole "
-            "story")]
+          "Stay informed and aligned"]
         [:div.card-content
           (str
-            "New employees get up to "
-            "speed quickly with the full "
-            "picture in one place.")]]
+            "Get up to speed quickly with the "
+            "full picture in one place. Perfect "
+            "for distributed teams, too.")]]
       [:div.card.card-5
         [:div.card-icon]
         [:div.card-title
@@ -153,9 +145,8 @@
             "with Slack")]
         [:div.card-content
           (str
-            "Communication is "
-            "automatically shared to the "
-            "right channel. ")
+            "Discussions are automatically "
+            "shared to the right channels. ")
           [:a
             {:href "/slack"}
             "Learn more"]]]]])
@@ -245,14 +236,10 @@
         [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Stay aligned without interruptions"]
-        [:div.subheadline.big-web-only
-          "Focused communication that keeps teams aligned"]
-        [:div.subheadline.second-line.big-web-only
-          "around what matters most."]
-        [:div.subheadline.mobile-only
+          "Better informed, less noise."]
+        [:div.subheadline
           (str
-            "Focused communication that keeps teams aligned "
+            "Your company digest keeps everyone aligned "
             "around what matters most.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
@@ -273,7 +260,7 @@
         [:div.stay-aligned-container
           [:div.stay-aligned-icon]
           [:div.stay-aligned-message
-            "Stay aligned around the topics that matter."]]
+            "Rise above the noise."]]
 
         carrot-cards]
 
@@ -366,8 +353,8 @@
 
         [:div.slack-subline
           (str
-            "Focused communication that keeps teams "
-            "aligned without interruptions.")]
+           "Slack keeps your team connected in the moment. "
+           "Carrot keeps it aligned over time.")]
 
         [:div.sigin-with-slack-container
           [:button.signin-with-slack.mlb-reset
@@ -394,9 +381,10 @@
             "Designed for Slack"]
           [:div.designed-for-content
             (str
-             "Slack is fun and awesome for real-time work, but gets noisy. "
-             "With Carrot, leaders rise above the noise "
-             "to keep everyone on the same page.")]]
+             "Slack is fun and awesome for real-time work, "
+             "but gets noisy. With Carrot, what matters most "
+             "rises above the noise to keep everyone "
+             "on the same page.")]]
 
         carrot-cards]
 
@@ -404,9 +392,7 @@
 
       [:section.third-section
         [:div.third-section-title
-          (str
-           "Slack keeps your team connected in the moment. "
-           "Carrot keeps it aligned over time.")]
+          "Keep everyone aligned around what matters most."]
         [:div.sigin-with-slack-container
           [:button.signin-with-slack.mlb-reset
             {:onClick "javascript:window.location=\"/sign-up\";"}
@@ -429,6 +415,8 @@
         [:div.balloon.small-green-face]
         [:div.balloon.small-blue]
         [:div.balloon.small-purple]
+        [:div.balloon.big-purple]
+        [:div.balloon.small-yellow]
         [:div.balloon.big-yellow]
         [:div.balloon.small-purple-1]
         [:div.balloon.small-purple-2]
@@ -436,9 +424,33 @@
 
         [:h1.about "About us"]
         [:div.about-subline
-          (str
-           "Carrot is a communication platform that inspires "
-           "transparency and team alignment.")]
+          "We believe real transparency and alignment requires focused communication."]
+        [:div.about-copy
+          [:p
+            (str
+             "Workplace chat is everywhere, and "
+             "yet teams are still struggling to "
+             "stay on the same page - especially "
+             "growing or distributed teams.")]
+          [:p
+            (str
+             "Chat might be ideal for fast and "
+             "spontaneous conversations in the moment, "
+             "but it gets noisy and drowns out "
+             "important information and follow-on "
+             "discussions that teams need to stay "
+             "aligned over time.")]
+          [:p
+            (str
+             "Carrot is a company digest that gives "
+             "everyone time to read and react to "
+             "important information without worrying "
+             "they missed it.")]
+          [:p
+            (str
+             "When it’s this easy to see what matters "
+             "most, busy teams stay informed and "
+             "aligned with fewer distractions.")]]
         [:div.team-container
           [:div.team-row.group.three-cards
             [:div.team-card.iacopo-carraro

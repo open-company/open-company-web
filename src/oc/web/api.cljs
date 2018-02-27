@@ -859,18 +859,13 @@
 
 (defn react-from-picker
   "Given the link to react with an arbitrary emoji and the emoji, post it to the interaction service"
-  [activity-data emoji]
+  [activity-data emoji callback]
   (when activity-data
     (when-let [react-link (utils/link-for (:links activity-data) "react")]
       (interaction-http (method-for-link react-link) (relative-href react-link)
         {:headers (headers-for-link react-link)
          :body emoji}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch!
-           [:react-from-picker/finish
-            {:status status
-             :activity-data activity-data
-             :reaction-data (if success (json->cljs body) {})}]))))))
+        callback))))
 
 (defn remove-user-from-private-board
   [user]

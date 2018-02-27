@@ -122,4 +122,3 @@
   (-> db
       (assoc :email-confirmed confirmed)
       (dissoc :latest-entry-point :latest-auth-settings)))
-

@@ -56,11 +56,16 @@
           (for [user-data (take 4 comments-authors)]
             [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
-              (user-avatar-image user-data true)])]
+              (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
         ; Comments count
         [:div.is-comments-summary
           {:class (str "comments-count-" (:uuid entry-data))}
-          (str comments-count " comment" (when (or (zero? comments-count) (> comments-count 1)) "s"))]])))
+          (str comments-count
+            (when-not (responsive/is-mobile-size?)
+              (str
+               " comment"
+               (when (or (zero? comments-count) (> comments-count 1))
+                 "s"))))]])))
 
 (rum/defcs interactions-summary < rum/static
   [s entry-data show-zero-comments?]

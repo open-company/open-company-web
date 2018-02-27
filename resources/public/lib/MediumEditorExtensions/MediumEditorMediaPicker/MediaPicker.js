@@ -1,6 +1,24 @@
 function log(){
   var args = Array.prototype.slice.call(arguments);
-  console.debug("MediaPicker", args);
+  console.debug("XXX MediaPicker", args);
+}
+
+function PlaceCaretAtEnd(el) {
+  el.focus();
+  if (typeof window.getSelection != "undefined"
+        && typeof document.createRange != "undefined") {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else if (typeof document.body.createTextRange != "undefined") {
+    var textRange = document.body.createTextRange();
+    textRange.moveToElementText(el);
+    textRange.collapse(false);
+    textRange.select();
+  }
 }
 
 (function (root, factory) {
@@ -29,6 +47,10 @@ function log(){
     mediaButtonsContainer: undefined,
     /* Contains the picker buttons */
     pickerButtons: [],
+    /* Use inline plus button */
+    useInlinePlusButton: true,
+    /* Selector to identify the click that needs save the caret position */
+    saveSelectionClickElementId: undefined,
     /* Contains the picker buttons */
     options: {buttons: ['entry', 'photo', 'video', 'chart', 'attachment', 'divider-line'],
               delegateMethods: {}},
@@ -37,7 +59,6 @@ function log(){
     _waitingCB: false,
 
     constructor: function (options) {
-      log("constructor", options);
       if (options) {
         this.options = options;
       }
@@ -45,21 +66,25 @@ function log(){
     },
 
     init: function(){
-      log("init", this);
       rangy.init();
       // Create picker
-      this.pickerElement = this.createPicker();
-      this.getEditorElements()[0].parentNode.appendChild(this.pickerElement);
-      // Events
+      if (this.useInlinePlusButton) {
+        this.pickerElement = this.createPicker();
+        this.getEditorElements()[0].parentNode.appendChild(this.pickerElement);
+      }
+      // Picker button events
       var that = this;
       this.getEditorElements().forEach(function(element){
-        that.on(element, 'click', that.togglePicker.bind(that));
-        that.on(element, 'keyup', that.togglePicker.bind(that));
+        if (this.useInlinePlusButton) {
+          that.on(element, 'click', that.togglePicker.bind(that));
+          that.on(element, 'keyup', that.togglePicker.bind(that));
+          // that.on(element, 'focus', that.onFocus.bind(that));
+          that.on(element, 'editableInput', that.togglePicker.bind(that));
+        }
         // that.on(element, 'blur', that.hide.bind(that));
         that.on(that.window, 'click', that.windowClick.bind(that));
-        // that.on(element, 'focus', that.onFocus.bind(that));
-        that.on(element, 'editableInput', that.togglePicker.bind(that));
       });
+
       MediumEditor.Extension.prototype.init.apply(this, arguments);
       // Initialize tooltips
       $('[data-toggle=\"tooltip\"]').tooltip();
@@ -72,12 +97,10 @@ function log(){
     },
 
     destroy: function(){
-      // Remove the previous saved selection markers if any
-      if (this._lastSelection) {
-        rangy.removeMarkers(this._lastSelection);
-        this._lastSelection = undefined;
+      this.removeSelection();
+      if (this.useInlinePlusButton) {
+        this.pickerElement.parentNode.removeChild(this.pickerElement);
       }
-      this.pickerElement.parentNode.removeChild(this.pickerElement);
       this.pickerElement = undefined;
       this.mainButton = undefined;
       this.mediaButtonsContainer = undefined;
@@ -88,16 +111,40 @@ function log(){
       if (this._waitingCB) {
         return;
       }
-      log("windowClick", event.target, "isEditorDescendant:", MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true), "isPickerDescendant:", MediumEditor.util.isDescendant(this.pickerElement, event.target, true));
-      if(!MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true) &&
-         !MediumEditor.util.isDescendant(this.pickerElement, event.target, true)) {
-        this.hide();
-        this.collapse();
+      log("windowClick", event.target);
+      // If the inline plus button is enabled
+      if (this.useInlinePlusButton) {
+        log("   isEditorDescendant:", 
+            MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true),
+            "isPickerDescendant:",
+            MediumEditor.util.isDescendant(this.pickerElement, event.target, true))
+        // If the user clicked inside the editor or on the picker
+        if(!MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true) &&
+           !MediumEditor.util.isDescendant(this.pickerElement, event.target, true)) {
+          // Hide and collapse the picker
+          this.hide();
+          this.collapse();
+        }
+      }
+      // If we have a selector for an external picker
+      if (this.saveSelectionClickElementId !== undefined) {
+        log(this.saveSelectionClickElementId);
+        var target = event.target,
+            el = document.getElementById(this.saveSelectionClickElementId);
+        log("   target", target);
+        log("   el", el);
+        // And the target of the click is the same of the given selector
+        if (target === el) {
+          log("   SAVING SELECTION!");
+          // Save the current selection
+          this.saveSelection();
+          // TODO: if the currently focused element is not a MediumEditor element
+          // save a selection to add the content at the end of the field
+        }
       }
     },
 
     onFocus: function(event, editable){
-      log("onFocus", event, editable, this);
       setTimeout(this.togglePicker(), 100);
     },
 
@@ -183,7 +230,10 @@ function log(){
       }
       if (photoUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
-
+        if (!this.base.getFocusedElement()) {
+          log("MediumEditor not focused, give focus to the first!");
+          PlaceCaretAtEnd(this.getEditorElements()[0]);
+        }
         var sel = this.window.getSelection(),
             element = sel.getRangeAt(0).commonAncestorContainer,
             p;
@@ -237,7 +287,10 @@ function log(){
       }
       if (videoUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
-
+        if (!this.base.getFocusedElement()) {
+          log("MediumEditor not focused, give focus to the first!");
+          PlaceCaretAtEnd(this.getEditorElements()[0]);
+        }
         var sel = this.window.getSelection(),
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
@@ -296,7 +349,10 @@ function log(){
       }
       if (chartUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
-
+        if (!this.base.getFocusedElement()) {
+          log("MediumEditor not focused, give focus to the first!");
+          PlaceCaretAtEnd(this.getEditorElements()[0]);
+        }
         var sel = this.window.getSelection(),
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
@@ -354,7 +410,10 @@ function log(){
       }
       if (attachmentUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
-
+        if (!this.base.getFocusedElement()) {
+          log("MediumEditor not focused, give focus to the first!");
+          PlaceCaretAtEnd(this.getEditorElements()[0]);
+        }
         var sel = this.window.getSelection(),
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
@@ -436,7 +495,10 @@ function log(){
         rangy.restoreSelection(this._lastSelection);
       }
       // 2 cases: it's directly the div.medium-editor or it's a p already
-
+      if (!this.base.getFocusedElement()) {
+        log("MediumEditor not focused, give focus to the first!");
+        PlaceCaretAtEnd(this.getEditorElements()[0]);
+      }
       var sel = this.window.getSelection(),
           element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
           p;
@@ -524,6 +586,32 @@ function log(){
       return this.mainButton.classList.contains(this.expandedClass);
     },
 
+    saveSelection: function() {
+      log("SaveSelection");
+      // Remove the previous selection to avoid leaving
+      // markers in the body that are not needed
+      this.internalRemoveSelection();
+      // Save the current selection
+      this._lastSelection = rangy.saveSelection();
+      // Unfocus the field
+      this.getEditorElements().forEach(function(el){
+        el.blur();
+      });
+    },
+
+    internalRemoveSelection: function() {
+      // Remove the previous saved selection markers if any
+      if (this._lastSelection) {
+        rangy.removeMarkers(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+    },
+
+    removeSelection: function() {
+      log("RemoveSelection");
+      this.internalRemoveSelection();
+    },
+
     expand: function(){
       if (this._waitingCB) {
         return;
@@ -534,12 +622,7 @@ function log(){
       });
       // Hide the placeholder
       this.hidePlaceholder();
-      // Save the current selection
-      this._lastSelection = rangy.saveSelection();
-      // Unfocus the field
-      this.getEditorElements().forEach(function(el){
-        el.blur();
-      });
+      this.saveSelection();
       this.mainButton.classList.add(this.expandedClass);
       this.mediaButtonsContainer.classList.add(this.expandedClass);
 
@@ -572,10 +655,7 @@ function log(){
       if (this.isExpanded()) {
         this.collapse();
         // Remove last selection only on direct click of the button
-        if (this._lastSelection) {
-          rangy.removeMarkers(this._lastSelection);
-          this._lastSelection = undefined;
-        }
+        this.removeSelection();
       } else {
         this.expand();        
       }
@@ -642,31 +722,33 @@ function log(){
     },
 
     togglePicker: function(event, editable){
-      if (this._waitingCB) {
-        return;
-      }
-      if (event) {
-        log("togglePicker 1", event, event.type);
-      } else {
-        log("togglePicker 2", "no event");
-      }
-      var sel = this.window.getSelection(),
-          element;
-      log("   ", sel, sel.rangeCount, sel.rangeCount.length);
-      if (sel.rangeCount > 0) {
-        element = sel.getRangeAt(0).commonAncestorContainer;
-        log("   sel.rangeCount > 0", element);
-        if (sel !== undefined || element !== undefined) {
-          if (this.paragraphIsEmpty(element)){
-            var top = ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 10);
-            log("   top:", $(element).offset().top, $(this.pickerElement.parentNode).offset().top, top + "px");
-            this.pickerElement.style.top = top + "px";
-            this.show();
-            return;
+      if (this.useInlinePlusButton) {
+        if (this._waitingCB) {
+          return;
+        }
+        if (event) {
+          log("togglePicker 1", event, event.type);
+        } else {
+          log("togglePicker 2", "no event");
+        }
+        var sel = this.window.getSelection(),
+            element;
+        log("   ", sel, sel.rangeCount, sel.rangeCount.length);
+        if (sel.rangeCount > 0) {
+          element = sel.getRangeAt(0).commonAncestorContainer;
+          log("   sel.rangeCount > 0", element);
+          if (sel !== undefined || element !== undefined) {
+            if (this.paragraphIsEmpty(element)){
+              var top = ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 10);
+              log("   top:", $(element).offset().top, $(this.pickerElement.parentNode).offset().top, top + "px");
+              this.pickerElement.style.top = top + "px";
+              this.show();
+              return;
+            }
           }
         }
+        this.hide();
       }
-      this.hide();
     },
     
   });

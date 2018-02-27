@@ -31,17 +31,7 @@ div.emoji-picker {
 
   div.picker-container {
     position: absolute;
-    display: none;
-
-    &:not(.visible).preloading {
-      display: block;
-      top: -10000px;
-      left: -10000px;
-    }
-
-    &.visible {
-      display: block;
-    }
+    display: block;
 
     &.top {
       top: -#{$picker_height + 8}px;

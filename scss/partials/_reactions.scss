@@ -1,5 +1,5 @@
 div.reactions {
-  height: 32px;
+  height: 26px;
   float: left;
 
   @include mobile() {
@@ -12,84 +12,93 @@ div.reactions {
       float: left;
       outline: none;
       position: relative;
-      height: 32px;
-      margin-left: 1px;
+      height: 26px;
       cursor: default;
-      background-color: $carrot_light_gray_9;
-      padding: 0px 14px;
-      color: $carrot_light_gray_3;
+      padding: 4px;
       @include avenir_H();
-      font-size: 14px;
+      border: 1px solid #ECECEC;
+      box-shadow: none;
+      font-size: 11px;
+      color: $ui_grey;
+      min-width: 38px;
+      border-radius: 4px;
+      margin-left: 4px;
 
       &:first-child {
-        border-top-left-radius: 100px;
-        border-bottom-left-radius: 100px;
-      }
-
-      &:last-child {
-        border-top-right-radius: 100px;
-        border-bottom-right-radius: 100px;
+        margin-left: 0px;
       }
 
       span.reaction {
-        font-size: 15px;
-        top: 3px;
         position: relative;
-        display: inline-block;
-        -webkit-filter: grayscale(100%);
-        filter: grayscale(100%);
-        min-width: 22px;
-
-        &.has-count {
-          -webkit-filter: grayscale(0%);
-          filter: grayscale(0%);
-        }
+        float: left;
+        font-size: 15px;
+        margin-left: 2px;
       }
 
       div.count {
-        margin-left: 5px;
-        padding-top: 1px;
-        display: inline-block;
-        color: $carrot_light_gray_3;
-        vertical-align: bottom;
+        float: right;
+        margin-top: 2px;
+        min-width: 14px;
+        height: 15px;
+        text-align: center;
+        margin-left: -1px;
       }
 
       &.can-react {
         cursor: pointer;
 
         @include big_web() {
-
           &.reacted:hover {
-            background-color: rgba(#FED157, 0.4);
+            border: 1px solid $carrot_green;
+            box-shadow: 0px 2px 4px 0px rgba($feint_emerald, 0.07);
           }
 
           &:hover {
-            background-color: #EBE9E3;
-
-            span.reaction {
-              -webkit-filter: grayscale(0%);
-              filter: grayscale(0%);
-            }
+            border: 1px solid $light_ui_grey;
+            box-shadow: 0px 2px 4px 0px rgba(black, 0.07);
           }
         }
       }
 
       &.reacted {
-        background-color: #FFF6DD;
-
-        span.reaction {
-          -webkit-filter: grayscale(0%);
-          filter: grayscale(0%);
-        }
+        background-color: $feint_emerald;
+        border: 1px solid $carrot_green;
 
         div.count {
-          color: #FDAB1D;
+          color: $carrot_green;
         }
       }
 
       &.reaction-picker {
+        box-shadow: none;
+
         div.count {
-          vertical-align: middle;
+          color: $light_ui_grey;
+        }
+
+        @include big_web() {
+          &:hover {
+            box-shadow: 0px 2px 4px 0px rgba(black, 0.07);
+            background-color: transparent;
+            border: 1px solid $light_ui_grey;
+
+            span.reaction {
+              background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
+            }
+
+            div.count {
+              color: $ui_grey;
+            }
+          }
+        }
+
+        span.reaction {
+          width: 16px;
+          height: 16px;
+          background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
         }
       }
     }
@@ -97,7 +106,6 @@ div.reactions {
 
   div.reactions-picker-container {
     position: relative;
-    display: none;
     z-index: 1234;
 
     @include mobile() {
@@ -115,10 +123,6 @@ div.reactions {
         right: 8px;
         color: black;
       }
-    }
-
-    &.visible {
-      display: block;
     }
 
     div.emoji-mart {
