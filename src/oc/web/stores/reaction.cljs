@@ -7,8 +7,7 @@
 
 (defn handle-reaction-to-entry-finish
   [db activity-data reaction reaction-data]
-  (let [board-data (get-in db (dispatcher/current-board-key))
-        activity-uuid (:uuid activity-data)
+  (let [activity-uuid (:uuid activity-data)
         next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)
         activity-key (concat (dispatcher/current-board-key) [:fixed-items activity-uuid])]
     (if (nil? reaction-data)
@@ -30,7 +29,6 @@
 
 (defn handle-reaction-to-entry [db activity-data reaction-data]
   (let [board-key (dispatcher/current-board-key)
-        board-data (get-in db board-key)
         old-reactions-loading (or (:reactions-loading activity-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)
@@ -64,9 +62,6 @@
         is-all-posts (:from-all-posts @router/path)
         board-slug (router/current-board-slug)
         activity-uuid (:resource-uuid interaction-data)
-        ; Board data
-        board-key (if is-all-posts (dispatcher/all-posts-key org-slug) (dispatcher/board-data-key org-slug board-slug))
-        board-data (get-in db board-key)
         ; Entry data
         fixed-activity-uuid (or (router/current-secure-activity-id) activity-uuid)
         is-secure-activity (router/current-secure-activity-id)
