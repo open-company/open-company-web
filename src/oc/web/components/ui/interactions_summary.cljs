@@ -56,7 +56,7 @@
           (for [user-data (take 4 comments-authors)]
             [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
-              (user-avatar-image user-data true)])]
+              (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
         ; Comments count
         [:div.is-comments-summary
           {:class (str "comments-count-" (:uuid entry-data))}
