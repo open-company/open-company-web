@@ -37,7 +37,7 @@
         [:div.whats-new-modal
           [:div.carrot-logo]
           [:div.about-title
-            "Support"]
+            "What’s New"]
           [:div.about-links
             [:a.about-link
               {:href oc-urls/about

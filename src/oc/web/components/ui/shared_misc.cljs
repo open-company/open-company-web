@@ -36,47 +36,41 @@
       [:div.card.card-1
         [:div.card-icon]
         [:div.card-title
-          (str
-           "Know what’s "
-           "important")]
+          "Say what’s important "]
         [:div.card-content
           (str
-            "Elevate key updates above "
-            "the noise so they won’t be "
-            "missed. It’s perfect for "
-            "distributed teams, too.")]]
+            "Space to write more "
+            "than a quick chat - like "
+            "key updates, announcements, "
+            "plans, and stories.")]]
       [:div.card.card-2
         [:div.card-icon]
         [:div.card-title
-          "Cross-team awareness"]
+          "Read without interruptions"]
         [:div.card-content
           (str
-            "See what's happening across "
-            "the company so teams stay "
-            "in sync.")]]
+            "Stay in sync without worrying "
+            "you missed something important "
+            "in a fast-moving conversation.")]]
       [:div.card.card-3
         [:div.card-icon]
         [:div.card-title
-          (str
-            "Focused, topic-based "
-            "conversations")]
+          "Focused, topic-based discussion"]
         [:div.card-content
           (str
-            "Capture team reactions, "
-            "comments and questions "
-            "together in one place.")]]]
+            "Keep team reactions, comments "
+            "and questions together in one "
+            "place for better context.")]]]
     [:div.cards-row.group
       [:div.card.card-4
         [:div.card-icon]
         [:div.card-title
-          (str
-            "The whole "
-            "story")]
+          "Stay informed and aligned"]
         [:div.card-content
           (str
-            "New employees get up to "
-            "speed quickly with the full "
-            "picture in one place.")]]
+            "Get up to speed quickly with the "
+            "full picture in one place. Perfect "
+            "for distributed teams, too.")]]
       [:div.card.card-5
         [:div.card-icon]
         [:div.card-title
