@@ -34,7 +34,7 @@
         {:ref "stream-comments-inner"}
         (when (pos? (count comments-data))
           [:div.stream-comments-title
-            (str (count comments-data) " Response" (when (> (count comments-data) 1) "s"))])
+            (str (count comments-data) " Comment" (when (> (count comments-data) 1) "s"))])
         (if (pos? (count comments-data))
           (for [comment-data sorted-comments]
             [:div.stream-comment
