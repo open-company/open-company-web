@@ -1,0 +1,265 @@
+div.fullscreen-post-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: $oc_gray_8;
+  z-index: #{$navbar_zindex + 100};
+  overflow-y: auto;
+  height: 100vh;
+
+  @include mobile() {
+    width: 100%;
+  }
+
+  div.fullscreen-post-header {
+    position: absolute;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 64px;
+    background-color: white;
+    box-shadow: 0px 2px 6px 0px rgba($deep_tan, 0.5);
+    padding: 24px;
+    z-index: #{$navbar_zindex + 101};
+
+    div.fullscreen-post-header-left {
+      float: left;
+      width: 50%;
+
+      button.mobile-modal-close-bt {
+        @include image-2x("/img/ML/mobile_modal_close");
+        width: 24px;
+        height: 24px;
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        background-position: 5px 5px;
+        margin-top: -4px;
+        float: left;
+      }
+
+      @include activity-author(24);
+
+      div.user-avatar-img-container {
+        float: left;
+        margin-top: -4px;
+        margin-left: 32px;
+        margin-right: 0px;
+      }
+
+      div.header-title {
+        float: left;
+        margin-left: 24px;
+        @include avenir_H();
+        font-size: 14px;
+        color: $deep_navy;
+        max-width: 500px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-wrap: break-word;
+      }
+
+    }
+
+    div.fullscreen-post-header-right {
+      float: right;
+      width: 50%;
+
+      div.more-dropdown {
+        float: right;
+        width: 24px;
+        height: 24px;
+        margin-top: -4px;
+
+        div.activity-move {
+          position: absolute;
+          top: 60px;
+          left: unset;
+          right: 14px;
+
+          @include mobile() {
+            right: 8px;
+            top: 124px;
+          }
+        }
+
+        button.fullscreen-post-more {
+          width: 24px;
+          height: 26px;
+          padding: 2px 10px;
+          display: block;
+          background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+          background-position: center;
+          background-size: 4px 20px;
+          background-repeat: no-repeat;
+          opacity: 0.8;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.not-hover {
+            opacity: 0;
+          }
+        }
+
+        div.fullscreen-post-dropdown-menu {
+          position: absolute;
+          top: 60px;
+          left: calc(100% - 130px - 13px);
+          width: 130px;
+          min-width: 130px;
+          border: none;
+          outline: none;
+          box-shadow: none;
+          background-color: transparent;
+          padding: 0 0 .3em;
+          overflow: visible;
+          margin: 0px;
+          z-index: 100;
+
+          @include mobile() {
+            top: 124px;
+            left: unset;
+            right: 8px;
+          }
+
+          div.triangle {
+            position: absolute;
+            top: -7px;
+            left: calc(100% - 30px);
+            background-color: white;
+            border-top: 1px solid rgba(177,184,192,0.50);
+            border-left: 1px solid rgba(177,184,192,0.50);
+            transform: rotate(45deg);
+            width: 15px;
+            height: 15px;
+            z-index: 1001;
+          }
+
+          ul.fullscreen-post-more-menu {
+            background-color: white;
+            border: 1px solid rgba(177,184,192,0.50);
+            box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+            border-radius: 5px;
+            margin: 0;
+            padding: 10px 13px 6px 8px;
+            min-height: 50px;
+            list-style-type: none;
+            width: 100%;
+
+            li {
+              padding: 3px 8px;
+              @include avenir_M();
+              font-size: 14px;
+              color: $carrot_light_gray_3;
+              cursor: pointer;
+              background-color: transparent;
+
+              &.disabled {
+                opacity: 0.4;
+
+                &:hover {
+                  background-color: transparent;
+                }
+              }
+
+              &:hover {
+                background-color: rgba($carrot_light_gray_4, 0.2);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  div.fullscreen-post {
+    margin-top: 64px;
+    margin: 100px auto;
+    width: 1060px;
+
+    div.fullscreen-post-box {
+      display: flex;
+      flex-direction: row;
+
+      div.fullscreen-post-left-column {
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 720px;
+        width: 720px;
+
+        div.fullscreen-post-left-column-content {
+          box-shadow: 0px 2px 4px rgba($deep_tan, 0.5);
+          background-color: white;
+          border-radius: 6px;
+          padding: 40px;
+
+          div.fullscreen-post-box-content-board {
+            @include avenir_M();
+            font-size: 14px;
+            color: $ui_grey;
+          }
+
+          div.fullscreen-post-box-content-headline {
+            @include activity-headline();
+
+            @include avenir_H();
+            font-size: 28px;
+            color: $deep_navy;
+            line-height: 36px;
+            margin-top: 24px;
+          }
+
+          div.fullscreen-post-box-content-body {
+            @include activity-body(18);
+
+            @include avenir_BOOK();
+            font-size: 18px;
+            color: $deep_navy;
+            line-height: 30px;
+            margin-top: 32px;
+
+            p:not(:last-child) {
+              padding: 0 0 32px;
+            }
+
+            div.carrot-no-preview, a.carrot-no-preview {
+              display: none;
+            }
+          }
+
+          div.fullscreen-post-box-content-reactions {
+            margin-top: 32px;
+          }
+        }
+      }
+
+      div.fullscreen-post-right-column {
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 300px;
+        width: 300px;
+        margin-left: 40px;
+
+        &.add-comment-focused {
+          div.stream-comments {
+            max-height: calc(100% - 134px);
+          }
+        }
+
+        div.stream-comments  {
+          max-height: calc(100% - 52px);
+          height: auto;
+        }
+
+        div.add-comment-box-container {
+          padding-right: 12px;
+        }
+      }
+    }
+  }
+}
