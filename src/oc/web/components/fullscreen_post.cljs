@@ -62,6 +62,7 @@
                              (rum/local false ::showing-dropdown)
                              (rum/local false ::move-activity)
                              (rum/local nil ::window-click)
+                             (rum/local false ::resize-listener)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
@@ -72,6 +73,11 @@
                                  (when (and (not @(::animate s))
                                           (= (:activity-modal-fade-in modal-data) (:uuid (:activity-data modal-data))))
                                    (reset! (::animate s) true)))
+                               s)
+                              :will-mount (fn [s]
+                               (reset! (::resize-listener s)
+                                (events/listen js/window EventType/RESIZE
+                                 #(reset! (::resize-listener s) true)))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -89,6 +95,9 @@
                                (when @(::window-click s)
                                  (events/unlistenByKey @(::window-click s))
                                  (reset! (::window-click s) nil))
+                               (when @(::resize-listener s)
+                                 (events/unlistenByKey @(::resize-listener s))
+                                 (reset! (::resize-listener s) false))
                                s)}
   [s]
   (let [modal-data (drv/react s :fullscreen-post-data)
@@ -104,12 +113,19 @@
                                                       (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.fullscreen-post-header
-        [:div.fullscreen-post-header-left
-          [:button.mlb-reset.mobile-modal-close-bt
-            {:on-click #(close-clicked s)}]
+        [:button.mlb-reset.mobile-modal-close-bt
+          {:on-click #(close-clicked s)}]
+        [:div.header-title-container.group
           (user-avatar-image (:publisher activity-data))
           [:div.header-title
-            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]
+            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          [:div.header-timing
+            [:time
+              {:date-time (:published-at activity-data)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :title (utils/activity-date-tooltip activity-data)}
+              (utils/time-since (:published-at activity-data))]]]
         [:div.fullscreen-post-header-right
           (when (or edit-link
                     share-link
@@ -186,6 +202,7 @@
                 comments-data (or activity-comments (:comments activity-data))]
             [:div.fullscreen-post-right-column.group
               {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
-                                        :no-comments (zero? (count comments-data))})}
-              (stream-comments activity-data comments-data)
-              (add-comment activity-data)])]]]))
+                                        :no-comments (zero? (count comments-data))})
+               :style {:right (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px")}}
+              (add-comment activity-data)
+              (stream-comments activity-data comments-data)])]]]))

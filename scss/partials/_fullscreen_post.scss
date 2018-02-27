@@ -1,5 +1,6 @@
 div.fullscreen-post-container {
   position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   width: 100vw;
@@ -34,27 +35,28 @@ div.fullscreen-post-container {
     padding: 24px;
     z-index: #{$navbar_zindex + 101};
 
-    div.fullscreen-post-header-left {
+    button.mobile-modal-close-bt {
+      @include image-2x("/img/ML/mobile_modal_close");
+      width: 24px;
+      height: 24px;
+      background-repeat: no-repeat;
+      background-size: 14px 14px;
+      background-position: 5px 5px;
+      margin-top: -4px;
       float: left;
-      width: 50%;
+    }
 
-      button.mobile-modal-close-bt {
-        @include image-2x("/img/ML/mobile_modal_close");
-        width: 24px;
-        height: 24px;
-        background-repeat: no-repeat;
-        background-size: 14px 14px;
-        background-position: 5px 5px;
-        margin-top: -4px;
-        float: left;
-      }
+    $title_container_width: 400;
+    div.header-title-container {
+      margin: 0px auto;
+      width: auto;
+      max-width: #{$title_container_width}px;
 
       @include activity-author(24);
 
       div.user-avatar-img-container {
         float: left;
         margin-top: -4px;
-        margin-left: 32px;
         margin-right: 0px;
       }
 
@@ -64,13 +66,20 @@ div.fullscreen-post-container {
         @include avenir_H();
         font-size: 14px;
         color: $deep_navy;
-        max-width: 500px;
+        max-width: #{$title_container_width - 150}px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         word-wrap: break-word;
       }
 
+      div.header-timing {
+        @include avenir_M();
+        font-size: 14px;
+        color: rgba($ui_grey, 0.5);
+        margin-left: 24px;
+        float: left;
+      }
     }
 
     div.fullscreen-post-header-right {
@@ -192,13 +201,9 @@ div.fullscreen-post-container {
     width: 1060px;
 
     div.fullscreen-post-box {
-      display: flex;
-      flex-direction: row;
+      position: relative;
 
       div.fullscreen-post-left-column {
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: 720px;
         width: 720px;
 
         div.fullscreen-post-left-column-content {
@@ -248,15 +253,25 @@ div.fullscreen-post-container {
       }
 
       div.fullscreen-post-right-column {
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: 300px;
         width: 300px;
-        margin-left: 40px;
+        position: fixed;
+        top: 100px;
+        height: calc(100vh - 140px);
 
         &.no-comments {
           div.stream-comments {
             height: 100%;
+          }
+        }
+
+        div.add-comment-box-container {
+          div.add-comment-box {
+            div.emoji-picker {
+              div.picker-container {
+                top: unset !important;
+                right: 0px !important;
+              }
+            }
           }
         }
 
@@ -267,8 +282,8 @@ div.fullscreen-post-container {
         }
 
         div.stream-comments {
+          margin-top: 24px;
           max-height: calc(100% - 52px);
-          height: auto;
         }
 
         div.add-comment-box-container {
