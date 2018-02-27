@@ -61,11 +61,9 @@
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
-  (rum/local false ::preloaded)
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
-                 (utils/after 1500 #(reset! (::preloaded s) true))
                  (let [click-listener (events/listen
                                        js/window
                                        EventType/CLICK
@@ -136,23 +134,22 @@
                                                 @caret-pos)
                                             (not @visible))]
                                (reset! visible vis)))}]
-      [:div.picker-container
-        {:class (utils/class-set {position true
-                                  :preloading (not @(::preloaded s))
-                                  :visible @visible})}
-        (when-not (utils/is-test-env?)
-          (react-utils/build (.-Picker js/EmojiMart)
-           {:native true
-            :onClick (fn [emoji event]
-                      (when (and default-field-selector
-                                 (not @(::caret-pos s)))
-                        (utils/to-end-of-content-editable (.querySelector js/document default-field-selector))
-                        (save-caret-position s))
-                      (let [add-emoji? (boolean @(::caret-pos s))]
-                         (when add-emoji?
-                           (replace-with-emoji caret-pos emoji)
-                           (remove-markers s)
-                           (.focus @last-active-element))
-                         (reset! visible false)
-                         (when (fn? add-emoji-cb)
-                           (add-emoji-cb @last-active-element emoji add-emoji?))))}))]]))
+     (when @visible
+       [:div.picker-container
+         {:class (utils/class-set {position true})}
+         (when-not (utils/is-test-env?)
+           (react-utils/build (.-Picker js/EmojiMart)
+             {:native true
+              :onClick (fn [emoji event]
+                         (when (and default-field-selector
+                                    (not @(::caret-pos s)))
+                           (utils/to-end-of-content-editable (.querySelector js/document default-field-selector))
+                           (save-caret-position s))
+                         (let [add-emoji? (boolean @(::caret-pos s))]
+                           (when add-emoji?
+                             (replace-with-emoji caret-pos emoji)
+                             (remove-markers s)
+                             (.focus @last-active-element))
+                           (reset! visible false)
+                           (when (fn? add-emoji-cb)
+                             (add-emoji-cb @last-active-element emoji add-emoji?))))}))])]))

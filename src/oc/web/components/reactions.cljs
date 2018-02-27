@@ -114,16 +114,16 @@
                :on-click #(reset! (::show-picker s) (not @(::show-picker s)))}
               [:span.reaction]
               [:div.count "+"]])]
-        [:div.reactions-picker-container
-          {:class (utils/class-set {:visible @(::show-picker s)})}
-          (when (responsive/is-tablet-or-mobile?)
-            [:button.mlb-reset.dismiss-mobile-picker
-              {:on-click #(reset! (::show-picker s) false)}
-              "Cancel"])
-          (when-not (utils/is-test-env?)
-            (react-utils/build (.-Picker js/EmojiMart)
-              {:native true
-               :onClick (fn [emoji event]
-                          (when (can-pick-reaction (gobj/get emoji "native") reactions-data)
-                            (reaction-actions/react-from-picker entry-data (gobj/get emoji "native")))
-                          (reset! (::show-picker s) false))}))]])))
+       (when @(::show-picker s)
+         [:div.reactions-picker-container
+           (when (responsive/is-tablet-or-mobile?)
+             [:button.mlb-reset.dismiss-mobile-picker
+               {:on-click #(reset! (::show-picker s) false)}
+               "Cancel"])
+           (when-not (utils/is-test-env?)
+             (react-utils/build (.-Picker js/EmojiMart)
+               {:native true
+                :onClick (fn [emoji event]
+                           (when (can-pick-reaction (gobj/get emoji "native") reactions-data)
+                             (reaction-actions/react-from-picker entry-data (gobj/get emoji "native")))
+                           (reset! (::show-picker s) false))}))])])))

@@ -106,7 +106,6 @@ div.reactions {
 
   div.reactions-picker-container {
     position: relative;
-    display: none;
     z-index: 1234;
 
     @include mobile() {
@@ -124,10 +123,6 @@ div.reactions {
         right: 8px;
         color: black;
       }
-    }
-
-    &.visible {
-      display: block;
     }
 
     div.emoji-mart {
