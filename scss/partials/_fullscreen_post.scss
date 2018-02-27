@@ -245,13 +245,19 @@ div.fullscreen-post-container {
         width: 300px;
         margin-left: 40px;
 
+        &.no-comments {
+          div.stream-comments {
+            height: 100%;
+          }
+        }
+
         &.add-comment-focused {
           div.stream-comments {
             max-height: calc(100% - 134px);
           }
         }
 
-        div.stream-comments  {
+        div.stream-comments {
           max-height: calc(100% - 52px);
           height: auto;
         }

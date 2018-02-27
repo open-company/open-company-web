@@ -179,12 +179,13 @@
               [:div.fullscreen-post-box-content-reactions.group
                 (reactions activity-data)]]]
           ;; Right column
-          [:div.fullscreen-post-right-column.group
-            {:class (when (:add-comment-focus modal-data) "add-comment-focused")}
-            (let [activity-comments (-> modal-data
-                                        :comments-data
-                                        (get (:uuid activity-data))
-                                        :sorted-comments)
-                  comments-data (or activity-comments (:comments activity-data))]
-              (stream-comments activity-data comments-data))
-            (add-comment activity-data)]]]]))
+          (let [activity-comments (-> modal-data
+                                      :comments-data
+                                      (get (:uuid activity-data))
+                                      :sorted-comments)
+                comments-data (or activity-comments (:comments activity-data))]
+            [:div.fullscreen-post-right-column.group
+              {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
+                                        :no-comments (zero? (count comments-data))})}
+              (stream-comments activity-data comments-data)
+              (add-comment activity-data)])]]]))
