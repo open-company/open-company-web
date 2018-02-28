@@ -1,5 +1,6 @@
 (ns oc.web.actions.activity
   (:require [taoensso.timbre :as timbre]
+            [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -67,7 +68,10 @@
 
 (defn activity-edit
   [activity-data]
-  (load-cached-item activity-data :entry-editing))
+  (if (or (responsive/is-tablet-or-mobile?)
+          (not= (:status activity-data) "published"))
+    (load-cached-item activity-data :entry-editing)
+    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate])))))
 
 (defn entry-edit-dismiss
   []
@@ -104,3 +108,7 @@
 (defn entry-toggle-save-on-exit
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
+
+(defn entry-modal-save [activity-data board-slug]
+  (api/update-entry activity-data board-slug :modal-editing-data)
+  (dis/dispatch! [:entry-modal-save]))

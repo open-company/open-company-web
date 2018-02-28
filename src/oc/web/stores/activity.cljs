@@ -42,3 +42,7 @@
 (defmethod dispatcher/action :entry-toggle-save-on-exit
   [db [_ enabled?]]
   (assoc db :entry-save-on-exit enabled?))
+
+(defmethod dispatcher/action :entry-modal-save
+  [db [_]]
+  (assoc-in db [:modal-editing-data :loading] true))

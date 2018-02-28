@@ -1133,12 +1133,6 @@
         (dissoc :activity-loading)
         (assoc-in activity-key fixed-activity-data)))))
 
-(defmethod dispatcher/action :entry-modal-save
-  [db [_ board-slug]]
-  (let [entry-data (:modal-editing-data db)]
-    (api/update-entry entry-data board-slug :modal-editing-data)
-    (assoc-in db [:modal-editing-data :loading] true)))
-
 (defmethod dispatcher/action :whats-new/finish
   [db [_ whats-new-data]]
   (if whats-new-data
