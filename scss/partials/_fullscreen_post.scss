@@ -321,7 +321,7 @@ div.fullscreen-post-container {
           div.rich-body-editor {
             border: none;
             outline: none;
-            margin: 32px 0px 0px;
+            margin: 24px 0px 0px;
             cursor: text;
             min-height: 85px;
             @include activity-body(18);
@@ -331,7 +331,7 @@ div.fullscreen-post-container {
             line-height: 30px;
 
             p:not(:last-child) {
-              margin: 0 0 16px;
+              margin: 16px 0px;
             }
 
             div.carrot-no-preview, a.carrot-no-preview {
