@@ -21,6 +21,7 @@ div.add-comment-box-container {
 
     &:hover, &.show-buttons {
       box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
+      border: 2px solid $light_ui_grey;
     }
 
     @include mobile(){
