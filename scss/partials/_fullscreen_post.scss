@@ -339,11 +339,7 @@ div.fullscreen-post-container {
             }
 
             &.medium-editor-placeholder:after {
-              color: #8A8E94 !important;
-            }
-
-            * {
-              color: $deep_navy;
+              color: $deep_navy !important;
             }
 
             &:after {
@@ -361,10 +357,6 @@ div.fullscreen-post-container {
           line-height: 30px;
           margin-top: 32px;
           min-height: 85px;
-
-          p:not(:last-child) {
-            margin: 0 0 16px;
-          }
 
           div.carrot-no-preview, a.carrot-no-preview {
             display: none;

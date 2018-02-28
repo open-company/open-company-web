@@ -223,14 +223,6 @@ div.stream-view-item {
             color: $deep_navy;
             line-height: 30px;
 
-            p:not(:last-child) {
-              margin: 16px 0;
-            }
-
-            * {
-              color: $deep_navy;
-            }
-
             div.carrot-no-preview, a.carrot-no-preview {
               display: none;
             }
