@@ -158,12 +158,12 @@
                                                                :has-changes true})]))))
 
 (defn- save-editing? [state]
+  (clean-body)
   (let [modal-data @(drv/get-ref state :modal-data)
         edited-data (:modal-editing-data modal-data)]
     (when (:has-changes edited-data)
       (reset! (::entry-saving state) true)
-      (clean-body)
-      (dis/dispatch! [:entry-modal-save (router/current-board-slug)]))))
+      (activity-actions/entry-modal-save edited-data (router/current-board-slug)))))
 
 (defn- dismiss-editing? [state dismiss-modal?]
   (let [modal-data @(drv/get-ref state :modal-data)
