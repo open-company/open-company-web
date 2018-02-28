@@ -259,13 +259,13 @@ div.dashboard-layout {
       position: fixed;
       bottom: 24px;
       right: 24px;
+      z-index: 1000;
 
       button.add-to-board-floating-button {
         width: 66px;
         height: 66px;
         border-radius: 33px;
         background-color: $carrot_orange_2;
-        z-index: 1000;
         box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
         opacity: 1;
 
