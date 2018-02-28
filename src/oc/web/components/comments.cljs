@@ -68,7 +68,8 @@
     (utils/after 600 #(utils/to-end-of-content-editable (rum/ref-node s "comment-body")))))
 
 (defn delete-clicked [s]
-  (let [comment-data (first (:rum/args s))]
+  (let [activity-data (first (:rum/args s))
+        comment-data (second (:rum/args s))]
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "delete-comment"
                       :message (str "Delete this comment?")
@@ -77,9 +78,9 @@
                                          (dis/dispatch! [:alert-modal-hide])
                                          (stop-editing s))
                       :solid-button-title "Yes"
-                      :solid-button-cb #(let [activity-uuid (router/current-activity-id)]
-                                         (dis/dispatch! [:comment-delete activity-uuid comment-data])
-                                         (dis/dispatch! [:alert-modal-hide]))
+                      :solid-button-cb #(do
+                                          (comment-actions/delete-comment activity-data comment-data)
+                                          (dis/dispatch! [:alert-modal-hide]))
                       }]
       (dis/dispatch! [:alert-modal-show alert-data]))))
 
