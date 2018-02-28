@@ -1,7 +1,7 @@
 @import "../modules/_colors";
 @import "../modules/_fonts";
 
-$bottom_margin: 25;
+$bottom_margin: 16;
 $h2_top_margin: 20;
 
 @mixin activity-author($avatar_size: 32){
@@ -135,21 +135,21 @@ $h2_top_margin: 20;
 
   @include avenir_R();
   font-size: #{$font-size}px;
-  color: $carrot_dark_gray;
+  color: $deep_navy;
   white-space: pre-wrap;
   word-wrap: break-word;
 
   * {
-    color: $carrot_dark_gray;
+    color: $deep_navy;
   }
 
-  p {
-    margin: 0 0 #{$bottom_margin}px;
+  & > *:not(:last-child) {
+    margin: #{$bottom_margin}px 0px;
   }
 
   b, strong{
     @include avenir_BOOK();
-    color: $carrot_dark_gray;
+    color: $deep_navy;
     font-weight: 700;
   }
 
@@ -200,7 +200,7 @@ $h2_top_margin: 20;
     left: 50%;
     margin-left: -30px;
     height: 1px;
-    background-color: $carrot_dark_gray;
+    background-color: $deep_navy;
     margin-top: 0px;
     margin-bottom: 0px;
   }
