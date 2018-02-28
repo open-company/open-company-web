@@ -291,6 +291,9 @@
                                (when @(::resize-listener s)
                                  (events/unlistenByKey @(::resize-listener s))
                                  (reset! (::resize-listener s) false))
+                               (when @(::headline-input-listener s)
+                                 (events/unlistenByKey @(::headline-input-listener s))
+                                 (reset! (::headline-input-listener s) nil))
                                (set! (.-onbeforeunload js/window) nil)
                                s)}
   [s]
