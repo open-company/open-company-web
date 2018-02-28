@@ -464,13 +464,13 @@ div.fullscreen-post-container {
 
       &.add-comment-focused {
         div.stream-comments {
-          max-height: calc(100% - 134px);
+          max-height: calc(100% - 132px);
         }
       }
 
       div.stream-comments {
         margin-top: 24px;
-        max-height: calc(100% - 52px);
+        max-height: calc(100% - 50px);
       }
 
       div.add-comment-box-container {
