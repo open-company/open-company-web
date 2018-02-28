@@ -114,14 +114,18 @@
         comments-data (get-in db comments-key)
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
     (if comment-idx
-      (let [old-comment-data (get comments-data comment-idx)
-            body-comment-data (assoc old-comment-data
-                                :body (:body comment-data))
-            update-comment-data (assoc body-comment-data
-                                  :updated-at (:updated-at comment-data))
-            new-comment-data (if (contains? update-comment-data :reactions)
-                               update-comment-data
-                               (assoc update-comment-data :reactions (:reactions old-comment-data)))
-            new-comments-data (assoc comments-data comment-idx new-comment-data)]
-        (assoc-in db comments-key new-comments-data))
+      (let [old-comment-data (get comments-data comment-idx)]
+        (if (<= (utils/js-date
+                 (:updated-at old-comment-data))
+                (utils/js-date (:updated-at comment-data)))
+          (let [body-comment-data (assoc old-comment-data
+                                    :body (:body comment-data))
+                update-comment-data (assoc body-comment-data
+                                      :updated-at (:updated-at comment-data))
+                new-comment-data (if (contains? update-comment-data :reactions)
+                                   update-comment-data
+                                   (assoc update-comment-data :reactions (:reactions old-comment-data)))
+                new-comments-data (assoc comments-data comment-idx new-comment-data)]
+            (assoc-in db comments-key new-comments-data))
+          db))
       db)))
