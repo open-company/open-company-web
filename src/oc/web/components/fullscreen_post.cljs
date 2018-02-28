@@ -316,22 +316,24 @@
           {:on-click #(if editing
                         (dismiss-editing? s false)
                         (close-clicked s))}]
-        (if editing
-          [:div.header-title-container.editing-post
-            [:div.header-title-container-edit-pen]
-            [:div.header-title-container-edit-title
-              "Edit post"]]
-          [:div.header-title-container.group
-            (user-avatar-image (:publisher activity-data))
-            [:div.header-title
-              {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            [:div.header-timing
-              [:time
-                {:date-time (:published-at activity-data)
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since (:published-at activity-data))]]])
+        [:div.header-title-editing-post
+          [:div.header-title-container-edit-pen]
+          [:div.header-title-container-edit-title
+            "Edit post"]]
+        [:div.header-title-container.group
+          {:style {:opacity (if (and (not editing) (:first-render-done s)) "1" "0")
+                   :margin-left (when (:first-render-done s)
+                                  (str "-" (/ (.width (js/$ "div.header-title-container")) 2) "px"))}}
+          (user-avatar-image (:publisher activity-data))
+          [:div.header-title
+            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          [:div.header-timing
+            [:time
+              {:date-time (:published-at activity-data)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :title (utils/activity-date-tooltip activity-data)}
+              (utils/time-since (:published-at activity-data))]]]
         [:div.fullscreen-post-header-right
           (if editing
             [:button.mlb-reset.post-publish-bt

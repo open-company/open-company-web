@@ -23,6 +23,17 @@ div.fullscreen-post-container {
     opacity: 1;
   }
 
+  &.editing {
+    div.fullscreen-post-header {
+      div.header-title-container {
+        opacity: 0;
+      }
+      div.header-title-editing-post {
+        opacity: 1;
+      }
+    }
+  }
+
   div.fullscreen-post-header {
     position: absolute;
     position: fixed;
@@ -47,34 +58,42 @@ div.fullscreen-post-container {
       float: left;
     }
 
-    $title_container_width: 400;
+    div.header-title-editing-post {
+      margin: 0px auto;
+      width: auto;
+      position: absolute;
+      left: 50%;
+      width: 105px;
+      margin-left: -52px;
+      opacity: 0;
+      transition: opacity 180ms ease-in;
+
+      div.header-title-container-edit-pen {
+        float: left;
+        width: 16px;
+        height: 16px;
+        @include image-2x("/img/ML/editing_pen");
+        background-size: 16px 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      div.header-title-container-edit-title {
+        @include avenir_H();
+        font-size: 18px;
+        color: $deep_navy;
+        margin-left: 24px;
+        margin-top: -2px;
+      }
+    }
+
     div.header-title-container {
       margin: 0px auto;
       width: auto;
-      max-width: #{$title_container_width}px;
       opacity: 1;
-
-      &.editing-post {
-        width: 105px;
-
-        div.header-title-container-edit-pen {
-          float: left;
-          width: 16px;
-          height: 16px;
-          @include image-2x("/img/ML/editing_pen");
-          background-size: 16px 16px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-
-        div.header-title-container-edit-title {
-          @include avenir_H();
-          font-size: 18px;
-          color: $deep_navy;
-          margin-left: 24px;
-          margin-top: -2px;
-        }
-      }
+      position: absolute;
+      left: 50%;
+      transition: opacity 180ms ease-in;
 
       @include activity-author(24);
 
@@ -90,7 +109,7 @@ div.fullscreen-post-container {
         @include avenir_H();
         font-size: 14px;
         color: $deep_navy;
-        max-width: #{$title_container_width - 150}px;
+        max-width: 50vw;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -103,6 +122,7 @@ div.fullscreen-post-container {
         color: rgba($ui_grey, 0.5);
         margin-left: 8px;
         float: left;
+        margin-top: 1px;
       }
     }
 
@@ -461,8 +481,12 @@ div.fullscreen-post-container {
       }
 
       div.stream-comments {
-        margin-top: 24px;
+        margin-top: 16px;
         max-height: calc(100% - 50px);
+
+        div.stream-comments-inner {
+          padding-top: 16px;
+        }
       }
 
       div.add-comment-box-container {
