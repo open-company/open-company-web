@@ -311,7 +311,9 @@ div.stream-view-item {
       width: 387px;
       min-height: 300px;
       position: relative;
-      padding: 32px 20px 40px 32px;
+      // Restore this when moving the add comment box above
+      // padding: 32px 20px 40px 32px;
+      padding: 16px 20px 40px 32px;
       background-color: #FDFCFB;
       max-height: 685px;
       border-bottom-right-radius: 6px;
