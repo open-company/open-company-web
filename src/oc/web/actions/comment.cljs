@@ -4,7 +4,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions :as actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
 (defn add-comment-focus [activity-data]
@@ -66,3 +65,12 @@
   (api/toggle-reaction reaction-data reacting?
     (fn [{:keys [status success body]}]
       (get-comments activity-data))))
+
+(defn save-comment
+  [comment-data new-body]
+  (api/save-comment comment-data new-body)
+  (dis/dispatch! [:comment-save comment-data new-body]))
+
+(defn ws-comment-update
+  [interaction-data]
+  (dis/dispatch! [:ws-interaction/comment-update interaction-data]))

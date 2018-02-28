@@ -85,3 +85,43 @@
             new-comments-data (assoc comments-data comment-idx new-comment-data)]
         (assoc-in db comments-key new-comments-data))
       db)))
+
+(defmethod dispatcher/action :comment-save
+  [db [_ comment-data new-body]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-uuid (router/current-activity-id)
+        item-uuid (:uuid comment-data)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
+    (if comment-idx
+      (let [comment-data (nth comments-data comment-idx)
+            with-new-comment (assoc comment-data :body new-body)
+            new-comments-data (assoc comments-data comment-idx with-new-comment)]
+        (assoc-in db comments-key new-comments-data))
+      db)))
+
+(defmethod dispatcher/action :ws-interaction/comment-update
+  [db [_ interaction-data]]
+  (let [; Get the current router data
+        org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        comment-data (:interaction interaction-data)
+        item-uuid (:uuid comment-data)
+        activity-uuid (router/current-activity-id)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
+    (if comment-idx
+      (let [old-comment-data (get comments-data comment-idx)
+            body-comment-data (assoc old-comment-data
+                                :body (:body comment-data))
+            update-comment-data (assoc body-comment-data
+                                  :updated-at (:updated-at comment-data))
+            new-comment-data (if (contains? update-comment-data :reactions)
+                               update-comment-data
+                               (assoc update-comment-data :reactions (:reactions old-comment-data)))
+            new-comments-data (assoc comments-data comment-idx new-comment-data)]
+        (assoc-in db comments-key new-comments-data))
+      db)))

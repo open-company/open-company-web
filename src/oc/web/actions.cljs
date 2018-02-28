@@ -623,45 +623,6 @@
         new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
     (assoc-in db comments-key new-comments-data)))
 
-(defmethod dispatcher/action :comment-save
-  [db [_ comment-data new-body]]
-  (api/save-comment comment-data new-body)
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        activity-uuid (router/current-activity-id)
-        item-uuid (:uuid comment-data)
-        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
-        comments-data (get-in db comments-key)
-        comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
-    (if comment-idx
-      (let [comment-data (nth comments-data comment-idx)
-            with-new-comment (assoc comment-data :body new-body)
-            new-comments-data (assoc comments-data comment-idx with-new-comment)]
-        (assoc-in db comments-key new-comments-data))
-      db)))
-
-(defmethod dispatcher/action :ws-interaction/comment-update
-  [db [_ interaction-data]]
-  (if (= (jwt/get-key :user-id) (:user-id (:author (:interaction interaction-data))))
-    db
-    (let [; Get the current router data
-          org-slug   (router/current-org-slug)
-          board-slug (router/current-board-slug)
-          comment-data (:interaction interaction-data)
-          item-uuid (:uuid comment-data)
-          activity-uuid (router/current-activity-id)
-          comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
-          comments-data (get-in db comments-key)
-          comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
-      (if comment-idx
-        (let [old-comment-data (get comments-data comment-idx)
-              new-comment-data (if (contains? comment-data :reactions)
-                                 comment-data
-                                 (assoc comment-data :reactions (:reactions old-comment-data)))
-              new-comments-data (assoc comments-data comment-idx new-comment-data)]
-          (assoc-in db comments-key new-comments-data))
-        db))))
-
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
   (let [; Get the current router data
