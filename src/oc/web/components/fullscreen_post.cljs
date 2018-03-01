@@ -457,6 +457,6 @@
           [:div.fullscreen-post-right-column.group
             {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
                                       :no-comments (zero? (count comments-data))})
-             :style {:right (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px")}}
+             :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
             (add-comment activity-data)
             (stream-comments activity-data comments-data)])]]))
