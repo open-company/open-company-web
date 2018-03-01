@@ -99,16 +99,13 @@
                           (zero? (count (:fixed-items board-data))))
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        container-width (if (utils/in? (:route route) "all-posts")
-                          responsive/all-posts-container-width
-                          responsive/board-container-width)
         board-container-style {:marginLeft (if is-mobile-size?
                                              "0px"
                                              (str (max
                                                    sidebar-width
                                                    (+
                                                     (/
-                                                     (- @(::ww s) container-width sidebar-width)
+                                                     (- @(::ww s) responsive/board-container-width sidebar-width)
                                                      2)
                                                    sidebar-width))
                                              "px"))}

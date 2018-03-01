@@ -24,14 +24,14 @@ div.dashboard-layout {
       }
 
       &.all-posts-container {
-        width: 932px;
+        width: 948px;
 
         @include mobile() {
           width: 100%;
         }
 
         div.board-name-container {
-          padding: 0px;
+          padding: 0px 0px 0px 12px;
 
           @include mobile() {
             padding: 0px;
