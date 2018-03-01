@@ -228,6 +228,7 @@
                              (rum/local false ::edited-data-loaded)
                              (rum/local nil ::autosave-timer)
                              (rum/local false ::show-legend)
+                             (rum/local false ::re-render)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
@@ -271,7 +272,7 @@
                                  (comment-actions/get-comments (:activity-data modal-data)))
                                (reset! (::resize-listener s)
                                 (events/listen js/window EventType/RESIZE
-                                 #(reset! (::resize-listener s) true)))
+                                 #(reset! (::re-render s) true)))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
