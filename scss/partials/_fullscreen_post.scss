@@ -508,6 +508,10 @@ div.fullscreen-post-container {
         margin-top: 16px;
         max-height: calc(100% - 64px);
 
+        &:before {
+          @include top-gradient($oc_gray_8);
+        }
+
         @include tablet() {
           max-height: initial;
         }
