@@ -290,17 +290,16 @@ div.fullscreen-post-container {
 
   div.fullscreen-post {
     margin-top: 64px;
-    margin: 100px auto;
+    margin: 100px auto 32px;
     width: 1060px;
     position: relative;
-    min-height: 100vh;
+    min-height: calc(100vh - 32px);
     height: auto;
 
     @include tablet() {
       width: 100%;
       padding: 0px 24px;
       min-height: initial;
-      margin: 100px auto 32px;
     }
 
     div.fullscreen-post-left-column {
@@ -466,7 +465,7 @@ div.fullscreen-post-container {
       width: 300px;
       position: fixed;
       top: 100px;
-      height: calc(100vh - 140px);
+      height: calc(100vh - 132px);
       transition: opacity 180ms ease-in;
 
       @include tablet() {
@@ -507,7 +506,7 @@ div.fullscreen-post-container {
 
       div.stream-comments {
         margin-top: 16px;
-        max-height: calc(100% - 50px);
+        max-height: calc(100% - 64px);
 
         @include tablet() {
           max-height: initial;
