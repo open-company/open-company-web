@@ -334,7 +334,7 @@ div.fullscreen-post-container {
       @include tablet() {
         display: block;
         height: 64px;
-        background-color: $deep_tan;
+        background-color: $light_tan;
         padding: 16px 24px;
 
         @include activity-author(32);
