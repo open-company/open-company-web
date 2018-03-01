@@ -327,7 +327,7 @@
             "Edit post"]]
         [:div.header-title-container.group
           {:style {:opacity (if (and (not editing) (:first-render-done s)) "1" "0")
-                   :margin-left (when (:first-render-done s)
+                   :margin-left (when (and (not is-mobile?) (:first-render-done s))
                                   (str "-" (/ (.width (js/$ "div.header-title-container")) 2) "px"))}}
           (user-avatar-image (:publisher activity-data))
           [:div.header-title
@@ -399,6 +399,16 @@
                                     :on-change #(close-clicked s)}))])))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
+        (when is-mobile?
+          [:div.fullscreen-post-author-header.group
+            (user-avatar-image (:publisher activity-data))
+            [:div.fullscreen-post-author-header-title
+              (:name (:publisher activity-data))]
+            [:div.fullscreen-post-author-header-subtitle
+              [:time
+                {:date-time (:published-at activity-data)
+                 :title (utils/activity-date-tooltip activity-data)}
+                (utils/time-since (:published-at activity-data))]]])
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
