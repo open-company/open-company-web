@@ -11,7 +11,8 @@ div.fullscreen-post-container {
   height: 100vh;
   transition: opacity 180ms ease-in;
 
-  @include mobile() {
+  @include tablet() {
+    position: absolute;
     width: 100%;
   }
 
@@ -25,6 +26,10 @@ div.fullscreen-post-container {
 
   &.editing {
     div.fullscreen-post-header {
+      button.mobile-modal-close-bt {
+        @include image-2x("/img/ML/fullscreen_closing_x");
+        background-size: 14px 14px;
+      }
       div.header-title-container {
         opacity: 0;
       }
@@ -46,6 +51,10 @@ div.fullscreen-post-container {
     padding: 24px;
     z-index: #{$navbar_zindex + 101};
 
+    @include tablet() {
+      width: 100%;
+    }
+
     button.mobile-modal-close-bt {
       @include image-2x("/img/ML/fullscreen_back_arrow");
       width: 24px;
@@ -56,6 +65,7 @@ div.fullscreen-post-container {
       padding: 0;
       margin: -4px 0px 0px;
       float: left;
+      transition: background-image 180ms easi-in;
     }
 
     div.header-title-editing-post {
@@ -179,11 +189,6 @@ div.fullscreen-post-container {
           top: 60px;
           left: unset;
           right: 14px;
-
-          @include mobile() {
-            right: 8px;
-            top: 124px;
-          }
         }
 
         button.fullscreen-post-more {
@@ -220,12 +225,6 @@ div.fullscreen-post-container {
           overflow: visible;
           margin: 0px;
           z-index: 100;
-
-          @include mobile() {
-            top: 124px;
-            left: unset;
-            right: 8px;
-          }
 
           div.triangle {
             position: absolute;
@@ -297,12 +296,25 @@ div.fullscreen-post-container {
     min-height: 100vh;
     height: auto;
 
+    @include tablet() {
+      width: 100%;
+      padding: 0px 24px;
+      min-height: initial;
+      margin: 100px auto 32px;
+    }
+
     div.fullscreen-post-left-column {
       width: 720px;
       position: relative;
       left: 0px;
       top: 0px;
       transition: left 180ms ease-in;
+
+      @include tablet() {
+        width: 100%;
+        left: unset;
+        top: unset;
+      }
 
       div.fullscreen-post-left-column-content {
         box-shadow: 0px 2px 4px rgba($deep_tan, 0.5);
@@ -457,6 +469,15 @@ div.fullscreen-post-container {
       height: calc(100vh - 140px);
       transition: opacity 180ms ease-in;
 
+      @include tablet() {
+        width: 100%;
+        left: unset;
+        top: unset;
+        position: relative;
+        margin-top: 24px;
+        height: auto;
+      }
+
       &.no-comments {
         div.stream-comments {
           height: 100%;
@@ -477,12 +498,20 @@ div.fullscreen-post-container {
       &.add-comment-focused {
         div.stream-comments {
           max-height: calc(100% - 132px);
+
+          @include tablet() {
+            max-height: initial;
+          }
         }
       }
 
       div.stream-comments {
         margin-top: 16px;
         max-height: calc(100% - 50px);
+
+        @include tablet() {
+          max-height: initial;
+        }
 
         div.stream-comments-inner {
           padding-top: 16px;
@@ -491,6 +520,10 @@ div.fullscreen-post-container {
 
       div.add-comment-box-container {
         padding-right: 12px;
+
+        @include tablet() {
+          padding-right: 0px;
+        }
       }
     }
   }
