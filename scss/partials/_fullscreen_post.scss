@@ -12,7 +12,7 @@ div.fullscreen-post-container {
   transition: opacity 180ms ease-in;
 
   @include tablet() {
-    position: absolute;
+    position: relative;
     width: 100%;
     background-color: white;
   }
