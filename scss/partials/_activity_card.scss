@@ -329,22 +329,30 @@ div.activity-card {
       max-height: 28px;
 
       &.has-headline {
-        margin-bottom: 24px;
         height: 28px;
       }
     }
 
     @include activity-media-preview();
 
+    $body_height: 24*3;
     div.activity-card-body {
       @include activity-body();
       display: block;
       line-height: 24px;
-      max-height: #{24*3}px;
+      max-height: #{$body_height}px;
       overflow: hidden;
 
+      & > *:not(:last-child) {
+        margin: 24px 0px;
+      }
+
+      & > *:last-child {
+        margin: 24px 0px 0px;
+      }
+
       &.has-body {
-        height: #{24*3}px;
+        height: #{$body_height}px;
       }
 
       &.has-media-preview {
