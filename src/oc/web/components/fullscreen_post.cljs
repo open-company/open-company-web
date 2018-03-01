@@ -13,6 +13,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -265,6 +266,9 @@
                                        (reset! (::entry-saving s) false)))))
                                s)
                               :will-mount (fn [s]
+                               (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
+                                 ;; Force comments reload
+                                 (comment-actions/get-comments (:activity-data modal-data)))
                                (reset! (::resize-listener s)
                                 (events/listen js/window EventType/RESIZE
                                  #(reset! (::resize-listener s) true)))
