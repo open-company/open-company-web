@@ -49,8 +49,9 @@ div.stream-comments {
     padding-right: 12px;
     padding-top: 16px;
 
-    @include mobile() {
+    @include tablet() {
       padding-right: 0px;
+      height: auto;
     }
 
     div.stream-comments-title {

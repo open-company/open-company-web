@@ -2,7 +2,7 @@ div.add-comment-box-container {
   position: relative;
   width: 100%;
 
-  @include mobile() {
+  @include tablet() {
     padding: 16px 0px 0px;
     width: 100%;
     position: relative;
@@ -24,7 +24,7 @@ div.add-comment-box-container {
       border: 2px solid $light_ui_grey;
     }
 
-    @include mobile(){
+    @include tablet(){
       box-shadow: none;
     }
 
@@ -37,7 +37,7 @@ div.add-comment-box-container {
         background-size: 16px 16px;
       }
 
-      @include mobile() {
+      @include tablet() {
         display: none;
       }
 
@@ -72,7 +72,7 @@ div.add-comment-box-container {
           margin-right: 0px;
           width: 100%;
 
-          @include mobile() {
+          @include tablet() {
             height: auto;
           }
         }
@@ -119,7 +119,7 @@ div.add-comment-box-container {
           color: rgba($ui_grey, 0.5);
         }
 
-        @include mobile() {
+        @include tablet() {
           width: 100%;
           resize: vertical;
           padding-right: 0px;
