@@ -145,6 +145,13 @@ $h2_top_margin: 20;
 
   & > *:not(:last-child) {
     margin: #{$bottom_margin}px 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  & > *:last-child {
+    margin: 0px 0px #{$bottom_margin}px;
+    padding-bottom: 0px;
   }
 
   b, strong{
@@ -186,11 +193,6 @@ $h2_top_margin: 20;
 
   .emojione {
     @include emoji-size($font-size - 2);
-  }
-
-  p:last-child, & > div:last-child {
-    margin-bottom: 0px;
-    padding-bottom: 0px;
   }
 
   hr.media-divider-line {
