@@ -1,6 +1,8 @@
 (ns oc.web.components.org-dashboard
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
+            [taoensso.timbre :as timbre]
+            [oc.web.lib.raven :as raven]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -88,7 +90,11 @@
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
-                             s)}
+                             s)
+                            :did-catch (fn [s e i]
+                              ;; Give 2.5s to sentry to send the error
+                              (utils/after 2500 #(router/redirect-500!))
+                              (assoc s ::keep-loading true))}
   [s]
   (let [{:keys [org-data
                 board-data
@@ -113,7 +119,9 @@
                          (count
                           (:results (drv/react s search/search-key))))]
     ;; Show loading if
-    (if (or ;; the org data are not loaded yet
+    (if (or ;; There was an error
+            (::keep-loading s)
+            ;; the org data are not loaded yet
             (not org-data)
             ;; No board specified
             (and (not (router/current-board-slug))
