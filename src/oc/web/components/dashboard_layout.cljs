@@ -48,7 +48,11 @@
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
-                                 :display (if (pos? opacity) "block" "none")})))))
+                                 :display (if (pos? opacity) "block" "none")}))))
+  (let [dashboard-layout (rum/dom-node s)]
+    (if (>= (.-scrollY js/window) 64)
+      (.add (.-classList dashboard-layout) "sticky-board-name")
+      (.remove (.-classList dashboard-layout) "sticky-board-name"))))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -71,6 +75,7 @@
                                 ;; Update window width on window resize
                                 (reset! (::resize-listener s)
                                  (events/listen js/window EventType/RESIZE #(reset! (::ww s) (responsive/ww))))
+                                ()
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -81,9 +86,11 @@
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
                                   (when @(::resize-listener s)
-                                    (events/unlistenByKey @(::resize-listener s)))
+                                    (events/unlistenByKey @(::resize-listener s))
+                                    (reset! (::resize-listener s) nil))
                                   (when @(::scroll-listener s)
-                                    (events/unlistenByKey @(::resize-listener s))))
+                                    (events/unlistenByKey @(::scroll-listener s))
+                                    (reset! (::scroll-listener s) nil)))
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -126,7 +133,7 @@
               ;; Board name and settings button
               [:div.board-name
                 (when (router/current-board-slug)
-                  [:span.board-name-span
+                  [:div.board-name-with-icon
                     {:dangerouslySetInnerHTML (if is-all-posts
                                                 #js {"__html" "All Posts"}
                                                 (utils/emojify (:name board-data)))}])

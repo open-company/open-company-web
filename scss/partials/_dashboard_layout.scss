@@ -3,6 +3,20 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  @include mobile() {
+    &.sticky-board-name {
+      padding-top: 48px;
+      div.dashboard-layout-container {
+        div.board-container.all-posts-container {
+          div.board-name-container {
+            position: fixed;
+            top: 0px;
+          }
+        }
+      }
+    }
+  }
+
   div.dashboard-layout-container {
     padding: 40px 0px;
     margin: 0 auto;
@@ -10,7 +24,7 @@ div.dashboard-layout {
     width: 100%;
 
     @include mobile(){
-      padding: 16px 0px;
+      padding: 0px;
     }
 
     div.board-container {
@@ -34,7 +48,46 @@ div.dashboard-layout {
           padding: 0px;
 
           @include mobile() {
-            padding: 0px;
+            width: 100%;
+            height: 48px;
+            position: relative;
+            z-index: 1000;
+            top: 0px;
+            left: 0px;
+            background-color: white;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+            border-top: 1px solid $light_tan;
+            padding: 15px;
+
+            &.sticky {
+              position: absolute;
+            }
+          
+            div.board-name {
+              div.board-name-with-icon {
+                @include avenir_H();
+                font-size: 15px;
+                color: $deep_navy;
+                width: 88px;
+                height: 18px;
+                text-align: right;
+                margin: 0 auto;
+                position: relative;
+
+                &:before {
+                  content: "";
+                  position: absolute;
+                  top: 0px;
+                  left: 0px;
+                  @include image-2x("/img/ML/all_posts_icon");
+                  background-size: 18px 18px;
+                  width: 18px;
+                  height: 18px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                }
+              }
+            }
           }
         }
       }
@@ -62,7 +115,7 @@ div.dashboard-layout {
             margin-left: 0px;
           }
 
-          span.board-name-span {
+          div.board-name-with-icon {
             @include avenir_M();
             font-size: 32px;
             color: $carrot_gray;
