@@ -65,26 +65,6 @@ div.all-posts {
           }
         }
       }
-
-      div.activity-card.all-posts-card {
-        max-height: initial;
-        margin: 0px 0px 20px 0px;
-
-        @include mobile() {
-          width: 100%;
-        }
-
-        div.activity-card-content {
-
-          div.activity-card-body {
-            max-height: #{24*6}px;
-
-            &.has-body {
-              height: initial;
-            }
-          }
-        }
-      }
     }
 
     div.load-next {
@@ -94,102 +74,6 @@ div.all-posts {
       button.load-next {
         font-size: 16px;
         @include avenir_H();
-      }
-    }
-  }
-
-  div.all-posts-nav {
-    float: right;
-    width: 224px;
-    position: relative;
-
-    @include mobile() {
-      display: none;
-    }
-
-    div.all-posts-nav-inner {
-      position: fixed;
-      overflow-y: auto;
-      min-width: 150px;
-      padding-right: 10px;
-
-      div.nav-year span.retrieving, div.nav-month span.retrieving {
-        width: 100%;
-        text-align: center;
-        color: $oc_gray_7;
-        font-size: 13px;
-        @include avenir_BOOKO();
-        margin-left: 16px;
-      }
-
-      div.nav-year {
-        margin-bottom: 4px;
-        cursor: pointer;
-        margin-top: 8px;
-
-        &.selected span.calendar-label {
-          color: $carrot_text_blue;
-        }
-
-        span.calendar-label {
-          @include avenir_H();
-          font-size: 16px;
-          color: $oc_gray_7;
-        }
-
-        &:hover {
-          span.calendar-label {
-            text-decoration: underline;
-          }
-        }
-      }
-
-      div.nav-month {
-        cursor: pointer;
-        margin-left: 24px;
-        position: relative;
-        padding: 2px 0;
-
-        span.calendar-label {
-          @include avenir_M();
-          font-size: 14px;
-          color: $oc_gray_7;
-        }
-
-        &:hover {
-          span.calendar-label {
-            text-decoration: underline;
-          }
-        }
-
-        &:before {
-          font-family: FontAwesome;
-          font-size: 9px;
-          content: "\f10c";
-          position: absolute;
-          color: $oc_gray_7;
-          top: 6px;
-          left: -23px;
-        }
-
-        &.selected {
-         span.calendar-label {
-            color: $carrot_text_blue;
-          }
-
-          &:before {
-            color: $carrot_text_blue;
-            content: "\f111";
-          }
-        }
-
-        &.selected{
-          color: $carrot_text_blue;
-          &:before {
-            color: $carrot_text_blue;
-            content: "\f111";
-          }
-        }
       }
     }
   }
