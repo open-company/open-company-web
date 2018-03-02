@@ -196,11 +196,13 @@
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
                                                                  :board-name (:label item)}))}))])
-              [:div.board-switcher
-                {:on-click #(reset! (::board-switch s) (if (= @(::board-switch s) :stream) :grid :stream))}
-                (if (= @(::board-switch s) :stream)
-                  "Grid view"
-                  "Stream view")]]
+              (when (and (not is-mobile-size?)
+                         (not is-all-posts))
+                [:div.board-switcher
+                  {:on-click #(reset! (::board-switch s) (if (= @(::board-switch s) :stream) :grid :stream))}
+                  (if (= @(::board-switch s) :stream)
+                    "Grid view"
+                    "Stream view")])]
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
