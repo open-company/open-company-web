@@ -28,8 +28,10 @@ nav.oc-navbar {
   box-shadow: 0px 2px 6px 0px rgba($deep_tan, 0.5);
 
   &.not-fixed {
-    box-shadow: none;
-    position: absolute;
+    @include mobile() {
+      box-shadow: none;
+      position: absolute;
+    }
   }
 
   &.showing-orgs-dropdown {
