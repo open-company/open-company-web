@@ -243,7 +243,7 @@
 
 (defn patch-board [data]
   (when data
-    (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers])
+    (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers :private-notifications])
           json-data (cljs->json board-data)
           board-patch-link (utils/link-for (:links data) "partial-update")]
       (storage-http (method-for-link board-patch-link) (relative-href board-patch-link)
@@ -501,7 +501,8 @@
         board-access (:access board-data)
         slack-mirror (:slack-mirror board-data)
         viewers (:viewers board-data)
-        authors (:authors board-data)]
+        authors (:authors board-data)
+        private-notifications (:private-notifications board-data)]
     (when (and board-name create-link)
       (storage-http (method-for-link create-link) (relative-href create-link)
         {:headers (headers-for-link create-link)
@@ -509,6 +510,7 @@
                                    :access board-access
                                    :authors authors
                                    :viewers viewers
+                                   :private-notifications private-notifications
                                    :slack-mirror slack-mirror})}
         (fn [{:keys [success status body]}]
           (let [board-data (when success (json->cljs body))]
