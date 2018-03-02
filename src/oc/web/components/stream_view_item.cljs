@@ -159,7 +159,7 @@
       [:div.stream-view-item-body.group
         [:div.stream-body-left.group
           {:style {:padding-bottom (when-not is-mobile?
-                                     (let [initial-padding 64
+                                     (let [initial-padding 104
                                            attachments-num (count activity-attachments)
                                            attachments-height (* (js/Math.ceil (/ attachments-num 2)) 65)
                                            total-padding (+ initial-padding

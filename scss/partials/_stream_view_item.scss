@@ -141,7 +141,7 @@ div.stream-view-item {
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
-    background-color: white;
+    background-color: #FDFCFB;
 
     @include mobile() {
       border-bottom-left-radius: 0px;
@@ -153,10 +153,10 @@ div.stream-view-item {
     div.stream-body-left {
       flex-grow: 0;
       flex-shrink: 0;
-      width: 505px;
+      width: 545px;
       position: relative;
-      padding: 40px 0px 48px 40px;
-      margin: 0px 40px 40px 0px;
+      padding: 40px 40px 88px 40px;
+      background-color: white;
 
       @include mobile() {
         width: 100%;
@@ -166,7 +166,8 @@ div.stream-view-item {
 
       div.stream-view-attachments {
         position: absolute;
-        bottom: 64px;
+        bottom: 104px;
+        width: 465px;
 
         @include mobile() {
           position: relative;
@@ -288,7 +289,7 @@ div.stream-view-item {
         height: 32px;
         margin-top: 24px;
         position: absolute;
-        bottom: 0px;
+        bottom: 40px;
 
         div.reactions {
           margin-top: 3px;
@@ -311,9 +312,7 @@ div.stream-view-item {
       width: 387px;
       min-height: 300px;
       position: relative;
-      // Restore this when moving the add comment box above
-      // padding: 32px 20px 40px 32px;
-      padding: 16px 20px 40px 32px;
+      padding: 32px 20px 40px 32px;
       background-color: #FDFCFB;
       max-height: 685px;
       border-bottom-right-radius: 6px;
@@ -332,13 +331,13 @@ div.stream-view-item {
         }
 
         div.stream-comments {
-          margin-top: 16px;
+          margin-top: 8px;
           height: calc(100% - 58px);
         }
       }
 
       div.add-comment-box-container {
-        width: 100%;
+        width: calc(100% - 12px);
         margin-right: 12px;
 
         div.add-comment-box {
