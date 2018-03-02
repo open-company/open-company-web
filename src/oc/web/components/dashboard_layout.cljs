@@ -110,7 +110,7 @@
                                                     (/
                                                      (- @(::ww s) container-width sidebar-width)
                                                      2)
-                                                   sidebar-width))
+                                                    sidebar-width))
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)]
