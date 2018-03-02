@@ -104,6 +104,16 @@ div.dashboard-layout {
           text-align: center;
         }
 
+        div.board-switcher {
+          float: right;
+          color: $carrot_orange;
+          text-decoration: underline;
+          @include avenir_M();
+          font-size: 18px;
+          cursor: pointer;
+          margin-top: 16px;
+        }
+
         div.board-name {
           float: left;
 
@@ -235,6 +245,7 @@ div.dashboard-layout {
         div.new-post-top-dropdown-container {
           position: relative;
           float: right;
+          margin-left: 24px;
 
           button.add-to-board-top-button {
             width: 143px;

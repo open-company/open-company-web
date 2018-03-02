@@ -15,6 +15,7 @@
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
+            [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
@@ -69,6 +70,7 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
+                              (rum/local :stream ::board-switch)
                               {:will-mount (fn [s]
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
@@ -106,7 +108,8 @@
                           (zero? (count (:fixed-items board-data))))
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        container-width (if (utils/in? (:route route) "all-posts")
+        container-width (if (or (utils/in? (:route route) "all-posts")
+                                (= @(::board-switch s) :stream))
                           responsive/all-posts-container-width
                           responsive/board-container-width)
         board-container-style {:marginLeft (if is-mobile-size?
@@ -192,7 +195,12 @@
                       :on-change (fn [item]
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
-                                                                 :board-name (:label item)}))}))])]
+                                                                 :board-name (:label item)}))}))])
+              [:div.board-switcher
+                {:on-click #(reset! (::board-switch s) (if (= @(::board-switch s) :stream) :grid :stream))}
+                (if (= @(::board-switch s) :stream)
+                  "Grid view"
+                  "Stream view")]]
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
@@ -210,9 +218,12 @@
                 ;; Drafts
                 is-drafts-board
                 (drafts-layout board-data)
-                ;; Entries
+                ;; Entries grid view
+                (= @(::board-switch s) :grid)
+                (entries-layout)
+                ;; Entries stream view
                 :else
-                (entries-layout)))
+                (section-stream)))
             ;; Add entry floating button
             (when (and (not (:read-only org-data))
                        (or (utils/link-for (:links board-data) "create")
