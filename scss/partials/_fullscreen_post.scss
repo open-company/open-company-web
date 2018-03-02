@@ -12,8 +12,12 @@ div.fullscreen-post-container {
   transition: opacity 180ms ease-in;
 
   @include tablet() {
-    position: relative;
+    position: initial;
     width: 100%;
+    height: initial;
+    padding-top: 64px;
+    top: unset;
+    left: unset;
     background-color: white;
   }
 
@@ -312,20 +316,20 @@ div.fullscreen-post-container {
   }
 
   div.fullscreen-post {
-    margin-top: 64px;
     margin: 100px auto 32px;
     width: 1060px;
     position: relative;
-    min-height: calc(100vh - 32px);
+    min-height: calc(100vh - 132px);
     height: auto;
 
     @include tablet() {
-      margin: 64px auto 32px;
+      margin: 0px auto 32px;
       width: 100%;
       min-height: initial;
       box-shadow: none;
       border: none;
       padding: 0px;
+      background-color: white;
     }
 
     div.fullscreen-post-author-header {
@@ -381,7 +385,7 @@ div.fullscreen-post-container {
         @include tablet() {
           box-shadow: none;
           border-radius: 0px;
-          padding: 32px 24px;
+          padding: 32px 24px 0px;
         }
 
         div.fullscreen-post-box-content-board {
@@ -450,7 +454,6 @@ div.fullscreen-post-container {
           color: $deep_navy;
           line-height: 30px;
           margin-top: 32px;
-          min-height: 85px;
 
           div.carrot-no-preview, a.carrot-no-preview {
             display: none;
@@ -539,6 +542,7 @@ div.fullscreen-post-container {
         margin-top: 24px;
         padding: 0px 24px;
         height: auto;
+        background-color: white;
       }
 
       &.no-comments {
@@ -572,6 +576,10 @@ div.fullscreen-post-container {
         margin-top: 16px;
         max-height: calc(100% - 64px);
 
+        @include tablet() {
+          background-color: white;
+        }
+
         &:before {
           @include top-gradient($oc_gray_8);
         }
@@ -591,6 +599,7 @@ div.fullscreen-post-container {
 
       div.add-comment-box-container {
         padding-right: 12px;
+        padding-top: 0px;
 
         @include tablet() {
           padding-right: 0px;
