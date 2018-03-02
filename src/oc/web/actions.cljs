@@ -105,7 +105,6 @@
 
 (defmethod dispatcher/action :board-get
   [db [_ link]]
-  (timbre/debug "Get board " link)
   (api/get-board link)
   db)
 
@@ -186,7 +185,6 @@
       ;; and update change-data to reflect that we are seeing this board
       (when-let [board-uuid (:uuid fixed-board-data)]
         (utils/after 10 #(dispatcher/dispatch! [:board-seen {:board-uuid board-uuid}])))
-      (timbre/debug "board is visible")
       ;; only watch the currently visible board.
       (ws-ic/board-unwatch (fn [rep]
         (timbre/debug rep "Watching on socket " (:uuid fixed-board-data))
