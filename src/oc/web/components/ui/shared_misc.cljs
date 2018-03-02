@@ -65,11 +65,11 @@
       [:div.card.card-4
         [:div.card-icon]
         [:div.card-title
-          "Stay informed and aligned"]
+          "Find anything fast"]
         [:div.card-content
           (str
             "Get up to speed quickly with the "
-            "full picture in one place. Perfect "
+            "full picture in one place. Great "
             "for distributed teams, too.")]]
       [:div.card.card-5
         [:div.card-icon]
@@ -77,10 +77,9 @@
           "See who’s engaged"]
         [:div.card-content
           (str
-            "Carrot measures team "
-            "engagement so leaders "
-            "can see if their teams "
-            "are aligned.")]]
+            "Carrot shows you who's reading "
+            "what so leaders can see if "
+            "their teams are aligned.")]]
       [:div.card.card-6
         [:div.card-icon]
         [:div.card-title
