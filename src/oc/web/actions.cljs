@@ -950,9 +950,10 @@
             board-slugs (distinct
                           (map :board-slug
                                (map second (:fixed-items with-calendar-data))))]
-        (doseq [board-slug board-slugs]
-          (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
-          (ws-ic/board-watch (org-board-map board-slug))))
+        (ws-ic/board-unwatch (fn [rep]
+          (doseq [board-slug board-slugs]
+            (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
+            (ws-ic/board-watch (org-board-map board-slug))))))
       (assoc-in db all-posts-key with-calendar-data))
     db))
 
