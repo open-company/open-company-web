@@ -136,3 +136,14 @@
     "text/php" "fa-file-code-o"
     ;; Generic case
     "fa-file"))
+
+(defn get-activity-date [activity]
+  (or (:published-at activity) (:created-at activity)))
+
+(defn compare-activities [act-1 act-2]
+  (let [time-1 (get-activity-date act-1)
+        time-2 (get-activity-date act-2)]
+    (compare time-2 time-1)))
+
+(defn get-sorted-activities [all-posts-data]
+  (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))
