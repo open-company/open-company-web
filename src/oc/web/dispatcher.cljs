@@ -189,6 +189,10 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
+   :section-stream-data [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (get-in base (board-data-key org-slug board-slug))))]
    :activity-data       [[:base :org-slug :board-slug :activity-uuid]
                           (fn [base org-slug board-slug activity-uuid]
                             (get-in base (activity-key org-slug board-slug activity-uuid)))]
