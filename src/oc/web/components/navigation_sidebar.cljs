@@ -126,7 +126,7 @@
           [:button.mlb-reset.close-mobile-menu
             {:on-click #(close-navigation-sidebar)}]
           [:div.mobile-header-title
-            "Boards"]]
+            "Your digests"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
@@ -144,7 +144,7 @@
             [:h3.left-navigation-sidebar-top-title.group
               {:id "navigation-sidebar-boards"}
               [:span
-                "BOARDS"]
+                "SECTIONS"]
               (when show-create-new-board
                 [:button.left-navigation-sidebar-top-title-button.btn-reset.right
                   {:on-click #(do
@@ -213,7 +213,7 @@
                           (dis/dispatch! [:org-settings-show :invite])
                           (close-navigation-sidebar))}
             [:div.invite-people-icon]
-            [:span "Add teammates"]])
+            [:span "Invite people"]])
         [:button.mlb-reset.about-carrot-btn
           {:on-click #(do
                         (dis/dispatch! [:whats-new-modal-show])

@@ -139,6 +139,7 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-mobile-header {
     display: none;
+    position: relative;
 
     @include mobile() {
       display: block;
@@ -160,11 +161,12 @@ div.left-navigation-sidebar {
       @include avenir_H();
       font-size: 22px;
       color: white;
-      width: 72px;
+      width: 150px;
       position: relative;
       left: 50%;
-      margin-left: #{-32 + -36}px;
-      float: left;
+      margin-left: -75px;
+      text-align: center;
+      position: absolute;
     }
   }
 
