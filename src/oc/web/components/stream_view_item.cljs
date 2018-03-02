@@ -51,7 +51,6 @@
                               (rum/local false ::move-activity)
                               (rum/local nil ::window-click)
                               (rum/local false ::expanded)
-                              (rum/local false ::mobile-show-comments)
                               {:did-mount (fn [s]
                                 (reset! (::window-click s)
                                  (events/listen
@@ -179,24 +178,24 @@
               {:on-click #(reset! (::expanded s) true)}
               "Continue reading"]]
           (stream-view-attachments activity-attachments)
-          (when (and is-mobile?
-                     @(::mobile-show-comments s))
-            [:div.stream-mobile-comments
-              {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (add-comment activity-data)
-              (stream-comments activity-data comments-data)])
           [:div.stream-item-reactions.group
+            (reactions activity-data)
             (when (and is-mobile?
-                       (not @(::mobile-show-comments s)))
+                       (not expanded?))
               [:div.stream-mobile-comments-summary
                 {:on-click #(do
                               (utils/event-stop %)
-                              (reset! (::mobile-show-comments s) true))}
+                              (reset! (::expanded s) true))}
                 (if (zero? (count comments-data))
                   (when is-mobile?
-                    [:div.zero-comments "Reply"])
-                  (comments-summary activity-data false))])
-            (reactions activity-data)]]
+                    [:div.zero-comments "Comment"])
+                  (comments-summary activity-data false))])]
+          (when (and is-mobile?
+                     expanded?)
+            [:div.stream-mobile-comments
+              {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
+              (add-comment activity-data)
+              (stream-comments activity-data comments-data)])]
         (when-not is-mobile?
           [:div.stream-body-right
             {:class (when expanded? "expanded")}
