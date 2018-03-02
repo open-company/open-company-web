@@ -323,18 +323,22 @@ div.stream-view-item {
       }
 
       div.stream-body-comments {
-        padding-bottom: 68px;
         height: 100%;
 
         &.add-comment-expanded {
-          padding-bottom: 142px;
+          div.stream-comments {
+            height: calc(100% - 140px);
+          }
+        }
+
+        div.stream-comments {
+          margin-top: 16px;
+          height: calc(100% - 58px);
         }
       }
 
       div.add-comment-box-container {
-        bottom: 40px;
-        width: calc(100% - 64px);
-        position: absolute;
+        width: 100%;
         margin-right: 12px;
 
         div.add-comment-box {
