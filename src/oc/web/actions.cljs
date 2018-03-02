@@ -1178,6 +1178,8 @@
 (defmethod dispatcher/action :private-board-user-add
   [db [_ user user-type]]
   (let [board-data (:board-editing db)
+        current-notifications (filterv #(not= (:user-id %) (:user-id user))
+                                       (:private-notifications board-data))
         current-authors (filterv #(not= % (:user-id user)) (:authors board-data))
         current-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))
         next-authors (if (= user-type :author)
@@ -1185,17 +1187,24 @@
                        current-authors)
         next-viewers (if (= user-type :viewer)
                        (vec (conj current-viewers (:user-id user)))
-                       current-viewers)]
-    (assoc db :board-editing (merge board-data {:authors next-authors
-                                                :viewers next-viewers}))))
+                       current-viewers)
+        next-notifications (vec (conj current-notifications user))]
+    (assoc db :board-editing
+           (merge board-data {:authors next-authors
+                              :viewers next-viewers
+                              :private-notifications next-notifications}))))
 
 (defmethod dispatcher/action :private-board-user-remove
   [db [_ user]]
   (let [board-data (:board-editing db)
+        private-notifications (filterv #(not= (:user-id %) (:user-id user))
+                                       (:private-notifications board-data))
         next-authors (filterv #(not= % (:user-id user)) (:authors board-data))
         next-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))]
-    (assoc db :board-editing (merge board-data {:authors next-authors
-                                                :viewers next-viewers}))))
+    (assoc db :board-editing
+           (merge board-data {:authors next-authors
+                              :viewers next-viewers
+                              :private-notifications private-notifications}))))
 
 (defmethod dispatcher/action :private-board-kick-out-self
   [db [_ user]]
