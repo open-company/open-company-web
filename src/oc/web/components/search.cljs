@@ -135,11 +135,11 @@
   (when (store/should-display)
     (let [search-active? (drv/react s store/search-active?)]
       [:div.search-box {:class (when @(::search-clicked? s) "active")}
-        [:button.search-close {:class (when (not @(::search-clicked? s))
+        [:button.search-close {:class (when-not @(::search-clicked? s)
                                         "inactive")
                                :on-click #(search-inactive s)}]
         [:input.search
-          {:class (when (not @(::search-clicked? s)) "inactive")
+          {:class (when-not @(::search-clicked? s) "inactive")
            :ref "search-input"
            :placeholder (when-not (responsive/is-mobile-size?) "Search")
            :on-click #(reset! (::search-clicked? s) true)

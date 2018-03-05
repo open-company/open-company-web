@@ -141,7 +141,7 @@ div.stream-view-item {
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
-    background-color: white;
+    background-color: #FDFCFB;
 
     @include mobile() {
       border-bottom-left-radius: 0px;
@@ -153,10 +153,10 @@ div.stream-view-item {
     div.stream-body-left {
       flex-grow: 0;
       flex-shrink: 0;
-      width: 505px;
+      width: 545px;
       position: relative;
-      padding: 40px 0px 48px 40px;
-      margin: 0px 40px 40px 0px;
+      padding: 40px 40px 88px 40px;
+      background-color: white;
 
       @include mobile() {
         width: 100%;
@@ -166,7 +166,8 @@ div.stream-view-item {
 
       div.stream-view-attachments {
         position: absolute;
-        bottom: 64px;
+        bottom: 104px;
+        width: 465px;
 
         @include mobile() {
           position: relative;
@@ -222,14 +223,6 @@ div.stream-view-item {
             @include avenir_BOOK();
             color: $deep_navy;
             line-height: 30px;
-
-            p:not(:last-child) {
-              margin: 0 0 24px;
-            }
-
-            * {
-              color: $deep_navy;
-            }
 
             div.carrot-no-preview, a.carrot-no-preview {
               display: none;
@@ -296,7 +289,7 @@ div.stream-view-item {
         height: 32px;
         margin-top: 24px;
         position: absolute;
-        bottom: 0px;
+        bottom: 40px;
 
         div.reactions {
           margin-top: 3px;
@@ -329,18 +322,22 @@ div.stream-view-item {
       }
 
       div.stream-body-comments {
-        padding-bottom: 68px;
         height: 100%;
 
         &.add-comment-expanded {
-          padding-bottom: 142px;
+          div.stream-comments {
+            height: calc(100% - 140px);
+          }
+        }
+
+        div.stream-comments {
+          margin-top: 8px;
+          height: calc(100% - 58px);
         }
       }
 
       div.add-comment-box-container {
-        bottom: 40px;
-        width: calc(100% - 64px);
-        position: absolute;
+        width: calc(100% - 12px);
         margin-right: 12px;
 
         div.add-comment-box {

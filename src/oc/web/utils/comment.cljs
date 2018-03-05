@@ -12,7 +12,7 @@
   ([comments :guard map?]
    (sort-comments (vals comments)))
   ([comments :guard sequential?]
-   (vec (sort-by :created-at comments))))
+   (vec (reverse (sort-by :created-at comments)))))
 
 (defn setup-medium-editor [comment-node]
   (let [config {:toolbar false

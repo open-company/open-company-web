@@ -187,7 +187,7 @@ div.entry-edit-modal-container {
         height: 88px;
         width: 100%;
         padding: 28px 41px;
-        border-bottom: 1px solid rgba($deep_tan, 0.3);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         @include mobile() {
           height: 48px;
@@ -391,7 +391,7 @@ div.entry-edit-modal-container {
           div.rich-body-editor {
             border: none;
             outline: none;
-            color: $carrot_dark_gray;
+            color: $deep_navy;
             @include avenir_R();
             font-size: 16px;
             margin: 15px 0;
@@ -414,15 +414,7 @@ div.entry-edit-modal-container {
             @include activity-attachment(true);
 
             &.medium-editor-placeholder:after {
-              color: rgba(#8A8E94, 0.5) !important;
-
-              @include tablet() {
-                color: rgba($carrot_dark_gray, 0.5) !important;
-              }
-            }
-
-            * {
-              color: $carrot_dark_gray;
+              color: $deep_navy !important;
             }
 
             &:after {

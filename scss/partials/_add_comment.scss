@@ -2,7 +2,7 @@ div.add-comment-box-container {
   position: relative;
   width: 100%;
 
-  @include mobile() {
+  @include tablet() {
     padding: 16px 0px 0px;
     width: 100%;
     position: relative;
@@ -12,24 +12,32 @@ div.add-comment-box-container {
     background-color: white;
     border-radius: 4px;
     border: 2px solid $deep_tan;
-    box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
     position: relative;
     left: 0;
     right: 0;
     bottom: 0px;
     width: 100%;
-    padding: 16px;
+    padding: 15px 16px;
 
-    @include mobile(){
+    &:hover, &.show-buttons {
+      box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
+      border: 2px solid $light_ui_grey;
+    }
+
+    @include tablet(){
       box-shadow: none;
     }
 
     div.emoji-picker {
       position: absolute;
       right: 16px;
-      top: 9px;
+      top: 11px;
 
-      @include mobile() {
+      button.emoji-button {
+        background-size: 16px 16px;
+      }
+
+      @include tablet() {
         display: none;
       }
 
@@ -40,7 +48,8 @@ div.add-comment-box-container {
 
     &.show-buttons {
       div.emoji-picker {
-
+        right: 52px;
+        top: 94px;
       }
 
       div.add-comment-internal {
@@ -61,8 +70,9 @@ div.add-comment-box-container {
           padding-top: 0px;
           padding-right: 0px;
           margin-right: 0px;
+          width: 100%;
 
-          @include mobile() {
+          @include tablet() {
             height: auto;
           }
         }
@@ -109,7 +119,7 @@ div.add-comment-box-container {
           color: rgba($ui_grey, 0.5);
         }
 
-        @include mobile() {
+        @include tablet() {
           width: 100%;
           resize: vertical;
           padding-right: 0px;

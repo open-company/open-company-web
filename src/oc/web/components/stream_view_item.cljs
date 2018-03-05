@@ -159,7 +159,7 @@
       [:div.stream-view-item-body.group
         [:div.stream-body-left.group
           {:style {:padding-bottom (when-not is-mobile?
-                                     (let [initial-padding 64
+                                     (let [initial-padding 104
                                            attachments-num (count activity-attachments)
                                            attachments-height (* (js/Math.ceil (/ attachments-num 2)) 65)
                                            total-padding (+ initial-padding
@@ -183,8 +183,8 @@
                      @(::mobile-show-comments s))
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (stream-comments activity-data comments-data)
-              (add-comment activity-data)])
+              (add-comment activity-data)
+              (stream-comments activity-data comments-data)])
           [:div.stream-item-reactions.group
             (when (and is-mobile?
                        (not @(::mobile-show-comments s)))
@@ -202,6 +202,5 @@
             {:class (when expanded? "expanded")}
             [:div.stream-body-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (rum/with-key (stream-comments activity-data comments-data)
-               (str "stream-comments-" (:uuid activity-data) "-" (count comments-data)))
-              (add-comment activity-data)]])]]))
+              (add-comment activity-data)
+              (stream-comments activity-data comments-data)]])]]))

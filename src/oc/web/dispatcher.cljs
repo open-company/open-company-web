@@ -226,10 +226,12 @@
                             (:alert-modal base))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
-   :modal-data          [[:base :org-data :activity-data :activity-share
-                          :add-comment-focus :comment-edit :ap-initial-at]
+   :fullscreen-post-data [[:base :org-data :activity-data :activity-share
+                          :add-comment-focus :comment-edit :ap-initial-at
+                          :comments-data]
                           (fn [base org-data activity-data activity-share
-                               add-comment-focus comment-edit ap-initial-at]
+                               add-comment-focus comment-edit ap-initial-at
+                               comments-data]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
@@ -240,6 +242,7 @@
                              :entry-save-on-exit (:entry-save-on-exit base)
                              :add-comment-focus add-comment-focus
                              :comment-edit comment-edit
+                             :comments-data comments-data
                              :ap-initial-at ap-initial-at})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
