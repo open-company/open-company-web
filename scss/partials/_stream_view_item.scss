@@ -172,6 +172,7 @@ div.stream-view-item {
         @include mobile() {
           position: relative;
           bottom: unset;
+          width: 100%;
         }
       }
 
