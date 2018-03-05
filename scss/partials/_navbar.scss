@@ -27,6 +27,13 @@ nav.oc-navbar {
   transition: height 230ms;
   box-shadow: 0px 2px 6px 0px rgba($deep_tan, 0.5);
 
+  &.not-fixed {
+    @include mobile() {
+      box-shadow: none;
+      position: absolute;
+    }
+  }
+
   &.showing-orgs-dropdown {
     overflow: visible;
   }

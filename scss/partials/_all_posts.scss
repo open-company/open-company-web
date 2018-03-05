@@ -4,6 +4,7 @@ div.all-posts {
   @include mobile() {
     width: 100%;
     margin-left: 0px;
+    margin-top: 24px;
   }
 
   div.all-posts-cards {
