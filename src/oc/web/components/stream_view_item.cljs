@@ -39,8 +39,8 @@
           dom-node (rum/dom-node s)]
       (if (or (responsive/is-tablet-or-mobile?)
               (> (.-clientHeight item-body) 400))
-        (.add (.-classList dom-node) "body-fade-out")
-        (.remove (.-classList dom-node) "body-fade-out")))))
+        (.add (.-classList dom-node) "show-continue-reading")
+        (.remove (.-classList dom-node) "show-continue-reading")))))
 
 (rum/defcs stream-view-item < rum/reactive
                               ;; Derivatives
