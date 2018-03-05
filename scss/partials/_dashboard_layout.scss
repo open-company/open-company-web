@@ -83,74 +83,47 @@ div.dashboard-layout {
         padding: 0px 12px;
 
         @include mobile() {
-            width: 100%;
-            height: 48px;
-            position: relative;
-            z-index: 1000;
-            top: 0px;
-            left: 0px;
-            background-color: white;
-            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-            border-top: 1px solid $light_tan;
-            padding: 15px;
+          width: 100%;
+          height: 48px;
+          position: relative;
+          z-index: 1000;
+          top: 0px;
+          left: 0px;
+          background-color: white;
+          box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+          border-top: 1px solid $light_tan;
+          padding: 15px;
 
-            &.sticky {
-              position: absolute;
-            }
-          
-            div.board-name {
-              div.board-name-with-icon {
-                @include avenir_H();
-                font-size: 15px;
-                color: $deep_navy;
-                width: auto;
-                height: 18px;
-                text-align: center;
-                margin: 0 auto;
-                position: relative;
-              }
-            }
-          }
-
-        div.board-switcher {
-          float: right;
-          color: $carrot_orange;
-          text-decoration: underline;
-          @include avenir_M();
-          font-size: 18px;
-          cursor: pointer;
-          margin-top: 16px;
-
-          @include mobile() {
-            display: none;
+          &.sticky {
+            position: absolute;
           }
         }
-
+          
         div.board-name {
           float: left;
 
           @include mobile() {
-            // display: inline-block;
-            text-align: center;
             float: unset;
-            margin-left: 0px;
           }
 
-          // div.board-name-with-icon {
-          //   @include avenir_M();
-          //   font-size: 32px;
-          //   color: $carrot_gray;
-          //   float: left;
+          div.board-name-with-icon {
+            @include avenir_M();
+            font-size: 32px;
+            color: $carrot_gray;
+            float: left;
 
-          //   @include mobile() {
-          //     color: $carrot_dark_gray;
-          //     float: unset;
-          //   }
-
-          //   .emojione {
-          //     @include emoji-size(32);
-          //   }
-          // }
+            @include mobile() {
+              @include avenir_H();
+              font-size: 15px;
+              color: $deep_navy;
+              width: auto;
+              height: 18px;
+              text-align: center;
+              margin: 0 auto;
+              position: relative;
+              float: unset;
+            }
+          }
 
           button.board-settings-bt {
             float: left;
@@ -167,12 +140,6 @@ div.dashboard-layout {
             opacity: 0.8;
 
             @include mobile(){
-              margin-right: -30px;
-              margin-left: 8px;
-              padding: 0px;
-              float: unset;
-
-              // Remove to show settings button on mobile
               display: none;
             }
 
@@ -251,6 +218,20 @@ div.dashboard-layout {
                 margin-left: -12px;
               }
             }
+          }
+        }
+
+        div.board-switcher {
+          float: right;
+          color: $carrot_orange;
+          text-decoration: underline;
+          @include avenir_M();
+          font-size: 18px;
+          cursor: pointer;
+          margin-top: 16px;
+
+          @include mobile() {
+            display: none;
           }
         }
 
