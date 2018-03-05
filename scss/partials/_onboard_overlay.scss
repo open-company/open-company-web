@@ -18,16 +18,9 @@ div.onboard-overlay-container {
   }
 
   div.onboard-overlay {
-    width: 600px;
-    height: 540px;
-    left: 50%;
-    top: 50%;
-    margin-left: -300px;
-    margin-top: -250px;
+    width: 100%;
+    height: 100%;
     position: relative;
-    background-color: white;
-    border-radius: 24px;
-    box-shadow: 0 4px 34px 0 rgba(#7B7B7B, 0.5);
     text-align: center;
 
     @include mobile(){
@@ -37,232 +30,17 @@ div.onboard-overlay-container {
       height: 100%;
       margin-left: 0px;
       margin-top: 0px;
-      border-radius: 0px;
-    }
-
-    div.onboard-overlay-step {
-      height: 540px;
-      background-size: 600px 540px;
-      background-repeat: no-repeat;
-      padding: 50px 32px;
-      position: relative;
-
-      div.onboard-balloon {
-        display: none;
-
-        @include tablet() {
-          display: block;
-          position: absolute;
-          background-position: center;
-          background-repeat: no-repeat;
-          z-index: 1;
-        }
-
-        &.red-balloon {
-          width: 135px;
-          height: 116px;
-          top: -55px;
-          left: -60px;
-          background-size: 135px 116px;
-          @include image-2x("/img/ML/onboard_mobile_red_balloon");
-        }
-
-        &.green-balloon {
-          width: 217px;
-          height: 216px;
-          top: -157px;
-          right: -118px;
-          transform: rotate(130deg);
-          background-size: 217px 216px;
-          @include image-2x("/img/ML/onboard_mobile_green_balloon");
-        }
-
-        &.yellow-balloon {
-          width: 15px;
-          height: 15px;
-          left: 260px;
-          top: 39px;
-          background-size: 15px 15px;
-          @include image-2x("/img/ML/onboard_mobile_yellow_balloon");
-        }
-
-        &.green-balloon-1 {
-          width: 180px;
-          height: 180px;
-          top: 92px;
-          left: -144px;
-          background-size: 180px 180px;
-          @include image-2x("/img/ML/onboard_mobile_green_balloon_1");
-        }
-
-        &.red-balloon-1 {
-          width: 135px;
-          height: 116px;
-          top: -63px;
-          right: -80px;
-          background-size: 135px 116px;
-          @include image-2x("/img/ML/onboard_mobile_red_balloon");
-        }
-
-        &.yellow-balloon-1 {
-          width: 15px;
-          height: 15px;
-          left: 180px;
-          top: 39px;
-          background-size: 15px 15px;
-          @include image-2x("/img/ML/onboard_mobile_yellow_balloon");
-        }
-
-        &.purple-balloon {
-          width: 23px;
-          height: 21px;
-          left: 282px;
-          top: 139px;
-          background-size: 23px 21px;
-          @include image-2x("/img/ML/onboard_mobile_purple_balloon");
-        }
-      }
-
-      div.onboard-overlay-step-title {
-        @include avenir_H();
-        font-size: 32px;
-        color: $carrot_dark_gray;
-        margin-top: 32px;
-      }
-
-      div.step-illustration-container-center {
-        width: 260px;
-        height: 293px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-left: -130px;
-        margin-top: -146px;
-
-        div.step-illustration-container {
-          margin: 0px auto;
-          background-position: center;
-          background-repeat: no-repeat;
-
-          @include mobile() {
-            margin: 8px auto 0px;
-          }
-        }
-
-        div.onboard-overlay-step-description {
-          @include avenir_M();
-          font-size: 18px;
-          color: $oc_gray_7;
-          line-height: 26px;
-          text-align: center;
-
-          @include mobile(){
-            width: 100%;
-          }
-        }
-      }
-
-      button.continue-btn {
-        width: 300px;
-        height: 40px;
-        border-radius: 100px;
-        background-color: $carrot_text_blue;
-        color: white;
-        @include avenir_H();
-        font-size: 16px;
-        text-align: center;
-        padding: 8px 28px;
-        position: absolute;
-        bottom: 64px;
-        left: 50%;
-        margin-left: -150px;
-      }
-
-      &.step-1 {
-        height: 100%;
-        background-image: cdnUrl("/img/ML/onboard_overlay_step_1.png");
-
-        @include mobile() {
-          height: calc(100vh - 42px);
-          background-image: none;
-        }
-
-        div.step-illustration-container-center {
-
-          div.step-illustration-container {
-            width: 246px;
-            height: 216px;
-            background-size: 246px 216px;
-            background-repeat: no-repeat;
-            @include image-2x("/img/ML/onboard_overlay_il_1");
-          }
-
-          div.onboard-overlay-step-description {
-            margin-top: 20px;
-          }
-        }
-
-        button.continue-btn {
-          margin-top: 32px;
-        }
-      }
-
-      &.step-last {
-        background-image: cdnUrl("/img/ML/onboard_overlay_step_last.png");
-
-        @include mobile() {
-          background-image: none;
-        }
-
-        div.onboard-overlay-step-title {
-          margin-top: 0px;
-        }
-
-        div.step-illustration-container-center {
-          width: 311px;
-          margin-left: -155px;
-          height: 329px;
-          margin-top: -164px;
-        
-          div.step-illustration-container {
-            width: 260px;
-            margin-left: 25px;
-            height: 231px;
-            background-size: 260px 231px;
-            background-repeat: no-repeat;
-            @include image-2x("/img/ML/onboard_overlay_il_last");
-          }
-
-          div.onboard-overlay-step-description {
-            margin-top: 20px;
-          }
-        }
-
-        button.continue-btn {
-          margin-top: 41px;
-          text-align: center;
-
-          @include mobile() {
-            margin-top: 8px;
-          }
-
-          &:after {
-            background-image: none;
-          }
-        }
-      }
     }
 
     // Mobile NUX
     div.onboard-overlay-mobile-step {
       width: 100%;
       height: 100%;
-      padding: 24px 40px;
+      padding: 70px 40px;
       position: relative;
-      border-radius: 12px;
 
       @include mobile() {
-        border-radius: 0px;
+        padding: 24px 40px;
       }
 
       div.onboard-overlay-step-title {
@@ -275,16 +53,26 @@ div.onboard-overlay-container {
         }
       }
 
-      div.step-illustration-container-center {
-        div.step-illustration-container {
+      div.step-illustration-container {
+        width: 860px;
+        height: 762px;
+        position: absolute;
+        top: 264px;
+        left: 50%;
+        margin-left: -430px;
+        background-size: 860px 762px;
+        background-position: 0px 0px;
+        background-repeat: no-repeat;
+
+        @include mobile() {
           width: 280px;
           height: 270px;
           overflow: hidden;
-          background-position: 0px 0px;
-          background-repeat: no-repeat;
           position: relative;
           margin: 16px auto;
           max-height: 270px;
+          top: unset;
+          left: unset;
 
           &:after {
             // Gradient
@@ -298,6 +86,9 @@ div.onboard-overlay-container {
             pointer-events: none;
           }
         }
+      }
+
+      div.step-illustration-container-center {
 
         div.onboard-overlay-step-description {
           @include avenir_M();
@@ -323,7 +114,7 @@ div.onboard-overlay-container {
         font-size: 16px;
         text-align: center;
         padding: 8px 28px;
-        margin: 32px auto 0px;
+        margin: 24px auto 0px;
 
         @include mobile() {
           position: absolute;
@@ -333,63 +124,29 @@ div.onboard-overlay-container {
         }
       }
 
-      div.steps-dot-container {
-        height: 8px;
-        width: 40px;
-        margin: 24px auto 0px;
-        position: relative;
-
-        @include mobile() {
-          position: absolute;
-          bottom: 48px;
-          left: 50%;
-          margin-left: -20px;
-        }
-
-        div.step-dot {
-          position: absolute;
-          top: 0px;
-          width: 8px;
-          height: 8px;
-          border-radius: 4px;
-          background-color: rgba($deep_navy, 0.2);
-
-          &:first-child {
-            left: 0px;
-
-            &.active {
-              background-color: $carrot_orange;
-            }
-          }
-
-          &:nth-child(2) {
-            left: 16px;
-
-            &.active {
-              background-color: $carrot_green;
-            }
-          }
-
-          &:nth-child(3) {
-            left: 32px;
-
-            &.active {
-              background-color: $carrot_gold;
-            }
-          }
-        }
-      }
-
       &.step-1 {
-        background-color: $coral;
+        background-color: $feint_emerald;
 
         div.onboard-overlay-step-title {
-          color: $carrot_orange;
+          color: $carrot_green;
         }
 
         div.step-illustration-container-center {
+          position: relative;
 
-          div.step-illustration-container {
+          @include mobile() {
+            position: unset;
+          }
+        }
+
+        button.continue-btn {
+          background-color: $carrot_green;
+        }
+
+        div.step-illustration-container {
+          @include image-2x("/img/ML/onboard_desktop_screenshot_1");
+
+          @include mobile() {
             @include image-2x("/img/ML/mobile_nux_il_1");
             background-size: 280px 426px;
 
@@ -405,22 +162,31 @@ div.onboard-overlay-container {
             }
           }
         }
+      }
+
+      &.step-2 {
+        background-color: $coral;
+
+        div.onboard-overlay-step-title {
+          color: $carrot_orange;
+        }
+
+        div.step-illustration-container-center {
+          position: relative;
+
+          @include mobile() {
+            position: unset;
+          }
+        }
 
         button.continue-btn {
           background-color: $carrot_orange;
         }
-      }
 
-      &.step-2 {
-        background-color: $feint_emerald;
+        div.step-illustration-container {
+          @include image-2x("/img/ML/onboard_desktop_screenshot_2");
 
-        div.onboard-overlay-step-title {
-          color: $carrot_green;
-        }
-
-        div.step-illustration-container-center {
-
-          div.step-illustration-container {
+          @include mobile() {
             @include image-2x("/img/ML/mobile_nux_il_2");
             background-size: 280px 350px;
 
@@ -435,39 +201,6 @@ div.onboard-overlay-container {
               filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
             }
           }
-        }
-
-        button.continue-btn {
-          background-color: $carrot_green;
-        }
-      }
-
-      &.step-3 {
-        background-color: $light_gold;
-
-        div.onboard-overlay-step-title {
-          color: $carrot_gold;
-        }
-
-        div.step-illustration-container-center {
-
-          div.step-illustration-container {
-            @include image-2x("/img/ML/mobile_nux_il_3");
-            background-size: 263px 231px;
-            width: 263px;
-
-            @include mobile() {
-              height: 231px;
-            }
-
-            &:after {
-              display: none;
-            }
-          }
-        }
-
-        button.continue-btn {
-          background-color: $carrot_gold;
         }
       }
     }

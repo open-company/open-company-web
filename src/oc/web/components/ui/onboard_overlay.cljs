@@ -47,8 +47,9 @@
               [:div.onboard-overlay-step-title
                 "Above the noise"])
             [:div.step-illustration-container-center
-              [:div.step-illustration-container
-                {:style (when is-mobile? {:height (str (min 418 (- wh 138 203)) "px")})}]
+              (when is-mobile?
+                [:div.step-illustration-container
+                  {:style {:height (str (min 418 (- wh 138 203)) "px")}}])
               (when-not is-mobile?
                 [:div.onboard-overlay-step-title
                   "Above the noise"])
@@ -60,27 +61,25 @@
               {:on-click #(dis/dispatch! [:input [:nux] :2])
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
               "Next"]
-            [:div.steps-dot-container
-              {:style (when is-mobile? {:bottom (if is-safari-mobile "90px" "48px")})}
-              [:div.step-dot.active]
-              [:div.step-dot]
-              [:div.step-dot]]]
+            (when-not is-mobile?
+              [:div.step-illustration-container])]
           :2
           [:div.onboard-overlay-mobile-step.step-2
             (when is-mobile?
               [:div.onboard-overlay-step-title
                 "Focused conversations"])
             [:div.step-illustration-container-center
-              [:div.step-illustration-container
-                {:style (when is-mobile?
-                          (let [max-h 342
-                                height (- wh 138 263)
-                                next-height (min 342 height)
-                                margin-top (if (>= height max-h)
-                                             (+ (/ (- height max-h) 2) 32)
-                                             32)]
-                            {:height (str next-height "px")
-                             :margin-top (if is-mobile? (str margin-top "px") "0px")}))}]
+              (when is-mobile?
+                [:div.step-illustration-container
+                  {:style (when is-mobile?
+                            (let [max-h 342
+                                  height (- wh 138 263)
+                                  next-height (min 342 height)
+                                  margin-top (if (>= height max-h)
+                                               (+ (/ (- height max-h) 2) 32)
+                                               32)]
+                              {:height (str next-height "px")
+                               :margin-top (if is-mobile? (str margin-top "px") "0px")}))}])
               (when-not is-mobile?
                 [:div.onboard-overlay-step-title
                   "Focused conversations"])
@@ -89,40 +88,8 @@
                  "Team reactions and comments "
                  "stay together for context.")]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(dis/dispatch! [:input [:nux] :3])
+              {:on-click #(dis/dispatch! [:nux-end])
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
               "Next"]
-            [:div.steps-dot-container
-              {:style (when is-mobile? {:bottom (if is-safari-mobile "90px" "48px")})}
-              [:div.step-dot]
-              [:div.step-dot.active]
-              [:div.step-dot]]]
-          :3
-          [:div.onboard-overlay-mobile-step.step-3
-            (when is-mobile?
-              [:div.onboard-overlay-step-title
-                "Stay aligned"])
-            [:div.step-illustration-container-center
-              [:div.step-illustration-container
-                {:style (let [margin-top (/ (- wh 115 203 201) 2)]
-                          (when is-mobile?
-                            {:margin-top (str margin-top "px")}))}]
-              (when-not is-mobile?
-                [:div.onboard-overlay-step-title
-                  "Stay aligned"])
-              [:div.onboard-overlay-step-description
-                (str
-                 "The full picture in one place "
-                 "keeps everyone in sync.")]]
-            [:button.mlb-reset.continue-btn
-              {:on-click #(if (or is-mobile?
-                                  (not create-board-link))
-                            (dis/dispatch! [:nux-end])
-                            (dis/dispatch! [:input [:nux] :4]))
-               :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
-              "Start using Carrot"]
-            [:div.steps-dot-container
-              {:style (when is-mobile? {:bottom (if is-safari-mobile "90px" "48px")})}
-              [:div.step-dot]
-              [:div.step-dot]
-              [:div.step-dot.active]]]))]])
+            (when-not is-mobile?
+              [:div.step-illustration-container])]))]])
