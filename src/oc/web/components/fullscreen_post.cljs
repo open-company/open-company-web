@@ -200,7 +200,7 @@
 
 (defn setup-editing-data [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
-    (when (not @(::edited-data-loaded s))
+    (when-not @(::edited-data-loaded s)
       (let [activity-data (:activity-data modal-data)
             initial-body (:body activity-data)
             initial-headline (utils/emojify (:headline activity-data))]
@@ -283,7 +283,8 @@
                                    (when (and (not
                                                (utils/event-inside? e (rum/ref-node s "more-dropdown")))
                                               (not
-                                               (utils/event-inside? e (sel1 [:div.fullscreen-post :div.activity-move]))))
+                                               (utils/event-inside? e
+                                                (sel1 [:div.fullscreen-post :div.activity-move]))))
                                      (reset! (::showing-dropdown s) false))
                                    (when (and @(::show-legend s)
                                               (not (utils/event-inside? e (rum/ref-node s "legend-container"))))
