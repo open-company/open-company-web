@@ -120,7 +120,14 @@
                                                     sidebar-width))
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
-        all-boards (drv/react s :editable-boards)]
+        all-boards (drv/react s :editable-boards)
+        should-show-add-post-tooltip? true
+        compose-fn (fn [_]
+                    (if (or is-drafts-board is-all-posts)
+                      (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                      (let [entry-data {:board-slug (:slug board-data)
+                                        :board-name (:name board-data)}]
+                        (activity-actions/entry-edit entry-data))))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -171,12 +178,7 @@
                 [:div.new-post-top-dropdown-container.group
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
-                     :on-click (fn [_]
-                                (if (or is-drafts-board is-all-posts)
-                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (activity-actions/entry-edit entry-data))))}
+                     :on-click compose-fn}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "Compose"]]
@@ -193,6 +195,19 @@
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
                                                                  :board-name (:label item)}))}))])]
+            (when should-show-add-post-tooltip?
+              [:div.add-post-tooltip-container.group
+                [:button.mlb-reset.add-post-tooltip-dismiss
+                  {:on-click #()}]
+                [:div.add-post-tooltip-icon]
+                [:div.add-post-tooltip
+                  (str
+                   "Get started by creating a new post to share a team update, plans, or announcement. "
+                   "The sample post below can be deleted anytime.")]
+                [:div.add-post-tooltip-arrow]
+                [:button.mlb-reset.add-post-tooltip-compose-bt
+                  {:on-click compose-fn}
+                  "Create new post"]])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards

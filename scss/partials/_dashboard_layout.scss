@@ -97,6 +97,93 @@ div.dashboard-layout {
         left: unset;
       }
 
+      div.add-post-tooltip-container {
+        border: 2px dashed $light_tan;
+        border-radius: 6px;
+        padding: 32px 40px;
+        margin: 32px 0px;
+        position: relative;
+
+        @include tablet() {
+          width: calc(100% - 48px);
+          margin: 32px 24px;
+        }
+
+        button.add-post-tooltip-dismiss {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          width: 30px;
+          height: 30px;
+          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+
+          @include tablet() {
+            top: 16px;
+            left: 16px;
+          }
+        }
+
+        div.add-post-tooltip-icon {
+          @include image-2x("/img/ML/balloon_small_yellow_face");
+          background-size: 48px 48px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 48px;
+          height: 48px;
+          float: left;
+
+          @include tablet() {
+            float: unset;
+            margin: 0px auto;
+          }
+        }
+
+        div.add-post-tooltip {
+          @include avenir_M();
+          font-size: 18px;
+          color: $deep_navy;
+          width: 699px;
+          float: left;
+          margin-left: 24px;
+
+          @include tablet() {
+            float: unset;
+            margin: 24px auto 0px;
+            width: 100%;
+            text-align: center;
+          }
+        }
+
+        div.add-post-tooltip-arrow {
+          background-image: cdnUrl("/img/ML/add_post_tooltip_arrow.svg");
+          background-size: 32px 38px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 32px;
+          height: 38px;
+          float: right;
+
+          @include tablet() {
+            display: none;
+          }
+        }
+
+        button.add-post-tooltip-compose-bt {
+          display: none;
+
+          @include tablet() {
+            display: block;
+            color: $carrot_orange;
+            @include avenir_H();
+            font-size: 15px;
+            margin: 24px auto 0px;
+          }
+        }
+      }
+
       div.board-name-container {
         padding: 0px 12px;
 
@@ -162,7 +249,7 @@ div.dashboard-layout {
           div.private-board {
             @include avenir_M();
             font-size: 14px;
-            color: rgba(#34414F, 0.5);
+            color: rgba($deep_navy, 0.5);
             position: relative;
             padding-left: 16px;
             float: left;
@@ -198,7 +285,7 @@ div.dashboard-layout {
           div.public-board {
             @include avenir_M();
             font-size: 14px;
-            color: rgba(#34414F, 0.5);
+            color: rgba($deep_navy, 0.5);
             position: relative;
             padding-left: 16px;
             float: left;
