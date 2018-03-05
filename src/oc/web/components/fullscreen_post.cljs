@@ -308,8 +308,8 @@
         delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
-        activity-attachments (au/get-attachments-from-body (:body activity-data))
-        editing (:modal-editing modal-data)]
+        editing (:modal-editing modal-data)
+        activity-attachments (if editing (:attachments (:modal-editing-data modal-data)) (:attachments activity-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -440,7 +440,7 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
-            (stream-view-attachments activity-attachments editing)
+            (stream-view-attachments activity-attachments (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             [:div.fullscreen-post-box-footer.group
               (if editing
                 [:div.fullscreen-post-box-footer-editing
