@@ -246,7 +246,9 @@
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e items]
-            (stream-view-item e))]
+            (rum/with-key
+             (stream-view-item e)
+             (str "all-posts-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
