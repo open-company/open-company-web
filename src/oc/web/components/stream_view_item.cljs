@@ -38,8 +38,8 @@
     (let [item-body (rum/ref-node s "item-body")
           dom-node (rum/dom-node s)]
       (if (> (.-clientHeight item-body) 400)
-        (.add (.-classList dom-node) "show-continue-reading")
-        (.remove (.-classList dom-node) "show-continue-reading")))))
+        (.add (.-classList dom-node) "body-fade-out")
+        (.remove (.-classList dom-node) "body-fade-out")))))
 
 (rum/defcs stream-view-item < rum/reactive
                               ;; Derivatives
@@ -51,7 +51,7 @@
                               (rum/local false ::move-activity)
                               (rum/local nil ::window-click)
                               (rum/local false ::expanded)
-                              (rum/local false ::mobile-show-comments)
+                              (rum/local false ::should-scroll-to-comments)
                               {:did-mount (fn [s]
                                 (reset! (::window-click s)
                                  (events/listen
@@ -68,6 +68,9 @@
                                 (should-show-continue-reading? s)
                                 (comment-actions/get-comments-if-needed (first (:rum/args s))
                                  @(drv/get-ref s :comments-data))
+                                (when @(::should-scroll-to-comments s)
+                                  (utils/scroll-to-y (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 180)
+                                  (reset! (::should-scroll-to-comments s) false))
                                 s)
                                :will-unmount (fn [s]
                                 (events/unlistenByKey @(::window-click s))
@@ -88,7 +91,8 @@
         activity-attachments (au/get-attachments-from-body (:body activity-data))]
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
-                                :expanded expanded?})}
+                                :expanded expanded?
+                                :show-continue-reading (not expanded?)})}
       [:div.stream-view-item-header
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))
@@ -175,28 +179,31 @@
               [:div.stream-item-body-inner
                 {:ref "item-body"
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
-            [:button.mlb-reset.expand-button
-              {:on-click #(reset! (::expanded s) true)}
-              "Continue reading"]]
+            (when-not expanded?
+              [:button.mlb-reset.expand-button
+                {:on-click #(reset! (::expanded s) true)}
+                "Continue reading"])]
           (stream-view-attachments activity-attachments)
+          [:div.stream-item-reactions.group
+            {:ref "stream-item-reactions"}
+            (reactions activity-data)
+            (when (and is-mobile?
+                       (not expanded?))
+              [:div.stream-mobile-comments-summary
+                {:on-click (fn [e]
+                              (utils/event-stop e)
+                              (reset! (::expanded s) true)
+                              (reset! (::should-scroll-to-comments s) true))}
+                (if (zero? (count comments-data))
+                  (when is-mobile?
+                    [:div.zero-comments "Comment"])
+                  (comments-summary activity-data false))])]
           (when (and is-mobile?
-                     @(::mobile-show-comments s))
+                     expanded?)
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
               (add-comment activity-data)
-              (stream-comments activity-data comments-data)])
-          [:div.stream-item-reactions.group
-            (when (and is-mobile?
-                       (not @(::mobile-show-comments s)))
-              [:div.stream-mobile-comments-summary
-                {:on-click #(do
-                              (utils/event-stop %)
-                              (reset! (::mobile-show-comments s) true))}
-                (if (zero? (count comments-data))
-                  (when is-mobile?
-                    [:div.zero-comments "Reply"])
-                  (comments-summary activity-data false))])
-            (reactions activity-data)]]
+              (stream-comments activity-data comments-data)])]
         (when-not is-mobile?
           [:div.stream-body-right
             {:class (when expanded? "expanded")}

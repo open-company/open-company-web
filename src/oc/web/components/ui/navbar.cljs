@@ -36,6 +36,7 @@
                                                         (pos?
                                                          (:count
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
+                                :not-fixed (utils/in? (:route @router/path) "all-posts")
                                 :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
                                                      (not (:read-only org-data)))

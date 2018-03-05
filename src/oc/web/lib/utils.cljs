@@ -486,7 +486,7 @@
   (.play
     (new Scroll
          (.-scrollingElement js/document)
-         #js [0 (.-scrollTop (.-body js/document))]
+         #js [0 (.-scrollY js/window)]
          #js [0 scroll-y]
          (if (integer? duration) duration oc-animation-duration))))
 
