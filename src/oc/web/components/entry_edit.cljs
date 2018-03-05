@@ -420,7 +420,7 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable"})
             ; Attachments
-            (stream-view-attachments (:attachments entry-editing) #(do (js/console.log "entry-edit/attachment-remove-cb" %) (activity-actions/remove-attachment :entry-editing %)))]
+            (stream-view-attachments (:attachments entry-editing) #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
               {:id "entry-edit-footer-multi-picker"}]
