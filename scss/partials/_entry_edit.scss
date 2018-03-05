@@ -373,6 +373,12 @@ div.entry-edit-modal-container {
           }
         }
 
+        div.stream-view-attachments {
+          @include mobile(){
+            padding: 0px 24px;
+          }
+        }
+
         div.rich-body-editor-container {
           position: relative;
           overflow: visible;
