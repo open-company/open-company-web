@@ -1143,9 +1143,8 @@
    (:first-ever-user router/nux-cookie-values)
    (* 60 60 24 7))
   (when org-data
-    (let [org-slug (:slug org-data)
-          first-board (first (:boards org-data))]
-      (utils/after 100 #(router/redirect! (oc-urls/board org-slug (:slug first-board))))))
+    (let [org-slug (:slug org-data)]
+      (utils/after 100 #(router/redirect! (oc-urls/all-posts org-slug)))))
   db)
 
 (defmethod dispatcher/action :first-forced-post-start
