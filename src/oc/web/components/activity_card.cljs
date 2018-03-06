@@ -13,7 +13,6 @@
             [oc.web.mixins.activity :as am]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
