@@ -105,13 +105,13 @@ div.onboard-overlay-container {
       }
 
       button.continue-btn {
-        width: 280px;
+        min-width: 160px;
         height: 40px;
         border-radius: 100px;
         background-color: $carrot_text_blue;
         color: white;
         @include avenir_H();
-        font-size: 16px;
+        font-size: 18px;
         text-align: center;
         padding: 8px 28px;
         margin: 24px auto 0px;

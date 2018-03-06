@@ -9,6 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -45,20 +46,18 @@
           [:div.onboard-overlay-mobile-step.step-1
             (when is-mobile?
               [:div.onboard-overlay-step-title
-                "Above the noise"])
+                "Your company digest keeps everyone aligned."])
             [:div.step-illustration-container-center
               (when is-mobile?
                 [:div.step-illustration-container
                   {:style {:height (str (min 418 (- wh 138 203)) "px")}}])
               (when-not is-mobile?
                 [:div.onboard-overlay-step-title
-                  "Above the noise"])
+                  "Your company digest keeps everyone aligned."])
               [:div.onboard-overlay-step-description
-                (str
-                 "Share key updates and stories "
-                 "that won’t be missed.")]]
+                "Reactions and comments stay together for better context."]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(dis/dispatch! [:input [:nux] :2])
+              {:on-click #(activity-actions/nux-next-step :2)
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
               "Next"]
             (when-not is-mobile?
@@ -67,7 +66,7 @@
           [:div.onboard-overlay-mobile-step.step-2
             (when is-mobile?
               [:div.onboard-overlay-step-title
-                "Focused conversations"])
+                "Information stays organized so it’s easy to find."])
             [:div.step-illustration-container-center
               (when is-mobile?
                 [:div.step-illustration-container
@@ -82,14 +81,12 @@
                                :margin-top (if is-mobile? (str margin-top "px") "0px")}))}])
               (when-not is-mobile?
                 [:div.onboard-overlay-step-title
-                  "Focused conversations"])
+                  "Information stays organized so it’s easy to find."])
               [:div.onboard-overlay-step-description
-                (str
-                 "Team reactions and comments "
-                 "stay together for context.")]]
+                "Get caught up anytime - great for distributed teams."]]
             [:button.mlb-reset.continue-btn
-              {:on-click #(dis/dispatch! [:nux-end])
+              {:on-click #(activity-actions/nux-end)
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
-              "Next"]
+              "Start using Carrot"]
             (when-not is-mobile?
               [:div.step-illustration-container])]))]])
