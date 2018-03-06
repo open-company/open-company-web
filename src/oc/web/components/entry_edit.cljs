@@ -395,7 +395,8 @@
                                  (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                  (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
                                  (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))
-                    :placeholder (when true
+                    :placeholder (when (and (= (count all-boards) 1)
+                                            (= (:slug (first all-boards)) "general"))
                                    [:div.add-section-tooltip-container
                                      [:div.add-section-tooltip-arrow]
                                      [:div.add-section-tooltip
