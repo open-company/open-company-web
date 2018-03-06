@@ -133,6 +133,8 @@
   (let [org-data (dis/org-data)]
     (and ;; The cookie is set
          (cook/get-cookie (router/show-add-post-tooltip-cookie))
+         ;; user has edit permission
+         (utils/link-for (:links org-data) "create")
          ;; has only one board
          (= (count (:boards org-data)) 1)
          ;; and the board
