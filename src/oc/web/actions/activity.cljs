@@ -116,6 +116,8 @@
   (dis/dispatch! [:entry-modal-save]))
 
 (defn nux-next-step [next-step]
+  (let [next-url (str (oc-urls/board (router/current-org-slug) (router/current-board-slug)) "#nux" (name next-step))]
+    (.pushState (.-history js/window) (.. js/window -history -state) (.-title js/document) next-url))
   (dis/dispatch! [:nux-next-step next-step]))
 
 (defn show-add-post-tooltip []
@@ -155,4 +157,6 @@
     (show-add-post-tooltip)
     (hide-add-post-tooltip))
   (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
-  (dis/dispatch! [:nux-end]))
+  (dis/dispatch! [:nux-end])
+  (let [next-url (oc-urls/board (router/current-org-slug) (router/current-board-slug))]
+    (.pushState (.-history js/window) (.. js/window -history -state) (.-title js/document) next-url)))

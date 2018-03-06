@@ -215,13 +215,13 @@
           [:input.field
             {:type "text"
              :ref "first-name"
-             :value (:first-name user-data)
+             :value (or (:first-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
           [:input.field
             {:type "text"
-             :value (:last-name user-data)
+             :value (or (:last-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
           [:button.continue
             {:disabled (or (and (empty? (:first-name user-data))
