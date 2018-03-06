@@ -7,7 +7,7 @@ div.onboard-overlay-container {
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 103};
   transition: opacity 180ms ease-in;
-  overflow: auto;
+  overflow-y: hidden;
 
   &.will-appear {
     opacity: 0;
