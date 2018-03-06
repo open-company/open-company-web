@@ -20,10 +20,9 @@
                              ;; Mixins
                              mixins/no-scroll-mixin
                              {:will-mount (fn [s]
-                              (when (responsive/is-tablet-or-mobile?)
-                                (reset! (::resize-listener s)
-                                 (events/listen js/window EventType/RESIZE
-                                  #(reset! (::wh s) (.-innerHeight js/window)))))
+                              (reset! (::resize-listener s)
+                               (events/listen js/window EventType/RESIZE
+                                #(reset! (::wh s) (.-innerHeight js/window))))
                               (reset! (::wh s) (.-innerHeight js/window))
                               s)
                               :will-unmount (fn [s]
@@ -40,10 +39,13 @@
             is-mobile? (responsive/is-tablet-or-mobile?)
             is-safari-mobile (and is-mobile?
                                   (js/isSafari))
-            wh @(::wh s)]
+            wh @(::wh s)
+            top-padding (when-not is-mobile?
+                          {:padding-top (str (if (< wh 800) 70 (/ (- wh 536 71 64) 2)) "px")})]
         (case step
           :1
           [:div.onboard-overlay-mobile-step.step-1
+            {:style top-padding}
             (when is-mobile?
               [:div.onboard-overlay-step-title
                 "Your company digest keeps everyone aligned."])
@@ -61,9 +63,11 @@
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
               "Next"]
             (when-not is-mobile?
-              [:div.step-illustration-container])]
+              [:div.step-illustration-container
+                {:style {:bottom (str (if (< wh 800) (- wh 800) 0) "px")}}])]
           :2
           [:div.onboard-overlay-mobile-step.step-2
+            {:style top-padding}
             (when is-mobile?
               [:div.onboard-overlay-step-title
                 "Information stays organized so it’s easy to find."])
@@ -89,4 +93,5 @@
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
               "Start using Carrot"]
             (when-not is-mobile?
-              [:div.step-illustration-container])]))]])
+              [:div.step-illustration-container
+                {:style {:bottom (str (if (< wh 800) (- wh 800) 0) "px")}}])]))]])
