@@ -178,42 +178,43 @@
                 ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
                 ;;(when is-new [:div.new-tag "New"])
                 ]]
-      [:div.activity-card-content.group
-        ; Headline
-        [:div.activity-card-headline
-          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-           :class (when has-headline "has-headline")}]
-        ; Body
-        (let [body-without-preview (utils/body-without-preview (:body activity-data))
-              activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))
-              emojied-body (utils/emojify body-without-preview)]
-          [:div.activity-card-body
-            {:dangerouslySetInnerHTML emojied-body
-             :ref "activity-body"
-             :class (utils/class-set {:has-body has-body
-                                      :has-headline has-headline
-                                      :has-media-preview @(:body-thumbnail s)})}])
-        ; Body preview
-        (when @(:body-thumbnail s)
-          [:div.media-preview-container
-            {:class (or (:type @(:body-thumbnail s)) "image")}
-            [:img
-              {:src (:thumbnail @(:body-thumbnail s))}]])]
-      [:div.activity-card-footer.group
-        (interactions-summary activity-data)
-        (when share-thoughts
-          [:div.activity-share-thoughts
-            "Share your thoughts"])
-        (when (and (not nux)
-                   (utils/link-for (:links activity-data) "partial-update"))
-          [:button.mlb-reset.post-edit
-            {:title "Edit"
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                      (not @(::more-dropdown s)))})
-             :on-click (fn [e]
-                         (utils/remove-tooltips)
-                         (reset! (::more-dropdown s) false)
-                         (activity-actions/activity-edit activity-data))}])]]))
+      [:div.activity-card-shadow-container.group
+        [:div.activity-card-content.group
+          ; Headline
+          [:div.activity-card-headline
+            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
+             :class (when has-headline "has-headline")}]
+          ; Body
+          (let [body-without-preview (utils/body-without-preview (:body activity-data))
+                activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))
+                emojied-body (utils/emojify body-without-preview)]
+            [:div.activity-card-body
+              {:dangerouslySetInnerHTML emojied-body
+               :ref "activity-body"
+               :class (utils/class-set {:has-body has-body
+                                        :has-headline has-headline
+                                        :has-media-preview @(:body-thumbnail s)})}])
+          ; Body preview
+          (when @(:body-thumbnail s)
+            [:div.media-preview-container
+              {:class (or (:type @(:body-thumbnail s)) "image")}
+              [:img
+                {:src (:thumbnail @(:body-thumbnail s))}]])]
+        [:div.activity-card-footer.group
+          (interactions-summary activity-data)
+          (when share-thoughts
+            [:div.activity-share-thoughts
+              "Share your thoughts"])
+          (when (and (not nux)
+                     (utils/link-for (:links activity-data) "partial-update"))
+            [:button.mlb-reset.post-edit
+              {:title "Edit"
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :class (utils/class-set {:not-hover (and (not @(::move-activity s))
+                                                        (not @(::more-dropdown s)))})
+               :on-click (fn [e]
+                           (utils/remove-tooltips)
+                           (reset! (::more-dropdown s) false)
+                           (activity-actions/activity-edit activity-data))}])]]]))

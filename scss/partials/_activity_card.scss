@@ -1,11 +1,18 @@
 div.activity-card {
-  width: 432px;
+  width: 454px;
   float: left;
   background-color: white;
-  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
   border-radius: 4px;
   margin: 12px;
   position: relative;
+
+  &:nth-child(even) {
+    margin: 12px 0px 12px 12px;
+  }
+
+  &:nth-child(odd) {
+    margin: 12px 12px 12px 0px;
+  }
 
   @include mobile() {
     width: 100%;
@@ -14,7 +21,9 @@ div.activity-card {
 
   &:hover, &.dropdown-active {
     @include big_web() {
-      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
+      div.activity-card-shadow-container {
+        box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
+      }
 
       div.activity-card-head.entry-card {
         background-color: $carrot_light_gray_5;
@@ -308,6 +317,14 @@ div.activity-card {
           }
         }
       }
+    }
+  }
+
+  div.activity-card-shadow-container {
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+
+    @include mobile() {
+      box-shadow: none;
     }
   }
 
