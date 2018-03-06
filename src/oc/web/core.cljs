@@ -65,7 +65,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root #(loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))}) target)))
+    (drv-root #(loading) target)))
 
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)

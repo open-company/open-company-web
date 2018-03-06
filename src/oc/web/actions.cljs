@@ -1142,8 +1142,6 @@
    (router/show-nux-cookie (jwt/user-id))
    (:first-ever-user router/nux-cookie-values)
    (* 60 60 24 7))
-  ;; Static cookie for blue loading screen
-  (cook/set-cookie! :nux true (* 60 60 24 7))
   (when org-data
     (let [org-slug (:slug org-data)
           first-board (first (:boards org-data))]

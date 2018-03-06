@@ -371,7 +371,6 @@
                           (dis/dispatch! [:input [:org-editing :name] org-name])
                           (if (and (seq org-name)
                                    (> (count org-name) 2))
-                           ;; Create org and show setup screen
                            (dis/dispatch! [:org-create])
                            (dis/dispatch! [:input [:org-editing :error] true])))}
             "All set!"]]]]))

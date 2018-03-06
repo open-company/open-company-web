@@ -133,7 +133,7 @@
             (and nux-loading
                  (not nux-end)))
       [:div.org-dashboard
-        (loading {:loading true :nux (or (cook/get-cookie :nux) nux-loading)})]
+        (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :modal-activity-view (router/current-activity-id)
