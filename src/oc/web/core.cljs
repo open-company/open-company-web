@@ -159,7 +159,8 @@
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :nux-loading (cook/get-cookie :nux)
-                        :nux-end nil}]
+                        :nux-end nil
+                        :show-add-post-tooltip (cook/get-cookie (router/show-add-post-tooltip-cookie))}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
         (utils/after nux-setup-time
          #(do
@@ -289,21 +290,21 @@
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
       (when (and (jwt/jwt)
-                 (seq (router/last-org-cookie)))
+                 (seq (cook/get-cookie (router/last-org-cookie))))
         (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
       (when (and (jwt/jwt)
-                 (seq (router/last-org-cookie)))
+                 (seq (cook/get-cookie (router/last-org-cookie))))
         (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
       (if (jwt/jwt)
-        (when (seq (router/last-org-cookie))
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
           (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
@@ -311,7 +312,7 @@
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
       (if (jwt/jwt)
-        (when (seq (router/last-org-cookie))
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
           (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
@@ -319,7 +320,7 @@
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
       (if (jwt/jwt)
-        (when (seq (router/last-org-cookie))
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
           (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
