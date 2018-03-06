@@ -159,8 +159,7 @@
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :nux-loading (cook/get-cookie :nux)
-                        :nux-end nil
-                        :show-add-post-tooltip (cook/get-cookie (router/show-add-post-tooltip-cookie))}]
+                        :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
         (utils/after nux-setup-time
          #(do
