@@ -40,7 +40,7 @@ div.onboard-overlay-container {
       position: relative;
 
       @include mobile() {
-        padding: 24px 40px;
+        padding: 24px 32px;
       }
 
       div.onboard-overlay-step-title {
@@ -50,6 +50,7 @@ div.onboard-overlay-container {
 
         @include mobile() {
           max-width: 300px;
+          font-size: 23px;
         }
       }
 
@@ -71,7 +72,7 @@ div.onboard-overlay-container {
           overflow: hidden;
           position: relative;
           margin: 16px auto;
-          max-height: 270px;
+          max-height: 360px;
           top: unset;
           left: unset;
 

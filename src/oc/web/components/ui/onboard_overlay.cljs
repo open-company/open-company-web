@@ -52,12 +52,13 @@
             [:div.step-illustration-container-center
               (when is-mobile?
                 [:div.step-illustration-container
-                  {:style {:height (str (min 418 (- wh 138 203)) "px")}}])
+                  {:style {:height (str (min 518 (- wh 138 103)) "px")}}])
               (when-not is-mobile?
                 [:div.onboard-overlay-step-title
                   "Your company digest keeps everyone aligned."])
-              [:div.onboard-overlay-step-description
-                "Reactions and comments stay together for better context."]]
+              (when-not is-mobile?
+                [:div.onboard-overlay-step-description
+                  "Reactions and comments stay together for better context."])]
             [:button.mlb-reset.continue-btn
               {:on-click #(activity-actions/nux-next-step :2)
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
@@ -76,8 +77,8 @@
                 [:div.step-illustration-container
                   {:style (when is-mobile?
                             (let [max-h 342
-                                  height (- wh 138 263)
-                                  next-height (min 342 height)
+                                  height (- wh 38 263)
+                                  next-height (min 442 height)
                                   margin-top (if (>= height max-h)
                                                (+ (/ (- height max-h) 2) 32)
                                                32)]
@@ -86,8 +87,9 @@
               (when-not is-mobile?
                 [:div.onboard-overlay-step-title
                   "Information stays organized so it’s easy to find."])
-              [:div.onboard-overlay-step-description
-                "Get caught up anytime - great for distributed teams."]]
+              (when-not is-mobile?
+                [:div.onboard-overlay-step-description
+                  "Get caught up anytime - great for distributed teams."])]
             [:button.mlb-reset.continue-btn
               {:on-click #(activity-actions/nux-end)
                :style (when is-mobile? {:bottom (if is-safari-mobile "120px" "78px")})}
