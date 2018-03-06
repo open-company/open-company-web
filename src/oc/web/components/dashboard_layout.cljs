@@ -62,6 +62,7 @@
                               (drv/drv :all-posts)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
+                              (drv/drv :show-add-post-tooltip)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
@@ -75,7 +76,6 @@
                                 ;; Update window width on window resize
                                 (reset! (::resize-listener s)
                                  (events/listen js/window EventType/RESIZE #(reset! (::ww s) (responsive/ww))))
-                                ()
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -121,10 +121,13 @@
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
-        should-show-add-post-tooltip? true
         compose-fn (fn [_]
-                    (if (or is-drafts-board is-all-posts)
-                      (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                    (utils/remove-tooltips)
+                    (if (or is-drafts-board
+                            is-all-posts)
+                      (reset!
+                       (::show-floating-boards-dropdown s)
+                       (not @(::show-floating-boards-dropdown s)))
                       (let [entry-data {:board-slug (:slug board-data)
                                         :board-name (:name board-data)}]
                         (activity-actions/entry-edit entry-data))))]
@@ -178,7 +181,12 @@
                 [:div.new-post-top-dropdown-container.group
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                     {:class (when @(::show-top-boards-dropdown s) "active")
-                     :on-click compose-fn}
+                     :on-click (fn [_]
+                                (if (or is-drafts-board is-all-posts)
+                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                  (let [entry-data {:board-slug (:slug board-data)
+                                                    :board-name (:name board-data)}]
+                                    (activity-actions/entry-edit entry-data))))}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "Compose"]]
@@ -195,10 +203,10 @@
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
                                                                  :board-name (:label item)}))}))])]
-            (when should-show-add-post-tooltip?
+            (when (drv/react s :show-add-post-tooltip)
               [:div.add-post-tooltip-container.group
                 [:button.mlb-reset.add-post-tooltip-dismiss
-                  {:on-click #()}]
+                  {:on-click #(activity-actions/hide-add-post-tooltip)}]
                 [:div.add-post-tooltip-icon]
                 [:div.add-post-tooltip
                   (str
@@ -247,16 +255,7 @@
                      :data-container "body"
                      :data-toggle (when-not is-mobile-size? "tooltip")
                      :title "Start a new post"
-                     :on-click (fn [_]
-                                (utils/remove-tooltips)
-                                (if (or is-drafts-board
-                                        is-all-posts)
-                                  (reset!
-                                   (::show-floating-boards-dropdown s)
-                                   (not @(::show-floating-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (activity-actions/entry-edit entry-data))))}
+                     :on-click compose-fn}
                     [:div.add-to-board-pencil]]
                   (when @(::show-floating-boards-dropdown s)
                     (dropdown-list
