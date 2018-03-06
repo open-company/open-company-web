@@ -71,6 +71,8 @@
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
                               {:will-mount (fn [s]
+                                ;; Check if it still needs the add post tooltip
+                                (activity-actions/check-add-post-tooltip)
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
                                 ;; Update window width on window resize
