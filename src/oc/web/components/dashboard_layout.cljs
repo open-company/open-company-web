@@ -108,17 +108,13 @@
                           (zero? (count (:fixed-items board-data))))
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        container-width (if (or (utils/in? (:route route) "all-posts")
-                                (= @(::board-switch s) :stream))
-                          responsive/all-posts-container-width
-                          responsive/board-container-width)
         board-container-style {:marginLeft (if is-mobile-size?
                                              "0px"
                                              (str (max
                                                    sidebar-width
                                                    (+
                                                     (/
-                                                     (- @(::ww s) container-width sidebar-width)
+                                                     (- @(::ww s) responsive/dashboard-container-width sidebar-width)
                                                      2)
                                                     sidebar-width))
                                              "px"))}
@@ -196,20 +192,22 @@
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
                                                                  :board-name (:label item)}))}))])
-              (when (and (not is-mobile-size?)
-                         (not is-all-posts))
-                [:div.board-switcher
-                  {:on-click #(reset! (::board-switch s) (if (= @(::board-switch s) :stream) :grid :stream))}
-                  (if (= @(::board-switch s) :stream)
-                    "Grid view"
-                    "Stream view")])]
+              (when (not is-mobile-size?)
+                [:div.board-switcher.group
+                  [:button.mlb-reset.board-switcher-bt.stream-view
+                    {:class (when (= @(::board-switch s) :stream) "active")
+                     :on-click #(reset! (::board-switch s) :stream)}]
+                  [:button.mlb-reset.board-switcher-bt.grid-view
+                    {:class (when (= @(::board-switch s) :grid) "active")
+                     :on-click #(reset! (::board-switch s) :grid)}]])]
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; All Posts
-              is-all-posts
+              (and is-all-posts
+                   (= @(::board-switch s) :stream))
               (all-posts)
               ;; Empty board
               empty-board?
