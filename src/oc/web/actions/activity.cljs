@@ -1,11 +1,13 @@
 (ns oc.web.actions.activity
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions :as actions]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.user-cache :as uc]
             [oc.web.lib.responsive :as responsive]))
 
@@ -112,3 +114,45 @@
 (defn entry-modal-save [activity-data board-slug]
   (api/update-entry activity-data board-slug :modal-editing-data)
   (dis/dispatch! [:entry-modal-save]))
+
+(defn nux-next-step [next-step]
+  (dis/dispatch! [:nux-next-step next-step]))
+
+(defn show-add-post-tooltip []
+  (cook/set-cookie! (router/show-add-post-tooltip-cookie (jwt/user-id)) true (* 60 60 24 365))
+  (dis/dispatch! [:input [:show-add-post-tooltip] true]))
+
+(defn hide-add-post-tooltip []
+  (cook/remove-cookie! (router/show-add-post-tooltip-cookie (jwt/user-id)))
+  (dis/dispatch! [:input [:show-add-post-tooltip] false]))
+
+(defn should-show-add-post-tooltip
+  "Check if we need to show the add post tooltip."
+  []
+  (let [org-data (dis/org-data)]
+    (and ;; the cookie is set
+         (cook/get-cookie (router/show-add-post-tooltip-cookie (jwt/user-id)))
+         ;; has only one board
+         (= (count (:boards org-data)) 1)
+         ;; and the board
+         (let [board-data (dis/board-data)
+               first-post (first (vals (:fixed-items board-data)))
+               first-post-author (when first-post
+                                   (if (map? (:author first-post))
+                                      (:author first-post)
+                                      (first (:author first-post))))]
+           ;; or
+           (or (and ;; has only one post
+                    (= (count (:fixed-items board-data)) 1)
+                    first-post
+                    ;; from CarrotHQ
+                    (= (:user-id first-post-author) "0000-0000-0000"))
+                ;; has no posts
+               (zero? (count (:fixed-items board-data))))))))
+
+(defn nux-end []
+  (if true ; (should-show-add-post-tooltip)
+    (show-add-post-tooltip)
+    (hide-add-post-tooltip))
+  (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
+  (dis/dispatch! [:nux-end]))

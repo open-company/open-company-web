@@ -129,6 +129,11 @@
   [user-id]
   (str "show-nux-" user-id))
 
+(defn show-add-post-tooltip-cookie
+  "Cookie to remember if the boards and journals tooltips where shown."
+  [user-id]
+  (str "add-post-tooltip-" user-id))
+
 ;; Values for NUX cookie
 
 (def nux-cookie-values

@@ -1058,11 +1058,6 @@
     (timbre/debug "Change status data:" new-status-data)
     (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))
 
-(defmethod dispatcher/action :nux-end
-  [db [_]]
-  (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
-  (dissoc db :nux))
-
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data]]
   (-> db
