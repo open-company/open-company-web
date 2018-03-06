@@ -1,4 +1,32 @@
 div.onboard-wrapper-container {
+
+  div.screenshots-preload {
+    div.screenshot-preload {
+      &.screenshot-1 {
+        @include big_web() {
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_1.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_1@2x.png"), "after");
+        }
+
+        @include mobile() {
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_1.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_1@2x.png"), "after");
+        }
+      }
+      &.screenshot-2 {
+        @include big_web() {
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_2.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_2@2x.png"), "after");
+        }
+
+        @include mobile() {
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_2.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_2@2x.png"), "after");
+        }
+      }
+    }
+  }
+
   div.onboard-wrapper {
     position: absolute;
     top: 0;
