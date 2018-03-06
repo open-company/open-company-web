@@ -151,7 +151,7 @@
                (zero? (count (:fixed-items board-data))))))))
 
 (defn nux-end []
-  (if true ; (should-show-add-post-tooltip)
+  (if (should-show-add-post-tooltip)
     (show-add-post-tooltip)
     (hide-add-post-tooltip))
   (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
