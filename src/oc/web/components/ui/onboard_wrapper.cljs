@@ -50,7 +50,7 @@
            :aria-label "Back"}]
         [:div.title.main-lander
           "Welcome!"]
-        [:button.top-continue
+        [:button.mlb-reset.top-continue
           {:class (when (or (not (utils/valid-email? @(::email s)))
                             (<= (count @(::pswd s)) 7))
                     "disabled")
@@ -63,7 +63,8 @@
                           (when (<= (count @(::pswd s)) 7)
                             (reset! (::password-error s) true)))
                         (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
-           :aria-label "Continue"}]]
+           :aria-label "Continue"}
+           "Continue"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -173,7 +174,7 @@
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.title.about-yourself
-          "Tell us about yourself"]
+          "Personal details"]
         (let [top-continue-disabled (or (and (empty? (:first-name user-data))
                                              (empty? (:last-name user-data)))
                                         (empty? (:avatar-url user-data)))]
@@ -184,7 +185,8 @@
              :on-click #(when-not top-continue-disabled
                           (reset! (::saving s) true)
                           (dis/dispatch! [:user-profile-save]))
-             :aria-label "Continue"}])]
+             :aria-label "Continue"}
+            "Continue"])]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -290,7 +292,8 @@
   [s]
   (let [teams-data (drv/react s :teams-data)
         _ (drv/react s :teams-load)
-        org-editing (drv/react s :org-editing)]
+        org-editing (drv/react s :org-editing)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.onboard-lander.lander-team
       [:div.screenshots-preload
         [:div.screenshot-preload.screenshot-1]
@@ -310,44 +313,46 @@
                               ;; Create org and show setup screen
                               (dis/dispatch! [:org-create])
                               (dis/dispatch! [:input [:org-editing :error] true]))))
-             :aria-label "Continue"}])]
+             :aria-label "Done"}
+           "Done"])]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.org-logo.group
-            {:on-click (fn [_]
-                        (if (empty? (:logo-url org-editing))
-                          (iu/upload! {:accept "image/*"}
-                            (fn [res]
-                              (let [url (gobj/get res "url")
-                                    img (gdom/createDom "img")]
-                                (set! (.-onload img) (fn []
-                                                        (dis/dispatch!
-                                                         [:input
-                                                          [:org-editing]
-                                                          (merge
-                                                           org-editing
-                                                           {:logo-url url
-                                                            :logo-width (.-width img)
-                                                            :logo-height (.-height img)})])
-                                                        (gdom/removeNode img)))
-                                (set! (.-className img) "hidden")
-                                (gdom/append (.-body js/document) img)
-                                (set! (.-src img) url)))
-                            nil
-                            (fn [_])
-                            nil)
-                          (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
-                                                                                    :logo-width 0
-                                                                                    :logo-height 0})])))}
-            (org-avatar org-editing false :never)
-            [:div.add-picture-link
-              (if (empty? (:logo-url org-editing))
-                "+ Upload your company logo"
-                "+ Change your company logo")]
-            [:div.add-picture-link-subtitle
-              "A transparent background PNG works best"]]
+          (when-not is-mobile?
+            [:div.logo-upload-container.org-logo.group
+              {:on-click (fn [_]
+                          (if (empty? (:logo-url org-editing))
+                            (iu/upload! {:accept "image/*"}
+                              (fn [res]
+                                (let [url (gobj/get res "url")
+                                      img (gdom/createDom "img")]
+                                  (set! (.-onload img) (fn []
+                                                          (dis/dispatch!
+                                                           [:input
+                                                            [:org-editing]
+                                                            (merge
+                                                             org-editing
+                                                             {:logo-url url
+                                                              :logo-width (.-width img)
+                                                              :logo-height (.-height img)})])
+                                                          (gdom/removeNode img)))
+                                  (set! (.-className img) "hidden")
+                                  (gdom/append (.-body js/document) img)
+                                  (set! (.-src img) url)))
+                              nil
+                              (fn [_])
+                              nil)
+                            (dis/dispatch! [:input [:org-editing] (merge org-editing {:logo-url nil
+                                                                                      :logo-width 0
+                                                                                      :logo-height 0})])))}
+              (org-avatar org-editing false :never)
+              [:div.add-picture-link
+                (if (empty? (:logo-url org-editing))
+                  "+ Upload your company logo"
+                  "+ Change your company logo")]
+              [:div.add-picture-link-subtitle
+                "A transparent background PNG works best"]])
           [:div.field-label
             "Team name"
             (when (:error org-editing)
