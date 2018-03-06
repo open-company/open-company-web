@@ -121,19 +121,18 @@
   (dis/dispatch! [:nux-next-step next-step]))
 
 (defn show-add-post-tooltip []
-  (cook/set-cookie! (router/show-add-post-tooltip-cookie (jwt/user-id)) true (* 60 60 24 365))
   (dis/dispatch! [:input [:show-add-post-tooltip] true]))
 
 (defn hide-add-post-tooltip []
-  (cook/remove-cookie! (router/show-add-post-tooltip-cookie (jwt/user-id)))
+  (cook/remove-cookie! (router/show-add-post-tooltip-cookie))
   (dis/dispatch! [:input [:show-add-post-tooltip] false]))
 
 (defn should-show-add-post-tooltip
   "Check if we need to show the add post tooltip."
   []
   (let [org-data (dis/org-data)]
-    (and ;; the cookie is set
-         (cook/get-cookie (router/show-add-post-tooltip-cookie (jwt/user-id)))
+    (and ;; The cookie is set
+         (cook/get-cookie (router/show-add-post-tooltip-cookie))
          ;; has only one board
          (= (count (:boards org-data)) 1)
          ;; and the board
@@ -152,10 +151,15 @@
                 ;; has no posts
                (zero? (count (:fixed-items board-data))))))))
 
-(defn nux-end []
+(defn check-add-post-tooltip []
   (if (should-show-add-post-tooltip)
     (show-add-post-tooltip)
-    (hide-add-post-tooltip))
+    (hide-add-post-tooltip)))
+
+(defn nux-end []
+  ;; Add the cookie to show the add post tooltip
+  (cook/set-cookie! (router/show-add-post-tooltip-cookie) true (* 60 60 24 365))
+  (check-add-post-tooltip)
   (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
   (dis/dispatch! [:nux-end])
   (let [next-url (oc-urls/board (router/current-org-slug) (router/current-board-slug))]
