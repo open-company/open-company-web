@@ -7,8 +7,11 @@ div.sections-picker {
   width: 360px;
   z-index: 1000;
   cursor: default;
-  max-height: 300px;
-  overflow-y: auto;
+
+
+  &.sections-list {
+    overflow-y: auto;
+  }
 
   div.sections-picker-header {
     height: 46px;
@@ -65,6 +68,7 @@ div.sections-picker {
         font-size: 12px;
         color: $ui_grey;
         padding: 12px 24px;
+        background-color: $oc_gray_8;
       }
 
       div.sections-picker-section {
@@ -124,6 +128,146 @@ div.sections-picker {
           text-overflow: ellipsis;
           text-align: right;
         }
+      }
+    }
+  }
+
+  div.sections-picker-add {
+    div.sections-picker-add-label {
+      margin-top: 24px;
+      @include avenir_H();
+      font-size: 15px;
+      color: $deep_navy;
+    }
+
+    div.sections-picker-add-name {
+      border-radius: 4px;
+      border: 1px solid $carrot_light_gray_1;
+      height: 40px;
+      width: 100%;
+      @include avenir_M();
+      font-size: 15px;
+      color: $deep_navy;
+      padding: 10px 16px;
+      position: relative;
+      cursor: text;
+      outline: none;
+      margin-top: 8px;
+
+      &:empty:before {
+        padding: 10px 16px;
+        height: 40px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        content: attr(placeholder);
+        opacity: 0.5;
+        font-style: none;
+        display: block;
+      }
+    }
+
+    div.sections-picker-add-access {
+      border-radius: 4px;
+      border: 1px solid $carrot_light_gray_1;
+      height: 40px;
+      width: 100%;
+      @include avenir_M();
+      font-size: 15px;
+      color: $deep_navy;
+      padding: 10px 32px 10px 16px;
+      position: relative;
+      cursor: pointer;
+      margin-top: 8px;
+
+      &.expanded:after {
+        transform: rotate(180deg);
+      }
+
+      &:after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 5px;
+        top: 18px;
+        right: 16px;
+        background-image: cdnUrl("/img/ML/section_access_chevron.svg");
+        background-size: 8px 5px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+    }
+
+    div.sections-picker-add-access-list {
+      border-radius: 4px;
+      border: 1px solid $carrot_light_gray_1;
+      position: absolute;
+      width: 310px;
+      background-color: white;
+      z-index: 1001;
+
+      div.access-list-row {
+        height: 40px;
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba($deep_tan, 0.3);
+        opacity: 0.6;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    div.access-item {
+      @include avenir_M();
+      font-size: 15px;
+      color: $deep_navy;
+      padding-left: 24px;
+      position: relative;
+      height: 22px;
+      float: left;
+
+      &.private-access:before {
+        background-image: cdnUrl("/img/ML/section_access_private.svg");
+      }
+
+      &.team-access:before {
+        background-image: cdnUrl("/img/ML/section_access_team.svg");
+      }
+
+      &.public-access:before {
+        background-image: cdnUrl("/img/ML/section_access_public.svg");
+      }
+
+      &:before {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 1px;
+        left: 0px;
+        background-size: 16px 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+    }
+
+    div.sections-picker-add-footer {
+      margin-top: 16px;
+      height: 24px;
+
+      button.mlb-reset.create-bt {
+        height: 24px;
+        float: right;
+        color: $carrot_green;
+        @include avenir_H();
+        font-size: 15px;
       }
     }
   }
