@@ -70,9 +70,11 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
-                              {:will-mount (fn [s]
+                              {:before-render (fn [s]
                                 ;; Check if it still needs the add post tooltip
                                 (activity-actions/check-add-post-tooltip)
+                                s)
+                               :will-mount (fn [s]
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
                                 ;; Update window width on window resize
@@ -125,11 +127,14 @@
         all-boards (drv/react s :editable-boards)
         compose-fn (fn [_]
                     (utils/remove-tooltips)
-                    (if (or is-drafts-board
-                            is-all-posts)
-                      (reset!
-                       (::show-floating-boards-dropdown s)
-                       (not @(::show-floating-boards-dropdown s)))
+                    (if (or is-drafts-board is-all-posts)
+                      (if (> (count all-boards) 1)
+                        (reset! (::show-floating-boards-dropdown s)
+                         (not @(::show-floating-boards-dropdown s)))
+                        (let [first-board (second (first all-boards))
+                              entry-data {:board-slug (:slug first-board)
+                                          :board-name (:name first-board)}]
+                          (activity-actions/entry-edit entry-data)))
                       (let [entry-data {:board-slug (:slug board-data)
                                         :board-name (:name board-data)}]
                         (activity-actions/entry-edit entry-data))))]
@@ -185,7 +190,12 @@
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
                                 (if (or is-drafts-board is-all-posts)
-                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                  (if (> (count all-boards) 1)
+                                    (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                    (let [first-board (second (first all-boards))
+                                          entry-data {:board-slug (:slug first-board)
+                                                      :board-name (:name first-board)}]
+                                      (activity-actions/entry-edit entry-data)))
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}]
                                     (activity-actions/entry-edit entry-data))))}
