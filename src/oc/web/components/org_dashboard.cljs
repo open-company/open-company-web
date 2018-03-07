@@ -133,6 +133,10 @@
             (and nux-loading
                  (not nux-end)))
       [:div.org-dashboard
+        (when should-show-onboard-overlay?
+          [:div.screenshots-preload
+            [:div.screenshot-preload.screenshot-1]
+            [:div.screenshot-preload.screenshot-2]])
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true

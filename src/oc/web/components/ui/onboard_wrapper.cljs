@@ -295,9 +295,6 @@
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.onboard-lander.lander-team
-      [:div.screenshots-preload
-        [:div.screenshot-preload.screenshot-1]
-        [:div.screenshot-preload.screenshot-2]]
       [:div.main-cta
         [:div.title.company-setup
           "Your company"]
@@ -459,9 +456,6 @@
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)]
     [:div.onboard-lander.invitee-lander-profile
-      [:div.screenshots-preload
-        [:div.screenshot-preload.screenshot-1]
-        [:div.screenshot-preload.screenshot-2]]
       [:div.main-cta
         [:div.title.about-yourself
           "Tell us a bit about yourself…"]
