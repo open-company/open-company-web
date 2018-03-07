@@ -103,6 +103,7 @@
                   (not (responsive/is-tablet-or-mobile?)))
          (emoji-picker {:width 32
                         :height 32
+                        :position "bottom"
                         :add-emoji-cb (fn [active-element emoji already-added?]
                                         (let [add-comment (rum/ref-node s "add-comment")]
                                           (.focus add-comment)
