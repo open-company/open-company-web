@@ -19,6 +19,7 @@
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -286,8 +287,6 @@
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
         wh (.-innerHeight js/window)
         media-input (drv/react s :media-input)
-        all-boards (drv/react s :editable-boards)
-        entry-board (get all-boards (:board-slug entry-editing))
         published? (= (:status entry-editing) "published")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
@@ -380,18 +379,7 @@
                   {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
                   (:board-name entry-editing)]
                 (when @(::show-boards-dropdown s)
-                  (dropdown-list
-                   {:items (map
-                            #(clojure.set/rename-keys % {:name :label :slug :value})
-                            (vals all-boards))
-                    :value (:board-slug entry-editing)
-                    :on-blur #(reset! (::show-boards-dropdown s) false)
-                    :on-change (fn [item]
-                                 (toggle-save-on-exit s true)
-                                 (reset! (::show-boards-dropdown s) false)
-                                 (dis/dispatch! [:input [:entry-editing :has-changes] true])
-                                 (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                 (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]]
+                  (sections-picker "Post to:" (:board-slug entry-editing) :entry-editing))]]]
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element
