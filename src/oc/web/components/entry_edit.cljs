@@ -205,9 +205,13 @@
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::window-click-listener s)
                            (events/listen js/window EventType/CLICK
-                            #(when (and @(::show-legend s)
+                            #(do
+                               (when (and @(::show-boards-dropdown s)
+                                          (not (utils/event-inside? % (rum/ref-node s "boards-dropdown-caret"))))
+                                 (reset! (::show-boards-dropdown s) false))
+                               (when (and @(::show-legend s)
                                         (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
-                                (reset! (::show-legend s) false))))
+                                 (reset! (::show-legend s) false)))))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
@@ -375,11 +379,18 @@
                     "Draft for: ")
                   "Posting in: ")]
               [:div.boards-dropdown-caret
+                {:ref "boards-dropdown-caret"}
                 [:div.board-name
                   {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
                   (:board-name entry-editing)]
                 (when @(::show-boards-dropdown s)
-                  (sections-picker "Post to:" (:board-slug entry-editing) :entry-editing))]]]
+                  (sections-picker (:board-slug entry-editing)
+                   (fn [board-data]
+                     (reset! (::show-boards-dropdown s) false)
+                     (when board-data
+                      (dis/dispatch! [:input [:entry-editing]
+                       (merge entry-editing {:board-slug (:slug board-data)
+                                             :board-name (:name board-data)})])))))]]]
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element
