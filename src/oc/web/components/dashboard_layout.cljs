@@ -215,7 +215,7 @@
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
                                                                  :board-name (:label item)}))}))])]
-            (when (drv/react s :show-add-post-tooltip)
+            (when true ;(drv/react s :show-add-post-tooltip)
               [:div.add-post-tooltip-container.group
                 [:button.mlb-reset.add-post-tooltip-dismiss
                   {:on-click #(activity-actions/hide-add-post-tooltip)}]

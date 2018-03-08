@@ -98,7 +98,8 @@ div.dashboard-layout {
       }
 
       div.add-post-tooltip-container {
-        border: 2px dashed $light_tan;
+        border: 2px dashed $carrot_gold;
+        background-color: $light_gold;
         border-radius: 6px;
         padding: 32px 40px;
         margin: 32px 0px;
@@ -171,6 +172,7 @@ div.dashboard-layout {
           width: 32px;
           height: 38px;
           float: right;
+          margin-top: -20px;
 
           @include tablet() {
             display: none;
