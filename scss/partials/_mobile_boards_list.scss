@@ -3,7 +3,7 @@ div.mobile-boards-list {
   background-color: $oc_gray_8;
 
   div.mobile-boards-list-inner {
-    min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px - 41px);
+    min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px - 41px);
 
     div.mobile-boards-list-box {
       margin-top: 22px;

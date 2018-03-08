@@ -9,7 +9,7 @@ body {
 div.list-boards {
 
   div.navbar-offset {
-    padding-top: #{$mobile_navbar_height}px;
+    padding-top: #{$navbar_height}px;
     min-height: calc(100vh - #{$navbar_height}px - #{$footer_height}px);
 
     ul.boards {

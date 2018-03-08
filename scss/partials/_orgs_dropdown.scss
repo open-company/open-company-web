@@ -1,5 +1,5 @@
 div.orgs-dropdown {
-  height: 56px;
+  height: 40px;
   position: relative;
 
   button.orgs-dropdown-btn {
@@ -14,6 +14,8 @@ div.orgs-dropdown {
     @include mobile(){
       height: 32px;
     }
+
+    @include org-avatar(40);
 
     &.dropdown-toggle{
 
