@@ -95,6 +95,7 @@
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions]))
                       @(::more-dropdown s)
                       @(::move-activity s))
 
