@@ -45,7 +45,6 @@
                         (drv/drv :nux)
                         ;; Mixins
                         am/truncate-body-mixin
-                        am/body-thumbnail-mixin
                         {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
@@ -192,14 +191,7 @@
               {:dangerouslySetInnerHTML emojied-body
                :ref "activity-body"
                :class (utils/class-set {:has-body has-body
-                                        :has-headline has-headline
-                                        :has-media-preview @(:body-thumbnail s)})}])
-          ; Body preview
-          (when @(:body-thumbnail s)
-            [:div.media-preview-container
-              {:class (or (:type @(:body-thumbnail s)) "image")}
-              [:img
-                {:src (:thumbnail @(:body-thumbnail s))}]])]
+                                        :has-headline has-headline})}])]
         [:div.activity-card-footer.group
           (reactions activity-data)
           (comments-summary activity-data)
