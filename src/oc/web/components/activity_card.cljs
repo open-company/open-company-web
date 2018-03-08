@@ -16,8 +16,8 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
+            [oc.web.components.ui.interactions-summary :refer (comments-summary)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
-            [oc.web.components.ui.interactions-summary :refer (interactions-summary)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -201,7 +201,8 @@
               [:img
                 {:src (:thumbnail @(:body-thumbnail s))}]])]
         [:div.activity-card-footer.group
-          (interactions-summary activity-data)
+          (reactions activity-data)
+          (comments-summary activity-data)
           (when share-thoughts
             [:div.activity-share-thoughts
               "Share your thoughts"])
