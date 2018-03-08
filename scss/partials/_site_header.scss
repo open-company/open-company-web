@@ -202,6 +202,10 @@ nav.site-navbar {
       @include mobile() {
         left: 40px;
       }
+
+      @media screen and (max-width: 320px) {
+        width: 30px;
+      }
     }
   }
 }
