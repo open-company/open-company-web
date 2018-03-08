@@ -178,7 +178,7 @@
         (let [top-continue-disabled (or (and (empty? (:first-name user-data))
                                              (empty? (:last-name user-data)))
                                         (empty? (:avatar-url user-data)))]
-          [:button.top-continue
+          [:button.mlb-reset.top-continue
             {:class (when top-continue-disabled
                       "disabled")
              :on-touch-start identity
@@ -299,7 +299,7 @@
         [:div.title.company-setup
           "Your company"]
         (let [top-continue-disabled (< (count (clean-org-name (:name org-editing))) 3)]
-          [:button.top-continue
+          [:button.mlb-reset.top-continue
             {:class (when top-continue-disabled "disabled")
              :on-touch-start identity
              :on-click #(when-not top-continue-disabled
