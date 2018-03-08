@@ -266,6 +266,7 @@
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
 
+;; Auth settings
 (defmethod dispatcher/action :auth-settings-get
   [db [_]]
   (api/get-auth-settings)
