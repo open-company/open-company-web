@@ -74,8 +74,8 @@
             [:a.mobile-your-boards
               {:href your-boards
                :on-click (partial nav! your-boards)}
-              [:img.user-avatar
-                {:src (jwt/get-key :avatar-url)}]]
+              [:span.go-to-digest
+                "Go to digest"]]
             [:a.start
               {:href oc-urls/sign-up
                :on-click (fn [e]

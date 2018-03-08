@@ -13,6 +13,16 @@ span.go-to-digest {
   text-align: right;
   padding: 11px 26px 11px 26px;
 
+  @include mobile() {
+    padding: 11px 16px 11px 16px;
+    text-align: center;
+    width: 134px;
+
+    &:before {
+      display: none;
+    }
+  }
+
   &:before {
     content: "";
     position: absolute;
