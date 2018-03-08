@@ -1,5 +1,32 @@
 /* Header */
 
+span.go-to-digest {
+  width: 174px;
+  height: 42px;
+  border-radius: 100px;
+  background-color: $carrot_green;
+  color: white;
+  @include avenir_H();
+  font-size: 16px;
+  position: relative;
+  display: block;
+  text-align: right;
+  padding: 11px 26px 11px 26px;
+
+  &:before {
+    content: "";
+    position: absolute;
+    left: 26px;
+    top: 12px;
+    width: 18px;
+    height: 16px;
+    background-image: cdnUrl("/img/ML/digest_white.svg");
+    background-size: 18px 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+}
+
 nav.site-navbar {
   height: 72px;
   background-color: white;
@@ -134,21 +161,12 @@ nav.site-navbar {
         }
 
         &.your-boards {
-          padding: 7px 16px 7px 8px;
-          span {
-            img.user-avatar {
-              max-width: 26px;
-              max-height: 26px;
-              float: left;
-              border-radius: 50%;
-              margin-right: 12px;
-            }
-
-            span {
-              margin-top: 2px;
-              display: inline-block;
-            }
-          }
+          height: unset;
+          border: none;
+          border-radius: none;
+          padding: 0px;
+          margin-top: 0px;
+          opacity: 1;
         }
 
         &:hover {

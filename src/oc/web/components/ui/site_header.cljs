@@ -62,10 +62,8 @@
                             (user-actions/login-with-slack slack-auth-link)
                             (nav! oc-urls/sign-up e))))}
             (if logged-in
-              [:span
-                [:img.user-avatar
-                  {:src (jwt/get-key :avatar-url)}]
-                [:span "Your digest"]]
+              [:span.go-to-digest
+                "Go to digest"]
               (if use-slack-signup-button
                 [:span
                   "Sign up with "
