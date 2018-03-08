@@ -149,6 +149,12 @@ div.dashboard-layout {
           float: left;
           margin-left: 24px;
 
+          &.second-line {
+            @include tablet() {
+              margin: 0px auto;
+            }
+          }
+
           @include tablet() {
             float: unset;
             margin: 24px auto 0px;
