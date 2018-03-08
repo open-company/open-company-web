@@ -33,14 +33,14 @@ div.onboard-overlay-container {
     }
 
     // Mobile NUX
-    div.onboard-overlay-mobile-step {
+    div.onboard-overlay-step {
       width: 100%;
       height: 100%;
       padding: 70px 40px;
       position: relative;
 
       @include mobile() {
-        padding: 24px 32px;
+        padding: 40px 32px;
       }
 
       div.onboard-overlay-step-title {
@@ -134,39 +134,15 @@ div.onboard-overlay-container {
 
         div.step-illustration-container-center {
           position: relative;
-
-          @include mobile() {
-            position: unset;
-          }
         }
 
         button.continue-btn {
           background-color: $carrot_green;
           width: 160px;
-
-          @include mobile() {
-            margin-left: -80px;
-          }
         }
 
         div.step-illustration-container {
           @include image-2x("/img/ML/onboard_desktop_screenshot_1");
-
-          @include mobile() {
-            @include image-2x("/img/ML/mobile_nux_il_2");
-            background-size: 280px 350px;
-
-            &:after {
-              $gradient_base_color: $feint_emerald;
-              background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
-              background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
-              background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
-              background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
-              background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
-              background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
-              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
-            }
-          }
         }
       }
 
@@ -180,8 +156,11 @@ div.onboard-overlay-container {
         div.step-illustration-container-center {
           position: relative;
 
-          @include mobile() {
-            position: unset;
+          div.onboard-overlay-step-description {
+            @include mobile() {
+              bottom: 0px;
+              position: absolute;
+            }
           }
         }
 
@@ -198,19 +177,10 @@ div.onboard-overlay-container {
           @include image-2x("/img/ML/onboard_desktop_screenshot_2");
 
           @include mobile() {
-            @include image-2x("/img/ML/mobile_nux_il_1");
-            background-size: 280px 426px;
-
-            &:after {
-              $gradient_base_color: $coral;
-              background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
-              background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
-              background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
-              background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
-              background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
-              background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
-              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
-            }
+            width: 263px;
+            height: 231px;
+            @include image-2x("/img/ML/mobile_onboard_overlay");
+            background-size: 263px 231px;
           }
         }
       }
