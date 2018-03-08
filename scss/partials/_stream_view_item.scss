@@ -167,6 +167,7 @@ div.stream-view-item {
       position: relative;
       padding: 40px 40px 88px 40px;
       background-color: white;
+      border-bottom-left-radius: 6px;
 
       @include mobile() {
         width: 100%;
@@ -251,6 +252,7 @@ div.stream-view-item {
           font-size: 16px;
           text-align: center;
           display: none;
+          padding: 3px 7px 2px 7px;
         }
       }
 
@@ -354,7 +356,7 @@ div.stream-view-item {
           &.show-buttons {
             div.emoji-picker {
               top: unset;
-              bottom: 9px;
+              bottom: 4px;
               right: 60px;
               left: unset;
             }
