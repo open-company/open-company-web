@@ -158,13 +158,11 @@
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
-                        :nux-loading (cook/get-cookie :nux)
+                        :nux-loading show-nux
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
         (utils/after nux-setup-time
-         #(do
-           (cook/remove-cookie! :nux)
-           (swap! dis/app-state assoc :nux-end true)))))
+         #(swap! dis/app-state assoc :nux-end true))))
 
 ;; Company list
 (defn org-handler [route target component params]
