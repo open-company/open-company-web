@@ -328,7 +328,7 @@ div.activity-card {
 
   div.activity-card-content {
     width: 100%;
-    padding: 40px 40px 0px;
+    padding: 32px 32px 0px;
 
     span.posted-in {
       @include avenir_M();
@@ -336,26 +336,18 @@ div.activity-card {
       color: $ui_grey;
     }
 
-    div.activity-card-title {
-      @include activity-title();
-      margin-bottom: 24px;
-    }
-
     div.activity-card-headline {
       margin-top: 16px;
       @include activity-title();
       @include avenir_H();
-      font-size: 22px;
+      font-size: 20px;
+      line-height: 28px;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
       max-height: 31px;
-
-      // &.has-headline {
-      //   height: 28px;
-      // }
 
       @include mobile() {
         margin-top: 16px;
@@ -366,8 +358,9 @@ div.activity-card {
 
     $body_height: 24*3;
     div.activity-card-body {
-      @include activity-body(18);
-      @include avenir_BOOK();
+      margin-top: 16px;
+      @include activity-body(14);
+      @include avenir_M();
       color: $deep_navy;
       line-height: 24px;
       display: block;
@@ -380,6 +373,10 @@ div.activity-card {
 
       & > *:last-child {
         margin: 24px 0px 0px;
+      }
+
+      & > *:first-child {
+        margin-top: 0px;
       }
 
       &.has-body {
@@ -439,8 +436,8 @@ div.activity-card {
 
   div.activity-card-footer {
     width: 100%;
-    height: 72px;
-    padding: 24px 24px 24px 32px;
+    height: 80px;
+    padding: 24px 32px 32px 32px;
 
     div.activity-share-thoughts {
       background-color: $carrot_green_3;
