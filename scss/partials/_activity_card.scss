@@ -2,7 +2,7 @@ div.activity-card {
   width: 454px;
   float: left;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 6px;
   margin: 12px;
   position: relative;
 
@@ -22,7 +22,7 @@ div.activity-card {
   &:hover, &.dropdown-active {
     @include big_web() {
       div.activity-card-shadow-container {
-        box-shadow: 0 4px 10px 0 rgba(0,0,0,0.15);
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
       }
 
       div.activity-card-head.entry-card {
@@ -36,7 +36,7 @@ div.activity-card {
 
         div.more-button {
           button.more-ellipsis {
-            opacity: 0.8;
+            background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
           }
         }
       }
@@ -164,35 +164,34 @@ div.activity-card {
     color: $oc_gray_7;
     padding: 24px;
     background-color: $carrot_light_gray_2;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
   }
 
   div.activity-card-head {
     width: 100%;
-    padding: 16px 24px;
+    padding: 20px 24px;
     height: 72px;
 
     &.entry-card {
       background-color: $carrot_light_gray_2;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
     }
 
     div.activity-card-head-author {
       float: left;
       width: 55%;
       padding-right: 20px;
-      overflow: hidden;
+      height: 32px;
 
-      @include activity-author(40);
+      @include activity-author(32);
     }
 
     div.activity-card-head-right {
       float: right;
       position: relative;
       width: 45%;
-      margin-top: 8px;
 
       div.activity-attachments {
         float: right;
@@ -235,11 +234,10 @@ div.activity-card {
           height: 24px;
           padding: 2px 10px;
           display: block;
-          background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+          background-image: cdnUrl("/img/ML/vertical_ellipsis_ui_grey.svg");
           background-position: center;
           background-size: 4px 20px;
           background-repeat: no-repeat;
-          opacity: 0;
 
           @include mobile() {
             opacity: 1;
@@ -292,7 +290,7 @@ div.activity-card {
           ul.activity-card-more-menu {
             background-color: white;
             border: 1px solid rgba(177,184,192,0.50);
-            box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
             margin: 0px;
             padding: 10px 13px 6px 8px;
@@ -321,7 +319,7 @@ div.activity-card {
   }
 
   div.activity-card-shadow-container {
-    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
 
     @include mobile() {
       box-shadow: none;
@@ -330,7 +328,13 @@ div.activity-card {
 
   div.activity-card-content {
     width: 100%;
-    padding: 32px 32px 0px;
+    padding: 40px 40px 0px;
+
+    span.posted-in {
+      @include avenir_M();
+      font-size: 14px;
+      color: $ui_grey;
+    }
 
     div.activity-card-title {
       @include activity-title();
@@ -338,15 +342,23 @@ div.activity-card {
     }
 
     div.activity-card-headline {
-      @include activity-headline();
+      margin-top: 16px;
+      @include activity-title();
+      @include avenir_H();
+      font-size: 22px;
+      color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
-      max-height: 28px;
+      max-height: 31px;
 
-      &.has-headline {
-        height: 28px;
+      // &.has-headline {
+      //   height: 28px;
+      // }
+
+      @include mobile() {
+        margin-top: 16px;
       }
     }
 
@@ -354,9 +366,11 @@ div.activity-card {
 
     $body_height: 24*3;
     div.activity-card-body {
-      @include activity-body();
-      display: block;
+      @include activity-body(18);
+      @include avenir_BOOK();
+      color: $deep_navy;
       line-height: 24px;
+      display: block;
       max-height: #{$body_height}px;
       overflow: hidden;
 
@@ -501,7 +515,7 @@ div.activity-card {
         ul.activity-share-dropdown-list {
           background-color: white;
           border: 1px solid rgba(177,184,192,0.50);
-          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
+          box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);;
           border-radius: 5px;
           margin: 0px;
           padding: 10px 13px 6px 8px;

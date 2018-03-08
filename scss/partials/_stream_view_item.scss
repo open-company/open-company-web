@@ -26,6 +26,16 @@ div.stream-view-item {
     }
   }
 
+  &:hover {
+    div.stream-view-item-header {
+      div.more-button {
+        button.more-ellipsis {
+          background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg"); 
+        }
+      }
+    }
+  }
+
   div.stream-view-item-header {
     height: 72px;
     background-color: $light_tan;
@@ -57,7 +67,7 @@ div.stream-view-item {
         height: 24px;
         padding: 2px 10px;
         display: block;
-        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
+        background-image: cdnUrl("/img/ML/vertical_ellipsis_ui_grey.svg");
         background-position: center;
         background-size: 4px 20px;
         background-repeat: no-repeat;
@@ -222,7 +232,7 @@ div.stream-view-item {
             @include activity-body(18);
             @include avenir_BOOK();
             color: $deep_navy;
-            line-height: 30px;
+            line-height: 24px;
 
             div.carrot-no-preview, a.carrot-no-preview {
               display: none;

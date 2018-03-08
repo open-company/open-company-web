@@ -179,6 +179,8 @@
                 ]]
       [:div.activity-card-shadow-container.group
         [:div.activity-card-content.group
+          [:span.posted-in
+            {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}]
           ; Headline
           [:div.activity-card-headline
             {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
