@@ -100,8 +100,6 @@
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
-        show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
-                                   create-link)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
@@ -142,19 +140,8 @@
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              {:id "navigation-sidebar-boards"}
               [:span
-                "SECTIONS"]
-              (when show-create-new-board
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.right
-                  {:on-click #(do
-                               (dis/dispatch! [:board-edit nil])
-                               (close-navigation-sidebar))
-                   :title "Create a new board"
-                   :id "add-board-button"
-                   :data-placement "top"
-                   :data-toggle "tooltip"
-                   :data-container "body"}])]])
+                "SECTIONS"]]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)

@@ -284,31 +284,6 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/boards_icon.svg");
       }
     }
-
-    button.left-navigation-sidebar-top-title-button {
-      width: 20px;
-      height: 20px;
-      margin-right: 0px;
-      margin-top: 1px;
-      float: right;
-      padding: 0;
-      cursor: pointer;
-      transition: 230ms;
-      background-color: #F0EFEA;
-      background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-      background-repeat: no-repeat;
-      background-position: 50%;
-      background-size: 8px 8px;
-      border-radius: 10px;
-      @include avenir_H();
-
-      &:hover, &.active {
-        background-color: $carrot_green_2;
-        background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
-      }
-
-      @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
-    }
   }
 
   div.left-navigation-sidebar-items{
