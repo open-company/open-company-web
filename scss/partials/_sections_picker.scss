@@ -138,6 +138,17 @@ div.sections-picker {
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
+
+      span.role-header {
+        float: right;
+        @include avenir_R();
+        font-size: 15px;
+        color: $ui_grey;
+      }
+
+      span.main-label {
+        float: left;
+      }
     }
 
     div.sections-picker-add-name {
@@ -164,6 +175,69 @@ div.sections-picker {
         opacity: 0.5;
         font-style: none;
         display: block;
+      }
+    }
+
+    div.sections-picker-private-users-search {
+      border-radius: 4px;
+      border: 1px solid $carrot_light_gray_1;
+      height: 40px;
+      width: 100%;
+      @include avenir_M();
+      font-size: 15px;
+      color: $deep_navy;
+      padding: 10px 16px;
+      position: relative;
+      cursor: text;
+      outline: none;
+      margin-top: 8px;
+
+      input {
+        width: 100%;
+        margin: 0px;
+        padding: 0px;
+        border: none;
+        outline: none;
+        @include avenir_M();
+        font-size: 15px;
+        color: $deep_navy;
+
+        @include placeholder() {
+          opacity: 0.6;
+        }
+      }
+
+      div.sections-picker-private-users-results {
+        position: absolute;
+        top: 40px;
+        left: 0px;
+        border-radius: 4px;
+        border: 1px solid $carrot_light_gray_1;
+        width: 100%;
+        background-color: white;
+        padding: 10px 16px;
+        z-index: 10;
+
+        div.sections-picker-private-users-result {
+          height: 40px;
+          cursor: pointer;
+          padding: 12px 0px;
+
+          @include user-profile(24);
+
+          div.user-avatar-img-container {
+            float: left;
+          }
+
+          div.name {
+            float: left;
+            width: calc(100% - 40px);
+            @include avenir_M();
+            font-size: 15px;
+            color: $deep_navy;
+            margin-left: 16px;
+          }
+        }
       }
     }
 
@@ -255,6 +329,127 @@ div.sections-picker {
         background-size: 16px 16px;
         background-position: center;
         background-repeat: no-repeat;
+      }
+    }
+
+    div.sections-picker-add-private-users {
+      margin: 16px 0px 0px;
+      position: relative;
+
+      div.sections-picker-add-private-users-dropdown-container {
+        position: absolute;
+        right: 140px;
+        z-index: 3;
+
+        div.dropdown-list-container {
+          top: -4px;
+          left: unset;
+
+          div.triangle {
+            top: unset;
+            bottom: -2px;
+            left: unset;
+            right: 20px;
+            border-top: 0px solid rgba(177,184,192,0.50);
+            border-left: 0px solid rgba(177,184,192,0.50);
+            border-bottom: 1px solid rgba(177,184,192,0.50);
+            border-right: 1px solid rgba(177,184,192,0.50);
+          }
+        }
+      }
+
+      div.sections-picker-add-private-users-list {
+        width: 100%;
+        padding: 0px;
+        @include avenir_M();
+        font-size: 14px;
+        color: $deep_navy;
+        max-height: 224px;
+        overflow-y: auto;
+
+        div.sections-picker-add-private-user {
+          height: 60px;
+          width: 100%;
+          padding: 16px 0px;
+          border-bottom: 1px solid rgba($deep_tan, 0.3);
+
+          &:first-child {
+            border-top: 1px solid rgba($deep_tan, 0.3);
+          }
+
+          @include user-profile(24);
+
+          div.user-avatar-img-container {
+            float: left;
+          }
+
+          div.name {
+            float: left;
+            max-width: 50%;
+            margin-left: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 4px;
+          }
+
+          div.user-type {
+            float: right;
+            max-width: calc(50% - 32px - 6px);
+            margin-top: 4px;
+            position: relative;
+            cursor: pointer;
+            @include avenir_R();
+            font-size: 14px;
+            color: $deep_navy;
+            padding-right: 12px;
+            opacity: 0.6;
+
+            &.active {
+              opacity: 1;
+            }
+
+            &.remove-link {
+              text-decoration: underline;
+              color: $carrot_orange;
+              padding-right: 0px;
+
+              &:after {
+                display: none;
+              }
+            }
+
+            &:after {
+              content: "";
+              position: absolute;
+              top: 6px;
+              right: 0px;
+              background-image: cdnUrl("/img/ML/board_settings.svg");
+              background-size: 8px 8px;
+              background-repeat: no-repeat;
+              width: 8px;
+              height: 8px;
+            }
+
+            &.no-dropdown {
+              cursor: default;
+              padding-right: 0px;
+
+              &:after {
+                display: none;
+              }
+            }
+
+            div.dropdown-list-container {
+              top: 24px;
+              left: -68px;
+
+              div.triangle {
+                left: unset;
+                right: 30px;
+              }
+            }
+          }
+        }
       }
     }
 
