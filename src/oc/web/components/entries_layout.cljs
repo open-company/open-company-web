@@ -119,13 +119,14 @@
                       end (min (+ start 2) (count sorted-entries))
                       entries (subvec sorted-entries start end)
                       has-headline (some #(seq (:headline %)) entries)
-                      has-body (some #(seq (:body %)) entries)]]
+                      has-body (some #(seq (:body %)) entries)
+                      has-attachments (some #(pos? (count (:attachments %))) entries)]]
             ; Renteder the entries in thisnrow
             [:div.entries-cards-container-row.group
               {:key (str "entries-row-" idx)}
               (for [entry entries
                     :let [is-new (new? entry changes)]]
-                (rum/with-key (activity-card entry has-headline has-body is-new false)
+                (rum/with-key (activity-card entry has-headline has-body is-new has-attachments)
                   (str "entry-latest-" (:uuid entry))))
               ; If the row contains less than 2, add a placeholder
 
