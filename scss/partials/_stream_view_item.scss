@@ -28,8 +28,8 @@ div.stream-view-item {
 
   &:hover {
     div.stream-view-item-header {
-      div.more-button {
-        button.more-ellipsis {
+      div.more-menu {
+        button.more-menu-bt {
           background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg"); 
         }
       }
@@ -55,92 +55,6 @@ div.stream-view-item {
       overflow: hidden;
 
       @include activity-author(32);
-    }
-
-    div.more-button {
-      float: right;
-      position: relative;
-      margin-right: -6px;
-
-      button.more-ellipsis {
-        width: 24px;
-        height: 24px;
-        padding: 2px 10px;
-        display: block;
-        background-image: cdnUrl("/img/ML/vertical_ellipsis_ui_grey.svg");
-        background-position: center;
-        background-size: 4px 20px;
-        background-repeat: no-repeat;
-      }
-
-      div.activity-move {
-        position: absolute;
-        top: 36px;
-        left: unset;
-        right: -10px;
-
-        @include mobile() {
-          right: -10px;
-        }
-      }
-
-      div.activity-more-dropdown-menu {
-        position: absolute;
-        top: 36px;
-        right: -10px;
-        left: calc(100% - 100px + 10px);
-        min-width: 100px;
-        height: auto;
-        border: none;
-        outline: none;
-        box-shadow: none;
-        background-color: transparent;
-        overflow: visible;
-        z-index: 100;
-
-        div.triangle {
-          position: absolute;
-          top: -7px;
-          left: calc(100% - 30px);
-          background-color: white;
-          border-top: 1px solid rgba(177,184,192,0.50);
-          border-left: 1px solid rgba(177,184,192,0.50);
-          transform: rotate(45deg);
-          width: 15px;
-          height: 15px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-
-        ul.activity-card-more-menu {
-          background-color: white;
-          border: 1px solid rgba(177,184,192,0.50);
-          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-          border-radius: 5px;
-          margin: 0px;
-          padding: 10px 13px 6px 8px;
-          min-height: 50px;
-          list-style-type: none;
-          width: 100%;
-
-          li {
-            padding: 3px 8px;
-            @include avenir_M();
-            font-size: 14px;
-            color: $carrot_light_gray_3;
-            cursor: pointer;
-            background-color: transparent;
-
-            @include big_web() {
-              &:hover {
-                background-color: rgba($carrot_light_gray_4, 0.2);
-              }
-            }
-          }
-        }
-      }
     }
   }
 

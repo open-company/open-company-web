@@ -14,7 +14,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.ui.activity-move :refer (activity-move)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.interactions-summary :refer (comments-summary)]
@@ -50,31 +50,15 @@
                               ;; Locals
                               (rum/local false ::more-dropdown)
                               (rum/local false ::move-activity)
-                              (rum/local nil ::window-click)
                               (rum/local false ::expanded)
                               (rum/local false ::should-scroll-to-comments)
-                              {:did-mount (fn [s]
-                                (reset! (::window-click s)
-                                 (events/listen
-                                  js/window
-                                  EventType/CLICK
-                                  (fn [e]
-                                   (when (and (or @(::more-dropdown s)
-                                                  @(::move-activity s))
-                                              (not (utils/event-inside? e (rum/ref-node s "more-button")))
-                                              (not (utils/event-inside? e (rum/ref-node s "activity-move-container"))))
-                                     (reset! (::more-dropdown s) false)))))
-                                s)
-                               :after-render (fn [s]
+                              {:after-render (fn [s]
                                 (should-show-continue-reading? s)
                                 (comment-actions/get-comments-if-needed (first (:rum/args s))
                                  @(drv/get-ref s :comments-data))
                                 (when @(::should-scroll-to-comments s)
                                   (utils/scroll-to-y (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 180)
                                   (reset! (::should-scroll-to-comments s) false))
-                                s)
-                               :will-unmount (fn [s]
-                                (events/unlistenByKey @(::window-click s))
                                 s)}
   [s activity-data]
   (let [org-data (drv/react s :org-data)
@@ -106,60 +90,7 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (when (or edit-link
-                  delete-link)
-          (let [all-boards (filter
-                            #(not= (:slug %) utils/default-drafts-board-slug)
-                            (:boards (drv/react s :org-data)))]
-            [:div.more-button
-              {:ref "more-button"}
-              [:button.mlb-reset.more-ellipsis
-                {:type "button"
-                 :on-click (fn [e]
-                             (utils/remove-tooltips)
-                             (reset! (::more-dropdown s) (not @(::more-dropdown s)))
-                             (reset! (::move-activity s) false))
-                 :title "More"
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"}]
-              (when @(::more-dropdown s)
-                [:div.activity-more-dropdown-menu
-                  [:div.triangle]
-                  [:ul.activity-card-more-menu
-                    (when edit-link
-                      [:li
-                        {:on-click #(do
-                                      (utils/remove-tooltips)
-                                      (reset! (::more-dropdown s) false)
-                                      (activity-actions/activity-edit activity-data))}
-                        "Edit"])
-                    (when share-link
-                      [:li
-                        {:on-click #(do
-                                      (reset! (::more-dropdown s) false)
-                                      (dis/dispatch! [:activity-share-show activity-data]))}
-                        "Share"])
-                    (when (and edit-link
-                               (> (count all-boards) 1))
-                      [:li
-                        {:on-click #(do
-                                      (reset! (::more-dropdown s) false)
-                                      (reset! (::move-activity s) true))}
-                        "Move"])
-                    (when (utils/link-for (:links activity-data) "delete")
-                      [:li
-                        {:on-click #(do
-                                      (reset! (::more-dropdown s) false)
-                                      (delete-clicked % activity-data))}
-                        "Delete"])]])
-              (when @(::move-activity s)
-                [:div.activity-move-container
-                  {:ref "activity-move-container"}
-                  (activity-move
-                   {:activity-data activity-data
-                    :boards-list all-boards
-                    :dismiss-cb #(reset! (::move-activity s) false)})])]))]
+        (more-menu activity-data)]
       [:div.stream-view-item-body.group
         [:div.stream-body-left.group
           {:style {:padding-bottom (when-not is-mobile?

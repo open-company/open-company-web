@@ -16,9 +16,9 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -60,24 +60,6 @@
       (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s)))
-
-;; Delete handling
-
-(defn delete-clicked [e activity-data]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message (str "Delete this update?")
-                    :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(let [org-slug (router/current-org-slug)
-                                            board-slug (router/current-board-slug)
-                                            board-url (oc-urls/board org-slug board-slug)]
-                                       (router/nav! board-url)
-                                       (dis/dispatch! [:activity-delete activity-data])
-                                       (dis/dispatch! [:alert-modal-hide]))
-                    }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
 
 ;; Editing
 
@@ -280,12 +262,6 @@
                                  js/window
                                  EventType/CLICK
                                  (fn [e]
-                                   (when (and (not
-                                               (utils/event-inside? e (rum/ref-node s "more-dropdown")))
-                                              (not
-                                               (utils/event-inside? e
-                                                (sel1 [:div.fullscreen-post :div.activity-move]))))
-                                     (reset! (::showing-dropdown s) false))
                                    (when (and @(::show-legend s)
                                               (not (utils/event-inside? e (rum/ref-node s "legend-container"))))
                                       (reset! (::show-legend s) false)))))
@@ -306,9 +282,6 @@
   (let [modal-data (drv/react s :fullscreen-post-data)
         activity-data (:activity-data modal-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        delete-link (utils/link-for (:links activity-data) "delete")
-        edit-link (utils/link-for (:links activity-data) "partial-update")
-        share-link (utils/link-for (:links activity-data) "share")
         activity-attachments (au/get-attachments-from-body (:body activity-data))
         editing (:modal-editing modal-data)]
     [:div.fullscreen-post-container.group
@@ -346,58 +319,7 @@
               {:on-click #(save-editing? s)
                :class (when @(::entry-saving s) "loading")}
               "Post changes"]
-            (when (or edit-link
-                      share-link
-                      delete-link)
-              (let [all-boards (filter
-                                #(not= (:slug %) utils/default-drafts-board-slug)
-                                (:boards (:org-data modal-data)))]
-                [:div.more-dropdown
-                  {:ref "more-dropdown"}
-                  [:button.mlb-reset.fullscreen-post-more.dropdown-toggle
-                    {:type "button"
-                     :on-click (fn [_]
-                                 (when-not editing
-                                   (utils/remove-tooltips)
-                                   (reset! (::showing-dropdown s) (not @(::showing-dropdown s)))
-                                   (reset! (::move-activity s) false)))
-                     :data-toggle (if editing "" "tooltip")
-                     :data-placement "left"
-                     :data-container "body"
-                     :title "More"}]
-                  (when @(::showing-dropdown s)
-                    [:div.fullscreen-post-dropdown-menu
-                      [:div.triangle]
-                      [:ul.fullscreen-post-more-menu
-                        (when edit-link
-                         [:li.no-editing
-                           {:on-click #(do
-                                        (reset! (::showing-dropdown s) false)
-                                        (activity-actions/activity-edit activity-data))}
-                           "Edit"])
-                        (when share-link
-                         [:li.no-editing
-                           {:on-click #(do
-                                        (reset! (::showing-dropdown s) false)
-                                        (dis/dispatch! [:activity-share-show activity-data]))}
-                           "Share"])
-                        (when edit-link
-                          [:li.no-editing
-                            {:on-click #(do
-                                         (reset! (::showing-dropdown s) false)
-                                         (reset! (::move-activity s) true))}
-                            "Move"])
-                        (when delete-link
-                          [:li
-                            {:on-click #(do
-                                          (reset! (::showing-dropdown s) false)
-                                          (delete-clicked % activity-data))}
-                            "Delete"])]])
-                  (when @(::move-activity s)
-                    (activity-move {:activity-data activity-data
-                                    :boards-list all-boards
-                                    :dismiss-cb #(reset! (::move-activity s) false)
-                                    :on-change #(close-clicked s)}))])))]]
+            (more-menu activity-data))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         (when is-mobile?

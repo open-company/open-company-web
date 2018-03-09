@@ -14,8 +14,8 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.interactions-summary :refer (comments-summary)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [goog.object :as gobj]
@@ -36,10 +36,6 @@
     (dis/dispatch! [:alert-modal-show alert-data])))
 
 (rum/defcs activity-card < rum/reactive
-                        ;; Locals
-                        (rum/local false ::more-dropdown)
-                        (rum/local false ::move-activity)
-                        (rum/local nil ::window-click)
                         ;; Derivatives
                         (drv/drv :org-data)
                         (drv/drv :nux)
@@ -56,22 +52,6 @@
                             (doto (js/$ "[data-toggle=\"tooltip\"]")
                               (.tooltip "fixTitle")
                               (.tooltip "hide")))
-                          s)
-                         :did-mount (fn [s]
-                          (let [activity-data (first (:rum/args s))
-                                activity-card-class (str "div.activity-card-" (:uuid activity-data))]
-                            (reset! (::window-click s)
-                             (events/listen
-                              js/window
-                              EventType/CLICK
-                              (fn [e]
-                                (when (and
-                                       (not (utils/event-inside? e (sel1 [activity-card-class [:div.more-button]])))
-                                       (not (utils/event-inside? e (sel1 [activity-card-class [:div.activity-move]]))))
-                                  (reset! (::more-dropdown s) false))))))
-                          s)
-                         :will-unmount (fn [s]
-                          (events/unlistenByKey @(::window-click s))
                           s)}
   [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (au/get-attachments-from-body (:body activity-data))
@@ -81,8 +61,6 @@
         nux (drv/react s :nux)]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                                :dropdown-active (or @(::more-dropdown s)
-                                                     @(::move-activity s))
                                 :all-posts-card is-all-posts})
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
@@ -90,14 +68,11 @@
                      (or
                       nux
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-button]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-move]))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-menu]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions]))
-                      @(::more-dropdown s)
-                      @(::move-activity s))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions])))
 
                       (activity-actions/activity-modal-fade-in activity-data))))}
       ; Card header
@@ -118,58 +93,8 @@
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
-          (when (and (not nux)
-                     (or (utils/link-for (:links activity-data) "partial-update")
-                         (utils/link-for (:links activity-data) "delete")))
-            (let [all-boards (filter
-                              #(not= (:slug %) utils/default-drafts-board-slug)
-                              (:boards (drv/react s :org-data)))]
-              [:div.more-button
-                [:button.mlb-reset.more-ellipsis
-                  {:type "button"
-                   :on-click (fn [e]
-                               (utils/remove-tooltips)
-                               (reset! (::more-dropdown s) (not @(::more-dropdown s)))
-                               (reset! (::move-activity s) false))
-                   :title "More"
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-placement "top"
-                   :data-container "body"}]
-                (when @(::more-dropdown s)
-                  [:div.activity-more-dropdown-menu
-                    [:div.triangle]
-                    [:ul.activity-card-more-menu
-                      (when edit-link
-                        [:li
-                          {:on-click #(do
-                                        (utils/remove-tooltips)
-                                        (reset! (::more-dropdown s) false)
-                                        (activity-actions/activity-edit activity-data))}
-                          "Edit"])
-                      (when share-link
-                        [:li
-                          {:on-click #(do
-                                        (reset! (::more-dropdown s) false)
-                                        (dis/dispatch! [:activity-share-show activity-data]))}
-                          "Share"])
-                      (when (and edit-link
-                                 (> (count all-boards) 1))
-                        [:li
-                          {:on-click #(do
-                                        (reset! (::more-dropdown s) false)
-                                        (reset! (::move-activity s) true))}
-                          "Move"])
-                      (when (utils/link-for (:links activity-data) "delete")
-                        [:li
-                          {:on-click #(do
-                                        (reset! (::more-dropdown s) false)
-                                        (delete-clicked % activity-data))}
-                          "Delete"])]])
-                (when @(::move-activity s)
-                  (activity-move
-                   {:activity-data activity-data
-                    :boards-list all-boards
-                    :dismiss-cb #(reset! (::move-activity s) false)}))]))
+          (when (not nux)
+            (more-menu activity-data))
           (activity-attachments activity-data true)
           (when is-all-posts
             [:div.activity-tag.board-tag.on-gray
@@ -208,8 +133,6 @@
                :data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
                :data-container "body"
-               :class (utils/class-set {:not-hover (and (not @(::move-activity s))
-                                                        (not @(::more-dropdown s)))})
                :on-click (fn [e]
                            (utils/remove-tooltips)
                            (reset! (::more-dropdown s) false)
