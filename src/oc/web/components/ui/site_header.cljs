@@ -62,10 +62,8 @@
                             (user-actions/login-with-slack slack-auth-link)
                             (nav! oc-urls/sign-up e))))}
             (if logged-in
-              [:span
-                [:img.user-avatar
-                  {:src (jwt/get-key :avatar-url)}]
-                [:span "Your digest"]]
+              [:span.go-to-digest
+                "Go to digest"]
               (if use-slack-signup-button
                 [:span
                   "Sign up with "
@@ -76,8 +74,8 @@
             [:a.mobile-your-boards
               {:href your-boards
                :on-click (partial nav! your-boards)}
-              [:img.user-avatar
-                {:src (jwt/get-key :avatar-url)}]]
+              [:span.go-to-digest
+                "Go to digest"]]
             [:a.start
               {:href oc-urls/sign-up
                :on-click (fn [e]
