@@ -73,6 +73,10 @@ div.is-comments {
     color: $ui_grey;
     @include avenir_M();
     margin-top: 3px;
+    white-space: nowrap;
+    width: 74%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
