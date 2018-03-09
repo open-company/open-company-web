@@ -193,10 +193,6 @@ div.activity-card {
       position: relative;
       width: 45%;
 
-      div.activity-attachments {
-        float: right;
-      }
-
       div.new-tag {
         @include avenir_B();
         color: $carrot_green_1;
@@ -342,10 +338,15 @@ div.activity-card {
     }
   }
 
+  div.activity-card-attachments {
+    margin-top: 16px;
+    height: 20px;
+  }
+
   div.activity-card-footer {
     width: 100%;
-    height: 80px;
     padding: 24px 32px 32px 32px;
+    min-height: 82px;
 
     div.activity-share-thoughts {
       background-color: $carrot_green_3;
@@ -363,14 +364,9 @@ div.activity-card {
       cursor: pointer;
     }
 
-    div.reactions {
-
-    }
-
-    div.is-comments {
-      margin-top: 0px;
-      padding-top: 0px;
-      margin-left: 16px;
+    div.activity-attachments {
+      width: 100%;
+      margin-top: 16px;
     }
 
     div.activity-share {
