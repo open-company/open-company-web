@@ -263,7 +263,7 @@ div.activity-card {
     $body_height: 24*3;
     div.activity-card-body {
       margin-top: 16px;
-      @include activity-body(14);
+      @include activity-body(16);
       @include avenir_M();
       color: $deep_navy;
       line-height: 24px;
