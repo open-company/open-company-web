@@ -24,11 +24,12 @@ div.stream-view-attachments {
     a.stream-view-attachments-item {
       display: inline-block;
       height: 50px;
-      border: 1px solid rgba($deep_tan, 0.7);
+      border: 1px solid #ECECEC;
       background-color: white;
       padding: 9px 18px;
       margin-top: 8px;
       width: 100%;
+      border-radius: 6px;
 
       @include mobile() {
         flex-grow: 1;
@@ -37,7 +38,7 @@ div.stream-view-attachments {
 
       &:hover {
         box-shadow: 0px 2px 4px 0px rgba($deep_tan, 1);
-        border: 1px solid rgba($deep_tan, 0.9);
+        border: 1px solid $light_ui_grey;
 
         div.attachment-icon {
           background-color: rgba($light_ui_grey, 1);
