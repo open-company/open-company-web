@@ -8,23 +8,21 @@
 
 (rum/defcs activity-attachments < (rum/local false ::attachments-dropdown)
   [s activity-data small-version?]
-  (let [attachments (au/get-attachments-from-body (:body activity-data))]
-    (when (pos? (count attachments))
+  (let [attachments (au/get-attachments-from-body (:body activity-data))
+        attachments-num (count attachments)]
+    (when (pos? attachments-num)
       [:div.activity-attachments
         {:class (utils/class-set {:small-version small-version?})
          :on-mouse-enter #(reset! (::attachments-dropdown s) true)
          :on-mouse-leave #(reset! (::attachments-dropdown s) false)}
-        [:button.mlb-reset.attachments-button
-          {:ref "attachments-button"
-           :class (when @(::attachments-dropdown s) "expanded")}
-          (count attachments)]
+        [:div.attachments-summary
+          (str attachments-num " attachment" (when (> attachments-num 1) "s"))]
         (when @(::attachments-dropdown s)
           [:div.attachments-dropdown
-            [:div.triangle]
             [:div.attachments-dropdown-list
               [:div.attachments-dropdown-header.group
                 [:div.title "Attachments"]
-                [:div.subtitle (str (count attachments) " files")]]
+                [:div.subtitle (str attachments-num " files")]]
               (for [atch attachments
                     :let [author (:author atch)
                           createdat (:createdat atch)
