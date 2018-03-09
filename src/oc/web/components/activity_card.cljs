@@ -53,7 +53,7 @@
                               (.tooltip "fixTitle")
                               (.tooltip "hide")))
                           s)}
-  [s activity-data has-headline has-body is-new is-all-posts share-thoughts show-attachments]
+  [s activity-data has-headline has-body is-new is-all-posts show-attachments]
   (let [attachments (au/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
@@ -104,8 +104,6 @@
                 ]]
       [:div.activity-card-shadow-container.group
         [:div.activity-card-content.group
-          [:span.posted-in
-            {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}]
           ; Headline
           [:div.activity-card-headline
             {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
@@ -120,15 +118,11 @@
                :class (utils/class-set {:has-body has-body
                                         :has-headline has-headline})}])
           (when show-attachments
-            [:div.activity-card-attachments
-              (activity-attachments activity-data)])]
+              [:div.activity-card-attachments
+                (activity-attachments activity-data)])]
         [:div.activity-card-footer.group
-          {:style (when-not is-mobile? {:height (+ (* 26 ))})}
           (reactions activity-data)
           (comments-summary activity-data)
-          (when share-thoughts
-            [:div.activity-share-thoughts
-              "Share your thoughts"])
           (when (and (not nux)
                      (utils/link-for (:links activity-data) "partial-update"))
             [:button.mlb-reset.post-edit

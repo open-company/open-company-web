@@ -42,26 +42,6 @@
                       (nil? seen-at)))]
     new?))
 
-(defn is-share-thoughts? [entry changes]
-  (let [entry-js-date (utils/js-date (:published-at entry))
-        now (utils/js-date)
-        thirty-days (* 1000 60 60 24 30)
-        user-id (jwt/get-key :user-id)
-        author-id (-> entry :author first :user-id)]
-    (and ;; Was not created by this user
-         (not= author-id user-id)
-         ;; was created in the last 30 days
-         (<= (- (.getTime now) thirty-days) (.getTime entry-js-date))
-         ;; has 0 comments
-         (zero? (:count (utils/link-for (:links entry) "comments")))
-         ;; has no reactions from the current user
-         (zero? (count (filter :reacted (:reactions entry)))))))
-
-(defn find-share-thoughts-uuid [board-data changes]
-  (let [entries (vals (:fixed-items board-data))
-        sorted-entries (reverse (sort-by :published-at entries))]
-    (some #(when (is-share-thoughts? % changes) (:uuid %)) sorted-entries)))
-
 (defn load-more-items-next-fn [s scroll]
   (when (compare-and-set! (::loading-more s) false true)
     (dis/dispatch! [:all-posts-more @(::next-link s) :up])))
@@ -126,7 +106,6 @@
           change-data (drv/react s :change-data)
           board-uuid (:uuid board-data)
           changes (get change-data board-uuid)
-          share-thoughts-uuid (find-share-thoughts-uuid board-data changes)
           is-mobile? (responsive/is-mobile-size?)
           entries (vals (:fixed-items board-data))
           sorted-entries (vec (reverse (sort-by :published-at entries)))]
@@ -145,9 +124,8 @@
             [:div.entries-cards-container-row.group
               {:key (str "entries-row-" idx)}
               (for [entry entries
-                    :let [is-new (new? entry changes)
-                          share-thoughts (= (:uuid entry) share-thoughts-uuid)]]
-                (rum/with-key (activity-card entry has-headline has-body is-new false share-thoughts)
+                    :let [is-new (new? entry changes)]]
+                (rum/with-key (activity-card entry has-headline has-body is-new false)
                   (str "entry-latest-" (:uuid entry))))
               ; If the row contains less than 2, add a placeholder
 

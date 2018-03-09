@@ -125,8 +125,8 @@
         [:div.left-navigation-sidebar-mobile-header.group
           [:button.mlb-reset.close-mobile-menu
             {:on-click #(close-navigation-sidebar)}]
-          [:div.mobile-header-title
-            "Your digests"]]
+          [:span.go-to-digest ;div.mobile-header-title
+            "Go to digest"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
