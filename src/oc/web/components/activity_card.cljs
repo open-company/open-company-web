@@ -73,7 +73,8 @@
                          :will-unmount (fn [s]
                           (events/unlistenByKey @(::window-click s))
                           s)}
-  [s activity-data has-headline has-body is-new is-all-posts]
+
+[s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (au/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")

@@ -89,7 +89,7 @@
                               (get (:uuid activity-data))
                               :sorted-comments)
                           (:comments activity-data))
-        activity-attachments (au/get-attachments-from-body (:body activity-data))]
+        activity-attachments (:attachments activity-data)]
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
