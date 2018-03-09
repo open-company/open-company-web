@@ -236,7 +236,7 @@ div.entry-edit-modal-container {
             }
           }
 
-          span {
+          span.posting-in-span {
             float: left;
           }
 
@@ -299,34 +299,6 @@ div.entry-edit-modal-container {
               top: 32px;
               left: 50%;
               margin-left: -180px;
-            }
-
-            div.dropdown-list-container {
-              top: 32px;
-              left: 50%;
-              margin-left: -100px;
-              width: 200px;
-
-              @include mobile() {
-                width: 100vw;
-                height: calc(100vh - 64px - 48px);
-                top: 34px;
-                left: 0px;
-                text-align: left;
-                background-color: white;
-
-                div.triangle {
-                  display: none;
-                }
-
-                div.dropdown-list-content {
-                  border: none;
-                  border-radius: 0px;
-                  padding: 24px;
-                  margin: 0px;
-                  box-shadow: none;
-                }
-              }
             }
           }
         }

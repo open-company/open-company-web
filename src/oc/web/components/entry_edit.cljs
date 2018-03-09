@@ -18,7 +18,6 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -372,7 +371,7 @@
           [:div.entry-edit-modal-headline
             (user-avatar-image current-user-data)
             [:div.posting-in
-              [:span
+              [:span.posting-in-span
                 (if (:uuid entry-editing)
                   (if (= (:status entry-editing) "published")
                     "Posted in: "
