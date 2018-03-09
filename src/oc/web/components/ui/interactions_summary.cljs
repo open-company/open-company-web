@@ -35,7 +35,7 @@
     "you"
     (if (seq (:first-name author))
       (:first-name author)
-      (:name author))))
+      (first (string/split (:name author) " ")))))
 
 (defn comment-summary-string [authors]
   (case (count authors)
