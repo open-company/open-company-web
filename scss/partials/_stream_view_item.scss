@@ -82,6 +82,7 @@ div.stream-view-item {
       padding: 40px 40px 88px 40px;
       background-color: white;
       border-bottom-left-radius: 6px;
+      border-right: 1px solid #F4F3F1;
 
       @include mobile() {
         width: 100%;
