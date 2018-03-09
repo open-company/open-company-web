@@ -29,9 +29,7 @@
                :key (str "attachment-" size "-" (:url atch))
                :href (:url atch)
                :target "_blank"}
-              [:div.attachment-icon
-                [:i.fa
-                  {:class (au/icon-for-mimetype (:mimetype atch))}]]
+              [:div.attachment-icon]
               [:div.attachment-content
                 [:div.attachment-name
                   (:name atch)]
