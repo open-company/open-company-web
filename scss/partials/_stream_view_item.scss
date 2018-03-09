@@ -6,7 +6,7 @@ div.stream-view-item {
     width: 100%;
   }
 
-  &:not(.expanded).body-fade-out {
+  &:not(.expanded).show-continue-reading {
     div.stream-view-item-body {
       div.stream-body-left {
         div.stream-item-body-container {
@@ -16,6 +16,10 @@ div.stream-view-item {
             &:after {
               display: block;
             }
+          }
+
+          button.expand-button {
+            display: block;
           }
         }
       }
@@ -237,6 +241,7 @@ div.stream-view-item {
           @include avenir_M();
           font-size: 16px;
           text-align: center;
+          display: none;
         }
       }
 

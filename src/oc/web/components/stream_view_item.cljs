@@ -37,9 +37,10 @@
   (when-not @(::expanded s)
     (let [item-body (rum/ref-node s "item-body")
           dom-node (rum/dom-node s)]
-      (if (> (.-clientHeight item-body) 400)
-        (.add (.-classList dom-node) "body-fade-out")
-        (.remove (.-classList dom-node) "body-fade-out")))))
+      (if (or (responsive/is-tablet-or-mobile?)
+              (> (.-clientHeight item-body) 400))
+        (.add (.-classList dom-node) "show-continue-reading")
+        (.remove (.-classList dom-node) "show-continue-reading")))))
 
 (rum/defcs stream-view-item < rum/reactive
                               ;; Derivatives
@@ -91,8 +92,7 @@
         activity-attachments (:attachments activity-data)]
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
-                                :expanded expanded?
-                                :show-continue-reading (not expanded?)})}
+                                :expanded expanded?})}
       [:div.stream-view-item-header
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))
@@ -179,10 +179,9 @@
               [:div.stream-item-body-inner
                 {:ref "item-body"
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
-            (when-not expanded?
-              [:button.mlb-reset.expand-button
-                {:on-click #(reset! (::expanded s) true)}
-                "Continue reading"])]
+            [:button.mlb-reset.expand-button
+              {:on-click #(reset! (::expanded s) true)}
+              "Continue reading"]]
           (stream-view-attachments activity-attachments)
           [:div.stream-item-reactions.group
             {:ref "stream-item-reactions"}
