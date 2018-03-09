@@ -116,18 +116,17 @@
           (stream-view-attachments activity-attachments)
           [:div.stream-item-reactions.group
             {:ref "stream-item-reactions"}
-            (reactions activity-data)
-            (when (and is-mobile?
-                       (not expanded?))
-              [:div.stream-mobile-comments-summary
-                {:on-click (fn [e]
-                              (utils/event-stop e)
-                              (reset! (::expanded s) true)
-                              (reset! (::should-scroll-to-comments s) true))}
-                (if (zero? (count comments-data))
-                  (when is-mobile?
-                    [:div.zero-comments "Comment"])
-                  (comments-summary activity-data false))])]
+            (reactions activity-data)]
+          (when (and is-mobile?
+                     (not expanded?)
+                     (pos? (count comments-data)))
+            [:div.stream-mobile-comments-summary
+              {:on-click (fn [e]
+                            (utils/event-stop e)
+                            (reset! (::expanded s) true)
+                            (reset! (::should-scroll-to-comments s) true))}
+              (when-not (zero? (count comments-data))
+                (comments-summary activity-data false))])
           (when (and is-mobile?
                      expanded?)
             [:div.stream-mobile-comments
