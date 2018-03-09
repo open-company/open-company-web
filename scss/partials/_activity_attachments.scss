@@ -26,18 +26,20 @@ div.activity-attachments {
     font-size: 14px;
     color: $deep_navy;
     position: relative;
+    float: left;
+    padding-right: 16px;
 
     &:after {
       content: "";
       position: absolute;
-      top: 0px;
+      top: 8px;
       right: 0px;
       background-image: cdnUrl("/img/ML/section_access_chevron.svg");
       background-repeat: no-repeat;
       width: 8px;
-      height: 5px;
-      background-size: 8px 5px;
-      background-position: 0px 9px;
+      height: 6px;
+      background-size: 8px 6px;
+      background-position: center;
       background-color: transparent;
     }
   }
