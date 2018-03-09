@@ -73,7 +73,7 @@
                          :will-unmount (fn [s]
                           (events/unlistenByKey @(::window-click s))
                           s)}
-  [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
+  [s activity-data has-headline has-body is-new is-all-posts]
   (let [attachments (au/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
@@ -200,9 +200,6 @@
               {:src (:thumbnail @(:body-thumbnail s))}]])]
       [:div.activity-card-footer.group
         (interactions-summary activity-data)
-        (when share-thoughts
-          [:div.activity-share-thoughts
-            "Share your thoughts"])
         (when (and (not nux)
                    (utils/link-for (:links activity-data) "partial-update"))
           [:button.mlb-reset.post-edit
