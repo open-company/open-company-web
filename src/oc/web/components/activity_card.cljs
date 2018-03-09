@@ -44,8 +44,7 @@
                         {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
-                                body-a-sel (str body-sel " a")
-                                is-all-posts (nth (:rum/args s) 4 false)]
+                                body-a-sel (str body-sel " a")]
                             ; Prevent body links in FoC
                             (.click (js/$ body-a-sel) #(.stopPropagation %)))
                           (when-not (responsive/is-tablet-or-mobile?)
@@ -53,15 +52,14 @@
                               (.tooltip "fixTitle")
                               (.tooltip "hide")))
                           s)}
-  [s activity-data has-headline has-body is-new is-all-posts show-attachments]
+  [s activity-data has-headline has-body is-new show-attachments]
   (let [attachments (au/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
         nux (drv/react s :nux)]
     [:div.activity-card
-      {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                                :all-posts-card is-all-posts})
+      {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true})
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                     (when-not
@@ -95,13 +93,9 @@
         [:div.activity-card-head-right
           (when (not nux)
             (more-menu activity-data))
-          (when is-all-posts
-            [:div.activity-tag.board-tag.on-gray
-              {:on-click #(router/nav! (oc-urls/board (router/current-org-slug) (:board-slug activity-data)))}
-              (:board-name activity-data)])
-                ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
-                ;;(when is-new [:div.new-tag "New"])
-                ]]
+          ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
+          ;;(when is-new [:div.new-tag "New"])
+          ]]
       [:div.activity-card-shadow-container.group
         [:div.activity-card-content.group
           ; Headline

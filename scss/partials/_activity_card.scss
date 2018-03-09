@@ -341,6 +341,10 @@ div.activity-card {
   div.activity-card-attachments {
     margin-top: 16px;
     height: 20px;
+
+    div.activity-attachments {
+      width: 100%;
+    }
   }
 
   div.activity-card-footer {
@@ -348,25 +352,21 @@ div.activity-card {
     padding: 24px 32px 32px 32px;
     min-height: 82px;
 
-    div.activity-share-thoughts {
-      background-color: $carrot_green_3;
-      height: 32px;
-      padding: 8px 16px 8px 32px;
-      border-radius: 100px;
-      @include avenir_H();
-      font-size: 12px;
-      color: $carrot_green_1;
-      background-image: cdnUrl("/img/ML/share_thoughts.svg");
-      background-position: 16px 10px;
-      background-size: 12px 12px;
-      background-repeat: no-repeat;
+    div.reactions {
       float: left;
-      cursor: pointer;
+
+      @include mobile() {
+        float: unset;
+      }
     }
 
-    div.activity-attachments {
-      width: 100%;
-      margin-top: 16px;
+    div.is-comments {
+      float: left;
+      margin-left: 16px;
+
+      @include mobile() {
+        float: unset;
+      }
     }
 
     div.activity-share {
