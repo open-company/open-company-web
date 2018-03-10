@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.sections-picker
   (:require [rum.core :as rum]
+            [goog.object :as gobj]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
@@ -8,7 +9,7 @@
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-;; Private board users search helpers
+;; Private section users search helpers
 
 (defn filter-user-by-query
   "Given a user and a query string, return true if first-name, last-name or email contains it."
@@ -33,8 +34,8 @@
 
 (defn get-addable-users
   "Filter users that are not arleady viewer or author users."
-  [board-editing users]
-  (let [already-in-ids (concat (:viewers board-editing) (:authors board-editing))
+  [section-editing users]
+  (let [already-in-ids (concat (:viewers section-editing) (:authors section-editing))
         without-self (remove #(= (:user-id %) (jwt/user-id)) users)]
     (remove #(some #{(:user-id %)} already-in-ids) without-self)))
 
@@ -60,30 +61,38 @@
                             ;; Locals
                             (rum/local "" ::query)
                             (rum/local false ::show-access-list)
-                            (rum/local :team ::access)
                             (rum/local false ::show-search-results)
                             (rum/local nil ::show-edit-user-dropdown)
                             (rum/local nil ::show-edit-user-top)
+                            (rum/local "" ::initial-section-name)
                             ;; Derivatives
                             (drv/drv :org-data)
                             (drv/drv :board-data)
-                            (drv/drv :board-editing)
+                            (drv/drv :section-editing)
                             (drv/drv :team-data)
                             (drv/drv :team-channels)
                             (drv/drv :team-roster)
-  [s]
+                            {:will-mount (fn [s]
+                             (let [initial-section-data (first (:rum/args s))
+                                   fixed-section-data (if (nil? initial-section-data)
+                                                       utils/default-section
+                                                       initial-section-data)]
+                               (when-not (string/blank? (:name fixed-section-data))
+                                 (reset! (::initial-section-name s) (:name fixed-section-data)))
+                               (dis/dispatch! [:input [:section-editing] fixed-section-data]))
+                             s)}
+  [s initial-section-data on-change]
   (let [org-data (drv/react s :org-data)
-        board-editing (drv/react s :board-editing)
-        board-data (if (seq (:slug board-editing)) (drv/react s :board-data) board-editing)
+        section-editing (drv/react s :section-editing)
+        section-data (if (seq (:slug section-editing)) (drv/react s :board-data) section-editing)
         team-data (drv/react s :team-data)
         roster (drv/react s :team-roster)
         current-user-id (jwt/user-id)
-        ;; user can edit the private board users if
-        ;; he's creating a new board
-        ;; or if he's in the authors list of the existing board
-        can-change (or (not (seq (:slug board-editing)))
-                       (some #{current-user-id} (map :user-id (:authors board-editing))))]
-    (js/console.log "show dropdown?" @(::show-edit-user-dropdown s) "top" @(::show-edit-user-top s))
+        ;; user can edit the private section users if
+        ;; he's creating a new section
+        ;; or if he's in the authors list of the existing section
+        can-change (or (not (seq (:slug section-editing)))
+                       (some #{current-user-id} (map :user-id (:authors section-editing))))]
     [:div.sections-picker-add
       {:on-click #(do
                     (when-not (utils/event-inside? % (rum/ref-node s "private-users-search"))
@@ -94,43 +103,52 @@
         "Add a new section"]
       [:div.sections-picker-add-name
         {:content-editable true
-         :placeholder "Section name"}]
+         :placeholder "Section name"
+         :ref "section-name"
+         :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "section-name") %)
+         :on-key-up #(when (:board-name-error section-editing)
+                       (dis/dispatch! [:input [:section-editing :board-name-error] nil]))
+         :on-key-press (fn [e]
+                         (when (or (>= (count (.. e -target -innerText)) 50)
+                                  (= (.-key e) "Enter"))
+                          (utils/event-stop e)))
+         :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
       [:div.sections-picker-add-label
         "Who can view this section?"]
       [:div.sections-picker-add-access
         {:class (when @(::show-access-list s) "expanded")
          :on-click #(reset! (::show-access-list s) (not @(::show-access-list s)))}
-        (case @(::access s)
-          :private private-access
-          :team team-access
-          :public public-access)]
+        (case (:access section-editing)
+          "private" private-access
+          "public" public-access
+          team-access)]
       (when @(::show-access-list s)
         [:div.sections-picker-add-access-list
           [:div.access-list-row
             {:on-click #(do
                           (utils/event-stop %)
                           (reset! (::show-access-list s) false)
-                          (reset! (::access s) :private))}
-            private-access]
-          [:div.access-list-row
-            {:on-click #(do
-                          (utils/event-stop %)
-                          (reset! (::show-access-list s) false)
-                          (reset! (::access s) :team))}
+                          (dis/dispatch! [:input [:section-editing :access] "team"]))}
             team-access]
           [:div.access-list-row
             {:on-click #(do
                           (utils/event-stop %)
                           (reset! (::show-access-list s) false)
-                          (reset! (::access s) :public))}
+                          (dis/dispatch! [:input [:section-editing :access] "private"]))}
+            private-access]
+          [:div.access-list-row
+            {:on-click #(do
+                          (utils/event-stop %)
+                          (reset! (::show-access-list s) false)
+                          (dis/dispatch! [:input [:section-editing :access] "public"]))}
             public-access]])
-      (when (= @(::access s) :private)
+      (when (= (:access section-editing) "private")
         [:div.sections-picker-add-label
           "Invite member"])
-      (when (= @(::access s) :private)
+      (when (= (:access section-editing) "private")
         (let [query  (::query s)
               available-users (filter :user-id (:users roster))
-              addable-users (get-addable-users board-editing available-users)
+              addable-users (get-addable-users section-editing available-users)
               filtered-users (filter-users addable-users @query)]
           (when (and can-change
                      (pos? (count addable-users)))
@@ -139,7 +157,7 @@
               [:input
                 {:value @query
                  :type "text"
-                 :placeholder "Add a team member to this board"
+                 :placeholder "Add a team member to this section"
                  :on-focus #(reset! (::show-search-results s) true)
                  :on-change #(let [q (.. % -target -value)]
                               (reset! (::show-search-results s) (seq q))
@@ -149,7 +167,7 @@
                   (for [u filtered-users
                         :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
                               user (merge u team-user)
-                              user-type (utils/get-user-type user org-data board-editing)]]
+                              user-type (utils/get-user-type user org-data section-editing)]]
                     [:div.sections-picker-private-users-result
                       {:on-click #(do
                                     (reset! query "")
@@ -159,19 +177,21 @@
                       (user-avatar-image user)
                       [:div.name
                         (utils/name-or-email user)]])])])))
-      (when (= @(::access s) :private)
+      (when (and (= (:access section-editing) "private")
+                 (pos? (+ (count (:authors section-editing))
+                          (count (:viewers section-editing)))))
         [:div.sections-picker-add-label.group
           [:span.main-label
             "Section members"]
           [:span.role-header
             "Role"]])
-      (when (and (= @(::access s) :private)
-                 (pos? (+ (count (:authors board-editing))
-                          (count (:viewers board-editing)))))
+      (when (and (= (:access section-editing) "private")
+                 (pos? (+ (count (:authors section-editing))
+                          (count (:viewers section-editing)))))
         [:div.sections-picker-add-private-users
           {:ref "sections-picker-add-private-users"}
           (let [user-id @(::show-edit-user-dropdown s)
-                user-type (if (utils/in? (:viewers board-editing) user-id)
+                user-type (if (utils/in? (:viewers section-editing) user-id)
                             :viewer
                             :author)
                 team-user (some #(when (= (:user-id %) user-id) %) (:users team-data))]
@@ -193,8 +213,8 @@
                           (reset! (::show-edit-user-dropdown s) nil)
                           (reset! (::show-edit-user-top s) nil))
              :ref "edit-users-scroll"}
-            (let [author-ids (set (:authors board-editing))
-                  viewer-ids (set (:viewers board-editing))
+            (let [author-ids (set (:authors section-editing))
+                  viewer-ids (set (:viewers section-editing))
                   authors (filter (comp author-ids :user-id) (:users team-data))
                   viewers (filter (comp viewer-ids :user-id) (:users team-data))
                   complete-authors (map
@@ -224,23 +244,23 @@
                   [:div.name
                     (utils/name-or-email user)]
                   (if self
-                    (if (and (seq (:slug board-editing))
-                             (> (count (:authors board-data)) 1))
+                    (if (and (seq (:slug section-editing))
+                             (> (count (:authors section-data)) 1))
                       [:div.user-type.remove-link
                         {:on-click (fn []
-                          (let [authors (:authors board-data)
+                          (let [authors (:authors section-data)
                                 self-data (first (filter #(= (:user-id %) current-user-id) authors))]
                             (dis/dispatch! [:alert-modal-show
                              {:icon "/img/ML/error_icon.png"
-                              :action "remove-self-user-from-private-board"
-                              :message "Are you sure you want to leave this board?"
+                              :action "remove-self-user-from-private-section"
+                              :message "Are you sure you want to leave this section?"
                               :link-button-title "No"
                               :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                               :solid-button-title "Yes"
                               :solid-button-cb (fn []
                                (dis/dispatch! [:private-board-kick-out-self self-data])
                                (dis/dispatch! [:alert-modal-hide]))}])))}
-                        "Leave Board"]
+                        "Leave section"]
                       [:div.user-type.no-dropdown
                         "Full Access"])
                     [:div.user-type
@@ -251,6 +271,15 @@
                         "Viewer")])]))]])
       [:div.sections-picker-add-footer
         [:button.mlb-reset.create-bt
+          {:on-click #(let [section-node (rum/ref-node s "section-name")
+                            inner-html (.-innerHTML section-node)
+                            section-name (utils/strip-HTML-tags
+                                          (utils/emoji-images-to-unicode
+                                           (gobj/get (utils/emojify inner-html) "__html")))
+                            next-section-editing (merge section-editing {:slug utils/default-section-slug
+                                                                         :name section-name})]
+                        (dis/dispatch! [:input [:section-editing] next-section-editing])
+                        (on-change next-section-editing))}
           "Create"]]]))
 
 (defn sections-group
@@ -278,31 +307,44 @@
 
 (rum/defcs sections-picker < rum/reactive
                              (drv/drv :editable-boards)
-                             (rum/local false ::show-add-board)
+                             (drv/drv :section-editing)
+                             (rum/local false ::show-add-section)
   [s active-slug on-change]
-  (let [all-sections (vals (drv/react s :editable-boards))
+  (let [section-editing (drv/react s :section-editing)
+        all-sections (vals (drv/react s :editable-boards))
         team-sections (filterv #(= (:access %) "team") all-sections)
+        fixed-team-sections (if (= (:access section-editing) "team")
+                              (vec (concat [section-editing] team-sections))
+                              team-sections)
         public-sections (filterv #(= (:access %) "public") all-sections)
+        fixed-public-sections (if (= (:access section-editing) "public")
+                                (vec (concat [section-editing] public-sections))
+                                public-sections)
         private-sections (filterv #(= (:access %) "private") all-sections)
-        should-show-headers? (or (and (pos? (count private-sections))
-                                      (pos? (count public-sections)))
-                                 (and (pos? (count team-sections))
-                                      (pos? (count public-sections)))
-                                 (and (pos? (count team-sections))
-                                      (pos? (count private-sections))))]
+        fixed-private-sections (if (= (:access section-editing) "private")
+                                 (vec (concat [section-editing] private-sections))
+                                 private-sections)
+        cfn #(pos? (count %))
+        ;; Check if at least 2 groups are shown
+        ;; logic: a? (b || c) : (b && c)
+        should-show-headers? (if (cfn fixed-team-sections)
+                                (or (cfn fixed-private-sections)
+                                    (cfn fixed-public-sections))
+                                (and (cfn fixed-private-sections)
+                                     (cfn fixed-public-sections)))]
     [:div.sections-picker.group
-      {:class (when-not @(::show-add-board s) "sections-list")}
+      {:class (when-not @(::show-add-section s) "sections-list")}
       [:div.sections-picker-header
         [:div.sections-picker-header-left
           "Post to..."]
         [:div.sections-picker-header-right
-          (when-not @(::show-add-board s)
+          (when-not @(::show-add-section s)
             [:button.mlb-reset.add-new-section-bt
-              {:on-click #(reset! (::show-add-board s) true)}
+              {:on-click #(reset! (::show-add-section s) true)}
               "Add new section"])]]
-      (if @(::show-add-board s)
-        (section-editor)
+      (if @(::show-add-section s)
+        (section-editor nil on-change)
         [:div.sections-picker-content
-          (sections-group s team-sections should-show-headers?)
-          (sections-group s public-sections should-show-headers?)
-          (sections-group s private-sections should-show-headers?)])]))
+          (sections-group s fixed-team-sections should-show-headers?)
+          (sections-group s fixed-public-sections should-show-headers?)
+          (sections-group s fixed-private-sections should-show-headers?)])]))
