@@ -784,17 +784,51 @@
 
 (defmethod dispatcher/action :entry-publish
   [db [_]]
-  (let [entry-data (:entry-editing db)
-        entry-exists? (seq (:links entry-data))
-        board-data-key (dispatcher/board-data-key (router/current-org-slug) (:board-slug entry-data))
-        board-data (get-in db board-data-key)
-        publish-entry-link (if entry-exists?
-                            ;; If the entry already exists use the publish link in it
-                            (utils/link-for (:links entry-data) "publish")
-                            ;; If the entry is new, use
-                            (utils/link-for (:links board-data) "create"))]
-    (api/publish-entry entry-data publish-entry-link)
-    (assoc-in db [:entry-editing :publishing] true)))
+  (let [entry-data (:entry-editing db)]
+    (if (= (:board-slug entry-data) utils/default-section-slug)
+      (let [fixed-entry-data (dissoc entry-data :board-slug :board-name)
+            section-editing (:section-editing db)
+            final-board-data (assoc section-editing :entries [fixed-entry-data])]
+        (api/create-board final-board-data
+          (fn [{:keys [success status body]}]
+            (if (= status 409)
+              ; Board name exists
+              (dispatcher/dispatch!
+               [:input
+                [:board-editing :board-name-error]
+                "Board name already exists or isn't allowed"])
+              (dispatcher/dispatch! [:entry-publish-with-board/finish (when success (json->cljs body))]))))
+        (assoc-in db [:entry-editing :publishing] true))
+      (let [entry-exists? (seq (:links entry-data))
+            board-data-key (dispatcher/board-data-key (router/current-org-slug) (:board-slug entry-data))
+            board-data (get-in db board-data-key)
+            publish-entry-link (if entry-exists?
+                                ;; If the entry already exists use the publish link in it
+                                (utils/link-for (:links entry-data) "publish")
+                                ;; If the entry is new, use
+                                (utils/link-for (:links board-data) "create"))]
+        (api/publish-entry entry-data publish-entry-link)
+        (assoc-in db [:entry-editing :publishing] true)))))
+
+(defmethod dispatcher/action :entry-publish-with-board/finish
+  [db [_ new-board-data]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (:slug new-board-data)
+        board-key (dispatcher/board-data-key org-slug (:slug new-board-data))
+        fixed-board-data (utils/fix-board new-board-data)]
+    (remove-cached-item (-> db :entry-editing :uuid))
+    (api/get-org (dispatcher/org-data))
+    (if (not= (:slug fixed-board-data) (router/current-board-slug))
+      ;; If creating a new board, start watching changes
+      (ws-cc/container-watch [(:uuid fixed-board-data)])
+      ;; If updating an existing board, refresh the org data
+      (api/get-org (dispatcher/org-data)))
+  (-> db
+    (assoc-in board-key fixed-board-data)
+    (dissoc :board-editing)
+    (update-in [:entry-editing] dissoc :publishing)
+    (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
+    (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ {:keys [activity-data]}]]
@@ -810,16 +844,13 @@
       (-> db
         (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
         (update-in [:entry-editing] dissoc :publishing)
-        (dissoc :entry-toggle-save-on-exit)
-        ;; Progress the NUX
-        (assoc :nux (when (= (:nux db) :3) :4))))))
+        (dissoc :entry-toggle-save-on-exit)))))
 
 (defmethod dispatcher/action :entry-publish/failed
   [db [_]]
   (-> db
     (update-in [:entry-editing] dissoc :publishing)
-    (update-in [:entry-editing] assoc :error true)
-    (assoc :nux (when (= (:nux db) :3) :5))))
+    (update-in [:entry-editing] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ activity-data]]
@@ -883,7 +914,16 @@
   (let [board-data (:board-editing db)]
     (if (and (string/blank? (:slug board-data))
              (not (string/blank? (:name board-data))))
-      (api/create-board board-data)
+      (api/create-board board-data
+       (fn [{:keys [success status body]}]
+         (let [board-data (when success (json->cljs body))]
+           (if (= status 409)
+             ; Board name exists
+             (dispatcher/dispatch!
+              [:input
+               [:board-editing :board-name-error]
+               "Board name already exists or isn't allowed"])
+             (dispatcher/dispatch! [:board-edit-save/finish board-data])))))
       (api/patch-board board-data)))
   db)
 
