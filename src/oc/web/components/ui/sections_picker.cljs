@@ -91,7 +91,7 @@
         ;; user can edit the private section users if
         ;; he's creating a new section
         ;; or if he's in the authors list of the existing section
-        can-change (or (not (seq (:slug section-editing)))
+        can-change (or (= (:slug section-editing) utils/default-section-slug)
                        (some #{current-user-id} (map :user-id (:authors section-editing))))]
     [:div.sections-picker-add
       {:on-click #(do
