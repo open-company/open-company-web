@@ -44,7 +44,6 @@ div.dashboard-layout {
         }
 
         div.board-name-container {
-          padding: 16px 0px 8px;
 
           @include mobile() {
           
@@ -80,7 +79,7 @@ div.dashboard-layout {
       }
 
       div.board-name-container {
-        padding: 0px;
+        padding: 0px 0px 8px;
 
         @include mobile() {
           width: 100%;
