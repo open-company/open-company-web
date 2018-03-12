@@ -1,32 +1,35 @@
 @mixin default-item(){
   background-color: transparent;
+
+  @include mobile() {
+    height: 77px;
+    margin: 0px 24px;
+    padding: 24px 0px;
+    border-bottom: 1px solid $light_tan;
+  }
+
   .internal {
     @include avenir_M();
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.71;
-    color: $carrot_light_gray_3;
+    color: $ui_grey;
     text-decoration: none;
-
-    @include mobile() {
-      color: white;
-      font-size: 18px;
-    }
 
     &.new {
       @include avenir_B();
     }
   }
 
-  div.all-posts-label {
+  div.all-posts-label, div.drafts-label {
     @include avenir_H();
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.71;
-    color: $carrot_light_gray_3;
+    color: $deep_navy;
     text-decoration: none;
 
-    @include mobile() {
-      color: white;
-      font-size: 18px;
+    span.count {
+      @include avenir_M();
+      font-size: 16px;
     }
 
     &.new {
@@ -36,26 +39,21 @@
 }
 
 @mixin item-selected(){
-  background-color: $carrot_light_blue_2;
+  background-color: $feint_emerald;
   border-top-right-radius: 100px;
   border-bottom-right-radius: 100px;
 
   @include mobile() {
-    border-radius: 100px;
+    border-radius: 0px;
+    background-color: transparent;
   }
 
-  .internal, div.all-posts-label {
-    color: $carrot_text_blue_3;
+  .internal, div.all-posts-label, div.drafts-label {
+    color: $carrot_green;
     @include avenir_H();
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
-
-    @include mobile() {
-      color: $carrot_text_blue;
-      font-size: 18px;
-      margin-top: 4px;
-    }
   }
 }
 
@@ -65,41 +63,32 @@
   border-bottom-right-radius: 100px;
 
   @include mobile() {
-    border-radius: 100px;
+    background-color: transparent;
+    border-radius: 0px;
   }
 
   .internal {
-    color: $carrot_dark_gray;
+    color: $deep_navy;
     @include avenir_M();
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
-
-    @include mobile() {
-      color: white;
-      font-size: 18px;
-    }
 
     &.new {
       @include avenir_B();
     }
   }
 
-  div.public, div.private, div.all-posts-icon {
+  div.public, div.private, div.all-posts-icon, div.drafts-icon {
     opacity: 1;
   }
 
-  div.all-posts-label {
-    color: $carrot_dark_gray;
+  div.all-posts-label, div.drafts-label {
+    color: $deep_navy;
     @include avenir_H();
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
-
-    @include mobile() {
-      color: white;
-      font-size: 18px;
-    }
 
     &.new {
       @include avenir_B();
@@ -128,9 +117,8 @@ div.left-navigation-sidebar {
     left: 0px;
     display: none;
     z-index: 10000;
-    background-color: $carrot_text_blue;
+    background-color: white;
     max-height: initial;
-    padding: 16px 24px;
 
     &.show-mobile-boards-menu {
       display: block;
@@ -139,32 +127,37 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-mobile-header {
     display: none;
-    position: relative;
 
     @include mobile() {
       display: block;
-      height: 32px;
-      margin-bottom: 24px;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100vw;
+      height: 64px;
+      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     }
 
     button.close-mobile-menu {
       width: 32px;
       height: 32px;
-      background-image: cdnUrl("/img/ML/white_close.svg");
+      background-image: cdnUrl("/img/ML/black_close.svg");
       background-size: 15px;
       background-position: center;
       background-repeat: no-repeat;
       float: left;
+      margin: 16px;
     }
 
     div.mobile-header-title {
       @include avenir_H();
-      font-size: 22px;
-      color: white;
-      width: 150px;
+      font-size: 18px;
+      color: $deep_navy;
+      width: 250px;
       position: relative;
       left: 50%;
-      margin-left: -75px;
+      margin-top: 21px;
+      margin-left: -125px;
       text-align: center;
       position: absolute;
     }
@@ -172,14 +165,29 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-content {
     padding-bottom: 32px;
+
+    @include mobile() {
+      padding-top: 64px;
+    }
   }
 
   a.all-posts {
+    margin-bottom: 40px;
+
+    &.showing-drafts {
+      margin-bottom: 0px;
+    }
+  }
+
+  a.drafts {
+    margin-bottom: 40px;
+  }
+
+  a.all-posts, a.drafts {
     display: block;
     background-color: transparent;
     border: none;
     outline: none;
-    margin-bottom: 16px;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     padding-left: 32px;
@@ -206,56 +214,68 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-posts-label {
-      padding: 5px 5px 0 5px;
+    div.all-posts-label, div.drafts-label {
+      padding: 7px 5px 2px 5px;
       width: 148px;
       text-align: left;
       margin-left: 16px;
 
       @include mobile() {
-        margin-left: 50px;
+        margin-left: 34px;
         width: auto;
         padding: 0px;
       }
     }
 
     div.all-posts-icon {
-      background-image: cdnUrl("/img/ML/activity_hamburger.svg");
-      background-size: 15px 14px;
-      width: 15px;
-      height: 14px;
+      background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
+      background-size: 18px 18px;
+      width: 18px;
+      height: 18px;
       float: left;
       margin-left: -4px;
       margin-top: 8px;
-      opacity: 0.5;
 
       @include mobile() {
-        margin-left: 24px;
-        margin-top: 6px;
+        margin-left: 0px;
+        margin-top: 3px;
         opacity: 1;
-        background-image: cdnUrl("/img/ML/activity_hamburger_white.svg");
       }
 
       &.selected {
         opacity: 1;
-        background-image: cdnUrl("/img/ML/activity_hamburger_blue.svg");
+        background-image: cdnUrl("/img/ML/digest_icon_green.svg");
+      }
+    }
+
+    div.drafts-icon {
+      background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
+      background-size: 18px 19px;
+      width: 18px;
+      height: 19px;
+      float: left;
+      margin-left: -4px;
+      margin-top: 7px;
+
+      @include mobile() {
+        margin-left: 0px;
+        margin-top: 3px;
+        opacity: 1;
+      }
+
+      &.selected {
+        opacity: 1;
+        background-image: cdnUrl("/img/ML/drafts_icon_green.svg");
       }
     }
   }
 
   div.left-navigation-sidebar-top{
-    @include mobile() {
-      margin-top: 24px;
-    }
 
     .left-navigation-sidebar-top-title {
-      padding: 3px 0 2px 32px;
+      padding: 0px 0 0px 32px;
       margin: 0;
-      margin-bottom: 16px;
-
-      @include mobile() {
-        padding: 0px;
-      }
+      margin-bottom: 24px;
 
       span {
         @include avenir_B();
@@ -263,14 +283,7 @@ div.left-navigation-sidebar {
         color: $carrot_gray;
         float: left;
         margin-left: 21px;
-        margin-top: 6px;
         cursor: default;
-
-        @include mobile() {
-          color: white;
-          margin-left: 24px;
-          margin-top: 0px;
-        }
       }
 
       div.boards-icon {
@@ -328,7 +341,7 @@ div.left-navigation-sidebar {
       div.public {
         float: left;
         margin-left: 6px;
-        margin-top: 7px;
+        margin-top: 10px;
         width: 12px;
         height: 12px;
         background-image: cdnUrl("/img/ML/board_public.svg");
@@ -338,7 +351,7 @@ div.left-navigation-sidebar {
         @include mobile() {
           background-image: cdnUrl("/img/ML/board_public_white.svg");
           margin-left: 23px;
-          margin-top: 5px;
+          margin-top: 8px;
           opacity: 1;
         }
 
@@ -355,7 +368,7 @@ div.left-navigation-sidebar {
       div.private{
         float: left;
         margin-left: 7px;
-        margin-top: 6px;
+        margin-top: 9px;
         width: 9px;
         height: 11px;
         background-image: cdnUrl("/img/ML/board_private.svg");
@@ -365,7 +378,7 @@ div.left-navigation-sidebar {
         @include mobile() {
           background-image: cdnUrl("/img/ML/board_private_white.svg");
           margin-left: 25px;
-          margin-top: 7px;
+          margin-top: 10px;
           opacity: 1;
         }
 
@@ -385,10 +398,22 @@ div.left-navigation-sidebar {
         @include mobile() {
           margin: 4px 0px 4px 24px;
           height: 37px;
+
+          &.team-board {
+            margin-left: 0px;
+          }
+
+          &.privte-board {
+            margin-left: 24px;
+          }
+
+          &.public-board {
+            margin-left: 24px;
+          }
         }
 
         div.internal {
-          padding: 3px 5px 0 5px;
+          padding: 4px 5px 1px 5px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -399,7 +424,7 @@ div.left-navigation-sidebar {
           @include mobile() {
             width: auto;
             padding: 0px;
-            margin-left: 24px;
+            margin-left: 0px;
 
             &.has-icon {
               margin-left: 14px;
