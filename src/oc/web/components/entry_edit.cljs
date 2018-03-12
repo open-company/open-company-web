@@ -290,6 +290,8 @@
       [:div.entry-edit-modal-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(cancel-clicked s)}]
+        [:div.entry-edit-modal-header-title
+          "Edit post"]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right

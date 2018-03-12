@@ -46,6 +46,33 @@ div.entry-edit-modal-container {
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     }
 
+    div.entry-edit-modal-header-title {
+      @include avenir_H();
+      font-size: 18px;
+      color: $deep_navy;
+      width: 105px;
+      text-align: right;
+      position: relative;
+      margin: 0px auto;
+
+      &:before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 0px;
+        width: 15px;
+        height: 16px;
+        background-image: cdnUrl("/img/ML/edit_pencil.svg");
+        background-size: 15px 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      @include mobile() {
+        display: none;
+      }
+    }
+
     button.mobile-modal-close-bt {
       @include image-2x("/img/ML/mobile_modal_close");
       width: 24px;
