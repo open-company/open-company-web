@@ -26,16 +26,6 @@ div.stream-view-item {
     }
   }
 
-  &:hover {
-    div.stream-view-item-header {
-      div.more-menu {
-        button.more-menu-bt {
-          background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg"); 
-        }
-      }
-    }
-  }
-
   div.stream-view-item-header {
     height: 72px;
     background-color: $light_tan;

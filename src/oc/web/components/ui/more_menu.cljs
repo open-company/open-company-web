@@ -56,6 +56,7 @@
            :on-click (fn [_]
                        (utils/remove-tooltips)
                        (reset! (::showing-menu s) (not @(::showing-menu s))))
+           :class (when @(::showing-menu s) "active")
            :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
            :data-placement "left"
            :data-container "body"

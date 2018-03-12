@@ -114,16 +114,6 @@
               [:div.activity-card-attachments
                 (activity-attachments activity-data)])]
         [:div.activity-card-footer.group
+          [:div.activity-card-footer-divider-line]
           (reactions activity-data)
-          (comments-summary activity-data)
-          (when (and (not nux)
-                     (utils/link-for (:links activity-data) "partial-update"))
-            [:button.mlb-reset.post-edit
-              {:title "Edit"
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :on-click (fn [e]
-                           (utils/remove-tooltips)
-                           (reset! (::more-dropdown s) false)
-                           (activity-actions/activity-edit activity-data))}])]]]))
+          (comments-summary activity-data)]]]))

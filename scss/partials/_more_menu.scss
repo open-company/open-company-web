@@ -2,7 +2,7 @@ div.more-menu {
   float: right;
   width: 24px;
   height: 24px;
-  margin-top: -4px;
+  margin-top: 3px;
   transform: opacity 180ms ease-in;
   opacity: 1;
   position: relative;
@@ -29,8 +29,8 @@ div.more-menu {
       opacity: 1;
     }
 
-    &.not-hover {
-      opacity: 0;
+    &:hover, &.active {
+      background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
     }
   }
 
