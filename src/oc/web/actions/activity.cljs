@@ -1,5 +1,6 @@
 (ns oc.web.actions.activity
   (:require [taoensso.timbre :as timbre]
+            [oc.web.api :as api]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -107,3 +108,13 @@
 (defn entry-toggle-save-on-exit
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
+
+(defn entry-modal-save [activity-data board-slug]
+  (api/update-entry activity-data board-slug :modal-editing-data)
+  (dis/dispatch! [:entry-modal-save]))
+
+(defn add-attachment [dispatch-input-key attachment-data]
+  (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data]))
+
+(defn remove-attachment [dispatch-input-key attachment-data]
+  (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data]))

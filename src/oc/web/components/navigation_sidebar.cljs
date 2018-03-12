@@ -126,17 +126,33 @@
           [:button.mlb-reset.close-mobile-menu
             {:on-click #(close-navigation-sidebar)}]
           [:div.mobile-header-title
-            "Boards"]]
+            "Digest navigation"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
-            {:class (when is-all-posts "item-selected")
+            {:class (utils/class-set {:item-selected is-all-posts
+                                      :showing-drafts show-drafts})
              :href (oc-urls/all-posts)
              :on-click #(anchor-nav! % (oc-urls/all-posts))}
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
                 "All Posts"]])
+        (when show-drafts
+          (let [board-url (oc-urls/board (:slug drafts-board))]
+            [:a.drafts.hover-item.group
+              {:class (when (and (not is-all-posts)
+                                 (= (router/current-board-slug) (:slug drafts-board)))
+                        "item-selected")
+               :data-board (name (:slug drafts-board))
+               :key (str "board-list-" (name (:slug drafts-board)))
+               :href board-url
+               :on-click #(anchor-nav! % board-url)}
+              [:div.drafts-icon
+                {:class (when (= (router/current-board-slug) (:slug drafts-board)) "selected")}]
+              [:div.drafts-label.group
+                "Drafts "
+                [:span.count "(" (:count drafts-link) ")"]]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
@@ -144,7 +160,7 @@
             [:h3.left-navigation-sidebar-top-title.group
               {:id "navigation-sidebar-boards"}
               [:span
-                "BOARDS"]
+                "SECTIONS"]
               (when show-create-new-board
                 [:button.left-navigation-sidebar-top-title-button.btn-reset.right
                   {:on-click #(do
@@ -180,31 +196,7 @@
                     {:class (utils/class-set {:new (new? change-data board)
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])
-            (when show-drafts
-              (let [board-url (oc-urls/board (:slug drafts-board))]
-                [:a.left-navigation-sidebar-item.drafts-board.hover-item
-                  {:class (when (and (not is-all-posts)
-                                     (= (router/current-board-slug)
-                                     (:slug drafts-board)))
-                            "item-selected")
-                   :data-board (name (:slug drafts-board))
-                   :key (str "board-list-" (name (:slug drafts-board)))
-                   :href board-url
-                   :on-click #(anchor-nav! % board-url)}
-                  [:div.private
-                    {:class (when (= (router/current-board-slug) (:slug drafts-board)) "selected")}]
-                  [:div.board-name.group
-                    {:class (utils/class-set {:public-board (= (:access drafts-board) "public")
-                                              :private-board (= (:access drafts-board) "private")
-                                              :team-board (= (:access drafts-board) "team")})}
-                    [:div.internal.has-icon
-                      {:key (str "board-list-" (name (:slug drafts-board)) "-internal")
-                       :dangerouslySetInnerHTML
-                        (utils/emojify
-                         (str
-                          (or (:name drafts-board) (:slug drafts-board))
-                          " (" (:count drafts-link) ")"))}]]]))])]
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       [:div.left-navigation-sidebar-footer
         {:style {:position (if is-tall-enough? "absolute" "relative")}}
         (when show-invite-people
@@ -213,7 +205,7 @@
                           (dis/dispatch! [:org-settings-show :invite])
                           (close-navigation-sidebar))}
             [:div.invite-people-icon]
-            [:span "Add teammates"]])
+            [:span "Invite people"]])
         [:button.mlb-reset.about-carrot-btn
           {:on-click #(do
                         (dis/dispatch! [:whats-new-modal-show])

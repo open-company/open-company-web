@@ -33,3 +33,14 @@
   user-select: none;           /* non-prefixed version, currently
                                   not supported by any browser */
 }
+
+
+@mixin top-gradient($gradient_base_color: #FDFCFB) {
+  background: -moz-linear-gradient(top,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, top, bottom, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$gradient_base_color}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+}

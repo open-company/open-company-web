@@ -42,3 +42,19 @@
 (defmethod dispatcher/action :entry-toggle-save-on-exit
   [db [_ enabled?]]
   (assoc db :entry-save-on-exit enabled?))
+
+(defmethod dispatcher/action :entry-modal-save
+  [db [_]]
+  (assoc-in db [:modal-editing-data :loading] true))
+
+(defmethod dispatcher/action :activity-add-attachment
+  [db [_ dispatch-input-key attachment-data]]
+  (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
+        next-attachments (vec (conj old-attachments attachment-data))]
+    (assoc-in db [dispatch-input-key :attachments] next-attachments)))
+
+(defmethod dispatcher/action :activity-remove-attachment
+  [db [_ dispatch-input-key attachment-data]]
+  (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
+        next-attachments (filterv #(not= (:file-url %) (:file-url attachment-data)) old-attachments)]
+    (assoc-in db [dispatch-input-key :attachments] next-attachments)))

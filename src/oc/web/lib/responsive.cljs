@@ -82,9 +82,10 @@
   []
   (or (is-mobile-size?) (user-agent-mobile?)))
 
-(def left-navigation-sidebar-minimum-right-margin 40)
+(def left-navigation-sidebar-minimum-right-margin 16)
 (def left-navigation-sidebar-width 200)
 (def board-container-width 912)
+(def all-posts-container-width 944)
 
 (defn is-tablet-or-mobile? []
   ;; check if it's test env, can't import utils to avoid circular dependencies

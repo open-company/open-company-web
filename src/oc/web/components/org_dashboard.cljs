@@ -19,13 +19,13 @@
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
+            [oc.web.components.fullscreen-post :refer (fullscreen-post)]
+            [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
-            [oc.web.components.activity-modal :refer (activity-modal)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
+            [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
-            [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
-            [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data [s]
@@ -179,7 +179,7 @@
                (not entry-edit-dissmissing))
           (let [from-ap (:from-all-posts @router/path)
                 board-slug (if from-ap :all-posts (router/current-board-slug))]
-            (activity-modal)))
+            (fullscreen-post)))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

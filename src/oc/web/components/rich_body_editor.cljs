@@ -10,6 +10,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]
             [cljsjs.medium-editor]
@@ -24,7 +25,6 @@
   "Called every time the image picke close, reset to inital state."
   [s editable]
   (when-not @(::media-attachment-did-success s)
-    (.addAttachment editable nil nil)
     (reset! (::media-attachment s) false)))
 
 (defn attachment-upload-failed-cb [state editable]
@@ -51,16 +51,13 @@
             prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
             subtitle (str prefix (filesize size :binary false :format "%.2f" ))
             icon (au/icon-for-mimetype mimetype)
-            attachment-data {:fileName filename
-                             :fileType mimetype
-                             :fileSize size
-                             :title filename
-                             :subtitle subtitle
-                             :createdat (.getTime createdat)
-                             :author (jwt/get-key :name)
-                             :icon icon}]
+            attachment-data {:file-name filename
+                             :file-type mimetype
+                             :file-size size
+                             :file-url url}
+            dispatch-input-key (:dispatch-input-key (first (:rum/args state)))]
         (reset! (::media-attachment state) false)
-        (.addAttachment editable url (clj->js attachment-data))
+        (activity-actions/add-attachment dispatch-input-key attachment-data)
         (utils/after 1000 #(reset! (::media-attachment-did-success state) false))))))
 
 (defn attachment-upload-error-cb [state editable res error]
@@ -391,7 +388,8 @@
              classes
              show-placeholder
              upload-progress-cb
-             multi-picker-container-selector]}]
+             multi-picker-container-selector
+             dispatch-input-key]}]
   [:div.rich-body-editor-container
     (when multi-picker-container-selector
       (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]

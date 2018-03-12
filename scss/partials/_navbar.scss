@@ -25,8 +25,14 @@ nav.oc-navbar {
   width: 100%;
   background-color: white;
   transition: height 230ms;
-  border-bottom: 1px solid $carrot_light_gray_7;
-  box-shadow: 0px 2px 6px 0px rgba($carrot_light_gray_7, 0.5);
+  box-shadow: 0px 2px 6px 0px rgba($deep_tan, 0.5);
+
+  &.not-fixed {
+    @include mobile() {
+      box-shadow: none;
+      position: absolute;
+    }
+  }
 
   &.showing-orgs-dropdown {
     overflow: visible;
