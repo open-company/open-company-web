@@ -12,11 +12,11 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
-            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -62,6 +62,7 @@
                               (drv/drv :all-posts)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
+                              (drv/drv :show-section-editor)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
@@ -120,7 +121,8 @@
                                                     sidebar-width))
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
-        all-boards (drv/react s :editable-boards)]
+        all-boards (drv/react s :editable-boards)
+        show-section-editor (drv/react s :show-section-editor)]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -141,12 +143,16 @@
                 (when (and (router/current-board-slug)
                            (not is-all-posts)
                            (not (:read-only board-data)))
-                  [:button.mlb-reset.board-settings-bt
-                    {:data-toggle (when-not is-mobile-size? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :title (str (:name board-data) " settings")
-                     :on-click #(dis/dispatch! [:board-edit board-data])}])
+                  [:div.board-settings-container.group
+                    [:button.mlb-reset.board-settings-bt
+                      {:data-toggle (when-not is-mobile-size? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :title (str (:name board-data) " settings")
+                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
+                    (when show-section-editor
+                      (section-editor board-data
+                       #(dis/dispatch! [:section-edit-save])))])
                 (when (= (:access board-data) "private")
                   [:div.private-board
                     {:data-toggle "tooltip"
