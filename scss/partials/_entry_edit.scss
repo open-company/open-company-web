@@ -75,8 +75,9 @@ div.entry-edit-modal-container {
           float: right;
           width: 1px;
           background-color: #D8DBDF;
-          height: 16px;
-          margin: 4px 24px 0px 12px;
+          height: 64px;
+          margin: -20px 16px 0px 16px;
+          display: block;
         }
       }
 
@@ -87,21 +88,44 @@ div.entry-edit-modal-container {
         float: right;
         color: $carrot_green;
         margin: 0px;
+        position: relative;
+
+        div.button-icon {
+          position: absolute;
+          top: 10px;
+          left: 20px;
+          width: 20px;
+          height: 20px;
+          background-repeat: no-repeat;
+          background-color: transparent;
+          background-position: center;
+        }
 
         &.post-button {
           border-radius: 100px;
-          background-color: $coral;
-          color: $carrot_orange;
-          padding: 0px 32px;
+          background-color: $carrot_green;
+          color: white;
+          padding: 0px 32px 0px 48px;
           margin-left: 24px;
+
+          div.button-icon {
+            background-size: 20px 20px;
+            @include image-2x("/img/ML/entry_post_button_icon_white");
+          }
+
+          &.disabled {
+            div.button-icon {
+              background-size: 20px 20px;
+              @include image-2x("/img/ML/entry_post_button_icon");
+            }
+          }
         }
 
         @include mobile() {
           height: 24px;
           font-size: 15px;
           line-height: 24px;
-          position: relative;
-          padding: 2px 12px 0px 32px;
+          padding: 2px 0px 0px 32px;
           border-radius: 0px;
           color: $carrot_green;
 
@@ -111,31 +135,20 @@ div.entry-edit-modal-container {
           }
 
           div.button-icon {
-            position: absolute;
             top: 2px;
             left: 0px;
-            width: 20px;
-            height: 20px;
-            background-repeat: no-repeat;
-            background-color: transparent;
-            background-position: center;
           }
 
           &.post-button {
             margin-left: 0px;
             background-color: transparent;
-            padding: 2px 12px 0px 32px;
+            padding: 2px 0px 0px 32px;
+            color: $carrot_green;
+            background-color: transparent;
 
             div.button-icon {
-              @include image-2x("/img/ML/entry_post_button_icon_green");
               background-size: 20px 20px;
-            }
-
-            &.disabled {
-              div.button-icon {
-                background-size: 20px 20px;
-                @include image-2x("/img/ML/entry_post_button_icon");
-              }
+              @include image-2x("/img/ML/entry_post_button_icon_green");
             }
           }
 

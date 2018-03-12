@@ -353,10 +353,8 @@
                                 (clean-body)
                                 (reset! (::saving s) true)
                                 (dis/dispatch! [:entry-save])))}
-                  (if working?
-                    (small-loading)
-                    [:div.button-icon
-                      {:class (when disabled? "disabled")}])
+                  (when working?
+                    (small-loading))
                   (str "Save " (when-not is-mobile? "to ") "draft")]))])
           (when is-mobile?
             [:div.entry-edit-modal-mobile-subheader
