@@ -27,6 +27,22 @@ div.sections-picker-container {
     width: 360px;
     cursor: default;
 
+    &.show-headers {
+      div.sections-picker-header {
+        border-bottom: none;
+      }
+
+      div.sections-picker-content {
+        div.sections-picker-group {
+          div.sections-picker-section {
+            &:last-child {
+              border-bottom: none;
+            }
+          }
+        }
+      }
+    }
+
     @include mobile() {
       width: 100vw;
       min-height: 100vh;

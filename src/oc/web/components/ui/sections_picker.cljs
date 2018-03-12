@@ -86,6 +86,7 @@
                               (reset! (::show-add-section s) false)
                               (on-change %)))
         [:div.sections-picker.group
+          {:class (when should-show-headers? "show-headers")}
           [:div.sections-picker-header
             [:div.sections-picker-header-left
               "Post to..."]
