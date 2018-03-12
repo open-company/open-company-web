@@ -122,7 +122,7 @@ div.fullscreen-post-container {
 
       div.user-avatar-img-container {
         float: left;
-        margin-top: -4px;
+        margin-top: -8px;
         margin-right: 0px;
 
         @include tablet() {
@@ -213,6 +213,7 @@ div.fullscreen-post-container {
 
       div.fullscreen-post-right-column {
         opacity: 0;
+        pointer-events: none;
       }
     }
   }

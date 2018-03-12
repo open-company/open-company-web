@@ -53,8 +53,7 @@
                               (.tooltip "hide")))
                           s)}
   [s activity-data has-headline has-body is-new show-attachments]
-  (let [attachments (au/get-attachments-from-body (:body activity-data))
-        share-link (utils/link-for (:links activity-data) "share")
+  (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
         nux (drv/react s :nux)]

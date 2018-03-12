@@ -3,20 +3,6 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
-(defn get-attachments-from-body [body]
-  (let [$body (.html (js/$ "<div/>") body)
-        attachments (js/$ "a.media-attachment" $body)
-        atch-map (atom [])]
-    (.each attachments (fn [idx item]
-      (let [$item (js/$ item)]
-        (reset! atch-map (vec (conj @atch-map {:name (.data $item "name")
-                                               :size (.data $item "size")
-                                               :mimetype (.data $item "mimetype")
-                                               :author (.data $item "author")
-                                               :createdat (.data $item "createdat")
-                                               :url (.attr $item "href")}))))))
-    @atch-map))
-
 (defn get-first-body-thumbnail
   "Given an entry body get the first thumbnail available.
   Thumbnail type: image, video or chart."
