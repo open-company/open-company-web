@@ -70,14 +70,17 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
-                              (rum/local :stream ::board-switch)
+                              (rum/local nil ::board-switch)
                               {:will-mount (fn [s]
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
                                 ;; Update window width on window resize
                                 (reset! (::resize-listener s)
                                  (events/listen js/window EventType/RESIZE #(reset! (::ww s) (responsive/ww))))
-                                ()
+                                (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
+                                      cookie-value (cook/get-cookie board-view-cookie)
+                                      board-view (or (keyword cookie-value) :stream)]
+                                  (reset! (::board-switch s) board-view))
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -119,7 +122,8 @@
                                                     sidebar-width))
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
-        all-boards (drv/react s :editable-boards)]
+        all-boards (drv/react s :editable-boards)
+        board-view-cookie (router/last-board-view-cookie (router/current-org-slug))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -196,10 +200,14 @@
                 [:div.board-switcher.group
                   [:button.mlb-reset.board-switcher-bt.stream-view
                     {:class (when (= @(::board-switch s) :stream) "active")
-                     :on-click #(reset! (::board-switch s) :stream)}]
+                     :on-click #(do
+                                  (reset! (::board-switch s) :stream)
+                                  (cook/set-cookie! board-view-cookie "stream" (* 60 60 24 365)))}]
                   [:button.mlb-reset.board-switcher-bt.grid-view
                     {:class (when (= @(::board-switch s) :grid) "active")
-                     :on-click #(reset! (::board-switch s) :grid)}]])]
+                     :on-click #(do
+                                  (reset! (::board-switch s) :grid)
+                                  (cook/set-cookie! board-view-cookie "grid" (* 60 60 24 365)))}]])]
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
