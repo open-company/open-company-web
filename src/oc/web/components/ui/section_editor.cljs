@@ -120,8 +120,8 @@
           {:dangerouslySetInnerHTML
             (utils/emojify
              (if @(::editing-existing-section s)
-               "Creating a new section"
-               (str "Editing " (:name section-editing))))}]]
+               (str "Editing " (:name section-editing))
+                "Add a new section"))}]]
       [:div.section-editor-add
         [:div.section-editor-add-label
           "Add a new section"]

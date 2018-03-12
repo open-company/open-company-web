@@ -8,10 +8,28 @@ div.section-editor {
   z-index: 1000;
   cursor: default;
 
+  @include mobile() {
+    width: 100vw;
+    min-height: 100vh;
+    padding: 20px 24px 16px;
+    border-radius: 0px;
+  }
+
   div.section-editor-header {
     height: 46px;
     border-bottom: 1px solid $deep_tan;
     padding-bottom: 24px;
+
+    @include mobile() {
+      height: 64px;
+      border-bottom: 0px;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100vw;
+      padding-bottom: 0px;
+      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    }
 
     div.section-editor-header-left {
       float: left;
@@ -22,10 +40,23 @@ div.section-editor {
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      @include mobile() {
+        float: none;
+        text-align: center;
+        @include avenir_H();
+        font-size: 18px;
+        height: 64px;
+        padding-top: 20px;
+      }
     }
   }
 
   div.section-editor-add {
+    @include mobile() {
+      margin-top: 64px;
+    }
+
     div.section-editor-add-label {
       margin-top: 24px;
       @include avenir_H();

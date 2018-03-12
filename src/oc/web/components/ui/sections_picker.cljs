@@ -76,6 +76,8 @@
                                 (and (cfn fixed-private-sections)
                                      (cfn fixed-public-sections)))]
     [:div.sections-picker-container
+      [:button.mlb-reset.mobile-modal-close-bt
+        {:on-click #(on-change nil)}]
       (if @(::show-add-section s)
         (section-editor nil #(do
                               (reset! (::show-add-section s) false)
