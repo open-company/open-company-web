@@ -371,7 +371,8 @@
                     (sections-picker (:board-slug entry-editing)
                      (fn [board-data]
                        (dis/dispatch! [:input [:show-sections-picker] false])
-                       (when board-data
+                       (when (and board-data
+                                  (not (string/blank? (:name board-data))))
                         (dis/dispatch! [:input [:entry-editing]
                          (merge entry-editing {:board-slug (:slug board-data)
                                                :board-name (:name board-data)})])))))]]])]

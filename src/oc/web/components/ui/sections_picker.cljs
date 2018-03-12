@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.sections-picker
   (:require [rum.core :as rum]
             [goog.events :as events]
+            [cuerdas.core :as string]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
@@ -54,18 +55,20 @@
                                s)}
   [s active-slug on-change]
   (let [section-editing (drv/react s :section-editing)
+        fixed-section-editing (when (not (string/blank? (:name section-editing)))
+                                section-editing)
         all-sections (vals (drv/react s :editable-boards))
         team-sections (filterv #(= (:access %) "team") all-sections)
-        fixed-team-sections (if (= (:access section-editing) "team")
-                              (vec (concat [section-editing] team-sections))
+        fixed-team-sections (if (= (:access fixed-section-editing) "team")
+                              (vec (concat [fixed-section-editing] team-sections))
                               team-sections)
         public-sections (filterv #(= (:access %) "public") all-sections)
-        fixed-public-sections (if (= (:access section-editing) "public")
-                                (vec (concat [section-editing] public-sections))
+        fixed-public-sections (if (= (:access fixed-section-editing) "public")
+                                (vec (concat [fixed-section-editing] public-sections))
                                 public-sections)
         private-sections (filterv #(= (:access %) "private") all-sections)
-        fixed-private-sections (if (= (:access section-editing) "private")
-                                 (vec (concat [section-editing] private-sections))
+        fixed-private-sections (if (= (:access fixed-section-editing) "private")
+                                 (vec (concat [fixed-section-editing] private-sections))
                                  private-sections)
         cfn #(pos? (count %))
         ;; Check if at least 2 groups are shown
