@@ -12,7 +12,6 @@
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
-            [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -101,7 +100,6 @@
                 whats-new-modal-data
                 made-with-carrot-modal-data
                 is-entry-editing
-                is-board-editing
                 is-sharing-activity
                 entry-edit-dissmissing
                 is-showing-alert
@@ -156,9 +154,6 @@
           ;; Entry editing
           is-entry-editing
           (entry-edit)
-          ;; Board editing
-          is-board-editing
-          (board-edit)
           ;; Activity share for mobile
           (and is-mobile?
                is-sharing-activity)
