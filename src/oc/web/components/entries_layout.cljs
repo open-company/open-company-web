@@ -61,11 +61,9 @@
                           (mixins/load-more-items 400)
 
                           {:init (fn [s]
-                            (if (= (router/current-board-slug) "all-posts")
-                              (-> s
-                                (assoc :load-more-items-next-fn (atom nil))
-                                (assoc :load-more-items-prev-fn (atom nil)))
-                              s))
+                            (-> s
+                             (assoc :load-more-items-next-fn (atom nil))
+                             (assoc :load-more-items-prev-fn (atom nil))))
                            :before-render (fn [s]
                             (when (= (router/current-board-slug) "all-posts")
                               (let [board-data @(drv/get-ref s :board-data)
