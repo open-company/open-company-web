@@ -24,14 +24,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn should-show-divider-line [s]
-  (when @(:first-render-done s)
-    (when-let [entry-edit-modal-body (rum/ref-node s "entry-edit-modal-body")]
-      (let [container-height (+ (.-clientHeight entry-edit-modal-body) 11) ;; Remove padding
-            next-show-divider-line (> (.-scrollHeight entry-edit-modal-body) container-height)]
-        (when (not= next-show-divider-line @(::show-divider-line s))
-          (reset! (::show-divider-line s) next-show-divider-line))))))
-
 (defn calc-entry-edit-modal-height
   [s & [force-calc]]
   (when @(:first-render-done s)
@@ -161,6 +153,7 @@
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
+                        (drv/drv :show-sections-picker)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -169,10 +162,8 @@
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
-                        (rum/local false ::show-divider-line)
                         (rum/local false ::saving)
                         (rum/local false ::publishing)
-                        (rum/local false ::show-boards-dropdown)
                         (rum/local false ::window-resize-listener)
                         (rum/local false ::window-click-listener)
                         (rum/local nil ::autosave-timer)
@@ -206,9 +197,6 @@
                           (reset! (::window-click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(do
-                               (when (and @(::show-boards-dropdown s)
-                                          (not (utils/event-inside? % (rum/ref-node s "boards-dropdown-caret"))))
-                                 (reset! (::show-boards-dropdown s) false))
                                (when (and @(::show-legend s)
                                         (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
                                  (reset! (::show-legend s) false)))))
@@ -262,7 +250,6 @@
                                               (oc-urls/board (router/current-org-slug)
                                                (:board-slug entry-editing))))))))))))
                           s)
-                         :after-render  (fn [s] (should-show-divider-line s) s)
                          :will-unmount (fn [s]
                           (when @(::body-editor s)
                             (.destroy @(::body-editor s))
@@ -291,7 +278,8 @@
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
         wh (.-innerHeight js/window)
         media-input (drv/react s :media-input)
-        published? (= (:status entry-editing) "published")]
+        published? (= (:status entry-editing) "published")
+        show-sections-picker (drv/react s :show-sections-picker)]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -381,12 +369,12 @@
               [:div.boards-dropdown-caret
                 {:ref "boards-dropdown-caret"}
                 [:div.board-name
-                  {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
+                  {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
                   (:board-name entry-editing)]
-                (when @(::show-boards-dropdown s)
+                (when show-sections-picker
                   (sections-picker (:board-slug entry-editing)
                    (fn [board-data]
-                     (reset! (::show-boards-dropdown s) false)
+                     (dis/dispatch! [:input [:show-sections-picker] false])
                      (when board-data
                       (dis/dispatch! [:input [:entry-editing]
                        (merge entry-editing {:board-slug (:slug board-data)

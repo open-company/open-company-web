@@ -294,11 +294,12 @@ div.entry-edit-modal-container {
               }
             }
 
-            div.sections-picker {
+            div.sections-picker-container {
               position: absolute;
               top: 32px;
               left: 50%;
               margin-left: -180px;
+              z-index: 1000;
             }
           }
         }
