@@ -327,7 +327,7 @@ div.entry-edit-modal-container {
       div.entry-edit-modal-body {
         margin: 0px;
         padding: 0px 42px 24px 42px;
-        width: calc(100% + 22px);
+        width: 100%;
         border-bottom: 1px solid rgba($deep_tan, 0.3);
 
         @include mobile() {
