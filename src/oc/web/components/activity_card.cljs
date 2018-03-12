@@ -13,7 +13,6 @@
             [oc.web.mixins.activity :as am]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
@@ -74,7 +73,8 @@
                          :will-unmount (fn [s]
                           (events/unlistenByKey @(::window-click s))
                           s)}
-  [s activity-data has-headline has-body is-new is-all-posts share-thoughts]
+
+[s activity-data has-headline has-body is-new is-all-posts share-thoughts]
   (let [attachments (au/get-attachments-from-body (:body activity-data))
         share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
@@ -201,9 +201,6 @@
               {:src (:thumbnail @(:body-thumbnail s))}]])]
       [:div.activity-card-footer.group
         (interactions-summary activity-data)
-        (when share-thoughts
-          [:div.activity-share-thoughts
-            "Share your thoughts"])
         (when (and (not nux)
                    (utils/link-for (:links activity-data) "partial-update"))
           [:button.mlb-reset.post-edit

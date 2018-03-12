@@ -54,3 +54,15 @@
 (defmethod dispatcher/action :nux-end
   [db [_]]
   (dissoc db :nux))
+
+(defmethod dispatcher/action :activity-add-attachment
+  [db [_ dispatch-input-key attachment-data]]
+  (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
+        next-attachments (vec (conj old-attachments attachment-data))]
+    (assoc-in db [dispatch-input-key :attachments] next-attachments)))
+
+(defmethod dispatcher/action :activity-remove-attachment
+  [db [_ dispatch-input-key attachment-data]]
+  (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
+        next-attachments (filterv #(not= (:file-url %) (:file-url attachment-data)) old-attachments)]
+    (assoc-in db [dispatch-input-key :attachments] next-attachments)))

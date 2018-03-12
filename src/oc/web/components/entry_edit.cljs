@@ -15,10 +15,11 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
+            [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -427,11 +428,10 @@
                                :dispatch-input-key :entry-editing
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video" "attachment"]
+                               :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable"})
-            [:div.entry-edit-controls-right]
-            ; Bottom controls
-            [:div.entry-edit-controls.group]]
+            ; Attachments
+            (stream-view-attachments (:attachments entry-editing) #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
               {:id "entry-edit-footer-multi-picker"}]

@@ -166,3 +166,9 @@
   (dis/dispatch! [:nux-end])
   (let [next-url (oc-urls/board (router/current-org-slug) (router/current-board-slug))]
     (.pushState (.-history js/window) (.. js/window -history -state) (.-title js/document) next-url)))
+
+(defn add-attachment [dispatch-input-key attachment-data]
+  (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data]))
+
+(defn remove-attachment [dispatch-input-key attachment-data]
+  (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data]))
