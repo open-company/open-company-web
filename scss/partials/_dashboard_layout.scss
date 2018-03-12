@@ -3,6 +3,22 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  div.section-add {
+
+    &.has-drafts {
+      div.section-editor {
+        top: 250px;
+      }
+    }
+
+    div.section-editor {
+      position: absolute;
+      top: 214px;
+      left: 180px;
+      z-index: 1000;
+    }
+  }
+
   @include mobile() {
     &.sticky-board-name {
       padding-top: 48px;

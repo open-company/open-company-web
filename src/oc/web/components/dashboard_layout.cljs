@@ -63,6 +63,7 @@
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
+                              (drv/drv :show-section-add)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
@@ -76,7 +77,6 @@
                                 ;; Update window width on window resize
                                 (reset! (::resize-listener s)
                                  (events/listen js/window EventType/RESIZE #(reset! (::ww s) (responsive/ww))))
-                                ()
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -122,9 +122,17 @@
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
-        show-section-editor (drv/react s :show-section-editor)]
+        show-section-editor (drv/react s :show-section-editor)
+        show-section-add (drv/react s :show-section-add)
+        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
+        drafts-link (utils/link-for (:links drafts-board) "self")
+        show-drafts (pos? (:count drafts-link))]
       ;; Entries list
       [:div.dashboard-layout.group
+        (when show-section-add
+          [:div.section-add
+            {:class (when show-drafts "has-drafts")}
+            (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))])
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
           [:div.board-container.group
