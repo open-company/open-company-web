@@ -137,7 +137,7 @@
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
-                "Digest"]])
+                "All Posts"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group
