@@ -795,7 +795,7 @@
               ; Board name exists
               (dispatcher/dispatch!
                [:input
-                [:board-editing :board-name-error]
+                [:section-editing :section-name-error]
                 "Board name already exists or isn't allowed"])
               (dispatcher/dispatch! [:entry-publish-with-board/finish (when success (json->cljs body))]))))
         (assoc-in db [:entry-editing :publishing] true))
@@ -825,7 +825,7 @@
       (api/get-org (dispatcher/org-data)))
   (-> db
     (assoc-in board-key fixed-board-data)
-    (dissoc :board-editing)
+    (dissoc :section-editing)
     (update-in [:entry-editing] dissoc :publishing)
     (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
     (dissoc :entry-toggle-save-on-exit))))
@@ -897,57 +897,6 @@
 (defmethod dispatcher/action :alert-modal-hide-done
   [db [_]]
   (dissoc db :alert-modal))
-
-(defmethod dispatcher/action :board-edit
-  [db [_ initial-board-data]]
-  (let [authors (or (map :user-id (:authors initial-board-data)) [])
-        viewers (or (map :user-id (:viewers initial-board-data)) [])
-        board-data (or
-                    initial-board-data
-                    {:name "" :slug "" :access "team"})
-        fixed-board-data (merge board-data {:viewers viewers
-                                            :authors authors})]
-    (assoc db :board-editing fixed-board-data)))
-
-(defmethod dispatcher/action :board-edit-save
-  [db [_]]
-  (let [board-data (:board-editing db)]
-    (if (and (string/blank? (:slug board-data))
-             (not (string/blank? (:name board-data))))
-      (api/create-board board-data
-       (fn [{:keys [success status body]}]
-         (let [board-data (when success (json->cljs body))]
-           (if (= status 409)
-             ; Board name exists
-             (dispatcher/dispatch!
-              [:input
-               [:board-editing :board-name-error]
-               "Board name already exists or isn't allowed"])
-             (dispatcher/dispatch! [:board-edit-save/finish board-data])))))
-      (api/patch-board board-data)))
-  db)
-
-(defmethod dispatcher/action :board-edit-save/finish
-  [db [_ board-data]]
-  (let [org-slug (router/current-org-slug)
-        board-slug (:slug board-data)
-        board-key (dispatcher/board-data-key org-slug (:slug board-data))
-        fixed-board-data (utils/fix-board board-data)]
-    (api/get-org (dispatcher/org-data))
-    (if (not= (:slug board-data) (router/current-board-slug))
-      ;; If creating a new board, redirect to that board page, and watch the new board
-      (do
-        (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug board-data))))
-        (ws-cc/container-watch [(:uuid board-data)]))
-      ;; If updating an existing board, refresh the org data
-      (api/get-org (dispatcher/org-data)))
-  (-> db
-    (assoc-in board-key fixed-board-data)
-    (dissoc :board-editing))))
-
-(defmethod dispatcher/action :board-edit/dismiss
-  [db [_]]
-  (dissoc db :board-editing))
 
 (defmethod dispatcher/action :all-posts-get
   [db [_]]
@@ -1215,13 +1164,53 @@
                        :board-slug (:slug current-board)}]
     (merge db {:entry-editing entry-editing})))
 
-(defmethod dispatcher/action :private-board-user-add
+(defmethod dispatcher/action :section-edit-save
+  [db [_]]
+  (let [section-data (:section-editing db)]
+    (if (and (string/blank? (:slug section-data))
+             (not (string/blank? (:name section-data))))
+      (api/create-board section-data
+       (fn [{:keys [success status body]}]
+         (let [section-data (when success (json->cljs body))]
+           (if (= status 409)
+             ; Board name exists
+             (dispatcher/dispatch!
+              [:input
+               [:section-editing :section-name-error]
+               "Section name already exists or isn't allowed"])
+             (dispatcher/dispatch! [:section-edit-save/finish section-data])))))
+      (api/patch-board section-data)))
+  db)
+
+(defmethod dispatcher/action :section-edit-save/finish
+  [db [_ section-data]]
+  (let [org-slug (router/current-org-slug)
+        section-slug (:slug section-data)
+        board-key (dispatcher/board-data-key org-slug (:slug section-data))
+        fixed-section-data (utils/fix-board section-data)]
+    (api/get-org (dispatcher/org-data))
+    (if (not= (:slug section-data) (router/current-board-slug))
+      ;; If creating a new board, redirect to that board page, and watch the new board
+      (do
+        (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
+        (ws-cc/container-watch [(:uuid section-data)]))
+      ;; If updating an existing board, refresh the org data
+      (api/get-org (dispatcher/org-data)))
+  (-> db
+    (assoc-in board-key fixed-section-data)
+    (dissoc :section-editing))))
+
+(defmethod dispatcher/action :section-edit/dismiss
+  [db [_]]
+  (dissoc db :section-editing))
+
+(defmethod dispatcher/action :private-section-user-add
   [db [_ user user-type]]
-  (let [board-data (:board-editing db)
+  (let [section-data (:section-editing db)
         current-notifications (filterv #(not= (:user-id %) (:user-id user))
-                                       (:private-notifications board-data))
-        current-authors (filterv #(not= % (:user-id user)) (:authors board-data))
-        current-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))
+                                       (:private-notifications section-data))
+        current-authors (filterv #(not= % (:user-id user)) (:authors section-data))
+        current-viewers (filterv #(not= % (:user-id user)) (:viewers section-data))
         next-authors (if (= user-type :author)
                        (vec (conj current-authors (:user-id user)))
                        current-authors)
@@ -1229,31 +1218,31 @@
                        (vec (conj current-viewers (:user-id user)))
                        current-viewers)
         next-notifications (vec (conj current-notifications user))]
-    (assoc db :board-editing
-           (merge board-data {:authors next-authors
-                              :viewers next-viewers
-                              :private-notifications next-notifications}))))
+    (assoc db :section-editing
+           (merge section-data {:authors next-authors
+                                :viewers next-viewers
+                                :private-notifications next-notifications}))))
 
-(defmethod dispatcher/action :private-board-user-remove
+(defmethod dispatcher/action :private-section-user-remove
   [db [_ user]]
-  (let [board-data (:board-editing db)
+  (let [section-data (:section-editing db)
         private-notifications (filterv #(not= (:user-id %) (:user-id user))
-                                       (:private-notifications board-data))
-        next-authors (filterv #(not= % (:user-id user)) (:authors board-data))
-        next-viewers (filterv #(not= % (:user-id user)) (:viewers board-data))]
-    (assoc db :board-editing
-           (merge board-data {:authors next-authors
-                              :viewers next-viewers
-                              :private-notifications private-notifications}))))
+                                       (:private-notifications section-data))
+        next-authors (filterv #(not= % (:user-id user)) (:authors section-data))
+        next-viewers (filterv #(not= % (:user-id user)) (:viewers section-data))]
+    (assoc db :section-editing
+           (merge section-data {:authors next-authors
+                                :viewers next-viewers
+                                :private-notifications private-notifications}))))
 
-(defmethod dispatcher/action :private-board-kick-out-self
+(defmethod dispatcher/action :private-section-kick-out-self
   [db [_ user]]
-  ;; If the user is self (same user-id) kick out from the current private board
+  ;; If the user is self (same user-id) kick out from the current private section
   (when (= (:user-id user) (jwt/user-id))
     (api/remove-user-from-private-board user))
   db)
 
-(defmethod dispatcher/action :private-board-kick-out-self/finish
+(defmethod dispatcher/action :private-section-kick-out-self/finish
   [db [_ success]]
   (if success
     ;; Redirect to the first available board
@@ -1267,6 +1256,6 @@
      (api/get-org org-data)
      (utils/after 0 #(router/nav! redirect-url))
      ;; Force board editing dismiss
-     (dissoc db :board-editing))
+     (dissoc db :section-editing))
     ;; An error occurred while kicking the user out, no-op to let the user retry
     db))
