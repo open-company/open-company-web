@@ -196,10 +196,9 @@
                             #(calc-entry-edit-modal-height s true)))
                           (reset! (::window-click-listener s)
                            (events/listen js/window EventType/CLICK
-                            #(do
-                               (when (and @(::show-legend s)
-                                        (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
-                                 (reset! (::show-legend s) false)))))
+                            #(when (and @(::show-legend s)
+                                      (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
+                               (reset! (::show-legend s) false))))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
@@ -359,44 +358,44 @@
                     [:div.button-icon
                       {:class (when disabled? "disabled")}])
                   (str "Save " (when-not is-mobile? "to ") "draft")]))])
-          [:div.entry-edit-modal-mobile-subheader
-            [:div.posting-in
-              [:span.posting-in-span
-                posting-title]
-              [:div.boards-dropdown-caret
-                {:ref "boards-dropdown-caret"}
-                [:div.board-name
-                  {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                  (:board-name entry-editing)]
-                (when show-sections-picker
-                  (sections-picker (:board-slug entry-editing)
-                   (fn [board-data]
-                     (dis/dispatch! [:input [:show-sections-picker] false])
-                     (when board-data
-                      (dis/dispatch! [:input [:entry-editing]
-                       (merge entry-editing {:board-slug (:slug board-data)
-                                             :board-name (:name board-data)})])))))]]]]
+          (when is-mobile?
+            [:div.entry-edit-modal-mobile-subheader
+              [:div.posting-in
+                [:span.posting-in-span
+                  posting-title]
+                [:div.boards-dropdown-caret
+                  [:div.board-name
+                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                    (:board-name entry-editing)]
+                  (when show-sections-picker
+                    (sections-picker (:board-slug entry-editing)
+                     (fn [board-data]
+                       (dis/dispatch! [:input [:show-sections-picker] false])
+                       (when board-data
+                        (dis/dispatch! [:input [:entry-editing]
+                         (merge entry-editing {:board-slug (:slug board-data)
+                                               :board-name (:name board-data)})])))))]]])]
       [:div.modal-wrapper
         [:div.entry-edit-modal.group
           {:ref "entry-edit-modal"}
-          [:div.entry-edit-modal-headline
-            (user-avatar-image current-user-data)
-            [:div.posting-in
-              [:span.posting-in-span
-                posting-title]
-              [:div.boards-dropdown-caret
-                {:ref "boards-dropdown-caret"}
-                [:div.board-name
-                  {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                  (:board-name entry-editing)]
-                (when show-sections-picker
-                  (sections-picker (:board-slug entry-editing)
-                   (fn [board-data]
-                     (dis/dispatch! [:input [:show-sections-picker] false])
-                     (when board-data
-                      (dis/dispatch! [:input [:entry-editing]
-                       (merge entry-editing {:board-slug (:slug board-data)
-                                             :board-name (:name board-data)})])))))]]]
+          (when-not is-mobile?
+            [:div.entry-edit-modal-headline
+              (user-avatar-image current-user-data)
+              [:div.posting-in
+                [:span.posting-in-span
+                  posting-title]
+                [:div.boards-dropdown-caret
+                  [:div.board-name
+                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                    (:board-name entry-editing)]
+                  (when show-sections-picker
+                    (sections-picker (:board-slug entry-editing)
+                     (fn [board-data]
+                       (dis/dispatch! [:input [:show-sections-picker] false])
+                       (when board-data
+                        (dis/dispatch! [:input [:entry-editing]
+                         (merge entry-editing {:board-slug (:slug board-data)
+                                               :board-name (:name board-data)})])))))]]])
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element
