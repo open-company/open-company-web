@@ -212,12 +212,15 @@
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
-   :board-editing       [[:base]
-                          (fn [base]
-                            (:board-editing base))]
    :section-editing     [[:base]
                           (fn [base]
                             (:section-editing base))]
+   :show-section-editor [[:base]
+                          (fn [base]
+                            (:show-section-editor base))]
+   :show-sections-picker [[:base]
+                          (fn [base]
+                            (:show-sections-picker base))]
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
@@ -285,7 +288,6 @@
                                :whats-new-modal-data (:whats-new-modal base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
-                               :is-board-editing (boolean (:board-editing base))
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
