@@ -279,7 +279,12 @@
         wh (.-innerHeight js/window)
         media-input (drv/react s :media-input)
         published? (= (:status entry-editing) "published")
-        show-sections-picker (drv/react s :show-sections-picker)]
+        show-sections-picker (drv/react s :show-sections-picker)
+        posting-title (if (:uuid entry-editing)
+                        (if (= (:status entry-editing) "published")
+                          "Posted in: "
+                          "Draft for: ")
+                        "Posting in: ")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -353,7 +358,24 @@
                     (small-loading)
                     [:div.button-icon
                       {:class (when disabled? "disabled")}])
-                  (str "Save " (when-not is-mobile? "to ") "draft")]))])]
+                  (str "Save " (when-not is-mobile? "to ") "draft")]))])
+          [:div.entry-edit-modal-mobile-subheader
+            [:div.posting-in
+              [:span.posting-in-span
+                posting-title]
+              [:div.boards-dropdown-caret
+                {:ref "boards-dropdown-caret"}
+                [:div.board-name
+                  {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                  (:board-name entry-editing)]
+                (when show-sections-picker
+                  (sections-picker (:board-slug entry-editing)
+                   (fn [board-data]
+                     (dis/dispatch! [:input [:show-sections-picker] false])
+                     (when board-data
+                      (dis/dispatch! [:input [:entry-editing]
+                       (merge entry-editing {:board-slug (:slug board-data)
+                                             :board-name (:name board-data)})])))))]]]]
       [:div.modal-wrapper
         [:div.entry-edit-modal.group
           {:ref "entry-edit-modal"}
@@ -361,11 +383,7 @@
             (user-avatar-image current-user-data)
             [:div.posting-in
               [:span.posting-in-span
-                (if (:uuid entry-editing)
-                  (if (= (:status entry-editing) "published")
-                    "Posted in: "
-                    "Draft for: ")
-                  "Posting in: ")]
+                posting-title]
               [:div.boards-dropdown-caret
                 {:ref "boards-dropdown-caret"}
                 [:div.board-name

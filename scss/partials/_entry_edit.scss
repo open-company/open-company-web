@@ -15,6 +15,7 @@ div.entry-edit-modal-container {
   @include mobile() {
     position: relative;
     height: initial;
+    min-height: 100vh;
   }
 
   &.will-appear {
@@ -39,7 +40,9 @@ div.entry-edit-modal-container {
     z-index: #{$navbar_zindex + 106};
 
     @include mobile() {
-      box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.12);
+      box-shadow: none;
+      height: 112px;
+      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     }
 
     button.mobile-modal-close-bt {
@@ -121,17 +124,17 @@ div.entry-edit-modal-container {
             margin-left: 0px;
             background-color: transparent;
             padding: 2px 12px 0px 32px;
-            color: $carrot_green;
-
-            &.disabled {
-              div.button-icon {
-                @include image-2x("/img/ML/entry_post_button_icon");
-              }
-            }
 
             div.button-icon {
               @include image-2x("/img/ML/entry_post_button_icon_green");
               background-size: 20px 20px;
+            }
+
+            &.disabled {
+              div.button-icon {
+                background-size: 20px 20px;
+                @include image-2x("/img/ML/entry_post_button_icon");
+              }
             }
           }
 
@@ -150,6 +153,107 @@ div.entry-edit-modal-container {
         }
       }
     }
+
+    div.entry-edit-modal-mobile-subheader {
+      height: 48px;
+      margin-top: 44px;
+      width: calc(100% + 48px);
+      margin-left: -24px;
+      padding: 12px 24px;
+      border-top: 1px solid $light_ui_grey;
+      display: none;
+
+      @include mobile() {
+        display: block;
+      }
+    }
+  }
+
+  div.posting-in {
+    @include avenir_M();
+    font-size: 16px;
+    color: $carrot_dark_gray;
+    float: left;
+    margin-top: 5px;
+    margin-left: 16px;
+
+    @include mobile() {
+      float: none;
+      margin-left: 0px;
+      font-size: 15px;
+    }
+
+    span.posting-in-span {
+      float: left;
+    }
+
+    div.boards-dropdown-caret {
+      @include avenir_M();
+      color: $carrot_green;
+      float: left;
+      margin-left: 6px;
+      cursor: pointer;
+      position: relative;
+
+      @include mobile() {
+        @include avenir_H();
+        font-size: 15px;
+      }
+
+      div.board-name {
+        @include avenir_M();
+        color: $carrot_green;
+        margin-bottom: 0px;
+        cursor: pointer;
+        position: relative;
+        float: left;
+
+        &:after {
+          float: right;
+          content: "";
+          background-image: cdnUrl("/img/ML/board_settings.svg");
+          background-size: 8px 8px;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-color: $deep_tan;
+          border-radius: 10px;
+          width: 20px;
+          height: 20px;
+          margin-top: 0px;
+          margin-left: 6px;
+          opacity: 0.8;
+
+          @include mobile() {
+            width: 8px 5px;
+            margin-top: -3px;
+            background-size: 8px 5px;
+            background-position: 0px 9px;
+            background-color: transparent;
+            background-image: cdnUrl("/img/ML/board_chevron_green.svg");
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      div.sections-picker-container {
+        position: absolute;
+        top: 32px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 1000;
+
+        @include mobile() {
+          position: fixed;
+          top: 0px;
+          left: 0px;
+          margin-left: 0px;
+          z-index: 1500;
+        }
+      }
+    }
   }
 
   div.modal-wrapper {
@@ -164,6 +268,7 @@ div.entry-edit-modal-container {
       height: initial;
       width: 100%;
       margin: 0px;
+      margin-top: 136px;
     }
 
     div.entry-edit-modal {
@@ -191,116 +296,16 @@ div.entry-edit-modal-container {
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         @include mobile() {
-          height: 48px;
-          padding: 0px;
-          border-bottom: none;
+          display: none;
         }
 
         @include user-profile(32);
 
-        div.user-avatar-img-container {
+        & > div.user-avatar-img-container {
           float: left;
 
           @include mobile() {
             display: none;
-          }
-        }
-
-        div.posting-in {
-          @include avenir_M();
-          font-size: 16px;
-          color: $carrot_dark_gray;
-          float: left;
-          margin-top: 5px;
-          margin-left: 16px;
-
-          @include mobile() {
-            font-size: 15px;
-            color: $carrot_text_blue_3;
-            background-color: $carrot_light_blue_2;
-            height: 48px;
-            padding: 14px 24px 0px;
-            float: none;
-            margin-top: 64px;
-            margin-left: 0px;
-
-            &.active {
-              background-color: $carrot_text_blue_3;
-
-              div.boards-dropdown-caret {
-                color: white;
-                &:after {
-                  background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
-                }
-              }
-            }
-          }
-
-          span.posting-in-span {
-            float: left;
-          }
-
-          div.boards-dropdown-caret {
-            @include avenir_M();
-            color: $carrot_green;
-            float: left;
-            margin-left: 6px;
-            cursor: pointer;
-            position: relative;
-
-            div.board-name {
-              @include avenir_M();
-              color: $carrot_green;
-              margin-bottom: 0px;
-              cursor: pointer;
-              position: relative;
-              float: left;
-
-              @include mobile() {
-                @include avenir_H();
-                color: $carrot_text_blue_3;
-              }
-
-              &:after {
-                float: right;
-                content: "";
-                background-image: cdnUrl("/img/ML/board_settings.svg");
-                background-size: 8px 8px;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-color: $deep_tan;
-                border-radius: 10px;
-                width: 20px;
-                height: 20px;
-                margin-top: 0px;
-                margin-left: 6px;
-                opacity: 0.8;
-
-                &:hover {
-                  opacity: 1;
-                }
-              }
-
-              @include mobile() {
-
-                &:after {
-                  width: 8px 5px;
-                  margin-top: -3px;
-                  background-size: 8px 5px;
-                  background-position: 0px 9px;
-                  background-color: transparent;
-                  background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
-                }
-              }
-            }
-
-            div.sections-picker-container {
-              position: absolute;
-              top: 32px;
-              left: 50%;
-              margin-left: -180px;
-              z-index: 1000;
-            }
           }
         }
       }
