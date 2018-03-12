@@ -346,7 +346,7 @@ div.entry-edit-modal-container {
           @include activity-headline();
           @include avenir_H();
           font-size: 18px;
-          color: $carrot_dark_gray;
+          color: $deep_navy;
           white-space: pre-wrap;
           word-wrap: break-word;
           margin-top: 35px;
@@ -363,12 +363,12 @@ div.entry-edit-modal-container {
           &:empty:before {
             content: attr(placeholder);
             display: inline-block;
-            color: rgba(#8A8E94, 0.5) !important;
+            color: $deep_navy !important;
             font-style: none;
             height: 26px;
 
             @include tablet() {
-              color: rgba($carrot_dark_gray, 0.5) !important;
+              color: $deep_navy !important;
             }
           }
         }
