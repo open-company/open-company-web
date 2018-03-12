@@ -260,9 +260,9 @@
             ; Board name exists
             (dispatcher/dispatch!
              [:input
-              [:board-editing :board-name-error]
+              [:section-editing :section-name-error]
               "Board name already exists or isn't allowed"])
-            (dispatcher/dispatch! [:board-edit-save/finish (json->cljs body)])))))))
+            (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])))))))
 
 (def org-keys [:name :logo-url :logo-width :logo-height])
 
