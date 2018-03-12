@@ -112,3 +112,9 @@
 (defn entry-modal-save [activity-data board-slug]
   (api/update-entry activity-data board-slug :modal-editing-data)
   (dis/dispatch! [:entry-modal-save]))
+
+(defn add-attachment [dispatch-input-key attachment-data]
+  (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data]))
+
+(defn remove-attachment [dispatch-input-key attachment-data]
+  (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data]))
