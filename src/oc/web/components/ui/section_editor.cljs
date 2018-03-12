@@ -88,7 +88,8 @@
                               (reset! (::click-listener s)
                                (events/listen js/window EventType/CLICK
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
-                                   (dis/dispatch! [:input [:show-section-editor] false]))))
+                                   (dis/dispatch! [:input [:show-section-editor] false])
+                                   (dis/dispatch! [:input [:show-section-add] false]))))
                               s)
                              :will-unmount (fn [s]
                               (when @(::click-listener s)
