@@ -1,0 +1,14 @@
+div.small-loading {
+  padding: 2px;
+  margin-right: 8px;
+  display: inline-block;
+
+  div.small-loading-inner {
+    width: 15px;
+    height: 15px;
+    background-image: cdnUrl("/img/small_loading.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 15px 15px;
+  }
+}

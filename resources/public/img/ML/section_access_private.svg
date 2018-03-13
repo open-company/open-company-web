@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="15px" viewBox="0 0 12 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="4.8" width="11.2" height="9.6" rx="1.5"></rect>
+    </defs>
+    <g id="👋-Onboarding" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Topic-Creation-Alts" transform="translate(-502.000000, -281.000000)">
+            <g id="Group-2" transform="translate(502.000000, 281.000000)">
+                <g id="Group-6" transform="translate(1.200000, 0.000000)" stroke="#34414F" stroke-width="1.5">
+                    <rect id="Rectangle-18" x="1.15" y="0.75" width="6.5" height="8.356" rx="2"></rect>
+                </g>
+                <g id="Rectangle-19">
+                    <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    <rect stroke="#34414F" stroke-width="1.5" x="0.75" y="5.55" width="9.7" height="8.1" rx="1.5"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

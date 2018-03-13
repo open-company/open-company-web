@@ -9,6 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (first-render-mixin)]
+            [oc.web.components.ui.section-editor :refer (section-editor)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -52,6 +53,16 @@
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height)))))
 
+(defn filter-board [board-data]
+  (let [self-link (utils/link-for (:links board-data) "self")]
+    (and (not= (:slug board-data) utils/default-drafts-board-slug)
+         (or (not (contains? self-link :count))
+             (and (contains? self-link :count)
+                  (pos? (:count self-link)))))))
+
+(defn filter-boards [all-boards]
+  (filterv filter-board all-boards))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -86,7 +97,8 @@
                                   s)
                                  :will-unmount (fn [s]
                                   (when @(::resize-listener s)
-                                    (events/unlistenByKey @(::resize-listener s)))
+                                    (events/unlistenByKey @(::resize-listener s))
+                                    (reset! (::resize-listener s) nil))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -94,14 +106,14 @@
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
-        boards (filterv #(not= (:slug %) utils/default-drafts-board-slug) all-boards)
+        boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
+        show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
+                                   create-link)
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
-        show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
-                                   create-link)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
@@ -148,8 +160,6 @@
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
                :on-click #(anchor-nav! % board-url)}
-              [:div.drafts-icon
-                {:class (when (= (router/current-board-slug) (:slug drafts-board)) "selected")}]
               [:div.drafts-label.group
                 "Drafts "
                 [:span.count "(" (:count drafts-link) ")"]]]))
@@ -158,15 +168,14 @@
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              {:id "navigation-sidebar-boards"}
               [:span
                 "SECTIONS"]
               (when show-create-new-board
                 [:button.left-navigation-sidebar-top-title-button.btn-reset.right
                   {:on-click #(do
-                               (dis/dispatch! [:board-edit nil])
+                               (dis/dispatch! [:input [:show-section-add] true])
                                (close-navigation-sidebar))
-                   :title "Create a new board"
+                   :title "Create a new section"
                    :id "add-board-button"
                    :data-placement "top"
                    :data-toggle "tooltip"

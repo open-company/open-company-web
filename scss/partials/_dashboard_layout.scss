@@ -3,6 +3,22 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  div.section-add {
+
+    &.has-drafts {
+      div.section-editor {
+        top: 250px;
+      }
+    }
+
+    div.section-editor {
+      position: absolute;
+      top: 214px;
+      left: 180px;
+      z-index: 1000;
+    }
+  }
+
   @include mobile() {
     &.sticky-board-name {
       padding-top: 48px;
@@ -225,32 +241,44 @@ div.dashboard-layout {
             }
           }
 
-          button.board-settings-bt {
+          div.board-settings-container {
             float: left;
-            background-image: cdnUrl("/img/ML/board_settings.svg");
-            background-size: 8px 8px;
-            background-repeat: no-repeat;
-            background-position: 6px 7px;
-            background-color: #F0EFEA;
-            border-radius: 10px;
-            width: 20px;
-            height: 20px;
             margin-top: 11px;
             margin-left: 7px;
-            opacity: 0.8;
+            position: relative;
 
-            @include mobile(){
-              margin-right: -30px;
-              margin-left: 8px;
-              padding: 0px;
-              float: unset;
-
-              // Remove to show settings button on mobile
-              display: none;
+            div.section-editor {
+              position: absolute;
+              top: 28px;
+              left: 50%;
+              margin-left: -180px;
+              z-index: 1000;
             }
 
-            &:hover {
-              opacity: 1;
+            button.board-settings-bt {
+              background-image: cdnUrl("/img/ML/board_settings.svg");
+              background-size: 8px 8px;
+              background-repeat: no-repeat;
+              background-position: 6px 7px;
+              background-color: #F0EFEA;
+              border-radius: 10px;
+              width: 20px;
+              height: 20px;
+              opacity: 0.8;
+
+              @include mobile(){
+                margin-right: -30px;
+                margin-left: 8px;
+                padding: 0px;
+                float: unset;
+
+                // Remove to show settings button on mobile
+                display: none;
+              }
+
+              &:hover {
+                opacity: 1;
+              }
             }
           }
 
