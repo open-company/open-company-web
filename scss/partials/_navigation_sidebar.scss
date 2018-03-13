@@ -484,17 +484,19 @@ div.left-navigation-sidebar {
         margin-right: 5px;
         float: left;
         margin-top: 1px;
+        opacity: 0.6;
 
         @include mobile() {
           color: white;
           background-image: cdnUrl("/img/ML/carrot_white.svg");
+          opacity: 1;
         }
       }
 
       span {
         font-size: 14px;
         line-height: 1.71;
-        color: $oc_gray_7;
+        color: $ui_grey;
         margin-left: 5px;
 
         @include mobile() {
@@ -520,17 +522,19 @@ div.left-navigation-sidebar {
         margin-right: 5px;
         float: left;
         margin-top: 1px;
+        opacity: 0.6;
 
         @include mobile() {
           color: white;
           background-image: cdnUrl("/img/ML/invite_people_white.svg");
+          opacity: 1;
         }
       }
 
       span {
         font-size: 14px;
         line-height: 1.71;
-        color: $oc_gray_7;
+        color: $ui_grey;
         margin-left: 5px;
 
         @include mobile() {
