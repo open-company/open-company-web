@@ -167,6 +167,7 @@ div.section-editor {
 
     div.section-editor-add-slack-channel {
       margin-top: 8px;
+      height: 40px;
 
       div.carrot-checkbox {
         float: left;
@@ -319,6 +320,10 @@ div.section-editor {
             border-top: 1px solid rgba($deep_tan, 0.3);
           }
 
+          &:last-child {
+            border-bottom: none;
+          }
+
           @include user-profile(24);
 
           div.user-avatar-img-container {
@@ -396,8 +401,10 @@ div.section-editor {
     }
 
     div.section-editor-add-footer {
-      margin-top: 16px;
+      margin-top: 24px;
       height: 24px;
+      border-top: 1px solid rgba($deep_tan, 0.3);
+      padding-top: 24px;
 
       button.delete-bt {
         height: 24px;
@@ -406,6 +413,9 @@ div.section-editor {
         color: $ui_grey;
         @include avenir_M();
         font-size: 15px;
+        margin-left: 0px;
+        padding-left: 0px;
+        text-align: left;
       }
 
       button.mlb-reset.create-bt {

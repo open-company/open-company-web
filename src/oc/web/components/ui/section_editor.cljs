@@ -132,8 +132,8 @@
           {:dangerouslySetInnerHTML
             (utils/emojify
              (if @(::editing-existing-section s)
-               (str "Editing " (:name section-editing))
-                "Add a new section"))}]]
+               "Section settings"
+               "Create a new section"))}]]
       [:div.section-editor-add
         [:div.section-editor-add-label
           "Section name"]
@@ -163,15 +163,15 @@
                                                  [:input
                                                   [:section-editing :slack-mirror]
                                                   nil])))})
-          (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
-                                    :initial-value (when channel-name (str "#" channel-name))
-                                    :on-change (fn [team channel]
-                                                 (dis/dispatch!
-                                                  [:input
-                                                   [:section-editing :slack-mirror]
-                                                   {:channel-id (:id channel)
-                                                    :channel-name (:name channel)
-                                                    :slack-org-id (:slack-org-id team)}]))})])
+          (when @(::slack-enabled s)
+            (slack-channels-dropdown {:initial-value (when channel-name (str "#" channel-name))
+                                      :on-change (fn [team channel]
+                                                   (dis/dispatch!
+                                                    [:input
+                                                     [:section-editing :slack-mirror]
+                                                     {:channel-id (:id channel)
+                                                      :channel-name (:name channel)
+                                                      :slack-org-id (:slack-org-id team)}]))}))])
         [:div.section-editor-add-label
           "Who can view this section?"]
         [:div.section-editor-add-access
@@ -262,8 +262,7 @@
                          :display (if @(::show-edit-user-dropdown s) "block" "none")}}
                 (dropdown-list {:items [{:value :viewer :label "Viewer"}
                                         {:value :author :label "Contributor"}
-                                        {:value nil :label :divider-line}
-                                        {:value :remove :label "Remove User" :color "#FA6452"}]
+                                        {:value :remove :label "Remove"}]
                                 :value user-type
                                 :on-change (fn [item]
                                  (reset! (::show-edit-user-dropdown s) nil)
