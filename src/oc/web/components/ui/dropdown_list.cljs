@@ -30,7 +30,7 @@
      :will-unmount (fn [s]
                      (events/unlistenByKey @(::window-click-listener s))
                     s)}
-  [{:keys [items value on-change on-blur selected-icon unselected-icon]}]
+  [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
   [:div.dropdown-list-container
     [:div.triangle]
     [:div.dropdown-list-content
@@ -49,4 +49,6 @@
                 (when unselected-icon
                   [:img.dropdown-list-item-icon {:src unselected-icon}])))
             (when (string? (:label item))
-              (:label item))])]]])
+              (:label item))])]
+      (when placeholder
+        placeholder)]])
