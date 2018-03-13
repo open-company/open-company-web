@@ -9,7 +9,24 @@ div.stream-view-attachments {
   div.stream-view-attachments-title {
     @include avenir_H();
     font-size: 14px;
-    color: $deep_navy;
+    color: $light_ui_grey;
+    padding-left: 23px;
+    position: relative;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      background-image: cdnUrl("/img/ML/attachments_icon.svg");
+      background-repeat: no-repeat;
+      width: 15px;
+      height: 18px;
+      opacity: 0.3;
+      background-size: 15px 18px;
+      background-position: center;
+      background-color: transparent;
+    }
   }
 
   div.stream-view-attachments-content {
@@ -88,7 +105,7 @@ div.stream-view-attachments {
         width: 32px;
         height: 32px;
         border-radius: 16px;
-        background-image: cdnUrl("/img/ML/attachments_icon.svg");
+        background-image: cdnUrl("/img/ML/attachments_file_icon.svg");
         background-position: center;
         background-size: 11px 14px;
         background-repeat: no-repeat;
