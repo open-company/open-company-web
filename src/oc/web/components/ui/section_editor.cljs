@@ -113,7 +113,7 @@
         ;; he's creating a new section
         ;; or if he's in the authors list of the existing section
         can-change (or (= (:slug section-editing) utils/default-section-slug)
-                       (some #{current-user-id} (map :user-id (:authors section-editing))))]
+                       (some #{current-user-id} (:authors section-editing)))]
     [:div.section-editor.group
       {:on-click (fn [e]
                    (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
