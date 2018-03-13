@@ -62,6 +62,7 @@
                               (drv/drv :all-posts)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
+                              (drv/drv :show-add-post-tooltip)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
@@ -69,13 +70,16 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
-                              {:will-mount (fn [s]
+                              {:before-render (fn [s]
+                                ;; Check if it still needs the add post tooltip
+                                (activity-actions/check-add-post-tooltip)
+                                s)
+                               :will-mount (fn [s]
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
                                 ;; Update window width on window resize
                                 (reset! (::resize-listener s)
                                  (events/listen js/window EventType/RESIZE #(reset! (::ww s) (responsive/ww))))
-                                ()
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -120,7 +124,20 @@
                                                     sidebar-width))
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
-        all-boards (drv/react s :editable-boards)]
+        all-boards (drv/react s :editable-boards)
+        compose-fn (fn [_]
+                    (utils/remove-tooltips)
+                    (if (or is-drafts-board is-all-posts)
+                      (if (> (count all-boards) 1)
+                        (reset! (::show-floating-boards-dropdown s)
+                         (not @(::show-floating-boards-dropdown s)))
+                        (let [first-board (second (first all-boards))
+                              entry-data {:board-slug (:slug first-board)
+                                          :board-name (:name first-board)}]
+                          (activity-actions/entry-edit entry-data)))
+                      (let [entry-data {:board-slug (:slug board-data)
+                                        :board-name (:name board-data)}]
+                        (activity-actions/entry-edit entry-data))))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -173,7 +190,12 @@
                     {:class (when @(::show-top-boards-dropdown s) "active")
                      :on-click (fn [_]
                                 (if (or is-drafts-board is-all-posts)
-                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                  (if (> (count all-boards) 1)
+                                    (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
+                                    (let [first-board (second (first all-boards))
+                                          entry-data {:board-slug (:slug first-board)
+                                                      :board-name (:name first-board)}]
+                                      (activity-actions/entry-edit entry-data)))
                                   (let [entry-data {:board-slug (:slug board-data)
                                                     :board-name (:name board-data)}]
                                     (activity-actions/entry-edit entry-data))))}
@@ -193,6 +215,19 @@
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
                                                                  :board-name (:label item)}))}))])]
+            (when (drv/react s :show-add-post-tooltip)
+              [:div.add-post-tooltip-container.group
+                [:button.mlb-reset.add-post-tooltip-dismiss
+                  {:on-click #(activity-actions/hide-add-post-tooltip)}]
+                [:div.add-post-tooltip-icon]
+                [:div.add-post-tooltip
+                  "Get started by creating a new post to share an update, announcement, or plans."]
+                [:div.add-post-tooltip.second-line
+                  "The sample post below can be deleted anytime."]
+                [:div.add-post-tooltip-arrow]
+                [:button.mlb-reset.add-post-tooltip-compose-bt
+                  {:on-click compose-fn}
+                  "Create new post"]])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
@@ -232,16 +267,7 @@
                      :data-container "body"
                      :data-toggle (when-not is-mobile-size? "tooltip")
                      :title "Start a new post"
-                     :on-click (fn [_]
-                                (utils/remove-tooltips)
-                                (if (or is-drafts-board
-                                        is-all-posts)
-                                  (reset!
-                                   (::show-floating-boards-dropdown s)
-                                   (not @(::show-floating-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (activity-actions/entry-edit entry-data))))}
+                     :on-click compose-fn}
                     [:div.add-to-board-pencil]]
                   (when @(::show-floating-boards-dropdown s)
                     (dropdown-list
