@@ -68,12 +68,11 @@
         route @(drv/get-ref s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
-        entry-data (if (or is-drafts-board is-all-posts)
-                      (get-default-section s)
-                      {:board-slug (:slug board-data)
-                       :board-name (:name board-data)})]
-    (activity-actions/entry-edit entry-data)))
+        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
+    (if (or is-drafts-board is-all-posts)
+      (get-default-section s)
+      {:board-slug (:slug board-data)
+       :board-name (:name board-data)})))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -151,7 +150,8 @@
         show-drafts (pos? (:count drafts-link))]
       ;; Entries list
       [:div.dashboard-layout.group
-        (when show-section-add
+        (when (and show-section-add
+                   (not (responsive/is-tablet-or-mobile?)))
           [:div.section-add
             {:class (when show-drafts "has-drafts")}
             (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))])
@@ -180,7 +180,8 @@
                        :data-container "body"
                        :title (str (:name board-data) " settings")
                        :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
-                    (when show-section-editor
+                    (when (and show-section-editor
+                               (not (responsive/is-tablet-or-mobile?)))
                       (section-editor board-data
                        #(dis/dispatch! [:section-edit-save])))])
                 (when (= (:access board-data) "private")
