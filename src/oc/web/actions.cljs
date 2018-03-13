@@ -1170,8 +1170,7 @@
 (defmethod dispatcher/action :section-edit-save
   [db [_]]
   (let [section-data (:section-editing db)]
-    (if (and (= (:slug section-data) utils/default-section-slug)
-             (not (string/blank? (:name section-data))))
+    (if (empty? (:links section-data))
       (api/create-board section-data
        (fn [{:keys [success status body]}]
          (let [section-data (when success (json->cljs body))]
