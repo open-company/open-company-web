@@ -196,7 +196,8 @@
                                    (reset! (::show-top-boards-dropdown s) false)
                                    (activity-actions/entry-edit {:board-slug (:value item)
                                                                  :board-name (:label item)}))}))])
-              (when (not is-mobile-size?)
+              (when (and (not is-mobile-size?)
+                         (not is-drafts-board))
                 [:div.board-switcher.group
                   [:button.mlb-reset.board-switcher-bt.stream-view
                     {:class (when (= @(::board-switch s) :stream) "active")
