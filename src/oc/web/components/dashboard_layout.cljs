@@ -154,7 +154,10 @@
                    (not (responsive/is-tablet-or-mobile?)))
           [:div.section-add
             {:class (when show-drafts "has-drafts")}
-            (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))])
+            (section-editor nil (fn [board-data]
+                                  (dis/dispatch! [:input [:show-section-add] false])
+                                  (when board-data
+                                    (dis/dispatch! [:section-edit-save]))))])
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
           [:div.board-container.group
@@ -183,7 +186,8 @@
                     (when (and show-section-editor
                                (not (responsive/is-tablet-or-mobile?)))
                       (section-editor board-data
-                       #(dis/dispatch! [:section-edit-save])))])
+                       #(when %
+                          (dis/dispatch! [:section-edit-save]))))])
                 (when (= (:access board-data) "private")
                   [:div.private-board
                     {:data-toggle "tooltip"

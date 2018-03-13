@@ -1178,7 +1178,7 @@
 (defmethod dispatcher/action :section-edit-save
   [db [_]]
   (let [section-data (:section-editing db)]
-    (if (and (string/blank? (:slug section-data))
+    (if (and (= (:slug section-data) utils/default-section-slug)
              (not (string/blank? (:name section-data))))
       (api/create-board section-data
        (fn [{:keys [success status body]}]
