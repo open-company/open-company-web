@@ -752,9 +752,16 @@
         (api/create-entry entry-data entry-create-link)))
     (assoc-in db [:entry-editing :loading] true)))
 
+(defn save-last-used-section [section-slug]
+  (let [org-slug (router/current-org-slug)
+        last-board-cookie (router/last-used-board-slug-cookie org-slug)]
+    (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))))
+
 (defmethod dispatcher/action :entry-save/finish
   [db [_ {:keys [activity-data board-slug edit-key]}]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))]
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+        org-slug (router/current-org-slug)]
+    (save-last-used-section (:board-slug activity-data))
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
@@ -764,9 +771,9 @@
     ; Add the new activity into the board
     (let [board-key (if (= (:status activity-data) "published")
                      (dispatcher/current-board-key)
-                     (dispatcher/board-data-key (router/current-org-slug) utils/default-drafts-board-slug))
+                     (dispatcher/board-data-key org-slug utils/default-drafts-board-slug))
           board-data (or (get-in db board-key) utils/default-drafts-board)
-          activity-board-data (get-in db (dispatcher/board-data-key (router/current-org-slug) board-slug))
+          activity-board-data (get-in db (dispatcher/board-data-key org-slug board-slug))
           fixed-activity-data (utils/fix-entry activity-data activity-board-data)
           next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
           next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
@@ -816,6 +823,7 @@
         board-slug (:slug new-board-data)
         board-key (dispatcher/board-data-key org-slug (:slug new-board-data))
         fixed-board-data (utils/fix-board new-board-data)]
+    (save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (-> db :entry-editing :uuid))
     (api/get-org (dispatcher/org-data))
     (if (not= (:slug fixed-board-data) (router/current-board-slug))
@@ -832,7 +840,10 @@
 
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ {:keys [activity-data]}]]
-  (let [board-slug (:board-slug activity-data)]
+  (let [org-slug (router/current-org-slug)
+        board-slug (:board-slug activity-data)]
+    ;; Save last used section
+    (save-last-used-section board-slug)
     (api/get-org (dispatcher/org-data))
     ;; Remove entry cached edits
     (remove-cached-item (-> db :entry-editing :uuid))
