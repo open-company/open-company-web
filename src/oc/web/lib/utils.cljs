@@ -1051,6 +1051,7 @@
 
 (def default-draft-status "draft")
 
+
 (def default-drafts-board
   {:uuid "0000-0000-0000"
    :created-at "2000-01-01T00:00:00.000Z"
@@ -1061,6 +1062,14 @@
    :fixed-items {}
    :access "private"
    :read-only true})
+
+(def default-section-slug "--default-section-slug")
+(def default-section-access "team")
+
+(def default-section
+  {:name ""
+   :access default-section-access
+   :slug default-section-slug})
 
 (defn retina-src [url]
   {:src (cdn (str url ".png"))

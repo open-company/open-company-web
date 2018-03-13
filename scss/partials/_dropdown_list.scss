@@ -62,14 +62,12 @@ div.dropdown-list-container {
         }
 
         &:hover {
-          background-color: $carrot_light_purple;
-          color: $carrot_purple;
+          color: $carrot_dark_gray_2;
         }
 
         &.select {
           @include avenir_H();
           text-decoration: none;
-          background-color: $carrot_light_gray_8;
           color: $carrot_dark_gray_2;
         }
 
