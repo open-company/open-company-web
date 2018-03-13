@@ -47,6 +47,14 @@
   [db [_]]
   (assoc-in db [:modal-editing-data :loading] true))
 
+(defmethod dispatcher/action :nux-next-step
+  [db [_ next-step]]
+  (assoc db :nux next-step))
+
+(defmethod dispatcher/action :nux-end
+  [db [_]]
+  (dissoc db :nux))
+
 (defmethod dispatcher/action :activity-add-attachment
   [db [_ dispatch-input-key attachment-data]]
   (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
