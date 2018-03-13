@@ -165,6 +165,24 @@ div.section-editor {
       }
     }
 
+    div.section-editor-add-slack-channel {
+      margin-top: 8px;
+
+      div.carrot-checkbox {
+        float: left;
+        margin-top: 7px;
+      }
+
+      div.slack-channels-dropdown {
+        float: right;
+        width: 230px;
+
+        input.board-edit-slack-channel {
+          height: 40px;
+        }
+      }
+    }
+
     div.section-editor-add-access {
       border-radius: 4px;
       border: 1px solid $carrot_light_gray_1;

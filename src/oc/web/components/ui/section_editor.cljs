@@ -9,7 +9,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
+            [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
 ;; Private section users search helpers
 
@@ -68,6 +70,7 @@
                             (rum/local "" ::initial-section-name)
                             (rum/local false ::editing-existing-section)
                             (rum/local nil ::click-listener)
+                            (rum/local false ::slack-enabled)
                             ;; Derivatives
                             (drv/drv :org-data)
                             (drv/drv :board-data)
@@ -101,6 +104,9 @@
         section-editing (drv/react s :section-editing)
         section-data (if (seq (:slug section-editing)) (drv/react s :board-data) section-editing)
         team-data (drv/react s :team-data)
+        slack-teams (drv/react s :team-channels)
+        show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
+        channel-name (when @(::editing-existing-section s) (:channel-name (:slack-mirror section-data)))
         roster (drv/react s :team-roster)
         current-user-id (jwt/user-id)
         ;; user can edit the private section users if
@@ -138,6 +144,29 @@
                                     (= (.-key e) "Enter"))
                             (utils/event-stop e)))
            :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
+        (when show-slack-channels?
+          [:div.section-editor-add-label
+            "Auto share to Slack"
+            [:span.info]])
+        (when show-slack-channels?
+        [:div.section-editor-add-slack-channel.group
+          (carrot-checkbox {:selected @(::slack-enabled s)
+                            :did-change-cb #(do
+                                              (reset! (::slack-enabled s) %)
+                                              (when-not %
+                                                (dis/dispatch!
+                                                 [:input
+                                                  [:section-editing :slack-mirror]
+                                                  nil])))})
+          (slack-channels-dropdown {:disabled (not @(::slack-enabled s))
+                                    :initial-value (when channel-name (str "#" channel-name))
+                                    :on-change (fn [team channel]
+                                                 (dis/dispatch!
+                                                  [:input
+                                                   [:section-editing :slack-mirror]
+                                                   {:channel-id (:id channel)
+                                                    :channel-name (:name channel)
+                                                    :slack-org-id (:slack-org-id team)}]))})])
         [:div.section-editor-add-label
           "Who can view this section?"]
         [:div.section-editor-add-access
