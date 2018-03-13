@@ -56,7 +56,9 @@
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
-        nux (drv/react s :nux)]
+        nux (drv/react s :nux)
+        is-all-posts (or (:from-all-posts @router/path)
+                         (= (router/current-board-slug) "all-posts"))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true})
        :on-click (fn [e]
@@ -97,10 +99,13 @@
           ]]
       [:div.activity-card-shadow-container.group
         [:div.activity-card-content.group
+          (when is-all-posts
+            [:div.posted-in
+              {:dangerouslySetInnerHTML (utils/emojify (str "Posted to " (:board-name activity-data)))}])
           ; Headline
           [:div.activity-card-headline
             {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-             :class (when has-headline "has-headline")}]
+             :class (when is-all-posts "showing-posted-in")}]
           ; Body
           (let [body-without-preview (utils/body-without-preview (:body activity-data))
                 activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))

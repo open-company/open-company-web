@@ -101,57 +101,6 @@ div.activity-card {
     }
   }
 
-  &.all-posts-card {
-    div.activity-card-head {
-      div.activity-card-head-author {
-        width: 45%;
-      }
-
-      div.activity-card-head-right {
-        width: 55%;
-      }
-    }
-
-    div.activity-card-content{
-
-      div.activity-card-body {
-        max-height: #{24*6}px;
-
-        &.has-media-preview {
-          width: 100%;
-          margin-right: 0px;
-          float: initial;
-        }
-      }
-
-      div.read-more {
-        width: 100%;
-        text-align: center;
-        margin-top: 24px;
-        color: $carrot_text_blue;
-        @include avenir_H();
-        font-size: 16px;
-      }
-
-      div.media-preview-container {
-        width: 100%;
-        text-align: center;
-        float: initial;
-        margin-top: 16px;
-        max-height: 200px;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        overflow: hidden;
-
-        img {
-          max-width: 100%;
-          max-height: 200px;
-        }
-      }
-    }
-  }
-
   div.activity-card-breadcrumb {
     @include avenir_R();
     font-size: 14px;
@@ -230,14 +179,28 @@ div.activity-card {
     width: 100%;
     padding: 32px 32px 0px;
 
-    span.posted-in {
+    div.posted-in {
+      padding-left: 26px;
       @include avenir_M();
       font-size: 14px;
       color: $ui_grey;
+      position: relative;
+
+      &:before {
+        content: "";
+        width: 18px;
+        height: 18px;
+        background-image: cdnUrl("/img/ML/posted_in_icon.svg");
+        background-size: 18px 18px;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
     }
 
     div.activity-card-headline {
-      margin-top: 16px;
       @include activity-title();
       @include avenir_H();
       font-size: 20px;
@@ -249,6 +212,10 @@ div.activity-card {
       white-space: nowrap;
       max-height: 31px;
 
+      &.showing-posted-in {
+        margin-top: 12px;
+      }
+
       @include mobile() {
         margin-top: 16px;
       }
@@ -258,7 +225,7 @@ div.activity-card {
 
     $body_height: 24*3;
     div.activity-card-body {
-      margin-top: 16px;
+      margin-top: 12px;
       @include activity-body(16);
       @include avenir_M();
       color: $deep_navy;
