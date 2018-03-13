@@ -53,6 +53,14 @@
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height)))))
 
+(defn filter-board [board-data]
+  (let [self-link (utils/link-for (:links board-data) "self")]
+    (and (not= (:slug board-data) utils/default-drafts-board-slug)
+         (pos? (:count self-link)))))
+
+(defn filter-boards [all-boards]
+  (filterv filter-board all-boards))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -96,7 +104,7 @@
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
-        boards (filterv #(not= (:slug %) utils/default-drafts-board-slug) all-boards)
+        boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
         show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
