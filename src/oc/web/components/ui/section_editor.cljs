@@ -87,7 +87,9 @@
                                 (reset! (::editing-existing-section s) (not new-section))
                                 (when-not (string/blank? (:name fixed-section-data))
                                   (reset! (::initial-section-name s) (:name fixed-section-data)))
-                                (dis/dispatch! [:input [:section-editing] fixed-section-data]))
+                                (dis/dispatch! [:input [:section-editing] fixed-section-data])
+                                (reset! (::slack-enabled s)
+                                 (not (string/blank? (:channel-id (:slack-mirror fixed-section-data))))))
                               (reset! (::click-listener s)
                                (events/listen js/window EventType/CLICK
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
