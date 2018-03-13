@@ -399,6 +399,15 @@ div.section-editor {
       margin-top: 16px;
       height: 24px;
 
+      button.delete-bt {
+        height: 24px;
+        float: left;
+        width: 120px;
+        color: $carrot_orange;
+        @include avenir_H();
+        font-size: 15px;
+      }
+
       button.mlb-reset.create-bt {
         height: 24px;
         float: right;

@@ -60,6 +60,10 @@
     (assoc :authors (map #(if (map? %) (:user-id %) %) (:authors section-data)))
     (assoc :viewers (map #(if (map? %) (:user-id %) %) (:viewers section-data)))))
 
+(defn dismiss []
+  (dis/dispatch! [:input [:show-section-editor] false])
+  (dis/dispatch! [:input [:show-section-add] false]))
+
 (rum/defcs section-editor < rum/reactive
                             ;; Locals
                             (rum/local "" ::query)
@@ -93,8 +97,7 @@
                               (reset! (::click-listener s)
                                (events/listen js/window EventType/CLICK
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
-                                   (dis/dispatch! [:input [:show-section-editor] false])
-                                   (dis/dispatch! [:input [:show-section-add] false]))))
+                                   (dismiss))))
                               s)
                              :will-unmount (fn [s]
                               (when @(::click-listener s)
@@ -130,7 +133,7 @@
             (utils/emojify
              (if @(::editing-existing-section s)
                (str "Editing " (:name section-editing))
-                "Add a new section"))}]]
+                "Section name"))}]]
       [:div.section-editor-add
         [:div.section-editor-add-label
           "Add a new section"]
@@ -148,7 +151,7 @@
            :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
         (when show-slack-channels?
           [:div.section-editor-add-label
-            "Auto share to Slack"
+            "Auto-share to Slack"
             [:span.info]])
         (when show-slack-channels?
         [:div.section-editor-add-slack-channel.group
@@ -329,6 +332,33 @@
                           "Contributor"
                           "Viewer")])]))]])
         [:div.section-editor-add-footer
+          (when (and @(::editing-existing-section s)
+                     (utils/link-for (:links section-data) "delete"))
+            [:button.mlb-reset.delete-bt
+              {:on-click (fn []
+                          (dis/dispatch!
+                           [:alert-modal-show
+                            {:icon "/img/ML/trash.svg"
+                             :action "delete-section"
+                             :message [:span
+                                        [:span "Are you sure?"]
+                                        (when (-> section-data :fixed-items count pos?)
+                                          [:span
+                                            " This will delete the section and "
+                                            [:strong "all"]
+                                            " its posts, too."])]
+                             :link-button-title "No"
+                             :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                             :solid-button-style :red
+                             :solid-button-title "Yes, I'm sure"
+                             :solid-button-cb (fn []
+                                                (dis/dispatch!
+                                                 [:board-delete
+                                                 (:slug section-data)])
+                                                (dis/dispatch!
+                                                 [:alert-modal-hide])
+                                                (dismiss))}]))}
+              "Delete section"])
           [:button.mlb-reset.create-bt
             {:on-click #(let [section-node (rum/ref-node s "section-name")
                               inner-html (.-innerHTML section-node)
