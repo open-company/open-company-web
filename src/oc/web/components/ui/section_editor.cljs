@@ -133,10 +133,10 @@
             (utils/emojify
              (if @(::editing-existing-section s)
                (str "Editing " (:name section-editing))
-                "Section name"))}]]
+                "Add a new section"))}]]
       [:div.section-editor-add
         [:div.section-editor-add-label
-          "Add a new section"]
+          "Section name"]
         [:div.section-editor-add-name
           {:content-editable true
            :placeholder "Section name"

@@ -403,8 +403,8 @@ div.section-editor {
         height: 24px;
         float: left;
         width: 120px;
-        color: $carrot_orange;
-        @include avenir_H();
+        color: $ui_grey;
+        @include avenir_M();
         font-size: 15px;
       }
 
