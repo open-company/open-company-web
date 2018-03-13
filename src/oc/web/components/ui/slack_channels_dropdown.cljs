@@ -55,7 +55,8 @@
     [:div.slack-channels-dropdown
       {:class (if disabled "disabled" "")}
       [:input.board-edit-slack-channel
-        {:value (if disabled "Not connected." (or @(::slack-channel s) "Select a channel..."))
+        {:value (or @(::slack-channel s) "")
+         :placeholder (if disabled "Not connected." "Select a channel...")
          :on-focus (fn []
                     (utils/after
                      100
