@@ -367,7 +367,8 @@
                   [:div.board-name
                     {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
                     (:board-name entry-editing)]
-                  (when show-sections-picker
+                  (when (and show-sections-picker
+                             (not is-mobile?))
                     (sections-picker (:board-slug entry-editing)
                      (fn [board-data]
                        (dis/dispatch! [:input [:show-sections-picker] false])
@@ -388,15 +389,7 @@
                 [:div.boards-dropdown-caret
                   [:div.board-name
                     {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                    (:board-name entry-editing)]
-                  (when show-sections-picker
-                    (sections-picker (:board-slug entry-editing)
-                     (fn [board-data]
-                       (dis/dispatch! [:input [:show-sections-picker] false])
-                       (when board-data
-                        (dis/dispatch! [:input [:entry-editing]
-                         (merge entry-editing {:board-slug (:slug board-data)
-                                               :board-name (:name board-data)})])))))]]])
+                    (:board-name entry-editing)]]]])
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element
