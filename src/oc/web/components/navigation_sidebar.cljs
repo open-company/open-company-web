@@ -56,7 +56,9 @@
 (defn filter-board [board-data]
   (let [self-link (utils/link-for (:links board-data) "self")]
     (and (not= (:slug board-data) utils/default-drafts-board-slug)
-         (pos? (:count self-link)))))
+         (or (not (contains? self-link :count))
+             (and (contains? self-link :count)
+                  (pos? (:count self-link)))))))
 
 (defn filter-boards [all-boards]
   (filterv filter-board all-boards))
