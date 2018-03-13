@@ -279,8 +279,10 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at]
-                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at]
+   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
+                            :show-section-editor :show-section-add :show-sections-picker :entry-editing]
+                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at
+                                 show-section-editor show-section-add show-sections-picker entry-editing]
                               {:nux nux
                                :nux-loading (:nux-loading base)
                                :nux-end (:nux-end base)
@@ -295,7 +297,11 @@
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
-                               :ap-initial-at ap-initial-at})]})
+                               :ap-initial-at ap-initial-at
+                               :show-section-editor show-section-editor
+                               :show-section-add show-section-add
+                               :show-sections-picker show-sections-picker
+                               :entry-editing-board-slug (:board-slug entry-editing)})]})
 
 
 ;; Action Loop =================================================================

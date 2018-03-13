@@ -17,9 +17,11 @@
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
             [oc.web.components.fullscreen-post :refer (fullscreen-post)]
+            [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
@@ -103,7 +105,11 @@
                 is-sharing-activity
                 entry-edit-dissmissing
                 is-showing-alert
-                media-input]} (drv/react s :org-dashboard-data)
+                media-input
+                show-section-editor
+                show-section-add
+                show-sections-picker
+                entry-editing-board-slug]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (some #{nux} [:1 :2 :3])
         search-active? (drv/react s search/search-active?)
@@ -151,6 +157,24 @@
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
+          ;; Mobile create a new section
+          (and is-mobile?
+               show-section-editor)
+          (section-editor nil #(dis/dispatch! [:section-edit-save]))
+          ;; Mobile edit current section data
+          (and is-mobile?
+               show-section-add)
+          (section-editor board-data #(dis/dispatch! [:input [:show-section-add] false]))
+          ;; Mobile sections picker
+          (and is-mobile?
+               show-sections-picker)
+          (sections-picker entry-editing-board-slug
+            (fn [board-data]
+             (dis/dispatch! [:input [:show-sections-picker] false])
+             (when board-data
+              (dis/dispatch! [:update [:entry-editing]
+               #(merge % {:board-slug (:slug board-data)
+                          :board-name (:name board-data)})]))))
           ;; Entry editing
           is-entry-editing
           (entry-edit)
