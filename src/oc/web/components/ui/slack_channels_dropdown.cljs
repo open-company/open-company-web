@@ -53,9 +53,14 @@
   [s {:keys [disabled initial-value on-change on-intermediate-change] :as data}]
   (let [slack-teams (drv/react s :team-channels)]
     [:div.slack-channels-dropdown
-      {:class (if disabled "disabled" "")}
+      {:class (if disabled "disabled" "")
+       :on-click #(when (not disabled)
+                    (reset! (::typing s) false)
+                    (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
+                    (utils/event-stop %))}
       [:input.board-edit-slack-channel
-        {:value (if disabled "Not connected." (or @(::slack-channel s) "Select a channel..."))
+        {:value (or @(::slack-channel s) "")
+         :placeholder (if disabled "Not connected" "Select a channel...")
          :on-focus (fn []
                     (utils/after
                      100
@@ -66,13 +71,6 @@
                          (on-intermediate-change (.. % -target -value)))
                        (reset! (::slack-channel s) (.. % -target -value)))
          :disabled disabled}]
-      [:i.fa
-        {:class (utils/class-set {:fa-angle-down (not @(::show-channels-dropdown s))
-                                  :fa-angle-up @(::show-channels-dropdown s)})
-         :on-click #(when (not disabled)
-                      (reset! (::typing s) false)
-                      (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
-                      (utils/event-stop %))}]
       (when @(::show-channels-dropdown s)
         [:div.slack-channels-dropdown-list
           (for [t slack-teams
@@ -92,6 +90,7 @@
                   :key (str "slack-chs-dd-" (:slack-org-id t) "-" (:id c))
                   :on-click #(do
                                 (on-change t c)
+                                (utils/event-stop %)
                                 (reset! (::slack-channel s) (str "#" (:name c)))
                                 (reset! (::show-channels-dropdown s) false)
                                 (reset! (::typing s) false))}

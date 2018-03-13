@@ -177,6 +177,12 @@
 
 (def ^:private search-http (partial req search-endpoint))
 
+;; Allowed keys
+
+(def entry-allowed-keys [:headline :body :attachments :board-slug])
+
+(def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
+
 (defn dispatch-body [action response]
   (let [body (if (:success response) (json->cljs (:body response)) {})]
     (dispatcher/dispatch! [action body])))
@@ -254,9 +260,9 @@
             ; Board name exists
             (dispatcher/dispatch!
              [:input
-              [:board-editing :board-name-error]
+              [:section-editing :section-name-error]
               "Board name already exists or isn't allowed"])
-            (dispatcher/dispatch! [:board-edit-save/finish (json->cljs body)])))))))
+            (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])))))))
 
 (def org-keys [:name :logo-url :logo-width :logo-height])
 
@@ -495,32 +501,18 @@
                 ; if not redirect the user to the slug)
                 (dispatcher/dispatch! [:org-redirect org-data])))))))))
 
-(defn create-board [board-data]
-  (let [create-link (utils/link-for (:links (dispatcher/org-data)) "create")
-        board-name (:name board-data)
-        board-access (:access board-data)
-        slack-mirror (:slack-mirror board-data)
-        viewers (:viewers board-data)
-        authors (:authors board-data)
-        private-notifications (:private-notifications board-data)]
-    (when (and board-name create-link)
-      (storage-http (method-for-link create-link) (relative-href create-link)
-        {:headers (headers-for-link create-link)
-         :json-params (cljs->json {:name board-name
-                                   :access board-access
-                                   :authors authors
-                                   :viewers viewers
-                                   :private-notifications private-notifications
-                                   :slack-mirror slack-mirror})}
-        (fn [{:keys [success status body]}]
-          (let [board-data (when success (json->cljs body))]
-            (if (= status 409)
-              ; Board name exists
-              (dispatcher/dispatch!
-               [:input
-                [:board-editing :board-name-error]
-                "Board name already exists or isn't allowed"])
-              (dispatcher/dispatch! [:board-edit-save/finish board-data]))))))))
+(defn create-board [board-data callback]
+  (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")
+        fixed-board-data (select-keys board-data board-allowed-keys)
+        fixed-entries (map #(select-keys % entry-allowed-keys) (:entries board-data))
+        with-entries (if (pos? (count fixed-entries))
+                       (assoc fixed-board-data :entries fixed-entries)
+                       fixed-board-data)]
+    (when (and (:name fixed-board-data) create-board-link)
+      (storage-http (method-for-link create-board-link) (relative-href create-board-link)
+        {:headers (headers-for-link create-board-link)
+         :json-params (cljs->json with-entries)}
+        callback))))
 
 (defn add-author
   "Given a user-id add him as an author to the current org.
@@ -717,12 +709,10 @@
           (if success
             (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
 
-(def entry-keys [:headline :body :attachments :board-slug])
-
 (defn create-entry
   [entry-data create-entry-link]
   (when entry-data
-    (let [cleaned-entry-data (select-keys entry-data entry-keys)]
+    (let [cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
       (storage-http (method-for-link create-entry-link) (relative-href create-entry-link)
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
@@ -739,7 +729,7 @@
   [entry-data publish-entry-link]
   (when (and entry-data
              (not= (:status entry-data) "published"))
-    (let [cleaned-entry-data (-> entry-data (select-keys entry-keys) (assoc :status "published"))]
+    (let [cleaned-entry-data (-> entry-data (select-keys entry-allowed-keys) (assoc :status "published"))]
       (storage-http (method-for-link publish-entry-link) (relative-href publish-entry-link)
         {:headers (headers-for-link publish-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
@@ -755,7 +745,7 @@
   [entry-data board-slug edit-key]
   (when entry-data
     (let [update-entry-link (utils/link-for (:links entry-data) "partial-update")
-          cleaned-entry-data (select-keys entry-data entry-keys)]
+          cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
       (storage-http (method-for-link update-entry-link) (relative-href update-entry-link)
         {:headers (headers-for-link update-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
