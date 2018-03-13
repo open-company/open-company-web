@@ -358,6 +358,157 @@ div.entry-edit-modal-container {
             display: none;
           }
         }
+
+        div.posting-in {
+          @include avenir_M();
+          font-size: 16px;
+          color: $carrot_dark_gray;
+          float: left;
+          margin-top: 5px;
+          margin-left: 16px;
+
+          @include mobile() {
+            font-size: 15px;
+            color: $carrot_text_blue_3;
+            background-color: $carrot_light_blue_2;
+            height: 48px;
+            padding: 14px 24px 0px;
+            float: none;
+            margin-top: 64px;
+            margin-left: 0px;
+
+            &.active {
+              background-color: $carrot_text_blue_3;
+
+              div.boards-dropdown-caret {
+                color: white;
+                &:after {
+                  background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
+                }
+              }
+            }
+          }
+
+          span {
+            float: left;
+          }
+
+          div.boards-dropdown-caret {
+            @include avenir_M();
+            color: $carrot_green;
+            float: left;
+            margin-left: 6px;
+            cursor: pointer;
+            position: relative;
+
+            div.board-name {
+              @include avenir_M();
+              color: $carrot_green;
+              margin-bottom: 0px;
+              cursor: pointer;
+              position: relative;
+              float: left;
+
+              @include mobile() {
+                @include avenir_H();
+                color: $carrot_text_blue_3;
+              }
+
+              &:after {
+                float: right;
+                content: "";
+                background-image: cdnUrl("/img/ML/board_settings.svg");
+                background-size: 8px 8px;
+                background-repeat: no-repeat;
+                background-position: center;
+                background-color: $deep_tan;
+                border-radius: 10px;
+                width: 20px;
+                height: 20px;
+                margin-top: 0px;
+                margin-left: 6px;
+                opacity: 0.8;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+
+              @include mobile() {
+
+                &:after {
+                  width: 8px 5px;
+                  margin-top: -3px;
+                  background-size: 8px 5px;
+                  background-position: 0px 9px;
+                  background-color: transparent;
+                  background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
+                }
+              }
+            }
+
+            div.dropdown-list-container {
+              top: 32px;
+              left: 50%;
+              margin-left: -100px;
+              width: 200px;
+
+              @include mobile() {
+                width: 100vw;
+                height: calc(100vh - 64px - 48px);
+                top: 34px;
+                left: 0px;
+                text-align: left;
+                background-color: white;
+
+                div.triangle {
+                  display: none;
+                }
+
+                div.dropdown-list-content {
+                  border: none;
+                  border-radius: 0px;
+                  padding: 24px;
+                  margin: 0px;
+                  box-shadow: none;
+
+                  div.add-section-tooltip-container {
+                    display: block !important;
+                    width: 100%;
+                    text-align: center;
+                    margin-top: 32px;
+
+                    div.add-section-tooltip-arrow {
+                      width: 20px;
+                      height: 38px;
+                      @include image-2x("/img/ML/section_tooltip_arrow");
+                      background-size: 20px 38px;
+                      background-position: center;
+                      background-repeat: no-repeat;
+                      margin: 0 auto;
+                    }
+
+                    div.add-section-tooltip {
+                      width: 100%;
+                      margin: 24px auto;
+                      @include avenir_M();
+                      font-size: 18px;
+                      color: $ui_grey;
+                      text-align: center;
+                      max-width: 311px;
+                    }
+                  }
+                }
+              }
+
+              div.dropdown-list-content {
+                div.add-section-tooltip-container {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
       }
 
       div.entry-edit-modal-body {

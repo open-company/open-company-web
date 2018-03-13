@@ -137,7 +137,11 @@
             (and nux-loading
                  (not nux-end)))
       [:div.org-dashboard
-        (loading {:loading true :nux (or (cook/get-cookie :nux) nux-loading)})]
+        (when should-show-onboard-overlay?
+          [:div.screenshots-preload
+            [:div.screenshot-preload.screenshot-1]
+            [:div.screenshot-preload.screenshot-2]])
+        (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :modal-activity-view (router/current-activity-id)

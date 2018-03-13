@@ -16,32 +16,6 @@ div.oc-loading {
     display: none;
   }
 
-  &.setup-screen {
-    background-color: $carrot_text_blue;
-    width: 100vw;
-    height: 100vh;
-    text-align: center;
-    @include avenir_H();
-    font-size: 25px;
-    color: white;
-
-    div.setup-cta {
-      position: relative;
-      top: 50%;
-      padding-top: 55px;
-      display: block;
-      width: 311px;
-      left: 50%;
-      margin-left: -160px;
-
-      @include mobile() {
-        width: calc(100vw - 48px);
-        left: 0px;
-        margin-left: 24px;
-      }
-    }
-  }
-
   div.oc-loading-inner {
     position: relative;
     width: 52px;

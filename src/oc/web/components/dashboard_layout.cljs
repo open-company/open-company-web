@@ -84,12 +84,19 @@
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
                               (drv/drv :show-section-add)
+                              (drv/drv :show-add-post-tooltip)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
                               (rum/local nil ::resize-listener)
                               (rum/local nil ::scroll-listener)
-                              {:will-mount (fn [s]
+                              (rum/local nil ::show-top-boards-dropdown)
+                              (rum/local nil ::show-floating-boards-dropdown)
+                              {:before-render (fn [s]
+                                ;; Check if it still needs the add post tooltip
+                                (activity-actions/check-add-post-tooltip)
+                                s)
+                               :will-mount (fn [s]
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
                                 ;; Update window width on window resize
@@ -215,6 +222,19 @@
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "Compose"]]])]
+            (when (drv/react s :show-add-post-tooltip)
+              [:div.add-post-tooltip-container.group
+                [:button.mlb-reset.add-post-tooltip-dismiss
+                  {:on-click #(activity-actions/hide-add-post-tooltip)}]
+                [:div.add-post-tooltip-icon]
+                [:div.add-post-tooltip
+                  "Get started by creating a new post to share an update, announcement, or plans."]
+                [:div.add-post-tooltip.second-line
+                  "The sample post below can be deleted anytime."]
+                [:div.add-post-tooltip-arrow]
+                [:button.mlb-reset.add-post-tooltip-compose-bt
+                  {:on-click compose-fn}
+                  "Create new post"]])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards

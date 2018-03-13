@@ -10,12 +10,12 @@
 (defn set-cookie!
   ([c-name c-value]
     (set-cookie! c-name c-value -1))
-  ([c-name c-value expiracy]
-    (set-cookie! c-name c-value expiracy "/"))
-  ([c-name c-value expiracy c-path]
-    (set-cookie! c-name c-value expiracy c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
-  ([c-name c-value expiracy c-path c-domain c-secure]
-    (.set cookies-static-obj (cookie-name c-name) c-value expiracy c-path c-domain c-secure)))
+  ([c-name c-value expiry]
+    (set-cookie! c-name c-value expiry "/"))
+  ([c-name c-value expiry c-path]
+    (set-cookie! c-name c-value expiry c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
+  ([c-name c-value expiry c-path c-domain c-secure]
+    (.set cookies-static-obj (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
 
 (defn get-cookie [c-name]
   (.get cookies-static-obj (cookie-name c-name)))

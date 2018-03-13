@@ -614,12 +614,9 @@
    :body [:body
           [:div#app
             [:div.oc-loading.active
-
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]
-              [:div.setup-cta
-                "Hang tight, we’re just getting set up…"]]]
+                [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Static js files
@@ -716,9 +713,7 @@
             [:div.oc-loading.active
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
-                [:div.oc-loading-body]]
-              [:div.setup-cta
-                "Hang tight, we’re just getting set up…"]]]
+                [:div.oc-loading-body]]]]
           [:div#oc-error-banner]
           [:div#oc-loading]
           ;; Static js files
