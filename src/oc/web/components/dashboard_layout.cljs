@@ -43,8 +43,7 @@
   (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
     (when (pos? (.-length entry-floating))
       (let [scroll-top (document-scroll-top)
-            opacity (if (or @(::show-floating-boards-dropdown s)
-                            (responsive/is-tablet-or-mobile?))
+            opacity (if (responsive/is-tablet-or-mobile?)
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
@@ -53,6 +52,28 @@
     (if (>= (.-scrollY js/window) 64)
       (.add (.-classList dashboard-layout) "sticky-board-name")
       (.remove (.-classList dashboard-layout) "sticky-board-name"))))
+
+(defn get-default-section [s]
+  (let [editable-boards @(drv/get-ref s :editable-boards)
+        org-slug (router/current-org-slug)
+        cookie-name (router/last-used-board-slug-cookie org-slug)
+        cookie-value (cook/get-cookie cookie-name)
+        board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
+        board-data (or board-from-cookie (first (sort-by :name (vals editable-boards))))]
+    {:board-name (:name board-data)
+     :board-slug (:slug board-data)}))
+
+(defn get-board-for-edit [s]
+  (let [board-data @(drv/get-ref s :board-data)
+        route @(drv/get-ref s :route)
+        is-all-posts (or (utils/in? (:route route) "all-posts")
+                         (:from-all-posts route))
+        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
+        entry-data (if (or is-drafts-board is-all-posts)
+                      (get-default-section s)
+                      {:board-slug (:slug board-data)
+                       :board-name (:name board-data)})]
+    (activity-actions/entry-edit entry-data)))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -69,8 +90,6 @@
                               (rum/local nil ::ww)
                               (rum/local nil ::resize-listener)
                               (rum/local nil ::scroll-listener)
-                              (rum/local nil ::show-top-boards-dropdown)
-                              (rum/local nil ::show-floating-boards-dropdown)
                               {:will-mount (fn [s]
                                 ;; Get current window width
                                 (reset! (::ww s) (responsive/ww))
@@ -122,6 +141,9 @@
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
+        compose-fn (fn [_]
+                    (utils/remove-tooltips)
+                    (activity-actions/entry-edit (get-board-for-edit s)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
@@ -184,29 +206,10 @@
                              is-all-posts))
                 [:div.new-post-top-dropdown-container.group
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
-                    {:class (when @(::show-top-boards-dropdown s) "active")
-                     :on-click (fn [_]
-                                (if (or is-drafts-board is-all-posts)
-                                  (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (activity-actions/entry-edit entry-data))))}
+                    {:on-click compose-fn}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
-                      "Compose"]]
-                  (when @(::show-top-boards-dropdown s)
-                    (dropdown-list
-                     {:items (map
-                              #(-> %
-                                (select-keys [:name :slug])
-                                (clojure.set/rename-keys {:name :label :slug :value}))
-                              (vals all-boards))
-                      :value ""
-                      :on-blur #(reset! (::show-top-boards-dropdown s) false)
-                      :on-change (fn [item]
-                                   (reset! (::show-top-boards-dropdown s) false)
-                                   (activity-actions/entry-edit {:board-slug (:value item)
-                                                                 :board-name (:label item)}))}))])]
+                      "Compose"]]])]
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
@@ -232,8 +235,7 @@
                        (or (utils/link-for (:links board-data) "create")
                            is-drafts-board
                            is-all-posts))
-              (let [opacity (if (or @(::show-floating-boards-dropdown s)
-                                    (responsive/is-tablet-or-mobile?))
+              (let [opacity (if (responsive/is-tablet-or-mobile?)
                               1
                               (calc-opacity (document-scroll-top)))]
                 [:div.new-post-floating-dropdown-container.group
@@ -241,32 +243,9 @@
                    :style {:opacity opacity
                            :display (if (pos? opacity) "block" "none")}}
                   [:button.mlb-reset.mlb-default.add-to-board-floating-button
-                    {:class (when @(::show-floating-boards-dropdown s) "active")
-                     :data-placement "left"
+                    {:data-placement "left"
                      :data-container "body"
                      :data-toggle (when-not is-mobile-size? "tooltip")
                      :title "Start a new post"
-                     :on-click (fn [_]
-                                (utils/remove-tooltips)
-                                (if (or is-drafts-board
-                                        is-all-posts)
-                                  (reset!
-                                   (::show-floating-boards-dropdown s)
-                                   (not @(::show-floating-boards-dropdown s)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (activity-actions/entry-edit entry-data))))}
-                    [:div.add-to-board-pencil]]
-                  (when @(::show-floating-boards-dropdown s)
-                    (dropdown-list
-                     {:items (map
-                              #(-> %
-                                (select-keys [:name :slug])
-                                (clojure.set/rename-keys {:name :label :slug :value}))
-                              (vals all-boards))
-                      :value ""
-                      :on-blur #(reset! (::show-floating-boards-dropdown s) false)
-                      :on-change (fn [item]
-                                   (reset! (::show-floating-boards-dropdown s) false)
-                                   (activity-actions/entry-edit {:board-slug (:value item)
-                                                                 :board-name (:label item)}))}))]))]]]))
+                     :on-click compose-fn}
+                    [:div.add-to-board-pencil]]]))]]]))
