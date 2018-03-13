@@ -141,7 +141,8 @@
   (clean-body)
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
         edited-data (:modal-editing-data modal-data)]
-    (when (:has-changes edited-data)
+    (when (and (:has-changes edited-data)
+               (pos? (count (:headline edited-data))))
       (reset! (::entry-saving state) true)
       (activity-actions/entry-modal-save edited-data (router/current-board-slug)))))
 
@@ -319,7 +320,8 @@
         [:div.fullscreen-post-header-right
           (if editing
             [:button.mlb-reset.post-publish-bt
-              {:on-click #(save-editing? s)
+              {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
+               :disabled (zero? (count (:headline (:modal-editing-data modal-data))))
                :class (when @(::entry-saving s) "loading")}
               "Post changes"]
             (more-menu activity-data))]]
