@@ -84,7 +84,7 @@
     }
   }
 
-  div.public, div.private, div.all-posts-icon, div.drafts-icon {
+  div.public, div.private, div.all-posts-icon {
     opacity: 1;
   }
 
@@ -252,27 +252,6 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/digest_icon_green.svg");
       }
     }
-
-    div.drafts-icon {
-      background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-      background-size: 18px 19px;
-      width: 18px;
-      height: 19px;
-      float: left;
-      margin-left: -4px;
-      margin-top: 7px;
-
-      @include mobile() {
-        margin-left: 0px;
-        margin-top: 3px;
-        opacity: 1;
-      }
-
-      &.selected {
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/drafts_icon_green.svg");
-      }
-    }
   }
 
   div.left-navigation-sidebar-top{
@@ -280,14 +259,15 @@ div.left-navigation-sidebar {
     .left-navigation-sidebar-top-title {
       padding: 0px 0 0px 28px;
       margin: 0;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
 
       span {
         @include avenir_B();
         font-size: 13px;
-        color: $carrot_gray;
+        color: $light_ui_grey;
         float: left;
         cursor: default;
+        margin-left: 21px;
       }
 
       div.boards-icon {
@@ -305,9 +285,9 @@ div.left-navigation-sidebar {
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: 0px;
-      margin-top: -6px;
-      float: right;
+      margin-left: 8px;
+      margin-top: -5px;
+      float: left;
       padding: 0;
       cursor: pointer;
       transition: 230ms;
