@@ -49,6 +49,8 @@ div.emoji-mart {
   border: 1px solid rgba($deep_tan, 0.7);
   box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
   border-radius: 6px;
+  z-index: #{$navbar_zindex - 1};
+
   div.emoji-mart-preview {
     div.emoji-mart-preview-data span.emoji-mart-title-label {
       display: none;
