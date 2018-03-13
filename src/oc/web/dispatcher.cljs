@@ -217,9 +217,18 @@
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
-   :board-editing       [[:base]
+   :section-editing     [[:base]
                           (fn [base]
-                            (:board-editing base))]
+                            (:section-editing base))]
+   :show-section-editor [[:base]
+                          (fn [base]
+                            (:show-section-editor base))]
+   :show-section-add    [[:base]
+                          (fn [base]
+                            (:show-section-add base))]
+   :show-sections-picker [[:base]
+                          (fn [base]
+                            (:show-sections-picker base))]
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
@@ -275,8 +284,10 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at]
-                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at]
+   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
+                            :show-section-editor :show-section-add :show-sections-picker :entry-editing]
+                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at
+                                 show-section-editor show-section-add show-sections-picker entry-editing]
                               {:nux nux
                                :nux-loading (:nux-loading base)
                                :nux-end (:nux-end base)
@@ -287,12 +298,15 @@
                                :whats-new-modal-data (:whats-new-modal base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
-                               :is-board-editing (boolean (:board-editing base))
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
-                               :ap-initial-at ap-initial-at})]})
+                               :ap-initial-at ap-initial-at
+                               :show-section-editor show-section-editor
+                               :show-section-add show-section-add
+                               :show-sections-picker show-sections-picker
+                               :entry-editing-board-slug (:board-slug entry-editing)})]})
 
 
 ;; Action Loop =================================================================

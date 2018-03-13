@@ -129,6 +129,11 @@
   [org-slug]
   (str "last-board-view-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
 
+(defn last-used-board-slug-cookie
+  "Cookie to save the last board slug used in a post creation"
+  [org-slug]
+  (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
+
 (defn show-nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]

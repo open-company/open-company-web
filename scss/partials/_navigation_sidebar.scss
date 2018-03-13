@@ -30,6 +30,7 @@
     span.count {
       @include avenir_M();
       font-size: 16px;
+      color: #C5C6C8;
     }
 
     &.new {
@@ -38,7 +39,7 @@
   }
 }
 
-@mixin item-selected(){
+@mixin item-selected() {
   background-color: $feint_emerald;
   border-top-right-radius: 100px;
   border-bottom-right-radius: 100px;
@@ -54,6 +55,10 @@
     font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
+
+    span.count {
+      color: $carrot_green;
+    }
   }
 }
 
@@ -79,7 +84,7 @@
     }
   }
 
-  div.public, div.private, div.all-posts-icon, div.drafts-icon {
+  div.public, div.private, div.all-posts-icon {
     opacity: 1;
   }
 
@@ -247,43 +252,22 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/digest_icon_green.svg");
       }
     }
-
-    div.drafts-icon {
-      background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-      background-size: 18px 19px;
-      width: 18px;
-      height: 19px;
-      float: left;
-      margin-left: -4px;
-      margin-top: 7px;
-
-      @include mobile() {
-        margin-left: 0px;
-        margin-top: 3px;
-        opacity: 1;
-      }
-
-      &.selected {
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/drafts_icon_green.svg");
-      }
-    }
   }
 
   div.left-navigation-sidebar-top{
 
     .left-navigation-sidebar-top-title {
-      padding: 0px 0 0px 32px;
+      padding: 0px 0 0px 28px;
       margin: 0;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
 
       span {
         @include avenir_B();
         font-size: 13px;
         color: $light_ui_grey;
         float: left;
-        margin-left: 21px;
         cursor: default;
+        margin-left: 21px;
       }
 
       div.boards-icon {
@@ -298,32 +282,12 @@ div.left-navigation-sidebar {
       }
     }
 
-    @include mobile() {
-      height: 40px;
-      margin: 0px;
-      background-color: $light_tan;
-      padding: 14px 24px;
-      
-      .left-navigation-sidebar-top-title {
-        padding: 0px;
-
-        span{
-          @include avenir_H();
-          font-size: 12px;
-          color: $ui_grey;
-          text-transform: uppercase;
-          margin: 0px;
-          padding: 0px;
-        }
-      }      
-    }
-
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: 0px;
-      margin-top: 1px;
-      float: right;
+      margin-left: 8px;
+      margin-top: -5px;
+      float: left;
       padding: 0;
       cursor: pointer;
       transition: 230ms;
@@ -402,7 +366,7 @@ div.left-navigation-sidebar {
 
         &.selected {
           opacity: 1;
-          background-image: cdnUrl("/img/ML/board_public_blue.svg");
+          background-image: cdnUrl("/img/ML/board_public_green.svg");
 
           @include mobile() {
             margin-top: 10px;
@@ -429,7 +393,7 @@ div.left-navigation-sidebar {
 
         &.selected {
           opacity: 1;
-          background-image: cdnUrl("/img/ML/board_private_blue.svg");
+          background-image: cdnUrl("/img/ML/board_private_green.svg");
 
           @include mobile() {
             margin-top: 12px;
@@ -448,7 +412,7 @@ div.left-navigation-sidebar {
             margin-left: 0px;
           }
 
-          &.privte-board {
+          &.private-board {
             margin-left: 24px;
           }
 
@@ -520,17 +484,19 @@ div.left-navigation-sidebar {
         margin-right: 5px;
         float: left;
         margin-top: 1px;
+        opacity: 0.6;
 
         @include mobile() {
           color: white;
           background-image: cdnUrl("/img/ML/carrot_white.svg");
+          opacity: 1;
         }
       }
 
       span {
         font-size: 14px;
         line-height: 1.71;
-        color: $oc_gray_7;
+        color: $ui_grey;
         margin-left: 5px;
 
         @include mobile() {
@@ -556,17 +522,19 @@ div.left-navigation-sidebar {
         margin-right: 5px;
         float: left;
         margin-top: 1px;
+        opacity: 0.6;
 
         @include mobile() {
           color: white;
           background-image: cdnUrl("/img/ML/invite_people_white.svg");
+          opacity: 1;
         }
       }
 
       span {
         font-size: 14px;
         line-height: 1.71;
-        color: $oc_gray_7;
+        color: $ui_grey;
         margin-left: 5px;
 
         @include mobile() {

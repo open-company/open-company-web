@@ -12,12 +12,12 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
-            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -44,8 +44,7 @@
   (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
     (when (pos? (.-length entry-floating))
       (let [scroll-top (document-scroll-top)
-            opacity (if (or @(::show-floating-boards-dropdown s)
-                            (responsive/is-tablet-or-mobile?))
+            opacity (if (responsive/is-tablet-or-mobile?)
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
@@ -55,6 +54,27 @@
       (.add (.-classList dashboard-layout) "sticky-board-name")
       (.remove (.-classList dashboard-layout) "sticky-board-name"))))
 
+(defn get-default-section [s]
+  (let [editable-boards @(drv/get-ref s :editable-boards)
+        org-slug (router/current-org-slug)
+        cookie-name (router/last-used-board-slug-cookie org-slug)
+        cookie-value (cook/get-cookie cookie-name)
+        board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
+        board-data (or board-from-cookie (first (sort-by :name (vals editable-boards))))]
+    {:board-name (:name board-data)
+     :board-slug (:slug board-data)}))
+
+(defn get-board-for-edit [s]
+  (let [board-data @(drv/get-ref s :board-data)
+        route @(drv/get-ref s :route)
+        is-all-posts (or (utils/in? (:route route) "all-posts")
+                         (:from-all-posts route))
+        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
+    (if (or is-drafts-board is-all-posts)
+      (get-default-section s)
+      {:board-slug (:slug board-data)
+       :board-name (:name board-data)})))
+
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
@@ -63,6 +83,8 @@
                               (drv/drv :all-posts)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
+                              (drv/drv :show-section-editor)
+                              (drv/drv :show-section-add)
                               (drv/drv :show-add-post-tooltip)
                               ;; Locals
                               (rum/local nil ::force-update)
@@ -131,19 +153,22 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         compose-fn (fn [_]
                     (utils/remove-tooltips)
-                    (if (or is-drafts-board is-all-posts)
-                      (if (> (count all-boards) 1)
-                        (reset! (::show-floating-boards-dropdown s)
-                         (not @(::show-floating-boards-dropdown s)))
-                        (let [first-board (second (first all-boards))
-                              entry-data {:board-slug (:slug first-board)
-                                          :board-name (:name first-board)}]
-                          (activity-actions/entry-edit entry-data)))
-                      (let [entry-data {:board-slug (:slug board-data)
-                                        :board-name (:name board-data)}]
-                        (activity-actions/entry-edit entry-data))))]
+                    (activity-actions/entry-edit (get-board-for-edit s)))
+        show-section-editor (drv/react s :show-section-editor)
+        show-section-add (drv/react s :show-section-add)
+        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
+        drafts-link (utils/link-for (:links drafts-board) "self")
+        show-drafts (pos? (:count drafts-link))]
       ;; Entries list
       [:div.dashboard-layout.group
+        (when (and show-section-add
+                   (not (responsive/is-tablet-or-mobile?)))
+          [:div.section-add
+            {:class (when show-drafts "has-drafts")}
+            (section-editor nil (fn [board-data]
+                                  (dis/dispatch! [:input [:show-section-add] false])
+                                  (when board-data
+                                    (dis/dispatch! [:section-edit-save]))))])
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
           [:div.board-container.group
@@ -162,12 +187,18 @@
                 (when (and (router/current-board-slug)
                            (not is-all-posts)
                            (not (:read-only board-data)))
-                  [:button.mlb-reset.board-settings-bt
-                    {:data-toggle (when-not is-mobile-size? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :title (str (:name board-data) " settings")
-                     :on-click #(dis/dispatch! [:board-edit board-data])}])
+                  [:div.board-settings-container.group
+                    [:button.mlb-reset.board-settings-bt
+                      {:data-toggle (when-not is-mobile-size? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :title (str (:name board-data) " settings")
+                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
+                    (when (and show-section-editor
+                               (not (responsive/is-tablet-or-mobile?)))
+                      (section-editor board-data
+                       #(when %
+                          (dis/dispatch! [:section-edit-save]))))])
                 (when (= (:access board-data) "private")
                   [:div.private-board
                     {:data-toggle "tooltip"
@@ -191,18 +222,7 @@
                              is-all-posts))
                 [:div.new-post-top-dropdown-container.group
                   [:button.mlb-reset.mlb-default.add-to-board-top-button.group
-                    {:class (when @(::show-top-boards-dropdown s) "active")
-                     :on-click (fn [_]
-                                (if (or is-drafts-board is-all-posts)
-                                  (if (> (count all-boards) 1)
-                                    (reset! (::show-top-boards-dropdown s) (not @(::show-top-boards-dropdown s)))
-                                    (let [first-board (second (first all-boards))
-                                          entry-data {:board-slug (:slug first-board)
-                                                      :board-name (:name first-board)}]
-                                      (activity-actions/entry-edit entry-data)))
-                                  (let [entry-data {:board-slug (:slug board-data)
-                                                    :board-name (:name board-data)}]
-                                    (activity-actions/entry-edit entry-data))))}
+                    {:on-click compose-fn}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
                       "Compose"]]
@@ -274,8 +294,7 @@
                        (or (utils/link-for (:links board-data) "create")
                            is-drafts-board
                            is-all-posts))
-              (let [opacity (if (or @(::show-floating-boards-dropdown s)
-                                    (responsive/is-tablet-or-mobile?))
+              (let [opacity (if (responsive/is-tablet-or-mobile?)
                               1
                               (calc-opacity (document-scroll-top)))]
                 [:div.new-post-floating-dropdown-container.group
@@ -283,23 +302,9 @@
                    :style {:opacity opacity
                            :display (if (pos? opacity) "block" "none")}}
                   [:button.mlb-reset.mlb-default.add-to-board-floating-button
-                    {:class (when @(::show-floating-boards-dropdown s) "active")
-                     :data-placement "left"
+                    {:data-placement "left"
                      :data-container "body"
                      :data-toggle (when-not is-mobile-size? "tooltip")
                      :title "Start a new post"
                      :on-click compose-fn}
-                    [:div.add-to-board-pencil]]
-                  (when @(::show-floating-boards-dropdown s)
-                    (dropdown-list
-                     {:items (map
-                              #(-> %
-                                (select-keys [:name :slug])
-                                (clojure.set/rename-keys {:name :label :slug :value}))
-                              (vals all-boards))
-                      :value ""
-                      :on-blur #(reset! (::show-floating-boards-dropdown s) false)
-                      :on-change (fn [item]
-                                   (reset! (::show-floating-boards-dropdown s) false)
-                                   (activity-actions/entry-edit {:board-slug (:value item)
-                                                                 :board-name (:label item)}))}))]))]]]))
+                    [:div.add-to-board-pencil]]]))]]]))
