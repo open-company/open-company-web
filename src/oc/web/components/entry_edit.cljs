@@ -15,10 +15,11 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
+            [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -250,9 +251,12 @@
                                       (utils/after
                                        180
                                        #(let [from-ap (or (:from-all-posts @router/path)
-                                                       (= (router/current-board-slug) "all-posts"))]
+                                                          (= (router/current-board-slug) "all-posts"))
+                                              go-to-ap (or from-ap
+                                                           (not= (:status entry-editing) "published"))]
+                                          ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
-                                            (if from-ap
+                                            (if go-to-ap
                                               (oc-urls/all-posts (router/current-org-slug))
                                               (oc-urls/board (router/current-org-slug)
                                                (:board-slug entry-editing))))))))))))
@@ -391,7 +395,15 @@
                                  (reset! (::show-boards-dropdown s) false)
                                  (dis/dispatch! [:input [:entry-editing :has-changes] true])
                                  (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                 (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]]
+                                 (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))
+                    :placeholder (when (and (= (count all-boards) 1)
+                                            (= (:slug (first all-boards)) "general"))
+                                   [:div.add-section-tooltip-container
+                                     [:div.add-section-tooltip-arrow]
+                                     [:div.add-section-tooltip
+                                      (str
+                                       "Keep posts organized by sections, e.g., "
+                                       "Announcements, and Design, Sales, and Marketing.")]])}))]]]
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element
@@ -416,11 +428,10 @@
                                :dispatch-input-key :entry-editing
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video" "attachment"]
+                               :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable"})
-            [:div.entry-edit-controls-right]
-            ; Bottom controls
-            [:div.entry-edit-controls.group]]
+            ; Attachments
+            (stream-view-attachments (:attachments entry-editing) #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
               {:id "entry-edit-footer-multi-picker"}]

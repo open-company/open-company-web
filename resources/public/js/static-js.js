@@ -106,16 +106,14 @@ document.addEventListener("DOMContentLoaded", function(_) {
     signupButton.addClass("your-boards");
 
     var decoded_jwt = OCStaticGetDecodedJWT(jwt),
-        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt),
-        user_avatar = decoded_jwt["avatar-url"];
+        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
     signupButton.attr("href", your_board_url);
-    signupButton.html("<span><img class=\"user-avatar\" src=\"" + user_avatar + "\" /><span>Your digest</span></span>");
+    signupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
 
     var mobileSignupButton = $("#site-header-mobile-signup-item");
     mobileSignupButton.removeClass("start");
-    mobileSignupButton.addClass("mobile-your-boards");
     mobileSignupButton.attr("href", your_board_url);
-    mobileSignupButton.html("<img class=\"user-avatar\" src=\"" + user_avatar + "\" />");
+    mobileSignupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
     // Set the action of the site mobile menu's Get started button
@@ -208,19 +206,6 @@ function OCStaticSiteMobileMenuToggle(){
     body.querySelector("div.site-mobile-menu").classList.remove("hidden");
     body.classList.add(menuClass);
   }
-}
-
-// Check nux cookie to see if we need to show the blue setup screen or the regular loading screen
-var nux_cookie = OCStaticGetCookie(OCStaticCookieName("nux"));
-var oc_loading = document.querySelectorAll("div.oc-loading");
-if (oc_loading) {
-  oc_loading.forEach(function(item) {
-    if (nux_cookie) {
-      item.classList.add('setup-screen');
-    }else{
-      item.classList.remove('setup-screen');
-    }
-  });
 }
 
 

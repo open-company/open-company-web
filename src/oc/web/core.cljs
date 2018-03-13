@@ -65,7 +65,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root #(loading {:nux (js/OCStaticGetCookie (js/OCStaticCookieName "nux"))}) target)))
+    (drv-root #(loading) target)))
 
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
@@ -154,17 +154,17 @@
                        (keyword (:org-settings query-params))
                        (when (contains? query-params :access)
                          :main))
-        next-app-state {:nux (when show-nux :1)
+        next-app-state {:nux (when show-nux (if (or (responsive/is-tablet-or-mobile?)
+                                                    (= (.. js/window -location -hash) "#nux2"))
+                                              :2 :1))
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
-                        :nux-loading (cook/get-cookie :nux)
+                        :nux-loading show-nux
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
         (utils/after nux-setup-time
-         #(do
-           (cook/remove-cookie! :nux)
-           (swap! dis/app-state assoc :nux-end true)))))
+         #(swap! dis/app-state assoc :nux-end true))))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -288,27 +288,39 @@
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
+      (when (and (jwt/jwt)
+                 (seq (cook/get-cookie (router/last-org-cookie))))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
+      (when (and (jwt/jwt)
+                 (seq (cook/get-cookie (router/last-org-cookie))))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
-      (when-not (jwt/jwt)
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
-      (when-not (jwt/jwt)
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-team-route urls/sign-up-team {:as params}
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
-      (when-not (jwt/jwt)
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 

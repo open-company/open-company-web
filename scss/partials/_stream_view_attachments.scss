@@ -53,7 +53,7 @@ div.stream-view-attachments {
         }
 
         div.attachment-content {
-          width: 146px;
+          width: calc(100% - 40px - 30px - 8px);
 
           @include mobile() {
             width: calc(100% - 40px);
@@ -64,6 +64,22 @@ div.stream-view-attachments {
       &:nth-child(even) {
         width: calc(50% - 8px);
         margin-left: 16px;
+      }
+
+      @include mobile(){
+        &:nth-child(odd):not(:first-child) {
+          margin-left: 16px;
+        }
+      }
+
+      &.editable {
+        div.attachment-content {
+          width: calc(100% - 40px - 30px - 8px);
+
+          @include mobile (){
+            width: calc(100% - 40px - 30px - 8px);
+          }
+        }
       }
 
       div.attachment-icon {
@@ -86,7 +102,7 @@ div.stream-view-attachments {
         float: left;
         margin-left: 8px;
         height: 32px;
-        width: 384px;
+        width: calc(100% - 80px);
 
         @include mobile() {
           width: calc(100% - 40px);
@@ -109,6 +125,16 @@ div.stream-view-attachments {
           text-overflow: ellipsis;
           white-space: nowrap;
         }
+      }
+
+      button.remove-attachment-bt {
+        width: 30px;
+        height: 30px;
+        float: right;
+        background-image: cdnUrl("/img/ML/clear_attachments_x.svg");
+        background-size: 10px 10px;
+        background-position: center;
+        background-repeat: no-repeat;
       }
     }
   }

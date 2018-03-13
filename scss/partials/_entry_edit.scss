@@ -317,6 +317,39 @@ div.entry-edit-modal-container {
                   padding: 24px;
                   margin: 0px;
                   box-shadow: none;
+
+                  div.add-section-tooltip-container {
+                    display: block !important;
+                    width: 100%;
+                    text-align: center;
+                    margin-top: 32px;
+
+                    div.add-section-tooltip-arrow {
+                      width: 20px;
+                      height: 38px;
+                      @include image-2x("/img/ML/section_tooltip_arrow");
+                      background-size: 20px 38px;
+                      background-position: center;
+                      background-repeat: no-repeat;
+                      margin: 0 auto;
+                    }
+
+                    div.add-section-tooltip {
+                      width: 100%;
+                      margin: 24px auto;
+                      @include avenir_M();
+                      font-size: 18px;
+                      color: $ui_grey;
+                      text-align: center;
+                      max-width: 311px;
+                    }
+                  }
+                }
+              }
+
+              div.dropdown-list-content {
+                div.add-section-tooltip-container {
+                  display: none;
                 }
               }
             }
@@ -370,6 +403,12 @@ div.entry-edit-modal-container {
             @include tablet() {
               color: rgba($carrot_dark_gray, 0.5) !important;
             }
+          }
+        }
+
+        div.stream-view-attachments {
+          @include mobile(){
+            padding: 0px 24px;
           }
         }
 
