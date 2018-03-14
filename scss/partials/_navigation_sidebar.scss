@@ -2,7 +2,7 @@
   background-color: transparent;
 
   @include mobile() {
-    height: 77px;
+    height: 70px;
     margin: 0px 24px;
     padding: 24px 0px;
     border-bottom: 1px solid $light_tan;
@@ -115,9 +115,9 @@ div.left-navigation-sidebar {
   @include no-user-select();
 
   @include mobile() {
-    position: fixed;
+    position: absolute;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     top: 0px;
     left: 0px;
     display: none;
@@ -182,10 +182,6 @@ div.left-navigation-sidebar {
     &.showing-drafts {
       margin-bottom: 0px;
     }
-  }
-
-  a.drafts {
-    margin-bottom: 40px;
   }
 
   a.all-posts, a.drafts {
@@ -254,12 +250,30 @@ div.left-navigation-sidebar {
     }
   }
 
+  a.drafts {
+    margin-bottom: 40px;
+
+    &.hover-item {
+      @include mobile() {
+        border-bottom: none;
+      }
+    }
+  }
+
   div.left-navigation-sidebar-top{
 
     .left-navigation-sidebar-top-title {
       padding: 0px 0 0px 28px;
       margin: 0;
       margin-bottom: 16px;
+
+      @include mobile() {
+        background-color: $oc_gray_8;
+        height: 40px;
+        width: 100%;
+        padding: 13px 24px;
+        margin-bottom: 0px;
+      }
 
       span {
         @include avenir_B();
@@ -268,6 +282,10 @@ div.left-navigation-sidebar {
         float: left;
         cursor: default;
         margin-left: 21px;
+
+        @include mobile() {
+          margin-left: 0px;
+        }
       }
 
       div.boards-icon {
@@ -301,10 +319,12 @@ div.left-navigation-sidebar {
 
       &:hover, &.active {
         background-color: $carrot_green_2;
-        background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
       }
 
-      @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
+      @include mobile() {
+        background-color: #F0EFEA;
+        float: right;
+      }
     }
   }
 
@@ -358,19 +378,14 @@ div.left-navigation-sidebar {
         opacity: 0.5;
 
         @include mobile() {
-          background-image: cdnUrl("/img/ML/board_public_white.svg");
-          margin-left: 23px;
-          margin-top: 8px;
+          margin-left: 4px;
+          margin-top: 6px;
           opacity: 1;
         }
 
         &.selected {
           opacity: 1;
           background-image: cdnUrl("/img/ML/board_public_green.svg");
-
-          @include mobile() {
-            margin-top: 10px;
-          }
         }
       }
 
@@ -385,19 +400,14 @@ div.left-navigation-sidebar {
         opacity: 0.5;
 
         @include mobile() {
-          background-image: cdnUrl("/img/ML/board_private_white.svg");
-          margin-left: 25px;
-          margin-top: 10px;
+          margin-left: 4px;
+          margin-top: 6px;
           opacity: 1;
         }
 
         &.selected {
           opacity: 1;
           background-image: cdnUrl("/img/ML/board_private_green.svg");
-
-          @include mobile() {
-            margin-top: 12px;
-          }
         }
       }
 
@@ -405,11 +415,9 @@ div.left-navigation-sidebar {
         margin-left: 24px;
 
         @include mobile() {
-          margin: 4px 0px 4px 24px;
-          height: 37px;
 
           &.team-board {
-            margin-left: 0px;
+            margin-left: 32px;
           }
 
           &.private-board {
@@ -436,7 +444,7 @@ div.left-navigation-sidebar {
             margin-left: 0px;
 
             &.has-icon {
-              margin-left: 14px;
+              margin-left: 8px;
             }
           }
 
@@ -488,7 +496,6 @@ div.left-navigation-sidebar {
 
         @include mobile() {
           color: white;
-          background-image: cdnUrl("/img/ML/carrot_white.svg");
           opacity: 1;
         }
       }
@@ -525,8 +532,6 @@ div.left-navigation-sidebar {
         opacity: 0.6;
 
         @include mobile() {
-          color: white;
-          background-image: cdnUrl("/img/ML/invite_people_white.svg");
           opacity: 1;
         }
       }
