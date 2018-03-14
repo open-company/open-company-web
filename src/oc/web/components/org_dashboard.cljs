@@ -8,6 +8,7 @@
             [oc.web.stores.search :as search]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
@@ -81,11 +82,15 @@
                    :button-position "left"
                    :on-next-click #(dis/dispatch! [:nux-end])}))))
 
-(rum/defcs org-dashboard < rum/static
+(rum/defcs org-dashboard < ;; Mixins
+                           rum/static
                            rum/reactive
+                           (ui-mixins/render-on-resize nil)
+                           ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
+
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
@@ -164,11 +169,11 @@
           ;; Mobile create a new section
           (and is-mobile?
                show-section-editor)
-          (section-editor nil #(dis/dispatch! [:section-edit-save]))
+          (section-editor board-data #(dis/dispatch! [:section-edit-save]))
           ;; Mobile edit current section data
           (and is-mobile?
                show-section-add)
-          (section-editor board-data #(dis/dispatch! [:input [:show-section-add] false]))
+          (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))
           ;; Mobile sections picker
           (and is-mobile?
                show-sections-picker)
@@ -217,7 +222,9 @@
                        (or (router/current-activity-id)
                            is-entry-editing
                            should-show-onboard-overlay?
-                           is-sharing-activity))
+                           is-sharing-activity
+                           show-section-add
+                           show-section-editor))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
