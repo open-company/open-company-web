@@ -314,7 +314,7 @@
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(if editing
-                        (dismiss-editing? s false)
+                        (dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))
                         (close-clicked s))}]
         [:div.header-title-editing-post
           [:div.header-title-container-edit-pen]
