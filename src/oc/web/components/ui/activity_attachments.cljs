@@ -6,7 +6,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(rum/defcs activity-attachments < (rum/local true ::attachments-dropdown)
+(rum/defcs activity-attachments < (rum/local false ::attachments-dropdown)
   [s activity-data]
   (let [attachments (:attachments activity-data)
         attachments-num (count attachments)]
