@@ -8,7 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (first-render-mixin)]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -63,6 +63,11 @@
 (defn filter-boards [all-boards]
   (filterv filter-board all-boards))
 
+(defn save-window-height
+  "Save the window height in the local state."
+  [s]
+  (reset! (::window-height s) (.-innerHeight js/window)))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -70,17 +75,13 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
-                                (rum/local nil ::resize-listener)
                                 (rum/local nil ::window-height)
                                 ;; Mixins
-                                first-render-mixin
+                                ui-mixins/first-render-mixin
+                                (ui-mixins/render-on-resize save-window-height)
+
                                 {:will-mount (fn [s]
-                                  (reset! (::window-height s) (.-innerHeight js/window))
-                                  (reset! (::resize-listener s)
-                                   (events/listen
-                                    js/window
-                                    EventType/RESIZE
-                                    #(reset! (::window-height s) (.-innerHeight js/window))))
+                                  (save-window-height s)
                                   (save-content-height s)
                                   s)
                                  :did-mount (fn [s]
@@ -94,11 +95,6 @@
                                  :did-update (fn [s]
                                   (when-not (utils/is-test-env?)
                                     (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                  s)
-                                 :will-unmount (fn [s]
-                                  (when @(::resize-listener s)
-                                    (events/unlistenByKey @(::resize-listener s))
-                                    (reset! (::resize-listener s) nil))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -109,8 +105,6 @@
         boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
-        show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
-                                   create-link)
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
@@ -170,13 +164,12 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:span
                 "SECTIONS"]
-              (when show-create-new-board
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.right
+              (when create-link
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(do
                                (dis/dispatch! [:input [:show-section-add] true])
                                (close-navigation-sidebar))
                    :title "Create a new section"
-                   :id "add-board-button"
                    :data-placement "top"
                    :data-toggle "tooltip"
                    :data-container "body"}])]])
