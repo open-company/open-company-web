@@ -263,7 +263,7 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-top{
 
     .left-navigation-sidebar-top-title {
-      padding: 0px 0 0px 28px;
+      padding: 0px 0 0px 32px;
       margin: 0;
       margin-bottom: 16px;
 
@@ -430,7 +430,7 @@ div.left-navigation-sidebar {
         }
 
         div.internal {
-          padding: 4px 5px 1px 5px;
+          padding: 4px 5px 1px 4px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -440,7 +440,7 @@ div.left-navigation-sidebar {
 
           @include mobile() {
             width: auto;
-            padding: 0px;
+            padding: 0px 0px 0px 2px;
             margin-left: 0px;
 
             &.has-icon {
