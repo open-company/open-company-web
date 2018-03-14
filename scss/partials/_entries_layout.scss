@@ -9,6 +9,10 @@ div.entries-layout {
     div.entries-cards-container-row {
       display: flex;
 
+      &:first-child {
+        margin-top: 4px;
+      }
+
       @include mobile() {
         display: block;
         width: 100%;

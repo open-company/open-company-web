@@ -14,6 +14,7 @@
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.drafts-layout :refer (drafts-layout)]
+            [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -92,6 +93,7 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
+                              (rum/local nil ::board-switch)
                               {:before-render (fn [s]
                                 ;; Check if it still needs the add post tooltip
                                 (activity-actions/check-add-post-tooltip)
@@ -102,6 +104,10 @@
                                 ;; Update window width on window resize
                                 (reset! (::resize-listener s)
                                  (events/listen js/window EventType/RESIZE #(reset! (::ww s) (responsive/ww))))
+                                (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
+                                      cookie-value (cook/get-cookie board-view-cookie)
+                                      board-view (or (keyword cookie-value) :stream)]
+                                  (reset! (::board-switch s) board-view))
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -132,21 +138,19 @@
                           (zero? (count (:fixed-items board-data))))
         sidebar-width (+ responsive/left-navigation-sidebar-width
                          responsive/left-navigation-sidebar-minimum-right-margin)
-        container-width (if (utils/in? (:route route) "all-posts")
-                          responsive/all-posts-container-width
-                          responsive/board-container-width)
         board-container-style {:marginLeft (if is-mobile-size?
                                              "0px"
                                              (str (max
                                                    sidebar-width
                                                    (+
                                                     (/
-                                                     (- @(::ww s) container-width sidebar-width)
+                                                     (- @(::ww s) responsive/dashboard-container-width sidebar-width)
                                                      2)
                                                     sidebar-width))
                                              "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
+        board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         compose-fn (fn [_]
                     (utils/remove-tooltips)
                     (activity-actions/entry-edit (get-board-for-edit s)))
@@ -221,7 +225,33 @@
                     {:on-click compose-fn}
                     [:div.add-to-board-pencil]
                     [:label.add-to-board-label
-                      "Compose"]]])]
+                      "Compose"]]
+                  (when @(::show-top-boards-dropdown s)
+                    (dropdown-list
+                     {:items (map
+                              #(-> %
+                                (select-keys [:name :slug])
+                                (clojure.set/rename-keys {:name :label :slug :value}))
+                              (vals all-boards))
+                      :value ""
+                      :on-blur #(reset! (::show-top-boards-dropdown s) false)
+                      :on-change (fn [item]
+                                   (reset! (::show-top-boards-dropdown s) false)
+                                   (activity-actions/entry-edit {:board-slug (:value item)
+                                                                 :board-name (:label item)}))}))])
+              (when (and (not is-mobile-size?)
+                         (not is-drafts-board))
+                [:div.board-switcher.group
+                  [:button.mlb-reset.board-switcher-bt.stream-view
+                    {:class (when (= @(::board-switch s) :stream) "active")
+                     :on-click #(do
+                                  (reset! (::board-switch s) :stream)
+                                  (cook/set-cookie! board-view-cookie "stream" (* 60 60 24 365)))}]
+                  [:button.mlb-reset.board-switcher-bt.grid-view
+                    {:class (when (= @(::board-switch s) :grid) "active")
+                     :on-click #(do
+                                  (reset! (::board-switch s) :grid)
+                                  (cook/set-cookie! board-view-cookie "grid" (* 60 60 24 365)))}]])]
             (when (drv/react s :show-add-post-tooltip)
               [:div.add-post-tooltip-container.group
                 [:button.mlb-reset.add-post-tooltip-dismiss
@@ -241,7 +271,8 @@
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; All Posts
-              is-all-posts
+              (and is-all-posts
+                   (= @(::board-switch s) :stream))
               (all-posts)
               ;; Empty board
               empty-board?
@@ -252,9 +283,12 @@
                 ;; Drafts
                 is-drafts-board
                 (drafts-layout board-data)
-                ;; Entries
+                ;; Entries grid view
+                (= @(::board-switch s) :grid)
+                (entries-layout)
+                ;; Entries stream view
                 :else
-                (entries-layout)))
+                (section-stream)))
             ;; Add entry floating button
             (when (and (not (:read-only org-data))
                        (or (utils/link-for (:links board-data) "create")

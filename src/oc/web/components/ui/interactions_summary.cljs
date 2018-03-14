@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.interactions-summary
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -28,6 +29,25 @@
               (str "You and +" (dec (:count max-reaction)))
               (str "You reacted" (when-not (responsive/is-mobile-size?) " to this")))
             (str "+" (:count max-reaction)))]])))
+
+(defn get-author-name [author]
+  (if (= (:user-id author) (jwt/user-id))
+    "you"
+    (if (seq (:first-name author))
+      (:first-name author)
+      (first (string/split (:name author) " ")))))
+
+(defn comment-summary-string [authors]
+  (case (count authors)
+    0 ""
+    1 (str (string/capital (get-author-name (first authors))) " commented")
+    2 (str (string/capital (get-author-name (first authors))) " and " (get-author-name (second authors)) " commented")
+    3 (str (string/capital (get-author-name (first authors))) ", "
+           (get-author-name (second authors)) " and "
+           (get-author-name (nth authors 2)) " commented")
+    (str (string/capital (get-author-name (first authors))) ", "
+         (get-author-name (second authors)) " and "
+         (- (count authors) 2) " others commented")))
 
 (rum/defcs comments-summary < rum/static
                               rum/reactive
@@ -60,12 +80,9 @@
         ; Comments count
         [:div.is-comments-summary
           {:class (str "comments-count-" (:uuid entry-data))}
-          (str comments-count
-            (when-not (responsive/is-mobile-size?)
-              (str
-               " comment"
-               (when (or (zero? comments-count) (> comments-count 1))
-                 "s"))))]])))
+          (if (responsive/is-tablet-or-mobile?)
+            (comment-summary-string comments-authors)
+            (str comments-count " comment" (when (> comments-count 1) "s")))]])))
 
 (rum/defcs interactions-summary < rum/static
   [s entry-data show-zero-comments?]

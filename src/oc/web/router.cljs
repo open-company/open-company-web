@@ -124,6 +124,11 @@
   [org-slug]
   (str "last-board-" (when (jwt/jwt) (str (jwt/user-id) "-")) (name org-slug)))
 
+(defn last-board-view-cookie
+  "Cookie to save the last view used: grid or stream"
+  [org-slug]
+  (str "last-board-view-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
+
 (defn last-used-board-slug-cookie
   "Cookie to save the last board slug used in a post creation"
   [org-slug]
