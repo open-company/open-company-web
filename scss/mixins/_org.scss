@@ -1,6 +1,49 @@
+@mixin oc-letter($max_logo_height) {
+  position: relative;
+
+  &:before {
+    content: attr(data-letter);
+    width: #{$max_logo_height}px;
+    height: #{$max_logo_height}px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: $coral;
+    text-align: center;
+    color: $carrot_orange;
+    @include avenir_H();
+    font-size: #{$max_logo_height * 0.56}px;
+    vertical-align: middle;
+    border-radius: 4px;
+    padding-top: #{$max_logo_height * 0.531}px;
+  }
+
+  img.org-avatar-img {
+    display: none;
+  }
+
+  span.org-name {
+    display: none;
+  }
+}
+
 @mixin org-avatar($max_logo_height: 42){
   div.org-avatar-container {
     line-height: 0;
+
+    &.no-avatar {
+      @include mobile() {
+        @include oc-letter($max_logo_height);
+      }
+
+      &.force-label {
+        @include oc-letter($max_logo_height);
+
+        span.org-name {
+          display: block;
+        }
+      }
+    }
 
     img.org-avatar-img{
       max-width: #{$max_logo_height * 8}px;
