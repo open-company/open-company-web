@@ -248,6 +248,7 @@ div.entry-edit-modal-container {
       @include mobile() {
         @include avenir_H();
         font-size: 15px;
+        width: calc(100% - 78px);
       }
 
       div.board-name {
@@ -258,8 +259,17 @@ div.entry-edit-modal-container {
         position: relative;
         float: left;
 
+        @include mobile() {
+          float: unset;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
         &:after {
-          float: right;
+          position: absolute;
+          top: 0px;
+          left: 6px;
           content: "";
           background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 8px 8px;
@@ -269,15 +279,15 @@ div.entry-edit-modal-container {
           border-radius: 10px;
           width: 20px;
           height: 20px;
-          margin-top: 0px;
-          margin-left: 6px;
           opacity: 0.8;
 
           @include mobile() {
-            width: 8px 5px;
             margin-top: -3px;
             background-size: 8px 5px;
-            background-position: 0px 9px;
+            background-position: 12px 9px;
+            top: 0px;
+            left: unset;
+            right: 0px;
             background-color: transparent;
             background-image: cdnUrl("/img/ML/board_chevron_green.svg");
           }
@@ -366,28 +376,6 @@ div.entry-edit-modal-container {
           float: left;
           margin-top: 5px;
           margin-left: 16px;
-
-          @include mobile() {
-            font-size: 15px;
-            color: $carrot_text_blue_3;
-            background-color: $carrot_light_blue_2;
-            height: 48px;
-            padding: 14px 24px 0px;
-            float: none;
-            margin-top: 64px;
-            margin-left: 0px;
-
-            &.active {
-              background-color: $carrot_text_blue_3;
-
-              div.boards-dropdown-caret {
-                color: white;
-                &:after {
-                  background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
-                }
-              }
-            }
-          }
 
           span {
             float: left;
