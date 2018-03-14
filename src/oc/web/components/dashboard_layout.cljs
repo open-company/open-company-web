@@ -174,8 +174,10 @@
                                     (dis/dispatch! [:section-edit-save]))))])
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
-          (when (and is-mobile?
-                     (not mobile-navigation-sidebar))
+          ;; Show the board always on desktop and
+          ;; on mobile only when the navigation menu is not visible
+          (when (or (not is-mobile?)
+                    (not mobile-navigation-sidebar))
             [:div.board-container.group
               {:class (when is-all-posts "all-posts-container")
                :style board-container-style}
