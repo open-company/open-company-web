@@ -95,3 +95,21 @@
         (reset! previous-scrolls (assoc @previous-scrolls (:-scroll-index s) nil))
         (dissoc s :-scroll-listener))
       s))})
+
+(defn render-on-resize
+  "Trigger a re-render when the window resizes."
+  [resize-cb]
+  {:init (fn [s]
+    (assoc s :render-on-rezie-trigger (atom 0)))
+   :will-mount (fn [s]
+    (assoc s :render-on-resize-listener
+     (events/listen js/window EventType/RESIZE
+      (fn [e]
+        (when (fn? resize-cb)
+          (resize-cb s e))
+        (reset! (:render-on-resize-trigger s) (.getTime (new js/Date)))))))
+   :will-unmount (fn [s]
+    (let [resize-listener (:render-on-resize-listener s)]
+      (when resize-listener
+        (events/unlistenByKey (:render-on-resize-listener s)))
+      (dissoc s :render-on-resize-listener :render-on-resize-trigger)))})

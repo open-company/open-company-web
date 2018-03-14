@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]
@@ -14,12 +15,13 @@
             [oc.web.components.search :refer (search-box)]))
 
 (rum/defcs navbar < rum/reactive
-                     (drv/drv :navbar-data)
-                     {:did-mount (fn [s]
-                                  (when-not (utils/is-test-env?)
-                                    (when-not (responsive/is-tablet-or-mobile?)
-                                      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
-                                  s)}
+                    (drv/drv :navbar-data)
+                    (ui-mixins/render-on-resize nil)
+                    {:did-mount (fn [s]
+                     (when-not (utils/is-test-env?)
+                       (when-not (responsive/is-tablet-or-mobile?)
+                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
+                     s)}
   [s disabled-user-menu]
   (let [{:keys [current-user-data
                 org-data

@@ -200,7 +200,6 @@
                              (rum/local false ::showing-dropdown)
                              (rum/local false ::move-activity)
                              (rum/local nil ::window-click)
-                             (rum/local false ::resize-listener)
                              ;; Editing locals
                              (rum/local "" ::initial-headline)
                              (rum/local "" ::initial-body)
@@ -211,10 +210,10 @@
                              (rum/local false ::edited-data-loaded)
                              (rum/local nil ::autosave-timer)
                              (rum/local false ::show-legend)
-                             (rum/local false ::re-render)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
+                             (mixins/render-on-resize nil)
                              mixins/first-render-mixin
 
                              {:before-render (fn [s]
@@ -253,9 +252,6 @@
                                (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
                                  ;; Force comments reload
                                  (comment-actions/get-comments (:activity-data modal-data)))
-                               (reset! (::resize-listener s)
-                                (events/listen js/window EventType/RESIZE
-                                 #(reset! (::re-render s) true)))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -271,9 +267,6 @@
                                (when @(::window-click s)
                                  (events/unlistenByKey @(::window-click s))
                                  (reset! (::window-click s) nil))
-                               (when @(::resize-listener s)
-                                 (events/unlistenByKey @(::resize-listener s))
-                                 (reset! (::resize-listener s) false))
                                (when @(::headline-input-listener s)
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
