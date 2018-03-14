@@ -171,7 +171,7 @@
                                (close-navigation-sidebar))
                    :title "Create a new section"
                    :data-placement "top"
-                   :data-toggle "tooltip"
+                   :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
                    :data-container "body"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
