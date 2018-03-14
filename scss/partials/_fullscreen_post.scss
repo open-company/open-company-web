@@ -301,6 +301,88 @@ div.fullscreen-post-container {
           @include avenir_M();
           font-size: 14px;
           color: $ui_grey;
+
+          &.section-editing {
+            color: $carrot_dark_gray;
+
+            @include mobile() {
+              float: none;
+              margin-left: 0px;
+              font-size: 15px;
+            }
+
+            span.posting-in-span {
+              float: left;
+            }
+
+            div.boards-dropdown-caret {
+              @include avenir_M();
+              color: $carrot_green;
+              float: left;
+              margin-left: 6px;
+              cursor: pointer;
+              position: relative;
+
+              @include mobile() {
+                @include avenir_H();
+                font-size: 15px;
+              }
+
+              div.board-name {
+                @include avenir_M();
+                color: $carrot_green;
+                margin-bottom: 0px;
+                cursor: pointer;
+                position: relative;
+                float: left;
+
+                &:after {
+                  float: right;
+                  content: "";
+                  background-image: cdnUrl("/img/ML/board_settings.svg");
+                  background-size: 8px 8px;
+                  background-repeat: no-repeat;
+                  background-position: center;
+                  background-color: $deep_tan;
+                  border-radius: 10px;
+                  width: 20px;
+                  height: 20px;
+                  margin-top: 0px;
+                  margin-left: 6px;
+                  opacity: 0.8;
+
+                  @include mobile() {
+                    width: 8px 5px;
+                    margin-top: -3px;
+                    background-size: 8px 5px;
+                    background-position: 0px 9px;
+                    background-color: transparent;
+                    background-image: cdnUrl("/img/ML/board_chevron_green.svg");
+                  }
+
+                  &:hover {
+                    opacity: 1;
+                  }
+                }
+              }
+
+              div.sections-picker-container {
+                position: absolute;
+                top: 32px;
+                left: 50%;
+                margin-left: -180px;
+                z-index: 1000;
+
+                @include mobile() {
+                  position: fixed;
+                  top: 0px;
+                  left: 0px;
+                  margin-left: 0px;
+                  z-index: 1500;
+                }
+              }
+            }
+          }
         }
 
         div.fullscreen-post-box-content-headline {

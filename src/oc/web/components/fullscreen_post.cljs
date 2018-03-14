@@ -22,6 +22,7 @@
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
 
 ;; Unsaved edits handling
@@ -239,13 +240,27 @@
                                  (when (and (:modal-editing modal-data)
                                             @(::entry-saving s))
                                    (let [entry-edit (:modal-editing-data modal-data)
+                                         activity-data (:activity-data modal-data)
+                                         dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop modal-data)
                                          initial-body (:body entry-edit)
                                          initial-headline (utils/emojify (:headline entry-edit))]
                                      (when-not (:loading entry-edit)
                                        (when-not (:error entry-edit)
                                          (reset! (::initial-headline s) initial-headline)
                                          (reset! (::initial-body s) initial-body)
-                                         (stop-editing s))
+                                         (stop-editing s)
+                                         (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
+                                         (cond
+                                           ;; If the board change redirect to the board since the url we have is
+                                           ;; not correct anymore
+                                           (not= (:board-slug entry-edit) (router/current-board-slug))
+                                           (router/nav!
+                                            (if (:from-all-posts @router/path)
+                                              (oc-urls/all-posts)
+                                              (oc-urls/board (:board-slug entry-edit))))
+                                           ;; Dismiss editing if needed
+                                           dismiss-modal-on-editing-stop
+                                           (close-clicked s)))
                                        (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
                                        (reset! (::entry-saving s) false)))))
                                s)
@@ -287,7 +302,9 @@
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
         editing (:modal-editing modal-data)
-        activity-attachments (if editing (:attachments (:modal-editing-data modal-data)) (:attachments activity-data))]
+        activity-editing (:modal-editing-data modal-data)
+        activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
+        show-sections-picker (and editing (:show-sections-picker modal-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -321,7 +338,7 @@
           (if editing
             [:button.mlb-reset.post-publish-bt
               {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
-               :disabled (zero? (count (:headline (:modal-editing-data modal-data))))
+               :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
               "Post changes"]
             (more-menu activity-data))]]
@@ -340,8 +357,27 @@
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
-            [:div.fullscreen-post-box-content-board
-              {:dangerouslySetInnerHTML (utils/emojify (str "Posted to " (:board-name activity-data)))}]
+            (if editing
+              [:div.fullscreen-post-box-content-board.section-editing.group
+                [:span.posting-in-span
+                  "Posted to "]
+                [:div.boards-dropdown-caret
+                  [:div.board-name
+                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                    (:board-name activity-editing)]
+                  (when show-sections-picker
+                    (sections-picker (:board-slug activity-editing)
+                     (fn [section-data]
+                       ;; Dismiss the picker
+                       (dis/dispatch! [:input [:show-sections-picker] false])
+                       ;; Update the post if the user picked a section
+                       (when (and activity-editing
+                                  (not (empty? (:name section-data))))
+                        (dis/dispatch! [:input [:modal-editing-data]
+                         (merge activity-editing {:board-slug (:slug section-data)
+                                                  :board-name (:name section-data)})])))))]]
+              [:div.fullscreen-post-box-content-board
+                {:dangerouslySetInnerHTML (utils/emojify (str "Posted to " (:board-name activity-data)))}])
             [:div.fullscreen-post-box-content-headline
               {:content-editable editing
                :ref "edit-headline"
