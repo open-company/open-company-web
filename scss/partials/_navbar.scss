@@ -76,8 +76,10 @@ nav.oc-navbar {
         font-size: 26px;
 
         @include mobile() {
-          width: 220px;
-          margin-left: -110px;
+          width: 50%;
+          height: 32px;
+          margin-left: -25%;
+          margin-top: 4px;
         }
 
         button.orgs-dropdown div.org-avatar {
@@ -131,7 +133,7 @@ nav.oc-navbar {
         button.mobile-menu {
           font-size: 24px;
           padding: 0px;
-          margin-top: 4px;
+          margin-top: 2px;
 
           @include user-profile(32);
         }

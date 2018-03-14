@@ -14,7 +14,7 @@ div.org-avatar {
   }
 
   @include big_web(){
-    @include org-avatar(42);
+    @include org-avatar(40);
   }
 
   @include mobile(){
