@@ -115,11 +115,11 @@ div.left-navigation-sidebar {
   @include no-user-select();
 
   @include mobile() {
-    position: absolute;
-    width: 100vw;
+    position: unset;
+    top: unset;
+    left: unset;
+    width: 100%;
     min-height: 100vh;
-    top: 0px;
-    left: 0px;
     display: none;
     z-index: 10000;
     background-color: white;
@@ -173,6 +173,7 @@ div.left-navigation-sidebar {
 
     @include mobile() {
       padding-top: 64px;
+      position: relative;
     }
   }
 

@@ -24,6 +24,7 @@
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
+            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
@@ -114,7 +115,8 @@
                 show-section-editor
                 show-section-add
                 show-sections-picker
-                entry-editing-board-slug]} (drv/react s :org-dashboard-data)
+                entry-editing-board-slug
+                mobile-navigation-sidebar]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (some #{nux} [:1 :2 :3])
         search-active? (drv/react s search/search-active?)
@@ -194,6 +196,10 @@
           ;; Search results
           (and is-mobile? search-active? (not (router/current-activity-id)))
           (search-results-view)
+          ;; Show mobile navigation
+          (and is-mobile?
+               mobile-navigation-sidebar)
+          (navigation-sidebar)
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
@@ -224,7 +230,8 @@
                            should-show-onboard-overlay?
                            is-sharing-activity
                            show-section-add
-                           show-section-editor))
+                           show-section-editor
+                           mobile-navigation-sidebar))
           [:div.page
             (navbar)
             [:div.org-dashboard-container

@@ -173,7 +173,8 @@
                                   (when board-data
                                     (dis/dispatch! [:section-edit-save]))))])
         [:div.dashboard-layout-container.group
-          (navigation-sidebar)
+          (when-not is-mobile?
+            (navigation-sidebar))
           ;; Show the board always on desktop and
           ;; on mobile only when the navigation menu is not visible
           (when (or (not is-mobile?)
