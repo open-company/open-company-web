@@ -100,7 +100,7 @@
   "Trigger a re-render when the window resizes."
   [resize-cb]
   {:init (fn [s]
-    (assoc s :render-on-rezie-trigger (atom 0)))
+    (assoc s :render-on-resize-trigger (atom 0)))
    :will-mount (fn [s]
     (assoc s :render-on-resize-listener
      (events/listen js/window EventType/RESIZE
