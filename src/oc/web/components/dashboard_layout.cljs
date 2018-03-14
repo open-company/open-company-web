@@ -161,6 +161,7 @@
         show-drafts (pos? (:count drafts-link))]
       ;; Entries list
       [:div.dashboard-layout.group
+        ;; Show create new section for desktop
         (when (and show-section-add
                    (not (responsive/is-tablet-or-mobile?)))
           [:div.section-add
@@ -194,11 +195,14 @@
                        :data-container "body"
                        :title (str (:name board-data) " settings")
                        :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
+                    ;; Show section settings for desktop
                     (when (and show-section-editor
                                (not (responsive/is-tablet-or-mobile?)))
                       (section-editor board-data
-                       #(when %
-                          (dis/dispatch! [:section-edit-save]))))])
+                       (fn [section-data]
+                         (dis/dispatch! [:input [:show-section-editor] false])
+                         (when section-data
+                           (dis/dispatch! [:section-edit-save])))))])
                 (when (= (:access board-data) "private")
                   [:div.private-board
                     {:data-toggle "tooltip"
