@@ -69,7 +69,7 @@
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug fixed-board-data]]
-  (let [board-key (dispatcher/board-data-key org-slug (:slug new-board-data))]
+  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data))]
   (-> db
     (assoc-in board-key fixed-board-data)
     (dissoc :section-editing)
