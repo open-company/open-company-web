@@ -360,7 +360,7 @@
             (if editing
               [:div.fullscreen-post-box-content-board.section-editing.group
                 [:span.posting-in-span
-                  "Posted to "]
+                  "Posted in "]
                 [:div.boards-dropdown-caret
                   [:div.board-name
                     {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
@@ -377,7 +377,7 @@
                          (merge activity-editing {:board-slug (:slug section-data)
                                                   :board-name (:name section-data)})])))))]]
               [:div.fullscreen-post-box-content-board
-                {:dangerouslySetInnerHTML (utils/emojify (str "Posted to " (:board-name activity-data)))}])
+                {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
             [:div.fullscreen-post-box-content-headline
               {:content-editable editing
                :ref "edit-headline"
