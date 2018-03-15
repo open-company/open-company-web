@@ -1,87 +1,226 @@
-@media (min-width: 768px) { /* not mobile */
-  div#wrap.wrap-pricing {
-    min-height: calc(100vh - 40px);
+/***** Pricing ******/
+
+div#wrap {
+  background-color: $oc_gray_8;
+
+  div.main.pricing {
+    width: 100%;
+
+    @include mobile() {
+      padding: 0 32px;
+    }
+
+    section {
+      @include mobile_to_tablet(){
+        padding: 0 32px;
+      }
+    }
+
+    section.pricing-header {
+      padding-top: 72px;
+      padding-bottom: 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+
+      div.balloon {
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 1;
+
+        @include mobile() {
+          display: none;
+        }
+
+        &.big-red {
+          @include image-2x("/img/ML/pricing_balloon_big_red");
+          background-size: 111px 103px;
+          width: 111px;
+          height: 103px;
+          top: 0px;
+          left: 50%;
+          margin-left: -600px;
+        }
+
+        &.big-green {
+          @include image-2x("/img/ML/slack_balloon_big_green");
+          background-size: 172px 172px;
+          width: 172px;
+          height: 172px;
+          top: 6px;
+          right: -50px;
+        }
+
+        &.small-blue {
+          @include image-2x("/img/ML/pricing_balloon_small_blue");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 105px;
+          right: 159px;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/pricing_balloon_big_purple");
+          background-size: 256px 222px;
+          width: 256px;
+          height: 222px;
+          top: 225px;
+          // transform: rotate(160deg);
+          left: 50%;
+          margin-left: -558px;
+        }
+      }
+
+      h1.pricing-headline {
+        font-size: 48px;
+        @include avenir_H();
+        color: $deep_navy;
+        margin-top: 88px;
+      }
+
+      div.pricing-block {
+        width: 940px;
+        padding: 32px 8px;
+        background-color: white;
+        border-radius: 6px;
+        box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
+        margin: 80px auto 72px;
+        position: relative;
+        z-index: 2;
+
+        div.pricing-block-column {
+          text-align: center;
+          float: left;
+          width: 33.33%;
+          @include avenir_H();
+          color: $deep_navy;
+          padding: 0px 40px;
+
+          &:not(:first-child):not(:last-child) {
+            border-left: 1px solid $light_tan;
+            border-right: 1px solid $light_tan;
+          }
+
+          &.free-column {
+            div.price-column-price {
+              width: 80px;
+            }
+
+            button.price-button {
+              margin-top: 100px;
+            }
+          }
+
+          &.standard-column {
+            div.price-column-price {
+              width: 80px;
+            }
+          }
+
+          &.plus-column {
+            div.price-column-price {
+              width: 116px;
+            }
+          }
+
+          div.price-column-title {
+            font-size: 26px;
+          }
+
+          div.price-column-price {
+            font-size: 56px;
+            position: relative;
+            margin: 8px auto;
+            width: 48px;
+
+            &:before {
+              content: "$";
+              color: $ui_grey;
+              font-size: 16px;
+              position: absolute;
+              top: 16px;
+              left: 0px;
+              width: 24px;
+              height: 24px;
+            }
+          }
+
+          div.price-column-description {
+            margin-top: 8px;
+            @include avenir_M();
+            font-size: 16px;
+
+            &.second-line {
+              margin-top: 16px;
+            }
+
+            &.more-info {
+              @include avenir_H();
+              position: relative;
+              margin-top: 24px;
+
+              &:after {
+                content: "";
+                position: absolute;
+                top: 1px;
+                right: 0px;
+                background-image: cdnUrl("/img/ML/pricing_more_info.svg");
+                background-size: 16px 16px;
+                background-position: center;
+                background-repeat: no-repeat;
+                width: 16px;
+                height: 16px;
+              }
+            }
+          }
+
+          button.price-button {
+            margin: 24px auto 0px;
+            background-color: $sea_blue;
+            color: white;
+            font-size: 16px;
+            width: 175px;
+            height: 40px;
+            border-radius: 100px;
+          }
+        }
+      }
+
+      div.enterprise-block {
+        background-color: $light_gold;
+        border-radius: 8px;
+        width: 940px;
+        margin: 40px auto 0px;
+        padding: 24px;
+        text-align: center;
+
+        span.enterprise-block-title {
+          @include avenir_H();
+          color: $deep_navy;
+          font-size: 16px;
+        }
+
+        span.enterprise-block-copy {
+          @include avenir_R();
+          color: $ui_grey;
+          font-size: 16px;
+          margin: 0px 8px;
+        }
+
+        a.enterprise-block-link {
+          @include avenir_M();
+          font-size: 16px;
+          color: $sea_blue;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
   }
 }
-
-@media (min-width: 768px) { /* not mobile */
-  div.container.pricing {
-    margin-bottom: 40px;
-  }
-}
-
-@media (max-width: 767px) { /* mobile */
-  div.container.pricing {
-    margin-bottom: 20px;
-  }
-}
-
-@media (min-width: 768px) { /* not mobile */
-  div.container.pricing div.left {
-    padding-right: 40px;
-  }
-  div.container.pricing div.right {
-    padding-left: 40px;
-  }
-}
-
-div.price-box {
-  border: 1px solid $oc_gray_5;
-  border-radius: 6px;
-  padding: 15px 30px 0px 30px;
-  height: 90%;
-}
-
-@media (min-width: 768px) { /* not mobile */
-  div.price-box {
-    margin-top: 60px;
-  }
-}
-
-@media (max-width: 767px) { /* mobile */
-  div.price-box {
-    margin-top: 20px;
-  }
-}
-
-div.container.pricing h1 {
-  @include avenir_M();
-  font-size: 24px;
-  line-height: 1.1;
-  color: $oc_gray_5;
-  text-align: center;
-}
-
-div.container.pricing span.cost {
-  @include avenir_H();
-  font-size: 24px;
-  line-height: 1.1;
-  color: $oc_gray_5;
-}
-
-@media (min-width: 768px) { /* not mobile */
-  div.row.equal {
-    display: flex;
-    flex: 1 1 auto;
-    margin-bottom: 70px;
-  }
-}
-
-@media (max-width: 767px) { /* mobile */
-  div.row.equal {
-    margin-bottom: 20px;
-  }
-}
-
-@media (min-width: 768px) { /* not mobile */
-  img#oc-logo-gold {
-    display:block;
-    margin:auto;
-    margin-top: 15px;
-    margin-bottom: 40px;
-  }
-}
-@media (max-width: 767px) { /* mobile */
-  img#oc-logo-gold {
-    display:none;
-  }}

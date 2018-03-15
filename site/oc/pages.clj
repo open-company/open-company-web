@@ -275,51 +275,68 @@
 (defn pricing
   "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
   [options]
-   [:div.container.outer.sector.content
-    [:div.row
-     [:div.col-md-12.pricing-header
-      [:h2 "Simple Pricing"]
-      [:p "Transparent prices for any need."]]]
-    [:div.row
-     "<!-- Pricing Item -->"
-     [:div.col-md-4
-      [:div.pricing.hover-effect
-       [:div.pricing-name
-        [:h3 "Team"
-         [:span "Internal Slack distrbution"]]]
-       [:div.pricing-price [:h4 [:i "$"] "25" [:span "Per Month"]]]
-       [:ul.pricing-content.list-unstyled
-        [:li "Stakeholder dashboard"]
-        [:li "Rich Slack integration"]]
-       [:div.pricing-footer
-        [:p "Perfect for keeping your team members informed."]
-        [:p "Optionally involve the crowd with a public stakeholder dashboard."]]]]
-     [:div.col-md-4
-      [:div.pricing.hover-effect
-       [:div.pricing-name
-        [:h3 "Stakeholders"
-         [:span "Periodic stakeholder updates"]]]
-       [:div.pricing-price [:h4 [:i "$"] "50" [:span "Per Month"]]]
-       [:ul.pricing-content.list-unstyled
-        [:li "Stakeholder dashboard"]
-        [:li "Rich Slack integration"]
-        [:li [:b "Periodic stakeholder updates"]]]
-       [:div.pricing-footer
-        [:p "Keep your busy investors and advisors informed with periodic updates that follow best practices."]]]]
-     [:div.col-md-4
-      [:div.pricing.hover-effect
-       [:div.pricing-name
-        [:h3 "Concierge"
-         [:span "Beautifully designed content"]]]
-       [:div.pricing-price [:h4 [:i "$"] "250" [:span "Per Month"]]]
-       [:ul.pricing-content.list-unstyled
-        [:li "Stakeholder dashboard"]
-        [:li "Rich Slack integration"]
-        [:li "Periodic stakeholder updates"]
-        [:li [:b "Concierge support to desgin custom stakeholder content *"]]]
-       [:div.pricing-footer
-        [:p "Impress your investors and advisors with beautful, concise and meaningful updates."]]]]
-     ]])
+  [:div
+    {:id "wrap"}
+    [:div.main.pricing
+      [:section.pricing-header
+        ;; Top left
+        [:div.balloon.big-red]
+        [:div.balloon.big-green]
+        [:div.balloon.small-blue]
+        [:div.balloon.big-purple]
+
+        [:h1.pricing-headline
+          "Pricing guide"]
+
+        [:div.pricing-block.group
+          [:div.pricing-block-column.free-column
+            [:div.price-column-title
+              "Free"]
+            [:div.price-column-price
+              "0"]
+            [:div.price-column-description
+              "Free for small teams for an unlimited period of time"]
+            [:button.mlb-reset.price-button
+              {}
+              "Create a digest"]]
+
+          [:div.pricing-block-column.standard-column
+            [:div.price-column-title
+              "Standard"]
+            [:div.price-column-price
+              "8"]
+            [:div.price-column-description
+              "Per contributor per month billed annually"]
+            [:div.price-column-description.second-line
+              "Or $10 billed monthly"]
+            [:div.price-column-description.more-info
+              "Viewers are always free"]
+            [:button.mlb-reset.price-button
+              {}
+              "Buy standard"]]
+
+          [:div.pricing-block-column.plus-column
+            [:div.price-column-title
+              "Plus"]
+            [:div.price-column-price
+              "12"]
+            [:div.price-column-description
+              "Per contributor per month billed annually"]
+            [:div.price-column-description.second-line
+              "Or $14 billed monthly"]
+            [:div.price-column-description.more-info
+              "Viewers are always free"]
+            [:button.mlb-reset.price-button
+              {}
+              "Buy plus"]]]
+        [:div.enterprise-block
+          [:span.enterprise-block-title
+            "Enterprise Edition"]
+          [:span.enterprise-block-copy
+            "Let’s create a plan that’s right for your organization."]
+          [:a.enterprise-block-link
+            {:href (:contact-mail-to options)}
+            "Contact us"]]]]])
 
 (defn slack
   "Slack page. This is a copy of oc.web.components.slack and
