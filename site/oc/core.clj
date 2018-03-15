@@ -73,11 +73,11 @@
           {:href "/"
            :class (when (= active-page "index") "active")}
           "Home"]]
-      ; [:div.site-mobile-menu-item
-      ;   [:a
-      ;     {:href "/pricing"
-      ;      :class (when (= active-page "pricing") "active")}
-      ;     "Pricing"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/pricing"
+           :class (when (= active-page "pricing") "active")}
+          "Pricing"]]
       [:div.site-mobile-menu-item
         [:a
           {:href "/about"
@@ -140,6 +140,7 @@
             "COMPANY"]
           [:div.column-item [:a {:href "/"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
+          [:div.column-item [:a {:href "/pricing"} "Pricing"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
 
         [:div.column.column-resources
@@ -159,8 +160,8 @@
                "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "SUPPORT"]
-          ; [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
+          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
           [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
         [:div.column.column-integrations
