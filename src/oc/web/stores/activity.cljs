@@ -73,6 +73,6 @@
   (-> db
     (assoc-in board-key fixed-board-data)
     (dissoc :section-editing)
-    (update-in [:modal-editing-data] dissoc :publishing)
+    (update-in [:modal-editing-data] dissoc :loading)
     (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
     (dissoc :entry-toggle-save-on-exit))))
