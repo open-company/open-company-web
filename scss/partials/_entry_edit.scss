@@ -354,7 +354,7 @@ div.entry-edit-modal-container {
         height: 88px;
         width: 100%;
         padding: 28px 41px;
-        border-bottom: 1px solid $deep_tan;
+        border-bottom: 1px solid $light_tan;
 
         @include mobile() {
           display: none;
@@ -504,7 +504,7 @@ div.entry-edit-modal-container {
         margin: 0px;
         padding: 0px 42px 24px 42px;
         width: 100%;
-        border-bottom: 1px solid $deep_tan;
+        border-bottom: 1px solid $light_tan;
 
         @include mobile() {
           min-height: calc(100vh - 139px);
