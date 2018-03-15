@@ -101,7 +101,7 @@ div.entry-edit-modal-container {
         @include mobile() {
           float: right;
           width: 1px;
-          background-color: #D8DBDF;
+          background-color: $light_tan;
           height: 64px;
           margin: -20px 16px 0px 16px;
           display: block;
@@ -210,7 +210,7 @@ div.entry-edit-modal-container {
       width: calc(100% + 48px);
       margin-left: -24px;
       padding: 12px 24px;
-      border-top: 1px solid $light_ui_grey;
+      border-top: 1px solid $light_tan;
       display: none;
 
       @include mobile() {
