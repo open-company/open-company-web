@@ -319,12 +319,18 @@ div.left-navigation-sidebar {
       @include avenir_H();
 
       &:hover, &.active {
+        background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
         background-color: $carrot_green_2;
       }
 
       @include mobile() {
         background-color: #F0EFEA;
         float: right;
+
+        &:hover {
+          background-color: #F0EFEA;
+          background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+        }
       }
     }
   }
