@@ -139,7 +139,10 @@ div.left-navigation-sidebar {
     display: none;
     z-index: 10000;
     background-color: white;
-    max-height: initial;
+    max-height: unset;
+    height: unset;
+    overflow-y: unset;
+    overflow-x: unset;
 
     &.show-mobile-boards-menu {
       display: block;
@@ -151,10 +154,6 @@ div.left-navigation-sidebar {
 
     @include mobile() {
       display: block;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100vw;
       height: 64px;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     }
@@ -188,7 +187,6 @@ div.left-navigation-sidebar {
     padding-bottom: 32px;
 
     @include mobile() {
-      padding-top: 64px;
       position: relative;
       padding-bottom: 0px;
     }
