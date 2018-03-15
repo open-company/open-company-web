@@ -124,7 +124,7 @@
             {:ref "stream-item-reactions"}
             (reactions activity-data)]
           (when (and is-mobile?
-                     (not expanded?)
+                     (not @(::should-show-comments s))
                      (pos? (count comments-data)))
             [:div.stream-mobile-comments-summary
               {:on-click (fn [e]
