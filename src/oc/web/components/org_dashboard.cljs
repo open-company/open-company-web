@@ -2,6 +2,8 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -86,7 +88,19 @@
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
-                           {:did-mount (fn [s]
+                           (rum/local nil ::resize-listener)
+                           (rum/local false ::rerender)
+                           {:will-mount (fn [s]
+                             (reset! (::resize-listener s)
+                              (events/listen js/window EventType/RESIZE
+                               #(reset! (::rerender s) true)))
+                             s)
+                            :will-unmount (fn [s]
+                             (when @(::resize-listener s)
+                               (events/unlistenByKey @(::resize-listener s))
+                               (reset! (::resize-listener s) nil))
+                             s)
+                            :did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
                              s)}
