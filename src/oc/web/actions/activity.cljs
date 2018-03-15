@@ -112,6 +112,16 @@
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
+(defn entry-modal-save-with-board-finish [response]
+  (let [fixed-board-data (utils/fix-board new-board-data)]
+    (actions/save-last-used-section (:slug fixed-board-data))
+    (actions/remove-cached-item (-> db :modal-editing-data :uuid))
+    (api/get-org (dispatcher/org-data))
+    (when-not (= (:slug fixed-board-data) (router/current-board-slug))
+      ;; If creating a new board, start watching changes
+      (ws-cc/container-watch [(:uuid fixed-board-data)]))
+    (dis/dispatch! [:entry-save-with-board/finish fixed-board-data])))
+
 (defn entry-modal-save [activity-data board-slug section-editing]
   (timbre/debug section-editing)
   (if (= (:slug section-editing) utils/default-section-slug)
@@ -125,7 +135,7 @@
              [:input
               [:modal-editing-data :section-name-error]
               "Board name already exists or isn't allowed"])
-            (dis/dispatch! [:entry-save-with-board/finish (when success (json->cljs body))])))))
+            (entry-modal-save-with-board-finish (when success (json->cljs body)))))))
     (api/update-entry activity-data board-slug :modal-editing-data))
   (dis/dispatch! [:entry-modal-save]))
 
