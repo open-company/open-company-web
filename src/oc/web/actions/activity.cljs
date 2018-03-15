@@ -10,7 +10,8 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.user-cache :as uc]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.lib.ws-change-client :as ws-cc]))
 
 (defn load-cached-item
   [entry-data edit-key & [completed-cb]]
@@ -112,11 +113,11 @@
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
-(defn entry-modal-save-with-board-finish [response]
-  (let [fixed-board-data (utils/fix-board new-board-data)]
+(defn entry-modal-save-with-board-finish [activity-data response]
+  (let [fixed-board-data (utils/fix-board response)]
     (actions/save-last-used-section (:slug fixed-board-data))
-    (actions/remove-cached-item (-> db :modal-editing-data :uuid))
-    (api/get-org (dispatcher/org-data))
+    (actions/remove-cached-item (:uuid activity-data))
+    (api/get-org (dis/org-data))
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid fixed-board-data)]))
@@ -135,7 +136,7 @@
              [:input
               [:modal-editing-data :section-name-error]
               "Board name already exists or isn't allowed"])
-            (entry-modal-save-with-board-finish (when success (json->cljs body)))))))
+            (entry-modal-save-with-board-finish activity-data (when success (json->cljs body)))))))
     (api/update-entry activity-data board-slug :modal-editing-data))
   (dis/dispatch! [:entry-modal-save]))
 
