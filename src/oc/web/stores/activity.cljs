@@ -66,3 +66,24 @@
   (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
         next-attachments (filterv #(not= (:file-url %) (:file-url attachment-data)) old-attachments)]
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
+
+(defmethod dispatcher/action :entry-save-with-board/finish
+  [db [_ new-board-data]]
+  (let [org-slug (router/current-org-slug)
+        board-slug (:slug new-board-data)
+        board-key (dispatcher/board-data-key org-slug (:slug new-board-data))
+        fixed-board-data (utils/fix-board new-board-data)]
+    (save-last-used-section (:slug fixed-board-data))
+    (remove-cached-item (-> db :modal-editing-data :uuid))
+    (api/get-org (dispatcher/org-data))
+    (if (not= (:slug fixed-board-data) (router/current-board-slug))
+      ;; If creating a new board, start watching changes
+      (ws-cc/container-watch [(:uuid fixed-board-data)])
+      ;; If updating an existing board, refresh the org data
+      (api/get-org (dispatcher/org-data)))
+  (-> db
+    (assoc-in board-key fixed-board-data)
+    (dissoc :section-editing)
+    (update-in [:modal-editing-data] dissoc :publishing)
+    (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
+    (dissoc :entry-toggle-save-on-exit))))

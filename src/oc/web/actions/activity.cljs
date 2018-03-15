@@ -123,9 +123,9 @@
             ;; Board name exists
             (dis/dispatch!
              [:input
-              [:section-editing :section-name-error]
+              [:modal-editing-data :section-name-error]
               "Board name already exists or isn't allowed"])
-            (activity-edit activity-data)))))
+            (dis/dispatch! [:entry-save-with-board/finish (when success (json->cljs body))])))))
     (api/update-entry activity-data board-slug :modal-editing-data))
   (dis/dispatch! [:entry-modal-save]))
 
