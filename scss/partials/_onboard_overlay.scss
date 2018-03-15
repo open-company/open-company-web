@@ -177,10 +177,10 @@ div.onboard-overlay-container {
           @include image-2x("/img/ML/onboard_desktop_screenshot_2");
 
           @include mobile() {
-            width: 263px;
-            height: 231px;
+            width: 227px;
+            height: 200px;
             @include image-2x("/img/ML/mobile_onboard_overlay");
-            background-size: 263px 231px;
+            background-size: 227px 200px;
           }
         }
       }
