@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.actions :as actions]
             [oc.web.lib.cookies :as cook]
+            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.user-cache :as uc]
             [oc.web.lib.responsive :as responsive]))
 
@@ -111,8 +112,21 @@
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
-(defn entry-modal-save [activity-data board-slug]
-  (api/update-entry activity-data board-slug :modal-editing-data)
+(defn entry-modal-save [activity-data board-slug section-editing]
+  (timbre/debug section-editing)
+  (if (= (:slug section-editing) utils/default-section-slug)
+    (let [fixed-entry-data (dissoc activity-data :board-slug :board-name)
+          final-board-data (assoc section-editing :entries [fixed-entry-data])]
+      (api/create-board final-board-data
+        (fn [{:keys [success status body]}]
+          (if (= status 409)
+            ;; Board name exists
+            (dis/dispatch!
+             [:input
+              [:section-editing :section-name-error]
+              "Board name already exists or isn't allowed"])
+            (activity-edit activity-data)))))
+    (api/update-entry activity-data board-slug :modal-editing-data))
   (dis/dispatch! [:entry-modal-save]))
 
 (defn nux-next-step [next-step]
