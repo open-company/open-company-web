@@ -3,9 +3,20 @@
 
   @include mobile() {
     height: 70px;
-    margin: 0px 24px;
-    padding: 24px 0px;
-    border-bottom: 1px solid $light_tan;
+    padding: 24px;
+
+    &:not(:last-child) {
+      position: relative;
+      &:after {
+        content: "";
+        position: absolute;
+        width: calc(100% - 48px);
+        left: 24px;
+        bottom: 0px;
+        height: 1px;
+        background-color: $light_tan;
+      }
+    }
   }
 
   .internal {
@@ -16,11 +27,30 @@
     text-decoration: none;
 
     &.new {
-      @include avenir_B();
+      @include avenir_M();
+      color: $deep_navy;
     }
   }
 
-  div.all-posts-label, div.drafts-label {
+  div.drafts-label {
+    @include avenir_M();
+    font-size: 16px;
+    line-height: 1.71;
+    color: $ui_grey;
+    text-decoration: none;
+
+    span.count {
+      @include avenir_M();
+      font-size: 16px;
+      color: #C5C6C8;
+    }
+
+    &.new {
+      color: $deep_navy;
+    }
+  }
+
+  div.all-posts-label {
     @include avenir_H();
     font-size: 16px;
     line-height: 1.71;
@@ -32,10 +62,6 @@
       font-size: 16px;
       color: #C5C6C8;
     }
-
-    &.new {
-      @include avenir_B();
-    }
   }
 }
 
@@ -46,12 +72,11 @@
 
   @include mobile() {
     border-radius: 0px;
-    background-color: transparent;
   }
 
   .internal, div.all-posts-label, div.drafts-label {
     color: $carrot_green;
-    @include avenir_H();
+    @include avenir_M();
     font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
@@ -78,10 +103,6 @@
     font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
-
-    &.new {
-      @include avenir_B();
-    }
   }
 
   div.public, div.private, div.all-posts-icon {
@@ -90,14 +111,9 @@
 
   div.all-posts-label, div.drafts-label {
     color: $deep_navy;
-    @include avenir_H();
     font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
-
-    &.new {
-      @include avenir_B();
-    }
   }
 }
 
@@ -174,11 +190,16 @@ div.left-navigation-sidebar {
     @include mobile() {
       padding-top: 64px;
       position: relative;
+      padding-bottom: 0px;
     }
   }
 
   a.all-posts {
     margin-bottom: 40px;
+
+    @include mobile() {
+      margin-bottom: 0px;
+    }
 
     &.showing-drafts {
       margin-bottom: 0px;
@@ -254,9 +275,15 @@ div.left-navigation-sidebar {
   a.drafts {
     margin-bottom: 40px;
 
+    @include mobile() {
+      margin-bottom: 0px;
+    }
+
     &.hover-item {
       @include mobile() {
-        border-bottom: none;
+        &:after {
+          display: none;
+        }
       }
     }
   }
@@ -355,6 +382,10 @@ div.left-navigation-sidebar {
 
       &:last-child {
         margin-bottom: 10px;
+
+        @include mobile() {
+          margin-bottom: 0px;
+        }
       }
 
       &.hover-item {
