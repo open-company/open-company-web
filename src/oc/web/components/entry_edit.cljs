@@ -242,12 +242,10 @@
                                       (utils/after
                                        180
                                        #(let [from-ap (or (:from-all-posts @router/path)
-                                                          (= (router/current-board-slug) "all-posts"))
-                                              go-to-ap (or from-ap
-                                                           (not= (:status entry-editing) "published"))]
+                                                          (= (router/current-board-slug) "all-posts"))]
                                           ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
-                                            (if go-to-ap
+                                            (if from-ap
                                               (oc-urls/all-posts (router/current-org-slug))
                                               (oc-urls/board (router/current-org-slug)
                                                (:board-slug entry-editing))))))))))))
