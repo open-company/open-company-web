@@ -114,14 +114,15 @@
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
 (defn entry-modal-save-with-board-finish [activity-data response]
-  (let [fixed-board-data (utils/fix-board response)]
+  (let [fixed-board-data (utils/fix-board response)
+        org-slug (router/current-org-slug)]
     (actions/save-last-used-section (:slug fixed-board-data))
     (actions/remove-cached-item (:uuid activity-data))
     (api/get-org (dis/org-data))
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid fixed-board-data)]))
-    (dis/dispatch! [:entry-save-with-board/finish fixed-board-data])))
+    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
 
 (defn entry-modal-save [activity-data board-slug section-editing]
   (timbre/debug section-editing)

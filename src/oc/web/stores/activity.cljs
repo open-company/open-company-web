@@ -68,9 +68,8 @@
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
-  [db [_ fixed-board-data]]
-  (let [org-slug (router/current-org-slug)
-        board-key (dispatcher/board-data-key org-slug (:slug new-board-data))]
+  [db [_ org-slug fixed-board-data]]
+  (let [board-key (dispatcher/board-data-key org-slug (:slug new-board-data))]
   (-> db
     (assoc-in board-key fixed-board-data)
     (dissoc :section-editing)
