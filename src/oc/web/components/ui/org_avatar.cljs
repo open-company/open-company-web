@@ -9,8 +9,11 @@
 (def default-max-logo-height 42)
 
 (defn internal-org-avatar
-  [s org-data show-org-avatar? show-org-name?]
+  [s org-data show-org-avatar? show-org-name? force-label]
   [:div.org-avatar-container.group
+    {:data-letter (first (:name org-data))
+     :class (utils/class-set {:no-avatar (not show-org-avatar?)
+                              :force-label force-label})}
     (when show-org-avatar?
       [:img.org-avatar-img
         {:src (:logo-url org-data)
@@ -33,7 +36,7 @@
       auto means that it's shown if the org logo is empty."
   < rum/static
     (rum/local false ::img-load-failed)
-  [s org-data should-show-link & [show-org-name]]
+  [s org-data should-show-link & [show-org-name force-label]]
   (let [org-logo (:logo-url org-data)]
     [:div.org-avatar
       {:class (when (empty? org-logo) "missing-logo")}
@@ -67,5 +70,5 @@
                            (.preventDefault e)
                            (when should-show-link
                              (router/redirect! avatar-link)))}
-              (internal-org-avatar s org-data show-org-avatar? show-org-name?)]
-            (internal-org-avatar s org-data show-org-avatar? show-org-name?))))]))
+              (internal-org-avatar s org-data show-org-avatar? show-org-name? force-label)]
+            (internal-org-avatar s org-data show-org-avatar? show-org-name? force-label))))]))

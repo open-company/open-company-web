@@ -157,12 +157,7 @@ span.num.red {
 }
 
 .navbar-offset {
-  @include mobile(){
-    padding-top: #{$mobile_navbar_height}px;
-  }
-  @include big_web(){
-    padding-top: #{$navbar_height}px;
-  }
+  padding-top: #{$navbar_height}px;
 }
 
 div#wrap {

@@ -46,38 +46,29 @@
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
-          (if (responsive/is-mobile-size?)
-            [:div.nav.navbar-nav.navbar-left
-              [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-                {:on-click #(do
-                              (dis/dispatch! [:input [:mobile-menu-open] false])
-                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]
-             (search-box)]
-            [:div.nav.navbar-nav.navbar-left
-              (search-box)])
-          [:div.nav.navbar-nav.navbar-center
+          [:div.navbar-left
+            [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+              {:on-click #(do
+                            (dis/dispatch! [:input [:mobile-menu-open] false])
+                            (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]
+           (search-box)]
+          [:div.navbar-center
             (orgs-dropdown)]
-          [:ul.nav.navbar-nav.navbar-right
-            [:li
-              (if (responsive/is-mobile-size?)
-                [:button.btn-reset.mobile-menu.group
-                  {:on-click #(do
-                               (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                               (dis/dispatch! [:mobile-menu-toggle]))}
-                  (user-avatar-image current-user-data)]
-                (if (jwt/jwt)
-                  [:div.group
-                    [:div.dropdown.right
-                      (user-avatar
-                       {:classes (str "mlb-reset" (if disabled-user-menu " disabled-user-menu" " dropdown-toggle"))
-                        :disable-menu disabled-user-menu})
-                      (when-not disabled-user-menu
-                        (menu))]
-                    (comment ; FIXME: Remove the notification bell until we enable it.
-                      [:div.notification-bell.right
-                        [:img
-                          {:width 14 :height 16 :src (utils/cdn "/img/ML/alerts_bell.svg")}]])]
-                  (login-button)))]]]]
+          [:div.navbar-right
+            (if (responsive/is-mobile-size?)
+              [:button.btn-reset.mobile-menu.group
+                {:on-click #(do
+                             (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                             (dis/dispatch! [:mobile-menu-toggle]))}
+                (user-avatar-image current-user-data)]
+              (if (jwt/jwt)
+                [:div.user-menu
+                  (user-avatar
+                   {:classes (str "mlb-reset" (if disabled-user-menu " disabled-user-menu" " dropdown-toggle"))
+                    :disable-menu disabled-user-menu})
+                  (when-not disabled-user-menu
+                    (menu))]
+                (login-button)))]]]
       (when (responsive/is-mobile-size?)
         ;; Render the menu here only on mobile so it can expand the navbar
         (menu))
