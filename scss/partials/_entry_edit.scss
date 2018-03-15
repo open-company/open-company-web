@@ -258,6 +258,7 @@ div.entry-edit-modal-container {
         cursor: pointer;
         position: relative;
         float: left;
+        padding-right: 28px;
 
         @include mobile() {
           float: unset;
@@ -269,7 +270,7 @@ div.entry-edit-modal-container {
         &:after {
           position: absolute;
           top: 0px;
-          left: 6px;
+          right: 0px;
           content: "";
           background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 8px 8px;
