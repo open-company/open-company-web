@@ -242,10 +242,10 @@
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share
                           :add-comment-focus :comment-edit :ap-initial-at
-                          :comments-data :show-sections-picker]
+                          :comments-data :show-sections-picker :section-editing]
                           (fn [base org-data activity-data activity-share
                                add-comment-focus comment-edit ap-initial-at
-                               comments-data show-sections-picker]
+                               comments-data show-sections-picker section-editing]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
@@ -258,7 +258,8 @@
                              :comment-edit comment-edit
                              :comments-data comments-data
                              :ap-initial-at ap-initial-at
-                             :show-sections-picker show-sections-picker})]
+                             :show-sections-picker show-sections-picker
+                             :section-editing section-editing})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open

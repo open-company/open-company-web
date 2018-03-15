@@ -141,7 +141,7 @@
 (defn- save-editing? [state]
   (clean-body)
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
-        section-editing @(drv/get-ref state :section-editing)
+        section-editing (:section-editing modal-data)
         edited-data (:modal-editing-data modal-data)]
     (when (and (:has-changes edited-data)
                (pos? (count (:headline edited-data))))
@@ -196,7 +196,6 @@
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
                              (drv/drv :fullscreen-post-data)
-                             (drv/drv :section-editing)
                              ;; Locals
                              (rum/local false ::dismiss)
                              (rum/local false ::animate)
