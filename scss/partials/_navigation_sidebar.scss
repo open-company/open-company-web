@@ -85,6 +85,10 @@
       color: $carrot_green;
     }
   }
+
+  div.all-posts-label {
+    @include avenir_H();
+  }
 }
 
 @mixin item-hover(){
