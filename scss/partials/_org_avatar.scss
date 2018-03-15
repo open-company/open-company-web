@@ -1,10 +1,6 @@
 div.org-avatar {
   float: left;
 
-  @include mobile(){
-    width: 80%;
-  }
-
   a {
     padding: 0;
 
