@@ -231,12 +231,13 @@ div.drafts-layout {
 
           button.delete-draft {
             float: right;
-            width: 20px;
-            height: 20px;
+            width: 32px;
+            height: 32px;
+            margin-top: -5px;
             padding: 0;
             color: $carrot_green;
-            float: right;
             opacity: 0.5;
+            text-align: right;
 
             &:hover {
               opacity: 1;
@@ -253,7 +254,7 @@ div.drafts-layout {
             @include avenir_O();
             font-size: 14px;
             opacity: 0.5;
-            margin-right: 8px;
+            margin-right: 0px;
           }
         }
 
