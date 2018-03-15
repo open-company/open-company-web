@@ -123,7 +123,8 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-not (responsive/is-tablet-or-mobile?)
+    (when (and (not (responsive/is-tablet-or-mobile?))
+               (= (.-activeElement js/document) (.-body js/document)))
       (when-let [headline-el (rum/ref-node state "headline")]
         ; move cursor at the end
         (utils/to-end-of-content-editable headline-el)))))
