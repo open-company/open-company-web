@@ -99,7 +99,8 @@ div#wrap {
         font-size: 48px;
         @include avenir_H();
         color: $deep_navy;
-        margin-top: 88px;
+        min-width: 300px;
+        margin: 88px auto 0px;
       }
 
       div.pricing-block {
