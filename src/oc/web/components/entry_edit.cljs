@@ -164,13 +164,13 @@
                         (rum/local nil ::uploading-media)
                         (rum/local false ::saving)
                         (rum/local false ::publishing)
-                        (rum/local false ::window-resize-listener)
                         (rum/local false ::window-click-listener)
                         (rum/local nil ::autosave-timer)
                         (rum/local false ::show-legend)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
+                        (mixins/render-on-resize (fn [s _] (calc-entry-edit-modal-height s true)))
 
                         {:will-mount (fn [s]
                           (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -189,11 +189,6 @@
                           (when-not (responsive/is-tablet-or-mobile?)
                             (when-let [headline-el (rum/ref-node s "headline")]
                               (utils/to-end-of-content-editable headline-el)))
-                          (reset! (::window-resize-listener s)
-                           (events/listen
-                            js/window
-                            EventType/RESIZE
-                            #(calc-entry-edit-modal-height s true)))
                           (reset! (::window-click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(when (and @(::show-legend s)
@@ -259,9 +254,6 @@
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
-                          (when @(::window-resize-listener s)
-                            (events/unlistenByKey @(::window-resize-listener s))
-                            (reset! (::window-resize-listener s) nil))
                           (when @(::window-click-listener s)
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
