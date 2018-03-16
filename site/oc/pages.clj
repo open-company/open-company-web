@@ -336,7 +336,220 @@
             "Let’s create a plan that’s right for your organization."]
           [:a.enterprise-block-link
             {:href (:contact-mail-to options)}
-            "Contact us"]]]]])
+            "Contact us"]]]
+      [:section.second-section
+        [:h1.compare-plans
+          "Compare Plans"]
+
+        [:div.pricing-table
+          [:table
+            {:cellpadding "0"
+             :cellspacing "0"}
+            [:thead
+              [:tr
+                [:th]
+                [:th
+                  [:div
+                    "Free"]]
+                [:th
+                  [:div
+                    "Standard"]]
+                [:th
+                  [:div
+                    "Plus"]]]]
+            [:tbody
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Searchable posts"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Searchable posts"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td
+                  [:div "100"]]
+                [:td
+                  [:div "Unlimited"]]
+                [:td
+                  [:div "Unlimited"]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "History kept"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "History kept"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td
+                  [:div "Last 12 months"]]
+                [:td
+                  [:div "Unlimited"]]
+                [:td
+                  [:div "Unlimited"]]]
+              [:tr
+                [:td
+                  [:div "File storage"]]
+                [:td
+                  [:div "1 GB"]]
+                [:td
+                  [:div "10 GB"]]
+                [:td
+                  [:div "50 GB"]]]
+              [:tr
+                [:td
+                  [:div "File upload"]]
+                [:td
+                  [:div "25 MB"]]
+                [:td
+                  [:div "50 MB"]]
+                [:td
+                  [:div "100 MB"]]]
+              [:tr
+                [:td
+                  [:div "Slack single sign-on"]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Slack sync"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Slack sync"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Dropbox, Google Drive and other integrations"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Dropbox, Google Drive and other integrations"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "OAuth with Google"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "OAuth with Google"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Private and public visibility"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Private and public visibility"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Who read what"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Who read what"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div "Analytics"]]
+                [:td]
+                [:td]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div "Prioriy support"]]
+                [:td]
+                [:td]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div "Uptime SLA"]]
+                [:td]
+                [:td]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td]
+                [:td
+                  [:button.mlb-reset.price-button
+                    {}
+                    "Create a digest"]]
+                [:td
+                  [:button.mlb-reset.price-button
+                    {}
+                    "Buy standard"]]
+                [:td
+                  [:button.mlb-reset.price-button
+                    {}
+                    "Buy plus"]]]]]]]
+    ]])
 
 (defn slack
   "Slack page. This is a copy of oc.web.components.slack and

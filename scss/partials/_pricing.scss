@@ -18,7 +18,6 @@ div#wrap {
 
     section.pricing-header {
       padding-top: 72px;
-      padding-bottom: 80px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -87,7 +86,7 @@ div#wrap {
         background-color: white;
         border-radius: 6px;
         box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
-        margin: 80px auto 72px;
+        margin: 80px auto 32px;
         position: relative;
         z-index: 2;
 
@@ -179,12 +178,6 @@ div#wrap {
 
           button.price-button {
             margin: 24px auto 0px;
-            background-color: $sea_blue;
-            color: white;
-            font-size: 16px;
-            width: 175px;
-            height: 40px;
-            border-radius: 100px;
           }
         }
       }
@@ -218,6 +211,169 @@ div#wrap {
 
           &:hover {
             text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    button.price-button {
+      margin: px auto 0px;
+      background-color: $sea_blue;
+      color: white;
+      font-size: 16px;
+      width: 175px;
+      height: 40px;
+      border-radius: 100px;
+    }
+
+    section.second-section {
+      h1.compare-plans {
+        margin: 32px auto;
+        text-align: center;
+        @include avenir_M();
+        font-size: 34px;
+        color: $deep_navy;
+      }
+
+      div.pricing-table {
+        margin: 32px auto;
+        padding: 0px;
+        width: 940px;
+
+        div.check {
+          margin: 0px auto;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/pricing_table_check.svg");
+          background-position: center;
+          background-size: 24px 24px;
+          background-repeat: no-repeat;
+        }
+
+        div.more-info {
+          @include avenir_R();
+          font-size: 16px;
+          color: $deep_navy;
+          position: relative;
+
+          span.more-info-icon {
+            display: inline-block;
+            background-image: cdnUrl("/img/ML/pricing_more_info.svg");
+            background-size: 16px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 16px;
+            height: 16px;
+            margin-left: 8px;
+            margin-top: 2px;
+          }
+
+          &:hover {
+            div.more-info-bubble {
+              display: block;
+            }
+          }
+
+          div.more-info-bubble {
+            display: none;
+            width: 260px;
+            padding: 24px;
+            background-color: white;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba($deep_tan, 0.7);
+            position: absolute;
+            top: 20px;
+            right: -100%;
+
+            div.more-info-title {
+              @include avenir_H();
+              font-size: 14px;
+              color: $deep_navy;
+            }
+
+            div.more-info-desc {
+              margin-top: 16px;
+              @include avenir_BOOK();
+              font-size: 14px;
+              color: $deep_navy;
+            }
+          }
+        }
+
+        table {
+          margin: 0px;
+          padding: 0px;
+          border: none;
+          width: 100%;
+          text-align: center;
+          border-top: 2px solid $deep_tan;
+          border-bottom: 2px solid $deep_tan;
+
+          thead {
+            padding: 0px;
+            margin: 0px;
+
+            tr {
+              padding: 0px;
+              margin: 0px;
+              height: 75px;
+              border-bottom: 2px solid $deep_tan;
+
+              th {
+                padding: 0px;
+                margin: 0px;
+                width: 25%;
+                text-align: center;
+
+                &:not(:first-child):not(:last-child) {
+                  border-left: 1px solid $deep_tan;
+                  border-right: 1px solid $deep_tan;
+                }
+              }
+            }
+          }
+
+          tbody {
+            padding: 0px;
+            margin: 0px;
+
+            tr {
+              padding: 0px;
+              margin: 0px;
+              height: 75px;
+
+              &:nth-child(odd) {
+                background-color: transparent;
+              }
+
+              &:nth-child(even) {
+                background-color: rgba($deep_tan, 0.2);
+              }
+
+              td {
+                padding: 0px;
+                margin: 0px;
+                width: 25%;
+                @include avenir_H();
+                font-size: 16px;
+                color: $deep_navy;
+                text-align: center;
+
+                & > div {
+                  padding: 0px 32px;
+                }
+
+                &:first-child {
+                  @include avenir_R();
+                  text-align: left;
+                }
+
+                &:not(:first-child):not(:last-child) {
+                  border-left: 1px solid $deep_tan;
+                  border-right: 1px solid $deep_tan;
+                }
+              }
+            }
           }
         }
       }
