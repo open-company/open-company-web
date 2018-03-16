@@ -27,8 +27,6 @@
           [:div.balloon.big-green]
           [:div.balloon.small-blue]
           [:div.balloon.big-purple]
-          [:div.balloon.big-yellow]
-          [:div.balloon.small-blue-1]
 
           [:h1.pricing-headline
             "Pricing guide"]

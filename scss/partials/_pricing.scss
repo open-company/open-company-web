@@ -20,7 +20,6 @@ div#wrap {
       padding-top: 72px;
       text-align: center;
       position: relative;
-      overflow: hidden;
 
       div.balloon {
         position: absolute;
@@ -304,7 +303,7 @@ div#wrap {
 
     section.second-section {
       h1.compare-plans {
-        margin: 32px auto;
+        margin: 64px auto 32px;
         text-align: center;
         @include avenir_M();
         font-size: 34px;
@@ -317,7 +316,7 @@ div#wrap {
         width: 940px;
 
         @include mobile() {
-          width: calc(100% + 32px);
+          width: calc(100% + 64px);
           margin-left: -32px;
           overflow-x: auto;
         }
