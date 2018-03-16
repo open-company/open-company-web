@@ -286,7 +286,10 @@
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(cancel-clicked s)}]
         [:div.entry-edit-modal-header-title
-          "Edit post"]
+          {:class (when (:uuid entry-editing) "editing")}
+          (if (:uuid entry-editing)
+            "Editing post"
+            "Create new post")]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
