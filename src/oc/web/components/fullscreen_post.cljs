@@ -92,9 +92,10 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-let [headline-el   (rum/ref-node state "edit-headline")]
-      ; move cursor at the end
-      (utils/to-end-of-content-editable headline-el))))
+    (when (= (.-activeElement js/document) (.-body js/document))
+      (when-let [headline-el   (rum/ref-node state "edit-headline")]
+        ; move cursor at the end
+        (utils/to-end-of-content-editable headline-el)))))
 
 (defn- add-emoji-cb [state]
   (headline-on-change state)
