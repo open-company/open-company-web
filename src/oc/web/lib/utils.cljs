@@ -633,7 +633,7 @@
 
 (defn strip-empty-tags [text]
   (when text
-    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
+    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}(class)?[ ]{0,}([0-9a-zA-Z-]{0,}=\"[a-zA-Z\\s]{0,}\")?>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
       (.replace text reg ""))))
 
 (defn su-default-title []
