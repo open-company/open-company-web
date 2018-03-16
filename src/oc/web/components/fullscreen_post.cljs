@@ -92,9 +92,10 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-let [headline-el   (rum/ref-node state "edit-headline")]
-      ; move cursor at the end
-      (utils/to-end-of-content-editable headline-el))))
+    (when (= (.-activeElement js/document) (.-body js/document))
+      (when-let [headline-el   (rum/ref-node state "edit-headline")]
+        ; move cursor at the end
+        (utils/to-end-of-content-editable headline-el)))))
 
 (defn- add-emoji-cb [state]
   (headline-on-change state)
@@ -200,7 +201,6 @@
                              (rum/local false ::showing-dropdown)
                              (rum/local false ::move-activity)
                              (rum/local nil ::window-click)
-                             (rum/local false ::resize-listener)
                              ;; Editing locals
                              (rum/local "" ::initial-headline)
                              (rum/local "" ::initial-body)
@@ -211,10 +211,10 @@
                              (rum/local false ::edited-data-loaded)
                              (rum/local nil ::autosave-timer)
                              (rum/local false ::show-legend)
-                             (rum/local false ::re-render)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
+                             (mixins/render-on-resize nil)
                              mixins/first-render-mixin
 
                              {:before-render (fn [s]
@@ -253,9 +253,6 @@
                                (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
                                  ;; Force comments reload
                                  (comment-actions/get-comments (:activity-data modal-data)))
-                               (reset! (::resize-listener s)
-                                (events/listen js/window EventType/RESIZE
-                                 #(reset! (::re-render s) true)))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -271,9 +268,6 @@
                                (when @(::window-click s)
                                  (events/unlistenByKey @(::window-click s))
                                  (reset! (::window-click s) nil))
-                               (when @(::resize-listener s)
-                                 (events/unlistenByKey @(::resize-listener s))
-                                 (reset! (::resize-listener s) false))
                                (when @(::headline-input-listener s)
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
@@ -377,6 +371,7 @@
                   (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                                  :width 20
                                  :height 20
+                                 :position "bottom"
                                  :default-field-selector "div.fullscreen-post div.rich-body-editor"
                                  :container-selector "div.fullscreen-post"})
                   [:div.fullscreen-post-box-footer-legend-container

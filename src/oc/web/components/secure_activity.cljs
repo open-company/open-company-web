@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -19,24 +20,20 @@
 (def default-activity-header-height 69)
 (def default-activity-content-height 136)
 
-(rum/defcs secure-activity < rum/reactive
-                          (drv/drv :secure-activity-data)
-                          (drv/drv :made-with-carrot-modal)
-                          (rum/local 0 ::win-height)
-                          (rum/local nil ::win-resize-listener)
-                          {:will-mount (fn [s]
-                            (utils/after 100 #(dis/dispatch! [:secure-activity-get]))
-                            (save-win-height s)
-                            (when (responsive/is-tablet-or-mobile?)
-                              (reset! (::win-resize-listener s)
-                               (events/listen js/window EventType/RESIZE
-                                #(save-win-height s))))
-                            s)
-                           :will-unmount (fn [s]
-                            (when @(::win-resize-listener s)
-                              (events/unlistenByKey @(::win-resize-listener s))
-                              (reset! (::win-resize-listener s) nil))
-                            s)}
+(rum/defcs secure-activity < ;; Mixins
+                             rum/reactive
+                             (ui-mixins/render-on-resize save-win-height)
+                             ;; Derivatives
+                             (drv/drv :secure-activity-data)
+                             (drv/drv :made-with-carrot-modal)
+                             ;; Locals
+                             (rum/local 0 ::win-height)
+                             (rum/local nil ::win-resize-listener)
+
+                             {:will-mount (fn [s]
+                               (utils/after 100 #(dis/dispatch! [:secure-activity-get]))
+                               (save-win-height s)
+                              s)}
   [s]
   (let [activity-data (drv/react s :secure-activity-data)
         activity-author (:publisher activity-data)

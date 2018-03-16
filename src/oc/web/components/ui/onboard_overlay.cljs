@@ -13,27 +13,22 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn save-win-height
+  "Save the window height in the local component state."
+  [s]
+  (reset! (::wh s) (.-innerHeight js/window)))
+
 (rum/defcs onboard-overlay < ;; Locals
                              (rum/local false ::dismiss)
-                             (rum/local nil ::resize-listener)
                              (rum/local nil ::wh)
                              ;; Mixins
                              mixins/no-scroll-mixin
+                             (mixins/render-on-resize save-win-height)
                              {:will-mount (fn [s]
-                              (reset! (::resize-listener s)
-                               (events/listen js/window EventType/RESIZE
-                                #(reset! (::wh s) (.-innerHeight js/window))))
-                              (reset! (::wh s) (.-innerHeight js/window))
-                              s)
-                              :will-unmount (fn [s]
-                               (when @(::resize-listener s)
-                                 (events/unlistenByKey @(::resize-listener s))
-                                 (reset! (::resize-listener s) nil))
-                               s)}
+                              (save-win-height s)
+                              s)}
   [s step]
   [:div.onboard-overlay-container
-    {:class (utils/class-set {:will-appear @(::dismiss s)
-                              :appear (not @(::dismiss s))})}
     [:div.onboard-overlay
       (let [create-board-link (utils/link-for (:links (dis/org-data)) "create")
             is-mobile? (responsive/is-tablet-or-mobile?)

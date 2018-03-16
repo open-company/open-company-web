@@ -180,12 +180,12 @@ div.stream-view-item {
         &:after {
           content: "";
           position: absolute;
-          width: 8px;
-          height: 5px;
-          top: 30px;
+          width: 9px;
+          height: 15px;
+          top: 20px;
           right: 0px;
-          background-image: cdnUrl("/img/ML/section_access_chevron.svg");
-          background-size: 8px 5px;
+          background-image: cdnUrl("/img/ML/mobile_comments_chevron.svg");
+          background-size: 9px 15px;
           background-position: center;
           background-repeat: no-repeat;
         }
