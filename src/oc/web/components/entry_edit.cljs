@@ -238,8 +238,8 @@
                                        180
                                        #(let [from-ap (or (:from-all-posts @router/path)
                                                           (= (router/current-board-slug) "all-posts"))
-                                              go-to-ap (or from-ap
-                                                           (not= (:status entry-editing) "published"))]
+                                              go-to-ap (and (not (:new-section entry-editing))
+                                                            from-ap)]
                                           ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
                                             (if go-to-ap

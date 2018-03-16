@@ -797,6 +797,7 @@
     (dissoc :section-editing)
     (update-in [:entry-editing] dissoc :publishing)
     (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
+    (assoc-in [:entry-editing :new-section] true)
     (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/finish
