@@ -216,6 +216,13 @@
           [:div.author-company
             ""]]]]])
 
+(def keep-aligned
+  [:section.keep-aligned
+    [:div.keep-aligned-title
+      "Keep everyone aligned around what matters most."]
+    [:button.mlb-reset.get-started-button
+      "Get started for free"]])
+
 (defn index [options]
   [:div
     {:id "wrap"}
@@ -265,11 +272,7 @@
 
       testimonials-section
 
-      [:section.third-section
-        [:div.third-section-title
-          "Keep everyone aligned around what matters most."]
-        [:button.mlb-reset.get-started-button
-          "Get started for free"]]
+      keep-aligned
       ]])
 
 (defn pricing
@@ -284,6 +287,8 @@
         [:div.balloon.big-green]
         [:div.balloon.small-blue]
         [:div.balloon.big-purple]
+        [:div.balloon.big-yellow]
+        [:div.balloon.small-blue-1]
 
         [:h1.pricing-headline
           "Pricing guide"]
@@ -534,21 +539,11 @@
                 [:td]
                 [:td]
                 [:td
-                  [:div.check]]]
-              [:tr
-                [:td]
-                [:td
-                  [:button.mlb-reset.price-button
-                    {}
-                    "Create a digest"]]
-                [:td
-                  [:button.mlb-reset.price-button
-                    {}
-                    "Buy standard"]]
-                [:td
-                  [:button.mlb-reset.price-button
-                    {}
-                    "Buy plus"]]]]]]]
+                  [:div.check]]]]]]]
+
+      testimonials-section
+
+      keep-aligned
     ]])
 
 (defn slack
@@ -619,8 +614,8 @@
 
       testimonials-section
 
-      [:section.third-section
-        [:div.third-section-title
+      [:section.keep-aligned
+        [:div.keep-aligned-title
           "Keep everyone aligned around what matters most."]
         [:div.sigin-with-slack-container
           [:button.signin-with-slack.mlb-reset

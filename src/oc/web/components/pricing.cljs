@@ -4,11 +4,8 @@
   (:require [rum.core :as rum]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
-            [oc.web.actions.user :as user]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
@@ -30,6 +27,8 @@
           [:div.balloon.big-green]
           [:div.balloon.small-blue]
           [:div.balloon.big-purple]
+          [:div.balloon.big-yellow]
+          [:div.balloon.small-blue-1]
 
           [:h1.pricing-headline
             "Pricing guide"]
@@ -281,21 +280,12 @@
                   [:td]
                   [:td]
                   [:td
-                    [:div.check]]]
-                [:tr
-                  [:td]
-                  [:td
-                    [:button.mlb-reset.price-button
-                      {}
-                      "Create a digest"]]
-                  [:td
-                    [:button.mlb-reset.price-button
-                      {}
-                      "Buy standard"]]
-                  [:td
-                    [:button.mlb-reset.price-button
-                      {}
-                      "Buy plus"]]]]]]]
+                    [:div.check]]]]]]]
+
+        shared-misc/carrot-testimonials
+
+        (when-not (jwt/jwt)
+          shared-misc/keep-aligned)
       ] ;<!-- main -->
     ] ; <!-- wrap -->
 

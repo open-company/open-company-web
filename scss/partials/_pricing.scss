@@ -71,6 +71,28 @@ div#wrap {
           left: 50%;
           margin-left: -558px;
         }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow_1");
+          background-size: 135px 135px;
+          width: 135px;
+          height: 135px;
+          top: 1540px;
+          left: 50%;
+          margin-left: -438px;
+          z-index: 2;
+        }
+
+        &.small-blue-1 {
+          @include image-2x("/img/ML/balloon_small_blue_1");
+          background-size: 50px 44px;
+          width: 50px;
+          height: 44px;
+          top: 1540px;
+          left: 50%;
+          margin-left: -356px;
+          z-index: 2;
+        }
       }
 
       h1.pricing-headline {
@@ -84,11 +106,17 @@ div#wrap {
         width: 940px;
         padding: 32px 8px;
         background-color: white;
-        border-radius: 6px;
+        border-radius: 8px;
         box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
         margin: 80px auto 32px;
         position: relative;
         z-index: 2;
+
+        @include mobile() {
+          width: 100%;
+          padding: 0px;
+          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+        }
 
         div.pricing-block-column {
           text-align: center;
@@ -98,9 +126,22 @@ div#wrap {
           color: $deep_navy;
           padding: 0px 40px;
 
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            padding: 40px 32px;
+          }
+
           &:not(:first-child):not(:last-child) {
             border-left: 1px solid $light_tan;
             border-right: 1px solid $light_tan;
+
+            @include mobile() {
+              border-left: none;
+              border-right: none;
+              border-bottom: 1px solid $light_tan;
+              border-top: 1px solid $light_tan;
+            }
           }
 
           &.free-column {
@@ -109,7 +150,11 @@ div#wrap {
             }
 
             button.price-button {
-              margin-top: 100px;
+              margin-top: 108px;
+
+              @include mobile() {
+                margin-top: 24px;
+              }
             }
           }
 
@@ -127,6 +172,7 @@ div#wrap {
 
           div.price-column-title {
             font-size: 26px;
+            line-height: 42px;
           }
 
           div.price-column-price {
@@ -172,6 +218,11 @@ div#wrap {
                 background-repeat: no-repeat;
                 width: 16px;
                 height: 16px;
+
+                //////////////
+                // Uncomment this to show the more info icon
+                display: none;
+                //////////////
               }
             }
           }
@@ -190,10 +241,21 @@ div#wrap {
         padding: 24px;
         text-align: center;
 
+        @include mobile() {
+          width: 100%;
+          padding: 32px;
+        }
+
         span.enterprise-block-title {
           @include avenir_H();
           color: $deep_navy;
           font-size: 16px;
+
+          @include mobile() {
+            display: block;
+            width: 100%;
+            text-align: center;
+          }
         }
 
         span.enterprise-block-copy {
@@ -201,6 +263,13 @@ div#wrap {
           color: $ui_grey;
           font-size: 16px;
           margin: 0px 8px;
+
+          @include mobile() {
+            margin-top: 16px;
+            display: block;
+            width: 100%;
+            text-align: center;
+          }
         }
 
         a.enterprise-block-link {
@@ -208,6 +277,13 @@ div#wrap {
           font-size: 16px;
           color: $sea_blue;
           text-decoration: none;
+
+          @include mobile() {
+            margin-top: 8px;
+            display: block;
+            width: 100%;
+            text-align: center;
+          }
 
           &:hover {
             text-decoration: underline;
@@ -236,9 +312,15 @@ div#wrap {
       }
 
       div.pricing-table {
-        margin: 32px auto;
+        margin: 32px auto 120px;
         padding: 0px;
         width: 940px;
+
+        @include mobile() {
+          width: calc(100% + 32px);
+          margin-left: -32px;
+          overflow-x: auto;
+        }
 
         div.check {
           margin: 0px auto;
@@ -266,13 +348,20 @@ div#wrap {
             height: 16px;
             margin-left: 8px;
             margin-top: 2px;
+            //////////////
+            // Remove this to show the info icons
+            display: none;
+            //////////////
           }
 
-          &:hover {
-            div.more-info-bubble {
-              display: block;
-            }
-          }
+          ////////////////
+          // Uncomment to show the info bubbles
+          // &:hover {
+          //   div.more-info-bubble {
+          //     display: block;
+          //   }
+          // }
+          ////////////////
 
           div.more-info-bubble {
             display: none;
@@ -281,6 +370,7 @@ div#wrap {
             background-color: white;
             box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba($deep_tan, 0.7);
+            border-radius: 4px;
             position: absolute;
             top: 20px;
             right: -100%;
@@ -308,6 +398,11 @@ div#wrap {
           text-align: center;
           border-top: 2px solid $deep_tan;
           border-bottom: 2px solid $deep_tan;
+          
+          @include mobile() {
+            margin: 0px 32px;
+            width: 820px;
+          }
 
           thead {
             padding: 0px;
@@ -317,7 +412,7 @@ div#wrap {
               padding: 0px;
               margin: 0px;
               height: 75px;
-              border-bottom: 2px solid $deep_tan;
+              border-bottom: 1px solid $deep_tan;
 
               th {
                 padding: 0px;
@@ -360,7 +455,7 @@ div#wrap {
                 text-align: center;
 
                 & > div {
-                  padding: 0px 32px;
+                  padding: 0px 24px;
                 }
 
                 &:first-child {
