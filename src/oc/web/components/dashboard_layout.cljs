@@ -110,8 +110,11 @@
                                 (win-width s)
                                 (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
                                       cookie-value (cook/get-cookie board-view-cookie)
-                                      board-view (or (keyword cookie-value) :stream)]
-                                  (reset! (::board-switch s) board-view))
+                                      board-view (or (keyword cookie-value) :stream)
+                                      fixed-board-view (if (responsive/is-tablet-or-mobile?)
+                                                        :stream
+                                                        board-view)]
+                                  (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
