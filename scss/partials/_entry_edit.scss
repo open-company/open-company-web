@@ -101,7 +101,7 @@ div.entry-edit-modal-container {
         @include mobile() {
           float: right;
           width: 1px;
-          background-color: #D8DBDF;
+          background-color: $light_tan;
           height: 64px;
           margin: -20px 16px 0px 16px;
           display: block;
@@ -210,7 +210,7 @@ div.entry-edit-modal-container {
       width: calc(100% + 48px);
       margin-left: -24px;
       padding: 12px 24px;
-      border-top: 1px solid $light_ui_grey;
+      border-top: 1px solid $light_tan;
       display: none;
 
       @include mobile() {
@@ -258,6 +258,7 @@ div.entry-edit-modal-container {
         cursor: pointer;
         position: relative;
         float: left;
+        padding-right: 28px;
 
         @include mobile() {
           float: unset;
@@ -269,7 +270,7 @@ div.entry-edit-modal-container {
         &:after {
           position: absolute;
           top: 0px;
-          left: 6px;
+          right: 0px;
           content: "";
           background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 8px 8px;
@@ -353,7 +354,7 @@ div.entry-edit-modal-container {
         height: 88px;
         width: 100%;
         padding: 28px 41px;
-        border-bottom: 1px solid $deep_tan;
+        border-bottom: 1px solid $light_tan;
 
         @include mobile() {
           display: none;
@@ -503,7 +504,7 @@ div.entry-edit-modal-container {
         margin: 0px;
         padding: 0px 42px 24px 42px;
         width: 100%;
-        border-bottom: 1px solid $deep_tan;
+        border-bottom: 1px solid $light_tan;
 
         @include mobile() {
           min-height: calc(100vh - 139px);
