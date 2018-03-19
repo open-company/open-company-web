@@ -8,7 +8,11 @@ _Image source: the [Flux repo](https://github.com/facebook/flux)_
 
 It's important to note, Flux isn't a particular software library, instead it's an architectural pattern that's been implemented now in countless React apps and in many React web frameworks.
 
-The key idea in Flux is unidirectional data flow.
+The key idea in Flux is having a unidirectional data flow:
+
+<img src="./flux-simple-f8-diagram-with-client-action-1300w.png" style="width: 100%;" />
+
+_Image source: [Flux concepts](https://github.com/facebook/flux/tree/master/examples/flux-concepts)_
 
 Here is some background information on Flux:
 
