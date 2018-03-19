@@ -6,21 +6,30 @@ Follows the facebook flux pattern.
 
 ### Action Creators
 
-An action creator is called by a user interaction or an API request finishing.
+An action creator is called by a user interaction or an API request that has finished.
 
 These action creators are located in `/src/oc/web/actions/`. They are losely
 organized based the data they will act on. So `/src/oc/web/actions/user.cljs`
 contains actions for a user to sign up, login, and change user profile
 information.
 
+An action creator will handle the following:
+
+- Pass data and an action to the dispatcher.
+- Make async API calls where the results call a "finished" action creator.
+
+##### Things the action creators do now but might belong in a store.
+- Update cookie information
+- Update url routes.
+
 
 ### Simplified Data Model
 
 - Org
-  - has many Teams
   - has many Sections
 
 - Team
+  - has many Orgs
   - has many Users
   - Authentication Settings
   - Slack bot
@@ -53,8 +62,53 @@ We subscribe stores to particular events by creating a function with an arity
 matching the event and payload. Stores with interest in the same event/payload
 will have a separate register to the dispatcher.
 
-When parts of the app state are changed a derivative is changed and used to
-render the UI. Also UI components can read from a store to retrieve more information.
+In a traditional flux architechure the components subscribe to a change event
+in a store and then use the store to get data. With derivatives we have all that
+data in a single atom. 
+
+The first parameter to a store's handler is the application state, an atom that
+contains all the data used by the react components. Each handler modifies the
+passed in app state and then returns it.
+
+When parts of the app state are changed the value of a derivative is changed and used to render the UI. The use of derivaties reduce the amount of code needed
+to listen for events and then read the current state from each store.
+
+A store can process a single event with the following code:
+```clojure
+;; dispatcher/action is a multimethod. Additional action methods can be
+;; defined to handle an "event" (this case it is :search-query/finish)
+(defmethod dispatcher/action :search-query/finish
+  [db [data]]
+  (assoc db :something-changed data) ;; always return the application state
+)
+```
+
+The second way is to register with the dispatcher to receive all events:
+
+```clojure
+(ns oc.web.stores.reaction
+  (:require [cljs-flux.dispatcher :as flux]
+            [oc.web.dispatcher :as dispatcher]))
+
+;; Reducers used to watch for reaction dispatch data
+(defmulti reducer (fn [db [action-type & _]]
+                    (timbre/info "Dispatching reaction reducer:" action-type)
+                    action-type))
+
+(def reactions-dispatch
+  (flux/register
+   dispatcher/actions
+   (fn [payload]
+     (swap! dispatcher/app-state reducer payload))))
+
+(defmethod reducer :default [db payload]
+  ;; ignore state changes not specific to reactions
+  db)
+
+(defmethod reducer :all-posts-get/finish
+  [db [_ {:keys [org year month from body]}]]
+  db)
+```
 
 #### Org
 
@@ -99,20 +153,13 @@ The app-state has the following structure:
 
 ```clojure
 {
-  :buffer {
-     :company-data {
+  :key {
+     :data-for-key {
        :name "Buffer"
        :slug "buffer"
        ;; ... other data form /companies/buffer ....
      }
-     :su-list {
-        :collection {
-          ;; .. data from /companies/buffer/updates...
-        }
-     }
-     :buffer-update-march-2016 {
-       ;; ... data from /companies/buffer/buffer-update-march-2016 ...
-     }
+  }
 }
 ```
 
