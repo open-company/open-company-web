@@ -26,9 +26,7 @@ Here is some background information on Flux:
 An action creator is called by a user interaction or an API request finishing.
 
 These action creators are located in `/src/oc/web/actions/`. They are losely
-organized based the data they will act on. So `/src/oc/web/actions/user.cljs`
-contains actions for a user to sign up, login, and change user profile
-information.
+organized based on the data they will act on. So `/src/oc/web/actions/user.cljs` contains actions for things like: user sign up, login, and change of user profile information.
 
 
 ### Simplified Data Model
@@ -65,7 +63,7 @@ information.
   
 ### Stores (changing the app state)
 
-Our action creators will dispatch data and an event using our dispatcher.
+Our action creators dispatch data in an action event using our dispatcher.
 We subscribe stores to particular events by creating a function with an arity
 matching the event and payload. Stores with interest in the same event/payload
 will have a separate register to the dispatcher.
