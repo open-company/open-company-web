@@ -1,8 +1,20 @@
-## Techincal Design
+## Technical Design
 
-Follows the facebook flux pattern.
-- https://github.com/facebook/flux
-- https://github.com/kgann/cljs-flux
+Carrot follows the Facebook Flux pattern:
+
+<img src="./flux-diagram-white-background.png" style="width: 100%;" />
+_image source: the Flux repo_
+
+It's important to note, Flux isn't a particular software library, instead it's an architectural pattern that's been implemented now in countless React apps and in many React web frameworks.
+
+The key idea in Flux is unidirectional data flow.
+
+Here is some background information on Flux:
+
+- https://github.com/facebook/flux - The Flux repo (documentation of the pattern, as well as a JavaScript Dispatcher implemntation)
+- https://github.com/facebook/flux/tree/master/examples/flux-concepts - High-level Flux concepts
+- https://facebook.github.io/flux/docs/in-depth-overview.html - Flux in depth
+- https://github.com/kgann/cljs-flux - An example implementation of the Flux pattern in ClojureScript
 
 ### Action Creators
 
