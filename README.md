@@ -136,6 +136,10 @@ cljs.user=> (utils/vec-dissoc [:a :b :c] :a)
 [:b :c]
 ```
 
+## Technical Design
+
+Documentation of the technical design is [here](./docs/TECHNICAL_DESIGN.md).
+
 ## Testing
 
 Install [PhantomJS](https://http://phantomjs.org/) downloading the latest 2.x binary from [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
@@ -166,4 +170,4 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
 
-Copyright © 2015-2017 OpenCompany, LLC.
+Copyright © 2015-2018 OpenCompany, LLC.
