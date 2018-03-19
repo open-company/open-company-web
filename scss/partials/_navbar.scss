@@ -1,23 +1,3 @@
-@include big_web(){
-  body.trend-bar-collapsed {
-    nav.oc-navbar {
-      height: #{$navbar_height + $carrot_trend_collapsed_height}px;
-    }
-  }
-
-  body.trend-bar-expanded {
-    nav.oc-navbar {
-      height: #{$navbar_height + $carrot_trend_expanded_height}px;
-    }
-  }
-
-  body.trend-bar-trending {
-    nav.oc-navbar {
-      height: #{$navbar_height + $carrot_trend_trending_height}px;
-    }
-  }
-}
-
 nav.oc-navbar {
   position: fixed;
   top: 0;
@@ -58,7 +38,7 @@ nav.oc-navbar {
     }
 
     &:not(.mobile-menu-open) {
-      height: #{$mobile_navbar_height}px;
+      height: #{$navbar_height}px;
     }
   }
 
@@ -73,24 +53,12 @@ nav.oc-navbar {
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 14px 24px 0;
+    padding: 12px 24px;
     height: #{$navbar_height}px;
     width: 100%;
 
-    div.oc-navbar-separator {
-      border-bottom: 1px solid rgba(78,90,107,0.1);
-      padding-top: 10px;
-    }
-
-    @media screen and (max-width: 413px){
-      margin-left: 9px;
-      margin-right: 9px;
-      width: auto !important;
-    }
-
-    @media screen and (max-width: 683px){
-      padding: 0px;
-      margin-top: 10px;
+    @include mobile() {
+      width: 100vw;
     }
 
     div.oc-navbar-header-container{
@@ -108,10 +76,10 @@ nav.oc-navbar {
         font-size: 26px;
 
         @include mobile() {
-          width: 40%;
+          width: 160px;
           height: 32px;
-          margin-left: -82px;
-          top: 0px;
+          margin-left: -80px;
+          margin-top: 4px;
         }
 
         button.orgs-dropdown div.org-avatar {
@@ -127,104 +95,48 @@ nav.oc-navbar {
           }
         }
       }
-    }
 
-    div.navbar-left {
-      float: left;
-      margin-top: 6px;
-      width: 24px;
-      height: 24px;
-
-      @include mobile() {
-        margin-top: 10px;
-        margin-left: 16px;
-        width: 40%;
-        height: 40px;
-      }
-
-      button.mobile-navigation-sidebar-ham-bt {
-        display: none;
+      div.navbar-left {
+        float: left;
+        margin-top: 8px;
+        height: 24px;
 
         @include mobile() {
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/mobile_navigation_sidebar_ham.svg");
-          background-repeat: no-repeat;
-          background-size: 18px 14px;
-          background-position: 3px 5px;
-          display: inline;
+          width: 40%;
+        }
+
+        button.mobile-navigation-sidebar-ham-bt {
+          display: none;
+
+          @include mobile() {
+            width: 24px;
+            height: 24px;
+            background-image: cdnUrl("/img/ML/mobile_navigation_sidebar_ham.svg");
+            background-repeat: no-repeat;
+            background-size: 18px 14px;
+            background-position: 3px 5px;
+            display: inline;
+          }
         }
       }
-    }
 
-    ul.navbar-right {
-      float: right;
-      margin-right: 30px;
-
-      @include mobile() {
-        margin-right: 0px;
-      }
-
-      div.alerts {
+      div.navbar-right {
         float: right;
-      }
-
-      div.user-avatar {
-        float: right;
-      }
-
-      div.notification-bell {
-        margin-right: 0.5rem;
-        margin-top: 5px;
-      }
-
-      button.invite-others {
-        margin-top: 14px;
-        font-size: 16px;
-      }
-
-      button.mobile-menu {
-        font-size: 24px;
-        padding: 0px;
-        margin-top: 0px;
-        margin-right: 16px;
-
-        @include user-profile(32);
-      }
-    }
-  }
-
-  div.oc-navbar-bottom {
-    position: relative;
-    margin: 7px auto;
-    padding: 0 28px;
-
-    a {
-      font-size: 14px;
-      color: rgba(78,90,107,0.6);
-      margin-right: 20px;
-      @include avenir_M();
-      margin-top: 2px;
-      outline: none;
-
-      &:hover {
-        color: $oc_gray_5;
-      }
-
-      &:hover, &:active, &:focus {
-        outline: none;
-        text-decoration: none;
-      }
-
-      &.active {
-        color: $oc_gray_5;
-      }
-    }
-
-    div.right {
-      a {
         margin-right: 0px;
-        margin-left: 20px;
+
+        div.user-menu {
+          margin-top: 4px;
+          width: 32px;
+          height: 32px;
+        }
+
+        button.mobile-menu {
+          font-size: 24px;
+          padding: 0px;
+          margin-top: 2px;
+
+          @include user-profile(32);
+        }
       }
     }
   }

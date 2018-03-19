@@ -3,20 +3,6 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
-(defn get-attachments-from-body [body]
-  (let [$body (.html (js/$ "<div/>") body)
-        attachments (js/$ "a.media-attachment" $body)
-        atch-map (atom [])]
-    (.each attachments (fn [idx item]
-      (let [$item (js/$ item)]
-        (reset! atch-map (vec (conj @atch-map {:name (.data $item "name")
-                                               :size (.data $item "size")
-                                               :mimetype (.data $item "mimetype")
-                                               :author (.data $item "author")
-                                               :createdat (.data $item "createdat")
-                                               :url (.attr $item "href")}))))))
-    @atch-map))
-
 (defn get-first-body-thumbnail
   "Given an entry body get the first thumbnail available.
   Thumbnail type: image, video or chart."
@@ -136,3 +122,14 @@
     "text/php" "fa-file-code-o"
     ;; Generic case
     "fa-file"))
+
+(defn get-activity-date [activity]
+  (or (:published-at activity) (:created-at activity)))
+
+(defn compare-activities [act-1 act-2]
+  (let [time-1 (get-activity-date act-1)
+        time-2 (get-activity-date act-2)]
+    (compare time-2 time-1)))
+
+(defn get-sorted-activities [all-posts-data]
+  (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))

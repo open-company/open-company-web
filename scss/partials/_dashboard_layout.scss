@@ -3,11 +3,27 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  div.section-add {
+
+    &.has-drafts {
+      div.section-editor {
+        top: 250px;
+      }
+    }
+
+    div.section-editor {
+      position: absolute;
+      top: 214px;
+      left: 180px;
+      z-index: 1000;
+    }
+  }
+
   @include mobile() {
     &.sticky-board-name {
       padding-top: 48px;
       div.dashboard-layout-container {
-        div.board-container.all-posts-container {
+        div.board-container {
           div.board-name-container {
             position: fixed;
             top: 0px;
@@ -44,34 +60,15 @@ div.dashboard-layout {
         }
 
         div.board-name-container {
-          padding: 0px;
 
           @include mobile() {
-            width: 100%;
-            height: 48px;
-            position: relative;
-            z-index: 1000;
-            top: 0px;
-            left: 0px;
-            background-color: white;
-            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-            border-top: 1px solid $light_tan;
-            padding: 15px;
-
-            &.sticky {
-              position: absolute;
-            }
           
             div.board-name {
+
               div.board-name-with-icon {
-                @include avenir_H();
-                font-size: 15px;
-                color: $deep_navy;
                 width: 88px;
-                height: 18px;
-                text-align: right;
                 margin: 0 auto;
-                position: relative;
+                text-align: right;
 
                 &:before {
                   content: "";
@@ -97,21 +94,126 @@ div.dashboard-layout {
         left: unset;
       }
 
-      div.board-name-container {
-        padding: 0px 12px;
+      div.add-post-tooltip-container {
+        border: 2px dashed $carrot_gold;
+        background-color: $light_gold;
+        border-radius: 6px;
+        padding: 32px 40px;
+        margin: 32px 0px;
+        position: relative;
 
-        @include mobile() {
-          text-align: center;
+        @include tablet() {
+          width: calc(100% - 48px);
+          margin: 32px 24px;
         }
 
+        button.add-post-tooltip-dismiss {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          width: 30px;
+          height: 30px;
+          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+
+          @include tablet() {
+            top: 16px;
+            left: 16px;
+          }
+        }
+
+        div.add-post-tooltip-icon {
+          @include image-2x("/img/ML/balloon_small_yellow_face");
+          background-size: 48px 48px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 48px;
+          height: 48px;
+          float: left;
+
+          @include tablet() {
+            float: unset;
+            margin: 0px auto;
+          }
+        }
+
+        div.add-post-tooltip {
+          @include avenir_M();
+          font-size: 18px;
+          color: $deep_navy;
+          width: 699px;
+          float: left;
+          margin-left: 24px;
+
+          &.second-line {
+            @include tablet() {
+              margin: 0px auto;
+            }
+          }
+
+          @include tablet() {
+            float: unset;
+            margin: 24px auto 0px;
+            width: 100%;
+            text-align: center;
+          }
+        }
+
+        div.add-post-tooltip-arrow {
+          background-image: cdnUrl("/img/ML/add_post_tooltip_arrow.svg");
+          background-size: 32px 38px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 32px;
+          height: 38px;
+          float: right;
+          margin-top: -20px;
+
+          @include tablet() {
+            display: none;
+          }
+        }
+
+        button.add-post-tooltip-compose-bt {
+          display: none;
+
+          @include tablet() {
+            display: block;
+            color: $carrot_orange;
+            @include avenir_H();
+            font-size: 15px;
+            margin: 24px auto 0px;
+          }
+        }
+      }
+
+      div.board-name-container {
+        padding: 0px 0px 8px;
+
+        @include mobile() {
+          width: 100%;
+          height: 48px;
+          position: relative;
+          z-index: 1000;
+          top: 0px;
+          left: 0px;
+          background-color: white;
+          box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+          border-top: 1px solid $light_tan;
+          padding: 15px;
+
+          &.sticky {
+            position: absolute;
+          }
+        }
+          
         div.board-name {
           float: left;
 
           @include mobile() {
-            display: inline-block;
-            text-align: center;
             float: unset;
-            margin-left: 0px;
           }
 
           div.board-name-with-icon {
@@ -121,48 +223,67 @@ div.dashboard-layout {
             float: left;
 
             @include mobile() {
-              color: $carrot_dark_gray;
+              @include avenir_H();
+              font-size: 15px;
+              color: $deep_navy;
+              width: auto;
+              height: 18px;
+              text-align: center;
+              margin: 0 auto;
+              position: relative;
               float: unset;
-            }
-
-            .emojione {
-              @include emoji-size(32);
             }
           }
 
-          button.board-settings-bt {
+          div.board-settings-container {
             float: left;
-            background-image: cdnUrl("/img/ML/board_settings.svg");
-            background-size: 8px 8px;
-            background-repeat: no-repeat;
-            background-position: 6px 7px;
-            background-color: #F0EFEA;
-            border-radius: 10px;
-            width: 20px;
-            height: 20px;
             margin-top: 11px;
             margin-left: 7px;
-            opacity: 0.8;
+            position: relative;
 
             @include mobile(){
-              margin-right: -30px;
-              margin-left: 8px;
-              padding: 0px;
-              float: unset;
-
-              // Remove to show settings button on mobile
               display: none;
             }
 
-            &:hover {
-              opacity: 1;
+            div.section-editor {
+              position: absolute;
+              top: 28px;
+              left: 50%;
+              margin-left: -180px;
+              z-index: 1000;
+            }
+
+            button.board-settings-bt {
+              background-image: cdnUrl("/img/ML/board_settings.svg");
+              background-size: 8px 8px;
+              background-repeat: no-repeat;
+              background-position: 6px 7px;
+              background-color: #F0EFEA;
+              border-radius: 10px;
+              width: 20px;
+              height: 20px;
+              opacity: 0.8;
+
+              @include mobile(){
+                margin-right: -30px;
+                margin-left: 8px;
+                padding: 0px;
+                float: unset;
+
+                // Remove to show settings button on mobile
+                display: none;
+              }
+
+              &:hover {
+                opacity: 1;
+              }
             }
           }
 
           div.private-board {
             @include avenir_M();
             font-size: 14px;
-            color: rgba(#34414F, 0.5);
+            color: rgba($deep_navy, 0.5);
             position: relative;
             padding-left: 16px;
             float: left;
@@ -198,7 +319,7 @@ div.dashboard-layout {
           div.public-board {
             @include avenir_M();
             font-size: 14px;
-            color: rgba(#34414F, 0.5);
+            color: rgba($deep_navy, 0.5);
             position: relative;
             padding-left: 16px;
             float: left;
@@ -232,9 +353,45 @@ div.dashboard-layout {
           }
         }
 
+        div.board-switcher {
+          float: right;
+          width: 64px;
+          height: 32px;
+          margin-top: 2px;
+
+          @include mobile() {
+            display: none;
+          }
+
+          button.board-switcher-bt {
+            width: 32px;
+            height: 32px;
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+            background-position: 0px 8px;
+            float: left;
+            opacity: 0.6;
+            padding: 0;
+            margin: 0;
+
+            &.active {
+              opacity: 1;
+            }
+
+            &.stream-view {
+              background-image: cdnUrl("/img/ML/stream_view_button.svg");
+            }
+
+            &.grid-view {
+              background-image: cdnUrl("/img/ML/grid_view_button.svg");
+            }
+          }
+        }
+
         div.new-post-top-dropdown-container {
           position: relative;
           float: right;
+          margin-left: 24px;
 
           button.add-to-board-top-button {
             width: 143px;

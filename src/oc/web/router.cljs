@@ -117,17 +117,32 @@
 (defn last-org-cookie
   "Cookie to save the last accessed org"
   []
-  (str "last-org-" (when (jwt/jwt) (jwt/get-key :user-id))))
+  (str "last-org-" (when (jwt/jwt) (jwt/user-id))))
 
 (defn last-board-cookie
   "Cookie to save the last accessed board"
   [org-slug]
-  (str "last-board-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
+  (str "last-board-" (when (jwt/jwt) (str (jwt/user-id) "-")) (name org-slug)))
+
+(defn last-board-view-cookie
+  "Cookie to save the last view used: grid or stream"
+  [org-slug]
+  (str "last-board-view-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
+
+(defn last-used-board-slug-cookie
+  "Cookie to save the last board slug used in a post creation"
+  [org-slug]
+  (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
 (defn show-nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
   (str "show-nux-" user-id))
+
+(defn show-add-post-tooltip-cookie
+  "Cookie to remember if the boards and journals tooltips where shown."
+  []
+  (str "add-post-tooltip-" (jwt/user-id)))
 
 ;; Values for NUX cookie
 

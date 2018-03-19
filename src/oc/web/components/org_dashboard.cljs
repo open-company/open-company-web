@@ -2,26 +2,31 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.stores.search :as search]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
-            [oc.web.components.board-edit :refer (board-edit)]
             [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
             [oc.web.components.fullscreen-post :refer (fullscreen-post)]
+            [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
+            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
@@ -80,11 +85,15 @@
                    :button-position "left"
                    :on-next-click #(dis/dispatch! [:nux-end])}))))
 
-(rum/defcs org-dashboard < rum/static
+(rum/defcs org-dashboard < ;; Mixins
+                           rum/static
                            rum/reactive
+                           (ui-mixins/render-on-resize nil)
+                           ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
+
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
@@ -101,11 +110,15 @@
                 whats-new-modal-data
                 made-with-carrot-modal-data
                 is-entry-editing
-                is-board-editing
                 is-sharing-activity
                 entry-edit-dissmissing
                 is-showing-alert
-                media-input]} (drv/react s :org-dashboard-data)
+                media-input
+                show-section-editor
+                show-section-add
+                show-sections-picker
+                entry-editing-board-slug
+                mobile-navigation-sidebar]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (some #{nux} [:1 :2 :3])
         search-active? (drv/react s search/search-active?)
@@ -133,7 +146,11 @@
             (and nux-loading
                  (not nux-end)))
       [:div.org-dashboard
-        (loading {:loading true :nux (or (cook/get-cookie :nux) nux-loading)})]
+        (when should-show-onboard-overlay?
+          [:div.screenshots-preload
+            [:div.screenshot-preload.screenshot-1]
+            [:div.screenshot-preload.screenshot-2]])
+        (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :modal-activity-view (router/current-activity-id)
@@ -153,12 +170,27 @@
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
+          ;; Mobile create a new section
+          (and is-mobile?
+               show-section-editor)
+          (section-editor board-data #(dis/dispatch! [:section-edit-save]))
+          ;; Mobile edit current section data
+          (and is-mobile?
+               show-section-add)
+          (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))
+          ;; Mobile sections picker
+          (and is-mobile?
+               show-sections-picker)
+          (sections-picker entry-editing-board-slug
+            (fn [board-data]
+             (dis/dispatch! [:input [:show-sections-picker] false])
+             (when board-data
+              (dis/dispatch! [:update [:entry-editing]
+               #(merge % {:board-slug (:slug board-data)
+                          :board-name (:name board-data)})]))))
           ;; Entry editing
           is-entry-editing
           (entry-edit)
-          ;; Board editing
-          is-board-editing
-          (board-edit)
           ;; Activity share for mobile
           (and is-mobile?
                is-sharing-activity)
@@ -166,6 +198,10 @@
           ;; Search results
           (and is-mobile? search-active? (not (router/current-activity-id)))
           (search-results-view)
+          ;; Show mobile navigation
+          (and is-mobile?
+               mobile-navigation-sidebar)
+          (navigation-sidebar)
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
@@ -194,7 +230,10 @@
                        (or (router/current-activity-id)
                            is-entry-editing
                            should-show-onboard-overlay?
-                           is-sharing-activity))
+                           is-sharing-activity
+                           show-section-add
+                           show-section-editor
+                           mobile-navigation-sidebar))
           [:div.page
             (navbar)
             [:div.org-dashboard-container

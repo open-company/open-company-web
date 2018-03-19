@@ -15,21 +15,14 @@
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
-
-(defn should-show-divider-line [s]
-  (when @(:first-render-done s)
-    (when-let [entry-edit-modal-body (rum/ref-node s "entry-edit-modal-body")]
-      (let [container-height (+ (.-clientHeight entry-edit-modal-body) 11) ;; Remove padding
-            next-show-divider-line (> (.-scrollHeight entry-edit-modal-body) container-height)]
-        (when (not= next-show-divider-line @(::show-divider-line s))
-          (reset! (::show-divider-line s) next-show-divider-line))))))
 
 (defn calc-entry-edit-modal-height
   [s & [force-calc]]
@@ -130,7 +123,8 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-not (responsive/is-tablet-or-mobile?)
+    (when (and (not (responsive/is-tablet-or-mobile?))
+               (= (.-activeElement js/document) (.-body js/document)))
       (when-let [headline-el (rum/ref-node state "headline")]
         ; move cursor at the end
         (utils/to-end-of-content-editable headline-el)))))
@@ -160,6 +154,7 @@
                         (drv/drv :alert-modal)
                         (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
+                        (drv/drv :show-sections-picker)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local nil ::body-editor)
@@ -168,17 +163,15 @@
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
-                        (rum/local false ::show-divider-line)
                         (rum/local false ::saving)
                         (rum/local false ::publishing)
-                        (rum/local false ::show-boards-dropdown)
-                        (rum/local false ::window-resize-listener)
                         (rum/local false ::window-click-listener)
                         (rum/local nil ::autosave-timer)
                         (rum/local false ::show-legend)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
+                        (mixins/render-on-resize (fn [s _] (calc-entry-edit-modal-height s true)))
 
                         {:will-mount (fn [s]
                           (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -197,16 +190,11 @@
                           (when-not (responsive/is-tablet-or-mobile?)
                             (when-let [headline-el (rum/ref-node s "headline")]
                               (utils/to-end-of-content-editable headline-el)))
-                          (reset! (::window-resize-listener s)
-                           (events/listen
-                            js/window
-                            EventType/RESIZE
-                            #(calc-entry-edit-modal-height s true)))
                           (reset! (::window-click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(when (and @(::show-legend s)
-                                        (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
-                                (reset! (::show-legend s) false))))
+                                      (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
+                               (reset! (::show-legend s) false))))
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
@@ -250,14 +238,16 @@
                                       (utils/after
                                        180
                                        #(let [from-ap (or (:from-all-posts @router/path)
-                                                       (= (router/current-board-slug) "all-posts"))]
+                                                          (= (router/current-board-slug) "all-posts"))
+                                              go-to-ap (and (not (:new-section entry-editing))
+                                                            from-ap)]
+                                          ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
-                                            (if from-ap
+                                            (if go-to-ap
                                               (oc-urls/all-posts (router/current-org-slug))
                                               (oc-urls/board (router/current-org-slug)
                                                (:board-slug entry-editing))))))))))))
                           s)
-                         :after-render  (fn [s] (should-show-divider-line s) s)
                          :will-unmount (fn [s]
                           (when @(::body-editor s)
                             (.destroy @(::body-editor s))
@@ -265,9 +255,6 @@
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
-                          (when @(::window-resize-listener s)
-                            (events/unlistenByKey @(::window-resize-listener s))
-                            (reset! (::window-resize-listener s) nil))
                           (when @(::window-click-listener s)
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
@@ -286,15 +273,24 @@
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
         wh (.-innerHeight js/window)
         media-input (drv/react s :media-input)
-        all-boards (drv/react s :editable-boards)
-        entry-board (get all-boards (:board-slug entry-editing))
-        published? (= (:status entry-editing) "published")]
+        published? (= (:status entry-editing) "published")
+        show-sections-picker (drv/react s :show-sections-picker)
+        posting-title (if (:uuid entry-editing)
+                        (if (= (:status entry-editing) "published")
+                          "Posted in: "
+                          "Draft for: ")
+                        "Posting in: ")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.entry-edit-modal-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(cancel-clicked s)}]
+        [:div.entry-edit-modal-header-title
+          {:class (when (:uuid entry-editing) "editing")}
+          (if (:uuid entry-editing)
+            "Editing post"
+            "Create new post")]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
@@ -358,40 +354,40 @@
                                 (clean-body)
                                 (reset! (::saving s) true)
                                 (dis/dispatch! [:entry-save])))}
-                  (if working?
-                    (small-loading)
-                    [:div.button-icon
-                      {:class (when disabled? "disabled")}])
-                  (str "Save " (when-not is-mobile? "to ") "draft")]))])]
+                  (when working?
+                    (small-loading))
+                  (str "Save " (when-not is-mobile? "to ") "draft")]))])
+          (when is-mobile?
+            [:div.entry-edit-modal-mobile-subheader
+              [:div.posting-in
+                [:span.posting-in-span
+                  posting-title]
+                [:div.boards-dropdown-caret
+                  [:div.board-name
+                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                    (:board-name entry-editing)]]]])]
       [:div.modal-wrapper
         [:div.entry-edit-modal.group
           {:ref "entry-edit-modal"}
-          [:div.entry-edit-modal-headline
-            (user-avatar-image current-user-data)
-            [:div.posting-in
-              [:span
-                (if (:uuid entry-editing)
-                  (if (= (:status entry-editing) "published")
-                    "Posted in: "
-                    "Draft for: ")
-                  "Posting in: ")]
-              [:div.boards-dropdown-caret
-                [:div.board-name
-                  {:on-click #(reset! (::show-boards-dropdown s) (not @(::show-boards-dropdown s)))}
-                  (:board-name entry-editing)]
-                (when @(::show-boards-dropdown s)
-                  (dropdown-list
-                   {:items (map
-                            #(clojure.set/rename-keys % {:name :label :slug :value})
-                            (vals all-boards))
-                    :value (:board-slug entry-editing)
-                    :on-blur #(reset! (::show-boards-dropdown s) false)
-                    :on-change (fn [item]
-                                 (toggle-save-on-exit s true)
-                                 (reset! (::show-boards-dropdown s) false)
-                                 (dis/dispatch! [:input [:entry-editing :has-changes] true])
-                                 (dis/dispatch! [:input [:entry-editing :board-slug] (:value item)])
-                                 (dis/dispatch! [:input [:entry-editing :board-name] (:label item)]))}))]]]
+          (when-not is-mobile?
+            [:div.entry-edit-modal-headline
+              (user-avatar-image current-user-data)
+              [:div.posting-in
+                [:span.posting-in-span
+                  posting-title]
+                [:div.boards-dropdown-caret
+                  [:div.board-name
+                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                    (:board-name entry-editing)]
+                  (when show-sections-picker
+                    (sections-picker (:board-slug entry-editing)
+                     (fn [board-data]
+                       (dis/dispatch! [:input [:show-sections-picker] false])
+                       (when (and board-data
+                                  (not (string/blank? (:name board-data))))
+                        (dis/dispatch! [:input [:entry-editing]
+                         (merge entry-editing {:board-slug (:slug board-data)
+                                               :board-name (:name board-data)})])))))]]])
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element
@@ -416,17 +412,17 @@
                                :dispatch-input-key :entry-editing
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video" "attachment"]
+                               :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable"})
-            [:div.entry-edit-controls-right]
-            ; Bottom controls
-            [:div.entry-edit-controls.group]]
+            ; Attachments
+            (stream-view-attachments (:attachments entry-editing) #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
               {:id "entry-edit-footer-multi-picker"}]
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 20
                            :height 20
+                           :position "bottom"
                            :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                            :container-selector "div.entry-edit-modal"})
             [:div.entry-edit-legend-container

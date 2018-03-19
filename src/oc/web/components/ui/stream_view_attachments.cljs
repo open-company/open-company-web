@@ -8,32 +8,45 @@
             [goog.events.EventType :as EventType]))
 
 (rum/defcs stream-view-attachments < (rum/local false ::attachments-dropdown)
-  [s attachments]
+  [s attachments remove-cb]
   (let [atc-num (count attachments)
-        ww (responsive/ww)]
+        ww (responsive/ww)
+        editable? (fn? remove-cb)]
     (when (pos? atc-num)
       [:div.stream-view-attachments
         [:div.stream-view-attachments-title
           (str atc-num " attachment" (when (> atc-num 1) "s"))]
         [:div.stream-view-attachments-content
           (for [atch attachments
-                :let [createdat (:createdat atch)
-                      size (:size atch)
+                :let [created-at (:created-at atch)
+                      size (:file-size atch)
                       subtitle (str
-                                  (when createdat
-                                    (str (utils/time-since createdat) " "))
+                                  (when created-at
+                                    (utils/time-since created-at))
+                                  (when (and created-at size)
+                                    " - ")
                                   (when size
-                                    (str "- " (filesize size :binary false :format "%.2f"))))]]
+                                    (filesize size :binary false :format "%.2f")))]]
             [:a.stream-view-attachments-item.group
-              {:class (when (> atc-num 1) "double-line")
-               :key (str "attachment-" size "-" (:url atch))
-               :href (:url atch)
+              {:class (utils/class-set {:double-line (> atc-num 1)
+                                        :editable editable?})
+               :key (str "attachment-" size "-" (:file-url atch))
+               :href (:file-url atch)
                :target "_blank"}
-              [:div.attachment-icon
-                [:i.fa
-                  {:class (au/icon-for-mimetype (:mimetype atch))}]]
+              [:div.attachment-icon]
               [:div.attachment-content
                 [:div.attachment-name
-                  (:name atch)]
+                  (:file-name atch)]
                 [:div.attachment-description
-                  subtitle]]])]])))
+                  subtitle]]
+              (when editable?
+                [:button.mlb-reset.remove-attachment-bt
+                  {:data-toggle (when-not (responsive/is-tablet-or-mobile?) "" "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Remove attachment"
+                   :on-click #(do
+                                (utils/event-stop %)
+                                (utils/remove-tooltips)
+                                (when (fn? remove-cb)
+                                  (remove-cb atch)))}])])]])))

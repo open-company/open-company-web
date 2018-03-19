@@ -45,7 +45,7 @@
       (do
         (stop-editing s)
         (set! (.-innerHTML new-comment) comment-text)
-        (dis/dispatch! [:comment-save c comment-text]))
+        (comment-actions/save-comment c comment-text))
       (cancel-edit e s c))))
 
 (defn start-editing [s]

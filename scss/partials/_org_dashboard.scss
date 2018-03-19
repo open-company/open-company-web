@@ -1,6 +1,33 @@
 div.org-dashboard {
   background-color: $oc_gray_8;
 
+  div.screenshots-preload {
+    div.screenshot-preload {
+      &.screenshot-1 {
+        @include big_web() {
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_1.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_1@2x.png"), "after");
+        }
+
+        @include mobile() {
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_1.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_1@2x.png"), "after");
+        }
+      }
+      &.screenshot-2 {
+        @include big_web() {
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_2.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/onboard_desktop_screenshot_2@2x.png"), "after");
+        }
+
+        @include mobile() {
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_2.png"), "before");
+          @include preload_image(cdnUrl("/img/ML/mobile_nux_il_2@2x.png"), "after");
+        }
+      }
+    }
+  }
+
   div.login-required {
     min-height: calc(100vh - #{$footer_small_height}px - 44px);
   }
@@ -20,7 +47,7 @@ div.org-dashboard {
 
     @include mobile(){
       background-color: $oc_gray_8;
-      padding-top: #{$mobile_navbar_height}px;
+      padding-top: #{$navbar_height}px;
     }
 
     div.org-dashboard-container {
@@ -59,7 +86,7 @@ div.org-dashboard {
       min-height: calc(100vh - #{$footer_small_height}px + 24px);
 
       @include mobile(){
-        min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px + 24px);
+        min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 24px);
       }
     }
   }
@@ -93,6 +120,6 @@ div.org-dashboard div.org-dashboard-inner {
     padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
   }
   @include mobile(){
-    min-height: calc(100vh - #{$mobile_navbar_height}px);
+    min-height: calc(100vh - #{$navbar_height}px);
   }
 }

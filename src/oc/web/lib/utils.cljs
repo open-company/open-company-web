@@ -633,7 +633,7 @@
 
 (defn strip-empty-tags [text]
   (when text
-    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
+    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}(class)?[ ]{0,}([0-9a-zA-Z-]{0,}=\"[a-zA-Z\\s]{0,}\")?>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
       (.replace text reg ""))))
 
 (defn su-default-title []
@@ -1051,6 +1051,7 @@
 
 (def default-draft-status "draft")
 
+
 (def default-drafts-board
   {:uuid "0000-0000-0000"
    :created-at "2000-01-01T00:00:00.000Z"
@@ -1061,6 +1062,14 @@
    :fixed-items {}
    :access "private"
    :read-only true})
+
+(def default-section-slug "--default-section-slug")
+(def default-section-access "team")
+
+(def default-section
+  {:name ""
+   :access default-section-access
+   :slug default-section-slug})
 
 (defn retina-src [url]
   {:src (cdn (str url ".png"))

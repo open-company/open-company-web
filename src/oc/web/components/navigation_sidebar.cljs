@@ -8,7 +8,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (first-render-mixin)]
+            [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.components.ui.section-editor :refer (section-editor)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -52,6 +53,21 @@
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height)))))
 
+(defn filter-board [board-data]
+  (let [self-link (utils/link-for (:links board-data) "self")]
+    (and (not= (:slug board-data) utils/default-drafts-board-slug)
+         (or (not (contains? self-link :count))
+             (and (contains? self-link :count)
+                  (pos? (:count self-link)))))))
+
+(defn filter-boards [all-boards]
+  (filterv filter-board all-boards))
+
+(defn save-window-height
+  "Save the window height in the local state."
+  [s]
+  (reset! (::window-height s) (.-innerHeight js/window)))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -59,17 +75,13 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
-                                (rum/local nil ::resize-listener)
                                 (rum/local nil ::window-height)
                                 ;; Mixins
-                                first-render-mixin
+                                ui-mixins/first-render-mixin
+                                (ui-mixins/render-on-resize save-window-height)
+
                                 {:will-mount (fn [s]
-                                  (reset! (::window-height s) (.-innerHeight js/window))
-                                  (reset! (::resize-listener s)
-                                   (events/listen
-                                    js/window
-                                    EventType/RESIZE
-                                    #(reset! (::window-height s) (.-innerHeight js/window))))
+                                  (save-window-height s)
                                   (save-content-height s)
                                   s)
                                  :did-mount (fn [s]
@@ -83,10 +95,6 @@
                                  :did-update (fn [s]
                                   (when-not (utils/is-test-env?)
                                     (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                  s)
-                                 :will-unmount (fn [s]
-                                  (when @(::resize-listener s)
-                                    (events/unlistenByKey @(::resize-listener s)))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -94,14 +102,12 @@
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
-        boards (filterv #(not= (:slug %) utils/default-drafts-board-slug) all-boards)
+        boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
-        show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
-                                   create-link)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
@@ -126,34 +132,46 @@
           [:button.mlb-reset.close-mobile-menu
             {:on-click #(close-navigation-sidebar)}]
           [:div.mobile-header-title
-            "Your digests"]]
+            "Digest navigation"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
-            {:class (when is-all-posts "item-selected")
+            {:class (utils/class-set {:item-selected is-all-posts
+                                      :showing-drafts show-drafts})
              :href (oc-urls/all-posts)
              :on-click #(anchor-nav! % (oc-urls/all-posts))}
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
                 "All Posts"]])
+        (when show-drafts
+          (let [board-url (oc-urls/board (:slug drafts-board))]
+            [:a.drafts.hover-item.group
+              {:class (when (and (not is-all-posts)
+                                 (= (router/current-board-slug) (:slug drafts-board)))
+                        "item-selected")
+               :data-board (name (:slug drafts-board))
+               :key (str "board-list-" (name (:slug drafts-board)))
+               :href board-url
+               :on-click #(anchor-nav! % board-url)}
+              [:div.drafts-label.group
+                "Drafts "
+                [:span.count "(" (:count drafts-link) ")"]]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              {:id "navigation-sidebar-boards"}
               [:span
                 "SECTIONS"]
-              (when show-create-new-board
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.right
+              (when create-link
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(do
-                               (dis/dispatch! [:board-edit nil])
+                               (dis/dispatch! [:input [:show-section-add] true])
                                (close-navigation-sidebar))
-                   :title "Create a new board"
-                   :id "add-board-button"
+                   :title "Create a new section"
                    :data-placement "top"
-                   :data-toggle "tooltip"
+                   :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
                    :data-container "body"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
@@ -180,31 +198,7 @@
                     {:class (utils/class-set {:new (new? change-data board)
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])
-            (when show-drafts
-              (let [board-url (oc-urls/board (:slug drafts-board))]
-                [:a.left-navigation-sidebar-item.drafts-board.hover-item
-                  {:class (when (and (not is-all-posts)
-                                     (= (router/current-board-slug)
-                                     (:slug drafts-board)))
-                            "item-selected")
-                   :data-board (name (:slug drafts-board))
-                   :key (str "board-list-" (name (:slug drafts-board)))
-                   :href board-url
-                   :on-click #(anchor-nav! % board-url)}
-                  [:div.private
-                    {:class (when (= (router/current-board-slug) (:slug drafts-board)) "selected")}]
-                  [:div.board-name.group
-                    {:class (utils/class-set {:public-board (= (:access drafts-board) "public")
-                                              :private-board (= (:access drafts-board) "private")
-                                              :team-board (= (:access drafts-board) "team")})}
-                    [:div.internal.has-icon
-                      {:key (str "board-list-" (name (:slug drafts-board)) "-internal")
-                       :dangerouslySetInnerHTML
-                        (utils/emojify
-                         (str
-                          (or (:name drafts-board) (:slug drafts-board))
-                          " (" (:count drafts-link) ")"))}]]]))])]
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       [:div.left-navigation-sidebar-footer
         {:style {:position (if is-tall-enough? "absolute" "relative")}}
         (when show-invite-people

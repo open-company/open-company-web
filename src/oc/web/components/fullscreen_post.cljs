@@ -16,9 +16,9 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -61,24 +61,6 @@
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s)))
 
-;; Delete handling
-
-(defn delete-clicked [e activity-data]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message (str "Delete this update?")
-                    :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(let [org-slug (router/current-org-slug)
-                                            board-slug (router/current-board-slug)
-                                            board-url (oc-urls/board org-slug board-slug)]
-                                       (router/nav! board-url)
-                                       (dis/dispatch! [:activity-delete activity-data])
-                                       (dis/dispatch! [:alert-modal-hide]))
-                    }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
-
 ;; Editing
 
 (defn body-on-change [state]
@@ -110,9 +92,10 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-let [headline-el   (rum/ref-node state "edit-headline")]
-      ; move cursor at the end
-      (utils/to-end-of-content-editable headline-el))))
+    (when (= (.-activeElement js/document) (.-body js/document))
+      (when-let [headline-el   (rum/ref-node state "edit-headline")]
+        ; move cursor at the end
+        (utils/to-end-of-content-editable headline-el)))))
 
 (defn- add-emoji-cb [state]
   (headline-on-change state)
@@ -159,7 +142,8 @@
   (clean-body)
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
         edited-data (:modal-editing-data modal-data)]
-    (when (:has-changes edited-data)
+    (when (and (:has-changes edited-data)
+               (pos? (count (:headline edited-data))))
       (reset! (::entry-saving state) true)
       (activity-actions/entry-modal-save edited-data (router/current-board-slug)))))
 
@@ -217,7 +201,6 @@
                              (rum/local false ::showing-dropdown)
                              (rum/local false ::move-activity)
                              (rum/local nil ::window-click)
-                             (rum/local false ::resize-listener)
                              ;; Editing locals
                              (rum/local "" ::initial-headline)
                              (rum/local "" ::initial-body)
@@ -228,10 +211,10 @@
                              (rum/local false ::edited-data-loaded)
                              (rum/local nil ::autosave-timer)
                              (rum/local false ::show-legend)
-                             (rum/local false ::re-render)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
+                             (mixins/render-on-resize nil)
                              mixins/first-render-mixin
 
                              {:before-render (fn [s]
@@ -270,9 +253,6 @@
                                (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
                                  ;; Force comments reload
                                  (comment-actions/get-comments (:activity-data modal-data)))
-                               (reset! (::resize-listener s)
-                                (events/listen js/window EventType/RESIZE
-                                 #(reset! (::re-render s) true)))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -280,12 +260,6 @@
                                  js/window
                                  EventType/CLICK
                                  (fn [e]
-                                   (when (and (not
-                                               (utils/event-inside? e (rum/ref-node s "more-dropdown")))
-                                              (not
-                                               (utils/event-inside? e
-                                                (sel1 [:div.fullscreen-post :div.activity-move]))))
-                                     (reset! (::showing-dropdown s) false))
                                    (when (and @(::show-legend s)
                                               (not (utils/event-inside? e (rum/ref-node s "legend-container"))))
                                       (reset! (::show-legend s) false)))))
@@ -294,9 +268,6 @@
                                (when @(::window-click s)
                                  (events/unlistenByKey @(::window-click s))
                                  (reset! (::window-click s) nil))
-                               (when @(::resize-listener s)
-                                 (events/unlistenByKey @(::resize-listener s))
-                                 (reset! (::resize-listener s) false))
                                (when @(::headline-input-listener s)
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
@@ -309,8 +280,8 @@
         delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
-        activity-attachments (au/get-attachments-from-body (:body activity-data))
-        editing (:modal-editing modal-data)]
+        editing (:modal-editing modal-data)
+        activity-attachments (if editing (:attachments (:modal-editing-data modal-data)) (:attachments activity-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -343,61 +314,11 @@
         [:div.fullscreen-post-header-right
           (if editing
             [:button.mlb-reset.post-publish-bt
-              {:on-click #(save-editing? s)
+              {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
+               :disabled (zero? (count (:headline (:modal-editing-data modal-data))))
                :class (when @(::entry-saving s) "loading")}
               "Post changes"]
-            (when (or edit-link
-                      share-link
-                      delete-link)
-              (let [all-boards (filter
-                                #(not= (:slug %) utils/default-drafts-board-slug)
-                                (:boards (:org-data modal-data)))]
-                [:div.more-dropdown
-                  {:ref "more-dropdown"}
-                  [:button.mlb-reset.fullscreen-post-more.dropdown-toggle
-                    {:type "button"
-                     :on-click (fn [_]
-                                 (when-not editing
-                                   (utils/remove-tooltips)
-                                   (reset! (::showing-dropdown s) (not @(::showing-dropdown s)))
-                                   (reset! (::move-activity s) false)))
-                     :data-toggle (if editing "" "tooltip")
-                     :data-placement "left"
-                     :data-container "body"
-                     :title "More"}]
-                  (when @(::showing-dropdown s)
-                    [:div.fullscreen-post-dropdown-menu
-                      [:div.triangle]
-                      [:ul.fullscreen-post-more-menu
-                        (when edit-link
-                         [:li.no-editing
-                           {:on-click #(do
-                                        (reset! (::showing-dropdown s) false)
-                                        (activity-actions/activity-edit activity-data))}
-                           "Edit"])
-                        (when share-link
-                         [:li.no-editing
-                           {:on-click #(do
-                                        (reset! (::showing-dropdown s) false)
-                                        (dis/dispatch! [:activity-share-show activity-data]))}
-                           "Share"])
-                        (when edit-link
-                          [:li.no-editing
-                            {:on-click #(do
-                                         (reset! (::showing-dropdown s) false)
-                                         (reset! (::move-activity s) true))}
-                            "Move"])
-                        (when delete-link
-                          [:li
-                            {:on-click #(do
-                                          (reset! (::showing-dropdown s) false)
-                                          (delete-clicked % activity-data))}
-                            "Delete"])]])
-                  (when @(::move-activity s)
-                    (activity-move {:activity-data activity-data
-                                    :boards-list all-boards
-                                    :dismiss-cb #(reset! (::move-activity s) false)
-                                    :on-change #(close-clicked s)}))])))]]
+            (more-menu activity-data))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         (when is-mobile?
@@ -441,7 +362,7 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
-            (stream-view-attachments activity-attachments editing)
+            (stream-view-attachments activity-attachments (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             [:div.fullscreen-post-box-footer.group
               (if editing
                 [:div.fullscreen-post-box-footer-editing
@@ -450,6 +371,7 @@
                   (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                                  :width 20
                                  :height 20
+                                 :position "bottom"
                                  :default-field-selector "div.fullscreen-post div.rich-body-editor"
                                  :container-selector "div.fullscreen-post"})
                   [:div.fullscreen-post-box-footer-legend-container

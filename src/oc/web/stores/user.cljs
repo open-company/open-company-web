@@ -90,7 +90,9 @@
 
 (defmethod dispatcher/action :signup-with-email
   [db [_]]
-  (dissoc db :signup-with-email-error :latest-auth-settings :latest-entry-point))
+  (-> db
+    (dissoc :signup-with-email-error :latest-auth-settings :latest-entry-point)
+    (assoc-in [:signup-with-email :error] nil)))
 
 (defmethod dispatcher/action :signup-with-email/failed
   [db [_ status]]

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="19px" viewBox="0 0 16 19" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="➡️-Boards-&amp;-Posts" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Nav-Redlines" transform="translate(-653.000000, -341.000000)" fill="#3FBD7C">
+            <path d="M666.997871,358 L655,357.999987 L654.995471,343 L660,343 L660,349 C660,349.552285 660.447715,350 661,350 L667.000057,350 L666.997871,358 Z M662,343 L662,348 L667,348 L662,343 Z M654.995471,341 L662.302791,341 C662.5787,341 662.961797,341.159489 663.153337,341.3511 L668.649031,346.848851 C668.842866,347.042758 669,347.427963 669,347.699255 L669,358.000729 C669,359.104896 668.105486,360 666.997871,360 L655.002129,360 C653.896384,360 653,359.101788 653,357.999987 L653,343.000013 C653,341.895436 653.895881,341 654.995471,341 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>
