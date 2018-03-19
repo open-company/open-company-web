@@ -3,7 +3,8 @@
 Carrot follows the Facebook Flux pattern:
 
 <img src="./flux-diagram-white-background.png" style="width: 100%;" />
-_image source: the Flux repo_
+
+_Image source: the [Flux repo](https://github.com/facebook/flux)_
 
 It's important to note, Flux isn't a particular software library, instead it's an architectural pattern that's been implemented now in countless React apps and in many React web frameworks.
 
