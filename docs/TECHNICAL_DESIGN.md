@@ -143,11 +143,12 @@ open_company_web.dispatcher.print_app_state()
 
 ### Component Tree Design
 
-The OpenCompany web app is made up of trees of Om/Rum components that start from a few top level components (company-dashboard, company-settings, user-settings, company-list, login...) and include other child components in a tree, sometimes just a few, and sometimes many.
+The Carrot web app is made up of trees of Rum components that start from a few top level components and include other child components in a tree, sometimes just a few, and sometimes many.
 
+TODO: Update copy.
 One of the most important component trees is the company dashboard. This provides the main UI for viewing and editing a company's topics. Here's a diagram of the read-only aspects of the company dashboard component tree:
 
-TODO: Update to actual components used.
+TODO: Update diagram to actual components used.
 
 ![Company Dashboard Diagram](https://cdn.rawgit.com/open-company/open-company-web/mainline/docs/dashboard-viewing-component-tree.svg)
 
