@@ -318,21 +318,5 @@ div#wrap {
         }
       }
     }
-
-    section.third-section {
-      padding: 72px 0px;
-      text-align: center;
-
-      div.third-section-title {
-        @include avenir_M();
-        font-size: 34px;
-        color: $carrot_dark_gray;
-        margin-bottom: 20px;
-      }
-
-      button.get-started-button {
-        margin-top: 0px;
-      }
-    }
   }
 }

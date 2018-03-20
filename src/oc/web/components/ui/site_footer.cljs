@@ -42,6 +42,7 @@
             "COMPANY"]
           [:div.column-item [:a {:href oc-urls/home} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
+          [:div.column-item [:a {:href oc-urls/pricing} "Pricing"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
 
         [:div.column.column-resources
@@ -64,8 +65,8 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :support)))}
             "SUPPORT"]
-          ; [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
           [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         [:div.column.column-integrations

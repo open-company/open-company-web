@@ -216,6 +216,13 @@
           [:div.author-company
             ""]]]]])
 
+(def keep-aligned
+  [:section.keep-aligned
+    [:div.keep-aligned-title
+      "Keep everyone aligned around what matters most."]
+    [:button.mlb-reset.get-started-button
+      "Get started for free"]])
+
 (defn index [options]
   [:div
     {:id "wrap"}
@@ -265,61 +272,277 @@
 
       testimonials-section
 
-      [:section.third-section
-        [:div.third-section-title
-          "Keep everyone aligned around what matters most."]
-        [:button.mlb-reset.get-started-button
-          "Get started for free"]]
+      keep-aligned
       ]])
 
 (defn pricing
   "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
   [options]
-   [:div.container.outer.sector.content
-    [:div.row
-     [:div.col-md-12.pricing-header
-      [:h2 "Simple Pricing"]
-      [:p "Transparent prices for any need."]]]
-    [:div.row
-     "<!-- Pricing Item -->"
-     [:div.col-md-4
-      [:div.pricing.hover-effect
-       [:div.pricing-name
-        [:h3 "Team"
-         [:span "Internal Slack distrbution"]]]
-       [:div.pricing-price [:h4 [:i "$"] "25" [:span "Per Month"]]]
-       [:ul.pricing-content.list-unstyled
-        [:li "Stakeholder dashboard"]
-        [:li "Rich Slack integration"]]
-       [:div.pricing-footer
-        [:p "Perfect for keeping your team members informed."]
-        [:p "Optionally involve the crowd with a public stakeholder dashboard."]]]]
-     [:div.col-md-4
-      [:div.pricing.hover-effect
-       [:div.pricing-name
-        [:h3 "Stakeholders"
-         [:span "Periodic stakeholder updates"]]]
-       [:div.pricing-price [:h4 [:i "$"] "50" [:span "Per Month"]]]
-       [:ul.pricing-content.list-unstyled
-        [:li "Stakeholder dashboard"]
-        [:li "Rich Slack integration"]
-        [:li [:b "Periodic stakeholder updates"]]]
-       [:div.pricing-footer
-        [:p "Keep your busy investors and advisors informed with periodic updates that follow best practices."]]]]
-     [:div.col-md-4
-      [:div.pricing.hover-effect
-       [:div.pricing-name
-        [:h3 "Concierge"
-         [:span "Beautifully designed content"]]]
-       [:div.pricing-price [:h4 [:i "$"] "250" [:span "Per Month"]]]
-       [:ul.pricing-content.list-unstyled
-        [:li "Stakeholder dashboard"]
-        [:li "Rich Slack integration"]
-        [:li "Periodic stakeholder updates"]
-        [:li [:b "Concierge support to desgin custom stakeholder content *"]]]
-       [:div.pricing-footer
-        [:p "Impress your investors and advisors with beautful, concise and meaningful updates."]]]]
-     ]])
+  [:div
+    {:id "wrap"}
+    [:div.main.pricing
+      [:section.pricing-header
+        ;; Top left
+        [:div.balloon.big-red]
+        [:div.balloon.big-green]
+        [:div.balloon.small-blue]
+        [:div.balloon.big-purple]
+
+        [:h1.pricing-headline
+          "Pricing guide"]
+
+        [:div.pricing-block.group
+          [:div.pricing-block-column.free-column
+            [:div.price-column-title
+              "Free"]
+            [:div.price-column-price
+              "0"]
+            [:div.price-column-description
+              "Free for small teams for an unlimited period of time"]
+            [:button.mlb-reset.price-button
+              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Free'});"}
+              "Create a digest"]]
+
+          [:div.pricing-block-column.standard-column
+            [:div.price-column-title
+              "Standard"]
+            [:div.price-column-price
+              "8"]
+            [:div.price-column-description
+              "Per contributor per month billed annually"]
+            [:div.price-column-description.second-line
+              "Or $10 billed monthly"]
+            [:div.price-column-description.more-info
+              "Viewers are always free"]
+            [:button.mlb-reset.price-button
+              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Standard'});"}
+              "Buy standard"]]
+
+          [:div.pricing-block-column.plus-column
+            [:div.price-column-title
+              "Plus"]
+            [:div.price-column-price
+              "12"]
+            [:div.price-column-description
+              "Per contributor per month billed annually"]
+            [:div.price-column-description.second-line
+              "Or $14 billed monthly"]
+            [:div.price-column-description.more-info
+              "Viewers are always free"]
+            [:button.mlb-reset.price-button
+              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Plus'});"}
+              "Buy plus"]]]
+        [:div.enterprise-block
+          [:span.enterprise-block-title
+            "Enterprise Edition"]
+          [:span.enterprise-block-copy
+            "Let’s create a plan that’s right for your organization."]
+          [:a.enterprise-block-link
+            {:href (:contact-mail-to options)}
+            "Contact us"]]]
+      [:section.second-section
+        [:h1.compare-plans
+          "Compare Plans"]
+
+        [:div.pricing-table
+          [:table
+            {:cellpadding "0"
+             :cellspacing "0"}
+            [:thead
+              [:tr
+                [:th]
+                [:th
+                  [:div
+                    "Free"]]
+                [:th
+                  [:div
+                    "Standard"]]
+                [:th
+                  [:div
+                    "Plus"]]]]
+            [:tbody
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Searchable posts"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Searchable posts"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td
+                  [:div "100"]]
+                [:td
+                  [:div "Unlimited"]]
+                [:td
+                  [:div "Unlimited"]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "History kept"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "History kept"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td
+                  [:div "Last 12 months"]]
+                [:td
+                  [:div "Unlimited"]]
+                [:td
+                  [:div "Unlimited"]]]
+              [:tr
+                [:td
+                  [:div "File storage"]]
+                [:td
+                  [:div "1 GB"]]
+                [:td
+                  [:div "10 GB"]]
+                [:td
+                  [:div "50 GB"]]]
+              [:tr
+                [:td
+                  [:div "File upload"]]
+                [:td
+                  [:div "25 MB"]]
+                [:td
+                  [:div "50 MB"]]
+                [:td
+                  [:div "100 MB"]]]
+              [:tr
+                [:td
+                  [:div "Slack single sign-on"]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Slack sync"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Slack sync"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Dropbox, Google Drive and other integrations"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Dropbox, Google Drive and other integrations"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "OAuth with Google"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "OAuth with Google"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Private and public visibility"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Private and public visibility"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div.more-info
+                    "Who read what"
+                    [:span.more-info-icon]
+                    [:div.more-info-bubble
+                      [:div.more-info-title
+                        "Who read what"]
+                      [:div.more-info-desc
+                        (str
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
+                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
+                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
+                [:td]
+                [:td
+                  [:div.check]]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div "Analytics"]]
+                [:td]
+                [:td]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div "Prioriy support"]]
+                [:td]
+                [:td]
+                [:td
+                  [:div.check]]]
+              [:tr
+                [:td
+                  [:div "Uptime SLA"]]
+                [:td]
+                [:td]
+                [:td
+                  [:div.check]]]]]]]
+
+      testimonials-section
+
+      keep-aligned
+    ]])
 
 (defn slack
   "Slack page. This is a copy of oc.web.components.slack and
@@ -389,8 +612,8 @@
 
       testimonials-section
 
-      [:section.third-section
-        [:div.third-section-title
+      [:section.keep-aligned
+        [:div.keep-aligned-title
           "Keep everyone aligned around what matters most."]
         [:div.sigin-with-slack-container
           [:button.signin-with-slack.mlb-reset
