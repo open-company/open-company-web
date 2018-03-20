@@ -31,6 +31,14 @@
   (timbre/debug "Trying post handshake jwt auth")
   (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
 
+(defn board-watch [board-uuid]
+  (timbre/debug "Watching board: " board-uuid)
+  (@chsk-send! [:watch/board {:board-uuid board-uuid}] 1000))
+
+(defn board-unwatch [callback]
+  (timbre/debug "Unwatching all boards.")
+  (@chsk-send! [:unwatch/board] 1000 callback))
+
 ;; Event handler
 
 (defmulti event-handler
