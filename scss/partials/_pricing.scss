@@ -20,6 +20,11 @@ div#wrap {
       padding-top: 72px;
       text-align: center;
       position: relative;
+      overflow: hidden;
+
+      @include mobile() {
+        overflow: visible;
+      }
 
       div.balloon {
         position: absolute;
