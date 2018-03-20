@@ -17,7 +17,7 @@
                  (utils/event-stop %)
                  (dis/dispatch! [:input [:orgs-dropdown-visible] false])
                  (router/nav! (oc-urls/org (:slug org))))}
-    (org-avatar org false :always)])
+    (org-avatar org false :always true)])
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive

@@ -10,12 +10,12 @@ div.search-box {
       position: absolute;
       min-width: 160px;
       width: 100vw;
-      height: calc(100vh - 13px);
+      height: 100vh;
       top: 0px;
       left: 0px;
       background-color: white;
       z-index: 1081;
-      padding: 10px 16px;
+      padding: 24px;
     }
   }
 
@@ -69,13 +69,7 @@ div.search-box {
     }
 
     &.inactive {
-      background-image: none;
-      border: none;
-      outline: none;
-      width: 0px;
-      height: 0px;
-      padding: 0px;
-      margin: 0px;
+      display: none;
     }
   }
 }
