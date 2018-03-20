@@ -335,3 +335,23 @@ section.testimonials-section {
     }
   }
 }
+
+section.keep-aligned {
+  padding: 72px 0px;
+  text-align: center;
+
+  @include mobile_to_tablet(){
+    padding: 0 32px;
+  }
+
+  div.keep-aligned-title {
+    @include avenir_M();
+    font-size: 34px;
+    color: $carrot_dark_gray;
+    margin-bottom: 20px;
+  }
+
+  button.get-started-button {
+    margin-top: 0px;
+  }
+}

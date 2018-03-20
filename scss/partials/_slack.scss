@@ -290,12 +290,12 @@ div#wrap {
       }
     }
 
-    section.third-section {
+    section.keep-aligned {
       text-align: center;
       max-width: 800px;
       margin: 72px auto;
 
-      div.third-section-title {
+      div.keep-aligned-title {
         @include avenir_M();
         font-size: 34px;
         color: $carrot_dark_gray;

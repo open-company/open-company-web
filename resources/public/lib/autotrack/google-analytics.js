@@ -127,6 +127,8 @@ var sendNavigationTimingMetrics = function() {
 
 var CarrotGA = {
 
+  NULL_VALUE: '(not set)',
+
   dimensions: {
     TRACKING_VERSION: 'dimension1',
     CLIENT_ID: 'dimension2',
@@ -163,6 +165,11 @@ var CarrotGA = {
     trackCustomDimensions();
     requireAutotrackPlugins();
     sendNavigationTimingMetrics();
+  },
+
+  /* Track an event */
+  trackEvent: function(params) {
+    ga('send', 'event', params);
   }
 
 };

@@ -43,16 +43,16 @@
                         (dis/dispatch! [:site-menu-toggle])
                         (router/nav! oc-urls/home))}
             "Home"]]
-        ; [:div.site-mobile-menu-item
-        ;   [:a
-        ;     {:href oc-urls/pricing
-        ;      :class (when (utils/in? (:route @router/path) "pricing") "active")
-        ;      :on-click #(do
-        ;                  (utils/event-stop %)
-        ;                  (dis/dispatch! [:login-overlay-show nil])
-        ;                  (dis/dispatch! [:site-menu-toggle])
-        ;                  (router/nav! oc-urls/pricing))}
-        ;     "Pricing"]]
+        [:div.site-mobile-menu-item
+          [:a
+            {:href oc-urls/pricing
+             :class (when (utils/in? (:route @router/path) "pricing") "active")
+             :on-click (fn [e]
+                        (utils/event-stop e)
+                        (dis/dispatch! [:login-overlay-show nil])
+                        (dis/dispatch! [:site-menu-toggle])
+                        (router/nav! oc-urls/pricing))}
+            "Pricing"]]
         [:div.site-mobile-menu-item
           [:a
             {:href oc-urls/about
