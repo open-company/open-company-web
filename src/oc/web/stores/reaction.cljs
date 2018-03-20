@@ -75,50 +75,48 @@
   [db [_ activity-data reaction reaction-data]]
   (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
 
+(defn- update-entry-reaction-data
+  [add-event? interaction-data entry-data]
+  (when entry-data
+    (let [reaction-data (assoc (:interaction interaction-data) :count (:count interaction-data))
+          reaction (:reaction reaction-data)
+          reactions-data (:reactions entry-data)
+          reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))
+          reaction-found (and (number? reaction-idx) (>= reaction-idx 0))
+          old-reaction-data (when reaction-found
+                             (get reactions-data reaction-idx))
+          is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+          with-reacted (if is-current-user
+                         ;; If the reaction is from the current user we need to
+                         ;; update the reacted, the links are the one coming with
+                         ;; the WS message
+                         (assoc reaction-data :reacted add-event?)
+                         ;; If it's a reaction from another user we need to
+                         ;; survive the reacted and the links from the reactions
+                         ;; we already have
+                         (assoc reaction-data :reacted (if old-reaction-data (:reacted old-reaction-data) false)))
+          new-reactions-data (if reactions-data
+                               (assoc reactions-data (if reaction-found reaction-idx (count reactions-data)) with-reacted)
+                               [with-reacted])
+          new-entry-data (assoc entry-data :reactions new-reactions-data)]
+      new-entry-data)))
+
 (defn- update-entry-reaction
-  "Need to update the local state with the data we have, if the interaction is from
-   the actual unchecked-short we need to refresh the entry since we don't have the
-   links to delete/add the reaction."
   [db interaction-data add-event?]
-  (let [; Get the current router data
-        org-slug (router/current-org-slug)
-        is-all-posts (:from-all-posts @router/path)
-        board-slug (router/current-board-slug)
-        activity-uuid (:resource-uuid interaction-data)
-        ; Entry data
-        fixed-activity-uuid (or (router/current-secure-activity-id) activity-uuid)
-        is-secure-activity (router/current-secure-activity-id)
-        secure-activity-data (when is-secure-activity
-                               (dispatcher/activity-data org-slug board-slug fixed-activity-uuid))
-        entry-key (dispatcher/activity-key org-slug board-slug fixed-activity-uuid)
-        entry-data (get-in db entry-key)]
-    (if (and is-secure-activity
-             (not= (:uuid secure-activity-data) activity-uuid))
-      db
-      (if (and entry-data (seq (:reactions entry-data)))
-        ; If the entry is present in the local state and it has reactions
-        (let [reaction-data (:interaction interaction-data)
-              old-reactions-data (or (:reactions entry-data) [])
-              reaction-idx (utils/index-of old-reactions-data #(= (:reaction %) (:reaction reaction-data)))
-              old-reaction-data (if reaction-idx
-                                  (get old-reactions-data reaction-idx)
-                                  {:reacted false :reaction (:reaction reaction-data)})
-              with-reaction-data (assoc old-reaction-data :count (:count interaction-data))
-              is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
-              reacted (if is-current-user add-event? (:reacted old-reaction-data))
-              with-reacted (assoc with-reaction-data :reacted reacted)
-              with-links (assoc with-reacted :links (:links reaction-data))
-              new-reactions-data (if (pos? (:count with-links))
-                                   (if (or (neg? reaction-idx) (nil? reaction-idx))
-                                     (assoc old-reactions-data (count old-reactions-data) with-links)
-                                     (assoc old-reactions-data reaction-idx with-links))
-                                   (vec (remove #(= (:reaction %) (:reaction reaction-data)) old-reactions-data)))
-          ; Update the entry with the new reaction
-              updated-entry-data (assoc entry-data :reactions new-reactions-data)]
-              ; Update the entry in the local state with the new reaction
-          (assoc-in db entry-key updated-entry-data))
-        ;; the entry is not present, refresh the full board
-        db))))
+  (let [item-uuid (:resource-uuid interaction-data)
+        entries-key (get @reactions-atom (make-activity-index item-uuid))
+        all-posts-key (assoc entries-key 2 :all-posts)
+        ;; look for data in the board and in AP key
+        keys (remove nil? [all-posts-key entries-key])
+        new-data (->> (mapcat #(vector %
+                                (update-entry-reaction-data add-event? interaction-data
+                                 (get-in db %)))
+                       keys)
+                  (partition 2)
+                  (filter second) ;; remove nil data
+                  (map vec))]
+    (when-not (empty? new-data)
+      (reduce #(assoc-in %1 (first %2) (second %2)) db new-data))))
 
 (defn- get-comments-data
   [db data-key item-uuid]
@@ -159,6 +157,7 @@
   (let [item-uuid (:resource-uuid interaction-data)
         comments-key (get @reactions-atom (make-comment-index item-uuid))
         all-posts-key (assoc comments-key 2 :all-posts)
+        ;; look for data in the board and in AP key
         keys (remove nil? [comments-key all-posts-key])
         new-data (->> (mapcat #(vector %
                                        (update-comments-data
