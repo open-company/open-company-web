@@ -60,7 +60,7 @@
               [:div.price-column-description.more-info
                 "Viewers are always free"]
               [:button.mlb-reset.price-button
-                {:on-click #(track-event "Purchase Standard")}
+                {:on-click #(track-event "Standard")}
                 "Buy standard"]]
 
             [:div.pricing-block-column.plus-column
@@ -75,7 +75,7 @@
               [:div.price-column-description.more-info
                 "Viewers are always free"]
               [:button.mlb-reset.price-button
-                {:on-click #(track-event "Purchase Plus")}
+                {:on-click #(track-event "Plus")}
                 "Buy plus"]]]
 
           [:div.enterprise-block
