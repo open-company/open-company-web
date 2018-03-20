@@ -33,7 +33,7 @@ An action creator will handle the following:
 - Pass data and an action to the dispatcher.
 - Make async API calls where the results call a "finished" action creator.
 
-#### Things the action creators do now but might belong in a store.
+There are some things the action creators do now but that might belong in a store:
 
 - Update cookie information
 - Update url routes.
