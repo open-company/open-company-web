@@ -123,7 +123,8 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-not (responsive/is-tablet-or-mobile?)
+    (when (and (not (responsive/is-tablet-or-mobile?))
+               (= (.-activeElement js/document) (.-body js/document)))
       (when-let [headline-el (rum/ref-node state "headline")]
         ; move cursor at the end
         (utils/to-end-of-content-editable headline-el)))))
@@ -164,13 +165,13 @@
                         (rum/local nil ::uploading-media)
                         (rum/local false ::saving)
                         (rum/local false ::publishing)
-                        (rum/local false ::window-resize-listener)
                         (rum/local false ::window-click-listener)
                         (rum/local nil ::autosave-timer)
                         (rum/local false ::show-legend)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
+                        (mixins/render-on-resize (fn [s _] (calc-entry-edit-modal-height s true)))
 
                         {:will-mount (fn [s]
                           (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -189,11 +190,6 @@
                           (when-not (responsive/is-tablet-or-mobile?)
                             (when-let [headline-el (rum/ref-node s "headline")]
                               (utils/to-end-of-content-editable headline-el)))
-                          (reset! (::window-resize-listener s)
-                           (events/listen
-                            js/window
-                            EventType/RESIZE
-                            #(calc-entry-edit-modal-height s true)))
                           (reset! (::window-click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(when (and @(::show-legend s)
@@ -243,8 +239,8 @@
                                        180
                                        #(let [from-ap (or (:from-all-posts @router/path)
                                                           (= (router/current-board-slug) "all-posts"))
-                                              go-to-ap (or from-ap
-                                                           (not= (:status entry-editing) "published"))]
+                                              go-to-ap (and (not (:new-section entry-editing))
+                                                            from-ap)]
                                           ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
                                             (if go-to-ap
@@ -259,9 +255,6 @@
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
-                          (when @(::window-resize-listener s)
-                            (events/unlistenByKey @(::window-resize-listener s))
-                            (reset! (::window-resize-listener s) nil))
                           (when @(::window-click-listener s)
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
@@ -294,7 +287,10 @@
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(cancel-clicked s)}]
         [:div.entry-edit-modal-header-title
-          "Edit post"]
+          {:class (when (:uuid entry-editing) "editing")}
+          (if (:uuid entry-editing)
+            "Editing post"
+            "Create new post")]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
@@ -426,6 +422,7 @@
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 20
                            :height 20
+                           :position "bottom"
                            :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                            :container-selector "div.entry-edit-modal"})
             [:div.entry-edit-legend-container

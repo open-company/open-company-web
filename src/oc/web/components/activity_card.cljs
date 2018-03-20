@@ -52,7 +52,7 @@
                               (.tooltip "fixTitle")
                               (.tooltip "hide")))
                           s)}
-  [s activity-data has-headline has-body is-new show-attachments]
+  [s activity-data has-headline has-body is-new has-attachments]
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -115,7 +115,7 @@
                :ref "activity-body"
                :class (utils/class-set {:has-body has-body
                                         :has-headline has-headline})}])
-          (when show-attachments
+          (when has-attachments
               [:div.activity-card-attachments
                 (activity-attachments activity-data)])]
         [:div.activity-card-footer.group

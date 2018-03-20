@@ -50,10 +50,14 @@ div.entry-edit-modal-container {
       @include avenir_H();
       font-size: 18px;
       color: $deep_navy;
-      width: 105px;
+      width: 162px;
       text-align: right;
       position: relative;
       margin: 0px auto;
+
+      &.editing {
+        width: 105px;
+      }
 
       &:before {
         content: "";
@@ -101,7 +105,7 @@ div.entry-edit-modal-container {
         @include mobile() {
           float: right;
           width: 1px;
-          background-color: #D8DBDF;
+          background-color: $light_tan;
           height: 64px;
           margin: -20px 16px 0px 16px;
           display: block;
@@ -210,7 +214,7 @@ div.entry-edit-modal-container {
       width: calc(100% + 48px);
       margin-left: -24px;
       padding: 12px 24px;
-      border-top: 1px solid $light_ui_grey;
+      border-top: 1px solid $light_tan;
       display: none;
 
       @include mobile() {
@@ -248,6 +252,7 @@ div.entry-edit-modal-container {
       @include mobile() {
         @include avenir_H();
         font-size: 15px;
+        width: calc(100% - 78px);
       }
 
       div.board-name {
@@ -257,9 +262,19 @@ div.entry-edit-modal-container {
         cursor: pointer;
         position: relative;
         float: left;
+        padding-right: 28px;
+
+        @include mobile() {
+          float: unset;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
 
         &:after {
-          float: right;
+          position: absolute;
+          top: 0px;
+          right: 0px;
           content: "";
           background-image: cdnUrl("/img/ML/board_settings.svg");
           background-size: 8px 8px;
@@ -269,15 +284,15 @@ div.entry-edit-modal-container {
           border-radius: 10px;
           width: 20px;
           height: 20px;
-          margin-top: 0px;
-          margin-left: 6px;
           opacity: 0.8;
 
           @include mobile() {
-            width: 8px 5px;
             margin-top: -3px;
             background-size: 8px 5px;
-            background-position: 0px 9px;
+            background-position: 12px 9px;
+            top: 0px;
+            left: unset;
+            right: 0px;
             background-color: transparent;
             background-image: cdnUrl("/img/ML/board_chevron_green.svg");
           }
@@ -343,7 +358,7 @@ div.entry-edit-modal-container {
         height: 88px;
         width: 100%;
         padding: 28px 41px;
-        border-bottom: 1px solid $deep_tan;
+        border-bottom: 1px solid $light_tan;
 
         @include mobile() {
           display: none;
@@ -366,28 +381,6 @@ div.entry-edit-modal-container {
           float: left;
           margin-top: 5px;
           margin-left: 16px;
-
-          @include mobile() {
-            font-size: 15px;
-            color: $carrot_text_blue_3;
-            background-color: $carrot_light_blue_2;
-            height: 48px;
-            padding: 14px 24px 0px;
-            float: none;
-            margin-top: 64px;
-            margin-left: 0px;
-
-            &.active {
-              background-color: $carrot_text_blue_3;
-
-              div.boards-dropdown-caret {
-                color: white;
-                &:after {
-                  background-image: cdnUrl("/img/ML/board_blue_chevron_white.svg");
-                }
-              }
-            }
-          }
 
           span {
             float: left;
@@ -515,7 +508,7 @@ div.entry-edit-modal-container {
         margin: 0px;
         padding: 0px 42px 24px 42px;
         width: 100%;
-        border-bottom: 1px solid $deep_tan;
+        border-bottom: 1px solid $light_tan;
 
         @include mobile() {
           min-height: calc(100vh - 139px);

@@ -10,6 +10,7 @@
             [oc.web.stores.search :as search]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
@@ -25,6 +26,7 @@
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
+            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
@@ -83,24 +85,16 @@
                    :button-position "left"
                    :on-next-click #(dis/dispatch! [:nux-end])}))))
 
-(rum/defcs org-dashboard < rum/static
+(rum/defcs org-dashboard < ;; Mixins
+                           rum/static
                            rum/reactive
+                           (ui-mixins/render-on-resize nil)
+                           ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
-                           (rum/local nil ::resize-listener)
-                           (rum/local false ::rerender)
-                           {:will-mount (fn [s]
-                             (reset! (::resize-listener s)
-                              (events/listen js/window EventType/RESIZE
-                               #(reset! (::rerender s) true)))
-                             s)
-                            :will-unmount (fn [s]
-                             (when @(::resize-listener s)
-                               (events/unlistenByKey @(::resize-listener s))
-                               (reset! (::resize-listener s) nil))
-                             s)
-                            :did-mount (fn [s]
+
+                           {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
                              s)}
@@ -123,7 +117,8 @@
                 show-section-editor
                 show-section-add
                 show-sections-picker
-                entry-editing-board-slug]} (drv/react s :org-dashboard-data)
+                entry-editing-board-slug
+                mobile-navigation-sidebar]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (some #{nux} [:1 :2 :3])
         search-active? (drv/react s search/search-active?)
@@ -178,11 +173,11 @@
           ;; Mobile create a new section
           (and is-mobile?
                show-section-editor)
-          (section-editor nil #(dis/dispatch! [:section-edit-save]))
+          (section-editor board-data #(dis/dispatch! [:section-edit-save]))
           ;; Mobile edit current section data
           (and is-mobile?
                show-section-add)
-          (section-editor board-data #(dis/dispatch! [:input [:show-section-add] false]))
+          (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))
           ;; Mobile sections picker
           (and is-mobile?
                show-sections-picker)
@@ -203,6 +198,10 @@
           ;; Search results
           (and is-mobile? search-active? (not (router/current-activity-id)))
           (search-results-view)
+          ;; Show mobile navigation
+          (and is-mobile?
+               mobile-navigation-sidebar)
+          (navigation-sidebar)
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
@@ -231,7 +230,10 @@
                        (or (router/current-activity-id)
                            is-entry-editing
                            should-show-onboard-overlay?
-                           is-sharing-activity))
+                           is-sharing-activity
+                           show-section-add
+                           show-section-editor
+                           mobile-navigation-sidebar))
           [:div.page
             (navbar)
             [:div.org-dashboard-container

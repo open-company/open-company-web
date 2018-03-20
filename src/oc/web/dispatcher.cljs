@@ -308,7 +308,8 @@
                                :show-section-editor show-section-editor
                                :show-section-add show-section-add
                                :show-sections-picker show-sections-picker
-                               :entry-editing-board-slug (:board-slug entry-editing)})]})
+                               :entry-editing-board-slug (:board-slug entry-editing)
+                               :mobile-navigation-sidebar (:mobile-navigation-sidebar base)})]})
 
 
 ;; Action Loop =================================================================

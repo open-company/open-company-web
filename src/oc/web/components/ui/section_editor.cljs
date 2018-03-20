@@ -127,6 +127,8 @@
                      (reset! (::show-search-results s) false))
                    (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-private-users"))
                      (reset! (::show-edit-user-dropdown s) nil)))}
+      [:button.mlb-reset.mobile-modal-close-bt
+        {:on-click #(on-change nil)}]
       [:div.section-editor-header
         [:div.section-editor-header-left
           {:dangerouslySetInnerHTML

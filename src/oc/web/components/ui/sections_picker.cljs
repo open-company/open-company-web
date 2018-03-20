@@ -97,4 +97,12 @@
           [:div.sections-picker-content
             (sections-group s fixed-team-sections should-show-headers?)
             (sections-group s fixed-public-sections should-show-headers?)
-            (sections-group s fixed-private-sections should-show-headers?)]])]))
+            (sections-group s fixed-private-sections should-show-headers?)
+            (when (and (= (count all-sections) 1)
+                       (= (:slug (first all-sections)) "general"))
+              [:div.add-section-tooltip-container
+                [:div.add-section-tooltip-arrow]
+                [:div.add-section-tooltip
+                  (str
+                   "Keep posts organized by sections, e.g., "
+                   "Announcements, and Design, Sales, and Marketing.")]])]])]))
