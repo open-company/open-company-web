@@ -300,7 +300,7 @@
             [:div.price-column-description
               "Free for small teams for an unlimited period of time"]
             [:button.mlb-reset.price-button
-              {:on-click "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Free'});"}
+              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Free'});"}
               "Create a digest"]]
 
           [:div.pricing-block-column.standard-column
@@ -315,7 +315,7 @@
             [:div.price-column-description.more-info
               "Viewers are always free"]
             [:button.mlb-reset.price-button
-              {:on-click "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Standard'});"}
+              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Standard'});"}
               "Buy standard"]]
 
           [:div.pricing-block-column.plus-column
@@ -330,7 +330,7 @@
             [:div.price-column-description.more-info
               "Viewers are always free"]
             [:button.mlb-reset.price-button
-              {:on-click "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Plus'});"}
+              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Plus'});"}
               "Buy plus"]]]
         [:div.enterprise-block
           [:span.enterprise-block-title
