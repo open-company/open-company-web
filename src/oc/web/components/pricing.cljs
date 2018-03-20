@@ -11,6 +11,11 @@
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
+(defn track-event [event-name]
+  (.trackEvent js/CarrotGA #js {:eventCategory "purchase-click"
+                                :eventAction "click"
+                                :eventLabel event-name}))
+
 (rum/defcs pricing
   [s]
   [:div
@@ -40,7 +45,7 @@
               [:div.price-column-description
                 "Free for small teams for an unlimited period of time"]
               [:button.mlb-reset.price-button
-                {}
+                {:on-click #(track-event "Free")}
                 "Create a digest"]]
 
             [:div.pricing-block-column.standard-column
@@ -55,7 +60,7 @@
               [:div.price-column-description.more-info
                 "Viewers are always free"]
               [:button.mlb-reset.price-button
-                {}
+                {:on-click #(track-event "Purchase Standard")}
                 "Buy standard"]]
 
             [:div.pricing-block-column.plus-column
@@ -70,7 +75,7 @@
               [:div.price-column-description.more-info
                 "Viewers are always free"]
               [:button.mlb-reset.price-button
-                {}
+                {:on-click #(track-event "Purchase Plus")}
                 "Buy plus"]]]
 
           [:div.enterprise-block
