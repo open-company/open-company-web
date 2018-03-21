@@ -58,6 +58,7 @@
      {:org org
       :board board
       :activity activity-uuid
+      :previous-board (router/current-board-slug)
       :query-params (dissoc (:query-params @router/path) :ap-initial-at)
       :from-all-posts (= (router/current-board-slug) "all-posts")}))
   (when editing
@@ -65,21 +66,29 @@
   (dis/dispatch! [:activity-modal-fade-in activity-data editing]))
 
 (defn activity-modal-fade-out
-  [board-slug]
+  [activity-board-slug]
   (let [from-all-posts (:from-all-posts @router/path)
-        to-board (if from-all-posts "all-posts" board-slug)
+        previous-board-slug (:previous-board @router/path)
+        to-board (cond
+                   ;; If user was in AP go back there
+                   from-all-posts "all-posts"
+                   ;; if the previous position is set use it
+                   (seq previous-board-slug) previous-board-slug
+                   ;; else use the passed activity board slug
+                   :else activity-board-slug)
         org (router/current-org-slug)
         to-url (if from-all-posts
                 (oc-urls/all-posts org)
-                (oc-urls/board org board-slug))]
+                (oc-urls/board org activity-board-slug))]
     (.pushState (.-history js/window) #js {} "" to-url)
     (router/set-route! [org to-board (if from-all-posts "all-posts" "dashboard")]
      {:org org
       :board to-board
       :activity nil
+      :previous-board nil
       :query-params (:query-params @router/path)
       :from-all-posts false}))
-  (dis/dispatch! [:activity-modal-fade-out board-slug]))
+  (dis/dispatch! [:activity-modal-fade-out activity-board-slug]))
 
 (defn entry-edit
   [initial-entry-data]
@@ -171,7 +180,7 @@
               [:modal-editing-data :section-name-error]
               "Board name already exists or isn't allowed"])
             (entry-modal-save-with-board-finish activity-data (when success (json->cljs body)))))))
-    (api/update-entry activity-data board-slug :modal-editing-data))
+    (api/update-entry activity-data :modal-editing-data create-update-entry-cb))
   (dis/dispatch! [:entry-modal-save]))
 
 (defn nux-next-step [next-step]
