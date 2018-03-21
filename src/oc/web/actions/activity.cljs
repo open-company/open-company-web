@@ -238,8 +238,8 @@
 
 (defn entry-publish-cb [entry-uuid {:keys [status success body]}]
   (if success
-    (entry-publish-finish entry-uuid :modal-editing-data (when success (json->cljs body)))
-    (dis/dispatch! [:entry-publish/failed  :modal-editing-data])))
+    (entry-publish-finish entry-uuid :entry-editing (when success (json->cljs body)))
+    (dis/dispatch! [:entry-publish/failed  :entry-editing])))
 
 (defn entry-publish-with-board-finish [entry-uuid new-board-data]
   (let [board-slug (:slug new-board-data)]
