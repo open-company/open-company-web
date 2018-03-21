@@ -847,26 +847,6 @@
       (utils/after 100 #(router/redirect! (oc-urls/all-posts org-slug)))))
   db)
 
-(defmethod dispatcher/action :first-forced-post-start
-  [db [_]]
-  (let [current-board (dispatcher/board-data)
-        headline "We’re getting aligned with Carrot! 🚀"
-        body (str
-              "<p>It’s tough to keep everyone on the same page. Important information is "
-              "missed or lost, so everyone has a different idea of what’s important. Let’s fix "
-              "that!</p>"
-              (if (responsive/is-tablet-or-mobile?)
-                "<p>Carrot makes key announcements, updates and plans visible and interactive.</p>"
-                (str
-                 "<p>Carrot makes key announcements, updates and plans visible and interactive, so we "
-                 "can all stay on the same page.</p>")))
-        entry-editing {:headline headline
-                       :body body
-                       :has-changes true
-                       :board-name (:name current-board)
-                       :board-slug (:slug current-board)}]
-    (merge db {:entry-editing entry-editing})))
-
 (defmethod dispatcher/action :section-edit-save
   [db [_]]
   (let [section-data (:section-editing db)]
