@@ -204,3 +204,13 @@
     (-> next-db
       (dissoc :activity-loading)
       (assoc-in activity-key fixed-activity-data))))
+
+(defmethod dispatcher/action :entry-save-with-board/finish
+  [db [_ org-slug fixed-board-data]]
+  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data))]
+  (-> db
+    (assoc-in board-key fixed-board-data)
+    (dissoc :section-editing)
+    (update-in [:modal-editing-data] dissoc :loading)
+    (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
+    (dissoc :entry-toggle-save-on-exit))))

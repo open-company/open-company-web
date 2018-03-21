@@ -7,8 +7,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.user-cache :as uc]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.user-cache :as uc]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]))
 
@@ -146,8 +146,32 @@
     (entry-save-finish (json->cljs body) (:uuid entry-data) edit-key)
     (dis/dispatch! [:entry-save/failed edit-key])))
 
-(defn entry-modal-save [activity-data]
-  (api/update-entry activity-data :modal-editing-data create-update-entry-cb)
+(defn entry-modal-save-with-board-finish [activity-data response]
+  (let [fixed-board-data (utils/fix-board response)
+        org-slug (router/current-org-slug)]
+    (save-last-used-section (:slug fixed-board-data))
+    (remove-cached-item (:uuid activity-data))
+    (api/get-org (dis/org-data))
+    (when-not (= (:slug fixed-board-data) (router/current-board-slug))
+      ;; If creating a new board, start watching changes
+      (ws-cc/container-watch [(:uuid fixed-board-data)]))
+    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
+
+(defn entry-modal-save [activity-data board-slug section-editing]
+  (timbre/debug section-editing)
+  (if (= (:board-slug activity-data) utils/default-section-slug)
+    (let [fixed-entry-data (dissoc activity-data :board-slug :board-name)
+          final-board-data (assoc section-editing :entries [fixed-entry-data])]
+      (api/create-board final-board-data
+        (fn [{:keys [success status body]}]
+          (if (= status 409)
+            ;; Board name exists
+            (dis/dispatch!
+             [:input
+              [:modal-editing-data :section-name-error]
+              "Board name already exists or isn't allowed"])
+            (entry-modal-save-with-board-finish activity-data (when success (json->cljs body)))))))
+    (api/update-entry activity-data board-slug :modal-editing-data))
   (dis/dispatch! [:entry-modal-save]))
 
 (defn nux-next-step [next-step]

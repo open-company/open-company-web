@@ -88,7 +88,7 @@
         [:div.activity-card-content.group
           (when is-all-posts
             [:div.posted-in
-              {:dangerouslySetInnerHTML (utils/emojify (str "Posted to " (:board-name activity-data)))}])
+              {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
           ; Headline
           [:div.activity-card-headline
             {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
