@@ -161,28 +161,6 @@
         next-board-data (assoc board-data :fixed-items next-fixed-items)]
     (assoc-in db board-key next-board-data)))
 
-(defmethod dispatcher/action :activity-move
-  [db [_ activity-data board-data]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
-    (if is-all-posts
-      (let [next-activity-data-key (dispatcher/activity-key
-                                    (router/current-org-slug)
-                                    :all-posts
-                                    (:uuid activity-data))]
-        (assoc-in db next-activity-data-key fixed-activity-data))
-      (let [activity-data-key (dispatcher/activity-key
-                               (router/current-org-slug)
-                               (:board-slug activity-data)
-                               (:uuid activity-data))
-            next-activity-data-key (dispatcher/activity-key
-                                    (router/current-org-slug)
-                                    (:slug board-data)
-                                    (:uuid activity-data))]
-        (-> db
-          (update-in (butlast activity-data-key) dissoc (last activity-data-key))
-          (assoc-in next-activity-data-key fixed-activity-data))))))
-
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data]]
   (-> db
