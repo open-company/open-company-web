@@ -11,7 +11,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.utils.activity :as au]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -28,7 +27,7 @@
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
-                                        (dis/dispatch! [:activity-delete activity-data])
+                                        (activity-actions/activity-delete activity-data)
                                         (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))

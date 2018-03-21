@@ -9,6 +9,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.actions.user :as ua]
+            [oc.web.actions.activity :as aa]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -234,18 +235,6 @@
       (let [auth-settings-retry (or (:auth-settings-retry db) 1000)]
         (utils/after auth-settings-retry #(api/get-auth-settings))
         (assoc next-db :auth-settings-retry (* auth-settings-retry 2))))))
-
-(defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        board-key (if is-all-posts
-                   (dispatcher/all-posts-key (router/current-org-slug))
-                   (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
-        board-data (get db board-key)
-        new-entries (assoc (get board-data :fixed-items)
-                     entry-uuid
-                     (utils/fix-entry body board-data))
-        new-board-data (assoc board-data :fixed-items new-entries)]
-  (assoc db board-key new-board-data)))
 
 ;; This should be turned into a proper form library
 ;; Lomakeets FormState ideas seem like a good start:
@@ -670,7 +659,7 @@
                             (concat [new-author] old-authors))
               with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
           ;; Refresh the entry data to get the new links to interact with
-          (api/get-entry entry-data)
+          (aa/get-entry entry-data)
           (-> db
               (assoc-in comments-key sorted-comments-data)
               (assoc-in (vec (concat board-key [:fixed-items fixed-activity-uuid])) with-authors)))
@@ -683,183 +672,6 @@
 (defmethod dispatcher/action :trend-bar-status
   [db [_ status]]
   (assoc db :trend-bar-status status))
-
-(defn get-entry-cache-key
-  [entry-uuid]
-  (str (or
-        entry-uuid
-        (router/current-org-slug))
-   "-entry-edit"))
-
-(defn remove-cached-item
-  [item-uuid]
-  (uc/remove-item (get-entry-cache-key item-uuid)))
-
-(defmethod dispatcher/action :entry-clear-local-cache
-  [db [_ edit-key]]
-  (remove-cached-item (-> db edit-key :uuid))
-  (dissoc db :entry-save-on-exit))
-
-(defmethod dispatcher/action :entry-save
-  [db [_]]
-  (let [entry-data (:entry-editing db)]
-    (if (:links entry-data)
-      (let [redirect-board-slug (if (= (:status entry-data) "published")
-                                 (router/current-board-slug)
-                                 utils/default-drafts-board-slug)]
-        (api/update-entry entry-data redirect-board-slug :entry-editing))
-      (let [org-slug (router/current-org-slug)
-            entry-board-key (dispatcher/board-data-key org-slug (:board-slug entry-data))
-            entry-board-data (get-in db entry-board-key)
-            entry-create-link (utils/link-for (:links entry-board-data) "create")]
-        (api/create-entry entry-data entry-create-link)))
-    (assoc-in db [:entry-editing :loading] true)))
-
-(defn save-last-used-section [section-slug]
-  (let [org-slug (router/current-org-slug)
-        last-board-cookie (router/last-used-board-slug-cookie org-slug)]
-    (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))))
-
-(defmethod dispatcher/action :entry-save/finish
-  [db [_ {:keys [activity-data board-slug edit-key]}]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        org-slug (router/current-org-slug)]
-    (save-last-used-section (:board-slug activity-data))
-    ;; FIXME: refresh the last loaded all-posts link
-    (when-not is-all-posts
-      (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET")))
-    (api/get-org (dispatcher/org-data))
-    ; Remove saved cached item
-    (remove-cached-item (-> db edit-key :uuid))
-    ; Add the new activity into the board
-    (let [board-key (if (= (:status activity-data) "published")
-                     (dispatcher/current-board-key)
-                     (dispatcher/board-data-key org-slug utils/default-drafts-board-slug))
-          board-data (or (get-in db board-key) utils/default-drafts-board)
-          activity-board-data (get-in db (dispatcher/board-data-key org-slug board-slug))
-          fixed-activity-data (utils/fix-entry activity-data activity-board-data)
-          next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
-          next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
-          with-edited-key (if edit-key
-                            (update-in next-db [edit-key] dissoc :loading)
-                            next-db)
-          without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)]
-      without-entry-save-on-exit)))
-
-(defmethod dispatcher/action :entry-save/failed
-  [db [_ edit-key]]
-  (-> db
-    (update-in [edit-key] dissoc :loading)
-    (update-in [edit-key] assoc :error true)))
-
-(defmethod dispatcher/action :entry-publish
-  [db [_]]
-  (let [entry-data (:entry-editing db)]
-    (if (= (:board-slug entry-data) utils/default-section-slug)
-      (let [fixed-entry-data (dissoc entry-data :board-slug :board-name)
-            section-editing (:section-editing db)
-            final-board-data (assoc section-editing :entries [fixed-entry-data])]
-        (api/create-board final-board-data
-          (fn [{:keys [success status body]}]
-            (if (= status 409)
-              ; Board name exists
-              (dispatcher/dispatch!
-               [:input
-                [:section-editing :section-name-error]
-                "Board name already exists or isn't allowed"])
-              (dispatcher/dispatch! [:entry-publish-with-board/finish (when success (json->cljs body))]))))
-        (assoc-in db [:entry-editing :publishing] true))
-      (let [entry-exists? (seq (:links entry-data))
-            board-data-key (dispatcher/board-data-key (router/current-org-slug) (:board-slug entry-data))
-            board-data (get-in db board-data-key)
-            publish-entry-link (if entry-exists?
-                                ;; If the entry already exists use the publish link in it
-                                (utils/link-for (:links entry-data) "publish")
-                                ;; If the entry is new, use
-                                (utils/link-for (:links board-data) "create"))]
-        (api/publish-entry entry-data publish-entry-link)
-        (assoc-in db [:entry-editing :publishing] true)))))
-
-(defmethod dispatcher/action :entry-publish-with-board/finish
-  [db [_ new-board-data]]
-  (let [org-slug (router/current-org-slug)
-        board-slug (:slug new-board-data)
-        board-key (dispatcher/board-data-key org-slug (:slug new-board-data))
-        fixed-board-data (utils/fix-board new-board-data)]
-    (save-last-used-section (:slug fixed-board-data))
-    (remove-cached-item (-> db :entry-editing :uuid))
-    (api/get-org (dispatcher/org-data))
-    (if (not= (:slug fixed-board-data) (router/current-board-slug))
-      ;; If creating a new board, start watching changes
-      (ws-cc/container-watch [(:uuid fixed-board-data)])
-      ;; If updating an existing board, refresh the org data
-      (api/get-org (dispatcher/org-data)))
-  (-> db
-    (assoc-in board-key fixed-board-data)
-    (dissoc :section-editing)
-    (update-in [:entry-editing] dissoc :publishing)
-    (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
-    (assoc-in [:entry-editing :new-section] true)
-    (dissoc :entry-toggle-save-on-exit))))
-
-(defmethod dispatcher/action :entry-publish/finish
-  [db [_ {:keys [activity-data]}]]
-  (let [org-slug (router/current-org-slug)
-        board-slug (:board-slug activity-data)]
-    ;; Save last used section
-    (save-last-used-section board-slug)
-    (api/get-org (dispatcher/org-data))
-    ;; Remove entry cached edits
-    (remove-cached-item (-> db :entry-editing :uuid))
-    ; Add the new activity into the board
-    (let [board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
-          board-data (get-in db board-key)
-          fixed-activity-data (utils/fix-entry activity-data board-data)
-          next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
-      (-> db
-        (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
-        (update-in [:entry-editing] dissoc :publishing)
-        (dissoc :entry-toggle-save-on-exit)))))
-
-(defmethod dispatcher/action :entry-publish/failed
-  [db [_]]
-  (-> db
-    (update-in [:entry-editing] dissoc :publishing)
-    (update-in [:entry-editing] assoc :error true)))
-
-(defmethod dispatcher/action :activity-delete
-  [db [_ activity-data]]
-  (let [is-all-posts (utils/in? (:route @router/path) "all-posts")
-        board-key (if is-all-posts
-                   (dispatcher/all-posts-key (router/current-org-slug))
-                   (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
-        board-data (get-in db board-key)
-        next-fixed-items (dissoc (:fixed-items board-data) (:uuid activity-data))
-        next-board-data (assoc board-data :fixed-items next-fixed-items)]
-    (api/delete-activity activity-data)
-    (assoc-in db board-key next-board-data)))
-
-(defmethod dispatcher/action :activity-delete/finish
-  [db [_]]
-  (api/get-board (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))
-  ;; Reload the org to update the number of drafts in the navigation
-  (when (= (router/current-board-slug) utils/default-drafts-board-slug)
-    (api/get-org (dispatcher/org-data))
-    (let [org-slug (router/current-org-slug)
-          org-data (dispatcher/org-data)
-          boards-no-draft (sort-by :name (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
-          board-key (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug))
-          board-data (get-in db board-key)]
-      (when (zero? (count (:fixed-items board-data)))
-        (utils/after
-         100
-         #(router/nav!
-            (if (pos? (count boards-no-draft))
-              ;; If there is at least one board redirect to it
-              (oc-urls/board org-slug (:slug (first boards-no-draft)))
-              ;; If not boards are available redirect to the empty org
-              (oc-urls/org org-slug)))))))
-  db)
 
 (defmethod dispatcher/action :alert-modal-show
   [db [_ modal-data]]
@@ -992,29 +804,6 @@
   [db [_]]
   (dissoc db :org-settings))
 
-(defmethod dispatcher/action :activity-move
-  [db [_ activity-data board-data]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
-    (api/update-entry fixed-activity-data (:slug board-data) nil)
-    (if is-all-posts
-      (let [next-activity-data-key (dispatcher/activity-key
-                                    (router/current-org-slug)
-                                    :all-posts
-                                    (:uuid activity-data))]
-        (assoc-in db next-activity-data-key fixed-activity-data))
-      (let [activity-data-key (dispatcher/activity-key
-                               (router/current-org-slug)
-                               (:board-slug activity-data)
-                               (:uuid activity-data))
-            next-activity-data-key (dispatcher/activity-key
-                                    (router/current-org-slug)
-                                    (:slug board-data)
-                                    (:uuid activity-data))]
-        (-> db
-          (update-in (butlast activity-data-key) dissoc (last activity-data-key))
-          (assoc-in next-activity-data-key fixed-activity-data))))))
-
 (defmethod dispatcher/action :container/status
   [db [_ status-data]]
   (timbre/debug "Change status received:" status-data)
@@ -1031,32 +820,6 @@
     (timbre/debug "Change status data:" new-status-data)
     (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))
 
-(defmethod dispatcher/action :activity-share-show
-  [db [_ activity-data]]
-  (-> db
-    (assoc :activity-share {:share-data activity-data})
-    (dissoc :activity-shared-data)))
-
-(defmethod dispatcher/action :activity-share-hide
-  [db [_ activity-data]]
-  (dissoc db :activity-share))
-
-(defmethod dispatcher/action :activity-share-reset
-  [db [_]]
-  (dissoc db :activity-shared-data))
-
-(defmethod dispatcher/action :activity-share
-  [db [_ share-data]]
-  (api/share-activity (:share-data (:activity-share db)) share-data)
-  (assoc db :activity-share-data share-data))
-
-(defmethod dispatcher/action :activity-share/finish
-  [db [_ success shared-data]]
-  (assoc db :activity-shared-data
-    (if success
-      (utils/fix-entry shared-data (:board-slug shared-data))
-      {:error true})))
-
 (defmethod dispatcher/action :made-with-carrot-modal-show
   [db [_]]
   (assoc db :made-with-carrot-modal true))
@@ -1064,39 +827,6 @@
 (defmethod dispatcher/action :made-with-carrot-modal-hide
   [db [_]]
   (dissoc db :made-with-carrot-modal))
-
-(defmethod dispatcher/action :secure-activity-get
-  [db [_]]
-  (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id))
-  db)
-
-(defmethod dispatcher/action :activity-get/finish
-  [db [_ status activity-data]]
-  (let [next-db (if (= status 404)
-                  (dissoc db :latest-entry-point)
-                  db)]
-    (when (= status 404)
-      ; (router/redirect-404!)
-      (if (router/current-secure-activity-id)
-        (router/redirect-404!)
-        (router/nav! (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))
-    (when (and (router/current-secure-activity-id)
-             (jwt/jwt)
-             (jwt/user-is-part-of-the-team (:team-id activity-data)))
-      (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-    (let [activity-uuid (:uuid activity-data)
-          org-slug (router/current-org-slug)
-          board-slug (router/current-board-slug)
-          activity-key (if (router/current-secure-activity-id)
-                         (dispatcher/secure-activity-key org-slug (router/current-secure-activity-id))
-                         (dispatcher/activity-key org-slug board-slug activity-uuid))
-          fixed-activity-data (utils/fix-entry
-                               activity-data
-                               {:slug (or (:board-slug activity-data) board-slug)
-                                :name (:board-name activity-data)})]
-      (-> next-db
-        (dissoc :activity-loading)
-        (assoc-in activity-key fixed-activity-data)))))
 
 (defmethod dispatcher/action :whats-new/finish
   [db [_ whats-new-data]]

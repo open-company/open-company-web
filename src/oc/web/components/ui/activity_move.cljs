@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.activity :as activity-actions]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -12,7 +13,7 @@
         new-board @(::selected-board s)
         on-change (:on-change opts)
         dismiss-cb (:dismiss-cb opts)]
-    (dis/dispatch! [:activity-move activity-data new-board])
+    (activity-actions/activity-move activity-data new-board)
     (reset! (::show-boards-list s) false)
     (reset! (::selected-board s) nil)
     (when (fn? on-change)

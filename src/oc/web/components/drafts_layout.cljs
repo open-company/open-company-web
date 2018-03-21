@@ -20,7 +20,7 @@
                     :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
-                                       (dis/dispatch! [:activity-delete draft])
+                                       (activity-actions/activity-delete draft)
                                        (dis/dispatch! [:alert-modal-hide]))}]
    (dis/dispatch! [:alert-modal-show alert-data])))
 

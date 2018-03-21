@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -31,7 +32,7 @@
                              (rum/local nil ::win-resize-listener)
 
                              {:will-mount (fn [s]
-                               (utils/after 100 #(dis/dispatch! [:secure-activity-get]))
+                               (utils/after 100 #(activity-actions/secure-activity-get))
                                (save-win-height s)
                               s)}
   [s]

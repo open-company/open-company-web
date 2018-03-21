@@ -700,71 +700,48 @@
         callback))))
 
 (defn get-entry
-  [entry-data]
+  [entry-data callback]
   (when entry-data
     (let [entry-self-link (utils/link-for (:links entry-data) "self")]
       (storage-http (method-for-link entry-self-link) (relative-href entry-self-link)
         {:headers (headers-for-link entry-self-link)}
-        (fn [{:keys [status success body]}]
-          (if success
-            (dispatcher/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))))
+        callback))))
 
 (defn create-entry
-  [entry-data create-entry-link]
+  [entry-data edit-key create-entry-link callback]
   (when entry-data
     (let [cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
       (storage-http (method-for-link create-entry-link) (relative-href create-entry-link)
         {:headers (headers-for-link create-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
-        (fn [{:keys [status success body headers] :as resp}]
-          (if success
-            (dispatcher/dispatch!
-             [:entry-save/finish
-              {:activity-data (if success (json->cljs body) {})
-               :board-slug (:board-slug entry-data)
-               :edit-key :entry-editing}])
-            (dispatcher/dispatch! [:entry-save/failed  :entry-editing])))))))
+        (partial callback entry-data edit-key)))))
 
 (defn publish-entry
-  [entry-data publish-entry-link]
+  [entry-data publish-entry-link callback]
   (when (and entry-data
              (not= (:status entry-data) "published"))
     (let [cleaned-entry-data (-> entry-data (select-keys entry-allowed-keys) (assoc :status "published"))]
       (storage-http (method-for-link publish-entry-link) (relative-href publish-entry-link)
         {:headers (headers-for-link publish-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
-        (fn [{:keys [status success body]}]
-          (if success
-            (dispatcher/dispatch!
-             [:entry-publish/finish
-              {:activity-data (if success (json->cljs body) {})
-               :edit-key :modal-editing-data}])
-            (dispatcher/dispatch! [:entry-publish/failed  :modal-editing-data])))))))
+        callback))))
 
 (defn update-entry
-  [entry-data board-slug edit-key]
+  [entry-data edit-key callback]
   (when entry-data
     (let [update-entry-link (utils/link-for (:links entry-data) "partial-update")
           cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
       (storage-http (method-for-link update-entry-link) (relative-href update-entry-link)
         {:headers (headers-for-link update-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
-        (fn [{:keys [status success body]}]
-          (if success
-            (dispatcher/dispatch!
-             [:entry-save/finish
-              {:activity-data (if success (json->cljs body) {})
-               :board-slug board-slug
-               :edit-key edit-key}])
-            (dispatcher/dispatch! [:entry-save/failed  edit-key])))))))
+        (partial callback entry-data edit-key)))))
 
-(defn delete-activity [activity-data]
+(defn delete-activity [activity-data callback]
   (when activity-data
     (when-let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
       (storage-http (method-for-link activity-delete-link) (relative-href activity-delete-link)
         {:headers (headers-for-link activity-delete-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:activity-delete/finish]))))))
+        callback))))
 
 (defn get-all-posts [org-data & [activity-link {:keys [year month from]}]]
   (when org-data
@@ -819,33 +796,30 @@
         (fn [{:keys [success status body]}]
           (dispatcher/dispatch! [:draft-autosave/finish share-data]))))))
 
-(defn get-activity [activity-uuid activity-link]
+(defn get-activity [activity-uuid activity-link callback]
   (when activity-link
     (storage-http (method-for-link activity-link) (relative-href activity-link)
       {:headers (headers-for-link activity-link)}
-      (fn [{:keys [status success body]}]
-        (dispatcher/dispatch! [:activity-get/finish status (when success (json->cljs body))])))))
+      callback)))
 
-(defn share-activity [post-data share-data]
+(defn share-activity [post-data share-data callback]
   (when post-data
     (let [share-link (utils/link-for (:links post-data) "share")
           headers {:headers (headers-for-link share-link)}
           with-json-params (assoc headers :json-params (cljs->json share-data))]
       (storage-http (method-for-link share-link) (relative-href share-link)
         with-json-params
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:activity-share/finish success (when success (json->cljs body))]))))))
+        callback))))
 
-(defn get-secure-activity [org-slug secure-activity-id]
- (when secure-activity-id
+(defn get-secure-activity [org-slug secure-activity-id callback]
+  (when secure-activity-id
     (let [activity-link {:href (str "/orgs/" org-slug "/entries/" secure-activity-id)
                          :method "GET"
                          :rel ""
                          :accept "application/vnd.open-company.entry.v1+json"}]
       (storage-http (method-for-link activity-link) (relative-href activity-link)
         {:headers (headers-for-link activity-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:activity-get/finish status (if success (json->cljs body) {})]))))))
+        callback))))
 
 (defn react-from-picker
   "Given the link to react with an arbitrary emoji and the emoji, post it to the interaction service"

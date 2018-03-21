@@ -4,7 +4,8 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.json :refer (json->cljs)]))
+            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.actions.activity :as activity-actions]))
 
 (defn react-from-picker [activity-data emoji]
   (dis/dispatch! [:handle-reaction-to-entry activity-data
@@ -17,7 +18,7 @@
       (fn [{:keys [status success body]}]
         ;; Refresh the full entry after the reaction finished
         ;; in the meantime update the local state with the result.
-        (api/get-entry activity-data)
+        (activity-actions/get-entry activity-data)
         (dis/dispatch!
          [:react-from-picker/finish
           {:status status
@@ -58,7 +59,7 @@
         is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))]
     (if (and entry-data (seq (:reactions entry-data)))
       (when is-current-user
-        (api/get-entry entry-data))
+        (activity-actions/get-entry entry-data))
       (api/get-board (utils/link-for (:links board-data) ["item" "self"] "GET")))))
 
 (defn ws-interaction-reaction-add [interaction-data]
