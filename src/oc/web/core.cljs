@@ -120,7 +120,12 @@
                      (nil? (dis/org-data))))
         (user-actions/entry-point-get (router/current-org-slug)))
       (when (> (- now latest-auth-settings) reload-time)
-        (api/get-auth-settings))))))
+        (user-actions/auth-settings-get
+          #(when (and (utils/in? (:route @router/path) "confirm-invitation")
+                      (contains? (:query-params @router/path) :token))
+             (utils/after 100 (fn []
+               (user-actions/confirm-invitation
+                (:token (:query-params @router/path))))))))))))
 
 ;; home
 (defn home-handler [target params]

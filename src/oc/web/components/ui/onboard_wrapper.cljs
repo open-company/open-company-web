@@ -14,7 +14,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image default-avatar-url)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.dom :as gdom]
             [goog.object :as gobj]))
 
@@ -144,12 +144,13 @@
 
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
+                                  (drv/drv :current-user-data)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
-                                    (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
-                                    (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                    (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
+                                    (utils/after 100 #(user-actions/user-profile-save @(drv/get-ref s :current-user-data) @(drv/get-ref s :edit-user-profile)))
                                     s)
                                    :did-mount (fn [s]
                                     (delay-focus-field-with-ref s "first-name")
@@ -165,6 +166,7 @@
                                    s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
+        current-user-data (drv/react s :current-user-data)
         user-data (:user-data edit-user-profile)
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
@@ -184,7 +186,7 @@
              :on-touch-start identity
              :on-click #(when-not top-continue-disabled
                           (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save]))
+                          (user-actions/user-profile-save current-user-data edit-user-profile))
              :aria-label "Continue"}
             "Continue"])]
       (when (:error edit-user-profile)
@@ -232,7 +234,7 @@
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save]))}
+                          (user-actions/user-profile-save current-user-data edit-user-profile))}
             "That’s me"]]]]))
 
 (defn- setup-team-data
@@ -424,17 +426,18 @@
             {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
              :on-click #(if (< (count (:pswd collect-pswd)) 8)
                           (reset! (::password-error s) true)
-                          (dis/dispatch! [:pswd-collect]))
+                          (user-actions/pswd-collect collect-pswd false))
              :on-touch-start identity}
             "Continue"]]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive
                                     (drv/drv :edit-user-profile)
+                                    (drv/drv :current-user-data)
                                     (drv/drv :orgs)
                                     (rum/local false ::saving)
                                     (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                      (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
+                                      (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
                                        (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                       s)
                                      :did-mount (fn [s]
@@ -450,6 +453,7 @@
                                       s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
+        current-user-data (drv/react s :current-user-data)
         user-data (:user-data edit-user-profile)
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
@@ -506,7 +510,7 @@
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save]))}
+                          (user-actions/user-profile-save current-user-data edit-user-profile))}
             "That’s me"]]]]))
 
 (defn vertical-center-mixin [class-selector]
