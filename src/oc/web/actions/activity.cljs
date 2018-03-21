@@ -74,8 +74,10 @@
                    from-all-posts "all-posts"
                    ;; if the previous position is set use it
                    (seq previous-board-slug) previous-board-slug
-                   ;; else use the passed activity board slug
-                   :else activity-board-slug)
+                   ;; use the passed activity board slug if present
+                   (seq activity-board-slug) activity-board-slug
+                   ;; fallback to the current board slug
+                   :else (router/current-board-slug))
         org (router/current-org-slug)
         to-url (if from-all-posts
                 (oc-urls/all-posts org)
