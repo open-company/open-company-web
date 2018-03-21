@@ -19,19 +19,6 @@
             [oc.web.components.ui.interactions-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
 
-(defn- delete-clicked [e activity-data]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message "Delete this post?"
-                    :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(do
-                                        (activity-actions/activity-delete activity-data)
-                                        (dis/dispatch! [:alert-modal-hide]))
-                    }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
-
 (defn should-show-continue-reading? [s]
   (when-not @(::expanded s)
     (let [item-body (rum/ref-node s "item-body")
