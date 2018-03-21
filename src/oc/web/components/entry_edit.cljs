@@ -304,29 +304,29 @@
                              (clean-body)
                              (if (and (is-publishable? entry-editing)
                                       (not (zero? (count fixed-headline))))
-                               (if published?
-                                 (do
-                                   (reset! (::saving s) true)
-                                   (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                   (activity-actions/entry-save entry-editing))
-                                 (do
-                                   (reset! (::publishing s) true)
-                                   (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                   (activity-actions/entry-publish entry-editing nil)))
-                               (when (zero? (count fixed-headline))
-                                 (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
-                                   (when-not (.data $post-btn "bs.tooltip")
-                                     (.tooltip $post-btn
-                                      (clj->js {:container "body"
-                                                :placement "bottom"
-                                                :trigger "manual"
-                                                :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                                 "<div class=\"tooltip-arrow\"></div>"
-                                                                 "<div class=\"tooltip-inner\"></div>"
-                                                               "</div>")
-                                                :title "A title is required in order to save or share this post."})))
-                                   (utils/after 10 #(.tooltip $post-btn "show"))
-                                   (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+                                (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
+                                      updated-entry-editing @(drv/get-ref s :entry-editing)]
+                                 (if published?
+                                   (do
+                                     (reset! (::saving s) true)
+                                     (activity-actions/entry-save updated-entry-editing))
+                                   (do
+                                     (reset! (::publishing s) true)
+                                     (activity-actions/entry-publish updated-entry-editing nil)))
+                                 (when (zero? (count fixed-headline))
+                                   (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+                                     (when-not (.data $post-btn "bs.tooltip")
+                                       (.tooltip $post-btn
+                                        (clj->js {:container "body"
+                                                  :placement "bottom"
+                                                  :trigger "manual"
+                                                  :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                                   "<div class=\"tooltip-arrow\"></div>"
+                                                                   "<div class=\"tooltip-inner\"></div>"
+                                                                 "</div>")
+                                                  :title "A title is required in order to save or share this post."})))
+                                     (utils/after 10 #(.tooltip $post-btn "show"))
+                                     (utils/after 5000 #(.tooltip $post-btn "hide")))))))
                  :class (when disabled?
                           "disabled")}
                 (if working?
@@ -349,7 +349,7 @@
                               (when-not disabled?
                                 (clean-body)
                                 (reset! (::saving s) true)
-                                (activity-actions/entry-save entry-editing)))}
+                                (activity-actions/entry-save @(drv/get-ref s :entry-editing))))}
                   (when working?
                     (small-loading))
                   (str "Save " (when-not is-mobile? "to ") "draft")]))])
