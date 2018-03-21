@@ -187,9 +187,10 @@
       (when-let [board-uuid (:uuid fixed-board-data)]
         (utils/after 10 #(dispatcher/dispatch! [:board-seen {:board-uuid board-uuid}])))
       ;; only watch the currently visible board.
-      (ws-ic/board-unwatch (fn [rep]
-        (timbre/debug rep "Watching on socket " (:uuid fixed-board-data))
-        (ws-ic/board-watch (:uuid fixed-board-data))))
+      (when (jwt/jwt) ; only for logged in users
+        (ws-ic/board-unwatch (fn [rep]
+          (timbre/debug rep "Watching on socket " (:uuid fixed-board-data))
+          (ws-ic/board-watch (:uuid fixed-board-data)))))
 
       ;; Load the other boards
       (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
@@ -720,15 +721,16 @@
                  (not month)
                  (= (router/current-board-slug) "all-posts"))
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
-      (let [org-boards (:boards (dispatcher/org-data db))
-            org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))
-            board-slugs (distinct
-                          (map :board-slug
-                               (map second (:fixed-items with-calendar-data))))]
-        (ws-ic/board-unwatch (fn [rep]
-          (doseq [board-slug board-slugs]
-            (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
-            (ws-ic/board-watch (org-board-map board-slug))))))
+      (when (jwt/jwt) ; only for logged in users
+        (let [org-boards (:boards (dispatcher/org-data db))
+              org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))
+              board-slugs (distinct
+                            (map :board-slug
+                                 (map second (:fixed-items with-calendar-data))))]
+          (ws-ic/board-unwatch (fn [rep]
+            (doseq [board-slug board-slugs]
+              (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
+              (ws-ic/board-watch (org-board-map board-slug)))))))
       (assoc-in db all-posts-key with-calendar-data))
     db))
 
