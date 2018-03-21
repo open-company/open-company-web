@@ -79,7 +79,7 @@
         org (router/current-org-slug)
         to-url (if from-all-posts
                 (oc-urls/all-posts org)
-                (oc-urls/board org activity-board-slug))]
+                (oc-urls/board org to-board))]
     (.pushState (.-history js/window) #js {} "" to-url)
     (router/set-route! [org to-board (if from-all-posts "all-posts" "dashboard")]
      {:org org
