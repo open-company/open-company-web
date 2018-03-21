@@ -51,8 +51,8 @@
 
 (defn dismiss-modal [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)
-        activity-data (:activity-data modal-data)]
-    (activity-actions/activity-modal-fade-out (:board-slug activity-data))))
+        edited-data (:modal-editing-data modal-data)]
+    (activity-actions/activity-modal-fade-out (:board-slug edited-data))))
 
 (defn close-clicked [s]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :fullscreen-post-data))]
@@ -247,7 +247,7 @@
                                          (reset! (::initial-headline s) initial-headline)
                                          (reset! (::initial-body s) initial-body)
                                          (stop-editing s)
-                                         (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
+                                         (activity-actions/entry-clear-local-cache (:uuid activity-data) :modal-editing-data)
                                          (cond
                                            ;; If the board change redirect to the board since the url we have is
                                            ;; not correct anymore
