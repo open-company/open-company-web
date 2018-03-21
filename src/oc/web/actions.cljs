@@ -71,11 +71,11 @@
            (not (utils/in? (:route @router/path) "email-verification"))
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
-           (not (utils/in? (:route @router/path) "confirm-invitation")))
+           (not (utils/in? (:route @router/path) "confirm-invitation"))
+           (not (utils/in? (:route @router/path) "secure-activity")))
 
-      (cond
-        ;; Redirect to the first board if only one is present
-        (>= (count boards) 1)
+      (when (>= (count boards) 1)
+        ;; Redirect to the first board if at least one is present
         (let [board-to (utils/get-default-board org-data)]
           (utils/after 10
             #(router/nav!
