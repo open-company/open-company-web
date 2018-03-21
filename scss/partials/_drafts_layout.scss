@@ -41,6 +41,10 @@ div.drafts-layout {
         position: relative;
         cursor: pointer;
 
+        &:not(:first-child) {
+          margin-top: 24px;
+        }
+
         @include mobile() {
           width: 100%;
           min-height: initial;
