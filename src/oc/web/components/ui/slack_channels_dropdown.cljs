@@ -85,7 +85,7 @@
               (when show-slack-team-name
                 [:div.slack-team-name (:name t)])
               (for [c chs]
-               [:div.channel
+               [:div.channel.group
                  {:value (:id c)
                   :key (str "slack-chs-dd-" (:slack-org-id t) "-" (:id c))
                   :on-click #(do
