@@ -69,6 +69,8 @@
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (api/get-org org-data)
+             ;; 404 only if the user is not looking at a secure post page
+             ;; if so the entry point response can not include the specified org
              (when-not (router/current-secure-activity-id)
                (router/redirect-404!)))
            (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
