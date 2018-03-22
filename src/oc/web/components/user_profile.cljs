@@ -4,18 +4,19 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as user-actions]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image random-user-image)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [cljsjs.moment-timezone]
             [goog.object :as googobj]
             [goog.dom :as gdom]))
 
-(def default-user-profile (random-user-image))
+(def default-user-profile (oc.web.stores.user/random-user-image))
 
 (defn- img-on-load [url img]
   (dis/dispatch! [:input [:edit-user-profile :avatar-url] url])
@@ -95,7 +96,9 @@
   (reset! (::password-error s) false)
   (reset! (::current-password-error s) false)
   (reset! (::loading s) true)
-  (let [user-data (:user-data @(drv/get-ref s :edit-user-profile))]
+  (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+        current-user-data @(drv/get-ref s :current-user-data)
+        user-data (:user-data edit-user-profile)]
     (cond
       (and (empty? (:first-name user-data))
            (empty? (:last-name user-data)))
@@ -113,13 +116,14 @@
       (reset! (::password-error s) true)
 
       :else
-      (dis/dispatch! [:user-profile-save]))))
+      (user-actions/user-profile-save current-user-data edit-user-profile))))
 
 (rum/defcs user-profile < rum/reactive
                           ;; Derivatives
                           (drv/drv :orgs)
                           (drv/drv :alert-modal)
                           (drv/drv :edit-user-profile)
+                          (drv/drv :current-user-data)
                           ;; Locals
                           (rum/local false ::loading)
                           (rum/local false ::show-success)

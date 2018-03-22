@@ -90,9 +90,6 @@
                   http/get)]
   (method refresh-url (complete-params headers))))
 
-(defn- update-jwt-cookie! [jwt]
-  (oc.web.actions.user/update-jwt jwt))
-
 (defn- jwt-refresh [success-cb error-cb]
   (go
    (if-let [refresh-url (j/get-key :refresh-url)]
@@ -285,7 +282,6 @@
                 {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
                 (fn [response]
                   (let [body (if (:success response) (:body response) false)]
-                    (dispatcher/dispatch! [:auth-settings body])
                     (callback body))))))
 
 (defn auth-with-email [email pswd callback]
@@ -385,11 +381,9 @@
                           "Access-Control-Allow-Headers" "Content-Type, Authorization"
                           "Authorization" (str "Bearer " token)})}
         (fn [{:keys [status body success]}]
-          (utils/after 100 #(callback status))
-          (when success
-            (update-jwt-cookie! body)))))))
+          (utils/after 100 #(callback status body success)))))))
 
-(defn collect-password [pswd]
+(defn collect-password [pswd cb]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
     (when (and pswd update-link)
       (auth-http (method-for-link update-link) (relative-href update-link)
@@ -397,20 +391,18 @@
           :password pswd}
          :headers (headers-for-link update-link)}
         (fn [{:keys [status body success]}]
-          (when success
-            (dispatcher/dispatch! [:user-data (json->cljs body)]))
-          (utils/after 100 #(dispatcher/dispatch! [:pswd-collect/finish status])))))))
+          (utils/after 100 #(cb status body success)))))))
 
-(defn get-current-user [auth-links]
+(defn get-current-user [auth-links cb]
   (when-let [user-link (utils/link-for (:links auth-links) "user" "GET")]
     (auth-http (method-for-link user-link) (relative-href user-link)
       {:headers (headers-for-link user-link)}
       (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:user-data (json->cljs body)])))))
+        (cb body)))))
 
 (def user-profile-keys [:first-name :last-name :email :password :avatar-url :timezone :digest-frequency :digest-medium])
 
-(defn patch-user-profile [old-user-data new-user-data]
+(defn patch-user-profile [old-user-data new-user-data cb]
   (when (and (:links old-user-data)
              (map? new-user-data))
     (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")]
@@ -418,13 +410,9 @@
         {:headers (headers-for-link user-update-link)
          :json-params (cljs->json (select-keys new-user-data user-profile-keys))}
          (fn [{:keys [status body success]}]
-           (if (= status 422)
-              (dispatcher/dispatch! [:user-profile-update/failed])
-             (when success
-               (utils/after 1000 oc.web.actions.user/jwt-refresh)
-               (dispatcher/dispatch! [:user-data (json->cljs body)]))))))))
+           (cb status body success))))))
 
-(defn collect-name-password [firstname lastname pswd]
+(defn collect-name-password [firstname lastname pswd cb]
   (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
     (when (and (or firstname lastname) pswd update-link)
       (auth-http (method-for-link update-link) (relative-href update-link)
@@ -435,11 +423,7 @@
          }
          :headers (headers-for-link update-link)}
         (fn [{:keys [status body success]}]
-          (if-not success
-            (dispatcher/dispatch! [:name-pswd-collect/finish status nil])
-            (when success
-              (dispatcher/dispatch! [:name-pswd-collect/finish status (json->cljs body)])
-              (utils/after 1000 oc.web.actions.user/jwt-refresh))))))))
+          (cb status body success))))))
 
 (defn add-email-domain [domain]
   (when domain
@@ -455,14 +439,12 @@
         (fn [{:keys [status body success]}]
           (dispatcher/dispatch! [:email-domain-team-add/finish (= status 204)]))))))
 
-(defn refresh-slack-user []
+(defn refresh-slack-user [cb]
   (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
     (auth-http (method-for-link refresh-url) (relative-href refresh-url)
       {:headers (headers-for-link refresh-url)}
       (fn [{:keys [status body success]}]
-        (if success
-          (update-jwt-cookie! body)
-          (router/redirect! oc-urls/logout))))))
+        (cb status body success)))))
 
 (defn patch-team [team-id new-team-data org-data]
   (when-let* [team-data (dispatcher/team-data team-id)
@@ -634,14 +616,14 @@
           (get-board (dispatcher/board-data)))))))
 
 (defn password-reset
-  [email]
+  [email cb]
   (when email
     (when-let [reset-link (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "reset")]
       (auth-http (method-for-link reset-link) (relative-href reset-link)
         {:headers (headers-for-link reset-link)
          :body email}
         (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:password-reset/finish status]))))))
+          (cb status))))))
 
 (defn delete-board [board-slug]
   (when board-slug
