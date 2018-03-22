@@ -1,10 +1,12 @@
 (ns oc.web.actions.comment
-  (:require [oc.web.api :as api]
+  (:require [taoensso.timbre :as timbre]
+            [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.json :refer (json->cljs)]))
+            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.ws-interaction-client :as ws-ic]))
 
 (defn add-comment-focus [activity-data]
   (dis/dispatch! [:add-comment-focus activity-data]))
@@ -74,3 +76,8 @@
 (defn ws-comment-update
   [interaction-data]
   (dis/dispatch! [:ws-interaction/comment-update interaction-data]))
+
+(defmethod ws-ic/event-handler :interaction-comment/update
+  [_ body]
+  (timbre/debug "Comment update event" body)
+  (ws-comment-update body))
