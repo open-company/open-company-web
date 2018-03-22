@@ -1,19 +1,62 @@
 (ns oc.web.stores.user
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.router :as router]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]))
 
+(def default-user-image "/img/ML/happy_face_red.svg")
+(def other-user-images
+ ["/img/ML/happy_face_green.svg"
+  "/img/ML/happy_face_blue.svg"
+  "/img/ML/happy_face_purple.svg"
+  "/img/ML/happy_face_yellow.svg"])
+
+(defn random-user-image []
+  (first (shuffle (vec (conj other-user-images default-user-image)))))
+
+(def default-avatar-url (random-user-image))
+
+(defn- user-icon [user-id]
+  (if (= user-id (j/get-key :user-id))
+    ;; If the user id is the same of the current JWT use the red icon
+    default-user-image
+    ;; if not get a random icon from the rest of the images vector
+    (first other-user-images)))
+
 (defonce show-login-overlay-key :show-login-overlay)
 (defonce show-login-overlay? show-login-overlay-key)
+(defonce auth-settings-key :auth-settings)
 
 ;; Signup keys
 (defonce signup-with-email :signup-with-email)
 
 (defn get-show-login-overlay []
   (get-in @dispatcher/app-state [show-login-overlay-key]))
+
+;; Auth Settings
+(defn auth-settings? []
+  (contains? @dispatcher/app-state auth-settings-key))
+
+(defmethod dispatcher/action :auth-settings
+  [db [_ body]]
+  (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
+    (assoc next-db :auth-settings body)))
+
+(defn update-user-data [db user-data]
+  (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
+                            (assoc user-data :avatar-url (utils/cdn default-avatar-url true))
+                            user-data)
+        with-empty-password (assoc with-fixed-avatar :password "")
+        with-has-changes (assoc with-empty-password :has-changes false)]
+    (-> db
+        (assoc :current-user-data with-fixed-avatar)
+        (assoc :edit-user-profile with-has-changes)
+        (dissoc :edit-user-profile-failed))))
+
+(defmethod dispatcher/action :user-data
+  [db [_ user-data]]
+  (update-user-data db user-data))
 
 ;; JWT handling
 
@@ -85,6 +128,55 @@
 (defmethod dispatcher/action :auth-with-token/success
   [db [_ jwt]]
   (assoc db :email-verification-success true))
+
+(defmethod dispatcher/action :name-pswd-collect
+  [db [_]]
+  (dissoc db :latest-entry-point :latest-auth-settings))
+
+(defmethod dispatcher/action :name-pswd-collect/finish
+  [db [_ status user-data]]
+  (if (and status
+           (>= status 200)
+           (<= status 299))
+    (do
+      (cook/remove-cookie! :show-login-overlay)
+      (dissoc (update-user-data db user-data) :show-login-overlay))
+    (assoc db :collect-name-password-error status)))
+
+(defmethod dispatcher/action :pswd-collect
+  [db [_ password-reset?]]
+  (-> db
+    (assoc :is-password-reset password-reset?)
+    (dissoc :latest-entry-point :latest-auth-settings)))
+
+(defmethod dispatcher/action :pswd-collect/finish
+  [db [_ status]]
+  (if (and (>= status 200)
+           (<= status 299))
+    (dissoc db :show-login-overlay)
+    (assoc db :collect-password-error status)))
+
+(defmethod dispatcher/action :password-reset
+  [db [_]]
+  (dissoc db :latest-entry-point :latest-auth-settings))
+
+(defmethod dispatcher/action :password-reset/finish
+  [db [_ status]]
+  (assoc-in db [:password-reset :success] (and (>= status 200) (<= status 299))))
+
+(defmethod dispatcher/action :user-profile-reset
+  [db [_]]
+  (update-user-data db (:current-user-data db)))
+
+(defmethod dispatcher/action :user-profile-save
+  [db [_]]
+  (-> db
+      (assoc-in [:edit-user-profile :loading] true)
+      (dissoc :latest-entry-point :latest-auth-settings)))
+
+(defmethod dispatcher/action :user-profile-update/failed
+  [db [_]]
+  (assoc db :edit-user-profile-failed true))
 
 ;; Signup actions
 

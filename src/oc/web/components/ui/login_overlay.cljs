@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [clojure.string :as s]
+            [taoensso.timbre :as timbre]
             [goog.object :as gobj]
             [goog.style :as gstyle]
             [org.martinklepsch.derivatives :as drv]
@@ -23,8 +24,8 @@
 
 (def dont-scroll
   {:will-mount (fn [s]
-                (when-not (contains? @dis/app-state :auth-settings)
-                  (utils/after 100 #(dis/dispatch! [:auth-settings-get])))
+                 (when-not (user-store/auth-settings?)
+                   (utils/after 100 #(user-actions/auth-settings-get)))
                 s)
    :before-render (fn [s]
                     (if (responsive/is-mobile-size?)
@@ -50,7 +51,7 @@
 (rum/defcs login-with-email < rum/reactive
                               dont-scroll
                               no-scroll-mixin
-                              (drv/drv :auth-settings)
+                              (drv/drv user-store/auth-settings-key)
                               {:will-mount (fn [s]
                                 (dis/dispatch! [:input [:login-with-email] {:email "" :pswd ""}])
                                 s)
@@ -58,7 +59,7 @@
                                 (.focus (sel1 [:input.email]))
                                 s)}
   [state]
-  (let [auth-settings (drv/react state :auth-settings)
+  (let [auth-settings (drv/react state user-store/auth-settings-key)
         login-enabled (and auth-settings
                            (not (nil?
                             (utils/link-for
@@ -177,7 +178,7 @@
 (rum/defcs password-reset < rum/reactive
                             dont-scroll
                             no-scroll-mixin
-                            (drv/drv :auth-settings)
+                            (drv/drv user-store/auth-settings-key)
                             {:will-mount (fn [s]
                               (dis/dispatch! [:input [:password-reset] {:email ""}])
                               s)
@@ -185,7 +186,7 @@
                               (.focus (sel1 [:div.sign-in-field-container.email]))
                               s)}
   [state]
-  (let [auth-settings (drv/react state :auth-settings)]
+  (let [auth-settings (drv/react state user-store/auth-settings-key)]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
       [:button.carrot-modal-close.mlb-reset
@@ -223,7 +224,7 @@
                     "Done"]]]
               [:div.group
                 [:button.mlb-reset.mlb-default.continue
-                  {:on-click #(dis/dispatch! [:password-reset])
+                  {:on-click #(user-actions/password-reset (:email (:password-reset @dis/app-state)))
                    :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))
                    :on-touch-start identity}
                   "Reset Password"]
@@ -236,7 +237,7 @@
 (rum/defcs collect-name-password < rum/reactive
                                    dont-scroll
                                    no-scroll-mixin
-                                   (drv/drv :auth-settings)
+                                   (drv/drv user-store/auth-settings-key)
                                    {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:collect-name-pswd] {:firstname "" :lastname "" :pswd ""}])
                                     s)
@@ -256,7 +257,7 @@
                                      (utils/after 100 #(.focus (sel1 [:input.firstname])))
                                      s)}
   [state]
-  (let [auth-settings (drv/react state :auth-settings)]
+  (let [auth-settings (drv/react state user-store/auth-settings-key)]
     [:div.login-overlay-container.group
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay.collect-name-pswd.group
@@ -311,13 +312,14 @@
                :on-touch-start identity
                :on-click #(do
                             (utils/event-stop %)
-                            (dis/dispatch! [:name-pswd-collect]))}
+                            (user-actions/name-password-collect
+                              (:collect-name-pswd @dis/app-state)))}
               "Let Me In"]]]]]))
 
 (rum/defcs collect-password < rum/reactive
                               dont-scroll
                               no-scroll-mixin
-                              (drv/drv :auth-settings)
+                              (drv/drv user-store/auth-settings-key)
                               {:will-mount (fn [s]
                                 (dis/dispatch! [:input [:collect-pswd] {:pswd ""}])
                                 s)
@@ -332,7 +334,7 @@
                                                      (.focus pswd-el)))
                                 s)}
   [state]
-  (let [auth-settings (drv/react state :auth-settings)]
+  (let [auth-settings (drv/react state user-store/auth-settings-key)]
     [:div.login-overlay-container.group
       {:on-click #(utils/event-stop %)}
       [:div.login-overlay.collect-pswd.group
@@ -365,7 +367,7 @@
               {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                :on-click #(do
                             (utils/event-stop %)
-                            (dis/dispatch! [:pswd-collect true]))
+                            (user-actions/pswd-collect (:collect-pswd @dis/app-state) true))
                :on-touch-start identity}
               "Let Me In"]]]]]))
 

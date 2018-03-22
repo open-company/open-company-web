@@ -16,8 +16,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-interaction-client :as ws-ic]
-            [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.components.ui.user-avatar :refer (default-avatar-url)]))
+            [oc.web.lib.ws-change-client :as ws-cc]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -206,36 +205,6 @@
                             next-db)]
       without-loading)))
 
-(defmethod dispatcher/action :auth-settings
-  [db [_ body]]
-  (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
-    (if body
-      ; auth settings loaded
-      (do
-        (api/get-current-user body)
-        ;; Start teams retrieve if we have a link
-        (when (utils/link-for (:links body) "collection")
-          (utils/after 5000 #(dispatcher/dispatch! [:teams-get])))
-        (cond
-          ; if showing the create organization UI load the list of teams
-          ; if a link for it is present
-          ; to use the team name as suggestion and to PATCH the name back
-          ; if it doesn't has one yet
-          (or (utils/in? (:route @router/path) "create-org")
-              (utils/in? (:route @router/path) "sign-up"))
-          (utils/after 100 #(when (utils/link-for (:links (:auth-settings db)) "collection")
-                              (api/get-teams (:auth-settings db))))
-          ; confirm email invitation
-          (and (utils/in? (:route @router/path) "confirm-invitation")
-               (contains? (:query-params @router/path) :token)
-               (not (contains? db :email-confirmed)))
-          (utils/after 100 #(api/confirm-invitation (:token (:query-params @router/path)) ua/invitation-confirmed)))
-        (assoc next-db :auth-settings body))
-      ; if the auth-settings call failed retry it in 2 seconds
-      (let [auth-settings-retry (or (:auth-settings-retry db) 1000)]
-        (utils/after auth-settings-retry #(api/get-auth-settings))
-        (assoc next-db :auth-settings-retry (* auth-settings-retry 2))))))
-
 (defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
   (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
         board-key (if is-all-posts
@@ -267,12 +236,6 @@
   (if uuid
     (assoc-in db [:subscription uuid] data)
     (assoc db :subscription nil)))
-
-;; Auth settings
-(defmethod dispatcher/action :auth-settings-get
-  [db [_]]
-  (api/get-auth-settings)
-  db)
 
 (defmethod dispatcher/action :teams-get
   [db [_]]
@@ -448,59 +411,6 @@
   (api/get-teams (:auth-settings db))
   db)
 
-(defmethod dispatcher/action :name-pswd-collect
-  [db [_]]
-  (let [form-data (:collect-name-pswd db)]
-    (api/collect-name-password (:firstname form-data) (:lastname form-data) (:pswd form-data)))
-  (dissoc db :latest-entry-point :latest-auth-settings))
-
-(defn update-user-data [db user-data]
-  (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
-                            (assoc user-data :avatar-url (utils/cdn default-avatar-url true))
-                            user-data)
-        with-empty-password (assoc with-fixed-avatar :password "")
-        with-has-changes (assoc with-empty-password :has-changes false)]
-    (-> db
-        (assoc :current-user-data with-fixed-avatar)
-        (assoc :edit-user-profile with-has-changes)
-        (dissoc :edit-user-profile-failed))))
-
-(defmethod dispatcher/action :name-pswd-collect/finish
-  [db [_ status user-data]]
-  (if (and status
-           (>= status 200)
-           (<= status 299))
-    (do
-      (cook/remove-cookie! :show-login-overlay)
-      (dissoc (update-user-data db user-data) :show-login-overlay))
-    (assoc db :collect-name-password-error status)))
-
-(defmethod dispatcher/action :pswd-collect
-  [db [_ password-reset?]]
-  (let [form-data (:collect-pswd db)]
-    (api/collect-password (:pswd form-data)))
-  (-> db
-    (assoc :is-password-reset password-reset?)
-    (dissoc :latest-entry-point :latest-auth-settings)))
-
-(defmethod dispatcher/action :pswd-collect/finish
-  [db [_ status]]
-  (if (and (>= status 200)
-           (<= status 299))
-    (do
-      (if (:is-password-reset db)
-        (do
-          (cook/remove-cookie! :show-login-overlay)
-          (utils/after 200 #(router/nav! oc-urls/login)))
-        (do
-          (cook/set-cookie!
-           (router/show-nux-cookie (jwt/user-id))
-           (:new-user router/nux-cookie-values)
-           (* 60 60 24 7))
-          (router/nav! oc-urls/confirm-invitation-profile)))
-      (dissoc db :show-login-overlay))
-    (assoc db :collect-password-error status)))
-
 (defmethod dispatcher/action :mobile-menu-toggle
   [db [_]]
   (if (responsive/is-mobile-size?)
@@ -514,34 +424,6 @@
                               false
                               (not (:site-menu-open db)))]
     (assoc db :site-menu-open next-site-menu-open)))
-
-(defmethod dispatcher/action :user-profile-reset
-  [db [_]]
-  (update-user-data db (:current-user-data db)))
-
-(defmethod dispatcher/action :user-data
-  [db [_ user-data]]
-  (update-user-data db user-data))
-
-(defmethod dispatcher/action :user-profile-save
-  [db [_]]
-  (let [new-password (:password (:edit-user-profile db))
-        password-did-change (pos? (count new-password))
-        with-pswd (if (and password-did-change
-                           (>= (count new-password) 8))
-                    (:edit-user-profile db)
-                    (dissoc (:edit-user-profile db) :password))
-        new-email (:email (:edit-user-profile db))
-        email-did-change (not= new-email (:email (:current-user-data db)))
-        with-email (if (and email-did-change
-                            (utils/valid-email? new-email))
-                     (assoc with-pswd :email new-email)
-                     (assoc with-pswd :email (:email (:current-user-data db))))
-        without-has-changes (dissoc with-email :has-changes :loading)]
-    (api/patch-user-profile (:current-user-data db) without-has-changes))
-  (-> db
-    (assoc-in [:edit-user-profile :loading] true)
-    (dissoc :latest-entry-point :latest-auth-settings)))
 
 (defmethod dispatcher/action :email-domain-team-add
   [db [_]]
@@ -574,26 +456,12 @@
       (router/redirect! fixed-add-slack-team-link)))
   db)
 
-(defmethod dispatcher/action :refresh-slack-user
-  [db [_]]
-  (api/refresh-slack-user)
-  db)
-
 (defmethod dispatcher/action :org-create
   [db [_]]
   (let [org-data (:org-editing db)]
     (when-not (string/blank? (:name org-data))
       (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data))))
   (dissoc db :latest-entry-point :latest-auth-settings))
-
-(defmethod dispatcher/action :password-reset
-  [db [_]]
-  (api/password-reset (:email (:password-reset db)))
-  (dissoc db :latest-entry-point :latest-auth-settings))
-
-(defmethod dispatcher/action :password-reset/finish
-  [db [_ status]]
-  (assoc-in db [:password-reset :success] (and (>= status 200) (<= status 299))))
 
 (defmethod dispatcher/action :board-delete
   [db [_ board-slug]]
@@ -609,10 +477,6 @@
        (assoc :error-banner-message error-message)
        (assoc :error-banner-time error-time))
       db)))
-
-(defmethod dispatcher/action :user-profile-update/failed
-  [db [_]]
-  (assoc db :edit-user-profile-failed true))
 
 (defmethod dispatcher/action :trend-bar-status
   [db [_ status]]
