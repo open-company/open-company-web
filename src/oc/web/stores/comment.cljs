@@ -87,10 +87,9 @@
       db)))
 
 (defmethod dispatcher/action :comment-save
-  [db [_ comment-data new-body]]
+  [db [_ activity-uuid comment-data new-body]]
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (router/current-activity-id)
         item-uuid (:uuid comment-data)
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
         comments-data (get-in db comments-key)
@@ -109,7 +108,7 @@
         board-slug (router/current-board-slug)
         comment-data (:interaction interaction-data)
         item-uuid (:uuid comment-data)
-        activity-uuid (router/current-activity-id)
+        activity-uuid (:resource-uuid interaction-data)
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
         comments-data (get-in db comments-key)
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
@@ -131,12 +130,12 @@
       db)))
 
 (defmethod dispatcher/action :ws-interaction/comment-delete
-  [db [_ comment-data]]
+  [db [_ interaction-data]]
   (let [; Get the current router data
         org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
-        item-uuid (:uuid (:interaction comment-data))
-        activity-uuid (router/current-activity-id)
+        item-uuid (:uuid (:interaction interaction-data))
+        activity-uuid (:resource-uuid interaction-data)
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]

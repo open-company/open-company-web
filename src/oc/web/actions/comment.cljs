@@ -69,9 +69,9 @@
       (get-comments activity-data))))
 
 (defn save-comment
-  [comment-data new-body]
+  [activity-uuid comment-data new-body]
   (api/save-comment comment-data new-body)
-  (dis/dispatch! [:comment-save comment-data new-body]))
+  (dis/dispatch! [:comment-save activity-uuid comment-data new-body]))
 
 (defn ws-comment-update
   [interaction-data]

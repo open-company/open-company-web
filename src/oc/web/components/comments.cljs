@@ -39,13 +39,14 @@
 
 (defn edit-finished
   [e s c]
-  (let [new-comment (rum/ref-node s "comment-body")
+  (let [activity-data (first (:rum/args s))
+        new-comment (rum/ref-node s "comment-body")
         comment-text (cu/add-comment-content new-comment)]
     (if (pos? (count comment-text))
       (do
         (stop-editing s)
         (set! (.-innerHTML new-comment) comment-text)
-        (comment-actions/save-comment c comment-text))
+        (comment-actions/save-comment (:uuid activity-data) c comment-text))
       (cancel-edit e s c))))
 
 (defn start-editing [s]
