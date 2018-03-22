@@ -51,7 +51,8 @@
       (if (utils/link-for (:links org-data) "activity")
         ;; Load all posts only if not coming from a digest url
         ;; in that case do not load since we already have the results we need
-        (api/get-all-posts org-data (utils/link-for (:links org-data) "activity") {:from (:ap-initial-at db)})
+        (api/get-all-posts (utils/link-for (:links org-data) "activity") (:ap-initial-at db)
+         (partial aa/all-posts-get-finish (:ap-intiial-at db)))
         (router/redirect-404!))
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
@@ -685,100 +686,6 @@
 (defmethod dispatcher/action :alert-modal-hide-done
   [db [_]]
   (dissoc db :alert-modal))
-
-(defmethod dispatcher/action :all-posts-get
-  [db [_]]
-  (when-let [activity-link (utils/link-for (:links (dispatcher/org-data db)) "activity")]
-    (api/get-all-posts (dispatcher/org-data db) activity-link {:from (:ap-initial-at db)}))
-  db)
-
-(defmethod dispatcher/action :all-posts-calendar
-  [db [_ {:keys [link year month]}]]
-  (api/get-all-posts (dispatcher/org-data) link {:year year :month month})
-  db)
-
-(defmethod dispatcher/action :all-posts-get/finish
-  [db [_ {:keys [org year month from body]}]]
-  (if body
-    (let [org (router/current-org-slug)
-          all-posts-key (dispatcher/all-posts-key org)
-          fixed-all-posts (utils/fix-all-posts (:collection body))
-          with-calendar-data (-> fixed-all-posts
-                                (assoc :year year)
-                                (assoc :month month)
-                                ;; Force the component to trigger a did-remount
-                                ;; or it won't see the finish of the loading
-                                (assoc :rand (rand 1000)))
-          should-404? (and from
-                           (router/current-activity-id)
-                           (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
-      (when (and (not year) (not month))
-        (utils/after 2000 #(dispatcher/dispatch! [:boards-load-other (:boards (dispatcher/org-data db))])))
-      (when should-404?
-        (router/redirect-404!))
-      (when (and (not should-404?)
-                 (not year)
-                 (not month)
-                 (= (router/current-board-slug) "all-posts"))
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
-      (when (jwt/jwt) ; only for logged in users
-        (let [org-boards (:boards (dispatcher/org-data db))
-              org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))
-              board-slugs (distinct
-                            (map :board-slug
-                                 (map second (:fixed-items with-calendar-data))))]
-          (ws-ic/board-unwatch (fn [rep]
-            (doseq [board-slug board-slugs]
-              (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
-              (ws-ic/board-watch (org-board-map board-slug)))))))
-      (assoc-in db all-posts-key with-calendar-data))
-    db))
-
-(defmethod dispatcher/action :calendar-get
-  [db [_]]
-  (api/get-calendar (router/current-org-slug))
-  db)
-
-(defmethod dispatcher/action :calendar-get/finish
-  [db [_ {:keys [org body]}]]
-  (let [calendar-key (dispatcher/calendar-key org)]
-    (assoc-in db calendar-key body)))
-
-(defmethod dispatcher/action :all-posts-more
-  [db [_ more-link direction]]
-  (api/load-more-all-posts more-link direction)
-  (let [all-posts-key (dispatcher/all-posts-key (router/current-org-slug))
-        all-posts-data (get-in db all-posts-key)
-        next-all-posts-data (assoc all-posts-data :loading-more true)]
-    (assoc-in db all-posts-key next-all-posts-data)))
-
-; (def default-activity-limit 50)
-
-(defmethod dispatcher/action :all-posts-more/finish
-  [db [_ {:keys [org direction body]}]]
-  (if body
-    (let [all-posts-key (dispatcher/all-posts-key org)
-          fixed-all-posts (utils/fix-all-posts (:collection body))
-          old-all-posts (get-in db all-posts-key)
-          next-links (vec
-                      (remove
-                       #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
-                       (:links fixed-all-posts)))
-          link-to-move (if (= direction :up)
-                          (utils/link-for (:links old-all-posts) "next")
-                          (utils/link-for (:links old-all-posts) "previous"))
-          fixed-next-links (if link-to-move
-                              (vec (conj next-links link-to-move))
-                              next-links)
-          with-links (assoc fixed-all-posts :links fixed-next-links)
-          new-items (merge (:fixed-items old-all-posts) (:fixed-items with-links))
-          keeping-items (count (:fixed-items old-all-posts))
-          new-all-posts (-> with-links
-                              (assoc :fixed-items new-items)
-                              (assoc :direction direction)
-                              (assoc :saved-items keeping-items))]
-      (assoc-in db all-posts-key new-all-posts))
-    db))
 
 (defmethod dispatcher/action :org-edit
   [db [_ org-data]]

@@ -743,46 +743,21 @@
         {:headers (headers-for-link activity-delete-link)}
         callback))))
 
-(defn get-all-posts [org-data & [activity-link {:keys [year month from]}]]
-  (when org-data
-    (let [all-posts-link (or activity-link (utils/link-for (:links org-data) "activity"))
-          href (relative-href all-posts-link)
+(defn get-all-posts [activity-link from callback]
+  (when activity-link
+    (let [href (relative-href activity-link)
           final-href (if from
                        (str href "?start=" from "&direction=around")
                        href)]
-      (storage-http (method-for-link all-posts-link) final-href
-        {:headers (headers-for-link all-posts-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch!
-           [:all-posts-get/finish
-            {:org (:slug org-data)
-             :year year
-             :month month
-             :from from
-             :body (when success (json->cljs body))}]))))))
+      (storage-http (method-for-link activity-link) final-href
+        {:headers (headers-for-link activity-link)}
+        callback))))
 
-(defn load-more-all-posts [more-link direction]
+(defn load-more-all-posts [more-link direction callback]
   (when (and more-link direction)
     (storage-http (method-for-link more-link) (relative-href more-link)
       {:headers (headers-for-link more-link)}
-      (fn [{:keys [status success body]}]
-        (dispatcher/dispatch!
-         [:all-posts-more/finish
-          {:org (router/current-org-slug)
-           :direction direction
-           :body (when success (json->cljs body))}])))))
-
-(defn get-calendar [org-slug]
-  (when org-slug
-    (let [org-data (dispatcher/org-data)
-          calendar-link (utils/link-for (:links org-data) "calendar")]
-      (storage-http (method-for-link calendar-link) (relative-href calendar-link)
-        {:headers (headers-for-link calendar-link)}
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch!
-           [:calendar-get/finish
-            {:org (router/current-org-slug)
-             :body (when success (json->cljs body))}]))))))
+      callback)))
 
 (defn autosave-draft [story-data share-data]
   (when story-data

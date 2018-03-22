@@ -214,3 +214,41 @@
     (update-in [:modal-editing-data] dissoc :loading)
     (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
     (dissoc :entry-toggle-save-on-exit))))
+
+(defmethod dispatcher/action :all-posts-get/finish
+  [db [_ org-slug fixed-all-posts]]
+  (let [all-posts-key (dispatcher/all-posts-key org-slug)]
+    (assoc-in db all-posts-key fixed-all-posts)))
+
+(defmethod dispatcher/action :all-posts-more
+  [db [_ org-slug]]
+  (let [all-posts-key (dispatcher/all-posts-key org-slug)
+        all-posts-data (get-in db all-posts-key)
+        next-all-posts-data (assoc all-posts-data :loading-more true)]
+    (assoc-in db all-posts-key next-all-posts-data)))
+
+(defmethod dispatcher/action :all-posts-more/finish
+  [db [_ org direction all-posts-data]]
+  (if all-posts-data
+    (let [all-posts-key (dispatcher/all-posts-key org)
+          fixed-all-posts (utils/fix-all-posts (:collection all-posts-data))
+          old-all-posts (get-in db all-posts-key)
+          next-links (vec
+                      (remove
+                       #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
+                       (:links fixed-all-posts)))
+          link-to-move (if (= direction :up)
+                          (utils/link-for (:links old-all-posts) "next")
+                          (utils/link-for (:links old-all-posts) "previous"))
+          fixed-next-links (if link-to-move
+                              (vec (conj next-links link-to-move))
+                              next-links)
+          with-links (assoc fixed-all-posts :links fixed-next-links)
+          new-items (merge (:fixed-items old-all-posts) (:fixed-items with-links))
+          keeping-items (count (:fixed-items old-all-posts))
+          new-all-posts (-> with-links
+                              (assoc :fixed-items new-items)
+                              (assoc :direction direction)
+                              (assoc :saved-items keeping-items))]
+      (assoc-in db all-posts-key new-all-posts))
+    db))
