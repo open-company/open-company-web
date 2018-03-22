@@ -22,7 +22,7 @@
                                             board-slug (router/current-board-slug)
                                             board-url (oc-urls/board org-slug board-slug)]
                                        (router/nav! board-url)
-                                       (dis/dispatch! [:activity-delete activity-data])
+                                       (activity-actions/activity-delete activity-data)
                                        (dis/dispatch! [:alert-modal-hide]))
                     }]
     (dis/dispatch! [:alert-modal-show alert-data])))
@@ -73,5 +73,5 @@
                 "Delete"])
             (when share-link
              [:li.share
-               {:on-click #(dis/dispatch! [:activity-share-show activity-data])}
+               {:on-click #(activity-actions/activity-share-show activity-data)}
                "Share"])])])))

@@ -59,37 +59,33 @@
 ;; Close dismiss handling
 
 (defn cancel-clicked [s]
-  (if @(::uploading-media s)
-    (let [alert-data {:icon "/img/ML/trash.svg"
-                      :action "dismiss-edit-uploading-media"
-                      :message (str "Leave before finishing upload?")
-                      :link-button-title "Stay"
-                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                      :solid-button-style :red
-                      :solid-button-title "Cancel upload"
-                      :solid-button-cb #(do
-                                          (dis/dispatch! [:entry-clear-local-cache :entry-editing])
-                                          (dis/dispatch! [:alert-modal-hide])
-                                          (real-close s))
-                      }]
-      (dis/dispatch! [:alert-modal-show alert-data]))
-    (if (:has-changes @(drv/get-ref s :entry-editing))
+  (let [entry-editing @(drv/get-ref s :entry-editing)
+        clean-fn (fn [dismiss-modal?]
+                    (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing)
+                    (when dismiss-modal?
+                      (dis/dispatch! [:alert-modal-hide]))
+                    (real-close s))]
+    (if @(::uploading-media s)
       (let [alert-data {:icon "/img/ML/trash.svg"
-                        :action "dismiss-edit-dirty-data"
-                        :message (str "Leave without saving your changes?")
+                        :action "dismiss-edit-uploading-media"
+                        :message (str "Leave before finishing upload?")
                         :link-button-title "Stay"
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-style :red
-                        :solid-button-title "Lose changes"
-                        :solid-button-cb #(do
-                                            (dis/dispatch! [:entry-clear-local-cache :entry-editing])
-                                            (dis/dispatch! [:alert-modal-hide])
-                                            (real-close s))
-                        }]
+                        :solid-button-title "Cancel upload"
+                        :solid-button-cb #(clean-fn true)}]
         (dis/dispatch! [:alert-modal-show alert-data]))
-      (do
-       (dis/dispatch! [:entry-clear-local-cache :entry-editing])
-       (real-close s)))))
+      (if (:has-changes entry-editing)
+        (let [alert-data {:icon "/img/ML/trash.svg"
+                          :action "dismiss-edit-dirty-data"
+                          :message (str "Leave without saving your changes?")
+                          :link-button-title "Stay"
+                          :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                          :solid-button-style :red
+                          :solid-button-title "Lose changes"
+                          :solid-button-cb #(clean-fn true)}]
+          (dis/dispatch! [:alert-modal-show alert-data]))
+        (clean-fn false)))))
 
 ;; Data change handling
 
@@ -308,29 +304,29 @@
                              (clean-body)
                              (if (and (is-publishable? entry-editing)
                                       (not (zero? (count fixed-headline))))
-                               (if published?
-                                 (do
-                                   (reset! (::saving s) true)
-                                   (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                   (dis/dispatch! [:entry-save]))
-                                 (do
-                                   (reset! (::publishing s) true)
-                                   (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                   (dis/dispatch! [:entry-publish])))
-                               (when (zero? (count fixed-headline))
-                                 (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
-                                   (when-not (.data $post-btn "bs.tooltip")
-                                     (.tooltip $post-btn
-                                      (clj->js {:container "body"
-                                                :placement "bottom"
-                                                :trigger "manual"
-                                                :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                                 "<div class=\"tooltip-arrow\"></div>"
-                                                                 "<div class=\"tooltip-inner\"></div>"
-                                                               "</div>")
-                                                :title "A title is required in order to save or share this post."})))
-                                   (utils/after 10 #(.tooltip $post-btn "show"))
-                                   (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+                                (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
+                                      updated-entry-editing @(drv/get-ref s :entry-editing)]
+                                  (if published?
+                                    (do
+                                      (reset! (::saving s) true)
+                                      (activity-actions/entry-save updated-entry-editing))
+                                    (do
+                                      (reset! (::publishing s) true)
+                                      (activity-actions/entry-publish updated-entry-editing nil))))
+                                (when (zero? (count fixed-headline))
+                                  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+                                    (when-not (.data $post-btn "bs.tooltip")
+                                      (.tooltip $post-btn
+                                       (clj->js {:container "body"
+                                                 :placement "bottom"
+                                                 :trigger "manual"
+                                                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                                  "<div class=\"tooltip-arrow\"></div>"
+                                                                  "<div class=\"tooltip-inner\"></div>"
+                                                                "</div>")
+                                                 :title "A title is required in order to save or share this post."})))
+                                    (utils/after 10 #(.tooltip $post-btn "show"))
+                                    (utils/after 5000 #(.tooltip $post-btn "hide"))))))
                  :class (when disabled?
                           "disabled")}
                 (if working?
@@ -353,7 +349,7 @@
                               (when-not disabled?
                                 (clean-body)
                                 (reset! (::saving s) true)
-                                (dis/dispatch! [:entry-save])))}
+                                (activity-actions/entry-save @(drv/get-ref s :entry-editing))))}
                   (when working?
                     (small-loading))
                   (str "Save " (when-not is-mobile? "to ") "draft")]))])

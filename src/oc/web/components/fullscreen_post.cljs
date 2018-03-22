@@ -51,8 +51,8 @@
 
 (defn dismiss-modal [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)
-        activity-data (:activity-data modal-data)]
-    (activity-actions/activity-modal-fade-out (:board-slug activity-data))))
+        edited-data (:modal-editing-data modal-data)]
+    (activity-actions/activity-modal-fade-out (:board-slug edited-data))))
 
 (defn close-clicked [s]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :fullscreen-post-data))]
@@ -151,8 +151,11 @@
 
 (defn- dismiss-editing? [state dismiss-modal?]
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
-        dismiss-fn (fn []
-                     (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
+        dismiss-fn (fn [dismiss-alert?]
+                     (when dismiss-alert?
+                       (dis/dispatch! [:alert-modal-hide]))
+                     (activity-actions/entry-clear-local-cache (:uuid (:modal-editing-data modal-data))
+                      :modal-editing-data)
                      (stop-editing state)
                      (when dismiss-modal?
                        (close-clicked state)))]
@@ -164,10 +167,7 @@
                       :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                       :solid-button-style :red
                       :solid-button-title "Cancel upload"
-                      :solid-button-cb #(do
-                                          (dis/dispatch! [:alert-modal-hide])
-                                          (dismiss-fn))
-                      }]
+                      :solid-button-cb #(dismiss-fn true)}]
       (dis/dispatch! [:alert-modal-show alert-data]))
     (if (:has-changes (:modal-editing-data modal-data))
       (let [alert-data {:icon "/img/ML/trash.svg"
@@ -177,12 +177,9 @@
                         :link-button-cb #(dis/dispatch! [:alert-modal-hide])
                         :solid-button-style :red
                         :solid-button-title "Lose changes"
-                        :solid-button-cb #(do
-                                            (dis/dispatch! [:alert-modal-hide])
-                                            (dismiss-fn))
-                        }]
+                        :solid-button-cb #(dismiss-fn true)}]
         (dis/dispatch! [:alert-modal-show alert-data]))
-      (dismiss-fn)))))
+      (dismiss-fn false)))))
 
 (defn setup-editing-data [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
@@ -250,7 +247,7 @@
                                          (reset! (::initial-headline s) initial-headline)
                                          (reset! (::initial-body s) initial-body)
                                          (stop-editing s)
-                                         (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
+                                         (activity-actions/entry-clear-local-cache (:uuid activity-data) :modal-editing-data)
                                          (cond
                                            ;; If the board change redirect to the board since the url we have is
                                            ;; not correct anymore

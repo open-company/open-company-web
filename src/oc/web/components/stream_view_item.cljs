@@ -11,7 +11,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.utils.activity :as au]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -19,19 +18,6 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.interactions-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
-
-(defn- delete-clicked [e activity-data]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message "Delete this post?"
-                    :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(do
-                                        (dis/dispatch! [:activity-delete activity-data])
-                                        (dis/dispatch! [:alert-modal-hide]))
-                    }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
 
 (defn should-show-continue-reading? [s]
   (when-not @(::expanded s)
