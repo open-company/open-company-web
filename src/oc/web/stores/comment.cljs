@@ -87,10 +87,9 @@
       db)))
 
 (defmethod dispatcher/action :comment-save
-  [db [_ comment-data new-body]]
+  [db [_ activity-uuid comment-data new-body]]
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)
-        activity-uuid (router/current-activity-id)
         item-uuid (:uuid comment-data)
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
         comments-data (get-in db comments-key)
@@ -109,7 +108,7 @@
         board-slug (router/current-board-slug)
         comment-data (:interaction interaction-data)
         item-uuid (:uuid comment-data)
-        activity-uuid (router/current-activity-id)
+        activity-uuid (:resource-uuid interaction-data)
         comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
         comments-data (get-in db comments-key)
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
@@ -128,4 +127,56 @@
                 new-comments-data (assoc comments-data comment-idx new-comment-data)]
             (assoc-in db comments-key new-comments-data))
           db))
+      db)))
+
+(defmethod dispatcher/action :ws-interaction/comment-delete
+  [db [_ interaction-data]]
+  (let [; Get the current router data
+        org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        item-uuid (:uuid (:interaction interaction-data))
+        activity-uuid (:resource-uuid interaction-data)
+        comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+        comments-data (get-in db comments-key)
+        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
+    (assoc-in db comments-key new-comments-data)))
+
+(defmethod dispatcher/action :ws-interaction/comment-add
+  [db [_ interaction-data]]
+  (let [; Get the current router data
+        org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        is-all-posts (:from-all-posts @router/path)
+        activity-uuid (:resource-uuid interaction-data)
+        board-key (if is-all-posts
+                    (dispatcher/all-posts-key org-slug)
+                    (dispatcher/board-data-key org-slug board-slug))
+        ; Entry data
+        entry-key (dispatcher/activity-key org-slug board-slug activity-uuid)
+        entry-data (get-in db entry-key)]
+    (if entry-data
+      ; If the entry is present in the local state
+      (let [; get the comment data from the ws message
+            comment-data (:interaction interaction-data)
+            created-at (:created-at comment-data)
+            all-old-comments-data (dispatcher/activity-comments-data activity-uuid)
+            old-comments-data (filterv :links all-old-comments-data)
+            ; Add the new comment to the comments list, make sure it's not present already
+            new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
+            sorted-comments-data (vec (sort-by :created-at new-comments-data))
+            comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
+            ; update the comments link of the entry
+            comments-link-idx (utils/index-of
+                               (:links entry-data)
+                               #(and (= (:rel %) "comments") (= (:method %) "GET")))
+            with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
+            old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
+            new-author (:author comment-data)
+            new-authors (if (and old-authors (first (filter #(= (:user-id %) (:user-id new-author)) old-authors)))
+                          old-authors
+                          (concat [new-author] old-authors))
+            with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
+        (-> db
+         (assoc-in comments-key sorted-comments-data)
+         (assoc-in (vec (concat board-key [:fixed-items activity-uuid])) with-authors)))
       db)))
