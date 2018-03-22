@@ -22,19 +22,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn- delete-clicked [e activity-data]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message "Delete this post?"
-                    :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(do
-                                        (dis/dispatch! [:activity-delete activity-data])
-                                        (dis/dispatch! [:alert-modal-hide]))
-                    }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
-
 (rum/defcs activity-card < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)

@@ -12,6 +12,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.activity-card :refer (activity-card)]))
 
@@ -44,11 +45,11 @@
 
 (defn load-more-items-next-fn [s scroll]
   (when (compare-and-set! (::loading-more s) false true)
-    (dis/dispatch! [:all-posts-more @(::next-link s) :up])))
+    (activity-actions/all-posts-more @(::next-link s) :up)))
 
 (defn load-more-items-prev-fn [s scroll]
   (when (compare-and-set! (::loading-more s) false true)
-    (dis/dispatch! [:all-posts-more @(::prev-link s) :down])))
+    (activity-actions/all-posts-more @(::prev-link s) :down)))
 
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)

@@ -8,7 +8,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
             [oc.web.local-settings :as ls]
-            [oc.web.actions.reaction :as reaction-actions]
             [goog.Uri :as guri]))
 
 (def current-board-path (atom nil))
@@ -53,16 +52,6 @@
 (defmethod event-handler :chsk/ws-ping
   [_ & r]
   )
-
-(defmethod event-handler :interaction-reaction/add
-  [_ body]
-  (timbre/debug "Reaction add event" body)
-  (reaction-actions/ws-interaction-reaction-add body))
-
-(defmethod event-handler :interaction-reaction/delete
-  [_ body]
-  (timbre/debug "Reaction delete event" body)
-  (reaction-actions/ws-interaction-reaction-delete body))
 
 ;; Sente events handlers
 

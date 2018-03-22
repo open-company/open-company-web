@@ -9,6 +9,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.stream-view-item :refer (stream-view-item)]
@@ -77,7 +78,7 @@
       ;; Show a spinner at the top
       (reset! (::top-loading s) true)
       ;; if the user is close to the top margin, load more results if there is a link
-      (dis/dispatch! [:all-posts-more @(::has-next s) :up])
+      (activity-actions/all-posts-more @(::has-next s) :up)
       (reset! (::has-next s) false))
     ;; scrolling down
     (when (and @(::has-prev s)
@@ -86,7 +87,7 @@
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
-      (dis/dispatch! [:all-posts-more @(::has-prev s) :down])
+      (activity-actions/all-posts-more @(::has-prev s) :down)
       (reset! (::has-prev s) false)))
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))

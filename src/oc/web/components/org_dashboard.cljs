@@ -12,6 +12,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
@@ -34,14 +35,15 @@
 (defn refresh-board-data [s]
   (when-not (router/current-activity-id)
     (utils/after 100 (fn []
-     (if (= (router/current-board-slug) "all-posts")
-       (dis/dispatch! [:all-posts-get])
-       (let [{:keys [org-data
-                     board-data]} @(drv/get-ref s :org-dashboard-data)
-             fixed-board-data (or
-                               board-data
-                               (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
-         (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))))
+     (let [{:keys [org-data
+                   board-data
+                   ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
+       (if (= (router/current-board-slug) "all-posts")
+         (activity-actions/all-posts-get org-data ap-initial-at)
+         (let [fixed-board-data (or
+                                 board-data
+                                 (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
+           (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]))))))))
 
 (defn nux-steps
   [org-data board-data nux]

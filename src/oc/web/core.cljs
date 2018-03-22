@@ -17,6 +17,7 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
             [oc.web.actions.comment]
+            [oc.web.actions.reaction]
             [oc.web.actions.user :as user-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
