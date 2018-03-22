@@ -69,7 +69,8 @@
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (api/get-org org-data)
-             (router/redirect-404!))
+             (when-not (router/current-secure-activity-id)
+               (router/redirect-404!)))
            (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
