@@ -6,7 +6,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.ws-interaction-client :as ws-ic]))
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.actions.activity :as activity-actions]))
 
 (defn add-comment-focus [activity-data]
   (dis/dispatch! [:add-comment-focus activity-data]))
@@ -87,7 +88,7 @@
         entry-data (dis/activity-data org-slug board-slug activity-uuid)]
     (if entry-data
       ;; Refresh the entry data to get the new links to interact with
-      (api/get-entry entry-data)
+      (activity-actions/get-entry entry-data)
       ;; the entry is not present, refresh the full board
       (let [board-data (dis/board-data)]
         (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")))))
