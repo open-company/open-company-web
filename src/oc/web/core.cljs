@@ -7,13 +7,17 @@
             [cuerdas.core :as s]
             [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
+            ;; Pull in all the stores to register the events
             [oc.web.actions]
-            [oc.web.actions.user :as user-actions]
             [oc.web.stores.user]
             [oc.web.stores.search]
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
+            ;; Pull in the needed file for the ws interaction events
+            [oc.web.lib.ws-interaction-client]
+            [oc.web.actions.comment]
+            [oc.web.actions.user :as user-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]

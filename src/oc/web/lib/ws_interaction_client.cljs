@@ -9,7 +9,6 @@
             [oc.web.lib.jwt :as j]
             [oc.web.local-settings :as ls]
             [oc.web.actions.reaction :as reaction-actions]
-            [oc.web.actions.comment :as comment-actions]
             [goog.Uri :as guri]))
 
 (def current-board-path (atom nil))
@@ -54,21 +53,6 @@
 (defmethod event-handler :chsk/ws-ping
   [_ & r]
   )
-
-(defmethod event-handler :interaction-comment/add
-  [_ body]
-  (timbre/debug "Comment add event" body)
-  (dis/dispatch! [:ws-interaction/comment-add body]))
-
-(defmethod event-handler :interaction-comment/update
-  [_ body]
-  (timbre/debug "Comment update event" body)
-  (comment-actions/ws-comment-update body))
-
-(defmethod event-handler :interaction-comment/delete
-  [_ body]
-  (timbre/debug "Comment delete event" body)
-  (dis/dispatch! [:ws-interaction/comment-delete body]))
 
 (defmethod event-handler :interaction-reaction/add
   [_ body]

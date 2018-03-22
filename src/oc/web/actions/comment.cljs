@@ -1,10 +1,12 @@
 (ns oc.web.actions.comment
-  (:require [oc.web.api :as api]
+  (:require [taoensso.timbre :as timbre]
+            [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.json :refer (json->cljs)]))
+            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.ws-interaction-client :as ws-ic]))
 
 (defn add-comment-focus [activity-data]
   (dis/dispatch! [:add-comment-focus activity-data]))
@@ -74,3 +76,34 @@
 (defn ws-comment-update
   [interaction-data]
   (dis/dispatch! [:ws-interaction/comment-update interaction-data]))
+
+(defn ws-comment-delete [comment-data]
+  (dis/dispatch! [:ws-interaction/comment-delete comment-data]))
+
+(defn ws-comment-add [interaction-data]
+  (let [org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-uuid (:resource-uuid interaction-data)
+        entry-data (dis/activity-data org-slug board-slug activity-uuid)]
+    (if entry-data
+      ;; Refresh the entry data to get the new links to interact with
+      (api/get-entry entry-data)
+      ;; the entry is not present, refresh the full board
+      (let [board-data (dis/board-data)]
+        (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")))))
+  (dis/dispatch! [:ws-interaction/comment-add interaction-data]))
+
+(defmethod ws-ic/event-handler :interaction-comment/add
+  [_ body]
+  (timbre/debug "Comment add event" body)
+  (ws-comment-add body))
+
+(defmethod ws-ic/event-handler :interaction-comment/update
+  [_ body]
+  (timbre/debug "Comment update event" body)
+  (ws-comment-update body))
+
+(defmethod ws-ic/event-handler :interaction-comment/delete
+  [_ body]
+  (timbre/debug "Comment delete event" body)
+  (ws-comment-delete body))
