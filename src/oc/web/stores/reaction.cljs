@@ -173,8 +173,9 @@
 
 (defn- update-reaction
   [db interaction-data add-event?]
-  (let [with-updated-comment (update-comment-reaction db interaction-data add-event?)]
-    (or with-updated-comment (update-entry-reaction db interaction-data add-event?))))
+  (let [with-updated-comment (update-comment-reaction db interaction-data add-event?)
+        with-updated-activity (update-entry-reaction db interaction-data add-event?)]
+    (or with-updated-comment with-updated-activity db)))
 
 (defmethod dispatcher/action :ws-interaction/reaction-add
   [db [_ interaction-data]]
@@ -187,34 +188,6 @@
 ;; Reaction store specific reducers
 (defmethod reducer :default [db payload]
   ;; ignore state changes not specific to reactions
-  db)
-
-;; This is used to store the relationship between an activity uuid that has
-;; reactions with the activity key in the app state. When a related reaction
-;; is then needed you can search for the key by the activity uuid. It does not
-;; change the app state.
-(defn- index-posts
-  [ra org posts]
-  (reduce (fn [acc post]
-            (let [board-slug (:board-slug post)
-                  idx (make-activity-index (:uuid post))
-                  activity-key (dispatcher/activity-key
-                                org
-                                board-slug
-                                (:uuid post))]
-              (assoc acc idx activity-key)))
-          ra posts))
-
-(defmethod reducer :all-posts-get/finish
-  [db [_ {:keys [org year month from body]}]]
-  (swap! reactions-atom index-posts org (-> body :collection :items))
-  db)
-
-(defmethod reducer :board
-  [db [_ board-data]]
-  (let [org (router/current-org-slug)
-        fixed-board-data (utils/fix-board board-data)]
-    (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
   db)
 
 ;; This function is used to store the comment uuid and the comments key to
@@ -230,6 +203,36 @@
                                activity-uuid)]
               (assoc acc idx comment-key)))
           ra comments))
+
+;; This is used to store the relationship between an activity uuid that has
+;; reactions with the activity key in the app state. When a related reaction
+;; is then needed you can search for the key by the activity uuid. It does not
+;; change the app state.
+(defn- index-posts
+  [ra org posts]
+  (reduce (fn [acc post]
+            (let [board-slug (:board-slug post)
+                  activity-uuid (:uuid post)
+                  idx (make-activity-index activity-uuid)
+                  activity-key (dispatcher/activity-key
+                                org
+                                board-slug
+                                activity-uuid)
+                  next-acc (index-comments acc org board-slug activity-uuid (:comments post))]
+              (assoc next-acc idx activity-key)))
+          ra posts))
+
+(defmethod reducer :all-posts-get/finish
+  [db [_ {:keys [org year month from body]}]]
+  (swap! reactions-atom index-posts org (-> body :collection :items))
+  db)
+
+(defmethod reducer :board
+  [db [_ board-data]]
+  (let [org (router/current-org-slug)
+        fixed-board-data (utils/fix-board board-data)]
+    (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
+  db)
 
 (defmethod reducer :ws-interaction/comment-add
   [db [_ interaction-data]]
