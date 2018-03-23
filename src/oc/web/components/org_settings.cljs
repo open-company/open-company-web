@@ -8,7 +8,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
@@ -52,12 +52,12 @@
                         :action "org-settings-unsaved-edits"
                         :message "There are unsaved edits. OK to delete them?"
                         :link-button-title "Cancel"
-                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :link-button-cb #(alert-modal/hide-alert)
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
-                                            (dis/dispatch! [:alert-modal-hide])
+                                            (alert-modal/hide-alert)
                                             (dis/dispatch! [:org-settings-hide]))}]
-        (dis/dispatch! [:alert-modal-show alert-data]))
+        (alert-modal/show-alert alert-data))
       (dis/dispatch! [:org-settings-hide]))))
 
 (rum/defcs org-settings
@@ -91,7 +91,7 @@
         [:button.mlb-reset.carrot-modal-close
           {:on-click #(close-clicked s)}]
         (when alert-modal-data
-          (alert-modal))
+          (alert-modal/alert-modal))
         [:div.org-settings-inner
           [:div.org-settings-header
             "Settings"]

@@ -11,7 +11,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]
             [cljsjs.medium-editor]
             [goog.dom :as gdom]
@@ -33,8 +33,8 @@
                     :title "Sorry!"
                     :message "An error occurred with your file."
                     :solid-button-title "OK"
-                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
-    (dis/dispatch! [:alert-modal-show alert-data])
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)
     (utils/after 10 #(do
                        (reset! (::media-attachment-did-success state) false)
                        (media-attachment-dismiss-picker state editable)))))
@@ -148,11 +148,11 @@
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"
-                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}
+                    :solid-button-cb #(alert-modal/hide-alert)}
         upload-progress-cb (:upload-progress-cb (first (:rum/args s)))]
     (upload-progress-cb false)
     (reset! (::upload-lock s) false)
-    (dis/dispatch! [:alert-modal-show alert-data])))
+    (alert-modal/show-alert alert-data)))
 
 (defn media-photo-add-if-finished [s editable]
   (let [image @(::media-photo s)

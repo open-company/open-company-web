@@ -8,7 +8,8 @@
             [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.ui.small-loading :as loading]))
+            [oc.web.components.ui.small-loading :as loading]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (defn- create-org-alert []
   (let [alert-data {:icon "/img/ML/error_icon.png"
@@ -16,8 +17,8 @@
                     :title "Please enter a company name."
                     :message ""
                     :solid-button-title "OK"
-                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
-    (dis/dispatch! [:alert-modal-show alert-data])))
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)))
 
 (defn create-org-clicked [s e]
   (utils/event-stop e)
