@@ -468,10 +468,6 @@
        (assoc :error-banner-time error-time))
       db)))
 
-(defmethod dispatcher/action :trend-bar-status
-  [db [_ status]]
-  (assoc db :trend-bar-status status))
-
 (defmethod dispatcher/action :alert-modal-show
   [db [_ modal-data]]
   (assoc db :alert-modal modal-data))
