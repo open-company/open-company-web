@@ -6,6 +6,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -216,7 +217,7 @@
           {:on-click #(do
                         (reset! (::sending s) (count (filterv valid-user? invite-users)))
                         (reset! (::send-bt-cta s) "Sending")
-                        (dis/dispatch! [:invite-users]))
+                        (team-actions/invite-users @(drv/get-ref s :invite-users)))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
            :disabled (or (not (has-valid-user? invite-users))
                          (pos? @(::sending s)))}

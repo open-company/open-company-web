@@ -6,16 +6,17 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
 (defn user-action [team-id user action method other-link-params]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
-  (dis/dispatch! [:user-action team-id user action method other-link-params nil]))
+  (team-actions/user-action team-id user action method other-link-params nil))
 
 (defn real-remove-fn [author user team-id]
   (when author
-    (api/remove-author author))
+    (api/remove-author author team-actions/author-change-cb))
   (user-action team-id user "remove" "DELETE"  {:ref "application/vnd.open-company.user.v1+json"}))
 
 (defn alert-resend-done []
@@ -110,7 +111,7 @@
                                                           :role user-type
                                                           :error nil}]])
                                        (reset! (::resending-invite s) true)
-                                       (utils/after 100 #(dis/dispatch! [:invite-users]))))}
+                                       (team-actions/invite-users @(drv/get-ref s :invite-users))))}
                         "Resend"])
                     (when (and (= "pending" (:status user))
                                (utils/link-for (:links user) "remove"))

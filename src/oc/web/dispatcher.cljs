@@ -13,6 +13,8 @@
 
 (def api-entry-point-key [:api-entry-point])
 
+(def auth-settings-key [:auth-settings])
+
 (defn org-key [org-slug]
   [(keyword org-slug)])
 
@@ -332,6 +334,11 @@
   (flux/dispatch actions payload))
 
 ;; Data
+
+(defn auth-settings
+  "Get the Auth settings data"
+  ([] (auth-settings @app-state))
+  ([data] (get-in data )))
 
 (defn api-entry-point
   "Get the API entry point."

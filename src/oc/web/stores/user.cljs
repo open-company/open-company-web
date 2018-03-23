@@ -26,7 +26,6 @@
 
 (defonce show-login-overlay-key :show-login-overlay)
 (defonce show-login-overlay? show-login-overlay-key)
-(defonce auth-settings-key :auth-settings)
 
 ;; Signup keys
 (defonce signup-with-email :signup-with-email)
@@ -36,12 +35,12 @@
 
 ;; Auth Settings
 (defn auth-settings? []
-  (contains? @dispatcher/app-state auth-settings-key))
+  (contains? @dispatcher/app-state dispatcher/auth-settings-key))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
   (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
-    (assoc next-db :auth-settings body)))
+    (assoc next-db dispatcher/auth-settings-key body)))
 
 (defn update-user-data [db user-data]
   (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
