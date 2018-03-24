@@ -493,11 +493,10 @@
   "Given a map containing :user-id and :links, remove the user as an author using the `remove` link.
   Refresh the org data when finished."
   [user-author callback]
-  (let [remove-author-link (utils/link-for (:links user-author) "remove")]
-    (when remove-author-link
-      (storage-http (method-for-link remove-author-link) (relative-href remove-author-link)
-        {:headers (headers-for-link remove-author-link)}
-        callback))))
+  (when-let [remove-author-link (utils/link-for (:links user-author) "remove")]
+    (storage-http (method-for-link remove-author-link) (relative-href remove-author-link)
+      {:headers (headers-for-link remove-author-link)}
+      callback)))
 
 (defn send-invitation
   "Give a user email and type of user send an invitation to the team.
@@ -530,46 +529,21 @@
          :headers (headers-for-link invitation-link)}
         callback))))
 
-(defn switch-user-type
-  "Given an existing user switch user type"
-  [complete-user-data old-user-type new-user-type user user-author]
-  (when (not= old-user-type new-user-type)
-    (let [org-data           (dispatcher/org-data)
-          add-admin-link     (utils/link-for (:links user) "add")
-          remove-admin-link  (utils/link-for
-                              (:links user)
-                              "remove"
-                              "DELETE"
-                              {:ref "application/vnd.open-company.team.admin.v1"})
-          add-author-link    (utils/link-for (:links org-data) "add")
-          remove-author-link (utils/link-for (:links user-author) "remove")
-          add-admin?         (= new-user-type :admin)
-          remove-admin?      (= old-user-type :admin)
-          add-author?        (or (= new-user-type :author)
-                                 (= new-user-type :admin))
-          remove-author?     (= new-user-type :viewer)]
-      ;; Add an admin call
-      (when (and add-admin? add-admin-link)
-        (auth-http (method-for-link add-admin-link) (relative-href add-admin-link)
-          {:headers (headers-for-link add-admin-link)}
-          (fn [{:keys [status success body]}]
-            (if success
-              (dispatcher/dispatch! [:invite-user/success complete-user-data])
-              (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))
-      ;; Remove admin call
-      (when (and remove-admin? remove-admin-link)
-        (auth-http (method-for-link remove-admin-link) (relative-href remove-admin-link)
-          {:headers (headers-for-link remove-admin-link)}
-          (fn [{:keys [status success body]}]
-            (if success
-              (dispatcher/dispatch! [:invite-user/success complete-user-data])
-              (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))
-      ;; Add author call
-      (when (and add-author? add-author-link)
-        (add-author (:user-id user) oc.web.actions.team/author-change-cb))
-      ;; Remove author call
-      (when (and remove-author? remove-author-link)
-        (remove-author user-author oc.web.actions.team/author-change-cb)))))
+(defn add-admin [user callback]
+  (when-let [add-admin-link (utils/link-for (:links user) "add")]
+    (auth-http (method-for-link add-admin-link) (relative-href add-admin-link)
+      {:headers (headers-for-link add-admin-link)}
+      callback)))
+
+(defn remove-admin [user callback]
+  (when-let [remove-admin-link (utils/link-for
+                                (:links user)
+                                "remove"
+                                "DELETE"
+                                {:ref "application/vnd.open-company.team.admin.v1"})]
+    (auth-http (method-for-link remove-admin-link) (relative-href remove-admin-link)
+      {:headers (headers-for-link remove-admin-link)}
+      callback)))
 
 (defn add-private-board
   [board-data user-id user-type]

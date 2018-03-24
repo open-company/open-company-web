@@ -147,10 +147,11 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
-   :invite-users        [[:base :team-data :current-user-data :team-roster]
-                          (fn [base team-data current-user-data team-roster]
+   :invite-users        [[:base] (fn [base] (:invite-users base))]
+   :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
+                          (fn [base team-data current-user-data team-roster invite-users]
                             {:team-data team-data
-                             :invite-users (:invite-users base)
+                             :invite-users invite-users
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
@@ -338,7 +339,7 @@
 (defn auth-settings
   "Get the Auth settings data"
   ([] (auth-settings @app-state))
-  ([data] (get-in data )))
+  ([data] (get data auth-settings-key)))
 
 (defn api-entry-point
   "Get the API entry point."

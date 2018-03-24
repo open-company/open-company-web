@@ -40,7 +40,7 @@
 (defn close-clicked [s]
   (let [org-data @(drv/get-ref s :org-data)
         org-editing @(drv/get-ref s :org-editing)
-        invite-users (filterv #(not (:error %)) (:invite-users @(drv/get-ref s :invite-users)))
+        invite-users (filterv #(not (:error %)) (:invite-users @(drv/get-ref s :invite-data)))
         has-unsent-invites (and (pos? (count invite-users))
                                 (some #(seq (:user %)) invite-users))
         active-tab @(drv/get-ref s :org-settings)]
@@ -70,7 +70,7 @@
     (drv/drv :alert-modal)
     (drv/drv :teams-load)
     (drv/drv :org-editing)
-    (drv/drv :invite-users)
+    (drv/drv :invite-data)
     ;; Mixins
     no-scroll-mixin
 

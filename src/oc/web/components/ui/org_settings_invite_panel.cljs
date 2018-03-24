@@ -42,19 +42,19 @@
         (dis/dispatch! [:input [:invite-users i :type] value])))))
 
 (defn setup-initial-rows [s]
-  (let [inviting-users-data @(drv/get-ref s :invite-users)
+  (let [inviting-users-data @(drv/get-ref s :invite-data)
         invite-users (:invite-users inviting-users-data)]
     (when (zero? (count invite-users))
       (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))]))))
 
 (defn has-dirty-data? [s]
-  (let [invite-users-data @(drv/get-ref s :invite-users)
+  (let [invite-users-data @(drv/get-ref s :invite-data)
         invite-users (:invite-users invite-users-data)]
     (some #(seq (:user %)) invite-users)))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
-    (drv/drv :invite-users)
+    (drv/drv :invite-data)
     (rum/local "email" ::inviting-from)
     (rum/local (int (rand 10000)) ::rand)
     (rum/local "Send" ::send-bt-cta)
@@ -70,7 +70,7 @@
      :will-update (fn [s]
                    (let [sending @(::sending s)]
                      (when (pos? sending)
-                       (let [invite-drv @(drv/get-ref s :invite-users)
+                       (let [invite-drv @(drv/get-ref s :invite-data)
                              no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))]
                          (reset! (::sending s) (count no-error-invites))
                          (when (zero? (count no-error-invites))
@@ -84,7 +84,7 @@
                    (setup-initial-rows s)
                    s)}
   [s org-data dismiss-settings-cb]
-  (let [invite-users-data (drv/react s :invite-users)
+  (let [invite-users-data (drv/react s :invite-data)
         team-data (:team-data invite-users-data)
         invite-users (:invite-users invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
@@ -173,7 +173,7 @@
                                       invite-users
                                       i
                                       (merge user-data {:error nil :user (.. % -target -value)}))])
-                       :value (:user user-data)}])]
+                       :value (or (:user user-data) "")}])]
                 [:td.user-type-field
                   [:div.user-type-dropdown
                     (user-type-dropdown {:user-id (utils/guid)
@@ -217,7 +217,7 @@
           {:on-click #(do
                         (reset! (::sending s) (count (filterv valid-user? invite-users)))
                         (reset! (::send-bt-cta s) "Sending")
-                        (team-actions/invite-users @(drv/get-ref s :invite-users)))
+                        (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
            :disabled (or (not (has-valid-user? invite-users))
                          (pos? @(::sending s)))}

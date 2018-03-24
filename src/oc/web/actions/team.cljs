@@ -66,15 +66,77 @@
 
 ;; Invite users
 
+;; Authords
+
 (defn author-change-cb [{:keys [success]}]
   (when success
     ;; TODO: replace with action creator for get org
     (api/get-org (dis/org-data))))
 
+(defn remove-author [author]
+  (api/remove-author author author-change-cb))
+
+(defn add-author [author]
+  (api/add-author (:user-id author) author-change-cb))
+
+;; Admins
+
+(defn admin-change-cb [user {:keys [success]}]
+  (if success
+    (do
+      (teams-get (dis/auth-settings))
+      (dis/dispatch! [:invite-user/success user]))
+    (dis/dispatch! [:invite-user/failed user])))
+
+(defn add-admin [user]
+  (api/add-admin user (partial admin-change-cb user)))
+
+(defn remove-admin [user]
+  (api/add-admin user (partial admin-change-cb user)))
+
+;; Invite user callbacks
+
+(defn invite-user-failed [user-data]
+  (dis/dispatch! [:invite-user/failed user-data]))
+
 (defn invite-user-success [user-data]
   ; refresh the users list once the invitation succeded
   (teams-get (dis/auth-settings))
   (dis/dispatch! [:invite-user/success user-data]))
+
+;; Switch user-type
+
+(defn switch-user-type-cb [user-data {:keys [success]}]
+  (if success
+    (invite-user-success user-data)
+    (invite-user-failed user-data)))
+
+(defn switch-user-type
+  "Given an existing user switch user type"
+  [complete-user-data old-user-type new-user-type user & [author-data]]
+  (when (not= old-user-type new-user-type)
+    (let [org-data           (dis/org-data)
+          fixed-author-data  (or author-data
+                              (utils/get-author (:user-id user) (:authors org-data)))
+          add-admin?         (= new-user-type :admin)
+          remove-admin?      (= old-user-type :admin)
+          add-author?        (or (= new-user-type :author)
+                                 (= new-user-type :admin))
+          remove-author?     (= new-user-type :viewer)]
+      ;; Add an admin call
+      (when add-admin?
+        (add-admin user))
+      ;; Remove admin call
+      (when remove-admin?
+        (remove-admin user))
+      ;; Add author call
+      (when add-author?
+        (add-author user))
+      ;; Remove author call
+      (when remove-author?
+        (remove-author fixed-author-data)))))
+
+;; Invite user
 
 (defn send-invitation-cb [invite-data user-type {:keys [success body]}]
   (if success
@@ -83,9 +145,9 @@
       ;; If user was admin or author add him to the org as author
       (when (or (= user-type :author)
                 (= user-type :admin))
-        (api/add-author (:user-id new-user) author-change-cb))
+        (add-author new-user))
       (invite-user-success invite-data))
-    (dis/dispatch! [:invite-user/failed invite-data])))
+    (invite-user-failed invite-data)))
 
 (defn invite-user [org-data team-data invite-data]
   (let [invite-from (:type invite-data)
@@ -97,8 +159,8 @@
         email-address (:address parsed-email)
         ;; check if the user being invited by email is already present in the users list.
         ;; from slack is not possible to select a user already invited since they are filtered by status before
-        user  (when (= invite-from "email")
-                (first (filter #(= (:email %) email-address) (:users team-data))))
+        user (when (= invite-from "email")
+               (first (filter #(= (:email %) email-address) (:users team-data))))
         old-user-type (when user (utils/get-user-type user org-data))]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
@@ -116,24 +178,17 @@
             last-name (cond
                         (and (= invite-from "email") splittable-name?) (second splitted-name)
                         (and (= invite-from "slack") (seq (:last-name slack-user))) (:last-name slack-user)
-                        :else "")]
+                        :else "")
+            user-value (if (= invite-from "email") email-address slack-user)]
         ;; If the user is already in the list
         ;; but the type changed we need to change the user type too
         (when (and user
                   (not= old-user-type user-type))
-          (api/switch-user-type
-           invite-data
-           old-user-type
-           user-type
-           user
-           (utils/get-author (:user-id user) (:authors org-data))))
-        (api/send-invitation
-         invite-data
-         (if (= invite-from "email") email-address slack-user)
-         invite-from user-type first-name last-name
-         (partial send-invitation-cb invite-data user-type))
-        {:success true})
-      {:error "User already active" :success false})))
+          (switch-user-type invite-data old-user-type user-type user))
+        (api/send-invitation invite-data user-value invite-from user-type first-name last-name
+         (partial send-invitation-cb invite-data user-type))))))
+
+;; Invite user helpers
 
 (defn valid-inviting-user? [user]
   (or (and (= "email" (:type user))
@@ -153,6 +208,8 @@
           dup-user (first (filter #(= (:email %) (:address parsed-email)) users-list))]
       (and dup-user
            (not= (string/lower-case (:status dup-user)) "pending")))))
+
+;; Invite users
 
 (defn invite-users [inviting-users]
   (let [org-data (dis/org-data)
