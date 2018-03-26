@@ -35,8 +35,8 @@
     (fn [{:keys [success body status]}]
       (let [team-data (when success (json->cljs body))]
         (when success
-          (enumerate-channels team-data)
-          (dis/dispatch! [:team-loaded team-data]))))))
+          (dis/dispatch! [:team-loaded team-data])
+          (enumerate-channels team-data))))))
 
 (defn read-teams [teams]
   (doseq [team teams
@@ -52,8 +52,8 @@
   (let [fixed-body (when success (json->cljs body))]
     (if success
       (let [teams (-> fixed-body :collection :items)]
-        (read-teams teams)
-        (dis/dispatch! [:teams-loaded (-> fixed-body :collection :items)]))
+        (dis/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
+        (read-teams teams))
       ;; Reset the team-data-requested to restart the teams load
       (when (and (>= status 500)
                  (<= status 599))
