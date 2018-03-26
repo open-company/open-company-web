@@ -1,4 +1,4 @@
-(ns oc.web.stores.subscrition
+(ns oc.web.stores.subscription
   (:require [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :subscription
