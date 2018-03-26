@@ -1,9 +1,9 @@
 (ns oc.web.lib.ws-interaction-client
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [sablono.core :as html :refer-macros [html]]
             [taoensso.sente :as s]
             [taoensso.timbre :as timbre]
-            [cljs.core.async :as async :refer [<! >! chan]]
+            [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
@@ -18,8 +18,12 @@
 (def ch-state (atom nil))
 (def chsk-send! (atom nil))
 
-;; Auth
+(def ch-pub (chan))
+;; Publication that handlers will subscribe to
+(def publication
+  (pub ch-pub #(:topic %)))
 
+;; Auth
 (defn should-disconnect? [rep]
   (when-not (:valid rep)
     (timbre/warn "disconnecting client due to invalid JWT!" rep)
@@ -29,6 +33,7 @@
   (timbre/debug "Trying post handshake jwt auth")
   (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
 
+;; Actions
 (defn board-watch [board-uuid]
   (timbre/debug "Watching board: " board-uuid)
   (@chsk-send! [:watch/board {:board-uuid board-uuid}] 1000))
@@ -37,6 +42,13 @@
   (timbre/debug "Unwatching all boards.")
   (@chsk-send! [:unwatch/board] 1000 callback))
 
+(defn subscribe
+  [topic handler-fn]
+  (let [ws-ic-chan (chan)]
+    (sub publication topic ws-ic-chan)
+    (go-loop []
+      (handler-fn (<! ws-ic-chan))
+      (recur))))
 ;; Event handler
 
 (defmulti event-handler
@@ -51,7 +63,33 @@
 
 (defmethod event-handler :chsk/ws-ping
   [_ & r]
-  )
+  (go (>! ch-pub { :topic :chsk/ws-ping })))
+
+(defmethod event-handler :interaction-comment/add
+  [_ body]
+  (timbre/debug "Comment add event" body)
+  (go (>! ch-pub { :topic :interaction-comment/add :data body })))
+
+(defmethod event-handler :interaction-comment/update
+  [_ body]
+  (timbre/debug "Comment update event" body)
+  (go (>! ch-pub { :topic :interaction-comment/update :data body })))
+
+(defmethod event-handler :interaction-comment/delete
+  [_ body]
+  (timbre/debug "Comment delete event" body)
+  (go (>! ch-pub { :topic :interaction-comment/delete :data body })))
+
+(defmethod event-handler :interaction-reaction/add
+  [_ body]
+  (timbre/debug "Reaction add event" body)
+  (go (>! ch-pub { :topic :interaction-reaction/add :data body })))
+
+(defmethod event-handler :interaction-reaction/delete
+  [_ body]
+  (timbre/debug "Reaction delete event" body)
+  (go (>! ch-pub { :topic :interaction-reaction/delete :data body })))
+
 
 ;; Sente events handlers
 
@@ -89,7 +127,6 @@
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)))
 
 ;; Session test
-
 (defn test-session
   "Ping the server to update the sesssion state."
   []
