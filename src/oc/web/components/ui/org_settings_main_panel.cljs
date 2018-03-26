@@ -86,7 +86,6 @@
             (when false
               [:label.error "Name can't be empty"])]
           [:div.org-settings-field
-            (js/console.log "org-settings-main-panel" org-editing)
             [:input
               {:type "text"
                :value (:name org-editing)
