@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -68,17 +69,13 @@
     (drv/drv :org-data)
     (drv/drv :org-settings)
     (drv/drv :alert-modal)
-    (drv/drv :teams-load)
     (drv/drv :org-editing)
     (drv/drv :invite-data)
     ;; Mixins
     no-scroll-mixin
 
     {:before-render (fn [s]
-                      (let [teams-load @(drv/get-ref s :teams-load)]
-                        (when (and (:auth-settings teams-load)
-                                   (not (:teams-data-requested teams-load)))
-                          (dis/dispatch! [:teams-get])))
+                      (team-actions/teams-get-if-needed)
                       s)}
   [s]
   (let [settings-tab (drv/react s :org-settings)

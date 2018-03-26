@@ -336,6 +336,11 @@
 
 ;; Data
 
+(defn teams-data-requested
+  ""
+  ([] (teams-data-requested @app-state))
+  ([data] (:teams-data-requested data)))
+
 (defn auth-settings
   "Get the Auth settings data"
   ([] (auth-settings @app-state))

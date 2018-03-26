@@ -59,10 +59,20 @@
                  (<= status 599))
         (dis/dispatch! [:input [:team-data-requested] false])))))
 
-(defn teams-get [auth-settings]
-  (when (utils/link-for (:links auth-settings) "collection")
-    (api/get-teams auth-settings teams-get-cb)
-    (dis/dispatch! [:teams-get])))
+(defn teams-get []
+  (let [auth-settings (dis/auth-settings)]
+    (when (utils/link-for (:links auth-settings) "collection")
+      (api/get-teams auth-settings teams-get-cb)
+      (dis/dispatch! [:teams-get]))))
+
+(defn teams-get-if-needed []
+  (let [auth-settings (dis/auth-settings)
+        teams-data-requested (dis/teams-data-requested)
+        teams-data (dis/teams-data)]
+    (when (and (empty? teams-data)
+               auth-settings
+               (not teams-data-requested))
+      (teams-get))))
 
 ;; Invite users
 
@@ -84,7 +94,7 @@
 (defn admin-change-cb [user {:keys [success]}]
   (if success
     (do
-      (teams-get (dis/auth-settings))
+      (teams-get)
       (dis/dispatch! [:invite-user/success user]))
     (dis/dispatch! [:invite-user/failed user])))
 
@@ -101,7 +111,7 @@
 
 (defn invite-user-success [user-data]
   ; refresh the users list once the invitation succeded
-  (teams-get (dis/auth-settings))
+  (teams-get)
   (dis/dispatch! [:invite-user/success user-data]))
 
 ;; Switch user-type
@@ -236,7 +246,7 @@
 ;; User actions
 
 (defn user-action-cb [_]
-  (teams-get (dis/auth-settings)))
+  (teams-get))
 
 (defn user-action [team-id invitation action method other-link-params payload]
   (let [team-data (dis/team-data team-id)
@@ -249,7 +259,7 @@
 
 (defn email-domain-team-add-cb [{:keys [status body success]}]
   (when success
-    (teams-get (dis/auth-settings)))
+    (teams-get))
   (dis/dispatch! [:email-domain-team-add/finish (= status 204)]))
 
 (defn email-domain-team-add [domain]

@@ -138,7 +138,7 @@
         (api/get-current-user body (fn [data]
           (dis/dispatch! [:user-data (json->cljs data)])))
         ;; Start teams retrieve if we have a link
-        (team-actions/teams-get body)
+        (team-actions/teams-get)
         (dis/dispatch! [:auth-settings body])
         (cb body))))))
 
