@@ -74,7 +74,7 @@
 
 (defn get-org [& [org-data]]
   (let [fixed-org-data (or org-data (dis/org-data))]
-    (api/get-org org-data get-org-cb)))
+    (api/get-org fixed-org-data get-org-cb)))
 
 ;; Org redirect
 
