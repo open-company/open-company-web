@@ -137,9 +137,9 @@
         ;; auth settings loaded
         (api/get-current-user body (fn [data]
           (dis/dispatch! [:user-data (json->cljs data)])))
+        (dis/dispatch! [:auth-settings body])
         ;; Start teams retrieve if we have a link
         (team-actions/teams-get)
-        (dis/dispatch! [:auth-settings body])
         (cb body))))))
 
 (defn bot-auth [org-data team-data user-data]
