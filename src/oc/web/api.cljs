@@ -237,12 +237,11 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:board (json->cljs body)])))))
 
-(defn get-whats-new [whats-new-link]
+(defn get-whats-new [whats-new-link callback]
   (when whats-new-link
     (storage-http (method-for-link whats-new-link) (relative-href whats-new-link)
       {:headers (headers-for-link whats-new-link)}
-      (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})])))))
+      callback)))
 
 (defn patch-board [data]
   (when data

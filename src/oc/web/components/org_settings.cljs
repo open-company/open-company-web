@@ -15,6 +15,12 @@
 
 ;; FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
 
+(defn show-modal [& [panel]]
+  (dis/dispatch! [:input [:org-settings] (or panel :main)]))
+
+(defn dismiss-modal [& [panel]]
+  (dis/dispatch! [:input [:org-settings] nil]))
+
 (rum/defc org-settings-tabs
   [org-slug active-tab]
   [:div.org-settings-tabs.group
@@ -22,19 +28,19 @@
       {:class (when (= :main active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings org-slug)
-         :on-click #(do (utils/event-stop %) (dis/dispatch! [:org-settings-show :main]))}
+         :on-click #(do (utils/event-stop %) (show-modal :main))}
         "Team"]]
     [:div.org-settings-tab
       {:class (when (= :team active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings-team org-slug)
-         :on-click #(do (utils/event-stop %) (dis/dispatch! [:org-settings-show :team]))}
+         :on-click #(do (utils/event-stop %) (show-modal :team))}
         "Manage Members"]]
     [:div.org-settings-tab
       {:class (when (= :invite active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings-invite org-slug)
-         :on-click #(do (utils/event-stop %) (dis/dispatch! [:org-settings-show :invite]))}
+         :on-click #(do (utils/event-stop %) (show-modal :invite))}
         "Invite People"]]])
 
 (defn close-clicked [s]
@@ -56,9 +62,9 @@
                         :solid-button-title "Yes"
                         :solid-button-cb #(do
                                             (alert-modal/hide-alert)
-                                            (dis/dispatch! [:org-settings-hide]))}]
+                                            (dismiss-modal))}]
         (alert-modal/show-alert alert-data))
-      (dis/dispatch! [:org-settings-hide]))))
+      (dismiss-modal))))
 
 (rum/defcs org-settings
   "Org settings main component. It handles the data loading/reset and the tab logic."
@@ -85,7 +91,7 @@
         org-data (drv/react s :org-data)
         alert-modal-data (drv/react s :alert-modal)]
     (when (:read-only org-data)
-      (utils/after 100 #(dis/dispatch! [:org-settings-hide])))
+      (utils/after 100 #(dismiss-modal)))
     (if org-data
       [:div.org-settings.fullscreen-page
         [:button.mlb-reset.carrot-modal-close

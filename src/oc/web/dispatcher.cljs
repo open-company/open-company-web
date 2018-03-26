@@ -5,7 +5,6 @@
             [oc.web.router :as router]))
 
 (defonce app-state (atom {:loading false
-                          :mobile-menu-open false
                           :show-login-overlay false}))
 
 ;; Data key paths

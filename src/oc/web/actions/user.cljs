@@ -17,11 +17,6 @@
   (router/redirect! "/")
   (dis/dispatch! [:logout]))
 
-(defn logout-click [e]
-  (utils/event-stop e)
-  (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
-  (logout))
-
 ;; JWT
 
 (defn update-jwt-cookie [jwt]
@@ -43,6 +38,10 @@
 (defn jwt-refresh []
   (api/jwt-refresh update-jwt logout))
 
+;; Whats new callback
+(defn get-whats-new-cb [{:keys [body success]}]
+  (dis/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})]))
+
 ;; API Entry point
 (defn entry-point-get-finished
   ([success body] (entry-point-get-finished success body #()))
@@ -52,7 +51,7 @@
     (if success
       (let [orgs (:items collection)]
         (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
-          (api/get-whats-new whats-new-link))
+          (api/get-whats-new whats-new-link get-whats-new-cb))
         (callback orgs collection)
         (dis/dispatch! [:entry-point orgs collection]))
       (dis/dispatch! [:error-banner-show utils/generic-network-error 0])))))
