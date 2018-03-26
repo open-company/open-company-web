@@ -1,4 +1,4 @@
-(ns oc.web.sotres.error-banner
+(ns oc.web.stores.error-banner
   (:require [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :error-banner-show
