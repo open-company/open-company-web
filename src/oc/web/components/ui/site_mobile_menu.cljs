@@ -15,7 +15,7 @@
 (def body-class "mobile-menu-expanded")
 
 (defn site-menu-toggle [& [force-close]]
-  (let [site-menu-open (:site-mobile-menu @dis/app-state)
+  (let [site-menu-open (:site-menu-open @dis/app-state)
         next-site-menu-open (if (or force-close
                                     (not (responsive/is-mobile-size?)))
                               false
