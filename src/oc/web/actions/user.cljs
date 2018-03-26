@@ -7,9 +7,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local_settings :as ls]
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.local_settings :as ls]))
+            [oc.web.actions.team :as team-actions]))
 
 ;; Logout
 
@@ -137,10 +138,9 @@
         ;; auth settings loaded
         (api/get-current-user body (fn [data]
           (dis/dispatch! [:user-data (json->cljs data)])))
-        ;; Start teams retrieve if we have a link
-        (when (utils/link-for (:links body) "collection")
-          (utils/after 5000 #(dis/dispatch! [:teams-get])))
         (dis/dispatch! [:auth-settings body])
+        ;; Start teams retrieve if we have a link
+        (team-actions/teams-get)
         (cb body))))))
 
 (defn bot-auth [org-data team-data user-data]

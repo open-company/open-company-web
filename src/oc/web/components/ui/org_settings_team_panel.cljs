@@ -6,16 +6,17 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
 (defn user-action [team-id user action method other-link-params]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
-  (dis/dispatch! [:user-action team-id user action method other-link-params nil]))
+  (team-actions/user-action team-id user action method other-link-params nil))
 
 (defn real-remove-fn [author user team-id]
   (when author
-    (api/remove-author author))
+    (team-actions/remove-author author))
   (user-action team-id user "remove" "DELETE"  {:ref "application/vnd.open-company.user.v1+json"}))
 
 (defn alert-resend-done []
@@ -30,20 +31,20 @@
 
 (rum/defcs org-settings-team-panel
   < rum/reactive
-    (drv/drv :invite-users)
+    (drv/drv :invite-data)
     (rum/local false ::resending-invite)
     {:after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
                         (.tooltip "hide"))
                      (when @(::resending-invite s)
-                      (let [invite-users-data (:invite-users @(drv/get-ref s :invite-users))]
+                      (let [invite-users-data (:invite-users @(drv/get-ref s :invite-data))]
                         (when (zero? (count invite-users-data))
                           (alert-resend-done)
                           (reset! (::resending-invite s) false))))
                      s)}
   [s org-data]
-  (let [invite-users-data (drv/react s :invite-users)
+  (let [invite-users-data (drv/react s :invite-data)
         team-data (:team-data invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
         org-authors (:authors org-data)]
@@ -110,7 +111,7 @@
                                                           :role user-type
                                                           :error nil}]])
                                        (reset! (::resending-invite s) true)
-                                       (utils/after 100 #(dis/dispatch! [:invite-users]))))}
+                                       (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)))))}
                         "Resend"])
                     (when (and (= "pending" (:status user))
                                (utils/link-for (:links user) "remove"))
@@ -120,7 +121,7 @@
                 [:td.role
                   (user-type-dropdown {:user-id (:user-id user)
                                        :user-type user-type
-                                       :on-change #(api/switch-user-type user user-type % user author)
+                                       :on-change #(team-actions/switch-user-type user user-type % user author)
                                        :hide-admin (not (jwt/is-admin? (:team-id org-data)))
                                        :on-remove (if (and (not= "pending" (:status user))
                                                            (not= (:user-id user) (:user-id cur-user-data)))

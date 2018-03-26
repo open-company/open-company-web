@@ -10,6 +10,7 @@
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.org]
+            [oc.web.stores.team]
             [oc.web.stores.user]
             [oc.web.stores.search]
             [oc.web.stores.activity]
@@ -17,6 +18,7 @@
             [oc.web.stores.reaction]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
+            [oc.web.actions.team]
             [oc.web.actions.comment]
             [oc.web.actions.reaction]
             [oc.web.actions.user :as user-actions]
