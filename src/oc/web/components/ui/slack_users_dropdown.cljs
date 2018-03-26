@@ -7,6 +7,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn check-user [user s]
@@ -25,7 +26,6 @@
                                      (rum/local "" ::slack-user)
                                      (rum/local false ::typing)
                                      rum/reactive
-                                     (drv/drv :teams-load)
                                      (drv/drv :team-data)
                                      (drv/drv :team-roster)
                                      {:will-mount (fn [s]
@@ -48,10 +48,7 @@
                                                  (on-blur))))))
                                        s)
                                       :before-render (fn [s]
-                                       (let [teams-load-data @(drv/get-ref s :teams-load)]
-                                         (when (and (:auth-settings teams-load-data)
-                                                    (not (:teams-data-requested teams-load-data)))
-                                           (dis/dispatch! [:teams-get])))
+                                       (team-actions/teams-get-if-needed)
                                        s)
                                       :will-unmount (fn [s]
                                        (events/unlistenByKey @(::window-click s))

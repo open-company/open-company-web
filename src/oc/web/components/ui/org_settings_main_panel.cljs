@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.object :as gobj]
@@ -155,7 +156,7 @@
                     [:img.slack-logo {:src (utils/cdn "/img/slack.png")}]
                     (:name team)
                     [:button.remove-team-btn.btn-reset
-                      {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
+                      {:on-click #(team-actions/remove-team (:links team))}
                       "Remove Slack team"]]
                   (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
                     (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
@@ -168,7 +169,7 @@
                         "Add Bot"]))]))]
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
-                {:on-click #(dis/dispatch! [:slack-team-add])}
+                {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data))}
                 (str "Add "
                      (if (zero? (count (:slack-orgs team-data)))
                         "A"
@@ -193,7 +194,7 @@
                   {:key (str "email-domain-team-" (:domain team))}
                   [:span.org-settings-list-item-name (str "@" (:domain team))]
                   [:button.remove-team-btn.btn-reset
-                    {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
+                    {:on-click #(team-actions/remove-team (:links team))}
                     "Remove email domain"]])]
             [:div.org-settings-field
               {:class (when add-email-domain-team-error "error")}
@@ -208,7 +209,8 @@
             [:button.mlb-reset.mlb-default.add-email-domain-bt
               {:on-click #(let [domain (:domain um-domain-invite)]
                             (if (utils/valid-domain? domain)
-                              (dis/dispatch! [:email-domain-team-add])
+                              (team-actions/email-domain-team-add
+                               (-> @(drv/get-ref s :org-settings-team-management) :um-domain-invite :domain))
                               (dis/dispatch! [:input [:add-email-domain-team-error] true])))
                :disabled false} ;(not valid-domain-email?)}
               "Add"]])]

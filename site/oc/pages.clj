@@ -526,7 +526,7 @@
                   [:div.check]]]
               [:tr
                 [:td
-                  [:div "Prioriy support"]]
+                  [:div "Priority support"]]
                 [:td]
                 [:td]
                 [:td

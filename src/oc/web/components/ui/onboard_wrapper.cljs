@@ -11,6 +11,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.stores.user :as user-store]
+            [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -240,9 +241,10 @@
 (defn- setup-team-data
   ""
   [s]
+  ;; Load the list of teams if it's not already
+  (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)
-        teams-load @(drv/get-ref s :teams-load)]
+        teams-data @(drv/get-ref s :teams-data)]
     (when (and (zero? (count (:name org-editing)))
                (zero? (count (:logo-url org-editing)))
                (seq teams-data))
@@ -269,7 +271,6 @@
             (set! (.-src img) (:logo-url first-team))))))))
 
 (rum/defcs lander-team < rum/reactive
-                         (drv/drv :teams-load)
                          (drv/drv :teams-data)
                          (drv/drv :org-editing)
                          (rum/local false ::saving)
@@ -281,19 +282,10 @@
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
-                           (let [teams-data @(drv/get-ref s :teams-data)
-                                 teams-load @(drv/get-ref s :teams-load)]
-                             ;; Load the list of teams if it's not already
-                             (when (and (empty? teams-data)
-                                        (:auth-settings teams-load)
-                                        (not (:teams-data-requested teams-load)))
-                               (dis/dispatch! [:teams-get]))
-                             ;; If the team is loaded setup the form
-                             (setup-team-data s))
+                           (setup-team-data s)
                            s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
-        _ (drv/react s :teams-load)
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.onboard-lander.lander-team

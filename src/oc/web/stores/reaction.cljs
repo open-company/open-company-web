@@ -17,7 +17,8 @@
 
 ;; Reducers used to watch for reaction dispatch data
 (defmulti reducer (fn [db [action-type & _]]
-                    (timbre/info "Dispatching reaction reducer:" action-type)
+                    (when-not (some #{action-type} [:update :input])
+                      (timbre/debug "Dispatching reaction reducer:" action-type))
                     action-type))
 
 (def reactions-dispatch
