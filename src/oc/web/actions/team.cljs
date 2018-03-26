@@ -102,7 +102,7 @@
   (api/add-admin user (partial admin-change-cb user)))
 
 (defn remove-admin [user]
-  (api/add-admin user (partial admin-change-cb user)))
+  (api/remove-admin user (partial admin-change-cb user)))
 
 ;; Invite user callbacks
 
