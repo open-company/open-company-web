@@ -81,7 +81,6 @@
 
 (defn author-change-cb [{:keys [success]}]
   (when success
-    ;; TODO: replace with action creator for get org
     (org-actions/get-org)))
 
 (defn remove-author [author]
