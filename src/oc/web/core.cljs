@@ -9,6 +9,7 @@
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
+            [oc.web.stores.org]
             [oc.web.stores.user]
             [oc.web.stores.search]
             [oc.web.stores.activity]
@@ -19,7 +20,6 @@
             [oc.web.actions.comment]
             [oc.web.actions.reaction]
             [oc.web.actions.user :as user-actions]
-            [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -38,7 +38,6 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
-            [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
@@ -410,16 +409,6 @@
       (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
 
-    (defroute org-create-route urls/create-org {:as params}
-      (timbre/info "Routing org-create-route" urls/create-org)
-      (if (jwt/jwt)
-        (do
-          (pre-routing (:query-params params))
-          (router/set-route! ["create-org"] {:query-params (:query-params params)})
-          (post-routing)
-          (drv-root org-editor target))
-        (router/redirect! urls/home)))
-
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
@@ -516,7 +505,6 @@
                                  slack-route
                                  pricing-route
                                  logout-route
-                                 org-create-route
                                  email-confirmation-route
                                  confirm-invitation-route
                                  confirm-invitation-profile-route

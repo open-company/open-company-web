@@ -68,8 +68,6 @@
 
 ;; Organizations
 
-(def create-org "/create-org")
-
 (defn org
   "Org url"
   ([]

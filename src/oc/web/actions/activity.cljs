@@ -5,6 +5,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.org :as oa]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.json :refer (json->cljs)]
@@ -148,7 +149,7 @@
     ;; FIXME: refresh the last loaded all-posts link
     (when-not is-all-posts
       (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")))
-    (api/get-org (dis/org-data))
+    (oa/get-org)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
     (dis/dispatch! [:entry-save/finish activity-data edit-key])))
@@ -163,7 +164,7 @@
         org-slug (router/current-org-slug)]
     (save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
-    (api/get-org (dis/org-data))
+    (oa/get-org)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid fixed-board-data)]))
@@ -267,7 +268,7 @@
   (let [board-slug (:board-slug activity-data)]
     ;; Save last used section
     (save-last-used-section board-slug)
-    (api/get-org (dis/org-data))
+    (oa/get-org)
     ;; Remove entry cached edits
     (remove-cached-item initial-uuid)
     (dis/dispatch! [:entry-publish/finish edit-key activity-data])))
@@ -281,7 +282,7 @@
   (let [board-slug (:slug new-board-data)]
     (save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
-    (api/get-org (dis/org-data))
+    (oa/get-org)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid new-board-data)]))
@@ -314,7 +315,7 @@
   (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET"))
   ;; Reload the org to update the number of drafts in the navigation
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
-    (api/get-org (dis/org-data))
+    (oa/get-org)
     (let [org-slug (router/current-org-slug)
           org-data (dis/org-data)
           boards-no-draft (sort-by :name (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))

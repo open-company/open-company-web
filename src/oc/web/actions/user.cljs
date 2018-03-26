@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.local_settings :as ls]))
 
@@ -69,7 +70,7 @@
        (fn [orgs collection]
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-             (api/get-org org-data)
+             (org-actions/get-org org-data)
              ;; 404 only if the user is not looking at a secure post page
              ;; if so the entry point response can not include the specified org
              (when-not (router/current-secure-activity-id)
