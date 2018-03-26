@@ -344,7 +344,7 @@
 (defn auth-settings
   "Get the Auth settings data"
   ([] (auth-settings @app-state))
-  ([data] (get data auth-settings-key)))
+  ([data] (get-in data auth-settings-key)))
 
 (defn api-entry-point
   "Get the API entry point."

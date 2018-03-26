@@ -40,7 +40,7 @@
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
   (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
-    (assoc next-db dispatcher/auth-settings-key body)))
+    (assoc-in next-db dispatcher/auth-settings-key body)))
 
 (defn update-user-data [db user-data]
   (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
