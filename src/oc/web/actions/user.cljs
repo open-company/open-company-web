@@ -7,8 +7,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local_settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.local_settings :as ls]))
+            [oc.web.actions.error-banner :as error-banner-actions]))
 
 ;; Logout
 
@@ -54,14 +55,15 @@
           (api/get-whats-new whats-new-link get-whats-new-cb))
         (callback orgs collection)
         (dis/dispatch! [:entry-point orgs collection]))
-      (dis/dispatch! [:error-banner-show utils/generic-network-error 0])))))
+      (error-banner-actions/show-banner utils/generic-network-error 0)))))
 
 (defn entry-point-get [org-slug]
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (when (= status 404)
-        (dis/dispatch! [:error-banner-show (str "You have an older version of the Carrot web app, "
-                                                "please refresh your browser window!")]))))
+        (error-banner-actions/show-banner (str "You have an older version of the Carrot web app, "
+                                               "please refresh your browser window!")
+         0))))
   (api/get-entry-point
    (fn [success body]
      (entry-point-get-finished success body

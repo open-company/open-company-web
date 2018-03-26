@@ -9,6 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -28,10 +29,9 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (dis/dispatch!
-       [:error-banner-show
+      (error-banner-actions/show-banner
         "An error has occurred while processing the image URL. Please try again."
-        5000])
+        5000)
       (do
         (set! (.-onload node) #(img-on-load url node))
         (set! (.-className node) "hidden")
@@ -41,10 +41,9 @@
 (defn progress-cb [res progress])
 
 (defn error-cb [res error]
-  (dis/dispatch!
-   [:error-banner-show
-    "An error has occurred while processing the image URL. Please try again."
-    5000]))
+  (error-banner-actions/show-banner
+   "An error has occurred while processing the image URL. Please try again."
+   5000))
 
 (defn change! [s k v]
   (reset! (::name-error s) false)

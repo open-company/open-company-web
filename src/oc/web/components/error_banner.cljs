@@ -5,7 +5,8 @@
             [goog.events :as events]
             [goog.fx.dom :refer (Fade)]
             [oc.web.lib.utils :as utils]
-            [oc.web.dispatcher :as dis]))
+            [oc.web.dispatcher :as dis]
+            [oc.web.actions.error-banner :as error-banner-actions]))
 
 (rum/defcs error-banner < rum/reactive
                           (rum/local false ::showing)
@@ -24,7 +25,7 @@
                                   (when (pos? showing-time)
                                     (utils/after showing-time
                                      (fn []
-                                      (dis/dispatch! [:error-banner-show nil 0])
+                                      (error-banner-actions/show-banner nil 0)
                                       (reset! (::showing s) false))))))
                              s)}
   [s]
