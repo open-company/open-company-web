@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.actions.activity :as aa]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]))
@@ -28,7 +29,7 @@
       (if (utils/link-for (:links org-data) "activity")
         ;; Load all posts only if not coming from a digest url
         ;; in that case do not load since we already have the results we need
-        (oc.web.actions.activity/all-posts-get org-data ap-initial-at)
+        (aa/all-posts-get org-data ap-initial-at)
         (router/redirect-404!))
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
