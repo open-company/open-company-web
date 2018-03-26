@@ -10,6 +10,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.team :as team-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.item-input :refer (item-input email-item)]
@@ -60,7 +61,7 @@
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
                             {:will-mount (fn [s]
-                              (dis/dispatch! [:teams-get])
+                              (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
                                     org-data @(drv/get-ref s :org-data)
                                     subject (str

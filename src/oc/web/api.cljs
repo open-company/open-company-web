@@ -321,43 +321,28 @@
         (fn [{:keys [success body status]}]
           (callback success body status))))))
 
-(defn get-teams [auth-settings]
+(defn get-teams [auth-settings callback]
   (let [enumerate-link (utils/link-for (:links auth-settings) "collection" "GET")]
     (auth-http (method-for-link enumerate-link) (relative-href enumerate-link)
       {:headers (headers-for-link enumerate-link)}
-      (fn [{:keys [success body status]}]
-        (let [fixed-body (when success (json->cljs body))]
-          (if success
-            (dispatcher/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
-            ;; Reset the team-data-requested to restart the teams load
-            (when (and (>= status 500)
-                       (<= status 599))
-              (dispatcher/dispatch! [:input [:team-data-requested] false]))))))))
+      callback)))
 
-(defn get-team [team-link]
+(defn get-team [team-link callback]
   (when team-link
     (auth-http (method-for-link team-link) (relative-href team-link)
       {:headers (headers-for-link team-link)}
-      (fn [{:keys [success body status]}]
-        (let [fixed-body (when success (json->cljs body))]
-          (if success
-            (if (= (:rel team-link) "roster")
-              (dispatcher/dispatch! [:team-roster-loaded fixed-body])
-              (dispatcher/dispatch! [:team-loaded fixed-body]))))))))
+      callback)))
 
-(defn enumerate-channels [team-id]
+(defn enumerate-channels [team-id callback]
   (when team-id
     (let [team-data (dispatcher/team-data team-id)
           enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
       (when enumerate-link
         (auth-http (method-for-link enumerate-link) (relative-href enumerate-link)
           {:headers (headers-for-link enumerate-link)}
-          (fn [{:keys [success body status]}]
-            (let [fixed-body (when success (json->cljs body))]
-              (if success
-                (dispatcher/dispatch! [:channels-enumerate/success team-id (-> fixed-body :collection :items)])))))))))
+          callback)))))
 
-(defn user-action [action-link payload]
+(defn user-action [action-link payload callback]
   (when action-link
     (let [headers {:headers (headers-for-link action-link)}
           with-payload (if payload
@@ -365,8 +350,7 @@
                           headers)]
       (auth-http (method-for-link action-link) (relative-href action-link)
         with-payload
-        (fn [{:keys [status success body]}]
-          (dispatcher/dispatch! [:user-action/complete]))))))
+        callback))))
 
 (defn confirm-invitation [token callback]
   (let [auth-link (utils/link-for
@@ -425,7 +409,7 @@
         (fn [{:keys [status body success]}]
           (cb status body success))))))
 
-(defn add-email-domain [domain]
+(defn add-email-domain [domain callback]
   (when domain
     (let [team-data (dispatcher/team-data)
           add-domain-team-link (utils/link-for
@@ -436,8 +420,7 @@
       (auth-http (method-for-link add-domain-team-link) (relative-href add-domain-team-link)
         {:headers (headers-for-link add-domain-team-link)
          :body domain}
-        (fn [{:keys [status body success]}]
-          (dispatcher/dispatch! [:email-domain-team-add/finish (= status 204)]))))))
+        callback))))
 
 (defn refresh-slack-user [cb]
   (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
@@ -499,31 +482,27 @@
 (defn add-author
   "Given a user-id add him as an author to the current org.
   Refresh the user list and the org-data when finished."
-  [user-id]
+  [user-id callback]
   (when-let [add-author-link (utils/link-for (:links (dispatcher/org-data)) "add")]
     (storage-http (method-for-link add-author-link) (relative-href add-author-link)
       {:headers (headers-for-link add-author-link)
        :body user-id}
-      (fn [{:keys [status success body]}]
-        (when success
-          (get-org (dispatcher/org-data)))))))
+      callback)))
 
 (defn remove-author
   "Given a map containing :user-id and :links, remove the user as an author using the `remove` link.
   Refresh the org data when finished."
-  [user-author]
-  (let [remove-author-link (utils/link-for (:links user-author) "remove")]
-    (when remove-author-link
-      (storage-http (method-for-link remove-author-link) (relative-href remove-author-link)
-        {:headers (headers-for-link remove-author-link)}
-        (fn [{:keys [status success body]}]
-          (utils/after 1 #(get-org (dispatcher/org-data))))))))
+  [user-author callback]
+  (when-let [remove-author-link (utils/link-for (:links user-author) "remove")]
+    (storage-http (method-for-link remove-author-link) (relative-href remove-author-link)
+      {:headers (headers-for-link remove-author-link)}
+      callback)))
 
 (defn send-invitation
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the logo of the company if possible"
-  [complete-user-data invited-user invite-from user-type first-name last-name]
+  [complete-user-data invited-user invite-from user-type first-name last-name callback]
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
@@ -548,59 +527,23 @@
       (auth-http (method-for-link invitation-link) (relative-href invitation-link)
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
-        (fn [{:keys [success body status]}]
-          (if success
-            ;; On successfull invitation
-            ;; if the invited user was an author add it to the org
-            (if (or (= user-type :author)
-                    (= user-type :admin))
-              (let [new-user (json->cljs body)]
-                (add-author (:user-id new-user))
-                (dispatcher/dispatch! [:invite-user/success complete-user-data]))
-              ;; if not reload the users list immediately
-              (dispatcher/dispatch! [:invite-user/success complete-user-data]))
-            (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))))
+        callback))))
 
-(defn switch-user-type
-  "Given an existing user switch user type"
-  [complete-user-data old-user-type new-user-type user user-author]
-  (when (not= old-user-type new-user-type)
-    (let [org-data           (dispatcher/org-data)
-          add-admin-link     (utils/link-for (:links user) "add")
-          remove-admin-link  (utils/link-for
-                              (:links user)
-                              "remove"
-                              "DELETE"
-                              {:ref "application/vnd.open-company.team.admin.v1"})
-          add-author-link    (utils/link-for (:links org-data) "add")
-          remove-author-link (utils/link-for (:links user-author) "remove")
-          add-admin?         (= new-user-type :admin)
-          remove-admin?      (= old-user-type :admin)
-          add-author?        (or (= new-user-type :author)
-                                 (= new-user-type :admin))
-          remove-author?     (= new-user-type :viewer)]
-      ;; Add an admin call
-      (when (and add-admin? add-admin-link)
-        (auth-http (method-for-link add-admin-link) (relative-href add-admin-link)
-          {:headers (headers-for-link add-admin-link)}
-          (fn [{:keys [status success body]}]
-            (if success
-              (dispatcher/dispatch! [:invite-user/success complete-user-data])
-              (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))
-      ;; Remove admin call
-      (when (and remove-admin? remove-admin-link)
-        (auth-http (method-for-link remove-admin-link) (relative-href remove-admin-link)
-          {:headers (headers-for-link remove-admin-link)}
-          (fn [{:keys [status success body]}]
-            (if success
-              (dispatcher/dispatch! [:invite-user/success complete-user-data])
-              (dispatcher/dispatch! [:invite-user/failed complete-user-data])))))
-      ;; Add author call
-      (when (and add-author? add-author-link)
-        (add-author (:user-id user)))
-      ;; Remove author call
-      (when (and remove-author? remove-author-link)
-        (remove-author user-author)))))
+(defn add-admin [user callback]
+  (when-let [add-admin-link (utils/link-for (:links user) "add")]
+    (auth-http (method-for-link add-admin-link) (relative-href add-admin-link)
+      {:headers (headers-for-link add-admin-link)}
+      callback)))
+
+(defn remove-admin [user callback]
+  (when-let [remove-admin-link (utils/link-for
+                                (:links user)
+                                "remove"
+                                "DELETE"
+                                {:ref "application/vnd.open-company.team.admin.v1"})]
+    (auth-http (method-for-link remove-admin-link) (relative-href remove-admin-link)
+      {:headers (headers-for-link remove-admin-link)}
+      callback)))
 
 (defn add-private-board
   [board-data user-id user-type]
