@@ -6,7 +6,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn add-comment-focus [activity-data]
@@ -94,17 +93,11 @@
         (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")))))
   (dis/dispatch! [:ws-interaction/comment-add interaction-data]))
 
-(defmethod ws-ic/event-handler :interaction-comment/add
-  [_ body]
-  (timbre/debug "Comment add event" body)
-  (ws-comment-add body))
-
-(defmethod ws-ic/event-handler :interaction-comment/update
-  [_ body]
-  (timbre/debug "Comment update event" body)
-  (ws-comment-update body))
-
-(defmethod ws-ic/event-handler :interaction-comment/delete
-  [_ body]
-  (timbre/debug "Comment delete event" body)
-  (ws-comment-delete body))
+;; Pass in the subscriber until we sort out the namespaces in actions.cljs
+(defn subscribe [subscriber]
+  (subscriber :interaction-comment/add
+              #(ws-comment-add (:data %)))
+  (subscriber :interaction-comment/update
+              #(ws-comment-update (:data %)))
+  (subscriber :interaction-comment/delete
+              #(ws-comment-delete (:data %))))
