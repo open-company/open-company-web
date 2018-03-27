@@ -128,13 +128,8 @@
     (timbre/debug jwt expired?)
     (go
       (when (and jwt expired?)
-        (if-let [refresh-url (j/get-key :refresh-url)]
-          (let [res (<! (refresh-jwt refresh-url))]
-            (timbre/debug "jwt-refresh" res)
-            (if (:success res)
-              (oc.web.actions.user/update-jwt (:body res))
-              (oc.web.actions.user/logout)))
-          (oc.web.actions.user/logout)))
+        (jwt-refresh #(oc.web.actions.user/update-jwt (:body %))
+                     #(router/redirect! oc-urls/logout)))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
