@@ -151,66 +151,10 @@
     (update-in db path value-fn)
     db))
 
-(defmethod dispatcher/action :mobile-menu-toggle
-  [db [_]]
-  (if (responsive/is-mobile-size?)
-    (update-in db [:mobile-menu-open] not)
-    db))
-
-(defmethod dispatcher/action :site-menu-toggle
-  [db [_ force-close]]
-  (let [next-site-menu-open (if (or force-close
-                                    (not (responsive/is-mobile-size?)))
-                              false
-                              (not (:site-menu-open db)))]
-    (assoc db :site-menu-open next-site-menu-open)))
-
 (defmethod dispatcher/action :board-delete
   [db [_ board-slug]]
   (api/delete-board board-slug)
   (dissoc db :latest-entry-point))
-
-(defmethod dispatcher/action :error-banner-show
-  [db [_ error-message error-time]]
-  (if (empty? error-message)
-    (-> db (dissoc :error-banner-message) (dissoc :error-banner-time))
-    (if-not (:error-banner db)
-      (-> db
-       (assoc :error-banner-message error-message)
-       (assoc :error-banner-time error-time))
-      db)))
-
-(defmethod dispatcher/action :trend-bar-status
-  [db [_ status]]
-  (assoc db :trend-bar-status status))
-
-(defmethod dispatcher/action :alert-modal-show
-  [db [_ modal-data]]
-  (assoc db :alert-modal modal-data))
-
-(defmethod dispatcher/action :alert-modal-hide
-  [db [_]]
-  (assoc-in db [:alert-modal :dismiss] true))
-
-(defmethod dispatcher/action :alert-modal-hide-done
-  [db [_]]
-  (dissoc db :alert-modal))
-
-(defmethod dispatcher/action :whats-new-modal-show
-  [db [_]]
-  (assoc db :whats-new-modal true))
-
-(defmethod dispatcher/action :whats-new-modal-hide
-  [db [_]]
-  (dissoc db :whats-new-modal))
-
-(defmethod dispatcher/action :org-settings-show
-  [db [_ panel]]
-  (assoc db :org-settings (or panel :main)))
-
-(defmethod dispatcher/action :org-settings-hide
-  [db [_]]
-  (dissoc db :org-settings))
 
 (defmethod dispatcher/action :container/status
   [db [_ status-data]]
@@ -227,21 +171,6 @@
         new-status-data (merge old-status-data clean-status-data)]
     (timbre/debug "Change status data:" new-status-data)
     (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))
-
-(defmethod dispatcher/action :made-with-carrot-modal-show
-  [db [_]]
-  (assoc db :made-with-carrot-modal true))
-
-(defmethod dispatcher/action :made-with-carrot-modal-hide
-  [db [_]]
-  (dissoc db :made-with-carrot-modal))
-
-(defmethod dispatcher/action :whats-new/finish
-  [db [_ whats-new-data]]
-  (if whats-new-data
-    (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
-      (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
-    db))
 
 (defmethod dispatcher/action :section-edit-save
   [db [_]]

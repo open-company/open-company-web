@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.team :as team-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
@@ -27,7 +28,7 @@
                     :link-button-cb nil
                     :solid-button-title nil
                     :solid-button-cb nil}]
-   (dis/dispatch! [:alert-modal-show alert-data])))
+   (alert-modal/show-alert alert-data)))
 
 (rum/defcs org-settings-team-panel
   < rum/reactive
@@ -73,13 +74,14 @@
                                                         "Cancel invitation?"
                                                         "Remove user?")
                                                       :link-button-title "No"
-                                                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                                      :link-button-cb #(alert-modal/hide-alert)
+                                                      :solid-button-style :red
                                                       :solid-button-title "Yes"
                                                       :solid-button-cb
                                                        #(do
                                                          (real-remove-fn author user (:team-id team-data))
-                                                         (dis/dispatch! [:alert-modal-hide]))}]
-                                      (dis/dispatch! [:alert-modal-show alert-data])))]]
+                                                         (alert-modal/hide-alert))}]
+                                      (alert-modal/show-alert alert-data)))]]
               [:tr
                 {:key (str "org-settings-team-" (:user-id user))}
                 [:td.user-name

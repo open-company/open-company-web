@@ -8,8 +8,11 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]))
 
+(defn show-modal []
+  (dis/dispatch! [:input [:made-with-carrot-modal] true]))
+
 (defn dismiss-modal []
-  (dis/dispatch! [:made-with-carrot-modal-hide]))
+  (dis/dispatch! [:input [:made-with-carrot-modal] false]))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)

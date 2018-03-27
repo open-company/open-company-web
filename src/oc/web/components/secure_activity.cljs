@@ -11,7 +11,7 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
+            [oc.web.components.ui.made-with-carrot-modal :as made-with-carrot-modal]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -45,7 +45,7 @@
         {:style {:min-height (when is-mobile?
                                (str (- win-height default-activity-header-height) "px"))}}
         (when (drv/react s :made-with-carrot-modal)
-          (made-with-carrot-modal))
+          (made-with-carrot-modal/made-with-carrot-modal))
         [:div.activity-header.group
           (org-avatar (clojure.set/rename-keys
                        activity-data
@@ -75,7 +75,7 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])]]
         [:div.activity-content-footer
           {:on-click #(when-not is-mobile?
-                        (dis/dispatch! [:made-with-carrot-modal-show]))}
+                        (made-with-carrot-modal/show-modal))}
           [:div.activity-content-footer-inner
             [:div.carrot-logo]
             [:div.you-did-it "Made with Carrot"]]]]

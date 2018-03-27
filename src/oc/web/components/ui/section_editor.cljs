@@ -8,6 +8,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -313,16 +314,16 @@
                           {:on-click (fn []
                             (let [authors (:authors section-data)
                                   self-data (first (filter #(= (:user-id %) current-user-id) authors))]
-                              (dis/dispatch! [:alert-modal-show
+                              (alert-modal/show-alert
                                {:icon "/img/ML/error_icon.png"
                                 :action "remove-self-user-from-private-section"
                                 :message "Are you sure you want to leave this section?"
                                 :link-button-title "No"
-                                :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                :link-button-cb #(alert-modal/hide-alert)
                                 :solid-button-title "Yes"
                                 :solid-button-cb (fn []
                                  (dis/dispatch! [:private-section-kick-out-self self-data])
-                                 (dis/dispatch! [:alert-modal-hide]))}])))}
+                                 (alert-modal/hide-alert))})))}
                           "Leave section"]
                         [:div.user-type.no-dropdown
                           "Contributor"])
@@ -337,28 +338,24 @@
                      (utils/link-for (:links section-data) "delete"))
             [:button.mlb-reset.delete-bt
               {:on-click (fn []
-                          (dis/dispatch!
-                           [:alert-modal-show
-                            {:icon "/img/ML/trash.svg"
-                             :action "delete-section"
-                             :message [:span
-                                        [:span "Are you sure?"]
-                                        (when (-> section-data :fixed-items count pos?)
-                                          [:span
-                                            " This will delete the section and "
-                                            [:strong "all"]
-                                            " its posts, too."])]
-                             :link-button-title "No"
-                             :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                             :solid-button-style :red
-                             :solid-button-title "Yes, I'm sure"
-                             :solid-button-cb (fn []
-                                                (dis/dispatch!
-                                                 [:board-delete
-                                                 (:slug section-data)])
-                                                (dis/dispatch!
-                                                 [:alert-modal-hide])
-                                                (dismiss))}]))}
+                          (alert-modal/show-alert
+                           {:icon "/img/ML/trash.svg"
+                            :action "delete-section"
+                            :message [:span
+                                       [:span "Are you sure?"]
+                                       (when (-> section-data :fixed-items count pos?)
+                                         [:span
+                                           " This will delete the section and "
+                                           [:strong "all"]
+                                           " its posts, too."])]
+                            :link-button-title "No"
+                            :link-button-cb #(alert-modal/hide-alert)
+                            :solid-button-style :red
+                            :solid-button-title "Yes, I'm sure"
+                            :solid-button-cb (fn []
+                                               (dis/dispatch! [:board-delete (:slug section-data)])
+                                               (alert-modal/hide-alert)
+                                               (dismiss))}))}
               "Delete section"])
           [:button.mlb-reset.create-bt
             {:on-click #(let [section-node (rum/ref-node s "section-name")

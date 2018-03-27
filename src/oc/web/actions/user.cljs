@@ -10,7 +10,8 @@
             [oc.web.local_settings :as ls]
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.actions.team :as team-actions]))
+            [oc.web.actions.team :as team-actions]
+            [oc.web.actions.error-banner :as error-banner-actions]))
 
 ;; Logout
 
@@ -18,11 +19,6 @@
   (cook/remove-cookie! :jwt)
   (router/redirect! "/")
   (dis/dispatch! [:logout]))
-
-(defn logout-click [e]
-  (utils/event-stop e)
-  (utils/after 100 #(dis/dispatch! [:mobile-menu-toggle]))
-  (logout))
 
 ;; JWT
 
@@ -45,6 +41,10 @@
 (defn jwt-refresh []
   (api/jwt-refresh update-jwt logout))
 
+;; Whats new callback
+(defn get-whats-new-cb [{:keys [body success]}]
+  (dis/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})]))
+
 ;; API Entry point
 (defn entry-point-get-finished
   ([success body] (entry-point-get-finished success body #()))
@@ -54,17 +54,18 @@
     (if success
       (let [orgs (:items collection)]
         (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
-          (api/get-whats-new whats-new-link))
+          (api/get-whats-new whats-new-link get-whats-new-cb))
         (callback orgs collection)
         (dis/dispatch! [:entry-point orgs collection]))
-      (dis/dispatch! [:error-banner-show utils/generic-network-error 0])))))
+      (error-banner-actions/show-banner utils/generic-network-error 0)))))
 
 (defn entry-point-get [org-slug]
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (when (= status 404)
-        (dis/dispatch! [:error-banner-show (str "You have an older version of the Carrot web app, "
-                                                "please refresh your browser window!")]))))
+        (error-banner-actions/show-banner (str "You have an older version of the Carrot web app, "
+                                               "please refresh your browser window!")
+         0))))
   (api/get-entry-point
    (fn [success body]
      (entry-point-get-finished success body

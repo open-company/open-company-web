@@ -11,6 +11,7 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
@@ -43,8 +44,8 @@
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"
-                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
-    (dis/dispatch! [:alert-modal-show alert-data])))
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)))
 
 (rum/defcs org-settings-main-panel
   < rum/reactive
