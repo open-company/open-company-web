@@ -129,7 +129,7 @@
    (str "https://player.vimeo.com/video/" (:id video))))
 
 (defn media-video-add [s editable video-data]
-  (if (= :dismiss video-data)
+  (if (nil? video-data)
     (.addVideo editable nil nil nil nil)
     (.addVideo
      editable
