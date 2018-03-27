@@ -57,10 +57,11 @@
                  has-unsent-invites))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "org-settings-unsaved-edits"
-                        :message "There are unsaved edits. OK to delete them?"
-                        :link-button-title "Cancel"
+                        :message "Leave without saving your changes?"
+                        :link-button-title "Stay"
                         :link-button-cb #(alert-modal/hide-alert)
-                        :solid-button-title "Yes"
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (alert-modal/hide-alert)
                                             (dismiss-modal))}]
