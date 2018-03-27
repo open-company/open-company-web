@@ -11,6 +11,8 @@
             [oc.web.actions.user :as ua]
             [oc.web.actions.team :as ta]
             [oc.web.actions.activity :as aa]
+            [oc.web.actions.comment :as ca]
+            [oc.web.actions.reaction :as ra]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -87,11 +89,16 @@
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))))
+      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))
+      (ws-cc/subscribe :container/change #(dispatcher/dispatch! [:container/change (:data %)]))
+      (ws-cc/subscribe :container/status #(dispatcher/dispatch! [:container/status (:data %)]))))
+
   ;; Interaction service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
-      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+      (ws-ic/reconnect ws-link (jwt/get-key :user-id))
+      (ra/subscribe ws-ic/subscribe)
+      (ca/subscribe ws-ic/subscribe)))
   (-> db
     (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
     (assoc :org-editing (-> (:org-editing db)

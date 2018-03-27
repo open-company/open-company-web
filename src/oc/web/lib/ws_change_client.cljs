@@ -1,8 +1,9 @@
 (ns oc.web.lib.ws-change-client
-  (:require [taoensso.sente :as s]
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
+            [taoensso.sente :as s]
             [taoensso.timbre :as timbre]
             [taoensso.encore :as encore :refer-macros (have)]
-            [oc.web.dispatcher :as dis]
             [oc.lib.time :as time]
             [oc.web.local-settings :as ls]
             [goog.Uri :as guri]))
@@ -15,23 +16,35 @@
 (def ch-chsk (atom nil))
 (def ch-state (atom nil))
 (def chsk-send! (atom nil))
+(def ch-pub (chan))
+
+;; Publication that handlers will subscribe to
+(def publication
+  (pub ch-pub #(:topic %)))
 
 ;; ----- Actions -----
 
 (defn container-watch
-
   ([]
-  (container-watch (conj @board-ids (:uuid (dis/org-data)))))
+    (container-watch @board-ids))
 
   ([watch-ids]
-  (when @chsk-send!
-    (timbre/debug "Sending container/watch for:" watch-ids)
-    (@chsk-send! [:container/watch watch-ids] 1000))))
+    (when @chsk-send!
+      (timbre/debug "Sending container/watch for:" watch-ids)
+      (@chsk-send! [:container/watch watch-ids] 1000))))
 
 (defn container-seen [container-id]
   (when @chsk-send!
     (timbre/debug "Sending container/seen for:" container-id)
     (@chsk-send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}] 1000)))
+
+(defn subscribe
+  [topic handler-fn]
+  (let [ws-cc-chan (chan)]
+    (sub publication topic ws-cc-chan)
+    (go-loop []
+      (handler-fn (<! ws-cc-chan))
+      (recur))))
 
 ;; ----- Event handlers -----
 
@@ -47,17 +60,17 @@
 
 (defmethod event-handler :chsk/ws-ping
   [_ & r]
-  )
+  (go (>! ch-pub { :topic :chsk/ws-ping })))
 
 (defmethod event-handler :container/status
   [_ body]
   (timbre/debug "Status event:" body)
-  (dis/dispatch! [:container/status body]))
+  (go (>! ch-pub { :topic :container/status :data body })))
 
 (defmethod event-handler :container/change
   [_ body]
   (timbre/debug "Change event:" body)
-  (dis/dispatch! [:container/change body]))
+  (go (>! ch-pub { :topic :container/change :data body })))
 
 ;; ----- Sente event handlers -----
 
@@ -91,8 +104,8 @@
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data))
-  (container-watch))
+    (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)
+    (container-watch)))
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
 
