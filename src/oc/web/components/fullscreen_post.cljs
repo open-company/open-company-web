@@ -370,7 +370,7 @@
                                                   :board-name (:name section-data)})])))))]]
               [:div.fullscreen-post-box-content-board
                 {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
-            [:div.fullscreen-post-box-content-headline
+            [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable
               {:content-editable editing
                :ref "edit-headline"
                :placeholder utils/default-headline
