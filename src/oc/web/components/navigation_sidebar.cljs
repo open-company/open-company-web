@@ -11,7 +11,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.whats-new-modal :as whats-new-modal]
-            [oc.web.components.ui.section-editor :refer (section-editor)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))

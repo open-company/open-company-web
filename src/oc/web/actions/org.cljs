@@ -10,6 +10,7 @@
             [oc.web.actions.comment :as ca]
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.activity :as aa]
+            [oc.web.actions.activity :as sa]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]))
@@ -38,7 +39,7 @@
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
         (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-          (api/get-board board-link))
+          (sa/section-get board-link))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(dis/dispatch! [:board utils/default-drafts-board]))
