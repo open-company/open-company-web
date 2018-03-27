@@ -15,9 +15,10 @@
 (defn delete-clicked [e activity-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-entry"
-                    :message (str "Delete this update?")
+                    :message (str "Delete this post?")
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
                     :solid-button-title "Yes"
                     :solid-button-cb #(let [org-slug (router/current-org-slug)
                                             board-slug (router/current-board-slug)

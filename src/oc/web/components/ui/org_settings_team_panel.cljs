@@ -75,6 +75,7 @@
                                                         "Remove user?")
                                                       :link-button-title "No"
                                                       :link-button-cb #(alert-modal/hide-alert)
+                                                      :solid-button-style :red
                                                       :solid-button-title "Yes"
                                                       :solid-button-cb
                                                        #(do
