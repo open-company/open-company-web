@@ -79,7 +79,7 @@
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
-          (when (not nux)
+          (when-not nux
             (more-menu activity-data))
           ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
           ;;(when is-new [:div.new-tag "New"])

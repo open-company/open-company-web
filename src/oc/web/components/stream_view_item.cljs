@@ -47,7 +47,8 @@
                                 (comment-actions/get-comments-if-needed (first (:rum/args s))
                                  @(drv/get-ref s :comments-data))
                                 (when @(::should-scroll-to-comments s)
-                                  (utils/scroll-to-y (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 180)
+                                  (utils/scroll-to-y
+                                   (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 180)
                                   (reset! (::should-scroll-to-comments s) false))
                                 s)}
   [s activity-data]

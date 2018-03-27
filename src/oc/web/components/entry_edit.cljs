@@ -379,7 +379,7 @@
                      (fn [board-data]
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        (when (and board-data
-                                  (not (empty? (:name board-data))))
+                                  (seq (:name board-data)))
                         (dis/dispatch! [:input [:entry-editing]
                          (merge entry-editing {:board-slug (:slug board-data)
                                                :board-name (:name board-data)})])))))]]])
@@ -410,7 +410,8 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable"})
             ; Attachments
-            (stream-view-attachments (:attachments entry-editing) #(activity-actions/remove-attachment :entry-editing %))]
+            (stream-view-attachments (:attachments entry-editing)
+             #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
               {:id "entry-edit-footer-multi-picker"}]

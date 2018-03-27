@@ -247,7 +247,8 @@
                                          (reset! (::initial-headline s) initial-headline)
                                          (reset! (::initial-body s) initial-body)
                                          (stop-editing s)
-                                         (activity-actions/entry-clear-local-cache (:uuid activity-data) :modal-editing-data)
+                                         (activity-actions/entry-clear-local-cache (:uuid activity-data)
+                                          :modal-editing-data)
                                          (cond
                                            ;; If the board change redirect to the board since the url we have is
                                            ;; not correct anymore
@@ -364,7 +365,7 @@
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        ;; Update the post if the user picked a section
                        (when (and activity-editing
-                                  (not (empty? (:name section-data))))
+                                  (seq (:name section-data)))
                         (dis/dispatch! [:input [:modal-editing-data]
                          (merge activity-editing {:board-slug (:slug section-data)
                                                   :board-name (:name section-data)})])))))]]
@@ -396,7 +397,8 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
-            (stream-view-attachments activity-attachments (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
+            (stream-view-attachments activity-attachments
+             (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             [:div.fullscreen-post-box-footer.group
               (if editing
                 [:div.fullscreen-post-box-footer-editing

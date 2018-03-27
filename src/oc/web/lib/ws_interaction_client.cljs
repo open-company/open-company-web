@@ -21,7 +21,7 @@
 (def ch-pub (chan))
 ;; Publication that handlers will subscribe to
 (def publication
-  (pub ch-pub #(:topic %)))
+  (pub ch-pub :topic))
 
 ;; Auth
 (defn should-disconnect? [rep]
