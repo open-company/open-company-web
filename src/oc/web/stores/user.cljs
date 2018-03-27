@@ -35,7 +35,7 @@
 
 ;; Auth Settings
 (defn auth-settings? []
-  (contains? @dispatcher/app-state dispatcher/auth-settings-key))
+  (contains? @dispatcher/app-state :auth-settings))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
