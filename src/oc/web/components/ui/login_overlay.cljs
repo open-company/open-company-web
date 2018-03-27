@@ -12,7 +12,6 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.stores.user :as user-store]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.oc-colors :as occ]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.small-loading :refer (small-loading)]))

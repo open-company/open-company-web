@@ -9,7 +9,6 @@
             [oc.web.utils.activity :as au]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]

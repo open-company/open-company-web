@@ -147,8 +147,7 @@
   (test-cljs :js-env :phantom
              :exit? true
              :update-fs? true
-             :namespaces ['test.oc.web.lib.utils
-                          'test.oc.web.components.user-profile
+             :namespaces ['test.oc.web.components.user-profile
                           'test.oc.web.components.ui.loading
                           'test.oc.web.components.ui.login-button
                           'test.oc.web.components.ui.org-avatar

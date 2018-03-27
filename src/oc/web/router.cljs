@@ -1,6 +1,5 @@
 (ns oc.web.router
   (:require [secretary.core :as secretary]
-            [oc.web.lib.prevent-route-dispatch :as prd]
             [taoensso.timbre :as timbre]
             [goog.history.Html5History :as history5]
             [goog.events :as events]

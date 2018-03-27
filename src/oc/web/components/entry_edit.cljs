@@ -12,7 +12,6 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
