@@ -8,7 +8,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
-            [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -28,10 +29,9 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (dis/dispatch!
-       [:error-banner-show
+      (error-banner-actions/show-banner
         "An error has occurred while processing the image URL. Please try again."
-        5000])
+        5000)
       (do
         (set! (.-onload node) #(img-on-load url node))
         (set! (.-className node) "hidden")
@@ -41,10 +41,9 @@
 (defn progress-cb [res progress])
 
 (defn error-cb [res error]
-  (dis/dispatch!
-   [:error-banner-show
-    "An error has occurred while processing the image URL. Please try again."
-    5000]))
+  (error-banner-actions/show-banner
+   "An error has occurred while processing the image URL. Please try again."
+   5000))
 
 (defn change! [s k v]
   (reset! (::name-error s) false)
@@ -73,12 +72,12 @@
                       :action "user-profile-unsaved-edits"
                       :message "There are unsaved edits. OK to delete them?"
                       :link-button-title "Cancel"
-                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                      :link-button-cb #(alert-modal/hide-alert)
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
-                                          (dis/dispatch! [:alert-modal-hide])
+                                          (alert-modal/hide-alert)
                                           (real-close-cb orgs current-user-data))}]
-      (dis/dispatch! [:alert-modal-show alert-data]))
+      (alert-modal/show-alert alert-data))
     (real-close-cb orgs current-user-data)))
 
 (def default-user-profile-image-key {:accept "image/*"
@@ -161,7 +160,7 @@
         orgs (drv/react s :orgs)]
     [:div.user-profile.fullscreen-page
       (when (drv/react s :alert-modal)
-        (alert-modal))
+        (alert-modal/alert-modal))
       (carrot-close-bt {:on-click #(close-cb orgs current-user-data)})
       [:div.user-profile-header {} "Your Profile"]
       [:div.user-profile-internal

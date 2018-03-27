@@ -5,9 +5,7 @@
             [oc.web.router :as router]))
 
 (defonce app-state (atom {:loading false
-                          :mobile-menu-open false
-                          :show-login-overlay false
-                          :trend-bar-status :hidden}))
+                          :show-login-overlay false}))
 
 ;; Data key paths
 
@@ -206,9 +204,6 @@
    :comments-data       [[:base :org-slug :board-slug]
                          (fn [base org-slug board-slug]
                            (get-in base (comments-key org-slug board-slug)))]
-   :trend-bar-status    [[:base]
-                          (fn [base]
-                            (:trend-bar-status base))]
    :edit-user-profile   [[:base]
                           (fn [base]
                             {:user-data (:edit-user-profile base)

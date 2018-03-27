@@ -7,7 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.menu :refer (menu)]
+            [oc.web.components.ui.menu :as menu]
             [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
@@ -51,7 +51,7 @@
           [:div.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
               {:on-click #(do
-                            (dis/dispatch! [:input [:mobile-menu-open] false])
+                            (menu/mobile-menu-close)
                             (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]
            (search-box)]
           [:div.navbar-center
@@ -61,7 +61,7 @@
               [:button.btn-reset.mobile-menu.group
                 {:on-click #(do
                              (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                             (dis/dispatch! [:mobile-menu-toggle]))}
+                             (menu/mobile-menu-toggle))}
                 (user-avatar-image current-user-data)]
               (if (jwt/jwt)
                 [:div.user-menu
@@ -69,9 +69,9 @@
                    {:classes (str "mlb-reset" (if disabled-user-menu " disabled-user-menu" " dropdown-toggle"))
                     :disable-menu disabled-user-menu})
                   (when-not disabled-user-menu
-                    (menu))]
+                    (menu/menu))]
                 (login-button)))]]]
       (when (responsive/is-mobile-size?)
         ;; Render the menu here only on mobile so it can expand the navbar
-        (menu))
+        (menu/menu))
       ]))

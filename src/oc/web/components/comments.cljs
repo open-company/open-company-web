@@ -12,6 +12,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.comment-reactions :as comment-reactions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -76,14 +77,14 @@
                       :message (str "Delete this comment?")
                       :link-button-title "No"
                       :link-button-cb #(do
-                                         (dis/dispatch! [:alert-modal-hide])
+                                         (alert-modal/hide-alert)
                                          (stop-editing s))
                       :solid-button-title "Yes"
                       :solid-button-cb #(do
                                           (comment-actions/delete-comment activity-data comment-data)
-                                          (dis/dispatch! [:alert-modal-hide]))
+                                          (alert-modal/hide-alert))
                       }]
-      (dis/dispatch! [:alert-modal-show alert-data]))))
+      (alert-modal/show-alert alert-data))))
 
 (defn is-emoji
   [body]

@@ -14,6 +14,14 @@
 
 (def body-class "mobile-menu-expanded")
 
+(defn site-menu-toggle [& [force-close]]
+  (let [site-menu-open (:site-menu-open @dis/app-state)
+        next-site-menu-open (if (or force-close
+                                    (not (responsive/is-mobile-size?)))
+                              false
+                              (not site-menu-open))]
+    (dis/dispatch! [:input [:site-menu-open] next-site-menu-open])))
+
 (rum/defcs site-mobile-menu < rum/reactive
                               (drv/drv :site-menu-open)
                               {:did-mount (fn [s]
@@ -40,7 +48,7 @@
              :on-click (fn [e]
                         (utils/event-stop e)
                         (user/show-login nil)
-                        (dis/dispatch! [:site-menu-toggle])
+                        (site-menu-toggle)
                         (router/nav! oc-urls/home))}
             "Home"]]
         [:div.site-mobile-menu-item
@@ -50,7 +58,7 @@
              :on-click (fn [e]
                         (utils/event-stop e)
                         (dis/dispatch! [:login-overlay-show nil])
-                        (dis/dispatch! [:site-menu-toggle])
+                        (site-menu-toggle)
                         (router/nav! oc-urls/pricing))}
             "Pricing"]]
         [:div.site-mobile-menu-item
@@ -60,7 +68,7 @@
              :on-click (fn [e]
                         (.preventDefault e)
                         (user/show-login nil)
-                        (dis/dispatch! [:site-menu-toggle true])
+                        (site-menu-toggle true)
                         (router/nav! oc-urls/about))}
             "About"]]
         [:div.site-mobile-menu-item
@@ -72,7 +80,7 @@
         (when-not (jwt/jwt)
           [:button.mlb-reset.login-btn
             {:on-click (fn [e]
-                        (dis/dispatch! [:site-menu-toggle])
+                        (site-menu-toggle)
                         (if (utils/in? (:route @router/path) "login")
                           (user/show-login :login-with-slack)
                           (router/nav! oc-urls/login)))
@@ -82,7 +90,7 @@
           {:class (when (jwt/jwt) "your-boards")
            :on-touch-start identity
            :on-click (fn [e]
-                      (dis/dispatch! [:site-menu-toggle])
+                      (site-menu-toggle)
                       (if (jwt/jwt)
                         (router/redirect! (utils/your-boards-url))
                         (if (utils/in? (:route @router/path) "login")

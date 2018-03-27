@@ -15,6 +15,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.lib.raven :as sentry]
+            [oc.web.actions.error-banner :as error-banner-actions]
             [goog.Uri :as guri]))
 
 (def ^:private web-endpoint ls/web-server-domain)
@@ -146,7 +147,7 @@
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
                   (and (>= status 500) (<= status 599)))
-          (dispatcher/dispatch! [:error-banner-show utils/generic-network-error 10000]))
+          (error-banner-actions/show-banner utils/generic-network-error 10000))
         ; report all 5xx to sentry
         (when (or (and (>= status 500) (<= status 599))
                   (= status 400)
@@ -235,12 +236,11 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:board (json->cljs body)])))))
 
-(defn get-whats-new [whats-new-link]
+(defn get-whats-new [whats-new-link callback]
   (when whats-new-link
     (storage-http (method-for-link whats-new-link) (relative-href whats-new-link)
       {:headers (headers-for-link whats-new-link)}
-      (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})])))))
+      callback)))
 
 (defn patch-board [data]
   (when data

@@ -7,8 +7,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.ui.whats-new-modal :as whats-new-modal]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -204,13 +206,13 @@
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(do
-                          (dis/dispatch! [:org-settings-show :invite])
+                          (org-settings/show-modal :invite)
                           (close-navigation-sidebar))}
             [:div.invite-people-icon]
             [:span "Invite people"]])
         [:button.mlb-reset.about-carrot-btn
           {:on-click #(do
-                        (dis/dispatch! [:whats-new-modal-show])
+                        (whats-new-modal/show-modal)
                         (close-navigation-sidebar))}
           [:div.about-carrot-icon]
           [:span "Support"]]]]))
