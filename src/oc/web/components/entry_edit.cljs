@@ -96,7 +96,7 @@
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
   (when-let [headline (rum/ref-node state "headline")]
-    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerText headline)) "__html"))]
+    (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
                                                           :has-changes true})]))))
 

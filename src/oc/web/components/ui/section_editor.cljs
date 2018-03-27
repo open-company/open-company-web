@@ -363,9 +363,7 @@
           [:button.mlb-reset.create-bt
             {:on-click #(let [section-node (rum/ref-node s "section-name")
                               inner-html (.-innerHTML section-node)
-                              section-name (utils/strip-HTML-tags
-                                            (utils/emoji-images-to-unicode
-                                             (gobj/get (utils/emojify inner-html) "__html")))
+                              section-name (utils/strip-HTML-tags inner-html)
                               next-section-editing (merge section-editing {:slug utils/default-section-slug
                                                                            :name section-name})]
                           (dis/dispatch! [:input [:section-editing] next-section-editing])

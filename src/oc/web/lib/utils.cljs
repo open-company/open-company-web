@@ -9,7 +9,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [cuerdas.core :as s]
-            [cljsjs.emojione] ; pulled in for cljsjs externs
             [defun.core :refer (defun)]
             [cljs.reader :as reader]))
 
@@ -253,25 +252,8 @@
   "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
-  [text & [plain-text]]
-  ; ;; use an SVG sprite map
-  ; (set! (.-imageType js/emojione) "png")
-  ; (set! (.-sprites js/emojione) true)
-  ; (set! (.-spritePath js/emojione) "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png")
-  ; ;; convert ascii emoji's (like  :) and :D) into emojis
-  ; (set! (.-ascii js/emojione) true)
-  ; (let [text-string (or text "") ; handle nil
-  ;       unicode-string (.toImage js/emojione text-string)
-  ;       r (js/RegExp "<span " "ig")
-  ;       with-img (.replace unicode-string r "<img ")
-  ;       without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
-
-  ;   (if plain-text
-  ;     without-span
-  ;     #js {"__html" without-span}))
-  (if plain-text
-    text
-    #js {"__html" text}))
+  [text]
+  #js {"__html" text})
 
 (defn strip-HTML-tags [text]
   (when text
@@ -336,17 +318,6 @@
       (.moveToElementText rg content-editable-element)
       (.collapse rg false)
       (.select rg))))
-
-(defn emoji-images-to-unicode [html]
-  (let [div (.createElement js/document "div")]
-    (set! (.-id div) "temp-emojing")
-    (set! (.-innerHTML div) html)
-    (.appendChild (.-body js/document) div)
-    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (.-alt this))))
-    (let [$div       (js/$ "#temp-emojing")
-          inner-html (.html $div)]
-      (.remove $div)
-      inner-html)))
 
 (defn valid-email? [addr]
   (when addr
@@ -602,7 +573,7 @@
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
         cleaned-html (.html $container)
         _ (.detach $container)]
-    (emoji-images-to-unicode (gobj/get (emojify cleaned-html) "__html"))))
+    cleaned-html))
 
 (defn your-boards-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
