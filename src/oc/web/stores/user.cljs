@@ -215,3 +215,11 @@
   (-> db
       (assoc :email-confirmed confirmed)
       (dissoc :latest-entry-point :latest-auth-settings)))
+
+;; What's new get
+(defmethod dispatcher/action :whats-new/finish
+  [db [_ whats-new-data]]
+  (if whats-new-data
+    (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
+      (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
+    db))

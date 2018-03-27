@@ -14,6 +14,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -63,28 +64,28 @@
         clean-fn (fn [dismiss-modal?]
                     (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing)
                     (when dismiss-modal?
-                      (dis/dispatch! [:alert-modal-hide]))
+                      (alert-modal/hide-alert))
                     (real-close s))]
     (if @(::uploading-media s)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "dismiss-edit-uploading-media"
                         :message (str "Leave before finishing upload?")
                         :link-button-title "Stay"
-                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :link-button-cb #(alert-modal/hide-alert)
                         :solid-button-style :red
                         :solid-button-title "Cancel upload"
                         :solid-button-cb #(clean-fn true)}]
-        (dis/dispatch! [:alert-modal-show alert-data]))
+        (alert-modal/show-alert alert-data))
       (if (:has-changes entry-editing)
         (let [alert-data {:icon "/img/ML/trash.svg"
                           :action "dismiss-edit-dirty-data"
                           :message (str "Leave without saving your changes?")
                           :link-button-title "Stay"
-                          :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                          :link-button-cb #(alert-modal/hide-alert)
                           :solid-button-style :red
                           :solid-button-title "Lose changes"
                           :solid-button-cb #(clean-fn true)}]
-          (dis/dispatch! [:alert-modal-show alert-data]))
+          (alert-modal/show-alert alert-data))
         (clean-fn false)))))
 
 ;; Data change handling
@@ -147,7 +148,6 @@
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
                         (drv/drv :editable-boards)
-                        (drv/drv :alert-modal)
                         (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
                         (drv/drv :show-sections-picker)
@@ -263,7 +263,6 @@
   (let [org-data          (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
-        alert-modal       (drv/react s :alert-modal)
         new-entry?        (empty? (:uuid entry-editing))
         is-mobile? (responsive/is-tablet-or-mobile?)
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)

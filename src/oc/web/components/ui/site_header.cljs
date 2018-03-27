@@ -13,6 +13,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.components.ui.site-mobile-menu :as site-mobile-menu]
             [oc.web.components.ui.try-it-form :refer (get-started-button)]))
 
 ;; NB: this has a clone in oc.core/nav, every change should be reflected there and vice-versa
@@ -20,7 +21,7 @@
 (defn nav! [uri e]
   (.preventDefault e)
   (when (responsive/is-mobile-size?)
-    (dis/dispatch! [:site-menu-toggle true]))
+    (site-mobile-menu/site-menu-toggle true))
   (user/show-login nil)
   (router/nav! uri))
 
@@ -92,4 +93,4 @@
                     [:span.slack-orange-icon]]
                   "Start")])]
         [:div.mobile-ham-menu.mobile-only
-          {:on-click #(dis/dispatch! [:site-menu-toggle])}]]]))
+          {:on-click #(site-mobile-menu/site-menu-toggle)}]]]))
