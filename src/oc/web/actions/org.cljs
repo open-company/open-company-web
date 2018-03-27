@@ -7,6 +7,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.actions.comment :as ca]
+            [oc.web.actions.reaction :as ra]
             [oc.web.actions.activity :as aa]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-change-client :as ws-cc]
@@ -62,11 +64,16 @@
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))))
+      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))
+      (ws-cc/subscribe :container/change #(dispatcher/dispatch! [:container/change (:data %)]))
+      (ws-cc/subscribe :container/status #(dispatcher/dispatch! [:container/status (:data %)]))))
+
   ;; Interaction service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
-      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+      (ws-ic/reconnect ws-link (jwt/get-key :user-id))
+      (ra/subscribe ws-ic/subscribe)
+      (ca/subscribe ws-ic/subscribe)))
   (dis/dispatch! [:org-loaded org-data saved?]))
 
 (defn get-org-cb [{:keys [status body success]}]
