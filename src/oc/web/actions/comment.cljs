@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn add-comment-focus [activity-uuid]
@@ -90,7 +91,7 @@
       (activity-actions/get-entry entry-data)
       ;; the entry is not present, refresh the full board
       (let [board-data (dis/board-data)]
-        (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")))))
+        (section-actions/section-get (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")))))
   (dis/dispatch! [:ws-interaction/comment-add interaction-data]))
 
 ;; Pass in the subscriber until we sort out the namespaces in actions.cljs

@@ -27,8 +27,6 @@
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
       (when should-404?
         (router/redirect-404!))
-      (utils/after 2000
-       #(dis/dispatch! [:boards-load-other (:boards org-data)]))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
@@ -66,7 +64,7 @@
     (dis/dispatch! [:org-loaded org-data])
     (if is-all-posts
       (all-posts-get org-data (:ap-initial-at @dis/app-state))
-      (api/get-board (utils/link-for (:links board-data) "self" "GET")))))
+      (sa/section-get (utils/link-for (:links board-data) "self" "GET")))))
 
 (defn refresh-org-data []
   (api/get-org (dis/org-data) refresh-org-data-cb))
@@ -367,7 +365,6 @@
   (dis/dispatch! [:entry-publish]))
 
 (defn activity-delete-finish []
-  (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET"))
   ;; Reload the org to update the number of drafts in the navigation
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
     (refresh-org-data)
@@ -420,3 +417,4 @@
 
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+
