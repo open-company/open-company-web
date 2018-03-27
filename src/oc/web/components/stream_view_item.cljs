@@ -16,7 +16,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (comments-summary)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
 
 (defn should-show-continue-reading? [s]

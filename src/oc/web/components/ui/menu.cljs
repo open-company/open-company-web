@@ -11,11 +11,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]))
 
-(defn boards-click [e]
-  (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/boards (router/current-org-slug)))))
-
 (defn user-profile-click [e]
   (utils/event-stop e)
   (dis/dispatch! [:mobile-menu-toggle])
@@ -43,11 +38,6 @@
   (dis/dispatch! [:mobile-menu-toggle])
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
-
-(defn list-boards-click [e]
-  (dis/dispatch! [:mobile-menu-toggle])
-  (.preventDefault e)
-  (router/nav! (oc-urls/boards)))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)

@@ -16,7 +16,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (comments-summary)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
