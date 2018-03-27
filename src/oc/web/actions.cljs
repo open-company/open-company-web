@@ -220,14 +220,6 @@
     (update-in db path value-fn)
     db))
 
-;; Stripe Payment related actions
-
-(defmethod dispatcher/action :subscription
-  [db [_ {:keys [uuid] :as data}]]
-  (if uuid
-    (assoc-in db [:subscription uuid] data)
-    (assoc db :subscription nil)))
-
 (defmethod dispatcher/action :org-create
   [db [_]]
   (let [org-data (:org-editing db)]

@@ -217,12 +217,10 @@
        (let [fixed-body (when success (json->cljs body))]
          (callback success fixed-body))))))
 
-(defn get-subscription [company-uuid]
+(defn get-subscription [company-uuid callback]
   (pay-http http/get (str "/subscriptions/" company-uuid)
-           nil
-           (fn [response]
-             (let [body (if (:success response) (:body response) {})]
-               (dispatcher/dispatch! [:subscription body])))))
+   nil
+   callback))
 
 (defn get-org [org-data]
   (when-let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
