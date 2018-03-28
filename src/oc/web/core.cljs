@@ -5,7 +5,6 @@
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
-            [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
@@ -42,9 +41,7 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
-            [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
@@ -74,7 +71,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root #(loading) target)))
+    (drv-root loading target)))
 
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
@@ -414,16 +411,6 @@
       (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
 
-    (defroute org-create-route urls/create-org {:as params}
-      (timbre/info "Routing org-create-route" urls/create-org)
-      (if (jwt/jwt)
-        (do
-          (pre-routing (:query-params params))
-          (router/set-route! ["create-org"] {:query-params (:query-params params)})
-          (post-routing)
-          (drv-root org-editor target))
-        (router/redirect! urls/home)))
-
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
@@ -471,13 +458,6 @@
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
       (secure-activity-handler secure-activity "secure-activity" target params))
 
-    (defroute boards-list-route (urls/boards ":org") {:as params}
-      (timbre/info "Routing boards-list-route" (urls/boards ":org"))
-      (swap! dis/app-state assoc :loading true)
-      (if (responsive/is-mobile-size?)
-        (simple-handler mobile-boards-list "boards-list" target params)
-        (org-handler "boards-list" target [:div] params)))
-
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
       (board-handler "dashboard" target org-dashboard params))
@@ -520,7 +500,6 @@
                                  slack-route
                                  pricing-route
                                  logout-route
-                                 org-create-route
                                  email-confirmation-route
                                  confirm-invitation-route
                                  confirm-invitation-profile-route
@@ -547,7 +526,6 @@
                                  secure-activity-route
                                  secure-activity-slash-route
                                  ;; Boards
-                                 boards-list-route
                                  board-route
                                  board-slash-route
                                  ; Entry route

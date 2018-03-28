@@ -97,7 +97,8 @@
                          ;; we already have
                          (assoc reaction-data :reacted (if old-reaction-data (:reacted old-reaction-data) false)))
           new-reactions-data (if reactions-data
-                               (assoc reactions-data (if reaction-found reaction-idx (count reactions-data)) with-reacted)
+                               (assoc reactions-data (if reaction-found reaction-idx
+                                                      (count reactions-data)) with-reacted)
                                [with-reacted])
           new-entry-data (assoc entry-data :reactions new-reactions-data)]
       new-entry-data)))
@@ -116,7 +117,7 @@
                   (partition 2)
                   (filter second) ;; remove nil data
                   (map vec))]
-    (when-not (empty? new-data)
+    (when (seq new-data)
       (reduce #(assoc-in %1 (first %2) (second %2)) db new-data))))
 
 (defn- get-comments-data
@@ -169,7 +170,7 @@
                       (partition 2)
                       (filter second) ;; remove nil data
                       (map vec))]
-    (when-not (empty? new-data)
+    (when (seq new-data)
       (reduce #(assoc-in %1 (first %2) (second %2)) db new-data))))
 
 (defn- update-reaction

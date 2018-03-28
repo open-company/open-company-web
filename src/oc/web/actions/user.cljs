@@ -266,19 +266,18 @@
     (fn [status body success]
       (when success
         (dis/dispatch! [:user-data (json->cljs body)]))
-      (if (and (>= status 200)
-               (<= status 299))
-        (do
-          (if password-reset?
-            (do
-              (cook/remove-cookie! :show-login-overlay)
-              (utils/after 200 #(router/nav! oc-urls/login)))
-            (do
-              (cook/set-cookie!
-               (router/show-nux-cookie (jwt/user-id))
-               (:new-user router/nux-cookie-values)
-               (* 60 60 24 7))
-              (router/nav! oc-urls/confirm-invitation-profile)))))
+      (when (and (>= status 200)
+                 (<= status 299))
+        (if password-reset?
+          (do
+            (cook/remove-cookie! :show-login-overlay)
+            (utils/after 200 #(router/nav! oc-urls/login)))
+          (do
+            (cook/set-cookie!
+             (router/show-nux-cookie (jwt/user-id))
+             (:new-user router/nux-cookie-values)
+             (* 60 60 24 7))
+            (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))
   (dis/dispatch! [:pswd-collect password-reset?]))
 

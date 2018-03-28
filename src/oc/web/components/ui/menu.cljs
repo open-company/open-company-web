@@ -24,11 +24,6 @@
   (mobile-menu-toggle)
   (user-actions/logout))
 
-(defn boards-click [e]
-  (utils/event-stop e)
-  (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/boards (router/current-org-slug)))))
-
 (defn user-profile-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
@@ -56,11 +51,6 @@
   (mobile-menu-toggle)
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
-
-(defn list-boards-click [e]
-  (mobile-menu-toggle)
-  (.preventDefault e)
-  (router/nav! (oc-urls/boards)))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)

@@ -12,7 +12,6 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -98,7 +97,7 @@
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
   (when-let [headline (rum/ref-node state "headline")]
-    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerText headline)) "__html"))]
+    (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
                                                           :has-changes true})]))))
 
@@ -379,7 +378,7 @@
                      (fn [board-data]
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        (when (and board-data
-                                  (not (empty? (:name board-data))))
+                                  (seq (:name board-data)))
                         (dis/dispatch! [:input [:entry-editing]
                          (merge entry-editing {:board-slug (:slug board-data)
                                                :board-name (:name board-data)})])))))]]])
@@ -410,7 +409,8 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable"})
             ; Attachments
-            (stream-view-attachments (:attachments entry-editing) #(activity-actions/remove-attachment :entry-editing %))]
+            (stream-view-attachments (:attachments entry-editing)
+             #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
               {:id "entry-edit-footer-multi-picker"}]

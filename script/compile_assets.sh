@@ -11,7 +11,6 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/truncate/jquery.dotdotdot.js \
 --js lib/scrollTo/scrollTo.min.js \
 --js js/emojione/autocomplete.js \
---js lib/js-utils/svg-utils.js \
 --js lib/js-utils/pasteHtmlAtCaret.js \
 --js lib/cleanHTML/cleanHTML.js \
 --js lib/rangy/rangy-core.js \
@@ -19,7 +18,6 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/rangy/rangy-classapplier.js \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
 --js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
---js lib/select2/js/select2.js \
 --js lib/jwt_decode/jwt-decode.min.js \
 --output_wrapper "%output%
 //# sourceMappingURL=$3/oc_assets.js.map"

@@ -20,7 +20,7 @@
 
 ;; Publication that handlers will subscribe to
 (def publication
-  (pub ch-pub #(:topic %)))
+  (pub ch-pub :topic))
 
 ;; ----- Actions -----
 
