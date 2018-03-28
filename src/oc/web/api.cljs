@@ -221,12 +221,11 @@
    nil
    callback))
 
-(defn get-org [org-data]
+(defn get-org [org-data callback]
   (when-let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
     (storage-http (method-for-link org-link) (relative-href org-link)
       {:headers (headers-for-link org-link)}
-      (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:org (json->cljs body)])))))
+      callback)))
 
 (defn get-board [board-link]
   (when board-link
@@ -260,7 +259,7 @@
 
 (def org-keys [:name :logo-url :logo-width :logo-height])
 
-(defn patch-org [data]
+(defn patch-org [data callback]
   (when data
     (let [org-data (select-keys data org-keys)
           json-data (cljs->json org-data)
@@ -269,8 +268,7 @@
       (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
         {:json-params json-data
          :headers (headers-for-link org-patch-link)}
-        (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:org (json->cljs body) true]))))))
+        callback))))
 
 (defn get-auth-settings
   ([] (get-auth-settings #()))
@@ -426,17 +424,15 @@
       (fn [{:keys [status body success]}]
         (cb status body success)))))
 
-(defn patch-team [team-id new-team-data org-data]
+(defn patch-team [team-id new-team-data org-data callback]
   (when-let* [team-data (dispatcher/team-data team-id)
               team-patch (utils/link-for (:links team-data) "partial-update")]
     (auth-http (method-for-link team-patch) (relative-href team-patch)
       {:headers (headers-for-link team-patch)
        :json-params (cljs->json new-team-data)}
-      (fn [{:keys [success body status]}]
-        (when success
-          (dispatcher/dispatch! [:org-redirect org-data]))))))
+      callback)))
 
-(defn create-org [org-name logo-url logo-width logo-height]
+(defn create-org [org-name logo-url logo-width logo-height callback]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
         org-data {:name org-name :team-id team-id}
@@ -449,19 +445,7 @@
       (storage-http (method-for-link create-org-link) (relative-href create-org-link)
         {:headers (headers-for-link create-org-link)
          :json-params (cljs->json with-logo)}
-        (fn [{:keys [success status body]}]
-          (when-let [org-data (when success (json->cljs body))]
-            (dispatcher/dispatch! [:org org-data])
-            (let [team-data (dispatcher/team-data team-id)]
-              (if (and (s/blank? (:name team-data))
-                       (utils/link-for (:links team-data) "partial-update"))
-                ; if the current team has no name and
-                ; the user has write permission on it
-                ; use the org name
-                ; for it and patch it back
-                (patch-team (:team-id org-data) {:name org-name} org-data)
-                ; if not redirect the user to the slug)
-                (dispatcher/dispatch! [:org-redirect org-data])))))))))
+        callback))))
 
 (defn create-board [board-data callback]
   (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")

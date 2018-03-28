@@ -13,6 +13,66 @@
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]))
 
+;; All Posts
+
+(defn all-posts-get-finish [from {:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          all-posts-key (dis/all-posts-key org)
+          all-posts-data (when success (json->cljs body))
+          fixed-all-posts (utils/fix-all-posts (:collection all-posts-data))
+          should-404? (and from
+                           (router/current-activity-id)
+                           (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
+      (when should-404?
+        (router/redirect-404!))
+      (utils/after 2000
+       #(dis/dispatch! [:boards-load-other (:boards org-data)]))
+      (when (and (not should-404?)
+                 (= (router/current-board-slug) "all-posts"))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
+
+      (when (jwt/jwt) ; only for logged in users
+        (let [board-slugs (distinct (map :board-slug
+                                     (map second (:fixed-items fixed-all-posts))))
+              org-data (dis/org-data)
+              org-boards (:boards org-data)
+              org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
+          (ws-ic/board-unwatch (fn [rep]
+            (doseq [board-slug board-slugs]
+              (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
+              (ws-ic/board-watch (org-board-map board-slug)))))))
+      (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
+
+(defn all-posts-get [org-data ap-initial-at]
+  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
+    (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
+
+(defn all-posts-more-finish [direction {:keys [success body]}]
+  (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+
+(defn all-posts-more [more-link direction]
+  (api/load-more-all-posts more-link direction (partial all-posts-more-finish direction))
+  (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
+
+;; Referesh org when needed
+
+(defn refresh-org-data-cb [{:keys [status body success]}]
+  (let [org-data (json->cljs body)
+        is-all-posts (or (:from-all-posts @router/path)
+                         (= (router/current-board-slug) "all-posts"))
+        board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))]
+    (dis/dispatch! [:org-loaded org-data])
+    (if is-all-posts
+      (all-posts-get org-data (:ap-initial-at @dis/app-state))
+      (api/get-board (utils/link-for (:links board-data) "self" "GET")))))
+
+(defn refresh-org-data []
+  (api/get-org (dis/org-data) refresh-org-data-cb))
+
+;; Entry
+
 (defn save-last-used-section [section-slug]
   (let [org-slug (router/current-org-slug)
         last-board-cookie (router/last-used-board-slug-cookie org-slug)]
@@ -141,14 +201,9 @@
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
 (defn entry-save-finish [activity-data initial-uuid edit-key]
-  (let [is-all-posts (or (:from-all-posts @router/path)
-                         (= (router/current-board-slug) "all-posts"))
-        org-slug (router/current-org-slug)]
+  (let [org-slug (router/current-org-slug)]
     (save-last-used-section (:board-slug activity-data))
-    ;; FIXME: refresh the last loaded all-posts link
-    (when-not is-all-posts
-      (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET")))
-    (api/get-org (dis/org-data))
+    (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
     (dis/dispatch! [:entry-save/finish activity-data edit-key])))
@@ -163,7 +218,7 @@
         org-slug (router/current-org-slug)]
     (save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
-    (api/get-org (dis/org-data))
+    (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid fixed-board-data)]))
@@ -171,7 +226,8 @@
 
 (defn entry-modal-save [activity-data board-slug section-editing]
   (timbre/debug section-editing)
-  (if (= (:board-slug activity-data) utils/default-section-slug)
+  (if (and (= (:board-slug activity-data) utils/default-section-slug)
+           section-editing)
     (let [fixed-entry-data (dissoc activity-data :board-slug :board-name)
           final-board-data (assoc section-editing :entries [fixed-entry-data])]
       (api/create-board final-board-data
@@ -267,7 +323,7 @@
   (let [board-slug (:board-slug activity-data)]
     ;; Save last used section
     (save-last-used-section board-slug)
-    (api/get-org (dis/org-data))
+    (refresh-org-data)
     ;; Remove entry cached edits
     (remove-cached-item initial-uuid)
     (dis/dispatch! [:entry-publish/finish edit-key activity-data])))
@@ -281,7 +337,7 @@
   (let [board-slug (:slug new-board-data)]
     (save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
-    (api/get-org (dis/org-data))
+    (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid new-board-data)]))
@@ -314,7 +370,7 @@
   (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET"))
   ;; Reload the org to update the number of drafts in the navigation
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
-    (api/get-org (dis/org-data))
+    (refresh-org-data)
     (let [org-slug (router/current-org-slug)
           org-data (dis/org-data)
           boards-no-draft (sort-by :name (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
@@ -364,46 +420,3 @@
 
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
-
-;; All Posts
-
-(defn all-posts-get-finish [from {:keys [body success]}]
-  (when body
-    (let [org-data (dis/org-data)
-          org (router/current-org-slug)
-          all-posts-key (dis/all-posts-key org)
-          all-posts-data (when success (json->cljs body))
-          fixed-all-posts (utils/fix-all-posts (:collection all-posts-data))
-          should-404? (and from
-                           (router/current-activity-id)
-                           (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
-      (when should-404?
-        (router/redirect-404!))
-      (utils/after 2000
-       #(dis/dispatch! [:boards-load-other (:boards org-data)]))
-      (when (and (not should-404?)
-                 (= (router/current-board-slug) "all-posts"))
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
-
-      (when (jwt/jwt) ; only for logged in users
-        (let [board-slugs (distinct (map :board-slug
-                                     (map second (:fixed-items fixed-all-posts))))
-              org-data (dis/org-data)
-              org-boards (:boards org-data)
-              org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
-          (ws-ic/board-unwatch (fn [rep]
-            (doseq [board-slug board-slugs]
-              (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
-              (ws-ic/board-watch (org-board-map board-slug)))))))
-      (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
-
-(defn all-posts-get [org-data ap-initial-at]
-  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
-
-(defn all-posts-more-finish [direction {:keys [success body]}]
-  (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
-
-(defn all-posts-more [more-link direction]
-  (api/load-more-all-posts more-link direction (partial all-posts-more-finish direction))
-  (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
