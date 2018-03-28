@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -24,7 +25,7 @@
 (defn reset-form [s]
   (let [org-data (first (:rum/args s))
         um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
-    (dis/dispatch! [:org-edit org-data])
+    (org-actions/org-edit-setup org-data)
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
@@ -224,7 +225,7 @@
            :class (when (:saved org-editing) "no-disable")
            :on-click #(do
                         (reset! (::saving s) true)
-                        (dis/dispatch! [:org-edit-save]))}
+                        (org-actions/org-edit-save @(drv/get-ref s :org-editing)))}
           (if (:saved org-editing)
             "Saved!"
             (if @(::saving s)
