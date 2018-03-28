@@ -306,18 +306,14 @@
                                       (not (zero? (count fixed-headline))))
                                 (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
                                       updated-entry-editing @(drv/get-ref s :entry-editing)
-                                      section-editing @(drv/get-ref s :section-editing)
-                                      section-data (if (and (= (:board-slug updated-entry-editing) utils/default-section-slug)
-                                                            (= (:slug section-editing) utils/default-section-slug))
-                                                     section-editing
-                                                     nil)]
+                                      section-editing @(drv/get-ref s :section-editing)]
                                   (if published?
                                     (do
                                       (reset! (::saving s) true)
                                       (activity-actions/entry-save updated-entry-editing))
                                     (do
                                       (reset! (::publishing s) true)
-                                      (activity-actions/entry-publish updated-entry-editing section-data))))
+                                      (activity-actions/entry-publish updated-entry-editing section-editing))))
                                 (when (zero? (count fixed-headline))
                                   (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
                                     (when-not (.data $post-btn "bs.tooltip")
