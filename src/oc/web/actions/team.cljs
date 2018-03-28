@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
 (defn roster-get [roster-link]
@@ -80,8 +81,7 @@
 
 (defn author-change-cb [{:keys [success]}]
   (when success
-    ;; TODO: replace with action creator for get org
-    (api/get-org (dis/org-data))))
+    (org-actions/get-org)))
 
 (defn remove-author [author]
   (api/remove-author author author-change-cb))

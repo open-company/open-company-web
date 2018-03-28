@@ -8,6 +8,7 @@
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
+            [oc.web.stores.org]
             [oc.web.stores.team]
             [oc.web.stores.user]
             [oc.web.stores.search]
@@ -22,7 +23,6 @@
             [oc.web.actions.comment]
             [oc.web.actions.reaction]
             [oc.web.actions.user :as user-actions]
-            [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
