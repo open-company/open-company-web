@@ -163,7 +163,8 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
-        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)]
+        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
+        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))]
       ;; Entries list
       [:div.dashboard-layout.group
         ;; Show create new section for desktop
@@ -287,7 +288,7 @@
                 ;; All Posts
                 (and is-all-posts
                      (= @(::board-switch s) :stream))
-                (all-posts)
+                (rum/with-key (all-posts) all-posts-key)
                 ;; Empty board
                 empty-board?
                 (empty-board)

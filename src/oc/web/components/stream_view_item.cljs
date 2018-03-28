@@ -124,12 +124,12 @@
                      @(::should-show-comments s))
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (add-comment activity-data)
+              (rum/with-key (add-comment activity-data) (str "add-comment-mobile-" (:uuid activity-data)))
               (stream-comments activity-data comments-data)])]
         (when-not is-mobile?
           [:div.stream-body-right
             {:class (when expanded? "expanded")}
             [:div.stream-body-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (add-comment activity-data)
+              (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data)))
               (stream-comments activity-data comments-data)]])]]))
