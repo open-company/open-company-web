@@ -16,6 +16,7 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -152,7 +153,7 @@
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
         dismiss-fn (fn [dismiss-alert?]
                      (when dismiss-alert?
-                       (dis/dispatch! [:alert-modal-hide]))
+                       (alert-modal/hide-alert))
                      (activity-actions/entry-clear-local-cache (:uuid (:modal-editing-data modal-data))
                       :modal-editing-data)
                      (stop-editing state)
@@ -163,21 +164,21 @@
                       :action "dismiss-edit-uploading-media"
                       :message (str "Leave before finishing upload?")
                       :link-button-title "Stay"
-                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                      :link-button-cb #(alert-modal/hide-alert)
                       :solid-button-style :red
                       :solid-button-title "Cancel upload"
                       :solid-button-cb #(dismiss-fn true)}]
-      (dis/dispatch! [:alert-modal-show alert-data]))
+      (alert-modal/show-alert alert-data))
     (if (:has-changes (:modal-editing-data modal-data))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "dismiss-edit-dirty-data"
                         :message (str "Leave without saving your changes?")
                         :link-button-title "Stay"
-                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :link-button-cb #(alert-modal/hide-alert)
                         :solid-button-style :red
                         :solid-button-title "Lose changes"
                         :solid-button-cb #(dismiss-fn true)}]
-        (dis/dispatch! [:alert-modal-show alert-data]))
+        (alert-modal/show-alert alert-data))
       (dismiss-fn false)))))
 
 (defn setup-editing-data [s]

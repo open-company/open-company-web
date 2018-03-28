@@ -9,8 +9,11 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]))
 
+(defn show-modal []
+  (dis/dispatch! [:input [:whats-new-modal] true]))
+
 (defn dismiss-modal []
-  (dis/dispatch! [:whats-new-modal-hide]))
+  (dis/dispatch! [:input [:whats-new-modal] false]))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)

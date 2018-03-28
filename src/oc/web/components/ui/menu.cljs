@@ -9,33 +9,46 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.components.org-settings :as org-settings]))
+
+(defn mobile-menu-toggle []
+  (when (responsive/is-mobile-size?)
+    (dis/dispatch! [:update [:mobile-menu-open] not])))
+
+(defn mobile-menu-close []
+  (dis/dispatch! [:input [:mobile-menu-open] false]))
+
+(defn logout-click [e]
+  (utils/event-stop e)
+  (mobile-menu-toggle)
+  (user-actions/logout))
 
 (defn user-profile-click [e]
   (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
+  (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
 
 (defn team-settings-click [e]
   (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
+  (mobile-menu-toggle)
   ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings)))
-  (utils/after (+ utils/oc-animation-duration 100) #(dis/dispatch! [:org-settings-show :main])))
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
 (defn um-click [e]
   (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
+  (mobile-menu-toggle)
   ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-team))))
-  (utils/after (+ utils/oc-animation-duration 100) #(dis/dispatch! [:org-settings-show :team])))
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
 
 (defn invite-click [e]
   (utils/event-stop e)
-  (dis/dispatch! [:mobile-menu-toggle])
+  (mobile-menu-toggle)
   ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-invite))))
-  (utils/after (+ utils/oc-animation-duration 100) #(dis/dispatch! [:org-settings-show :invite])))
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 
 (defn sign-in-sign-up-click [e]
-  (dis/dispatch! [:mobile-menu-toggle])
+  (mobile-menu-toggle)
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
@@ -90,6 +103,6 @@
           [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
       (if (jwt/jwt)
         [:div.oc-menu-item
-          [:a.sign-out {:href oc-urls/logout :on-click user-actions/logout-click} "Sign Out"]]
+          [:a.sign-out {:href oc-urls/logout :on-click logout-click} "Sign Out"]]
         [:div.oc-menu-item
           [:a {:href "" :on-click sign-in-sign-up-click} "Sign In / Sign Up"]])]))

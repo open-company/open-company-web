@@ -9,12 +9,18 @@
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
 
 ;; FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
+
+(defn show-modal [& [panel]]
+  (dis/dispatch! [:input [:org-settings] (or panel :main)]))
+
+(defn dismiss-modal [& [panel]]
+  (dis/dispatch! [:input [:org-settings] nil]))
 
 (rum/defc org-settings-tabs
   [org-slug active-tab]
@@ -23,19 +29,19 @@
       {:class (when (= :main active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings org-slug)
-         :on-click #(do (utils/event-stop %) (dis/dispatch! [:org-settings-show :main]))}
+         :on-click #(do (utils/event-stop %) (show-modal :main))}
         "Team"]]
     [:div.org-settings-tab
       {:class (when (= :team active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings-team org-slug)
-         :on-click #(do (utils/event-stop %) (dis/dispatch! [:org-settings-show :team]))}
+         :on-click #(do (utils/event-stop %) (show-modal :team))}
         "Manage Members"]]
     [:div.org-settings-tab
       {:class (when (= :invite active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings-invite org-slug)
-         :on-click #(do (utils/event-stop %) (dis/dispatch! [:org-settings-show :invite]))}
+         :on-click #(do (utils/event-stop %) (show-modal :invite))}
         "Invite People"]]])
 
 (defn close-clicked [s]
@@ -51,15 +57,16 @@
                  has-unsent-invites))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "org-settings-unsaved-edits"
-                        :message "There are unsaved edits. OK to delete them?"
-                        :link-button-title "Cancel"
-                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                        :solid-button-title "Yes"
+                        :message "Leave without saving your changes?"
+                        :link-button-title "Stay"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
                         :solid-button-cb #(do
-                                            (dis/dispatch! [:alert-modal-hide])
-                                            (dis/dispatch! [:org-settings-hide]))}]
-        (dis/dispatch! [:alert-modal-show alert-data]))
-      (dis/dispatch! [:org-settings-hide]))))
+                                            (alert-modal/hide-alert)
+                                            (dismiss-modal))}]
+        (alert-modal/show-alert alert-data))
+      (dismiss-modal))))
 
 (rum/defcs org-settings
   "Org settings main component. It handles the data loading/reset and the tab logic."
@@ -82,13 +89,13 @@
         org-data (drv/react s :org-data)
         alert-modal-data (drv/react s :alert-modal)]
     (when (:read-only org-data)
-      (utils/after 100 #(dis/dispatch! [:org-settings-hide])))
+      (utils/after 100 #(dismiss-modal)))
     (if org-data
       [:div.org-settings.fullscreen-page
         [:button.mlb-reset.carrot-modal-close
           {:on-click #(close-clicked s)}]
         (when alert-modal-data
-          (alert-modal))
+          (alert-modal/alert-modal))
         [:div.org-settings-inner
           [:div.org-settings-header
             "Settings"]

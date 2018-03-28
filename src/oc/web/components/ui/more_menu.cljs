@@ -7,25 +7,27 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]))
+            [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Delete handling
 
 (defn delete-clicked [e activity-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-entry"
-                    :message (str "Delete this update?")
+                    :message (str "Delete this post?")
                     :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
                     :solid-button-title "Yes"
                     :solid-button-cb #(let [org-slug (router/current-org-slug)
                                             board-slug (router/current-board-slug)
                                             board-url (oc-urls/board org-slug board-slug)]
                                        (router/nav! board-url)
                                        (activity-actions/activity-delete activity-data)
-                                       (dis/dispatch! [:alert-modal-hide]))
+                                       (alert-modal/hide-alert))
                     }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
+    (alert-modal/show-alert alert-data)))
 
 (rum/defcs more-menu < rum/static
                        (rum/local false ::showing-menu)
