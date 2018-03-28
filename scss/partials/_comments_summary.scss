@@ -1,36 +1,3 @@
-div.is-reactions{
-  float: left;
-  margin-right: 32px;
-  height: 26px;
-  border-radius: 100px;
-  background-color: $carrot_light_gray_2;
-  padding: 2px 16px;
-  color: $carrot_light_gray_3;
-  @include avenir_H();
-  font-size: 12px;
-
-  @include mobile() {
-    margin-right: 8px;
-  }
-
-  &.reacted {
-    background-color: $carrot_light_yellow;
-    color: $carrot_yellow;
-  }
-
-  div.is-reactions-reaction {
-    float: left;
-    font-size: 20px;
-    margin-top: 3px;
-  }
-
-  div.is-reactions-summary {
-    float: left;
-    margin-left: 8px;
-    margin-top: 8px;
-  }
-}
-
 div.is-comments {
   float: left;
   text-align: right;
@@ -82,8 +49,4 @@ div.is-comments {
       max-width: 68vw;
     }
   }
-}
-
-div.interactions-summary {
-  float: left;
 }

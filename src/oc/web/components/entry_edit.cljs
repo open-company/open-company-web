@@ -12,7 +12,6 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.medium-editor-exts :as editor]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -98,7 +97,7 @@
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
   (when-let [headline (rum/ref-node state "headline")]
-    (let [emojied-headline  (utils/emoji-images-to-unicode (gobj/get (utils/emojify (.-innerText headline)) "__html"))]
+    (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:entry-editing] #(merge % {:headline emojied-headline
                                                           :has-changes true})]))))
 
@@ -147,6 +146,7 @@
                         (drv/drv :org-data)
                         (drv/drv :current-user-data)
                         (drv/drv :entry-editing)
+                        (drv/drv :section-editing)
                         (drv/drv :editable-boards)
                         (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
@@ -304,14 +304,15 @@
                              (if (and (is-publishable? entry-editing)
                                       (not (zero? (count fixed-headline))))
                                 (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                      updated-entry-editing @(drv/get-ref s :entry-editing)]
+                                      updated-entry-editing @(drv/get-ref s :entry-editing)
+                                      section-editing @(drv/get-ref s :section-editing)]
                                   (if published?
                                     (do
                                       (reset! (::saving s) true)
                                       (activity-actions/entry-save updated-entry-editing))
                                     (do
                                       (reset! (::publishing s) true)
-                                      (activity-actions/entry-publish updated-entry-editing nil))))
+                                      (activity-actions/entry-publish updated-entry-editing section-editing))))
                                 (when (zero? (count fixed-headline))
                                   (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
                                     (when-not (.data $post-btn "bs.tooltip")
@@ -379,7 +380,7 @@
                      (fn [board-data]
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        (when (and board-data
-                                  (not (empty? (:name board-data))))
+                                  (seq (:name board-data)))
                         (dis/dispatch! [:input [:entry-editing]
                          (merge entry-editing {:board-slug (:slug board-data)
                                                :board-name (:name board-data)})])))))]]])
@@ -410,7 +411,8 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable"})
             ; Attachments
-            (stream-view-attachments (:attachments entry-editing) #(activity-actions/remove-attachment :entry-editing %))]
+            (stream-view-attachments (:attachments entry-editing)
+             #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
               {:id "entry-edit-footer-multi-picker"}]

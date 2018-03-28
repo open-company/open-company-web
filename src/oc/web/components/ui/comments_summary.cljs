@@ -1,4 +1,4 @@
-(ns oc.web.components.ui.interactions-summary
+(ns oc.web.components.ui.comments-summary
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
@@ -8,27 +8,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
-
-(defn get-max-count-reaction [reactions]
-  (let [max-reaction (first (vec (reverse (sort-by :count (reverse reactions)))))]
-    max-reaction))
-
-(rum/defc reactions-summary < rum/static
-  [entry-data]
-  (let [max-reaction (get-max-count-reaction (:reactions entry-data))]
-    (when-not (zero? (:count max-reaction))
-      [:div.is-reactions.group
-        {:class (when (:reacted max-reaction) "reacted")}
-        [:div.is-reactions-reaction
-          (:reaction max-reaction)]
-        ; Reactions count
-        [:div.is-reactions-summary
-          {:class (utils/class-set {(str "reaction-" (:uuid entry-data) "-" (:reaction max-reaction)) true})}
-          (if (:reacted max-reaction)
-            (if (> (:count max-reaction) 1)
-              (str "You and +" (dec (:count max-reaction)))
-              (str "You reacted" (when-not (responsive/is-mobile-size?) " to this")))
-            (str "+" (:count max-reaction)))]])))
 
 (defn get-author-name [author]
   (if (= (:user-id author) (jwt/user-id))
@@ -83,13 +62,3 @@
           (if (responsive/is-tablet-or-mobile?)
             (comment-summary-string comments-authors)
             (str comments-count " comment" (when (> comments-count 1) "s")))]])))
-
-(rum/defcs interactions-summary < rum/static
-  [s entry-data show-zero-comments?]
-  [:div.interactions-summary.group
-    ;; Reactions
-    (when (seq (:reactions entry-data))
-      (reactions-summary entry-data))
-    ; Comments
-    (when (utils/link-for (:links entry-data) "comments")
-      (comments-summary entry-data show-zero-comments?))])

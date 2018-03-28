@@ -47,14 +47,15 @@
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))}
               "Company"]
             [:a.about-link
-              {:href oc-urls/help}
+              {:href oc-urls/help
+               :target "_blank"}
               "Help"]
             [:a.about-link
               {:href oc-urls/contact-mail-to}
               "Contact"]
             [:a.about-link.twitter
-              {:href oc-urls/oc-twitter}
-              ""]
+              {:href oc-urls/oc-twitter
+               :target "_blank"}]
             [:a.about-link.medium
               {:href oc-urls/blog}
               ""]]

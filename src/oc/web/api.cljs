@@ -7,7 +7,6 @@
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as j]
             [oc.web.router :as router]
@@ -181,10 +180,6 @@
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
-(defn dispatch-body [action response]
-  (let [body (if (:success response) (json->cljs (:body response)) {})]
-    (dispatcher/dispatch! [action body])))
-
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
     {:heades {
@@ -195,7 +190,7 @@
     #(when (fn? callback)
       (callback %))))
 
-(defn api-500-test [with-response]
+(defn store-500-test [with-response]
   (storage-http http/get (if with-response "/---error-test---" "/---500-test---")
     {:headers {
       ; required by Chrome
@@ -543,19 +538,6 @@
       {:headers (headers-for-link remove-admin-link)}
       callback)))
 
-(defn add-private-board
-  [board-data user-id user-type]
-  (when (and board-data user-id user-type)
-    (let [content-type {:content-type (if (= user-type :viewer)
-                                        "application/vnd.open-company.board.viewer.v1"
-                                        "application/vnd.open-company.board.author.v1")}
-          add-link (utils/link-for (:links board-data) "add" "POST" content-type)]
-      (storage-http (method-for-link add-link) (relative-href add-link)
-        {:headers (headers-for-link add-link)
-         :body user-id}
-        (fn [{:keys [status success body]}]
-          (get-board (dispatcher/board-data)))))))
-
 (defn password-reset
   [email cb]
   (when email
@@ -681,18 +663,6 @@
     (storage-http (method-for-link more-link) (relative-href more-link)
       {:headers (headers-for-link more-link)}
       callback)))
-
-(defn autosave-draft [story-data share-data]
-  (when story-data
-    (let [autosave-link (utils/link-for (:links story-data) "partial-update")
-          fixed-story-data (select-keys
-                            story-data
-                            [:title :body :board-slug :banner-url :banner-width :banner-height])]
-      (storage-http (method-for-link autosave-link) (relative-href autosave-link)
-        {:headers (headers-for-link autosave-link)
-         :json-params (cljs->json fixed-story-data)}
-        (fn [{:keys [success status body]}]
-          (dispatcher/dispatch! [:draft-autosave/finish share-data]))))))
 
 (defn get-activity [activity-uuid activity-link callback]
   (when activity-link

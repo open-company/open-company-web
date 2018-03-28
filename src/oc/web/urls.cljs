@@ -68,8 +68,6 @@
 
 ;; Organizations
 
-(def create-org "/create-org")
-
 (defn org
   "Org url"
   ([]
@@ -106,12 +104,6 @@
     (str (org-settings org-slug) "/invite")))
 
 ;; Boards
-
-(defn boards
-  ([]
-    (boards (router/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/boards")))
 
 (defn board
   "Board url"

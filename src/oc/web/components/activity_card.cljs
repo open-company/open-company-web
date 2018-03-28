@@ -16,7 +16,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.interactions-summary :refer (comments-summary)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -79,7 +79,7 @@
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
-          (when (not nux)
+          (when-not nux
             (more-menu activity-data))
           ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
           ;;(when is-new [:div.new-tag "New"])

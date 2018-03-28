@@ -7,16 +7,16 @@
     ;; NB: Do not upgrade boot-cljs-test to 0.3.1 since it breaks travis CI.
     ;; More info https://travis-ci.org/open-company/open-company-web/builds/239524353
     [crisptrutski/boot-cljs-test "0.3.4" :scope "test"]
-    [tolitius/boot-check "0.1.6" :scope "test"]
+    [tolitius/boot-check "0.1.9" :scope "test"]
 
     ;; Clojure/ClojureScript
     ;; NB: Need to change Clojure version in boot.properties in sync with this
     ;; NB: Can't go past Clojure Alpha 19 to Alpha 20 due to ##NaN issues w/ doo library
     ;;     discussed here: https://groups.google.com/forum/#!msg/clojure/IB2CaORBMnM/NjN24lQLDQAJ
     ;;     These are apparently fixed with ClojureScript 1.9.946+
-    [org.clojure/clojure "1.9.0-alpha19"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.10.0-alpha4"] ; Lisp on the JVM http://clojure.org/documentation
     ;; NB: Can't go past ClojureScript 1.9.908 right now due to issues w/ React
-    [org.clojure/clojurescript "1.9.908"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojurescript "1.10.238"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes access
@@ -29,10 +29,10 @@
     
     ;; ClojureScript libraries
     [cljs-http "0.1.44"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [secretary "2.0.0.1-41b949"] ; Client-side router https://github.com/gf3/secretary
+    [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
-    [com.cognitect/transit-cljs "0.8.243"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
-    [funcool/cuerdas "2.0.4"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [com.cognitect/transit-cljs "0.8.248"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
+    [funcool/cuerdas "2.0.5"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
     [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
@@ -41,11 +41,10 @@
     ;; Update together with resources/public/lib/jwt_decode/
     [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     ;; -----------------------------------------------------
-    [cljsjs/raven "3.22.1-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
+    [cljsjs/raven "3.23.3-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/raven
     [cljsjs/medium-editor "5.23.2-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.6.1-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
-    [cljsjs/emojione-picker "0.3.6-2"] ; EmojionePicker cljsjs package https://github.com/tommoor/emojione-picker
     [cljsjs/web-animations "2.1.4-0"] ; JavaScript implementation of the Web Animations API https://github.com/web-animations/web-animations-js
     [cljsjs/moment-timezone "0.5.11-1"] ; Timezone support for moment.js https://github.com/moment/moment-timezone/
     [cljsjs/filestack "0.9.9-0"] ; Filestack image manipulatino and storing https://github.com/filestack/filestack-js
@@ -53,7 +52,7 @@
     [cljsjs/localforage "1.5.3-0"] ; Offline storage, improved. Wraps IndexedDB, WebSQL, or localStorage using a simple but powerful API. https://github.com/localForage/localForage
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.14.8" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]] 
+    [open-company/lib "0.16.3" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
@@ -83,7 +82,7 @@
     [compojure "1.6.0" :scope "test"]
     [pandeiro/boot-http "0.8.3" :scope "test"]
     [deraen/boot-sass "0.3.1" :scope "test"]
-    [org.slf4j/slf4j-nop "1.8.0-beta0" :scope "test"]])
+    [org.slf4j/slf4j-nop "1.8.0-beta2" :scope "test"]])
 
 (set-env!
   :source-paths   #{"src" "scss" "site"}
@@ -147,8 +146,7 @@
   (test-cljs :js-env :phantom
              :exit? true
              :update-fs? true
-             :namespaces ['test.oc.web.lib.utils
-                          'test.oc.web.components.user-profile
+             :namespaces ['test.oc.web.components.user-profile
                           'test.oc.web.components.ui.loading
                           'test.oc.web.components.ui.login-button
                           'test.oc.web.components.ui.org-avatar
