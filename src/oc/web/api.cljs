@@ -14,7 +14,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.lib.raven :as sentry]
-            [oc.web.actions.error-banner :as error-banner-actions]
             [goog.Uri :as guri]))
 
 (def ^:private web-endpoint ls/web-server-domain)
@@ -45,6 +44,16 @@
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
+
+(declare jwt-refresh-handler)
+(declare jwt-refresh-error-hn)
+(declare network-error-handler)
+
+(defn config-request
+  [jwt-refresh-hn jwt-error-handler network-error-hn]
+  (def jwt-refresh-handler jwt-refresh-hn)
+  (def jwt-refresh-error-hn jwt-error-handler)
+  (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
   (if-let [jwt (j/jwt)]
@@ -128,13 +137,8 @@
     (timbre/debug jwt expired?)
     (go
       (when (and jwt expired?)
-        (if-let [refresh-url (j/get-key :refresh-url)]
-          (let [res (<! (refresh-jwt refresh-url))]
-            (timbre/debug "jwt-refresh" res)
-            (if (:success res)
-              (oc.web.actions.user/update-jwt (:body res))
-              (oc.web.actions.user/logout)))
-          (oc.web.actions.user/logout)))
+        (jwt-refresh #(jwt-refresh-handler (:body %))
+                     #(jwt-refresh-error-hn)))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
@@ -146,7 +150,7 @@
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
                   (and (>= status 500) (<= status 599)))
-          (error-banner-actions/show-banner utils/generic-network-error 10000))
+          (network-error-handler))
         ; report all 5xx to sentry
         (when (or (and (>= status 500) (<= status 599))
                   (= status 400)
