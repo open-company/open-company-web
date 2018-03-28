@@ -1,48 +1,17 @@
 (ns oc.web.lib.responsive
-  (:require [dommy.core :refer-macros (sel1)]
-            [oc.web.lib.cookies :as cook]
+  (:require [oc.web.lib.cookies :as cook]
             [goog.object :as gobj]
             [goog.userAgent :as userAgent]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
 (def big-web-min-width 768)
-; 2 columns 302 * 2 = 604 diff: 80 |30|col1|20|col2|30|
-; 1 column 420 diff: 263: |131|420|131|
-
-(def mobile-2-columns-breakpoint 320)
-;; 3 Columns
-(def c3-min-win-width 1024)
-(def c1-min-win-width 414)
 
 (defn ww []
   (when (and js/document
              (.-body js/document)
              (.-clientWidth (.-body js/document)))
     (.-clientWidth (.-body js/document))))
-
-(defn window-exceeds-breakpoint []
-  (> (ww) mobile-2-columns-breakpoint))
-
-(defn dashboard-columns-num []
-  (let [win-width (ww)]
-    (cond
-      ; (>= win-width c3-min-win-width)
-      ; 3
-      (>= win-width mobile-2-columns-breakpoint)
-      2
-      :else
-      1)))
-
-(defn columns-num []
-  (let [win-width (ww)]
-    (cond
-      ; (>= win-width c3-min-win-width)
-      ; 3
-      (>= win-width big-web-min-width)
-      2
-      :else
-      1)))
 
 (def _mobile (atom -1))
 
@@ -65,23 +34,6 @@
  (set-browser-type!))
  @_mobile)
 
-(defn mobile-dashboard-card-width [& [force-columns]]
-  (let [columns (or force-columns (dashboard-columns-num))
-        win-width (ww)]
-    (cond
-      (= columns 2)
-      (/ (- win-width 8 8 8) 2)
-      (= columns 1)
-      (- win-width 8 8))))
-
-(defn user-agent-mobile? []
-  userAgent/MOBILE)
-
-(defn is-mobile?
-  "Check if it's mobile based on UserAgent or screen size."
-  []
-  (or (is-mobile-size?) (user-agent-mobile?)))
-
 (def left-navigation-sidebar-minimum-right-margin 16)
 (def left-navigation-sidebar-width 200)
 (def dashboard-container-width 944)
@@ -93,12 +45,6 @@
     (or (= (gobj/get js/WURFL "form_factor") "Tablet")
         (= (gobj/get js/WURFL "form_factor") "Smartphone")
         (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
-
-(def card-width 432)
-
-(defn can-edit? []
-  "Check if it's mobile based only on the UserAgent"
-  (not (user-agent-mobile?)))
 
 (when-not (.-_phantom js/window)
   (events/listen js/window EventType/RESIZE set-browser-type!))

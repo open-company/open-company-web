@@ -5,7 +5,6 @@
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
-            [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
@@ -43,7 +42,6 @@
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
             ; [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
@@ -73,7 +71,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root #(loading) target)))
+    (drv-root loading target)))
 
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
@@ -460,13 +458,6 @@
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
       (secure-activity-handler secure-activity "secure-activity" target params))
 
-    (defroute boards-list-route (urls/boards ":org") {:as params}
-      (timbre/info "Routing boards-list-route" (urls/boards ":org"))
-      (swap! dis/app-state assoc :loading true)
-      (if (responsive/is-mobile-size?)
-        (simple-handler mobile-boards-list "boards-list" target params)
-        (org-handler "boards-list" target [:div] params)))
-
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
       (board-handler "dashboard" target org-dashboard params))
@@ -535,7 +526,6 @@
                                  secure-activity-route
                                  secure-activity-slash-route
                                  ;; Boards
-                                 boards-list-route
                                  board-route
                                  board-slash-route
                                  ; Entry route

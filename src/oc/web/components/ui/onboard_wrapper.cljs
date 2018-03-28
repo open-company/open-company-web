@@ -152,7 +152,9 @@
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
                                     (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
-                                    (utils/after 100 #(user-actions/user-profile-save @(drv/get-ref s :current-user-data) @(drv/get-ref s :edit-user-profile)))
+                                    (utils/after 100
+                                     #(user-actions/user-profile-save @(drv/get-ref s :current-user-data)
+                                       @(drv/get-ref s :edit-user-profile)))
                                     s)
                                    :did-mount (fn [s]
                                     (delay-focus-field-with-ref s "first-name")

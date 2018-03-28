@@ -49,8 +49,7 @@
 
 (defn add-comment-content [add-comment-div]
   (let [inner-html (.-innerHTML add-comment-div)
-        with-emojis-html (utils/emoji-images-to-unicode (gobj/get (utils/emojify inner-html) "__html"))
-        replace-br (.replace with-emojis-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
+        replace-br (.replace inner-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
         cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "")
         cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "\n")
         final-node (.html (js/$ "<div/>") cleaned-text-1)

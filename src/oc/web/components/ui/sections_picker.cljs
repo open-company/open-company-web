@@ -55,7 +55,7 @@
                                s)}
   [s active-slug on-change]
   (let [section-editing (drv/react s :section-editing)
-        fixed-section-editing (when (not (string/blank? (:name section-editing)))
+        fixed-section-editing (when-not (string/blank? (:name section-editing))
                                 section-editing)
         all-sections (vals (drv/react s :editable-boards))
         team-sections (filterv #(= (:access %) "team") all-sections)

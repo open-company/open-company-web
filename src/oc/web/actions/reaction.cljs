@@ -82,4 +82,3 @@
               #(ws-interaction-reaction-add (:data %)))
   (subscriber :interaction-reaction/delete
               #(ws-interaction-reaction-delete (:data %))))
-  

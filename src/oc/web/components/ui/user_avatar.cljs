@@ -4,7 +4,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.stores.user :as store]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]))
 
 (rum/defcs user-avatar-image < rum/static

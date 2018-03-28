@@ -105,12 +105,6 @@
 
 ;; Boards
 
-(defn boards
-  ([]
-    (boards (router/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/boards")))
-
 (defn board
   "Board url"
   ([]

@@ -226,7 +226,8 @@
 
 (defn entry-modal-save [activity-data board-slug section-editing]
   (timbre/debug section-editing)
-  (if (= (:board-slug activity-data) utils/default-section-slug)
+  (if (and (= (:board-slug activity-data) utils/default-section-slug)
+           section-editing)
     (let [fixed-entry-data (dissoc activity-data :board-slug :board-name)
           final-board-data (assoc section-editing :entries [fixed-entry-data])]
       (api/create-board final-board-data
