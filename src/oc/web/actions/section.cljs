@@ -8,7 +8,6 @@
             [oc.web.urls :as oc-urls]
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.actions.org :as oa]
             [oc.web.api :as api]))
 
 (defn is-currently-shown? [section]
@@ -87,6 +86,11 @@
       (router/nav! (oc-urls/org (router/current-org-slug)))
       (.reload (.-location js/window))))))
 
+(defn refresh-org-data []
+  (api/get-org (dispatcher/org-data)
+    (fn [status body success]
+      (dispatcher/dispatch! [:org-loaded (json->cljs body)]))))
+
 (defn section-save [section-data]
   (timbre/debug section-data)
   (if (empty? (:links section-data))
@@ -111,7 +115,7 @@
           [:section-editing :section-name-error]
           "Board name already exists or isn't allowed"])
         (do
-          (oa/get-org)
+          (refresh-org-data)
           (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])))))))
 
 (defn private-section-user-add
@@ -134,9 +138,19 @@
             redirect-url (if-let [next-board (first except-this-boards)]
                            (oc-urls/board (:slug next-board))
                            (oc-urls/org (router/current-org-slug)))]
-        (oa/get-org)
+        (refresh-org-data)
         (utils/after 0 #(router/nav! redirect-url))
         (dispatcher/dispatch! [:private-section-kick-out-self/finish success]))))))
+
+(defn ws-comment-add
+  [interaction-data]
+  (let [org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-uuid (:resource-uuid interaction-data)
+        entry-data (dispatcher/activity-data org-slug board-slug activity-uuid)]
+    (when-not entry-data
+      (let [board-data (dispatcher/board-data)]
+        (section-get (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))))
 
 (defn wc-subscribe
   [subscriber]
@@ -147,3 +161,8 @@
         ;; not an org data change
         (when (not= container-id (:uuid (dispatcher/org-data)))
           (section-change container-id (:change-at change-data)))))))
+
+(defn wi-subscribe
+  [subscriber]
+  (subscriber :interaction-comment/add
+              #(ws-comment-add (:data %))))
