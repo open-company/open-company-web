@@ -6,8 +6,8 @@
             [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :add-comment-focus
-  [db [_ focus?]]
-  (assoc db :add-comment-focus focus?))
+  [db [_ focus-uuid]]
+  (assoc db :add-comment-focus focus-uuid))
 
 (defmethod dispatcher/action :comment-add
   [db [_ activity-data comment-body]]
