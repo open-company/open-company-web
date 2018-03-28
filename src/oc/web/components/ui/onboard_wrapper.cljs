@@ -11,6 +11,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.stores.user :as user-store]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -304,7 +305,7 @@
                             (if (and (seq org-name)
                                      (> (count org-name) 2))
                               ;; Create org and show setup screen
-                              (dis/dispatch! [:org-create])
+                              (org-actions/org-create @(drv/get-ref s :org-editing))
                               (dis/dispatch! [:input [:org-editing :error] true]))))
              :aria-label "Done"}
            "Done"])]
@@ -364,7 +365,7 @@
                           (dis/dispatch! [:input [:org-editing :name] org-name])
                           (if (and (seq org-name)
                                    (> (count org-name) 2))
-                           (dis/dispatch! [:org-create])
+                           (org-actions/org-create @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true])))}
             "All set!"]]]]))
 

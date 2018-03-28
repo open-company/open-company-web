@@ -14,7 +14,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.lib.raven :as sentry]
-            [oc.web.actions.error-banner :as error-banner-actions]
             [goog.Uri :as guri]))
 
 (def ^:private web-endpoint ls/web-server-domain)
@@ -45,6 +44,16 @@
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))
+
+(declare jwt-refresh-handler)
+(declare jwt-refresh-error-hn)
+(declare network-error-handler)
+
+(defn config-request
+  [jwt-refresh-hn jwt-error-handler network-error-hn]
+  (def jwt-refresh-handler jwt-refresh-hn)
+  (def jwt-refresh-error-hn jwt-error-handler)
+  (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
   (if-let [jwt (j/jwt)]
@@ -128,13 +137,8 @@
     (timbre/debug jwt expired?)
     (go
       (when (and jwt expired?)
-        (if-let [refresh-url (j/get-key :refresh-url)]
-          (let [res (<! (refresh-jwt refresh-url))]
-            (timbre/debug "jwt-refresh" res)
-            (if (:success res)
-              (oc.web.actions.user/update-jwt (:body res))
-              (oc.web.actions.user/logout)))
-          (oc.web.actions.user/logout)))
+        (jwt-refresh #(jwt-refresh-handler (:body %))
+                     #(jwt-refresh-error-hn)))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
@@ -146,7 +150,7 @@
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
                   (and (>= status 500) (<= status 599)))
-          (error-banner-actions/show-banner utils/generic-network-error 10000))
+          (network-error-handler))
         ; report all 5xx to sentry
         (when (or (and (>= status 500) (<= status 599))
                   (= status 400)
@@ -217,12 +221,11 @@
    nil
    callback))
 
-(defn get-org [org-data]
+(defn get-org [org-data callback]
   (when-let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
     (storage-http (method-for-link org-link) (relative-href org-link)
       {:headers (headers-for-link org-link)}
-      (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:org (json->cljs body)])))))
+      callback)))
 
 (defn get-board [board-link]
   (when board-link
@@ -256,7 +259,7 @@
 
 (def org-keys [:name :logo-url :logo-width :logo-height])
 
-(defn patch-org [data]
+(defn patch-org [data callback]
   (when data
     (let [org-data (select-keys data org-keys)
           json-data (cljs->json org-data)
@@ -265,8 +268,7 @@
       (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
         {:json-params json-data
          :headers (headers-for-link org-patch-link)}
-        (fn [{:keys [success body status]}]
-          (dispatcher/dispatch! [:org (json->cljs body) true]))))))
+        callback))))
 
 (defn get-auth-settings
   ([] (get-auth-settings #()))
@@ -422,17 +424,15 @@
       (fn [{:keys [status body success]}]
         (cb status body success)))))
 
-(defn patch-team [team-id new-team-data org-data]
+(defn patch-team [team-id new-team-data org-data callback]
   (when-let* [team-data (dispatcher/team-data team-id)
               team-patch (utils/link-for (:links team-data) "partial-update")]
     (auth-http (method-for-link team-patch) (relative-href team-patch)
       {:headers (headers-for-link team-patch)
        :json-params (cljs->json new-team-data)}
-      (fn [{:keys [success body status]}]
-        (when success
-          (dispatcher/dispatch! [:org-redirect org-data]))))))
+      callback)))
 
-(defn create-org [org-name logo-url logo-width logo-height]
+(defn create-org [org-name logo-url logo-width logo-height callback]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
         org-data {:name org-name :team-id team-id}
@@ -445,19 +445,7 @@
       (storage-http (method-for-link create-org-link) (relative-href create-org-link)
         {:headers (headers-for-link create-org-link)
          :json-params (cljs->json with-logo)}
-        (fn [{:keys [success status body]}]
-          (when-let [org-data (when success (json->cljs body))]
-            (dispatcher/dispatch! [:org org-data])
-            (let [team-data (dispatcher/team-data team-id)]
-              (if (and (s/blank? (:name team-data))
-                       (utils/link-for (:links team-data) "partial-update"))
-                ; if the current team has no name and
-                ; the user has write permission on it
-                ; use the org name
-                ; for it and patch it back
-                (patch-team (:team-id org-data) {:name org-name} org-data)
-                ; if not redirect the user to the slug)
-                (dispatcher/dispatch! [:org-redirect org-data])))))))))
+        callback))))
 
 (defn create-board [board-data callback]
   (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")

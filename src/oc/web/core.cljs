@@ -8,6 +8,7 @@
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
+            [oc.web.stores.org]
             [oc.web.stores.team]
             [oc.web.stores.user]
             [oc.web.stores.search]
@@ -22,6 +23,7 @@
             [oc.web.actions.comment]
             [oc.web.actions.reaction]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -554,6 +556,13 @@
 (defn init []
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
+  ;; Setup API requests
+  (api/config-request
+   #(user-actions/update-jwt %) ;; success jwt refresh after expire
+   #(user-actions/logout) ;; failed to refresh jwt
+   ;; network error
+   #(error-banner-actions/show-banner utils/generic-network-error 10000))
+
   ;; Persist JWT in App State
   (user-actions/dispatch-jwt)
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
