@@ -882,7 +882,6 @@
           ;; ClojureScript generated JavaScript
           [:script {:src "/oc.js" :type "text/javascript"}]
           ;; Utilities
-          [:script {:type "text/javascript", :src "/lib/js-utils/svg-utils.js"}]
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]

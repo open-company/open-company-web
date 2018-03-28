@@ -8,8 +8,8 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.activity :as activity-actions]))
 
-(defn add-comment-focus [activity-data]
-  (dis/dispatch! [:add-comment-focus activity-data]))
+(defn add-comment-focus [activity-uuid]
+  (dis/dispatch! [:add-comment-focus activity-uuid]))
 
 (defn add-comment-blur []
   (dis/dispatch! [:add-comment-focus nil]))
