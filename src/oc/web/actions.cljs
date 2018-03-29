@@ -21,7 +21,6 @@
   (timbre/info "Full event: " (pr-str payload))
   db)
 
-
 (defn- org-change [db org-uuid change-at]
   (timbre/debug "Org change:" org-uuid "at:" change-at)
   (utils/after 1000 (fn [] (oa/get-org)))
@@ -47,19 +46,3 @@
   (if (fn? value-fn)
     (update-in db path value-fn)
     db))
-
-(defmethod dispatcher/action :container/status
-  [db [_ status-data]]
-  (timbre/debug "Change status received:" status-data)
-  (let [org-data (dispatcher/org-data db)
-        old-status-data (dispatcher/change-data db)
-        status-by-uuid (group-by :container-id status-data)
-        clean-status-data (zipmap (keys status-by-uuid) (->> status-by-uuid
-                                                          vals
-                                                          ; remove the sequence of 1 from group-by
-                                                          (map first)
-                                                          ; dup seen-at as nav-at
-                                                          (map #(assoc % :nav-at (:seen-at %)))))
-        new-status-data (merge old-status-data clean-status-data)]
-    (timbre/debug "Change status data:" new-status-data)
-    (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))

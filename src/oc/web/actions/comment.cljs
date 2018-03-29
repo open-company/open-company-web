@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn add-comment-focus [activity-uuid]
@@ -90,11 +91,10 @@
       (activity-actions/get-entry entry-data)))
   (dis/dispatch! [:ws-interaction/comment-add interaction-data]))
 
-;; Pass in the subscriber until we sort out the namespaces in actions.cljs
-(defn subscribe [subscriber]
-  (subscriber :interaction-comment/add
-              #(ws-comment-add (:data %)))
-  (subscriber :interaction-comment/update
-              #(ws-comment-update (:data %)))
-  (subscriber :interaction-comment/delete
-              #(ws-comment-delete (:data %))))
+(defn subscribe []
+  (ws-ic/subscribe :interaction-comment/add
+                   #(ws-comment-add (:data %)))
+  (ws-ic/subscribe :interaction-comment/update
+                   #(ws-comment-update (:data %)))
+  (ws-ic/subscribe :interaction-comment/delete
+                   #(ws-comment-delete (:data %))))
