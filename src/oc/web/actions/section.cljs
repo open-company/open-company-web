@@ -48,6 +48,8 @@
       ;; and update change-data to reflect that we are seeing this board
       (when-let [section-uuid (:uuid section)]
         (utils/after 10 #(section-seen section-uuid)))
+      ;; Reload a secondary board data
+      (load-other-sections (:boards (dispatcher/org-data)))
       ;; only watch the currently visible board.
       (when (jwt/jwt) ; only for logged in users
         (watch-single-section section)))

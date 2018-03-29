@@ -57,7 +57,7 @@
   (let [section-editing (drv/react s :section-editing)
         fixed-section-editing (when-not (string/blank? (:name section-editing))
                                 section-editing)
-        all-sections (vals (drv/react s :editable-boards))
+        all-sections (filterv #(not= (:slug fixed-section-editing) (:slug %)) (vals (drv/react s :editable-boards)))
         team-sections (filterv #(= (:access %) "team") all-sections)
         fixed-team-sections (if (= (:access fixed-section-editing) "team")
                               (vec (concat [fixed-section-editing] team-sections))
