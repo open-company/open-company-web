@@ -95,7 +95,6 @@
              :class (when is-all-posts "showing-posted-in")}]
           ; Body
           (let [body-without-preview (utils/body-without-preview (:body activity-data))
-                activity-url (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))
                 emojied-body (utils/emojify body-without-preview)]
             [:div.activity-card-body
               {:dangerouslySetInnerHTML emojied-body
