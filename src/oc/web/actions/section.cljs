@@ -83,7 +83,7 @@
 (defn section-delete [section-slug]
   (api/delete-board section-slug (fn [status success body]
     (if success
-      (router/nav! (oc-urls/org (router/current-org-slug)))
+      (router/redirect! (oc-urls/all-posts (router/current-org-slug)))
       (.reload (.-location js/window))))))
 
 (defn refresh-org-data []
