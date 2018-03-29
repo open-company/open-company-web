@@ -64,7 +64,7 @@
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))
+      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))
       (ws-cc/subscribe :container/change #(dis/dispatch! [:container/change (:data %)]))
       (ws-cc/subscribe :container/status #(dis/dispatch! [:container/status (:data %)]))))
 
