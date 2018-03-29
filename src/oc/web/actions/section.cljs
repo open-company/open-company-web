@@ -88,7 +88,7 @@
 
 (defn refresh-org-data []
   (api/get-org (dispatcher/org-data)
-    (fn [status body success]
+    (fn [{:keys [status body success]}]
       (dispatcher/dispatch! [:org-loaded (json->cljs body)]))))
 
 (defn section-save [section-data]
@@ -105,6 +105,7 @@
               "Section name already exists or isn't allowed"])
             (do
               (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
+              (utils/after 500 refresh-org-data)
               (ws-cc/container-watch [(:uuid section-data)])
               (dispatcher/dispatch! [:section-edit-save/finish section-data]))))))
     (api/patch-board section-data (fn [success body status]
