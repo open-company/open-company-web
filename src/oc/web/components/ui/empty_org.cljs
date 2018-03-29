@@ -10,9 +10,9 @@
     [:div.empty-org.group
       (if (:read-only org-data)
         [:div.empty-org-headline
-          (str "There aren't boards in " (:name org-data) " yet. ")]
+          (str "There aren't sections in " (:name org-data) " yet. ")]
         [:div.empty-org-headline
-          (str "You don’t have any boards yet. ")
+          (str "You don’t have any sections yet. ")
           [:button.mlb-reset
             {:on-click #(dis/dispatch! [:board-edit nil])}
             "Add one?"]])
