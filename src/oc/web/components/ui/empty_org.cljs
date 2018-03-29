@@ -14,6 +14,6 @@
         [:div.empty-org-headline
           (str "You don’t have any sections yet. ")
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:board-edit nil])}
+            {:on-click #(dis/dispatch! [:input [:show-section-add] true])}
             "Add one?"]])
       [:div.empty-org-image]]))
