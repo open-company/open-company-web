@@ -35,11 +35,11 @@
         [:button.mlb-reset.multi-picker-choice.choice-images
           {:on-click #(add-photo-cb %)}
           [:div.multi-picker-choice-icon]
-          "Images"]
+          "Image"]
         [:button.mlb-reset.multi-picker-choice.choice-media
           {:on-click #(add-video-cb %)}
           [:div.multi-picker-choice-icon]
-          "Media"]
+          "Video"]
         [:button.mlb-reset.multi-picker-choice.choice-attachment
           {:on-click #(add-attachment-cb %)}
           [:div.multi-picker-choice-icon]
