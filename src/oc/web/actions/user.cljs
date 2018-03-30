@@ -298,7 +298,7 @@
                     edit-user-profile
                     (dissoc edit-user-profile :password))
         new-email (:email edit-user-profile)
-        email-did-change (not= new-email (:email edit-user-profile))
+        email-did-change (not= new-email (:email current-user-data))
         with-email (if (and email-did-change
                             (utils/valid-email? new-email))
                      (assoc with-pswd :email new-email)
