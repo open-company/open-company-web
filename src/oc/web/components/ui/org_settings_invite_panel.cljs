@@ -228,15 +228,14 @@
               send-cta
               (str send-cta " " valid-users-count " Invite" (when needs-plural "s"))))]
         [:button.mlb-reset.mlb-link-black.cancel-btn
-          {:on-click #(if (has-dirty-data? s)
-                        (do
-                          (reset! (::rand s) (int (rand 10000)))
-                          (dis/dispatch!
-                           [:input
-                            [:invite-users]
-                            (vec
-                             (repeat
-                              default-row-num
-                              (assoc default-user-row :type @(::inviting-from s))))]))
-                        (dismiss-settings-cb))}
+          {:on-click #(do
+                       (reset! (::rand s) (int (rand 10000)))
+                       (dis/dispatch!
+                        [:input
+                         [:invite-users]
+                         (vec
+                          (repeat
+                           default-row-num
+                           (assoc default-user-row :type @(::inviting-from s))))])
+                       (dismiss-settings-cb))}
           "Cancel"]]]))
