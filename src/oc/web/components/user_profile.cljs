@@ -118,6 +118,14 @@
       :else
       (user-actions/user-profile-save current-user-data edit-user-profile))))
 
+(defn- setup-timezone [s]
+  (when (and (not (utils/is-test-env?))
+             (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile)))))
+    (dis/dispatch!
+      [:input
+       [:edit-user-profile :timezone]
+       (.. js/moment -tz guess)])))
+
 (rum/defcs user-profile < rum/reactive
                           ;; Derivatives
                           (drv/drv :orgs)
@@ -133,17 +141,13 @@
                           (rum/local false ::current-password-error)
                           {:will-mount (fn [s]
                             (dis/dispatch! [:user-profile-reset])
+                            (setup-timezone s)
                             s)
                            :after-render (fn [s]
                               (when-not (utils/is-test-env?)
                                 (doto (js/$ "[data-toggle=\"tooltip\"]")
                                   (.tooltip "fixTitle")
-                                  (.tooltip "hide"))
-                                (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
-                                  (dis/dispatch!
-                                    [:input
-                                     [:edit-user-profile :timezone]
-                                     (.. js/moment -tz guess)])))
+                                  (.tooltip "hide")))
                               s)
                            :did-remount (fn [old-state new-state]
                             (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
