@@ -47,11 +47,6 @@
     (when (zero? (count invite-users))
       (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))]))))
 
-(defn has-dirty-data? [s]
-  (let [invite-users-data @(drv/get-ref s :invite-data)
-        invite-users (:invite-users invite-users-data)]
-    (some #(seq (:user %)) invite-users)))
-
 (rum/defcs org-settings-invite-panel
   < rum/reactive
     (drv/drv :invite-data)
