@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.loading :refer (loading)]
@@ -81,9 +82,11 @@
     ;; Mixins
     no-scroll-mixin
 
-    {:before-render (fn [s]
-                      (team-actions/teams-get-if-needed)
-                      s)}
+    {:will-mount (fn [s]
+                   (let [org-data @(drv/get-ref s :org-data)]
+                     (org-actions/get-org org-data)
+                     (team-actions/force-team-refresh (:team-id org-data)))
+                   s)}
   [s]
   (let [settings-tab (drv/react s :org-settings)
         org-data (drv/react s :org-data)
