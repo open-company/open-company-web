@@ -194,7 +194,7 @@
                   {:type "text"
                    :tab-index 1
                    :on-change #(change! s :first-name (.. % -target -value))
-                   :value (:first-name current-user-data)}]]]
+                   :value (or (:first-name current-user-data) "")}]]]
             ; Current password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -206,7 +206,7 @@
                   {:type "password"
                    :tab-index 3
                    :on-change #(change! s :current-password (.. % -target -value))
-                   :value (:current-password current-user-data)}]]]
+                   :value (or (:current-password current-user-data) "")}]]]
             ; Email
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -218,7 +218,7 @@
                   {:type "text"
                    :tab-index 5
                    :on-change #(change! s :email (.. % -target -value))
-                   :value (:email current-user-data)}]]]
+                   :value (or (:email current-user-data) "")}]]]
             ;; Digest frequency
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -263,7 +263,7 @@
                   {:type "text"
                    :tab-index 2
                    :on-change #(change! s :last-name (.. % -target -value))
-                   :value (:last-name current-user-data)}]]]
+                   :value (or (:last-name current-user-data) "")}]]]
             ; New password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -275,14 +275,14 @@
                   {:type "password"
                    :tab-index 4
                    :on-change #(change! s :password (.. % -target -value))
-                   :value (:password current-user-data)}]]]
+                   :value (or (:password current-user-data) "")}]]]
             ;; Time zone
             [:div.user-profile-field-box
               [:div.user-profile-field-label
                 "Time Zone"]
               [:div.user-profile-field.timezone
                 [:select
-                  {:value (:timezone current-user-data)
+                  {:value (or (:timezone current-user-data) "")
                    :on-change #(change! s :timezone (.. % -target -value))}
                   ;; Promoted timezones
                   (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
