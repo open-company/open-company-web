@@ -39,6 +39,13 @@
           (dis/dispatch! [:team-loaded team-data])
           (enumerate-channels team-data))))))
 
+(defn force-team-refresh [team-id]
+  (when-let [team-data (dis/team-data team-id)]
+    (when-let [team-link (utils/link-for (:links team-data) "item")]
+      (team-get team-link))
+    (when-let [roster-link (utils/link-for (:links team-data) "roster")]
+      (roster-get roster-link))))
+
 (defn read-teams [teams]
   (doseq [team teams
           :let [team-link (utils/link-for (:links team) "item")
