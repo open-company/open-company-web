@@ -64,7 +64,8 @@
                               (get (:uuid activity-data))
                               :sorted-comments)
                           (:comments activity-data))
-        activity-attachments (:attachments activity-data)]
+        activity-attachments (:attachments activity-data)
+        comment-link (utils/link-for (:links activity-data) "comments")]
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
@@ -122,12 +123,14 @@
               (when-not (zero? (count comments-data))
                 (comments-summary activity-data false))])
           (when (and is-mobile?
+                     comment-link
                      @(::should-show-comments s))
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
               (rum/with-key (add-comment activity-data) (str "add-comment-mobile-" (:uuid activity-data)))
               (stream-comments activity-data comments-data)])]
-        (when-not is-mobile?
+        (when (and (not is-mobile?)
+                   comment-link)
           [:div.stream-body-right
             {:class (when expanded? "expanded")}
             [:div.stream-body-comments
