@@ -115,6 +115,8 @@
 
 (defmethod dispatcher/action :container/section-change
   [db [_ {container-uuid :container-id change-at :change-at user-id :user-id}]]
-  (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
-    (when (not= container-uuid (:uuid (dispatcher/org-data)))
-      (update-change-data db container-uuid :change-at change-at))))
+  (if (not= (jwt/user-id) user-id) ; no need to respond to our own events
+    (if (not= container-uuid (:uuid (dispatcher/org-data)))
+      (update-change-data db container-uuid :change-at change-at)
+      db)
+    db))
