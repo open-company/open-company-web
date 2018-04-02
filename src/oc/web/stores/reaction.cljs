@@ -229,7 +229,7 @@
   (swap! reactions-atom index-posts org (-> body :collection :items))
   db)
 
-(defmethod reducer :board
+(defmethod reducer :section
   [db [_ board-data]]
   (let [org (router/current-org-slug)
         fixed-board-data (utils/fix-board board-data)]
