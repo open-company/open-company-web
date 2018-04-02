@@ -52,10 +52,6 @@
         new? (and in-team?
                   (or (and change-at nav-at (> change-at nav-at))
                       (and change-at (not nav-at))))]
-    (timbre/debug "in-team? " in-team?)
-    (timbre/debug "change-at " change-at)
-    (timbre/debug "nav-at " nav-at)
-    (timbre/debug (and change-at nav-at (> change-at nav-at)))
     new?))
 
 (defn add-new-to-sections
@@ -63,8 +59,6 @@
   (let [section-data (:boards org-data)
         new-section-data (for [section section-data]
                            (assoc section :new (new? change-data section)))]
-    (timbre/debug change-data)
-    (timbre/debug new-section-data)
     (assoc org-data :boards new-section-data)))
 
 (defn fix-org-section-data
