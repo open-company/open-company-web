@@ -138,12 +138,7 @@
                               (when-not (utils/is-test-env?)
                                 (doto (js/$ "[data-toggle=\"tooltip\"]")
                                   (.tooltip "fixTitle")
-                                  (.tooltip "hide"))
-                                (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
-                                  (dis/dispatch!
-                                    [:input
-                                     [:edit-user-profile :timezone]
-                                     (.. js/moment -tz guess)])))
+                                  (.tooltip "hide")))
                               s)
                            :did-remount (fn [old-state new-state]
                             (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
@@ -194,7 +189,7 @@
                   {:type "text"
                    :tab-index 1
                    :on-change #(change! s :first-name (.. % -target -value))
-                   :value (or (:first-name current-user-data) "")}]]]
+                   :value (:first-name current-user-data)}]]]
             ; Current password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -206,7 +201,7 @@
                   {:type "password"
                    :tab-index 3
                    :on-change #(change! s :current-password (.. % -target -value))
-                   :value (or (:current-password current-user-data) "")}]]]
+                   :value (:current-password current-user-data)}]]]
             ; Email
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -218,7 +213,7 @@
                   {:type "text"
                    :tab-index 5
                    :on-change #(change! s :email (.. % -target -value))
-                   :value (or (:email current-user-data) "")}]]]
+                   :value (:email current-user-data)}]]]
             ;; Digest frequency
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -263,7 +258,7 @@
                   {:type "text"
                    :tab-index 2
                    :on-change #(change! s :last-name (.. % -target -value))
-                   :value (or (:last-name current-user-data) "")}]]]
+                   :value (:last-name current-user-data)}]]]
             ; New password
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -275,14 +270,14 @@
                   {:type "password"
                    :tab-index 4
                    :on-change #(change! s :password (.. % -target -value))
-                   :value (or (:password current-user-data) "")}]]]
+                   :value (:password current-user-data)}]]]
             ;; Time zone
             [:div.user-profile-field-box
               [:div.user-profile-field-label
                 "Time Zone"]
               [:div.user-profile-field.timezone
                 [:select
-                  {:value (or (:timezone current-user-data) "")
+                  {:value (:timezone current-user-data)
                    :on-change #(change! s :timezone (.. % -target -value))}
                   ;; Promoted timezones
                   (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
