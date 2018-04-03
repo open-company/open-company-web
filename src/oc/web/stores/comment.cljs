@@ -18,7 +18,7 @@
 
 (defn- is-emoji
   [body]
-  (let [plain-text (.text (js/$ body))
+  (let [plain-text (.text (js/$ (str "<div>" body "</div>")))
         is-emoji? (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")
         is-text-message? (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g")]
     (and ;; emojis can have up to 11 codepoints
@@ -44,12 +44,12 @@
         board-slug (router/current-board-slug)
         comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))
         comments-data (get-in db comments-key)
-        new-comments-data (sort-comments (conj comments-data
-                                          (parse-comment {:body comment-body
+        new-comment-data (parse-comment {:body comment-body
                                                           :created-at (utils/as-of-now)
                                                           :author {:name (jwt/get-key :name)
                                                                    :avatar-url (jwt/get-key :avatar-url)
-                                                                   :user-id (jwt/get-key :user-id)}})))]
+                                                                   :user-id (jwt/get-key :user-id)}})
+        new-comments-data (sort-comments (conj comments-data new-comment-data))]
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
