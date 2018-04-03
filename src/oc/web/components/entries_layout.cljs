@@ -13,6 +13,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.activity-card :refer (activity-card)]))
 
@@ -97,7 +98,7 @@
                                 (reset! (::board-uuid s) (:uuid board-data))))
                             s)
                            :will-unmount (fn [s]
-                            (dis/dispatch! [:board-nav-away {:board-uuid @(::board-uuid s)}])
+                            (section-actions/section-nav-away @(::board-uuid s))
                             s)}
   [s]
   [:div.entries-layout
