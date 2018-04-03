@@ -47,14 +47,13 @@
             (user-avatar-image (:author draft))
             [:div.name (:name (:author draft))]
             [:div.time-since
-              (let [t (:created-at draft)]
-                [:time
-                  {:date-time t
-                   :data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                   :title (utils/activity-date-tooltip draft)}
-                  (utils/time-since t)])]]]
+              [:time
+                {:date-time (:created-at draft)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :title (:time-tooltip draft)}
+                (:time-since draft)]]]]
         [:div.draft-card-content.group
           [:div.draft-card-title
             {:dangerouslySetInnerHTML
