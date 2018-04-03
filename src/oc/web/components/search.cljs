@@ -35,7 +35,7 @@
            :data-toggle "tooltip"
            :data-placement "top"
            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-           :title (utils/activity-date-tooltip result)}
+           :data-title (utils/activity-date-tooltip result)}
           (utils/time-since t)])]
       ]]))
 
