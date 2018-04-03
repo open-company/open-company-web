@@ -78,8 +78,7 @@
       (ca/subscribe ws-ic/subscribe)
       (sa/wi-subscribe ws-ic/subscribe)))
   
-  (dis/dispatch! [:org-loaded org-data saved?])
-  (dis/dispatch! [:org-edit-setup org-data]))
+  (dis/dispatch! [:org-loaded org-data saved?]))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
