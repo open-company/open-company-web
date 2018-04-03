@@ -321,9 +321,10 @@
                       [:li
                         {:on-click #(change! s :digest-medium "email")}
                         "Email"]
-                      [:li
-                        {:on-click #(change! s :digest-medium "slack")}
-                        "Slack"]]]]])]]]
+                      (when (some jwt/team-has-bot? (jwt/get-key :teams))
+                        [:li
+                          {:on-click #(change! s :digest-medium "slack")}
+                          "Slack"])]]]])]]]
             ;; Eventually we want them to be able specify day and time of digest, but not yet
             ; [:div.user-profile-field.digest-frequency-field.digest-day
             ;   [:select
