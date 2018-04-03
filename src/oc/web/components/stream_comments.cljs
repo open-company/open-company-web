@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.comment :as cu]
             [oc.web.actions.comment :as comment-actions]))
 
 (defn scroll-to-bottom [s]
