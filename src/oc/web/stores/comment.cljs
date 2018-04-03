@@ -44,11 +44,12 @@
         board-slug (router/current-board-slug)
         comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))
         comments-data (get-in db comments-key)
-        new-comments-data (conj comments-data (parse-comment {:body comment-body
-                                                             :created-at (utils/as-of-now)
-                                                              :author {:name (jwt/get-key :name)
-                                                                       :avatar-url (jwt/get-key :avatar-url)
-                                                                       :user-id (jwt/get-key :user-id)}}))]
+        new-comments-data (sort-comments (conj comments-data
+                                          (parse-comment {:body comment-body
+                                                          :created-at (utils/as-of-now)
+                                                          :author {:name (jwt/get-key :name)
+                                                                   :avatar-url (jwt/get-key :avatar-url)
+                                                                   :user-id (jwt/get-key :user-id)}})))]
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
