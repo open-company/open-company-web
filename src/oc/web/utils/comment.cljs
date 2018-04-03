@@ -2,27 +2,8 @@
   (:require [cljsjs.medium-editor]
             [goog.object :as gobj]
             [cuerdas.core :as string]
-            [defun.core :refer (defun)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]))
-
-(defn is-emoji
-  [body]
-  (let [plain-text (.text (js/$ body))
-        is-emoji? (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")
-        is-text-message? (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g")]
-    (and ;; emojis can have up to 11 codepoints
-         (<= (count plain-text) 11)
-         (.match plain-text is-emoji?)
-         (not (.match plain-text is-text-message?)))))
-
-(defun sort-comments
-  ([comments :guard nil?]
-   [])
-  ([comments :guard map?]
-   (sort-comments (vals comments)))
-  ([comments :guard sequential?]
-   (vec (reverse (sort-by :created-at comments)))))
 
 (defn setup-medium-editor [comment-node]
   (let [config {:toolbar false

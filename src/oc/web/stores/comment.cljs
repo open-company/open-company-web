@@ -1,9 +1,38 @@
 (ns oc.web.stores.comment
   (:require [taoensso.timbre :as timbre]
+            [defun.core :refer (defun-)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dispatcher]))
+
+
+(defun- sort-comments
+  ([comments :guard nil?]
+   [])
+  ([comments :guard map?]
+   (sort-comments (vals comments)))
+  ([comments :guard sequential?]
+   (vec (reverse (sort-by :created-at comments)))))
+
+
+(defn- is-emoji
+  [body]
+  (let [plain-text (.text (js/$ body))
+        is-emoji? (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")
+        is-text-message? (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g")]
+    (and ;; emojis can have up to 11 codepoints
+         (<= (count plain-text) 11)
+         (.match plain-text is-emoji?)
+         (not (.match plain-text is-text-message?)))))
+
+(defun- parse-comment
+  ([comments :guard sequential?]
+    (map parse-comment comments))
+  ([comment-map :guard nil?]
+    {})
+  ([comment-map :guard map?]
+    (assoc comment-map :is-emoji (is-emoji (:body comment-map)))))
 
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]
@@ -15,11 +44,11 @@
         board-slug (router/current-board-slug)
         comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid activity-data))
         comments-data (get-in db comments-key)
-        new-comments-data (conj comments-data {:body comment-body
-                                               :created-at (utils/as-of-now)
-                                               :author {:name (jwt/get-key :name)
-                                                        :avatar-url (jwt/get-key :avatar-url)
-                                                        :user-id (jwt/get-key :user-id)}})]
+        new-comments-data (conj comments-data (parse-comment {:body comment-body
+                                                             :created-at (utils/as-of-now)
+                                                              :author {:name (jwt/get-key :name)
+                                                                       :avatar-url (jwt/get-key :avatar-url)
+                                                                       :user-id (jwt/get-key :user-id)}}))]
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
@@ -39,7 +68,8 @@
   (let [comments-key (dispatcher/activity-comments-key
                       (router/current-org-slug)
                       (router/current-board-slug) activity-uuid)
-        sorted-comments (vec (sort-by :created-at (:items (:collection body))))
+        cleaned-comments (map parse-comment (:items (:collection body)))
+        sorted-comments (sort-comments cleaned-comments)
         pre-comments-key (vec (butlast comments-key))]
     (-> db
       (assoc-in comments-key sorted-comments)
@@ -124,7 +154,7 @@
                 new-comment-data (if (contains? update-comment-data :reactions)
                                    update-comment-data
                                    (assoc update-comment-data :reactions (:reactions old-comment-data)))
-                new-comments-data (assoc comments-data comment-idx new-comment-data)]
+                new-comments-data (assoc comments-data comment-idx (parse-comment new-comment-data))]
             (assoc-in db comments-key new-comments-data))
           db))
       db)))
@@ -157,13 +187,13 @@
     (if entry-data
       ; If the entry is present in the local state
       (let [; get the comment data from the ws message
-            comment-data (:interaction interaction-data)
+            comment-data (parse-comment (:interaction interaction-data))
             created-at (:created-at comment-data)
             all-old-comments-data (dispatcher/activity-comments-data activity-uuid)
             old-comments-data (filterv :links all-old-comments-data)
             ; Add the new comment to the comments list, make sure it's not present already
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-            sorted-comments-data (vec (sort-by :created-at new-comments-data))
+            sorted-comments-data (sort-comments new-comments-data)
             comments-key (dispatcher/activity-comments-key org-slug board-slug activity-uuid)
             ; update the comments link of the entry
             comments-link-idx (utils/index-of

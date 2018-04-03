@@ -27,46 +27,44 @@
                                       (scroll-to-bottom s))))
                                s)}
   [s activity-data comments-data]
-  (let [sorted-comments (cu/sort-comments comments-data)]
-    [:div.stream-comments
-      {:class (utils/class-set {:bottom-gradient @(::bottom-gradient s)})}
-      [:div.stream-comments-inner
-        {:ref "stream-comments-inner"}
-        (when (pos? (count comments-data))
-          [:div.stream-comments-title
-            (str (count comments-data) " Comment" (when (> (count comments-data) 1) "s"))])
-        (if (pos? (count comments-data))
-          (for [comment-data sorted-comments
-                :let [is-emoji-comment? (cu/is-emoji (:body comment-data))]]
-            [:div.stream-comment
-              {:key (str "stream-comment-" (:created-at comment-data))}
-              [:div.stream-comment-header.group
-                [:div.stream-comment-author-avatar
-                  {:style {:background-image (str "url(" (:avatar-url (:author comment-data)) ")")}}]
-                [:div.stream-comment-author-right
-                  [:div.stream-comment-author-name
-                    (:name (:author comment-data))]
-                  [:div.stream-comment-author-timestamp
-                    (utils/time-since (:created-at comment-data))]]]
-              [:div.stream-comment-content
-                [:div.stream-comment-body
-                  {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
-                   :class (utils/class-set {:emoji-comment is-emoji-comment?})}]]
-              (when-not is-emoji-comment?
-                [:div.stream-comment-footer.group
-                  (let [reaction-data (first (:reactions comment-data))
-                        can-react? (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"])]
-                    (when (or can-react?
-                              (pos? (:count reaction-data)))
-                      [:div.stream-comment-reaction
-                        {:class (utils/class-set {:reacted (:reacted reaction-data)
-                                                  :can-react can-react?})}
-                          (when (or (pos? (:count reaction-data))
-                                    can-react?)
-                            [:div.stream-comment-reaction-icon
-                              {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
-                                reaction-data (not (:reacted reaction-data)))}])
-                          (when (pos? (:count reaction-data))
-                            [:div.stream-comment-reaction-count
-                              (:count reaction-data)])]))])])
-          [:div.stream-comments-empty])]]))
+  [:div.stream-comments
+    {:class (utils/class-set {:bottom-gradient @(::bottom-gradient s)})}
+    [:div.stream-comments-inner
+      {:ref "stream-comments-inner"}
+      (when (pos? (count comments-data))
+        [:div.stream-comments-title
+          (str (count comments-data) " Comment" (when (> (count comments-data) 1) "s"))])
+      (if (pos? (count comments-data))
+        (for [comment-data comments-data]
+          [:div.stream-comment
+            {:key (str "stream-comment-" (:created-at comment-data))}
+            [:div.stream-comment-header.group
+              [:div.stream-comment-author-avatar
+                {:style {:background-image (str "url(" (:avatar-url (:author comment-data)) ")")}}]
+              [:div.stream-comment-author-right
+                [:div.stream-comment-author-name
+                  (:name (:author comment-data))]
+                [:div.stream-comment-author-timestamp
+                  (utils/time-since (:created-at comment-data))]]]
+            [:div.stream-comment-content
+              [:div.stream-comment-body
+                {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
+                 :class (utils/class-set {:emoji-comment (:is-emoji comment-data)})}]]
+            (when-not (:is-emoji comment-data)
+              [:div.stream-comment-footer.group
+                (let [reaction-data (first (:reactions comment-data))
+                      can-react? (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"])]
+                  (when (or can-react?
+                            (pos? (:count reaction-data)))
+                    [:div.stream-comment-reaction
+                      {:class (utils/class-set {:reacted (:reacted reaction-data)
+                                                :can-react can-react?})}
+                        (when (or (pos? (:count reaction-data))
+                                  can-react?)
+                          [:div.stream-comment-reaction-icon
+                            {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
+                              reaction-data (not (:reacted reaction-data)))}])
+                        (when (pos? (:count reaction-data))
+                          [:div.stream-comment-reaction-count
+                            (:count reaction-data)])]))])])
+        [:div.stream-comments-empty])]])
