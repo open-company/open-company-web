@@ -30,10 +30,11 @@
 (defmethod dispatcher/action :container/change
   [db [_ {container-uuid :container-id change-at :change-at user-id :user-id}]]
   (timbre/debug "Container change:" container-uuid "at:" change-at "by:" user-id)
-  (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
-    (when (= container-uuid (:uuid (dispatcher/org-data)))
-      (org-change db container-uuid change-at))))
-
+  (if (not= (jwt/user-id) user-id) ; no need to respond to our own events
+    (if (= container-uuid (:uuid (dispatcher/org-data)))
+      (org-change db container-uuid change-at)
+      db)
+    db))
 
 ;; This should be turned into a proper form library
 ;; Lomakeets FormState ideas seem like a good start:
