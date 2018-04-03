@@ -7,6 +7,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.section :as section-actions]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
@@ -237,7 +238,7 @@
                         {:on-click #(do
                                       (reset! query "")
                                       (reset! (::show-search-results s) false)
-                                      (dis/dispatch! [:private-section-user-add user user-type]))
+                                      (section-actions/private-section-user-add user user-type))
                          :ref (str "add-user-" (:user-id user))}
                         (user-avatar-image user)
                         [:div.name
@@ -270,8 +271,8 @@
                                 :on-change (fn [item]
                                  (reset! (::show-edit-user-dropdown s) nil)
                                  (if (= (:value item) :remove)
-                                   (dis/dispatch! [:private-section-user-remove team-user])
-                                   (dis/dispatch! [:private-section-user-add team-user (:value item)])))})])
+                                   (section-actions/private-section-user-remove team-user)
+                                   (section-actions/private-section-user-add team-user (:value item))))})])
             [:div.section-editor-add-private-users-list.group
               {:on-scroll #(do
                             (reset! (::show-edit-user-dropdown s) nil)
@@ -322,7 +323,7 @@
                                 :link-button-cb #(alert-modal/hide-alert)
                                 :solid-button-title "Yes"
                                 :solid-button-cb (fn []
-                                 (dis/dispatch! [:private-section-kick-out-self self-data])
+                                 (section-actions/private-section-kick-out-self self-data)
                                  (alert-modal/hide-alert))})))}
                           "Leave section"]
                         [:div.user-type.no-dropdown
@@ -353,7 +354,8 @@
                             :solid-button-style :red
                             :solid-button-title "Yes, I'm sure"
                             :solid-button-cb (fn []
-                                               (dis/dispatch! [:board-delete (:slug section-data)])
+                                               (section-actions/section-delete
+                                                 (:slug section-data))
                                                (alert-modal/hide-alert)
                                                (dismiss))}))}
               "Delete section"])
