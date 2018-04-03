@@ -175,49 +175,6 @@
         blue (take 2 (drop 4 colors))]
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
 
-(defn fix-entry
-  "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-body board-data]
-  (-> entry-body
-    (assoc :content-type "entry")
-    (assoc :read-only (readonly-entry? (:links entry-body)))
-    (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
-    (assoc :board-name (or (:board-name entry-body) (:name board-data)))))
-
-(defn fix-board
-  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
-  [board-data]
-  (let [links (:links board-data)
-        read-only (readonly-board? links)
-        with-read-only (assoc board-data :read-only read-only)
-        fixed-entries (zipmap
-                       (map :uuid (:entries board-data))
-                       (map #(fix-entry % board-data) (:entries board-data)))
-        without-entries (dissoc with-read-only :entries)
-        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
-    with-fixed-entries))
-
-(defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data))
-
-(defn fix-all-posts
-  "Fix org data coming from the API."
-  [all-posts-data]
-  (let [fixed-activities-list (map
-                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
-                               (:items all-posts-data))
-        without-items (dissoc all-posts-data :items)
-        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
-        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
-    with-fixed-activities))
-
-(defn fix-org
-  "Fix org data coming from the API."
-  [org-data]
-  (let [links (:links org-data)
-        read-only (readonly-org? links)]
-    (assoc org-data :read-only read-only)))
-
 (defn scroll-to-y [scroll-y & [duration]]
   (.play
     (new Scroll
@@ -487,7 +444,7 @@
 
 (defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
-        updated-at (js-date (:updated-at entry-data))
+        updated-at (js-date (:updated-at (last (:author entry-data))))
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)]
     (if (= (:created-at entry-data) (:updated-at entry-data))
@@ -621,3 +578,49 @@
 (defn retina-src [url]
   {:src (cdn (str url ".png"))
    :src-set (str (cdn (str url "@2x.png")) " 2x")})
+
+(defn fix-entry
+  "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
+  [entry-body board-data]
+  (let [creation-time (or (:published-at entry-body) (:created-at entry-body))]
+    (-> entry-body
+      (assoc :content-type "entry")
+      (assoc :read-only (readonly-entry? (:links entry-body)))
+      (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
+      (assoc :board-name (or (:board-name entry-body) (:name board-data)))
+      (assoc :time-since (time-since creation-time))
+      (assoc :time-tooltip (activity-date-tooltip entry-body)))))
+
+(defn fix-board
+  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
+  [board-data]
+  (let [links (:links board-data)
+        read-only (readonly-board? links)
+        with-read-only (assoc board-data :read-only read-only)
+        fixed-entries (zipmap
+                       (map :uuid (:entries board-data))
+                       (map #(fix-entry % board-data) (:entries board-data)))
+        without-entries (dissoc with-read-only :entries)
+        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
+    with-fixed-entries))
+
+(defn fix-activity [activity collection-data]
+  (fix-entry activity collection-data))
+
+(defn fix-all-posts
+  "Fix org data coming from the API."
+  [all-posts-data]
+  (let [fixed-activities-list (map
+                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
+                               (:items all-posts-data))
+        without-items (dissoc all-posts-data :items)
+        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
+        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
+    with-fixed-activities))
+
+(defn fix-org
+  "Fix org data coming from the API."
+  [org-data]
+  (let [links (:links org-data)
+        read-only (readonly-org? links)]
+    (assoc org-data :read-only read-only)))
