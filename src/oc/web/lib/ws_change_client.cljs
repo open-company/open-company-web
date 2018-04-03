@@ -9,7 +9,7 @@
             [goog.Uri :as guri]))
 
 (def current-org (atom nil))
-(def board-ids (atom []))
+(def container-ids (atom []))
 
 ;; Sente WebSocket atoms
 (def channelsk (atom nil))
@@ -26,11 +26,12 @@
 
 (defn container-watch
   ([]
-    (container-watch @board-ids))
+    (container-watch @container-ids))
 
   ([watch-ids]
     (when @chsk-send!
       (timbre/debug "Sending container/watch for:" watch-ids)
+      (swap! container-ids conj watch-ids)
       (@chsk-send! [:container/watch watch-ids] 1000))))
 
 (defn container-seen [container-id]
@@ -120,7 +121,7 @@
 
 (defn reconnect
   "Connect or reconnect the WebSocket connection to the change service"
-  [ws-link uid org-slug boards]
+  [ws-link uid org-slug containers]
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
@@ -138,7 +139,7 @@
           (timbre/info "Closing previous connection for:" @current-org)
           (stop-router!))
         (timbre/info "Attempting change service connection to:" ws-domain "for org:" org-slug)
-        (reset! board-ids boards)
+        (reset! container-ids containers)
         (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
                                                           {:type :auto
                                                            :host ws-domain
@@ -153,7 +154,7 @@
             (reset! ch-state state)
             (start-router!)))
 
-      ;; already connected, make sure we're watching all the current boards
+      ;; already connected, make sure we're watching all the current containers
       (do
-        (reset! board-ids boards)
+        (reset! container-ids containers)
         (container-watch)))))

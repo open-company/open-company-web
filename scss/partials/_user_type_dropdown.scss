@@ -2,8 +2,9 @@ div.dropdown{
   position: relative;
 
   button.user-type-btn {
-    margin-right: 10px;
     position: relative;
+    cursor: pointer;
+    padding-right: 25px;
 
     &:after {
       color: $oc_gray_7;
@@ -12,7 +13,7 @@ div.dropdown{
       content: "\F35D";
       position: absolute;
       top: -4px;
-      right: -15px;
+      right: 0px;
     }
   }
 

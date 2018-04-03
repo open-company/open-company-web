@@ -63,8 +63,7 @@
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (map :uuid (:boards org-data)))
-      (sa/wc-subscribe ws-cc/subscribe)
+      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))
       (ws-cc/subscribe :container/change #(dis/dispatch! [:container/change (:data %)]))
       (ws-cc/subscribe :container/status #(dis/dispatch! [:container/status (:data %)]))))
 
@@ -73,9 +72,9 @@
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
       (ws-ic/reconnect ws-link (jwt/get-key :user-id))
       (ra/subscribe ws-ic/subscribe)
-      (ca/subscribe ws-ic/subscribe)
-      (sa/wi-subscribe ws-ic/subscribe)))
-  (dis/dispatch! [:org-loaded org-data saved?]))
+      (ca/subscribe ws-ic/subscribe)))
+  (dis/dispatch! [:org-loaded org-data saved?])
+  (dis/dispatch! [:org-edit-setup org-data]))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]

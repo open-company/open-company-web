@@ -39,6 +39,13 @@
           (dis/dispatch! [:team-loaded team-data])
           (enumerate-channels team-data))))))
 
+(defn force-team-refresh [team-id]
+  (when-let [team-data (dis/team-data team-id)]
+    (when-let [team-link (utils/link-for (:links team-data) "item")]
+      (team-get team-link))
+    (when-let [roster-link (utils/link-for (:links team-data) "roster")]
+      (roster-get roster-link))))
+
 (defn read-teams [teams]
   (doseq [team teams
           :let [team-link (utils/link-for (:links team) "item")
@@ -224,7 +231,8 @@
 (defn invite-users [inviting-users]
   (let [org-data (dis/org-data)
         team-data (dis/team-data (:team-id org-data))
-        checked-users (for [user inviting-users]
+        filter-empty (filterv #(seq (:user %)) inviting-users)
+        checked-users (for [user filter-empty]
                         (let [valid? (valid-inviting-user? user)
                               intive-duplicated? (duplicated-email-addresses user inviting-users)
                               team-duplicated? (duplicated-team-user user (:users team-data))]
@@ -238,7 +246,7 @@
                             :else
                             (dissoc user :error))))
         cleaned-inviting-users (filterv #(not (:error %)) checked-users)]
-    (when (= (count cleaned-inviting-users) (count inviting-users))
+    (when (<= (count cleaned-inviting-users) (count filter-empty))
       (doseq [user cleaned-inviting-users]
         (invite-user org-data team-data user)))
     (dis/dispatch! [:invite-users (vec checked-users)])))
