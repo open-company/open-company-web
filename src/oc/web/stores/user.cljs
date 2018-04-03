@@ -42,16 +42,39 @@
   (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
     (assoc-in next-db dispatcher/auth-settings-key body)))
 
+(defn- with-fixed-avatar [user-data]
+  (if (empty? (:avatar-url user-data))
+    (merge user-data {:avatar-url (utils/cdn default-avatar-url true)})
+    user-data))
+
+(defn- fix-user-values [user-data]
+  (let [with-first-name (if (empty? (:first-name user-data))
+                          (merge user-data {:first-name ""})
+                          user-data)
+        with-last-name (if (empty? (:last-name with-first-name))
+                         (merge with-first-name {:last-name ""})
+                         with-first-name)
+        with-current-password (if (empty? (:current-password with-last-name))
+                               (merge with-last-name {:current-password ""})
+                               with-last-name)
+        with-new-password (if (empty? (:password with-current-password))
+                               (merge with-current-password {:password ""})
+                               with-current-password)
+        with-email (if (empty? (:email with-new-password))
+                     (merge with-new-password {:email ""})
+                     with-new-password)
+        with-timezone (if (empty? (:timezone with-email))
+                       (merge with-email {:timezone (or (.. js/moment -tz guess) "")})
+                       with-email)
+        with-user-avatar (with-fixed-avatar with-timezone)
+        with-has-changes (assoc with-user-avatar :has-changes false)]
+    with-has-changes))
+
 (defn update-user-data [db user-data]
-  (let [with-fixed-avatar (if (empty? (:avatar-url user-data))
-                            (assoc user-data :avatar-url (utils/cdn default-avatar-url true))
-                            user-data)
-        with-empty-password (assoc with-fixed-avatar :password "")
-        with-has-changes (assoc with-empty-password :has-changes false)]
-    (-> db
-        (assoc :current-user-data with-fixed-avatar)
-        (assoc :edit-user-profile with-has-changes)
-        (dissoc :edit-user-profile-failed))))
+  (-> db
+      (assoc :current-user-data (with-fixed-avatar user-data))
+      (assoc :edit-user-profile (fix-user-values user-data))
+      (dissoc :edit-user-profile-failed)))
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]
