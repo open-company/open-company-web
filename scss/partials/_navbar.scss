@@ -118,9 +118,9 @@ nav.oc-navbar {
             display: inline;
 
             &.close-bt {
-              @include image-2x("/img/ML/mobile_modal_close");
-              background-size: 14px 14px;
-              background-position: 5px 5px;
+              background-image: cdnUrl("/img/ML/black_close.svg");
+              background-size: 15px 15px;
+              background-position: center;
             }
           }
         }
