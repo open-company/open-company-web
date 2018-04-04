@@ -99,15 +99,19 @@
                   http/get)]
   (method refresh-url (complete-params headers))))
 
+(defn- sync-jwt-refresh
+  [success-cb error-cb]
+  (if-let [refresh-url (j/get-key :refresh-url)]
+    (let [res (<! (refresh-jwt refresh-url))]
+      (timbre/debug "jwt-refresh" res)
+      (if (:success res)
+        (success-cb (:body res))
+        (error-cb)))
+    (error-cb)))
+;; Async version of jwt-refresh
 (defn- jwt-refresh [success-cb error-cb]
   (go
-   (if-let [refresh-url (j/get-key :refresh-url)]
-     (let [res (<! (refresh-jwt refresh-url))]
-       (timbre/debug "jwt-refresh" res)
-       (if (:success res)
-         (success-cb (:body res))
-         (error-cb)))
-     (error-cb))))
+   (sync-jwt-refresh success-cb error-cb)))
 
 (defn- method-name [method]
   (cond
@@ -136,17 +140,10 @@
         expired? (j/expired?)]
     (timbre/debug jwt expired?)
     (go
-      ;; Async refresh the JWT token if needed
-      ;; Make sure this uses this same go cycle to avoid doing an async call and breaking
-      ;; the refresh flow
-      (when (and jwt expired?)
-        (if-let [refresh-url (j/get-key :refresh-url)]
-          (let [res (<! (refresh-jwt refresh-url))]
-            (timbre/debug "jwt-refresh" res)
-            (if (:success res)
-              (jwt-refresh-handler (:body res))
-              (jwt-refresh-error-hn)))
-          (jwt-refresh-error-hn)))
+     ;; sync refresh
+     (when (and jwt expired?)
+       (sync-jwt-refresh #(jwt-refresh-handler (:body %))
+                         #(jwt-refresh-error-hn)))
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
