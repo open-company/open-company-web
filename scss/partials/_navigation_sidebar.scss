@@ -301,7 +301,7 @@ div.left-navigation-sidebar {
         background-color: $oc_gray_8;
         height: 40px;
         width: 100%;
-        padding: 13px 24px;
+        padding: 13px 24px 13px 58px;
         margin-bottom: 0px;
       }
 
@@ -353,7 +353,7 @@ div.left-navigation-sidebar {
       }
 
       @include mobile() {
-        background-color: #F0EFEA;
+        display: none;
         float: right;
 
         &:hover {
