@@ -48,8 +48,6 @@
       ;; and update change-data to reflect that we are seeing this board
       (when-let [section-uuid (:uuid section)]
         (utils/after 10 #(section-seen section-uuid)))
-      ;; Reload a secondary board data
-      (load-other-sections (:boards (dispatcher/org-data)))
       ;; only watch the currently visible board.
       (when (jwt/jwt) ; only for logged in users
         (watch-single-section section)))
@@ -85,7 +83,8 @@
 (defn section-delete [section-slug]
   (api/delete-board section-slug (fn [status success body]
     (if success
-      (router/nav! (oc-urls/org (router/current-org-slug)))
+      (let [org-slug (router/current-org-slug)]
+        (dispatcher/dispatch! [:section-delete org-slug section-slug]))
       (.reload (.-location js/window))))))
 
 (defn refresh-org-data []
