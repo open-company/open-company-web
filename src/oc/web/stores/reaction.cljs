@@ -2,7 +2,6 @@
   (:require [taoensso.timbre :as timbre]
             [cljs-flux.dispatcher :as flux]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dispatcher]))
 
@@ -231,7 +230,7 @@
 
 (defmethod reducer :section
   [db [_ board-data]]
-  (let [org (router/current-org-slug)
+  (let [org (utils/section-org-slug board-data)
         fixed-board-data (utils/fix-board board-data (dispatcher/change-data db))]
     (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
   db)

@@ -224,7 +224,6 @@
     (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
 
 (defn entry-modal-save [activity-data board-slug section-editing]
-  (timbre/debug section-editing)
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
            section-editing)
     (let [fixed-entry-data (dissoc activity-data :board-slug :board-name)
@@ -300,10 +299,15 @@
   (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data]))
 
 (defn get-entry [entry-data]
-  (api/get-entry entry-data
-    (fn [{:keys [status success body]}]
-      (if success
-        (dis/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))
+  (let [is-all-posts (or (:from-all-posts @router/path)
+                         (= (router/current-board-slug) "all-posts"))
+        board-key (if is-all-posts
+                   (dis/all-posts-key (router/current-org-slug))
+                   (dis/board-data-key (router/current-org-slug) (router/current-board-slug)))]
+    (api/get-entry entry-data
+      (fn [{:keys [status success body]}]
+        (if success
+          (dis/dispatch! [:entry board-key (:uuid entry-data) (json->cljs body)]))))))
 
 (defn entry-clear-local-cache [item-uuid edit-key]
   (remove-cached-item item-uuid)
@@ -385,8 +389,12 @@
               (oc-urls/org org-slug))))))))
 
 (defn activity-delete [activity-data]
-  (api/delete-activity activity-data activity-delete-finish)
-  (dis/dispatch! [:activity-delete activity-data]))
+  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+        board-key (if is-all-posts
+                    (dis/all-posts-key (router/current-org-slug))
+                    (dis/board-data-key (router/current-org-slug) (router/current-board-slug)))]
+    (api/delete-activity activity-data activity-delete-finish)
+    (dis/dispatch! [:activity-delete board-key activity-data])))
 
 (defn activity-share-show [activity-data]
   (dis/dispatch! [:activity-share-show activity-data]))
@@ -404,17 +412,17 @@
   (api/share-activity activity-data share-data activity-share-cb)
   (dis/dispatch! [:activity-share share-data]))
 
-(defn activity-get-finish [status activity-data]
+(defn activity-get-finish [status activity-data secure-uuid]
   (when (= status 404)
     (router/redirect-404!))
-  (when (and (router/current-secure-activity-id)
+  (when (and secure-uuid
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
     (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-  (dis/dispatch! [:activity-get/finish status activity-data]))
+  (dis/dispatch! [:activity-get/finish status activity-data secure-uuid]))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
-  (activity-get-finish status (if success (json->cljs body) {})))
+  (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))

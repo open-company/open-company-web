@@ -1,6 +1,5 @@
 (ns oc.web.stores.activity
   (:require [taoensso.timbre :as timbre]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]))
@@ -69,12 +68,8 @@
         next-attachments (filterv #(not= (:file-url %) (:file-url attachment-data)) old-attachments)]
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
 
-(defmethod dispatcher/action :entry [db [_ {:keys [entry-uuid body]}]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        board-key (if is-all-posts
-                   (dispatcher/all-posts-key (router/current-org-slug))
-                   (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
-        board-data (get db board-key)
+(defmethod dispatcher/action :entry [db [_ board-key entry-uuid body]]
+  (let [board-data (get db board-key)
         new-entries (assoc (get board-data :fixed-items)
                      entry-uuid
                      (utils/fix-entry body board-data (dispatcher/change-data db)))
@@ -91,8 +86,8 @@
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ activity-data edit-key]]
-  (let [board-slug (:board-slug activity-data)
-        org-slug (router/current-org-slug)
+  (let [org-slug (utils/post-org-slug activity-data)
+        board-slug (:board-slug activity-data)
         board-key (if (= (:status activity-data) "published")
                    (dispatcher/current-board-key)
                    (dispatcher/board-data-key org-slug utils/default-drafts-board-slug))
@@ -121,9 +116,9 @@
 
 (defmethod dispatcher/action :entry-publish-with-board/finish
   [db [_ new-board-data]]
-  (let [org-slug (router/current-org-slug)
+  (let [org-slug (utils/section-org-slug new-board-data)
         board-slug (:slug new-board-data)
-        board-key (dispatcher/board-data-key org-slug (:slug new-board-data))
+        board-key (dispatcher/board-data-key org-slug board-slug)
         fixed-board-data (utils/fix-board new-board-data (dispatcher/change-data db))]
     (-> db
       (assoc-in board-key fixed-board-data)
@@ -136,7 +131,7 @@
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ edit-key activity-data]]
   (let [board-slug (:board-slug activity-data)
-        board-key (dispatcher/board-data-key (router/current-org-slug) board-slug)
+        board-key (dispatcher/board-data-key (utils/post-org-slug activity-data) board-slug)
         board-data (get-in db board-key)
         fixed-activity-data (utils/fix-entry activity-data board-data (dispatcher/change-data db))
         next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
@@ -152,12 +147,8 @@
     (update-in [:entry-editing] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
-  [db [_ activity-data]]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        board-key (if is-all-posts
-                   (dispatcher/all-posts-key (router/current-org-slug))
-                   (dispatcher/board-data-key (router/current-org-slug) (router/current-board-slug)))
-        board-data (get-in db board-key)
+  [db [_ board-key activity-data]]
+  (let [board-data (get-in db board-key)
         next-fixed-items (dissoc (:fixed-items board-data) (:uuid activity-data))
         next-board-data (assoc board-data :fixed-items next-fixed-items)]
     (assoc-in db board-key next-board-data)))
@@ -188,15 +179,15 @@
       {:error true})))
 
 (defmethod dispatcher/action :activity-get/finish
-  [db [_ status activity-data]]
+  [db [_ status activity-data secure-uuid]]
   (let [next-db (if (= status 404)
                   (dissoc db :latest-entry-point)
                   db)
         activity-uuid (:uuid activity-data)
-        org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        activity-key (if (router/current-secure-activity-id)
-                       (dispatcher/secure-activity-key org-slug (router/current-secure-activity-id))
+        org-slug (:org-slug activity-data)
+        board-slug (:board-slug activity-data)
+        activity-key (if secure-uuid
+                       (dispatcher/secure-activity-key org-slug secure-uuid)
                        (dispatcher/activity-key org-slug board-slug activity-uuid))
         fixed-activity-data (utils/fix-entry
                              activity-data

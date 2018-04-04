@@ -72,7 +72,6 @@
       (ws-ic/reconnect ws-link (jwt/get-key :user-id))))  
   (dis/dispatch! [:org-loaded org-data saved?]))
 
-
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
     (org-loaded org-data false)))

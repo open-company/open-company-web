@@ -24,7 +24,10 @@
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
   ;; Add the comment to the app-state to show it immediately
-  (dis/dispatch! [:comment-add activity-data comment-body])
+  (dis/dispatch! [:comment-add
+                  (router/current-org-slug)
+                  (router/current-board-slug)
+                  activity-data comment-body])
   (api/add-comment activity-data comment-body
     ;; Once the comment api request is finished refresh all the comments, no matter
     ;; if it worked or not
@@ -37,7 +40,10 @@
                                            :activity-data activity-data}]))))
 
 (defn get-comments [activity-data]
-  (dis/dispatch! [:comments-get activity-data])
+  (dis/dispatch! [:comments-get
+                  (router/current-org-slug)
+                  (router/current-board-slug)
+                  activity-data])
   (api/get-comments activity-data
    #(get-comments-finished activity-data %)))
 
@@ -56,7 +62,11 @@
       (get-comments activity-data))))
 
 (defn delete-comment [activity-data comment-data]
-  (dis/dispatch! [:comment-delete (:uuid activity-data) comment-data])
+  (dis/dispatch! [:comment-delete
+                  (router/current-org-slug)
+                  (router/current-board-slug)
+                  (:uuid activity-data)
+                  comment-data])
   (api/delete-comment (:uuid activity-data) comment-data
     (fn [{:keys [status success body]}]
       (api/get-comments activity-data
@@ -64,7 +74,13 @@
 
 (defn comment-reaction-toggle
   [activity-data comment-data reaction-data reacting?]
-  (dis/dispatch! [:comment-reaction-toggle])
+  (dis/dispatch! [:comment-reaction-toggle
+                  (router/current-org-slug)
+                  (router/current-board-slug)
+                  activity-data
+                  comment-data
+                  reaction-data
+                  reacting?])
   (api/toggle-reaction reaction-data reacting?
     (fn [{:keys [status success body]}]
       (get-comments activity-data))))
@@ -72,7 +88,12 @@
 (defn save-comment
   [activity-uuid comment-data new-body]
   (api/save-comment comment-data new-body)
-  (dis/dispatch! [:comment-save activity-uuid comment-data new-body]))
+  (dis/dispatch! [:comment-save
+                  (router/current-org-slug)
+                  (router/current-board-slug)
+                  activity-uuid
+                  comment-data
+                  new-body]))
 
 (defn ws-comment-update
   [interaction-data]
