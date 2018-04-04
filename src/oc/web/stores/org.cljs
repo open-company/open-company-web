@@ -6,7 +6,7 @@
   [db [_ org-data saved?]]  
   (-> db
     (assoc-in (dispatcher/org-data-key (:slug org-data)) (utils/fix-org org-data))
-    (assoc :org-editing (-> (:org-editing db)
+    (assoc :org-editing (-> org-data
                             (assoc :saved saved?)
                             (dissoc :has-changes)))))
 
