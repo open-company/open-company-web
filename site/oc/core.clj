@@ -70,7 +70,7 @@
     [:div.site-mobile-menu-container
       [:div.site-mobile-menu-item
         [:a
-          {:href "/"
+          {:href "/?no_redirect=1"
            :class (when (= active-page "index") "active")}
           "Home"]]
       [:div.site-mobile-menu-item
@@ -104,7 +104,7 @@
     [:nav.site-navbar
       [:div.site-navbar-container
         [:a.navbar-brand-left
-          {:href "/"}]
+          {:href "/?no_redirect=1"}]
         [:div.site-navbar-right.big-web-only
           [:a.login
             {:id "site-header-login-item"
@@ -138,7 +138,7 @@
                "$('nav.navbar-bottom div.column:not(.column-company)').removeClass('expanded');"
                "$('nav.navbar-bottom div.column.column-company').toggleClass('expanded');")}
             "COMPANY"]
-          [:div.column-item [:a {:href "/"} "Home"]]
+          [:div.column-item [:a {:href "/?no_redirect=1"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]

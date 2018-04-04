@@ -40,7 +40,7 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
-          [:div.column-item [:a {:href oc-urls/home} "Home"]]
+          [:div.column-item [:a {:href oc-urls/home-no-redirect} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
           [:div.column-item [:a {:href oc-urls/pricing} "Pricing"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
