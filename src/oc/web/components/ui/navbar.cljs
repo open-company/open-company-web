@@ -74,5 +74,4 @@
                 (login-button)))]]]
       (when (responsive/is-mobile-size?)
         ;; Render the menu here only on mobile so it can expand the navbar
-        (menu/menu))
-      ]))
+        (menu/menu))]))
