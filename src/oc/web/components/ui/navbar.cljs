@@ -50,7 +50,8 @@
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:on-click #(do
+              {:class (when mobile-navigation-sidebar "close-bt")
+               :on-click #(do
                             (menu/mobile-menu-close)
                             (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]
            (search-box)]

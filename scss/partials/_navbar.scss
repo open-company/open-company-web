@@ -116,6 +116,12 @@ nav.oc-navbar {
             background-size: 18px 14px;
             background-position: 3px 5px;
             display: inline;
+
+            &.close-bt {
+              @include image-2x("/img/ML/mobile_modal_close");
+              background-size: 14px 14px;
+              background-position: 5px 5px;
+            }
           }
         }
       }
