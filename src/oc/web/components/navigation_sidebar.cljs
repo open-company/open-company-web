@@ -129,11 +129,6 @@
       {:class (when mobile-navigation-sidebar "show-mobile-boards-menu")}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
-        [:div.left-navigation-sidebar-mobile-header.group
-          [:button.mlb-reset.close-mobile-menu
-            {:on-click #(close-navigation-sidebar)}]
-          [:div.mobile-header-title
-            "Digest navigation"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
