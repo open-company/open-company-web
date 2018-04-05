@@ -287,9 +287,11 @@
                               :targetCheckboxText "Open in new window"}
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
-                             :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop"]
-                             :cleanTags #js ["meta" "video" "audio" "img"]
-                             :unwrapTags (clj->js (remove nil? ["div" "span" "label" "font" "h1" (when-not show-subtitle "h2") "h3" "h4" "h5" "h6" "strong"]))}
+                             :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
+                             :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure"]
+                             :unwrapTags (clj->js (remove nil? ["div" "span" "label" "font" "h1"
+                                                   (when-not show-subtitle "h2") "h3" "h4" "h5"
+                                                   "h6" "strong" "section" "time" "em" "main"]))}
                  :placeholder #js {:text "What would you like to share?"
                                    :hideOnClick true}
                  :keyboardCommands #js {:commands #js [
