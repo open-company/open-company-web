@@ -317,7 +317,11 @@
                       [:li
                         {:on-click #(change! s :digest-medium "email")}
                         "Email"]
-                      (when (some jwt/team-has-bot? (jwt/get-key :teams))
+                      ;; Show Slack digest option if
+                      (when (and ;; at least one team has a Slack bot
+                                 (some jwt/team-has-bot? (jwt/get-key :teams))
+                                 ;; the user is also a Slack user
+                                 (seq (jwt/get-key :slack-id)))
                         [:li
                           {:on-click #(change! s :digest-medium "slack")}
                           "Slack"])]]]])]]]
