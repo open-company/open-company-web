@@ -288,8 +288,8 @@
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
                              :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop"]
-                             :cleanTags #js ["meta" "video" "audio"]
-                             :unwrapTags #js ["div" "span" "label" "font" "h1" "h3" "h4" "h5" "h6" "strong"]}
+                             :cleanTags #js ["meta" "video" "audio" "img"]
+                             :unwrapTags (clj->js (remove nil? ["div" "span" "label" "font" "h1" (when-not show-subtitle "h2") "h3" "h4" "h5" "h6" "strong"]))}
                  :placeholder #js {:text "What would you like to share?"
                                    :hideOnClick true}
                  :keyboardCommands #js {:commands #js [
@@ -320,9 +320,7 @@
                 "editableInput"
                 (fn [event editable]
                   (body-on-change s)))
-    (reset! (::editor s) body-editor)
-    ; (js/recursiveAttachPasteListener body-el #(body-on-change s))
-    ))
+    (reset! (::editor s) body-editor)))
 
 (defn toggle-menu-cb [s show?]
   (when-let [editable @(::editor s)]
