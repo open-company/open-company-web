@@ -484,7 +484,7 @@
 (defn send-invitation
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
-   Add the logo of the company if possible"
+   Add the company's logo and its size if possible."
   [complete-user-data invited-user invite-from user-type first-name last-name callback]
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
@@ -506,7 +506,9 @@
                                 :slack-org-id (:slack-org-id invited-user)})
                               (assoc json-params :email invited-user))
           with-company-name (merge with-invited-user {:org-name (:name org-data)
-                                                      :logo-url (:logo-url org-data)})]
+                                                      :logo-url (:logo-url org-data)
+                                                      :logo-width (:logo-width org-data)
+                                                      :logo-height (:logo-height org-data)})]
       (auth-http (method-for-link invitation-link) (relative-href invitation-link)
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
