@@ -190,3 +190,31 @@
       (update-in (butlast section-key) dissoc (last section-key))
       (assoc org-sections-key remaining-sections)
       (dissoc :section-editing))))
+
+(defmethod dispatcher/action :container/status
+  [db [_ status-data]]
+  (timbre/debug "Change status received:" status-data)
+  (let [org-data (dispatcher/org-data db)
+        old-status-data (dispatcher/change-data db)
+        status-by-uuid (group-by :container-id status-data)
+        clean-status-data (zipmap (keys status-by-uuid) (->> status-by-uuid
+                                                          vals
+                                                          ; remove the sequence of 1 from group-by
+                                                          (map first)
+                                                          ; dup seen-at as nav-at
+                                                          (map #(assoc % :nav-at (:seen-at %)))))
+        new-status-data (merge old-status-data clean-status-data)]
+    (timbre/debug "Change status data:" new-status-data)
+    (-> db
+      (fix-org-section-data org-data new-status-data)
+      (fix-sections org-data new-status-data)
+      (assoc-in (dispatcher/change-data-key (:slug org-data)) new-status-data))))
+
+;; Section store specific reducers
+(defmethod reducer :default [db payload]
+  ;; ignore state changes not specific to reactions
+  db)
+
+(defmethod reducer :org-loaded
+  [db [_ org-data saved?]]
+  (fix-org-section-data db org-data (dispatcher/change-data db)))
