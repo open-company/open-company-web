@@ -173,7 +173,7 @@
                           (let [entry-editing @(drv/get-ref s :entry-editing)
                                 initial-body (if (seq (:body entry-editing))
                                                (:body entry-editing)
-                                               utils/default-body)
+                                               "")
                                 initial-headline (utils/emojify
                                                    (if (seq (:headline entry-editing))
                                                      (:headline entry-editing)
