@@ -17,7 +17,7 @@
 
 ;; Org get
 
-(defn org-loaded [org-data ap-initial-at saved?]
+(defn org-loaded [org-data saved?]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
@@ -55,15 +55,13 @@
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation"))
            (not (utils/in? (:route @router/path) "secure-activity")))
-
-      (when (>= (count boards) 1)
-        ;; Redirect to the first board if at least one is present
-        (let [board-to (utils/get-default-board org-data)]
-          (utils/after 10
-            #(router/nav!
-               (if board-to
-                 (oc-urls/board (:slug org-data) (:slug board-to))
-                 (oc-urls/all-posts (:slug org-data)))))))))
+      ;; Redirect to the first board if at least one is present
+      (let [board-to (utils/get-default-board org-data)]
+        (utils/after 10
+          #(router/nav!
+             (if board-to
+               (oc-urls/board (:slug org-data) (:slug board-to))
+               (oc-urls/all-posts (:slug org-data))))))))
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
@@ -84,7 +82,7 @@
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (org-loaded org-data nil false)))
+    (org-loaded org-data false)))
 
 (defn get-org [& [org-data]]
   (let [fixed-org-data (or org-data (dis/org-data))]
@@ -110,7 +108,7 @@
 
 (defn org-create-cb [{:keys [success status body]}]
   (when-let [org-data (when success (json->cljs body))]
-    (org-loaded org-data nil false)
+    (org-loaded org-data false)
     (let [team-data (dis/team-data (:team-id org-data))]
       (if (and (empty? (:name team-data))
                (utils/link-for (:links team-data) "partial-update"))
@@ -132,7 +130,7 @@
   (dis/dispatch! [:org-edit-setup org-data]))
 
 (defn org-edit-save-cb [{:keys [success body status]}]
-  (org-loaded (json->cljs body) nil true))
+  (org-loaded (json->cljs body) true))
 
 (defn org-edit-save [org-data]
   (api/patch-org org-data org-edit-save-cb))

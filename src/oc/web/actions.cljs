@@ -36,7 +36,6 @@
       db)
     db))
 
-
 ;; This should be turned into a proper form library
 ;; Lomakeets FormState ideas seem like a good start:
 ;; https://github.com/metosin/lomakkeet/blob/master/src/cljs/lomakkeet/core.cljs
