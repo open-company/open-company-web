@@ -96,7 +96,7 @@
                 {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                   comment-body (cu/add-comment-content add-comment-div)]
                               (comment-actions/add-comment activity-data comment-body)
-                              (set! (.-innerHTML add-comment-div) "<p><br/></p>"))
+                              (set! (.-innerHTML add-comment-div) ""))
                  :disabled @(::add-button-disabled s)}
                 "Post"]]])]
        (when (and (not (js/isIE))

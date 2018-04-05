@@ -573,7 +573,7 @@
         _ (.detach $container)]
     cleaned-html))
 
-(defn your-boards-url []
+(defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
     (if-let [board-slug "all-posts"]
       ;; Repalce all-posts above with the following to go back to the last visited board

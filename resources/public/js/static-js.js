@@ -97,13 +97,13 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("section.keep-aligned").css({"display": "none"});
     // Remove login button from the site mobile menu
     $("button#site-mobile-menu-login").css({"display": "none"});
-    // Change Get started button to Your boards on site mobile menu
+    // Change Get started button to Your digest on site mobile menu
     var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
-    siteMobileMenuGetStarted.text( "Your Boards" );
-    siteMobileMenuGetStarted.addClass("your-boards");
-    // Top right corner became Your Boards
+    siteMobileMenuGetStarted.text( "Your digest" );
+    siteMobileMenuGetStarted.addClass("your-digest");
+    // Top right corner became Your digest
     var signupButton = $("#site-header-signup-item");
-    signupButton.addClass("your-boards");
+    signupButton.addClass("your-digest");
 
     var decoded_jwt = OCStaticGetDecodedJWT(jwt),
         your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
