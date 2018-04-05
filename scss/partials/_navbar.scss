@@ -116,6 +116,12 @@ nav.oc-navbar {
             background-size: 18px 14px;
             background-position: 3px 5px;
             display: inline;
+
+            &.close-bt {
+              background-image: cdnUrl("/img/ML/black_close.svg");
+              background-size: 15px 15px;
+              background-position: center;
+            }
           }
         }
       }
