@@ -11,7 +11,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.whats-new-modal :as whats-new-modal]
-            [oc.web.components.ui.section-editor :refer (section-editor)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -130,11 +129,6 @@
       {:class (when mobile-navigation-sidebar "show-mobile-boards-menu")}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
-        [:div.left-navigation-sidebar-mobile-header.group
-          [:button.mlb-reset.close-mobile-menu
-            {:on-click #(close-navigation-sidebar)}]
-          [:div.mobile-header-title
-            "Digest navigation"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group

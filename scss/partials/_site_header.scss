@@ -114,7 +114,7 @@ nav.site-navbar {
         }
       }
 
-      a.mobile-your-boards {
+      a.mobile-your-digest {
         margin-top: 6px;
 
         img.user-avatar {
@@ -138,7 +138,7 @@ nav.site-navbar {
         margin-top: 0px;
         opacity: 0.8;
 
-        &:not(.your-boards).slack-get-started {
+        &:not(.your-digest).slack-get-started {
           height: 42px;
           background-color: transparent;
           @include avenir_H();
@@ -170,7 +170,7 @@ nav.site-navbar {
           }
         }
 
-        &.your-boards {
+        &.your-digest {
           height: unset;
           border: none;
           border-radius: none;

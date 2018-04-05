@@ -118,6 +118,16 @@ div.stream-comments {
           &>*:last-child {
             margin-bottom: 0px;
           }
+
+          &.emoji-comment {
+            font-size: 50px;
+            height: 50px;
+
+            // & > * {
+            //   line-height: 20px;
+            //   margin-top: 20px;
+            // }
+          }
         }
       }
 

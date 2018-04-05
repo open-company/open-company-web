@@ -87,15 +87,15 @@
              :on-touch-start identity}
             "Log In"])
         [:button.mlb-reset.get-started-button
-          {:class (when (jwt/jwt) "your-boards")
+          {:class (when (jwt/jwt) "your-digest")
            :on-touch-start identity
            :on-click (fn [e]
                       (site-menu-toggle)
                       (if (jwt/jwt)
-                        (router/redirect! (utils/your-boards-url))
+                        (router/redirect! (utils/your-digest-url))
                         (if (utils/in? (:route @router/path) "login")
                           (user/show-login :signup-with-slack)
                           (router/nav! oc-urls/sign-up))))}
           (if (jwt/jwt)
-            "Your Boards"
+            "Your digest"
             "Get started for free")]]]))
