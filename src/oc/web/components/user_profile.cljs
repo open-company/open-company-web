@@ -1,6 +1,7 @@
 (ns oc.web.components.user-profile
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -316,9 +317,14 @@
                       [:li
                         {:on-click #(change! s :digest-medium "email")}
                         "Email"]
-                      [:li
-                        {:on-click #(change! s :digest-medium "slack")}
-                        "Slack"]]]]])]]]
+                      ;; Show Slack digest option if
+                      (when (and ;; at least one team has a Slack bot
+                                 (some jwt/team-has-bot? (jwt/get-key :teams))
+                                 ;; the user is also a Slack user
+                                 (seq (jwt/get-key :slack-id)))
+                        [:li
+                          {:on-click #(change! s :digest-medium "slack")}
+                          "Slack"])]]]])]]]
             ;; Eventually we want them to be able specify day and time of digest, but not yet
             ; [:div.user-profile-field.digest-frequency-field.digest-day
             ;   [:select
