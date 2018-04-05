@@ -2,6 +2,7 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
@@ -13,6 +14,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
@@ -38,11 +40,15 @@
                    board-data
                    ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
        (if (= (router/current-board-slug) "all-posts")
-         (activity-actions/all-posts-get org-data ap-initial-at)
+         (do
+           (activity-actions/all-posts-get org-data ap-initial-at)
+           (utils/after 2000
+             #(section-actions/load-other-sections (:boards org-data))))
+
          (let [fixed-board-data (or
                                  board-data
                                  (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
-           (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]))))))))
+           (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
 
 (rum/defcs org-dashboard < ;; Mixins
                            rum/static
@@ -132,7 +138,7 @@
           ;; Mobile create a new section
           (and is-mobile?
                show-section-editor)
-          (section-editor board-data #(dis/dispatch! [:section-edit-save]))
+          (section-editor board-data #(section-actions/section-save (:section-editing s)))
           ;; Mobile edit current section data
           (and is-mobile?
                show-section-add)
@@ -188,12 +194,12 @@
                            should-show-onboard-overlay?
                            is-sharing-activity
                            show-section-add
-                           show-section-editor
-                           mobile-navigation-sidebar))
+                           show-section-editor))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when-not (and is-mobile?
-                              (and search-active? search-results?))
+                              (and search-active? search-results?)
+                              mobile-navigation-sidebar)
                  (dashboard-layout))]]])])))

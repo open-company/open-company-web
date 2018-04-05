@@ -139,12 +139,7 @@
                               (when-not (utils/is-test-env?)
                                 (doto (js/$ "[data-toggle=\"tooltip\"]")
                                   (.tooltip "fixTitle")
-                                  (.tooltip "hide"))
-                                (when (empty? (:timezone (:user-data @(drv/get-ref s :edit-user-profile))))
-                                  (dis/dispatch!
-                                    [:input
-                                     [:edit-user-profile :timezone]
-                                     (.. js/moment -tz guess)])))
+                                  (.tooltip "hide")))
                               s)
                            :did-remount (fn [old-state new-state]
                             (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]

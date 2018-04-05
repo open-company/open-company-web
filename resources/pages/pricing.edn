@@ -1,1 +1,2 @@
-{:page :pricing}
+{:page :pricing
+ :drift true}
