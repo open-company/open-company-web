@@ -194,12 +194,12 @@
                            should-show-onboard-overlay?
                            is-sharing-activity
                            show-section-add
-                           show-section-editor
-                           mobile-navigation-sidebar))
+                           show-section-editor))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when-not (and is-mobile?
-                              (and search-active? search-results?))
+                              (and search-active? search-results?)
+                              mobile-navigation-sidebar)
                  (dashboard-layout))]]])])))

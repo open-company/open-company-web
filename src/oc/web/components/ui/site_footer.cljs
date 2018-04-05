@@ -21,8 +21,8 @@
         [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
     [:div.copyright "© Copyright 2017. All rights reserved"]])
 
-(defn navigate-to-your-boards [your-boards-url]
-  (router/redirect! your-boards-url))
+(defn navigate-to-your-digest [your-digest-url]
+  (router/redirect! your-digest-url))
 
 (rum/defcs site-footer  < (rum/local nil ::expanded)
   [s]

@@ -120,3 +120,13 @@
       (update-change-data db container-uuid :change-at change-at)
       db)
     db))
+
+(defmethod dispatcher/action :section-delete
+  [db [_ org-slug section-slug]]
+  (let [section-key (dispatcher/board-key org-slug section-slug)
+        org-sections-key (vec (conj (dispatcher/org-data-key org-slug) :boards))
+        remaining-sections (remove #(= (:slug %) section-slug) (get-in db org-sections-key))]
+    (-> db
+      (update-in (butlast section-key) dissoc (last section-key))
+      (assoc org-sections-key remaining-sections)
+      (dissoc :section-editing))))
