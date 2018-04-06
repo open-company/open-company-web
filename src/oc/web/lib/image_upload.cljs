@@ -62,6 +62,20 @@
           (when (= (count files-uploaded)1)
             (success-cb (get files-uploaded 0))))))))
 
+(defn upload-file! [file success-cb & [error-cb]]
+  (try
+    (let [fs-client (init-filestack)]
+      (.then
+        (.upload fs-client file #js {})
+        (fn [res]
+          (let [url (gobj/get res "url")]
+            (when (fn? success-cb)
+              (success-cb url))))))
+    (catch :default e
+      (sentry/capture-error e)
+      (when (fn? error-cb)
+        (error-cb e)))))
+
 (defn thumbnail! [fs-url & [success-cb progress-cb error-cb]]
   (let [fs-client (init-filestack)
         opts (clj->js {:resize {
