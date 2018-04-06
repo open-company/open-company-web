@@ -256,25 +256,26 @@
 (def default-mutli-picker-button-id "entry-edit-multi-picker-bt")
 
 (defn- file-dnd-handler [s editor-ext file]
-  (if (.match (.-type file) "image")
-    (iu/upload-file! file
-      (fn [url]
-        (.insertImageFile editor-ext url)))
-    (iu/upload-file! file
-      (fn [url]
-        (let [size (gobj/get file "size")
-              mimetype (gobj/get file "type")
-              filename (gobj/get file "name")
-              createdat (utils/js-date)
-              prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
-              subtitle (str prefix (filesize size :binary false :format "%.2f" ))
-              icon (au/icon-for-mimetype mimetype)
-              attachment-data {:file-name filename
-                               :file-type mimetype
-                               :file-size size
-                               :file-url url}
-              dispatch-input-key (:dispatch-input-key (first (:rum/args s)))]
-          (activity-actions/add-attachment dispatch-input-key attachment-data))))))
+  (when (< (gobj/get file "size") (* 5 1000 1000))
+    (if (.match (.-type file) "image")
+      (iu/upload-file! file
+        (fn [url]
+          (.insertImageFile editor-ext url)))
+      (iu/upload-file! file
+        (fn [url]
+          (let [size (gobj/get file "size")
+                mimetype (gobj/get file "type")
+                filename (gobj/get file "name")
+                createdat (utils/js-date)
+                prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+                subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+                icon (au/icon-for-mimetype mimetype)
+                attachment-data {:file-name filename
+                                 :file-type mimetype
+                                 :file-size size
+                                 :file-url url}
+                dispatch-input-key (:dispatch-input-key (first (:rum/args s)))]
+            (activity-actions/add-attachment dispatch-input-key attachment-data)))))))
 
 (defn- setup-editor [s]
   (let [options (first (:rum/args s))
