@@ -89,22 +89,19 @@ var MyFileDragging = MediumEditor.Extension.extend({
     },
 
     insertImageFile: function (file, imageURL, thumbnailURL) {
-        if (typeof FileReader !== 'function') {
-            return;
-        }
         var addImageElement = this.document.createElement('img');
-        addImageElement.src = imageURL;
-        addImageElement.className = "carrot-no-preview";
-        addImageElement.dataset.mediaType = "image";
-        addImageElement.onLoad = function(){
+        var that = this;
+        addImageElement.onload = function(){
             addImageElement.width = this.width;
             addImageElement.height = this.height;
+            addImageElement.className = "carrot-no-preview";
+            addImageElement.dataset.mediaType = "image";
+            if (thumbnailURL) {
+                addImageElement.dataset.thumbnail = photoThumbnail;
+            }
+            MediumEditor.util.insertHTMLCommand(that.document, addImageElement.outerHTML);
         };
-
-        if (thumbnailURL) {
-            addImageElement.dataset.thumbnail = photoThumbnail;
-        }
-        MediumEditor.util.insertHTMLCommand(this.document, addImageElement.outerHTML);
+        addImageElement.src = imageURL;
     }
 });
 
