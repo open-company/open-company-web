@@ -97,19 +97,33 @@
       s))})
 
 (defn render-on-resize
-  "Trigger a re-render when the window resizes."
+
+  "Trigger a re-render when the window resizes.
+
+  IMPORTANT: add this mixin at the bottom of your component mixins' list
+  if you want to use a rum/local in the passed callback.
+
+  Example, note when :my-key is setup and used:
+
+  (defn my-callback [state event]
+    (reset! (:my-key state) 1))
+
+  (rum/defc component < ;; Mixins: note the order of the following
+                        (rum/local 0 :my-key)
+                        (render-on-resize my-callback)
+    [s]
+    [:div])"
+
   [resize-cb]
-  {:init (fn [s]
-    (assoc s :render-on-resize-trigger (atom 0)))
-   :will-mount (fn [s]
+  {:will-mount (fn [s]
     (assoc s :render-on-resize-listener
      (events/listen js/window EventType/RESIZE
       (fn [e]
         (when (fn? resize-cb)
           (resize-cb s e))
-        (reset! (:render-on-resize-trigger s) (.getTime (new js/Date)))))))
+        (rum/request-render (:rum/react-component s))))))
    :will-unmount (fn [s]
     (let [resize-listener (:render-on-resize-listener s)]
       (when resize-listener
         (events/unlistenByKey (:render-on-resize-listener s)))
-      (dissoc s :render-on-resize-listener :render-on-resize-trigger)))})
+      (dissoc s :render-on-resize-listener)))})
