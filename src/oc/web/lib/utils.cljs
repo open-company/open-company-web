@@ -533,8 +533,6 @@
         _ (.remove $hidden-div)]
     body-without-preview))
 
-(def default-body "<p><br/></p>")
-
 (defn newest-org [orgs]
   (first (sort-by :created-at orgs)))
 
