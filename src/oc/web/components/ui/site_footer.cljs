@@ -21,8 +21,8 @@
         [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
     [:div.copyright "© Copyright 2017. All rights reserved"]])
 
-(defn navigate-to-your-boards [your-boards-url]
-  (router/redirect! your-boards-url))
+(defn navigate-to-your-digest [your-digest-url]
+  (router/redirect! your-digest-url))
 
 (rum/defcs site-footer  < (rum/local nil ::expanded)
   [s]
@@ -40,7 +40,7 @@
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :company)))}
             "COMPANY"]
-          [:div.column-item [:a {:href oc-urls/home} "Home"]]
+          [:div.column-item [:a {:href oc-urls/home-no-redirect} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
           [:div.column-item [:a {:href oc-urls/pricing} "Pricing"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]

@@ -21,15 +21,15 @@
 (def default-activity-header-height 69)
 (def default-activity-content-height 136)
 
-(rum/defcs secure-activity < ;; Mixins
-                             rum/reactive
-                             (ui-mixins/render-on-resize save-win-height)
+(rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
                              (drv/drv :made-with-carrot-modal)
                              ;; Locals
                              (rum/local 0 ::win-height)
                              (rum/local nil ::win-resize-listener)
+                             ;; Mixins
+                             (ui-mixins/render-on-resize save-win-height)
 
                              {:will-mount (fn [s]
                                (utils/after 100 #(activity-actions/secure-activity-get))

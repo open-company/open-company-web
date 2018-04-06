@@ -2,6 +2,7 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -61,7 +62,7 @@
     (if (and entry-data (seq (:reactions entry-data)))
       (when is-current-user
         (activity-actions/get-entry entry-data))
-      (api/get-board (utils/link-for (:links board-data) ["item" "self"] "GET")))))
+      (router/nav! (oc-urls/board (router/current-org-slug) board-slug)))))
 
 (defn ws-interaction-reaction-add [interaction-data]
   (let [org-slug (router/current-org-slug)

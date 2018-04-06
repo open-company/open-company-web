@@ -41,7 +41,7 @@
 
 (defn force-team-refresh [team-id]
   (when-let [team-data (dis/team-data team-id)]
-    (when-let [team-link (utils/link-for (:links team-data) "item")]
+    (when-let [team-link (utils/link-for (:links team-data) ["self" "item"] "GET")]
       (team-get team-link))
     (when-let [roster-link (utils/link-for (:links team-data) "roster")]
       (roster-get roster-link))))
