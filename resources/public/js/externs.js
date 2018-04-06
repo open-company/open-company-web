@@ -69,8 +69,8 @@ MediaPicker.addAttachment = function(){};
 MediaPicker.saveSelection = function(){};
 MediaPicker.removeSelection = function(){};
 // MediumEditorFileDragging
-var MyFileDragging = function(){};
-MyFileDragging.insertImageFile = function(){};
+var CarrotFileDragging = function(){};
+CarrotFileDragging.insertImageFile = function(){};
 // Debug app state
 var OCWebPrintAppState = function(){};
 var OCWebPrintOrgData = function(){};

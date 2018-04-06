@@ -5,7 +5,7 @@
     } else if (typeof define === 'function' && define.amd) {
         define(factory);
     } else {
-        root.MyFileDragging = factory;
+        root.CarrotFileDragging = factory;
     }
 }(this, function (MediumEditor) {
 
@@ -20,8 +20,8 @@ function clearClassNames(element) {
     });
 }
 
-var MyFileDragging = MediumEditor.Extension.extend({
-    name: 'myFileDragging',
+var CarrotFileDragging = MediumEditor.Extension.extend({
+    name: 'carrotFileDragging',
 
     allowedTypes: ['.*'],
 
@@ -105,6 +105,6 @@ var MyFileDragging = MediumEditor.Extension.extend({
     }
 });
 
-return MyFileDragging;
+return CarrotFileDragging;
 
 }(typeof require === 'function' ? require('medium-editor') : MediumEditor)));

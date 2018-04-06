@@ -296,7 +296,7 @@
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
-        file-dragging-ext (when-not mobile-editor (js/MyFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
+        file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
         buttons (if show-subtitle
                   ["bold" "italic" "h2" "unorderedlist" "anchor"]
                   ["bold" "italic" "unorderedlist" "anchor"])
@@ -305,7 +305,7 @@
                       #js {"autolist" (js/AutoList.)
                            "media-picker" media-picker-ext
                            "fileDragging" false
-                           "myFileDragging" file-dragging-ext})
+                           "carrotFileDragging" file-dragging-ext})
         options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                  :buttonLabels "fontawesome"
                  :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
