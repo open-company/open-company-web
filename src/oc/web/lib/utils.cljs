@@ -177,12 +177,18 @@
 
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-body board-data]
-  (-> entry-body
-    (assoc :content-type "entry")
-    (assoc :read-only (readonly-entry? (:links entry-body)))
-    (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
-    (assoc :board-name (or (:board-name entry-body) (:name board-data)))))
+  [entry-data board-data]
+  (let [comments-link (link-for (:links entry-data) "comments")
+        add-comment-link (link-for (:links entry-data) "create" "POST")
+        fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
+        fixed-board-name (or (:board-name entry-data) (:name board-data))]
+    (-> entry-data
+      (assoc :content-type "entry")
+      (assoc :read-only (readonly-entry? (:links entry-data)))
+      (assoc :board-slug fixed-board-slug)
+      (assoc :board-name fixed-board-name)
+      (assoc :has-comments (boolean comments-link))
+      (assoc :can-comment (boolean add-comment-link)))))
 
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
