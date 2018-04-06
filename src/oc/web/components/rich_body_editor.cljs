@@ -256,7 +256,7 @@
 (def default-mutli-picker-button-id "entry-edit-multi-picker-bt")
 
 (defn- file-dnd-handler [s editor-ext file]
-  (when (< (gobj/get file "size") (* 5 1000 1000))
+  (if (< (gobj/get file "size") (* 5 1000 1000))
     (if (.match (.-type file) "image")
       (iu/upload-file! file
         (fn [url]
@@ -275,7 +275,14 @@
                                  :file-size size
                                  :file-url url}
                 dispatch-input-key (:dispatch-input-key (first (:rum/args s)))]
-            (activity-actions/add-attachment dispatch-input-key attachment-data)))))))
+            (activity-actions/add-attachment dispatch-input-key attachment-data)))))
+    (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "dnd-file-too-big"
+                    :title "Sorry!"
+                    :message "Error, please use files smaller than 5MB."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+      (alert-modal/show-alert alert-data))))
 
 (defn- setup-editor [s]
   (let [options (first (:rum/args s))
