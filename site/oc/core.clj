@@ -63,7 +63,7 @@
       :type "text/javascript"
       :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
       :crossorigin "anonymous"}]
-    ;; jQuery textcomplete needed by Emoji One autocomplete
+    ;; JWT library to decode/encode JWT
     [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
 
 (defn mobile-menu

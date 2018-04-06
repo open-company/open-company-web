@@ -861,7 +861,7 @@
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-selectionsaverestore.js"}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script
-            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js"
+            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
              :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
@@ -940,7 +940,7 @@
           [:script {:src (cdn "/js/static-js.js")}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script
-            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js"
+            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
              :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
