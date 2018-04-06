@@ -325,7 +325,7 @@
               {:date-time (:published-at activity-data)
                :data-toggle "tooltip"
                :data-placement "top"
-               :title (utils/activity-date-tooltip activity-data)}
+               :data-title (utils/activity-date-tooltip activity-data)}
               (utils/time-since (:published-at activity-data))]]]
         [:div.fullscreen-post-header-right
           (if editing

@@ -75,7 +75,7 @@
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :title (utils/activity-date-tooltip activity-data)}
+                 :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
         ; Card labels
         [:div.activity-card-head-right
