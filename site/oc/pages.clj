@@ -30,7 +30,7 @@
       [:div.thanks-headline "Thanks!"]
       "We’ve sent you an email to confirm."
       [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
-      [:a.carrot-early-access-link.hidden {:href "/"} "/"]]])
+      [:a.carrot-early-access-link.hidden {:href "/?no_redirect=1"} "/"]]])
 
 (defn try-it-form [form-id try-it-class]
   [:form.validate

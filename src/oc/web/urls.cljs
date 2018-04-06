@@ -10,6 +10,8 @@
 
 (def home "/")
 
+(def home-no-redirect (str home "?no_redirect=1"))
+
 (def about "/about")
 
 (def slack "/slack")
