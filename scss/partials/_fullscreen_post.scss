@@ -211,7 +211,7 @@ div.fullscreen-post-container {
     }
   }
 
-  &.editing {
+  &.editing, &.no-comments {
     div.fullscreen-post {
       div.fullscreen-post-left-column {
         left: 170px;

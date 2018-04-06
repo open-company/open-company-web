@@ -297,13 +297,16 @@
         editing (:modal-editing modal-data)
         activity-editing (:modal-editing-data modal-data)
         activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
-        show-sections-picker (and editing (:show-sections-picker modal-data))]
+        show-sections-picker (and editing (:show-sections-picker modal-data))
+        comments-link (utils/link-for (:links activity-data) "comments")
+        add-comment-link (utils/link-for (:links activity-data) "create" "POST")]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
                                                       (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
-                                :editing editing})}
+                                :editing editing
+                                :no-comments (not comments-link)})}
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(if editing
@@ -425,14 +428,16 @@
                       [:div.fullscreen-post-box-footer-legend-image])]]
                 (reactions activity-data))]]]
         ;; Right column
-        (let [activity-comments (-> modal-data
-                                    :comments-data
-                                    (get (:uuid activity-data))
-                                    :sorted-comments)
-              comments-data (or activity-comments (:comments activity-data))]
-          [:div.fullscreen-post-right-column.group
-            {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
-                                      :no-comments (zero? (count comments-data))})
-             :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
-            (add-comment activity-data)
-            (stream-comments activity-data comments-data)])]]))
+        (when comments-link
+          (let [activity-comments (-> modal-data
+                                      :comments-data
+                                      (get (:uuid activity-data))
+                                      :sorted-comments)
+                comments-data (or activity-comments (:comments activity-data))]
+            [:div.fullscreen-post-right-column.group
+              {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
+                                        :no-comments (zero? (count comments-data))})
+               :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
+              (when add-comment-link
+                (add-comment activity-data))
+              (stream-comments activity-data comments-data)]))]]))
