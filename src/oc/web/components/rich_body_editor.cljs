@@ -260,7 +260,7 @@
     (if (.match (.-type file) "image")
       (iu/upload-file! file
         (fn [url]
-          (.insertImageFile editor-ext url)))
+          (.insertImageFile editor-ext file url nil)))
       (iu/upload-file! file
         (fn [url]
           (let [size (gobj/get file "size")
@@ -305,12 +305,12 @@
                       #js {"autolist" (js/AutoList.)
                            "media-picker" media-picker-ext
                            "fileDragging" false
-                           "imageDragging" false
                            "myFileDragging" file-dragging-ext})
         options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                  :buttonLabels "fontawesome"
                  :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
                  :extensions extensions
+                 :imageDragging false
                  :targetBlank true
                  :autoLink true
                  :anchor #js {:customClassOption nil
