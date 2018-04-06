@@ -260,7 +260,8 @@
     (if (.match (.-type file) "image")
       (iu/upload-file! file
         (fn [url]
-          (.insertImageFile editor-ext file url nil)))
+          (.insertImageFile editor-ext file url nil)
+          (utils/after 500 #(utils/to-end-of-content-editable (rum/ref-node s "body")))))
       (iu/upload-file! file
         (fn [url]
           (let [size (gobj/get file "size")
