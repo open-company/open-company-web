@@ -78,11 +78,16 @@ function OCStaticGetYourBoardsUrl (decoded_jwt) {
   return your_board_url;
 }
 
-
 document.addEventListener("DOMContentLoaded", function(_) {
   // Get the jwt cookie to know if the user is logged in
   var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
   if (jwt) {
+    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
+        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
+    if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
+      window.location = your_board_url;
+    }
+
     $("#site-header-login-item").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
@@ -104,9 +109,6 @@ document.addEventListener("DOMContentLoaded", function(_) {
     // Top right corner became Your digest
     var signupButton = $("#site-header-signup-item");
     signupButton.addClass("your-digest");
-
-    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
-        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
     signupButton.attr("href", your_board_url);
     signupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
 
