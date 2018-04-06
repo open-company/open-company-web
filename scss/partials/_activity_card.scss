@@ -165,7 +165,11 @@ div.activity-card {
         margin-top: 3px;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: #{$right_max_width - 46 - 8 - 8 - 24}px;
+        max-width: #{$right_max_width - 8 - 24}px;
+
+        &.has-new {
+          max-width: #{$right_max_width - 46 - 8 - 8 - 24}px;
+        }
       }
     }
   }

@@ -82,7 +82,8 @@
             (more-menu activity-data))
           (when is-all-posts
             [:div.section-tag
-              {:dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}])
+              {:class (when (:new activity-data) "has-new")
+               :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}])
           (when (:new activity-data)
             [:div.new-tag
               "New"])]]
