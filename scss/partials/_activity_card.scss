@@ -115,53 +115,58 @@ div.activity-card {
     width: 100%;
     padding: 20px 24px;
     height: 72px;
-
-    &.entry-card {
-      background-color: $carrot_light_gray_2;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-    }
+    display: flex;
+    background-color: $light_tan;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
 
     div.activity-card-head-author {
-      float: left;
-      width: 55%;
       padding-right: 20px;
-      height: 32px;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       @include activity-author(32);
     }
 
+    $right_max_width: 260;
+
     div.activity-card-head-right {
-      float: right;
-      position: relative;
-      width: 45%;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: #{$right_max_width}px;
 
       div.new-tag {
-        @include avenir_B();
-        color: $carrot_green_1;
+        @include avenir_H();
+        color: $sea_blue;
         font-size: 12px;
         line-height: 14px;
-        padding: 6px 7px 4px 7px;
+        padding: 6px 9px 5px 9px;
         float: right;
-        text-transform: uppercase;
-        border: 1px solid $carrot_green_2;
-        border-radius: 3px;
-      }
-
-      div.activity-tag {
-        margin-top: 0;
-        float: right;
-        max-width: 100%;
-        text-overflow: ellipsis;
-        overflow: hidden;
+        border: 1px solid $sea_blue;
+        border-radius: 100px;
         margin-right: 8px;
-
-        &.double-tag {
-          max-width: 50%;
-        }
+        height: 26px;
+        margin-top: 3px;
       }
 
-      @include activity-tag();
+      div.section-tag {
+        float: right;
+        margin-right: 8px;
+        background-color: $deep_tan;
+        border-radius: 100px;
+        height: 26px;
+        color: $ui_grey;
+        @include avenir_H();
+        font-size: 12px;
+        padding: 5px 9px 6px 9px;
+        border: 1px solid $deep_tan;
+        margin-top: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: #{$right_max_width - 46 - 8 - 8 - 24}px;
+      }
     }
   }
 
@@ -179,13 +184,6 @@ div.activity-card {
     width: 100%;
     padding: 32px 32px 0px;
 
-    div.posted-in {
-      @include avenir_M();
-      font-size: 14px;
-      color: $ui_grey;
-      position: relative;
-    }
-
     div.activity-card-headline {
       @include activity-title();
       @include avenir_H();
@@ -197,10 +195,6 @@ div.activity-card {
       overflow: hidden;
       white-space: nowrap;
       max-height: 31px;
-
-      &.showing-posted-in {
-        margin-top: 12px;
-      }
 
       @include mobile() {
         margin-top: 16px;
