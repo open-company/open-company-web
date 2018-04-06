@@ -71,11 +71,13 @@
   [db org-data changes]
   (let [sections (:boards org-data)
         org-slug (:slug org-data)]
-    (reduce #(let [board-key (dispatcher/board-data-key org-slug (:slug %2))
-                   board-data (utils/fix-board
-                               (dispatcher/board-data db org-slug (:slug %2))
-                               changes)]
-               (assoc-in %1 board-key board-data))
+    (reduce #(if (dispatcher/board-data db org-slug (:slug %2))
+               (let [board-key (dispatcher/board-data-key org-slug (:slug %2))
+                     board-data (utils/fix-board
+                                 (dispatcher/board-data db org-slug (:slug %2))
+                                 changes)]
+                 (assoc-in %1 board-key board-data))
+               %1)
             db sections)))
 
 (defn- update-change-data [db section-uuid property timestamp]
