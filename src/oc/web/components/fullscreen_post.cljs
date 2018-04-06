@@ -297,16 +297,14 @@
         editing (:modal-editing modal-data)
         activity-editing (:modal-editing-data modal-data)
         activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
-        show-sections-picker (and editing (:show-sections-picker modal-data))
-        comments-link (utils/link-for (:links activity-data) "comments")
-        add-comment-link (utils/link-for (:links activity-data) "create" "POST")]
+        show-sections-picker (and editing (:show-sections-picker modal-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
                                                       (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :editing editing
-                                :no-comments (not comments-link)})}
+                                :no-comments (not (:has-comments activity-data))})}
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(if editing
@@ -428,7 +426,7 @@
                       [:div.fullscreen-post-box-footer-legend-image])]]
                 (reactions activity-data))]]]
         ;; Right column
-        (when comments-link
+        (when (:has-comments activity-data)
           (let [activity-comments (-> modal-data
                                       :comments-data
                                       (get (:uuid activity-data))
@@ -438,6 +436,6 @@
               {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
                                         :no-comments (zero? (count comments-data))})
                :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
-              (when add-comment-link
+              (when (:can-comment activity-data)
                 (add-comment activity-data))
               (stream-comments activity-data comments-data)]))]]))
