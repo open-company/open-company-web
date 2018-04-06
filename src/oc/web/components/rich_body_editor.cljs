@@ -255,6 +255,27 @@
 
 (def default-mutli-picker-button-id "entry-edit-multi-picker-bt")
 
+(defn- file-dnd-handler [s editor-ext file]
+  (if (.match (.-type file) "image")
+    (iu/upload-file! file
+      (fn [url]
+        (.insertImageFile editor-ext url)))
+    (iu/upload-file! file
+      (fn [url]
+        (let [size (gobj/get file "size")
+              mimetype (gobj/get file "type")
+              filename (gobj/get file "name")
+              createdat (utils/js-date)
+              prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+              subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+              icon (au/icon-for-mimetype mimetype)
+              attachment-data {:file-name filename
+                               :file-type mimetype
+                               :file-size size
+                               :file-url url}
+              dispatch-input-key (:dispatch-input-key (first (:rum/args s)))]
+          (activity-actions/add-attachment dispatch-input-key attachment-data))))))
+
 (defn- setup-editor [s]
   (let [options (first (:rum/args s))
         mobile-editor (responsive/is-tablet-or-mobile?)
@@ -266,18 +287,23 @@
                            :saveSelectionClickElementId default-mutli-picker-button-id
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
-        media-picker-ext (js/MediaPicker. (clj->js media-picker-opts))
+        media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
+        file-dragging-ext (when-not mobile-editor (js/MyFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
         buttons (if show-subtitle
                   ["bold" "italic" "h2" "unorderedlist" "anchor"]
                   ["bold" "italic" "unorderedlist" "anchor"])
         extensions (if mobile-editor
                       #js {"autolist" (js/AutoList.)}
                       #js {"autolist" (js/AutoList.)
-                           "media-picker" media-picker-ext})
+                           "media-picker" media-picker-ext
+                           "fileDragging" false
+                           "imageDragging" false
+                           "myFileDragging" file-dragging-ext})
         options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                  :buttonLabels "fontawesome"
                  :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
                  :extensions extensions
+                 :targetBlank true
                  :autoLink true
                  :anchor #js {:customClassOption nil
                               :customClassOptionText "Button"
