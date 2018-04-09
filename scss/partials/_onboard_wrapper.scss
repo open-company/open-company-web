@@ -367,20 +367,9 @@ div.onboard-lander {
           width: 80px;
           height: 80px;
           background-color: transparent;
-          border: 2px solid $carrot_light_blue_2;
-          border-radius: 40px;
-
-          &:after {
-            content: "";
-            display: block;
-            width: 16px;
-            height: 16px;
-            @include image-2x("/img/ML/onboard_plus_icon");
-            background-repeat: no-repeat;
-            background-size: 16px;
-            margin-top: 32px;
-            margin-left: 32px;
-          }
+          background-image: cdnUrl("/img/ML/onboard_plus_icon.svg");
+          background-position: center;
+          background-size: 80px 80px;
         }
 
         div.org-avatar {
