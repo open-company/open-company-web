@@ -24,7 +24,7 @@
         [:div.sections-picker-group-header
           (get-section-name group)])
       (when (pos? (count group))
-        (for [b group
+        (for [b (sort-by :name group)
               :let [active (= (:slug b) active-slug)]]
           [:div.sections-picker-section.group
             {:key (str "sections-picker-" (:uuid b))
