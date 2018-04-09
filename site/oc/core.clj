@@ -17,7 +17,7 @@
     [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-    [:title "Your company digest | Carrot"]
+    [:title "Carrot | Company digest"]
     ;; Bootstrap - Latest compiled and minified CSS
     [:link
     {:rel "stylesheet"
@@ -63,7 +63,7 @@
       :type "text/javascript"
       :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
       :crossorigin "anonymous"}]
-    ;; jQuery textcomplete needed by Emoji One autocomplete
+    ;; JWT library to decode/encode JWT
     [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
 
 (defn mobile-menu

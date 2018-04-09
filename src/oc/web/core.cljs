@@ -21,8 +21,10 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
             [oc.web.actions.team]
-            [oc.web.actions.comment]
-            [oc.web.actions.reaction]
+            [oc.web.actions.org :as oa]
+            [oc.web.actions.comment :as ca]
+            [oc.web.actions.reaction :as ra]
+            [oc.web.actions.section :as sa]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.api :as api]
@@ -566,6 +568,14 @@
 
   ;; Persist JWT in App State
   (user-actions/dispatch-jwt)
+
+  ;; Subscribe to websocket client events
+  (sa/ws-change-subscribe)
+  (sa/ws-interaction-subscribe)
+  (oa/subscribe)
+  (ra/subscribe)
+  (ca/subscribe)
+
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ; mount the error banner

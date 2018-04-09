@@ -1,9 +1,6 @@
 (ns oc.web.actions
   (:require [taoensso.timbre :as timbre]
-            [oc.web.dispatcher :as dispatcher]
-            [oc.web.actions.org :as oa]
-            [oc.web.lib.jwt :as jwt]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.dispatcher :as dispatcher]))
 
 ;; ---- Generic Actions Dispatch
 ;; This is a small generic abstraction to handle "actions".
@@ -21,25 +18,6 @@
   (timbre/info "Full event: " (pr-str payload))
   db)
 
-
-(defn- org-change [db org-uuid change-at]
-  (timbre/debug "Org change:" org-uuid "at:" change-at)
-  (utils/after 1000 (fn [] (oa/get-org)))
-  db)
-
-(defmethod dispatcher/action :container/change
-  [db [_ {container-uuid :container-id change-at :change-at user-id :user-id}]]
-  (timbre/debug "Container change:" container-uuid "at:" change-at "by:" user-id)
-  (if (not= (jwt/user-id) user-id) ; no need to respond to our own events
-    (if (= container-uuid (:uuid (dispatcher/org-data)))
-      (org-change db container-uuid change-at)
-      db)
-    db))
-
-;; This should be turned into a proper form library
-;; Lomakeets FormState ideas seem like a good start:
-;; https://github.com/metosin/lomakkeet/blob/master/src/cljs/lomakkeet/core.cljs
-
 (defmethod dispatcher/action :input [db [_ path value]]
   (assoc-in db path value))
 
@@ -47,19 +25,3 @@
   (if (fn? value-fn)
     (update-in db path value-fn)
     db))
-
-(defmethod dispatcher/action :container/status
-  [db [_ status-data]]
-  (timbre/debug "Change status received:" status-data)
-  (let [org-data (dispatcher/org-data db)
-        old-status-data (dispatcher/change-data db)
-        status-by-uuid (group-by :container-id status-data)
-        clean-status-data (zipmap (keys status-by-uuid) (->> status-by-uuid
-                                                          vals
-                                                          ; remove the sequence of 1 from group-by
-                                                          (map first)
-                                                          ; dup seen-at as nav-at
-                                                          (map #(assoc % :nav-at (:seen-at %)))))
-        new-status-data (merge old-status-data clean-status-data)]
-    (timbre/debug "Change status data:" new-status-data)
-    (assoc-in db (dispatcher/change-data-key (:slug org-data)) new-status-data)))

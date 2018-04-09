@@ -1,14 +1,27 @@
 (ns oc.web.stores.section
   (:require [taoensso.timbre :as timbre]
+            [cljs-flux.dispatcher :as flux]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dispatcher]
             [oc.lib.time :as oc-time]
             [oc.web.lib.utils :as utils]))
 
+;; Reducers used to watch for org/section dispatch data
+(defmulti reducer (fn [db [action-type & _]]
+                    (when-not (some #{action-type} [:update :input])
+                      (timbre/debug "Dispatching section reducer:" action-type))
+                    action-type))
+
+(def sections-dispatch
+  (flux/register
+   dispatcher/actions
+   (fn [payload]
+     (swap! dispatcher/app-state reducer payload))))
+
 (defmethod dispatcher/action :section
   [db [_ section-data]]
-  (let [fixed-section-data (utils/fix-board section-data)
+  (let [fixed-section-data (utils/fix-board section-data (dispatcher/change-data db))
         db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
@@ -22,13 +35,62 @@
                   with-current-edit)]
     next-db))
 
+(defn new?
+  "
+  A board is new if:
+    user is part of the team (we don't track new for non-team members accessing public boards)
+     -and-
+    change-at is newer than seen at
+      -or-
+    we have a change-at and no seen at
+  "
+  [change-data board]
+  (let [changes (get change-data (:uuid board))
+        change-at (:change-at changes)
+        nav-at (:nav-at changes)
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
+        new? (and in-team?
+                  (or (and change-at nav-at (> change-at nav-at))
+                      (and change-at (not nav-at))))]
+    new?))
+
+(defn add-new-to-sections
+  [org-data change-data]
+  (let [section-data (:boards org-data)
+        new-section-data (for [section section-data]
+                           (assoc section :new (new? change-data section)))]
+    (assoc org-data :boards new-section-data)))
+
+(defn fix-org-section-data
+  [db org-data changes]
+  (assoc-in db
+            (dispatcher/org-data-key (:slug org-data))
+            (add-new-to-sections org-data changes)))
+
+(defn fix-sections
+  [db org-data changes]
+  (let [sections (:boards org-data)
+        org-slug (:slug org-data)]
+    (reduce #(if (dispatcher/board-data db org-slug (:slug %2))
+               (let [board-key (dispatcher/board-data-key org-slug (:slug %2))
+                     board-data (utils/fix-board
+                                 (dispatcher/board-data db org-slug (:slug %2))
+                                 changes)]
+                 (assoc-in %1 board-key board-data))
+               %1)
+            db sections)))
+
 (defn- update-change-data [db section-uuid property timestamp]
-  (let [change-data-key (dispatcher/change-data-key (router/current-org-slug))
+  (let [org-data (dispatcher/org-data db)
+        change-data-key (dispatcher/change-data-key (router/current-org-slug))
         change-data (get-in db change-data-key)
         change-map (or (get change-data section-uuid) {})
         new-change-map (assoc change-map property timestamp)
         new-change-data (assoc change-data section-uuid new-change-map)]
-    (assoc-in db change-data-key new-change-data)))
+    (-> db
+      (fix-org-section-data org-data new-change-data)
+      (fix-sections org-data new-change-data)
+      (assoc-in change-data-key new-change-data))))
 
 (defmethod dispatcher/action :section-change
   [db [_ section-uuid change-at]]
@@ -65,7 +127,7 @@
   (let [org-slug (router/current-org-slug)
         section-slug (:slug section-data)
         board-key (dispatcher/board-data-key org-slug section-slug)
-        fixed-section-data (utils/fix-board section-data)]
+        fixed-section-data (utils/fix-board section-data (dispatcher/change-data db))]
     (-> db
         (assoc-in board-key fixed-section-data)
         (dissoc :section-editing))))
@@ -130,3 +192,31 @@
       (update-in (butlast section-key) dissoc (last section-key))
       (assoc org-sections-key remaining-sections)
       (dissoc :section-editing))))
+
+(defmethod dispatcher/action :container/status
+  [db [_ status-data]]
+  (timbre/debug "Change status received:" status-data)
+  (let [org-data (dispatcher/org-data db)
+        old-status-data (dispatcher/change-data db)
+        status-by-uuid (group-by :container-id status-data)
+        clean-status-data (zipmap (keys status-by-uuid) (->> status-by-uuid
+                                                          vals
+                                                          ; remove the sequence of 1 from group-by
+                                                          (map first)
+                                                          ; dup seen-at as nav-at
+                                                          (map #(assoc % :nav-at (:seen-at %)))))
+        new-status-data (merge old-status-data clean-status-data)]
+    (timbre/debug "Change status data:" new-status-data)
+    (-> db
+      (fix-org-section-data org-data new-status-data)
+      (fix-sections org-data new-status-data)
+      (assoc-in (dispatcher/change-data-key (:slug org-data)) new-status-data))))
+
+;; Section store specific reducers
+(defmethod reducer :default [db payload]
+  ;; ignore state changes not specific to reactions
+  db)
+
+(defmethod reducer :org-loaded
+  [db [_ org-data saved?]]
+  (fix-org-section-data db org-data (dispatcher/change-data db)))

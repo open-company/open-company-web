@@ -232,7 +232,7 @@
 (defmethod reducer :section
   [db [_ board-data]]
   (let [org (router/current-org-slug)
-        fixed-board-data (utils/fix-board board-data)]
+        fixed-board-data (utils/fix-board board-data (dispatcher/change-data db))]
     (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
   db)
 
