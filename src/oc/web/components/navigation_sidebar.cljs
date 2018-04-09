@@ -26,25 +26,6 @@
   (router/nav! url)
   (close-navigation-sidebar))
 
-(defn new?
-  "
-  A board is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-     -and-
-    change-at is newer than seen at
-      -or-
-    we have a change-at and no seen at
-  "
-  [change-data board]
-  (let [changes (get change-data (:uuid board))
-        change-at (:change-at changes)
-        nav-at (:nav-at changes)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
-        new? (and in-team?
-                  (or (and change-at nav-at (> change-at nav-at))
-                      (and change-at (not nav-at))))]
-    new?))
-
 (def sidebar-top-margin 122)
 (def footer-button-height 31)
 
@@ -191,7 +172,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (new? change-data board)
+                    {:class (utils/class-set {:new (:new board)
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
