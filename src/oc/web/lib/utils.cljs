@@ -7,6 +7,7 @@
             [cljs-time.core :as time]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dispatcher]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
@@ -197,7 +198,7 @@
         seen-at (:seen-at changes)
         user-id (jwt/get-key :user-id)
         author-id (-> entry :author first :user-id)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (oc.web.dispatcher/org-data)))
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
         new? (and in-team?
                   (not= author-id user-id)
                   (> published-at too-old)
@@ -207,14 +208,14 @@
 
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-data board-data]
+  [entry-data board-data changes]
   (let [comments-link (link-for (:links entry-data) "comments")
         add-comment-link (link-for (:links entry-data) "create" "POST")
         fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
         fixed-board-name (or (:board-name entry-data) (:name board-data))]
     (-> entry-data
       (assoc :content-type "entry")
-      (assoc :new (post-new? entry-body changes))
+      (assoc :new (post-new? (:body entry-data) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
       (assoc :board-slug fixed-board-slug)
       (assoc :board-name fixed-board-name)
@@ -236,7 +237,7 @@
        with-fixed-entries)))
 
 (defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data))
+  (fix-entry activity collection-data {}))
 
 (defn fix-all-posts
   "Fix org data coming from the API."
