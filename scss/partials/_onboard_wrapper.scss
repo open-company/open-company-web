@@ -106,16 +106,27 @@ div.onboard-email-container {
     color: $carrot_orange;
   }
 
-  div.email-wall-sent-link {
-    color: $carrot_light_gray;
-    @include avenir_R();
-    font-size: 16px;
-    color: $oc_gray_7;
-    margin-top: 16px;
+  &.email-wall {
+    width: 360px;
+    color: $deep_navy;
 
-    span.email-address {
-      @include avenir_H();
-      color: $oc_gray_7;
+    div.email-wall-subtitle {
+      @include avenir_R();
+      font-size: 16px;
+      margin-top: 16px;
+    }
+
+    div.email-wall-sent-link {
+      color: $deep_navy;
+      @include avenir_R();
+      font-size: 16px;
+      margin-top: 40px;
+
+      div.email-address {
+        @include avenir_H();
+        font-size: 18px;
+        color: $deep_navy;
+      }
     }
   }
 

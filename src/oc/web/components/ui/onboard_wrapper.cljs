@@ -519,12 +519,20 @@
                         (vertical-center-mixin ".onboard-email-container")
   [s]
   (let [email (:e (drv/react s :query-params))]
-    [:div.onboard-email-container
-      "Please verify your email address"
-      [:div.email-wall-sent-link "We have sent a link to "
+    [:div.onboard-email-container.email-wall
+      "Please verify your email"
+      [:div.email-wall-subtitle
+        (str
+         "Before you can join your team, we just need to verify your idetity. "
+         "Please check your email, and continue the registration process from there.")]
+      [:div.email-wall-sent-link
+        "We have sent an email to"
         (if (seq email)
-          [:span.email-address email]
-          (str "your email address"))
+          ":"
+          " ")
+        (if (seq email)
+          [:div.email-address email]
+          "your email address")
         "."]]))
 
 (defn exchange-token-when-ready [s]
