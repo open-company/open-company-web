@@ -520,6 +520,7 @@
   [s]
   (let [email (:e (drv/react s :query-params))]
     [:div.onboard-email-container.email-wall
+      [:div.email-wall-icon]
       "Please verify your email"
       [:div.email-wall-subtitle
         (str
