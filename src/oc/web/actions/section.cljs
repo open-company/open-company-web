@@ -42,7 +42,7 @@
   (let [is-currently-shown (is-currently-shown? section)]
     (when is-currently-shown
       (when (and (router/current-activity-id)
-                 (not (contains? (:entries section) (router/current-activity-id))))
+                 (not (some #(when (= (router/current-activity-id) (:uuid %)) %) (:entries section))))
         (router/nav! (oc-urls/board (router/current-org-slug) (:slug section))))
       ;; Tell the container service that we are seeing this board,
       ;; and update change-data to reflect that we are seeing this board

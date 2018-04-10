@@ -57,11 +57,10 @@
            (not (utils/in? (:route @router/path) "secure-activity")))
       ;; Redirect to the first board if at least one is present
       (let [board-to (utils/get-default-board org-data)]
-        (utils/after 10
-          #(router/nav!
-             (if board-to
-               (oc-urls/board (:slug org-data) (:slug board-to))
-               (oc-urls/all-posts (:slug org-data))))))))
+        (router/nav!
+          (if board-to
+            (oc-urls/board (:slug org-data) (:slug board-to))
+            (oc-urls/all-posts (:slug org-data)))))))
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
