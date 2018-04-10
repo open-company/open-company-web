@@ -176,23 +176,23 @@
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)
-        orgs (drv/react s :orgs)]
+        orgs (drv/react s :orgs)
+        continue-disabled (or (and (empty? (:first-name user-data))
+                                   (empty? (:last-name user-data)))
+                              (empty? (:avatar-url user-data)))
+        continue-fn #(when-not continue-disabled
+                       (reset! (::saving s) true)
+                       (user-actions/user-profile-save current-user-data edit-user-profile))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.title.about-yourself
           "Personal details"]
-        (let [top-continue-disabled (or (and (empty? (:first-name user-data))
-                                             (empty? (:last-name user-data)))
-                                        (empty? (:avatar-url user-data)))]
-          [:button.mlb-reset.top-continue
-            {:class (when top-continue-disabled
-                      "disabled")
-             :on-touch-start identity
-             :on-click #(when-not top-continue-disabled
-                          (reset! (::saving s) true)
-                          (user-actions/user-profile-save current-user-data edit-user-profile))
-             :aria-label "Continue"}
-            "Continue"])]
+        [:button.mlb-reset.top-continue
+          {:class (when continue-disabled "disabled")
+           :on-touch-start identity
+           :on-click continue-fn
+           :aria-label "Continue"}
+          "Continue"]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -232,13 +232,9 @@
              :value (or (:last-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
           [:button.continue
-            {:disabled (or (and (empty? (:first-name user-data))
-                                (empty? (:last-name user-data)))
-                           (empty? (:avatar-url user-data)))
+            {:class (when continue-disabled "disabled")
              :on-touch-start identity
-             :on-click #(do
-                          (reset! (::saving s) true)
-                          (user-actions/user-profile-save current-user-data edit-user-profile))}
+             :on-click continue-fn}
             "That’s me"]]]]))
 
 (defn- setup-team-data
@@ -290,25 +286,33 @@
   [s]
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        continue-disabled (< (count (clean-org-name (:name org-editing))) 3)
+        continue-fn #(when-not continue-disabled
+                       (let [org-name (clean-org-name (:name org-editing))]
+                         (dis/dispatch! [:input [:org-editing :name] org-name])
+                         (if (and (seq org-name)
+                                  (> (count org-name) 2))
+                           ;; Create org and show setup screen
+                           (org-actions/org-create @(drv/get-ref s :org-editing))
+                           (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
       [:div.main-cta
         [:div.title.company-setup
           "Your company"]
-        (let [top-continue-disabled (< (count (clean-org-name (:name org-editing))) 3)]
-          [:button.mlb-reset.top-continue
-            {:class (when top-continue-disabled "disabled")
-             :on-touch-start identity
-             :on-click #(when-not top-continue-disabled
-                          (let [org-name (clean-org-name (:name org-editing))]
-                            (dis/dispatch! [:input [:org-editing :name] org-name])
-                            (if (and (seq org-name)
-                                     (> (count org-name) 2))
-                              ;; Create org and show setup screen
-                              (org-actions/org-create @(drv/get-ref s :org-editing))
-                              (dis/dispatch! [:input [:org-editing :error] true]))))
-             :aria-label "Done"}
-           "Done"])]
+        [:button.mlb-reset.top-continue
+          {:class (when continue-disabled "disabled")
+           :on-touch-start identity
+           :on-click #(when-not continue-disabled
+                        (let [org-name (clean-org-name (:name org-editing))]
+                          (dis/dispatch! [:input [:org-editing :name] org-name])
+                          (if (and (seq org-name)
+                                   (> (count org-name) 2))
+                            ;; Create org and show setup screen
+                            (org-actions/org-create @(drv/get-ref s :org-editing))
+                            (dis/dispatch! [:input [:org-editing :error] true]))))
+           :aria-label "Done"}
+         "Done"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -368,6 +372,107 @@
                            (org-actions/org-create @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true])))}
             "All set!"]]]]))
+
+(def default-invite-row
+  {:user ""
+   :type "email"
+   :role :author
+   :error false})
+
+(defn- check-invite-row [invite]
+  (assoc invite :error (and (seq (:user invite)) (not (utils/valid-email? (:user invite))))))
+
+(defn- check-invites [s]
+  (reset! (::invite-rows s) (vec (map check-invite-row @(::invite-rows s)))))
+
+(rum/defcs lander-invite < rum/reactive
+                           (drv/drv :org-data)
+                           (drv/drv :invite-users)
+                           (rum/local false ::inviting)
+                           (rum/local nil ::invite-error)
+                           (rum/local (rand 3) ::invite-rand)
+                           (rum/local (vec (repeat 3 default-invite-row)) ::invite-rows)
+                           {:did-mount (fn [s]
+                             ;; Load the list of teams if it's not already
+                             (team-actions/teams-get-if-needed)
+                             s)
+                            :will-update (fn [s]
+                             ;; Load the list of teams if it's not already
+                             (team-actions/teams-get-if-needed)
+                             (when @(::inviting s)
+                               (let [invite-users @(drv/get-ref s :invite-users)
+                                     invite-errors (filter :error invite-users)
+                                     to-send (filter #(not (:error %)) invite-users)]
+                                 (when (zero? (count to-send))
+                                   (reset! (::inviting s) false)
+                                   (if (pos? (count invite-errors))
+                                     ;; There were errors inviting users, show them and let the user retry
+                                     (do
+                                       (reset! (::invite-rand s) (rand 3))
+                                       (reset! (::invite-error s) "Error inviting the following users, please retry.")
+                                       (reset! (::invite-rows s) (vec invite-errors)))
+                                     ;; All invites sent, redirect to dashboard
+                                     (org-actions/org-redirect @(drv/get-ref s :org-data))))))
+                             s)}
+  [s]
+  (let [org-data (drv/react s :org-data)
+        continue-fn (fn []
+                     (let [_ (check-invites s)
+                           errors (filter :error @(::invite-rows s))]
+                       (when (zero? (count errors))
+                         (reset! (::inviting s) true)
+                         (reset! (::invite-error s) nil)
+                         (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
+                           (team-actions/invite-users not-empty-invites)))))]
+    [:div.onboard-lander.lander-invite
+      [:div.main-cta
+        [:div.title
+          "Setup complete!"]
+        [:button.mlb-reset.top-continue
+          {:on-touch-start identity
+           :on-click continue-fn
+           :aria-label "Done"}
+         "Done"]]
+      [:div.onboard-form
+        [:div.subtitle
+          "Invite a few colleagues to explore Carrot with you."]
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.field-label
+            "Email address"
+            [:button.mlb-reset.add-another-invite-row
+              {:on-click #(reset! (::invite-rows s) (vec (conj @(::invite-rows s) default-invite-row)))}
+              "+ Add another invitation"]]
+          (when @(::invite-error s)
+            [:div.error @(::invite-error s)])
+          [:div.invite-rows
+            (for [idx (range (count @(::invite-rows s)))
+                  :let [invite (get @(::invite-rows s) idx)]]
+              [:div.invite-row
+                {:class (when (:error invite) "error")
+                 :key (str "invite-row-" @(::invite-rand s) "-" idx)}
+                [:input
+                  {:type "text"
+                   :placeholder "name@example.com"
+                   :on-change (fn [e]
+                               (reset! (::invite-rows s)
+                                (vec
+                                 (assoc-in @(::invite-rows s) [idx]
+                                  (assoc invite :user (.. e -target -value)))))
+                               (check-invites s))
+                   :value (:user invite)}]])]
+          [:button.continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :class (when @(::inviting s) "disabled")}
+            (if @(::inviting s)
+              "Seding invites..."
+              "Send invites")]
+          [:div.skip-container
+            [:button.mlb-reset.skip-for-now
+              {:on-click #(org-actions/org-redirect org-data)}
+              "Skip for now"]]]]]))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
@@ -630,6 +735,7 @@
     :lander (lander)
     :lander-profile (lander-profile)
     :lander-team (lander-team)
+    :lander-invite (lander-invite)
     :invitee-lander (invitee-lander)
     :invitee-lander-profile (invitee-lander-profile)
     :email-wall (email-wall)
