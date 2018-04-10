@@ -33,11 +33,15 @@
         next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)
         org-slug (utils/post-org-slug activity-data)
         section-slug (:board-slug activity-data)
+        ap-key (concat (dispatcher/all-posts-key org-slug)
+                       [:fixed-items activity-uuid])
         activity-key (concat (dispatcher/board-data-key org-slug section-slug)
                              [:fixed-items activity-uuid])]
     (if (nil? reaction-data)
       (let [updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)]
-        (assoc-in db activity-key updated-activity-data))
+        (-> db
+          (assoc-in ap-key updated-activity-data)
+          (assoc-in activity-key updated-activity-data)))
       (let [reaction (first (keys reaction-data))
             next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
             reactions-data (or (:reactions activity-data) [])
@@ -50,7 +54,9 @@
             updated-activity-data (-> activity-data
                                    (assoc :reactions-loading next-reactions-loading)
                                    (assoc :reactions next-reactions-data))]
-        (assoc-in db activity-key updated-activity-data)))))
+        (-> db
+          (assoc-in ap-key updated-activity-data)
+          (assoc-in activity-key updated-activity-data))))))
 
 (defn handle-reaction-to-entry [db activity-data reaction-data]
   (let [org-slug (utils/post-org-slug activity-data)

@@ -245,6 +245,7 @@
             org-slug (name (nth entry-key 0))
             board-slug (name (nth entry-key 2))
             board-key (dispatcher/board-data-key org-slug board-slug)
+            ap-key (dispatcher/all-posts-key org-slug)
             comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid entry-data))
             all-posts-key (assoc comments-key 2 :all-posts)
             ; update the comments link of the entry
@@ -261,6 +262,7 @@
         (-> db
          (assoc-in comments-key sorted-comments-data)
          (assoc-in all-posts-key sorted-comments-data)
+         (assoc-in (vec (concat ap-key [:fixed-items post-uuid])) with-authors)
          (assoc-in (vec (concat board-key [:fixed-items post-uuid])) with-authors)))
       db)))
 
