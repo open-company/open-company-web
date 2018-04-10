@@ -107,7 +107,6 @@
                                                                    :avatar-url (jwt/get-key :avatar-url)
                                                                    :user-id (jwt/get-key :user-id)}})
         new-comments-data (sort-comments (conj comments-data new-comment-data))]
-    (index-comments @comments-atom org-slug board-slug (:uuid post-data) [new-comment-data])
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
@@ -244,7 +243,9 @@
             ; Add the new comment to the comments list, make sure it's not present already
             new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
             sorted-comments-data (sort-comments new-comments-data)
-            comments-key (get @comments-atom (make-comment-index (:uuid comment-data)))
+            org-slug (name (nth entry-key 0))
+            board-slug (name (nth entry-key 2))
+            comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid entry-data))
             all-posts-key (assoc comments-key 2 :all-posts)
             ; update the comments link of the entry
             comments-link-idx (utils/index-of
