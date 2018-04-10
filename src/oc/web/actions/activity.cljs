@@ -299,15 +299,10 @@
   (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data]))
 
 (defn get-entry [entry-data]
-  (let [is-all-posts (or (:from-all-posts @router/path)
-                         (= (router/current-board-slug) "all-posts"))
-        board-key (if is-all-posts
-                   (dis/all-posts-key (router/current-org-slug))
-                   (dis/board-data-key (router/current-org-slug) (router/current-board-slug)))]
-    (api/get-entry entry-data
-      (fn [{:keys [status success body]}]
-        (if success
-          (dis/dispatch! [:entry board-key (:uuid entry-data) (json->cljs body)]))))))
+  (api/get-entry entry-data
+    (fn [{:keys [status success body]}]
+      (if success
+        (dis/dispatch! [:entry (dis/current-board-key) (:uuid entry-data) (json->cljs body)])))))
 
 (defn entry-clear-local-cache [item-uuid edit-key]
   (remove-cached-item item-uuid)
@@ -389,12 +384,8 @@
               (oc-urls/org org-slug))))))))
 
 (defn activity-delete [activity-data]
-  (let [is-all-posts (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-        board-key (if is-all-posts
-                    (dis/all-posts-key (router/current-org-slug))
-                    (dis/board-data-key (router/current-org-slug) (router/current-board-slug)))]
-    (api/delete-activity activity-data activity-delete-finish)
-    (dis/dispatch! [:activity-delete board-key activity-data])))
+  (api/delete-activity activity-data activity-delete-finish)
+  (dis/dispatch! [:activity-delete (dis/current-board-key) activity-data]))
 
 (defn activity-share-show [activity-data]
   (dis/dispatch! [:activity-share-show activity-data]))
