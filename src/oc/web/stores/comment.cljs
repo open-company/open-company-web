@@ -230,7 +230,6 @@
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ interaction-data]]
   (let [post-uuid (:resource-uuid interaction-data)
-        board-key (dispatcher/current-board-key)
         entry-key (@comments-atom (make-post-index post-uuid))
         entry-data (get-in db entry-key)]
     (if entry-data
@@ -245,6 +244,7 @@
             sorted-comments-data (sort-comments new-comments-data)
             org-slug (name (nth entry-key 0))
             board-slug (name (nth entry-key 2))
+            board-key (dispatcher/board-data-key org-slug board-slug)
             comments-key (dispatcher/activity-comments-key org-slug board-slug (:uuid entry-data))
             all-posts-key (assoc comments-key 2 :all-posts)
             ; update the comments link of the entry

@@ -200,12 +200,17 @@
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
 (defn entry-save-finish [activity-data initial-uuid edit-key]
-  (let [org-slug (router/current-org-slug)]
-    (save-last-used-section (:board-slug activity-data))
+  (let [org-slug (router/current-org-slug)
+        board-slug (:board-slug activity-data)
+        board-key (if (= (:status activity-data) "published")
+                   (dis/current-board-key)
+                   (dis/board-data-key org-slug utils/default-drafts-board-slug))]
+    (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
-    (dis/dispatch! [:entry-save/finish activity-data edit-key])))
+
+    (dis/dispatch! [:entry-save/finish activity-data edit-key board-key])))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success

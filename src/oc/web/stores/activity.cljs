@@ -85,12 +85,9 @@
   (assoc-in db [:entry-editing :loading] true))
 
 (defmethod dispatcher/action :entry-save/finish
-  [db [_ activity-data edit-key]]
+  [db [_ activity-data edit-key board-key]]
   (let [org-slug (utils/post-org-slug activity-data)
         board-slug (:board-slug activity-data)
-        board-key (if (= (:status activity-data) "published")
-                   (dispatcher/current-board-key)
-                   (dispatcher/board-data-key org-slug utils/default-drafts-board-slug))
         board-data (or (get-in db board-key) utils/default-drafts-board)
         activity-board-data (get-in db (dispatcher/board-data-key org-slug board-slug))
         fixed-activity-data (utils/fix-entry activity-data activity-board-data (dispatcher/change-data db))
