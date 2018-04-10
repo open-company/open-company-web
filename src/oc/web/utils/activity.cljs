@@ -81,11 +81,6 @@
                                   (* 24 6)
                                   :else
                                   (* 24 3))]
-           (js/console.log "   el-h" el-h)
-           (js/console.log "   container-max-height" container-max-height)
-           (js/console.log "   prev-height" prev-height)
-           (js/console.log "   actual-height" actual-height)
-           (js/console.log "   truncate-height" truncate-height)
            (swap! partial-heights #(vec (conj % el-h)))
            (when (>= actual-height container-max-height)
              (reset! found true)
