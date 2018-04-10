@@ -136,11 +136,23 @@ div.drafts-layout {
             @include activity-body();
             display: block;
             line-height: 24px;
-            height: #{24*3}px;
+            height: #{24*2}px;
             overflow: hidden;
 
             &.has-body {
-              height: #{24*3}px;
+              height: #{24 * 2}px;
+            }
+
+            & > *:not(:last-child) {
+              margin: 24px 0px;
+            }
+
+            & > *:last-child {
+              margin: 24px 0px 0px;
+            }
+
+            & > *:first-child {
+              margin-top: 0px;
             }
 
             &.has-media-preview {
@@ -218,7 +230,6 @@ div.drafts-layout {
           padding: 16px;
           margin: 24px;
           height: 46px;
-          width: 382px;
           background-color: #D4F7E5;
           border-radius: 4px;
           cursor: pointer;

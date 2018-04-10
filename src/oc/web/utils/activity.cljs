@@ -39,6 +39,7 @@
 
 (def default-body-height 72)
 (def default-all-posts-body-height 144)
+(def default-draft-body-height 48)
 
 (defn truncate-body
   "Given a body element truncate the body. It iterate on the elements
@@ -48,6 +49,7 @@
   [body-el]
   (reset-truncate-body body-el)
   (let [is-ap (= (router/current-board-slug) "all-posts")
+        is-drafts (= (router/current-board-slug) utils/default-drafts-board-slug)
         $body-els (js/$ ">*" body-el)
         partial-heights (atom [])
         found (atom false)]
@@ -56,9 +58,10 @@
        (this-as this
          (let [$this (js/$ this)
                el-h (.outerHeight $this true) ;; Include margins in height calculation
-               container-max-height (if is-ap
-                                     default-all-posts-body-height
-                                     default-body-height)
+               container-max-height (cond
+                                     is-ap default-all-posts-body-height
+                                     is-drafts default-draft-body-height
+                                     :else default-body-height)
                prev-height (apply + @partial-heights)
                actual-height (+ prev-height el-h)
                truncate-height  (cond
@@ -75,7 +78,9 @@
                                   (< (- container-max-height prev-height) (* 24 5))
                                   (* 24 5)
                                   (< (- container-max-height prev-height) (* 24 6))
-                                  (* 24 6))]
+                                  (* 24 6)
+                                  :else
+                                  (* 24 3))]
            (swap! partial-heights #(vec (conj % el-h)))
            (when (>= actual-height container-max-height)
              (reset! found true)
