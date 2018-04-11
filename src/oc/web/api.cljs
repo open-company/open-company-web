@@ -489,11 +489,7 @@
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
-          invitation-link (utils/link-for
-                           (:links team-data)
-                           "add"
-                           "POST"
-                           {:content-type "application/vnd.open-company.team.invite.v1"})
+          invitation-link (utils/invite-people-link (:links team-data))
           api-entry-point-links (:api-entry-point @dispatcher/app-state)
           companies (count (filter #(= (:rel %) "company") api-entry-point-links))
           json-params {:first-name first-name

@@ -651,3 +651,10 @@
 (defn retina-src [url]
   {:src (cdn (str url ".png"))
    :src-set (str (cdn (str url "@2x.png")) " 2x")})
+
+(defn invite-people-link [team-links]
+  (link-for
+   team-links
+   "add"
+   "POST"
+   {:content-type "application/vnd.open-company.team.invite.v1"}))
