@@ -192,9 +192,9 @@
               {:on-click #(activity-actions/hide-invite-people-tooltip)}]
             [:div.invite-people-tooltip-icon]
             [:div.invite-people-tooltip-title
-              "Congrats on publishing your first post."]
+              "Well done on your first post!"]
             [:div.invite-people-tooltip-description
-              "In order for your post to be read, you’ll need to invite people to Carrot."]
+              "You can invite your team so they can see it."]
             [:div.invite-people-tooltip-arrow]])
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
