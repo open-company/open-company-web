@@ -28,20 +28,12 @@
 
 ;; Handle dispatch events
 (defn handle-reaction-to-entry-finish
-  [db activity-data reaction reaction-data]
+  [db activity-data reaction reaction-data activity-key]
   (let [activity-uuid (:uuid activity-data)
-        next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)
-        org-slug (utils/post-org-slug activity-data)
-        section-slug (:board-slug activity-data)
-        ap-key (concat (dispatcher/all-posts-key org-slug)
-                       [:fixed-items activity-uuid])
-        activity-key (concat (dispatcher/board-data-key org-slug section-slug)
-                             [:fixed-items activity-uuid])]
+        next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)]
     (if (nil? reaction-data)
       (let [updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)]
-        (-> db
-          (assoc-in ap-key updated-activity-data)
-          (assoc-in activity-key updated-activity-data)))
+        (assoc-in db activity-key updated-activity-data))
       (let [reaction (first (keys reaction-data))
             next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
             reactions-data (or (:reactions activity-data) [])
@@ -54,37 +46,32 @@
             updated-activity-data (-> activity-data
                                    (assoc :reactions-loading next-reactions-loading)
                                    (assoc :reactions next-reactions-data))]
-        (-> db
-          (assoc-in ap-key updated-activity-data)
-          (assoc-in activity-key updated-activity-data))))))
+        (assoc-in db activity-key updated-activity-data)))))
 
-(defn handle-reaction-to-entry [db activity-data reaction-data]
-  (let [org-slug (utils/post-org-slug activity-data)
-        section-slug (:board-slug activity-data)
-        board-key (dispatcher/board-data-key org-slug section-slug)
-        old-reactions-loading (or (:reactions-loading activity-data) [])
+(defn handle-reaction-to-entry [db activity-data reaction-data board-key]
+  (let [old-reactions-loading (or (:reactions-loading activity-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)
         activity-key (concat board-key [:fixed-items (:uuid activity-data)])]
     (assoc-in db activity-key updated-activity-data)))
 
 (defmethod dispatcher/action :handle-reaction-to-entry
-  [db [_ activity-data reaction-data]]
-  (handle-reaction-to-entry db activity-data reaction-data))
+  [db [_ activity-data reaction-data board-key]]
+  (handle-reaction-to-entry db activity-data reaction-data board-key))
 
 (defmethod dispatcher/action :react-from-picker/finish
-  [db [_ {:keys [status activity-data reaction reaction-data]}]]
+  [db [_ {:keys [status activity-data reaction reaction-data activity-key]}]]
   (if (and (>= status 200)
            (< status 300))
     (let [reaction-key (first (keys reaction-data))
           reaction (name reaction-key)]
-      (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
+      (handle-reaction-to-entry-finish db activity-data reaction reaction-data activity-key))
     ;; Wait for the entry refresh if it didn't
     db))
 
 (defmethod dispatcher/action :activity-reaction-toggle/finish
-  [db [_ activity-data reaction reaction-data]]
-  (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
+  [db [_ activity-data reaction reaction-data activity-key]]
+  (handle-reaction-to-entry-finish db activity-data reaction reaction-data activity-key))
 
 (defn- update-entry-reaction-data
   [add-event? interaction-data entry-data]
