@@ -99,6 +99,7 @@
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :comment-edit        [[:base] (fn [base] (:comment-edit base))]
    :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
+   :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
