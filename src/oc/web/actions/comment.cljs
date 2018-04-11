@@ -110,7 +110,7 @@
     (when entry-data
       ;; Refresh the entry data to get the new links to interact with
       (activity-actions/get-entry entry-data)))
-  (dis/dispatch! [:ws-interaction/comment-add interaction-data]))
+  (dis/dispatch! [:ws-interaction/comment-add interaction-data (dis/current-board-key)]))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-comment/add
