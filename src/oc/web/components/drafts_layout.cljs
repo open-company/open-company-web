@@ -9,6 +9,7 @@
             [oc.web.mixins.activity :as am]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn delete-clicked [draft e]
@@ -17,15 +18,14 @@
                     :action "delete-entry"
                     :message "Delete this draft?"
                     :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                    :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
-                                       (dis/dispatch! [:activity-delete draft])
-                                       (dis/dispatch! [:alert-modal-hide]))}]
-   (dis/dispatch! [:alert-modal-show alert-data])))
+                                       (activity-actions/activity-delete draft)
+                                       (alert-modal/hide-alert))}]
+   (alert-modal/show-alert alert-data)))
 
 (rum/defcs draft-card < am/truncate-body-mixin
-                        am/body-thumbnail-mixin
                         {:after-render (fn [s]
                           (let [draft-data (first (:rum/args s))
                                 body-sel (str "div.draft-card-" (:uuid draft-data) " div.draft-card-body")
@@ -53,7 +53,7 @@
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                   :title (utils/activity-date-tooltip draft)}
+                   :data-title (utils/activity-date-tooltip draft)}
                   (utils/time-since t)])]]]
         [:div.draft-card-content.group
           [:div.draft-card-title
@@ -64,16 +64,9 @@
           (let [fixed-body (utils/body-without-preview (:body draft))
                 empty-body? (empty? (utils/strip-HTML-tags fixed-body))]
             [:div.draft-card-body
-              {:class (utils/class-set {:empty-body empty-body?
-                                        :has-media-preview @(:body-thumbnail s)})
+              {:class (utils/class-set {:empty-body empty-body?})
                :ref "activity-body"
-               :dangerouslySetInnerHTML (utils/emojify fixed-body)}])
-          ; Body preview
-          (when @(:body-thumbnail s)
-            [:div.media-preview-container
-              {:class (or (:type @(:body-thumbnail s)) "image")}
-              [:img
-                {:src (:thumbnail @(:body-thumbnail s))}]])]
+               :dangerouslySetInnerHTML (utils/emojify fixed-body)}])]
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
           (when (utils/link-for (:links draft) "delete")

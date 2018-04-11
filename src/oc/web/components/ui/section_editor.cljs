@@ -7,7 +7,10 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.section :as section-actions]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -127,6 +130,8 @@
                      (reset! (::show-search-results s) false))
                    (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-private-users"))
                      (reset! (::show-edit-user-dropdown s) nil)))}
+      [:button.mlb-reset.mobile-modal-close-bt
+        {:on-click #(on-change nil)}]
       [:div.section-editor-header
         [:div.section-editor-header-left
           {:dangerouslySetInnerHTML
@@ -212,8 +217,7 @@
                 available-users (filter :user-id (:users roster))
                 addable-users (get-addable-users section-editing available-users)
                 filtered-users (filter-users addable-users @query)]
-            (when (and can-change
-                       (pos? (count addable-users)))
+            (when can-change
               [:div.section-editor-private-users-search
                 {:ref "private-users-search"}
                 [:input
@@ -226,19 +230,27 @@
                                 (reset! query q))}]
                 (when @(::show-search-results s)
                   [:div.section-editor-private-users-results
-                    (for [u filtered-users
-                          :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
-                                user (merge u team-user)
-                                user-type (utils/get-user-type user org-data section-editing)]]
-                      [:div.section-editor-private-users-result
-                        {:on-click #(do
-                                      (reset! query "")
-                                      (reset! (::show-search-results s) false)
-                                      (dis/dispatch! [:private-section-user-add user user-type]))
-                         :ref (str "add-user-" (:user-id user))}
-                        (user-avatar-image user)
+                    (if (pos? (count filtered-users))
+                      (for [u filtered-users
+                            :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
+                                  user (merge u team-user)
+                                  user-type (utils/get-user-type user org-data section-editing)]]
+                        [:div.section-editor-private-users-result
+                          {:on-click #(do
+                                        (reset! query "")
+                                        (reset! (::show-search-results s) false)
+                                        (section-actions/private-section-user-add user user-type))
+                           :ref (str "add-user-" (:user-id user))}
+                          (user-avatar-image user)
+                          [:div.name
+                            (utils/name-or-email user)]])
+                      [:div.section-editor-private-users-result.no-more-invites
                         [:div.name
-                          (utils/name-or-email user)]])])])))
+                          "Looks like you'll need to invite more people to your team before you can add them. You can do that in "
+                          [:a
+                            {:on-click #(org-settings/show-modal :invite)}
+                            "Carrot team settings"]
+                          "."]])])])))
         (when (and (= (:access section-editing) "private")
                    (pos? (+ (count (:authors section-editing))
                             (count (:viewers section-editing)))))
@@ -267,8 +279,8 @@
                                 :on-change (fn [item]
                                  (reset! (::show-edit-user-dropdown s) nil)
                                  (if (= (:value item) :remove)
-                                   (dis/dispatch! [:private-section-user-remove team-user])
-                                   (dis/dispatch! [:private-section-user-add team-user (:value item)])))})])
+                                   (section-actions/private-section-user-remove team-user)
+                                   (section-actions/private-section-user-add team-user (:value item))))})])
             [:div.section-editor-add-private-users-list.group
               {:on-scroll #(do
                             (reset! (::show-edit-user-dropdown s) nil)
@@ -311,16 +323,16 @@
                           {:on-click (fn []
                             (let [authors (:authors section-data)
                                   self-data (first (filter #(= (:user-id %) current-user-id) authors))]
-                              (dis/dispatch! [:alert-modal-show
+                              (alert-modal/show-alert
                                {:icon "/img/ML/error_icon.png"
                                 :action "remove-self-user-from-private-section"
                                 :message "Are you sure you want to leave this section?"
                                 :link-button-title "No"
-                                :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                                :link-button-cb #(alert-modal/hide-alert)
                                 :solid-button-title "Yes"
                                 :solid-button-cb (fn []
-                                 (dis/dispatch! [:private-section-kick-out-self self-data])
-                                 (dis/dispatch! [:alert-modal-hide]))}])))}
+                                 (section-actions/private-section-kick-out-self self-data)
+                                 (alert-modal/hide-alert))})))}
                           "Leave section"]
                         [:div.user-type.no-dropdown
                           "Contributor"])
@@ -335,35 +347,30 @@
                      (utils/link-for (:links section-data) "delete"))
             [:button.mlb-reset.delete-bt
               {:on-click (fn []
-                          (dis/dispatch!
-                           [:alert-modal-show
-                            {:icon "/img/ML/trash.svg"
-                             :action "delete-section"
-                             :message [:span
-                                        [:span "Are you sure?"]
-                                        (when (-> section-data :fixed-items count pos?)
-                                          [:span
-                                            " This will delete the section and "
-                                            [:strong "all"]
-                                            " its posts, too."])]
-                             :link-button-title "No"
-                             :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                             :solid-button-style :red
-                             :solid-button-title "Yes, I'm sure"
-                             :solid-button-cb (fn []
-                                                (dis/dispatch!
-                                                 [:board-delete
-                                                 (:slug section-data)])
-                                                (dis/dispatch!
-                                                 [:alert-modal-hide])
-                                                (dismiss))}]))}
+                          (alert-modal/show-alert
+                           {:icon "/img/ML/trash.svg"
+                            :action "delete-section"
+                            :message [:span
+                                       [:span "Are you sure?"]
+                                       (when (-> section-data :fixed-items count pos?)
+                                         [:span
+                                           " This will delete the section and "
+                                           [:strong "all"]
+                                           " its posts, too."])]
+                            :link-button-title "No"
+                            :link-button-cb #(alert-modal/hide-alert)
+                            :solid-button-style :red
+                            :solid-button-title "Yes, I'm sure"
+                            :solid-button-cb (fn []
+                                               (section-actions/section-delete
+                                                 (:slug section-data))
+                                               (alert-modal/hide-alert)
+                                               (dismiss))}))}
               "Delete section"])
           [:button.mlb-reset.create-bt
             {:on-click #(let [section-node (rum/ref-node s "section-name")
                               inner-html (.-innerHTML section-node)
-                              section-name (utils/strip-HTML-tags
-                                            (utils/emoji-images-to-unicode
-                                             (gobj/get (utils/emojify inner-html) "__html")))
+                              section-name (utils/strip-HTML-tags inner-html)
                               next-section-editing (merge section-editing {:slug utils/default-section-slug
                                                                            :name section-name})]
                           (dis/dispatch! [:input [:section-editing] next-section-editing])

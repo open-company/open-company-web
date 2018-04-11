@@ -68,10 +68,9 @@ MediaPicker.addChart = function(){};
 MediaPicker.addAttachment = function(){};
 MediaPicker.saveSelection = function(){};
 MediaPicker.removeSelection = function(){};
-// MediumEditorCustomBold
-var CustomBold = function(){};
-// Tooltip http://darsa.in/tooltip/
-var Tooltip = function(){};
+// MediumEditorFileDragging
+var CarrotFileDragging = function(){};
+CarrotFileDragging.insertImageFile = function(){};
 // Debug app state
 var OCWebPrintAppState = function(){};
 var OCWebPrintOrgData = function(){};
@@ -116,3 +115,10 @@ rangy.restoreSelection = function(){};
 rangy.getSelection = function(){};
 // jwt_decode
 var jwt_decode = function(){};
+// CarrotGA
+var CarrotGA = function(){};
+CarrotGA.dimentions = {};
+CarrotGA.metrics = {};
+CarrotGA.init = function(){};
+CarrotGA.trackEvent = function(){};
+CarrotGA.NULL_VALUE = {};

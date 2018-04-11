@@ -15,6 +15,24 @@ div.section-editor {
     border-radius: 0px;
   }
 
+  button.mobile-modal-close-bt {
+    @include image-2x("/img/ML/mobile_modal_close");
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: 5px 5px;
+    position: absolute;
+    top: 20px;
+    left: 18px;
+    display: none;
+
+    @include mobile() {
+      display: block;
+      z-index: 1001;
+    }
+  }
+
   div.section-editor-header {
     height: 46px;
     border-bottom: 1px solid $deep_tan;
@@ -148,6 +166,19 @@ div.section-editor {
           padding: 12px 0px;
 
           @include user-profile(24);
+
+          &.no-more-invites {
+            height: auto;
+
+            div.name {
+              margin-left: 0px;
+              color: $ui_grey;
+
+              a {
+                color: $carrot_green;
+              }
+            }
+          }
 
           div.user-avatar-img-container {
             float: left;

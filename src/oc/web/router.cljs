@@ -1,6 +1,5 @@
 (ns oc.web.router
   (:require [secretary.core :as secretary]
-            [oc.web.lib.prevent-route-dispatch :as prd]
             [taoensso.timbre :as timbre]
             [goog.history.Html5History :as history5]
             [goog.events :as events]
@@ -123,6 +122,11 @@
   "Cookie to save the last accessed board"
   [org-slug]
   (str "last-board-" (when (jwt/jwt) (str (jwt/user-id) "-")) (name org-slug)))
+
+(defn last-board-view-cookie
+  "Cookie to save the last view used: grid or stream"
+  [org-slug]
+  (str "last-board-view-" (when (jwt/jwt) (str (jwt/get-key :user-id) "-")) (name org-slug)))
 
 (defn last-used-board-slug-cookie
   "Cookie to save the last board slug used in a post creation"

@@ -1,10 +1,6 @@
 div.org-avatar {
   float: left;
 
-  @include mobile(){
-    width: 80%;
-  }
-
   a {
     padding: 0;
 
@@ -14,7 +10,7 @@ div.org-avatar {
   }
 
   @include big_web(){
-    @include org-avatar(42);
+    @include org-avatar(40);
   }
 
   @include mobile(){

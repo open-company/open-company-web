@@ -9,8 +9,11 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]))
 
+(defn show-modal []
+  (dis/dispatch! [:input [:whats-new-modal] true]))
+
 (defn dismiss-modal []
-  (dis/dispatch! [:whats-new-modal-hide]))
+  (dis/dispatch! [:input [:whats-new-modal] false]))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
@@ -44,14 +47,15 @@
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/about))}
               "Company"]
             [:a.about-link
-              {:href oc-urls/help}
+              {:href oc-urls/help
+               :target "_blank"}
               "Help"]
             [:a.about-link
               {:href oc-urls/contact-mail-to}
               "Contact"]
             [:a.about-link.twitter
-              {:href oc-urls/oc-twitter}
-              ""]
+              {:href oc-urls/oc-twitter
+               :target "_blank"}]
             [:a.about-link.medium
               {:href oc-urls/blog}
               ""]]

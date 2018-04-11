@@ -10,12 +10,14 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.team :as team-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.item-input :refer (item-input email-item)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
 (defn dismiss []
-  (dis/dispatch! [:activity-share-hide]))
+  (activity-actions/activity-share-hide))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
@@ -59,7 +61,7 @@
                             mixins/no-scroll-mixin
                             mixins/first-render-mixin
                             {:will-mount (fn [s]
-                              (dis/dispatch! [:teams-get])
+                              (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
                                     org-data @(drv/get-ref s :org-data)
                                     subject (str
@@ -105,7 +107,7 @@
                                    2000
                                    (fn []
                                     (reset! (::shared s) false)
-                                    (dis/dispatch! [:activity-share-reset])))))
+                                    (activity-actions/activity-share-reset)))))
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
@@ -243,7 +245,7 @@
                                     (reset! (::email-data s) (merge email-data {:to-error true}))
                                     (do
                                       (reset! (::sharing s) true)
-                                      (dis/dispatch! [:activity-share [email-share]]))))
+                                      (activity-actions/activity-share activity-data [email-share]))))
                      :class (when (empty? (:to email-data)) "disabled")}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)
@@ -331,7 +333,7 @@
                                       (reset! (::slack-data s) (merge slack-data {:channel-error true})))
                                     (do
                                       (reset! (::sharing s) true)
-                                      (dis/dispatch! [:activity-share [slack-share]]))))
+                                      (activity-actions/activity-share activity-data [slack-share]))))
                      :class (when (empty? (:channel slack-data)) "disabled")}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)

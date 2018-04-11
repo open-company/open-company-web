@@ -1,14 +1,16 @@
 (ns oc.web.actions.comment
-  (:require [oc.web.api :as api]
+  (:require [taoensso.timbre :as timbre]
+            [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions :as actions]
-            [oc.web.lib.json :refer (json->cljs)]))
+            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.actions.activity :as activity-actions]))
 
-(defn add-comment-focus [activity-data]
-  (dis/dispatch! [:add-comment-focus activity-data]))
+(defn add-comment-focus [activity-uuid]
+  (dis/dispatch! [:add-comment-focus activity-uuid]))
 
 (defn add-comment-blur []
   (dis/dispatch! [:add-comment-focus nil]))
@@ -66,3 +68,33 @@
   (api/toggle-reaction reaction-data reacting?
     (fn [{:keys [status success body]}]
       (get-comments activity-data))))
+
+(defn save-comment
+  [activity-uuid comment-data new-body]
+  (api/save-comment comment-data new-body)
+  (dis/dispatch! [:comment-save activity-uuid comment-data new-body]))
+
+(defn ws-comment-update
+  [interaction-data]
+  (dis/dispatch! [:ws-interaction/comment-update interaction-data]))
+
+(defn ws-comment-delete [comment-data]
+  (dis/dispatch! [:ws-interaction/comment-delete comment-data]))
+
+(defn ws-comment-add [interaction-data]
+  (let [org-slug   (router/current-org-slug)
+        board-slug (router/current-board-slug)
+        activity-uuid (:resource-uuid interaction-data)
+        entry-data (dis/activity-data org-slug board-slug activity-uuid)]
+    (when entry-data
+      ;; Refresh the entry data to get the new links to interact with
+      (activity-actions/get-entry entry-data)))
+  (dis/dispatch! [:ws-interaction/comment-add interaction-data]))
+
+(defn subscribe []
+  (ws-ic/subscribe :interaction-comment/add
+                   #(ws-comment-add (:data %)))
+  (ws-ic/subscribe :interaction-comment/update
+                   #(ws-comment-update (:data %)))
+  (ws-ic/subscribe :interaction-comment/delete
+                   #(ws-comment-delete (:data %))))

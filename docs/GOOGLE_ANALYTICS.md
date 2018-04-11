@@ -28,7 +28,8 @@ Each of the custom dimensions and metrics have been created in google analytics 
 * PAGE_LOADS: How often did a page load.
 
 #### Code
-[CarrogGA code](../resources/public/lib/autotrack/google-analytics.js)
+
+[Carrot GA code](../resources/public/lib/autotrack/google-analytics.js)
 
 ```javascript
 var CarrotGA = {

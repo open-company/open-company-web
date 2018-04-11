@@ -7,9 +7,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (first-render-mixin)]
-            [oc.web.components.ui.section-editor :refer (section-editor)]
+            [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.ui.whats-new-modal :as whats-new-modal]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -24,25 +25,6 @@
   (utils/event-stop e)
   (router/nav! url)
   (close-navigation-sidebar))
-
-(defn new?
-  "
-  A board is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-     -and-
-    change-at is newer than seen at
-      -or-
-    we have a change-at and no seen at
-  "
-  [change-data board]
-  (let [changes (get change-data (:uuid board))
-        change-at (:change-at changes)
-        nav-at (:nav-at changes)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
-        new? (and in-team?
-                  (or (and change-at nav-at (> change-at nav-at))
-                      (and change-at (not nav-at))))]
-    new?))
 
 (def sidebar-top-margin 122)
 (def footer-button-height 31)
@@ -63,6 +45,11 @@
 (defn filter-boards [all-boards]
   (filterv filter-board all-boards))
 
+(defn save-window-height
+  "Save the window height in the local state."
+  [s]
+  (reset! (::window-height s) (.-innerHeight js/window)))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -70,17 +57,13 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
-                                (rum/local nil ::resize-listener)
                                 (rum/local nil ::window-height)
                                 ;; Mixins
-                                first-render-mixin
+                                ui-mixins/first-render-mixin
+                                (ui-mixins/render-on-resize save-window-height)
+
                                 {:will-mount (fn [s]
-                                  (reset! (::window-height s) (.-innerHeight js/window))
-                                  (reset! (::resize-listener s)
-                                   (events/listen
-                                    js/window
-                                    EventType/RESIZE
-                                    #(reset! (::window-height s) (.-innerHeight js/window))))
+                                  (save-window-height s)
                                   (save-content-height s)
                                   s)
                                  :did-mount (fn [s]
@@ -94,11 +77,6 @@
                                  :did-update (fn [s]
                                   (when-not (utils/is-test-env?)
                                     (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
-                                  s)
-                                 :will-unmount (fn [s]
-                                  (when @(::resize-listener s)
-                                    (events/unlistenByKey @(::resize-listener s))
-                                    (reset! (::resize-listener s) nil))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -109,8 +87,6 @@
         boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
         create-link (utils/link-for (:links org-data) "create")
-        show-create-new-board (and (not (responsive/is-tablet-or-mobile?))
-                                   create-link)
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
@@ -134,11 +110,6 @@
       {:class (when mobile-navigation-sidebar "show-mobile-boards-menu")}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
-        [:div.left-navigation-sidebar-mobile-header.group
-          [:button.mlb-reset.close-mobile-menu
-            {:on-click #(close-navigation-sidebar)}]
-          [:div.mobile-header-title
-            "Digest navigation"]]
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
@@ -170,15 +141,14 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:span
                 "SECTIONS"]
-              (when show-create-new-board
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.right
+              (when create-link
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(do
                                (dis/dispatch! [:input [:show-section-add] true])
                                (close-navigation-sidebar))
                    :title "Create a new section"
-                   :id "add-board-button"
                    :data-placement "top"
-                   :data-toggle "tooltip"
+                   :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
                    :data-container "body"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
@@ -202,7 +172,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (new? change-data board)
+                    {:class (utils/class-set {:new (:new board)
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
@@ -211,13 +181,13 @@
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(do
-                          (dis/dispatch! [:org-settings-show :invite])
+                          (org-settings/show-modal :invite)
                           (close-navigation-sidebar))}
             [:div.invite-people-icon]
             [:span "Invite people"]])
         [:button.mlb-reset.about-carrot-btn
           {:on-click #(do
-                        (dis/dispatch! [:whats-new-modal-show])
+                        (whats-new-modal/show-modal)
                         (close-navigation-sidebar))}
           [:div.about-carrot-icon]
           [:span "Support"]]]]))

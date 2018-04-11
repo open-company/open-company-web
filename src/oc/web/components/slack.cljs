@@ -102,8 +102,8 @@
           shared-misc/carrot-testimonials
 
           (when-not (jwt/jwt)
-            [:section.third-section
-              [:div.third-section-title
+            [:section.keep-aligned
+              [:div.keep-aligned-title
                 "Keep everyone aligned around what matters most."]
               (get-started-button auth-settings)])
 

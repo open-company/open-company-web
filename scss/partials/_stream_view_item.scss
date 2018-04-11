@@ -46,92 +46,6 @@ div.stream-view-item {
 
       @include activity-author(32);
     }
-
-    div.more-button {
-      float: right;
-      position: relative;
-      margin-right: -6px;
-
-      button.more-ellipsis {
-        width: 24px;
-        height: 24px;
-        padding: 2px 10px;
-        display: block;
-        background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-        background-position: center;
-        background-size: 4px 20px;
-        background-repeat: no-repeat;
-      }
-
-      div.activity-move {
-        position: absolute;
-        top: 36px;
-        left: unset;
-        right: -10px;
-
-        @include mobile() {
-          right: -10px;
-        }
-      }
-
-      div.activity-more-dropdown-menu {
-        position: absolute;
-        top: 36px;
-        right: -10px;
-        left: calc(100% - 100px + 10px);
-        min-width: 100px;
-        height: auto;
-        border: none;
-        outline: none;
-        box-shadow: none;
-        background-color: transparent;
-        overflow: visible;
-        z-index: 100;
-
-        div.triangle {
-          position: absolute;
-          top: -7px;
-          left: calc(100% - 30px);
-          background-color: white;
-          border-top: 1px solid rgba(177,184,192,0.50);
-          border-left: 1px solid rgba(177,184,192,0.50);
-          transform: rotate(45deg);
-          width: 15px;
-          height: 15px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-
-        ul.activity-card-more-menu {
-          background-color: white;
-          border: 1px solid rgba(177,184,192,0.50);
-          box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-          border-radius: 5px;
-          margin: 0px;
-          padding: 10px 13px 6px 8px;
-          min-height: 50px;
-          list-style-type: none;
-          width: 100%;
-
-          li {
-            padding: 3px 8px;
-            @include avenir_M();
-            font-size: 14px;
-            color: $carrot_light_gray_3;
-            cursor: pointer;
-            background-color: transparent;
-
-            @include big_web() {
-              &:hover {
-                background-color: rgba($carrot_light_gray_4, 0.2);
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   div.stream-view-item-body {
@@ -157,6 +71,8 @@ div.stream-view-item {
       position: relative;
       padding: 40px 40px 88px 40px;
       background-color: white;
+      border-bottom-left-radius: 6px;
+      border-right: 1px solid #F4F3F1;
 
       @include mobile() {
         width: 100%;
@@ -223,7 +139,7 @@ div.stream-view-item {
             @include activity-body(18);
             @include avenir_BOOK();
             color: $deep_navy;
-            line-height: 30px;
+            line-height: 28px;
 
             div.carrot-no-preview, a.carrot-no-preview {
               display: none;
@@ -242,6 +158,7 @@ div.stream-view-item {
           font-size: 16px;
           text-align: center;
           display: none;
+          padding: 3px 7px 2px 7px;
         }
       }
 
@@ -255,33 +172,22 @@ div.stream-view-item {
       }
 
       div.stream-mobile-comments-summary {
-        margin-left: 16px;
-        float: left;
+        margin-top: 16px;
+        border-top: 1px solid #ECECEC;
+        padding-top: 16px;
+        position: relative;
 
-        @include mobile() {
-          margin-left: 24px;
-        }
-
-        div.zero-comments {
-          padding-left: 22px;
-          @include avenir_M();
-          font-size: 14px;
-          color: $ui_grey;
-          margin-top: 7px;
-          position: relative;
-
-          &:before {
-            content: "";
-            width: 14px;
-            height: 14px;
-            background-image: cdnUrl("/img/ML/reply_comment_shape.svg");
-            background-size: 14px 14px;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: absolute;
-            top: 2px;
-            left: 0px;
-          }
+        &:after {
+          content: "";
+          position: absolute;
+          width: 9px;
+          height: 15px;
+          top: 20px;
+          right: 0px;
+          background-image: cdnUrl("/img/ML/mobile_comments_chevron.svg");
+          background-size: 9px 15px;
+          background-position: center;
+          background-repeat: no-repeat;
         }
       }
 
@@ -345,7 +251,7 @@ div.stream-view-item {
           &.show-buttons {
             div.emoji-picker {
               top: unset;
-              bottom: 9px;
+              bottom: 4px;
               right: 60px;
               left: unset;
             }

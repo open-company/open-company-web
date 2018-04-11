@@ -10,6 +10,8 @@
 
 (def home "/")
 
+(def home-no-redirect (str home "?no_redirect=1"))
+
 (def about "/about")
 
 (def slack "/slack")
@@ -68,8 +70,6 @@
 
 ;; Organizations
 
-(def create-org "/create-org")
-
 (defn org
   "Org url"
   ([]
@@ -106,12 +106,6 @@
     (str (org-settings org-slug) "/invite")))
 
 ;; Boards
-
-(defn boards
-  ([]
-    (boards (router/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/boards")))
 
 (defn board
   "Board url"

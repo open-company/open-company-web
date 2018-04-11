@@ -5,15 +5,28 @@
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
-            [oc.web.lib.medium-editor-exts]
             [oc.web.rum-utils :as ru]
+            ;; Pull in all the stores to register the events
             [oc.web.actions]
-            [oc.web.actions.user :as user-actions]
+            [oc.web.stores.org]
+            [oc.web.stores.team]
             [oc.web.stores.user]
             [oc.web.stores.search]
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
+            [oc.web.stores.error-banner]
+            [oc.web.stores.subscription]
+            [oc.web.stores.section]
+            ;; Pull in the needed file for the ws interaction events
+            [oc.web.lib.ws-interaction-client]
+            [oc.web.actions.team]
+            [oc.web.actions.org :as oa]
+            [oc.web.actions.comment :as ca]
+            [oc.web.actions.reaction :as ra]
+            [oc.web.actions.section :as sa]
+            [oc.web.actions.user :as user-actions]
+            [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -33,9 +46,7 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
-            [oc.web.components.org-editor :refer (org-editor)]
             ; [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.mobile-boards-list :refer (mobile-boards-list)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
@@ -65,7 +76,7 @@
 
 (defn inject-loading []
   (let [target (sel1 [:div#oc-loading])]
-    (drv-root #(loading) target)))
+    (drv-root loading target)))
 
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
   (let [l (.-location js/window)
@@ -120,7 +131,12 @@
                      (nil? (dis/org-data))))
         (user-actions/entry-point-get (router/current-org-slug)))
       (when (> (- now latest-auth-settings) reload-time)
-        (api/get-auth-settings))))))
+        (user-actions/auth-settings-get
+          #(when (and (utils/in? (:route @router/path) "confirm-invitation")
+                      (contains? (:query-params @router/path) :token))
+             (utils/after 100 (fn []
+               (user-actions/confirm-invitation
+                (:token (:query-params @router/path))))))))))))
 
 ;; home
 (defn home-handler [target params]
@@ -400,16 +416,6 @@
       (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
 
-    (defroute org-create-route urls/create-org {:as params}
-      (timbre/info "Routing org-create-route" urls/create-org)
-      (if (jwt/jwt)
-        (do
-          (pre-routing (:query-params params))
-          (router/set-route! ["create-org"] {:query-params (:query-params params)})
-          (post-routing)
-          (drv-root org-editor target))
-        (router/redirect! urls/home)))
-
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
@@ -457,13 +463,6 @@
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
       (secure-activity-handler secure-activity "secure-activity" target params))
 
-    (defroute boards-list-route (urls/boards ":org") {:as params}
-      (timbre/info "Routing boards-list-route" (urls/boards ":org"))
-      (swap! dis/app-state assoc :loading true)
-      (if (responsive/is-mobile-size?)
-        (simple-handler mobile-boards-list "boards-list" target params)
-        (org-handler "boards-list" target [:div] params)))
-
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
       (board-handler "dashboard" target org-dashboard params))
@@ -506,7 +505,6 @@
                                  slack-route
                                  pricing-route
                                  logout-route
-                                 org-create-route
                                  email-confirmation-route
                                  confirm-invitation-route
                                  confirm-invitation-profile-route
@@ -533,7 +531,6 @@
                                  secure-activity-route
                                  secure-activity-slash-route
                                  ;; Boards
-                                 boards-list-route
                                  board-route
                                  board-slash-route
                                  ; Entry route
@@ -562,8 +559,23 @@
 (defn init []
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
+  ;; Setup API requests
+  (api/config-request
+   #(user-actions/update-jwt %) ;; success jwt refresh after expire
+   #(user-actions/logout) ;; failed to refresh jwt
+   ;; network error
+   #(error-banner-actions/show-banner utils/generic-network-error 10000))
+
   ;; Persist JWT in App State
   (user-actions/dispatch-jwt)
+
+  ;; Subscribe to websocket client events
+  (sa/ws-change-subscribe)
+  (sa/ws-interaction-subscribe)
+  (oa/subscribe)
+  (ra/subscribe)
+  (ca/subscribe)
+
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ; mount the error banner

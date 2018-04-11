@@ -160,3 +160,10 @@
             ""]
           [:div.author-company
             ""]]]]])
+
+(def keep-aligned
+  [:section.keep-aligned
+    [:div.keep-aligned-title
+      "Keep everyone aligned around what matters most."]
+    [:button.mlb-reset.get-started-button
+      "Get started for free"]])

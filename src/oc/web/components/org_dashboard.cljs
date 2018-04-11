@@ -4,17 +4,22 @@
             [taoensso.timbre :as timbre]
             [oc.web.lib.raven :as raven]
             [org.martinklepsch.derivatives :as drv]
+            [taoensso.timbre :as timbre]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.stores.search :as search]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
-            [oc.web.components.ui.carrot-tip :refer (carrot-tip)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
@@ -25,6 +30,7 @@
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
+            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
@@ -32,62 +38,29 @@
 (defn refresh-board-data [s]
   (when-not (router/current-activity-id)
     (utils/after 100 (fn []
-     (if (= (router/current-board-slug) "all-posts")
-       (dis/dispatch! [:all-posts-get])
-       (let [{:keys [org-data
-                     board-data]} @(drv/get-ref s :org-dashboard-data)
-             fixed-board-data (or
-                               board-data
-                               (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
-         (dis/dispatch! [:board-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")])))))))
+     (let [{:keys [org-data
+                   board-data
+                   ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
+       (if (= (router/current-board-slug) "all-posts")
+         (do
+           (activity-actions/all-posts-get org-data ap-initial-at)
+           (utils/after 2000
+             #(section-actions/load-other-sections (:boards org-data))))
 
-(defn nux-steps
-  [org-data board-data nux]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)
-        is-admin? (jwt/is-admin? (:team-id org-data))]
-    (case nux
-      :4
-      (let [create-link (utils/link-for (:links org-data) "create")]
-        (carrot-tip {:step nux
-                     :title "Update your team"
-                     :message (str
-                               "Click the compose button to add "
-                               "updates, announcements and plans "
-                               "that keep your team aligned.")
-                     :step-label (str "1 of " (if is-admin? "3" "2"))
-                     :button-title "Cool"
-                     :button-position "left"
-                     :on-next-click #(dis/dispatch! [:input [:nux] :5])}))
-      :5
-      (carrot-tip {:step nux
-                   :title "Boards keep posts organized"
-                   :message (str
-                             "You can add high-level boards like "
-                             "All-hands, Strategy, and Who We Are; or "
-                             "group-level boards like Sales, Marketing and "
-                             "Design.")
-                   :step-label (str "2 of " (if is-admin? "3" "2"))
-                   :button-title "Ok, got it"
-                   :button-position "left"
-                   :on-next-click #(if is-admin?
-                                    (dis/dispatch! [:input [:nux] :6])
-                                    (dis/dispatch! [:nux-end]))})
-      :6
-      (carrot-tip {:step nux
-                   :title "Invite your teammates"
-                   :message (str
-                             "The best way to keep your team aligned? Invite "
-                             "them to join you on Carrot!")
-                   :step-label "3 of 3"
-                   :button-title "Let's go"
-                   :button-position "left"
-                   :on-next-click #(dis/dispatch! [:nux-end])}))))
+         (let [fixed-board-data (or
+                                 board-data
+                                 (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
+           (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
 
-(rum/defcs org-dashboard < rum/static
+(rum/defcs org-dashboard < ;; Mixins
+                           rum/static
                            rum/reactive
+                           (ui-mixins/render-on-resize nil)
+                           ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
+
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
@@ -115,9 +88,10 @@
                 show-section-editor
                 show-section-add
                 show-sections-picker
-                entry-editing-board-slug]} (drv/react s :org-dashboard-data)
+                entry-editing-board-slug
+                mobile-navigation-sidebar]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :2 :3])
+        should-show-onboard-overlay? (some #{nux} [:1 :2])
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
@@ -172,11 +146,11 @@
           ;; Mobile create a new section
           (and is-mobile?
                show-section-editor)
-          (section-editor nil #(dis/dispatch! [:section-edit-save]))
+          (section-editor board-data #(section-actions/section-save (:section-editing s)))
           ;; Mobile edit current section data
           (and is-mobile?
                show-section-add)
-          (section-editor board-data #(dis/dispatch! [:input [:show-section-add] false]))
+          (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))
           ;; Mobile sections picker
           (and is-mobile?
                show-sections-picker)
@@ -197,6 +171,10 @@
           ;; Search results
           (and is-mobile? search-active? (not (router/current-activity-id)))
           (search-results-view)
+          ;; Show mobile navigation
+          (and is-mobile?
+               mobile-navigation-sidebar)
+          (navigation-sidebar)
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
@@ -218,18 +196,18 @@
         (when (and media-input
                    (:media-chart media-input))
           (media-chart-modal))
-        ;; Show onboard overlay
-        (when (some #{nux} [:4 :5 :6])
-          (nux-steps org-data board-data nux))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing
                            should-show-onboard-overlay?
-                           is-sharing-activity))
+                           is-sharing-activity
+                           show-section-add
+                           show-section-editor))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when-not (and is-mobile?
-                              (and search-active? search-results?))
+                              (and search-active? search-results?)
+                              mobile-navigation-sidebar)
                  (dashboard-layout))]]])])))

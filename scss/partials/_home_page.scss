@@ -19,7 +19,7 @@ button.get-started-button {
     margin: 16px auto;
     padding: 0px 32px;
 
-    &.your-boards {
+    &.your-digest {
       text-align: center;
 
       &:after {
@@ -316,22 +316,6 @@ div#wrap {
           display: inline-block;
           text-align: center;
         }
-      }
-    }
-
-    section.third-section {
-      padding: 72px 0px;
-      text-align: center;
-
-      div.third-section-title {
-        @include avenir_M();
-        font-size: 34px;
-        color: $carrot_dark_gray;
-        margin-bottom: 20px;
-      }
-
-      button.get-started-button {
-        margin-top: 0px;
       }
     }
   }

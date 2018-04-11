@@ -35,7 +35,7 @@
            :data-toggle "tooltip"
            :data-placement "top"
            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-           :title (utils/activity-date-tooltip result)}
+           :data-title (utils/activity-date-tooltip result)}
           (utils/time-since t)])]
       ]]))
 
@@ -148,10 +148,10 @@
            :on-focus #(let [search-input (.-target %)
                             search-query (.-value search-input)]
                         (reset! (::search-clicked? s) true)
+                        (search/focus)
                         (when (and (responsive/is-mobile-size?) (zero? (count search-query)))
                           (set! (.-placeholder search-input) "Search"))
                         (search/query search-query))
-           :on-change #(search/query (.-value (.-target %)))
-           }]
+           :on-change #(search/query (.-value (.-target %)))}]
        [:div.triangle {:class (when-not search-active? "inactive")}]
        (when-not (responsive/is-mobile-size?)(search-results-view))])))

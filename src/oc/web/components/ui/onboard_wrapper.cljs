@@ -11,10 +11,12 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.stores.user :as user-store]
+            [oc.web.actions.org :as org-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image default-avatar-url)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.dom :as gdom]
             [goog.object :as gobj]))
 
@@ -144,12 +146,15 @@
 
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
+                                  (drv/drv :current-user-data)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
-                                    (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
-                                    (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                    (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
+                                    (utils/after 100
+                                     #(user-actions/user-profile-save @(drv/get-ref s :current-user-data)
+                                       @(drv/get-ref s :edit-user-profile)))
                                     s)
                                    :did-mount (fn [s]
                                     (delay-focus-field-with-ref s "first-name")
@@ -165,6 +170,7 @@
                                    s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
+        current-user-data (drv/react s :current-user-data)
         user-data (:user-data edit-user-profile)
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
@@ -184,7 +190,7 @@
              :on-touch-start identity
              :on-click #(when-not top-continue-disabled
                           (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save]))
+                          (user-actions/user-profile-save current-user-data edit-user-profile))
              :aria-label "Continue"}
             "Continue"])]
       (when (:error edit-user-profile)
@@ -232,15 +238,16 @@
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save]))}
+                          (user-actions/user-profile-save current-user-data edit-user-profile))}
             "That’s me"]]]]))
 
 (defn- setup-team-data
   ""
   [s]
+  ;; Load the list of teams if it's not already
+  (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)
-        teams-load @(drv/get-ref s :teams-load)]
+        teams-data @(drv/get-ref s :teams-data)]
     (when (and (zero? (count (:name org-editing)))
                (zero? (count (:logo-url org-editing)))
                (seq teams-data))
@@ -267,7 +274,6 @@
             (set! (.-src img) (:logo-url first-team))))))))
 
 (rum/defcs lander-team < rum/reactive
-                         (drv/drv :teams-load)
                          (drv/drv :teams-data)
                          (drv/drv :org-editing)
                          (rum/local false ::saving)
@@ -279,19 +285,10 @@
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
-                           (let [teams-data @(drv/get-ref s :teams-data)
-                                 teams-load @(drv/get-ref s :teams-load)]
-                             ;; Load the list of teams if it's not already
-                             (when (and (empty? teams-data)
-                                        (:auth-settings teams-load)
-                                        (not (:teams-data-requested teams-load)))
-                               (dis/dispatch! [:teams-get]))
-                             ;; If the team is loaded setup the form
-                             (setup-team-data s))
+                           (setup-team-data s)
                            s)}
   [s]
   (let [teams-data (drv/react s :teams-data)
-        _ (drv/react s :teams-load)
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.onboard-lander.lander-team
@@ -308,7 +305,7 @@
                             (if (and (seq org-name)
                                      (> (count org-name) 2))
                               ;; Create org and show setup screen
-                              (dis/dispatch! [:org-create])
+                              (org-actions/org-create @(drv/get-ref s :org-editing))
                               (dis/dispatch! [:input [:org-editing :error] true]))))
              :aria-label "Done"}
            "Done"])]
@@ -368,7 +365,7 @@
                           (dis/dispatch! [:input [:org-editing :name] org-name])
                           (if (and (seq org-name)
                                    (> (count org-name) 2))
-                           (dis/dispatch! [:org-create])
+                           (org-actions/org-create @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true])))}
             "All set!"]]]]))
 
@@ -424,17 +421,18 @@
             {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
              :on-click #(if (< (count (:pswd collect-pswd)) 8)
                           (reset! (::password-error s) true)
-                          (dis/dispatch! [:pswd-collect]))
+                          (user-actions/pswd-collect collect-pswd false))
              :on-touch-start identity}
             "Continue"]]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive
                                     (drv/drv :edit-user-profile)
+                                    (drv/drv :current-user-data)
                                     (drv/drv :orgs)
                                     (rum/local false ::saving)
                                     (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                      (reset! (::temp-user-avatar s) (utils/cdn default-avatar-url true))
+                                      (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
                                        (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
                                       s)
                                      :did-mount (fn [s]
@@ -450,6 +448,7 @@
                                       s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
+        current-user-data (drv/react s :current-user-data)
         user-data (:user-data edit-user-profile)
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
@@ -506,7 +505,7 @@
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
-                          (dis/dispatch! [:user-profile-save]))}
+                          (user-actions/user-profile-save current-user-data edit-user-profile))}
             "That’s me"]]]]))
 
 (defn vertical-center-mixin [class-selector]
@@ -520,12 +519,21 @@
                         (vertical-center-mixin ".onboard-email-container")
   [s]
   (let [email (:e (drv/react s :query-params))]
-    [:div.onboard-email-container
-      "Please verify your email address"
-      [:div.email-wall-sent-link "We have sent a link to "
+    [:div.onboard-email-container.email-wall
+      [:div.email-wall-icon]
+      "Please verify your email"
+      [:div.email-wall-subtitle
+        (str
+         "Before you can join your team, we just need to verify your idetity. "
+         "Please check your email, and continue the registration process from there.")]
+      [:div.email-wall-sent-link
+        "We have sent an email to"
         (if (seq email)
-          [:span.email-address email]
-          (str "your email address"))
+          ":"
+          " ")
+        (if (seq email)
+          [:div.email-address email]
+          "your email address")
         "."]]))
 
 (defn exchange-token-when-ready [s]

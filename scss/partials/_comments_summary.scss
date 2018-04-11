@@ -1,0 +1,52 @@
+div.is-comments {
+  float: left;
+  text-align: right;
+  height: 26px;
+
+  div.is-comments-authors {
+    float: left;
+
+    &:not(:empty){
+      margin-right: 8px;
+    }
+
+    div.is-comments-author {
+      float: left;
+      width: 24px;
+      height: 24px;
+      border: 2px solid white;
+      background-color: white;
+      border-radius: 12px;
+      margin-left: -9px;
+
+      img {
+        max-width: 22px;
+        max-height: 22px;
+        margin-top: -2px;
+        margin-left: 1px;
+        border-radius: 11px;
+      }
+
+      &:first-child {
+        margin-left: 0px;
+      }
+    }
+  }
+
+  div.is-comments-summary {
+    float: left;
+    font-size: 14px;
+    color: $ui_grey;
+    @include avenir_M();
+    margin-top: 3px;
+    text-align: left;
+    white-space: nowrap;
+    max-width: 74%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @include mobile() {
+      max-width: 68vw;
+    }
+  }
+}

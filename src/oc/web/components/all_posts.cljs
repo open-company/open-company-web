@@ -7,16 +7,15 @@
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.stream-view-item :refer (stream-view-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
-
-(defn get-activity-date [activity]
-  (or (:published-at activity) (:published-at activity)))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 5)
@@ -29,7 +28,7 @@
    check if the entry was created on the date or before."
   [entry date-str]
   (let [js-date (utils/js-date date-str)
-        entry-date (utils/js-date (get-activity-date entry))]
+        entry-date (utils/js-date (activity-utils/get-activity-date entry))]
     (>= (.getTime entry-date) (.getTime js-date))))
 
 (defn days-for-month [y m]
@@ -60,14 +59,6 @@
                (first ens))
         en))))
 
-(defn compare-activities [act-1 act-2]
-  (let [time-1 (get-activity-date act-1)
-        time-2 (get-activity-date act-2)]
-    (compare time-2 time-1)))
-
-(defn get-sorted-items [all-posts-data]
-  (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))
-
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
   [s e]
@@ -87,7 +78,7 @@
       ;; Show a spinner at the top
       (reset! (::top-loading s) true)
       ;; if the user is close to the top margin, load more results if there is a link
-      (dis/dispatch! [:all-posts-more @(::has-next s) :up])
+      (activity-actions/all-posts-more @(::has-next s) :up)
       (reset! (::has-next s) false))
     ;; scrolling down
     (when (and @(::has-prev s)
@@ -96,7 +87,7 @@
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
-      (dis/dispatch! [:all-posts-more @(::has-prev s) :down])
+      (activity-actions/all-posts-more @(::has-prev s) :down)
       (reset! (::has-prev s) false)))
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
@@ -122,17 +113,17 @@
                         mixins/first-render-mixin
                         {:will-mount (fn [s]
                           (let [all-posts-data @(drv/get-ref s :all-posts)
-                                sorted-items (get-sorted-items all-posts-data)
+                                sorted-items (activity-utils/get-sorted-activities all-posts-data)
                                 year (:year all-posts-data)
                                 month (:month all-posts-data)
                                 direction (:direction all-posts-data)
                                 next-link (utils/link-for (:links all-posts-data) "previous")
                                 prev-link (utils/link-for (:links all-posts-data) "next")
-                                first-entry-date (utils/js-date (get-activity-date (first sorted-items)))
+                                first-entry-date (utils/js-date (activity-utils/get-activity-date (first sorted-items)))
                                 ap-initial-at @(drv/get-ref s :ap-initial-at)
                                 first-available-entry (when (and year month)
                                                         (get-first-available-entry
-                                                         (get-sorted-items all-posts-data)
+                                                         (activity-utils/get-sorted-activities all-posts-data)
                                                          year
                                                          month))]
                             (if (and year month)
@@ -148,7 +139,7 @@
                                 (let [saved-items (:saved-items all-posts-data)
                                       last-new-entry-idx (dec (- (count sorted-items) saved-items))
                                       scroll-to-entry (get sorted-items last-new-entry-idx)
-                                      created-date (utils/js-date (get-activity-date scroll-to-entry))
+                                      created-date (utils/js-date (activity-utils/get-activity-date scroll-to-entry))
                                       to-year (.getFullYear created-date)
                                       to-month (inc (int (.getMonth created-date)))]
                                   (reset! (::selected-year s) to-year)
@@ -161,7 +152,7 @@
                                   ; Load more :down scroll, needs to set the calendar
                                   (let [last-old-entry-idx (dec (:saved-items all-posts-data))
                                         last-old-entry (get sorted-items last-old-entry-idx)
-                                        created-date (utils/js-date (get-activity-date last-old-entry))
+                                        created-date (utils/js-date (activity-utils/get-activity-date last-old-entry))
                                         to-year (.getFullYear created-date)
                                         to-month (inc (int (.getMonth created-date)))]
                                     (reset! (::selected-year s) to-year)
@@ -200,7 +191,7 @@
                           s)
                          :before-render (fn [s]
                           (let [all-posts-data @(drv/get-ref s :all-posts)
-                                sorted-items (get-sorted-items all-posts-data)]
+                                sorted-items (activity-utils/get-sorted-activities all-posts-data)]
                             (when-not (:loading-more all-posts-data)
                               (when @(::top-loading s)
                                 (reset! (::top-loading s) false)
@@ -237,7 +228,7 @@
                           s)}
   [s]
   (let [all-posts-data (drv/react s :all-posts)
-        items (get-sorted-items all-posts-data)]
+        items (activity-utils/get-sorted-activities all-posts-data)]
     [:div.all-posts.group
       [:div.all-posts-cards
         (when @(::top-loading s)

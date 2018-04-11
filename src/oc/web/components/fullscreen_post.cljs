@@ -16,12 +16,14 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.activity-move :refer (activity-move)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
 
 ;; Unsaved edits handling
@@ -50,8 +52,8 @@
 
 (defn dismiss-modal [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)
-        activity-data (:activity-data modal-data)]
-    (activity-actions/activity-modal-fade-out (:board-slug activity-data))))
+        edited-data (:modal-editing-data modal-data)]
+    (activity-actions/activity-modal-fade-out (:board-slug edited-data))))
 
 (defn close-clicked [s]
   (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :fullscreen-post-data))]
@@ -60,24 +62,6 @@
       (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s)))
-
-;; Delete handling
-
-(defn delete-clicked [e activity-data]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message (str "Delete this update?")
-                    :link-button-title "No"
-                    :link-button-cb #(dis/dispatch! [:alert-modal-hide])
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(let [org-slug (router/current-org-slug)
-                                            board-slug (router/current-board-slug)
-                                            board-url (oc-urls/board org-slug board-slug)]
-                                       (router/nav! board-url)
-                                       (dis/dispatch! [:activity-delete activity-data])
-                                       (dis/dispatch! [:alert-modal-hide]))
-                    }]
-    (dis/dispatch! [:alert-modal-show alert-data])))
 
 ;; Editing
 
@@ -88,8 +72,7 @@
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
   (when-let [headline (rum/ref-node state "edit-headline")]
-    (let [emojied-headline (utils/emoji-images-to-unicode
-                            (gobj/get (utils/emojify (.-innerHTML headline)) "__html"))]
+    (let [emojied-headline (.-innerHTML headline)]
       (dis/dispatch! [:update [:modal-editing-data] #(merge % {:headline emojied-headline
                                                                :has-changes true})]))))
 
@@ -110,9 +93,10 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when-let [headline-el   (rum/ref-node state "edit-headline")]
-      ; move cursor at the end
-      (utils/to-end-of-content-editable headline-el))))
+    (when (= (.-activeElement js/document) (.-body js/document))
+      (when-let [headline-el   (rum/ref-node state "edit-headline")]
+        ; move cursor at the end
+        (utils/to-end-of-content-editable headline-el)))))
 
 (defn- add-emoji-cb [state]
   (headline-on-change state)
@@ -158,15 +142,20 @@
 (defn- save-editing? [state]
   (clean-body)
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
+        section-editing (:section-editing modal-data)
         edited-data (:modal-editing-data modal-data)]
-    (when (:has-changes edited-data)
+    (when (and (:has-changes edited-data)
+               (pos? (count (:headline edited-data))))
       (reset! (::entry-saving state) true)
-      (activity-actions/entry-modal-save edited-data (router/current-board-slug)))))
+      (activity-actions/entry-modal-save edited-data (router/current-board-slug) section-editing))))
 
 (defn- dismiss-editing? [state dismiss-modal?]
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
-        dismiss-fn (fn []
-                     (dis/dispatch! [:entry-clear-local-cache :modal-editing-data])
+        dismiss-fn (fn [dismiss-alert?]
+                     (when dismiss-alert?
+                       (alert-modal/hide-alert))
+                     (activity-actions/entry-clear-local-cache (:uuid (:modal-editing-data modal-data))
+                      :modal-editing-data)
                      (stop-editing state)
                      (when dismiss-modal?
                        (close-clicked state)))]
@@ -175,28 +164,22 @@
                       :action "dismiss-edit-uploading-media"
                       :message (str "Leave before finishing upload?")
                       :link-button-title "Stay"
-                      :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                      :link-button-cb #(alert-modal/hide-alert)
                       :solid-button-style :red
                       :solid-button-title "Cancel upload"
-                      :solid-button-cb #(do
-                                          (dis/dispatch! [:alert-modal-hide])
-                                          (dismiss-fn))
-                      }]
-      (dis/dispatch! [:alert-modal-show alert-data]))
+                      :solid-button-cb #(dismiss-fn true)}]
+      (alert-modal/show-alert alert-data))
     (if (:has-changes (:modal-editing-data modal-data))
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "dismiss-edit-dirty-data"
                         :message (str "Leave without saving your changes?")
                         :link-button-title "Stay"
-                        :link-button-cb #(dis/dispatch! [:alert-modal-hide])
+                        :link-button-cb #(alert-modal/hide-alert)
                         :solid-button-style :red
                         :solid-button-title "Lose changes"
-                        :solid-button-cb #(do
-                                            (dis/dispatch! [:alert-modal-hide])
-                                            (dismiss-fn))
-                        }]
-        (dis/dispatch! [:alert-modal-show alert-data]))
-      (dismiss-fn)))))
+                        :solid-button-cb #(dismiss-fn true)}]
+        (alert-modal/show-alert alert-data))
+      (dismiss-fn false)))))
 
 (defn setup-editing-data [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
@@ -217,7 +200,6 @@
                              (rum/local false ::showing-dropdown)
                              (rum/local false ::move-activity)
                              (rum/local nil ::window-click)
-                             (rum/local false ::resize-listener)
                              ;; Editing locals
                              (rum/local "" ::initial-headline)
                              (rum/local "" ::initial-body)
@@ -228,10 +210,10 @@
                              (rum/local false ::edited-data-loaded)
                              (rum/local nil ::autosave-timer)
                              (rum/local false ::show-legend)
-                             (rum/local false ::re-render)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
+                             (mixins/render-on-resize nil)
                              mixins/first-render-mixin
 
                              {:before-render (fn [s]
@@ -256,13 +238,28 @@
                                  (when (and (:modal-editing modal-data)
                                             @(::entry-saving s))
                                    (let [entry-edit (:modal-editing-data modal-data)
+                                         activity-data (:activity-data modal-data)
+                                         dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop modal-data)
                                          initial-body (:body entry-edit)
                                          initial-headline (utils/emojify (:headline entry-edit))]
                                      (when-not (:loading entry-edit)
                                        (when-not (:error entry-edit)
                                          (reset! (::initial-headline s) initial-headline)
                                          (reset! (::initial-body s) initial-body)
-                                         (stop-editing s))
+                                         (stop-editing s)
+                                         (activity-actions/entry-clear-local-cache (:uuid activity-data)
+                                          :modal-editing-data)
+                                         (cond
+                                           ;; If the board change redirect to the board since the url we have is
+                                           ;; not correct anymore
+                                           (not= (:board-slug entry-edit) (router/current-board-slug))
+                                           (router/nav!
+                                            (if (:from-all-posts @router/path)
+                                              (oc-urls/all-posts)
+                                              (oc-urls/board (:board-slug entry-edit))))
+                                           ;; Dismiss editing if needed
+                                           dismiss-modal-on-editing-stop
+                                           (close-clicked s)))
                                        (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
                                        (reset! (::entry-saving s) false)))))
                                s)
@@ -270,9 +267,6 @@
                                (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
                                  ;; Force comments reload
                                  (comment-actions/get-comments (:activity-data modal-data)))
-                               (reset! (::resize-listener s)
-                                (events/listen js/window EventType/RESIZE
-                                 #(reset! (::re-render s) true)))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -280,12 +274,6 @@
                                  js/window
                                  EventType/CLICK
                                  (fn [e]
-                                   (when (and (not
-                                               (utils/event-inside? e (rum/ref-node s "more-dropdown")))
-                                              (not
-                                               (utils/event-inside? e
-                                                (sel1 [:div.fullscreen-post :div.activity-move]))))
-                                     (reset! (::showing-dropdown s) false))
                                    (when (and @(::show-legend s)
                                               (not (utils/event-inside? e (rum/ref-node s "legend-container"))))
                                       (reset! (::show-legend s) false)))))
@@ -294,9 +282,6 @@
                                (when @(::window-click s)
                                  (events/unlistenByKey @(::window-click s))
                                  (reset! (::window-click s) nil))
-                               (when @(::resize-listener s)
-                                 (events/unlistenByKey @(::resize-listener s))
-                                 (reset! (::resize-listener s) false))
                                (when @(::headline-input-listener s)
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
@@ -310,17 +295,20 @@
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
         editing (:modal-editing modal-data)
-        activity-attachments (if editing (:attachments (:modal-editing-data modal-data)) (:attachments activity-data))]
+        activity-editing (:modal-editing-data modal-data)
+        activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
+        show-sections-picker (and editing (:show-sections-picker modal-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
                                                       (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
-                                :editing editing})}
+                                :editing editing
+                                :no-comments (not (:has-comments activity-data))})}
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(if editing
-                        (dismiss-editing? s false)
+                        (dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))
                         (close-clicked s))}]
         [:div.header-title-editing-post
           [:div.header-title-container-edit-pen]
@@ -338,66 +326,16 @@
               {:date-time (:published-at activity-data)
                :data-toggle "tooltip"
                :data-placement "top"
-               :title (utils/activity-date-tooltip activity-data)}
+               :data-title (utils/activity-date-tooltip activity-data)}
               (utils/time-since (:published-at activity-data))]]]
         [:div.fullscreen-post-header-right
           (if editing
             [:button.mlb-reset.post-publish-bt
-              {:on-click #(save-editing? s)
+              {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
+               :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
               "Post changes"]
-            (when (or edit-link
-                      share-link
-                      delete-link)
-              (let [all-boards (filter
-                                #(not= (:slug %) utils/default-drafts-board-slug)
-                                (:boards (:org-data modal-data)))]
-                [:div.more-dropdown
-                  {:ref "more-dropdown"}
-                  [:button.mlb-reset.fullscreen-post-more.dropdown-toggle
-                    {:type "button"
-                     :on-click (fn [_]
-                                 (when-not editing
-                                   (utils/remove-tooltips)
-                                   (reset! (::showing-dropdown s) (not @(::showing-dropdown s)))
-                                   (reset! (::move-activity s) false)))
-                     :data-toggle (if editing "" "tooltip")
-                     :data-placement "left"
-                     :data-container "body"
-                     :title "More"}]
-                  (when @(::showing-dropdown s)
-                    [:div.fullscreen-post-dropdown-menu
-                      [:div.triangle]
-                      [:ul.fullscreen-post-more-menu
-                        (when edit-link
-                         [:li.no-editing
-                           {:on-click #(do
-                                        (reset! (::showing-dropdown s) false)
-                                        (activity-actions/activity-edit activity-data))}
-                           "Edit"])
-                        (when share-link
-                         [:li.no-editing
-                           {:on-click #(do
-                                        (reset! (::showing-dropdown s) false)
-                                        (dis/dispatch! [:activity-share-show activity-data]))}
-                           "Share"])
-                        (when edit-link
-                          [:li.no-editing
-                            {:on-click #(do
-                                         (reset! (::showing-dropdown s) false)
-                                         (reset! (::move-activity s) true))}
-                            "Move"])
-                        (when delete-link
-                          [:li
-                            {:on-click #(do
-                                          (reset! (::showing-dropdown s) false)
-                                          (delete-clicked % activity-data))}
-                            "Delete"])]])
-                  (when @(::move-activity s)
-                    (activity-move {:activity-data activity-data
-                                    :boards-list all-boards
-                                    :dismiss-cb #(reset! (::move-activity s) false)
-                                    :on-change #(close-clicked s)}))])))]]
+            (more-menu activity-data))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         (when is-mobile?
@@ -413,11 +351,32 @@
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
-            [:div.fullscreen-post-box-content-board
-              {:dangerouslySetInnerHTML (utils/emojify (str "Posted to " (:board-name activity-data)))}]
+            (if editing
+              [:div.fullscreen-post-box-content-board.section-editing.group
+                [:span.posting-in-span
+                  "Posted in "]
+                [:div.boards-dropdown-caret
+                  [:div.board-name
+                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                    (:board-name activity-editing)]
+                  (when show-sections-picker
+                    (sections-picker (:board-slug activity-editing)
+                     (fn [section-data]
+                       ;; Dismiss the picker
+                       (dis/dispatch! [:input [:show-sections-picker] false])
+                       ;; Update the post if the user picked a section
+                       (when (and activity-editing
+                                  (seq (:name section-data)))
+                        (dis/dispatch! [:input [:modal-editing-data]
+                         (merge activity-editing {:board-slug (:slug section-data)
+                                                  :board-name (:name section-data)})])))))]]
+              [:div.fullscreen-post-box-content-board
+                {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
             [:div.fullscreen-post-box-content-headline
               {:content-editable editing
                :ref "edit-headline"
+               :class (utils/class-set {:emoji-autocomplete editing
+                                        :emojiable editing})
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
                :on-key-down #(headline-on-change s)
@@ -441,7 +400,8 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
-            (stream-view-attachments activity-attachments (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
+            (stream-view-attachments activity-attachments
+             (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             [:div.fullscreen-post-box-footer.group
               (if editing
                 [:div.fullscreen-post-box-footer-editing
@@ -450,6 +410,7 @@
                   (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                                  :width 20
                                  :height 20
+                                 :position "bottom"
                                  :default-field-selector "div.fullscreen-post div.rich-body-editor"
                                  :container-selector "div.fullscreen-post"})
                   [:div.fullscreen-post-box-footer-legend-container
@@ -465,14 +426,16 @@
                       [:div.fullscreen-post-box-footer-legend-image])]]
                 (reactions activity-data))]]]
         ;; Right column
-        (let [activity-comments (-> modal-data
-                                    :comments-data
-                                    (get (:uuid activity-data))
-                                    :sorted-comments)
-              comments-data (or activity-comments (:comments activity-data))]
-          [:div.fullscreen-post-right-column.group
-            {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
-                                      :no-comments (zero? (count comments-data))})
-             :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
-            (add-comment activity-data)
-            (stream-comments activity-data comments-data)])]]))
+        (when (:has-comments activity-data)
+          (let [activity-comments (-> modal-data
+                                      :comments-data
+                                      (get (:uuid activity-data))
+                                      :sorted-comments)
+                comments-data (or activity-comments (:comments activity-data))]
+            [:div.fullscreen-post-right-column.group
+              {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
+                                        :no-comments (zero? (count comments-data))})
+               :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
+              (when (:can-comment activity-data)
+                (add-comment activity-data))
+              (stream-comments activity-data comments-data)]))]]))

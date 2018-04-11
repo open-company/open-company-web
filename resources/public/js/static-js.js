@@ -78,11 +78,16 @@ function OCStaticGetYourBoardsUrl (decoded_jwt) {
   return your_board_url;
 }
 
-
 document.addEventListener("DOMContentLoaded", function(_) {
   // Get the jwt cookie to know if the user is logged in
   var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
   if (jwt) {
+    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
+        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
+    if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
+      window.location = your_board_url;
+    }
+
     $("#site-header-login-item").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
@@ -94,19 +99,16 @@ document.addEventListener("DOMContentLoaded", function(_) {
     // Remove the get started bottom button if the user is signed in
     $("div.about-bottom-get-started").css({"display": "none"});
     // Hide the try it box at the bottom of the homepage
-    $("section.third-section").css({"display": "none"});
+    $("section.keep-aligned").css({"display": "none"});
     // Remove login button from the site mobile menu
     $("button#site-mobile-menu-login").css({"display": "none"});
-    // Change Get started button to Your boards on site mobile menu
+    // Change Get started button to Your digest on site mobile menu
     var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
-    siteMobileMenuGetStarted.text( "Your Boards" );
-    siteMobileMenuGetStarted.addClass("your-boards");
-    // Top right corner became Your Boards
+    siteMobileMenuGetStarted.text( "Your digest" );
+    siteMobileMenuGetStarted.addClass("your-digest");
+    // Top right corner became Your digest
     var signupButton = $("#site-header-signup-item");
-    signupButton.addClass("your-boards");
-
-    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
-        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
+    signupButton.addClass("your-digest");
     signupButton.attr("href", your_board_url);
     signupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
 

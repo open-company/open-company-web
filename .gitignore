@@ -19,3 +19,7 @@ open-company-web.iml
 .ruby-version
 
 resources/public/js/oc_assets.*
+
+forms-emitted.txt
+forms-read.txt
+forms-analyzed.txt

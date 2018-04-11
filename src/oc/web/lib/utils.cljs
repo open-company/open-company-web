@@ -1,57 +1,22 @@
 (ns oc.web.lib.utils
   (:require [clojure.string]
-            [dommy.core :as dommy :refer-macros (sel1)]
-            [cljs.core.async :refer (put!)]
-            [cljs-time.format :as cljs-time-format]
-            [cljs-time.core :as cljs-time]
-            [goog.style :refer (setStyle)]
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
-            [goog.string :as gstring]
-            [goog.i18n.NumberFormat :as nf]
             [goog.object :as gobj]
-            [oc.web.dispatcher :as dis]
+            [cljs-time.format :as f]
+            [cljs-time.core :as time]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dispatcher]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.oc-colors :refer (get-color-by-kw)]
             [cuerdas.core :as s]
-            [cljsjs.emojione] ; pulled in for cljsjs externs
             [defun.core :refer (defun)]
-            [cljs.reader :as reader])
-  (:import  [goog.i18n NumberFormat]))
-
-(defn abs
-  "(abs n) is the absolute value of n"
-  [n]
-  (cond
-   (not (number? n)) n ; non-sensical, so leave it alone
-   (neg? n) (- n)
-   :else n))
+            [cljs.reader :as reader]))
 
 (def oc-animation-duration 300)
-
-(defn display [show]
-  (if show
-    #js {}
-    #js {:display "none"}))
-
-(def channel-coll (atom {}))
-
-(defn add-channel [channel-name channel]
-  (swap! channel-coll assoc channel-name channel))
-
-(defn get-channel [channel-name]
-  (@channel-coll channel-name))
-
-(defn remove-channel [channel-name]
-  (swap! channel-coll dissoc channel-name))
-
-(defn save-values [channel-name]
-  (let [save-channel (get-channel channel-name)]
-    (put! save-channel 1)))
 
 (defn in?
   "true if seq contains elm"
@@ -97,15 +62,6 @@
 (defn month-string [month & [flags]]
   (month-string-int (.parseInt js/window month 10) flags))
 
-;; TODO use goog.i18n.DateTimeFormat here
-(defn month-short-string [month]
-  (month-string-int (.parseInt js/window month 10) [:short :uppercase]))
-
-(defn format-value [value]
-  (if (nil? value)
-    0
-    (.toLocaleString value)))
-
 (defn camel-case-str [value]
   (when value
     (let [upper-value (clojure.string/replace value #"^(\w)" #(clojure.string/upper-case (first %1)))]
@@ -119,12 +75,6 @@
 
 (defn add-zero [v]
   (str (when (< v 10) "0") v))
-
-(defn add-zeros [v]
-  (str (cond
-        (< v 10) "00"
-        (< v 100) "0")
-    v))
 
 ;; TODO use goog.i18n.DateTimeFormat here
 (defn date-string [js-date & [flags]]
@@ -172,32 +122,10 @@
       :else
       "just now")))
 
-(defn get-click-position
-  "Return the x position inside the clicked element"
-  [event]
-  (let [client-x (.-clientX event)
-        bound-rect (.getBoundingClientRect (.-target event))
-        lf (.-left bound-rect)
-        from-left (- client-x lf)]
-    from-left))
-
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
   (clojure.string/join (map #(str " " (name %)) (keys (filter second classes)))))
-
-(defn period-exists [period data]
-  (if (pos? (count (filter #(= (:period %) period) data)))
-    true
-    false))
-
-(defn current-finance-period []
-  (let [date (js/Date.)
-        fixed-date (js/Date. (.setMonth date (dec (.getMonth date))))
-        month (inc (.getMonth fixed-date))
-        month-str (str (when (< month 10) "0") month)
-        cur-period (str (.getFullYear fixed-date) "-" month-str)]
-    cur-period))
 
 (defun link-for
 
@@ -251,30 +179,65 @@
         blue (take 2 (drop 4 colors))]
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
 
+(defn post-new?
+  "
+  An entry is new if:
+    user is part of the team (we don't track new for non-team members accessing public boards)
+      -and-
+    user is not the post's author
+      -and-
+    published-at is < 30 days
+      -and-
+    published-at of the entry is newer than seen at
+      -or-
+    no seen at
+  "
+  [entry changes]
+  (let [published-at (:published-at entry)
+        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
+        seen-at (:seen-at changes)
+        user-id (jwt/get-key :user-id)
+        author-id (-> entry :author first :user-id)
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
+        new? (and in-team?
+                  (not= author-id user-id)
+                  (> published-at too-old)
+                  (or (> published-at seen-at)
+                      (nil? seen-at)))]
+    new?))
+
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-body board-data]
-  (-> entry-body
-    (assoc :content-type "entry")
-    (assoc :read-only (readonly-entry? (:links entry-body)))
-    (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
-    (assoc :board-name (or (:board-name entry-body) (:name board-data)))))
+  [entry-data board-data changes]
+  (let [comments-link (link-for (:links entry-data) "comments")
+        add-comment-link (link-for (:links entry-data) "create" "POST")
+        fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
+        fixed-board-name (or (:board-name entry-data) (:name board-data))]
+    (-> entry-data
+      (assoc :content-type "entry")
+      (assoc :new (post-new? (:body entry-data) changes))
+      (assoc :read-only (readonly-entry? (:links entry-data)))
+      (assoc :board-slug fixed-board-slug)
+      (assoc :board-name fixed-board-name)
+      (assoc :has-comments (boolean comments-link))
+      (assoc :can-comment (boolean add-comment-link)))))
 
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
-  [board-data]
-  (let [links (:links board-data)
-        read-only (readonly-board? links)
-        with-read-only (assoc board-data :read-only read-only)
-        fixed-entries (zipmap
-                       (map :uuid (:entries board-data))
-                       (map #(fix-entry % board-data) (:entries board-data)))
-        without-entries (dissoc with-read-only :entries)
-        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
-    with-fixed-entries))
+  ([board-data] (fix-board board-data {}))
+
+  ([board-data changes]
+     (let [links (:links board-data)
+           read-only (readonly-board? links)
+           with-read-only (assoc board-data :read-only read-only)
+           fixed-entries (zipmap
+                          (map :uuid (:entries board-data))
+                          (map #(fix-entry % board-data changes) (:entries board-data)))
+           with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
+       with-fixed-entries)))
 
 (defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data))
+  (fix-entry activity collection-data {}))
 
 (defn fix-all-posts
   "Fix org data coming from the API."
@@ -286,201 +249,6 @@
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
     with-fixed-activities))
-
-(defn fix-org
-  "Fix org data coming from the API."
-  [org-data]
-  (let [links (:links org-data)
-        read-only (readonly-org? links)]
-    (assoc org-data :read-only read-only)))
-
-(defn px [n]
-  (str n "px"))
-
-(def quarterly-input-format (cljs-time-format/formatter "YYYY-MM"))
-(def monthly-input-format (cljs-time-format/formatter "YYYY-MM"))
-(def weekly-input-format (cljs-time-format/formatter "YYYY-MM-dd"))
-
-(defn get-formatter [interval]
-  "Get the date formatter from the interval type."
-  (case interval
-    "quarterly"
-    quarterly-input-format
-    "weekly"
-    weekly-input-format
-    ; else
-    monthly-input-format))
-
-(defn date-from-period [period & [interval]]
-  (if period
-    (cljs-time-format/parse (get-formatter interval) period)
-    (cljs-time/now)))
-
-(defn period-from-date [date & [interval]]
-  (cljs-time-format/unparse (get-formatter interval) date))
-
-(defn get-quarter-from-month [month & [flags]]
-  (let [short-str (in? flags :short)]
-    (cond
-      (and (>= month 1) (<= month 3))
-      (if short-str
-        "Q1"
-        "January - March")
-      (and (>= month 4) (<= month 6))
-      (if short-str
-        "Q2"
-        "April - June")
-      (and (>= month 7) (<= month 9))
-      (if short-str
-        "Q3"
-        "July - September")
-      (and (>= month 10) (<= month 12))
-      (if short-str
-        "Q4"
-        "October - December"))))
-
-(defn get-quarter-from-period [period & [flags]]
-  (let [date (date-from-period period "quarterly")
-        month (cljs-time/month date)]
-    (get-quarter-from-month month flags)))
-
-(def default-growth-interval "monthly")
-
-(defn get-period-string [period & [interval flags]]
-  "Get descriptive string for the period by interval. Use :short as a flag to get
-  the short formatted string."
-  (when period
-    (let [fixed-interval (or interval default-growth-interval)
-          parsed-date (date-from-period period fixed-interval)
-          month (cljs-time/month parsed-date)
-          year (cljs-time/year parsed-date)
-          fixed-year (if (in? flags :short-year) (str "'" (subs (str year) 2 4)) (str year))
-          plus-one-week-year (cljs-time/year (cljs-time/plus parsed-date (cljs-time/days 7)))
-          minus-one-week-year (cljs-time/year (cljs-time/minus parsed-date (cljs-time/days 7)))
-          needs-year (and (not (in? flags :skip-year))
-                          (or (in? flags :force-year)
-                            (case fixed-interval
-                              "weekly"
-                              (or (not= plus-one-week-year year) (not= minus-one-week-year year))
-                              "quarterly"
-                              (or (= month 1) (= month 10))
-                              ;else
-                              (or (= month 1) (= month 12)))))]
-      (case fixed-interval
-        "quarterly"
-        (str (get-quarter-from-month (cljs-time/month parsed-date) flags)
-             (when needs-year
-               (str " " fixed-year)))
-        "monthly"
-        (str (month-string-int (cljs-time/month parsed-date) flags)
-             (when needs-year
-               (str " " fixed-year)))
-        "weekly"
-        (str (month-string-int (cljs-time/month parsed-date) flags)
-             " "
-             (cljs-time/day parsed-date)
-             (when needs-year
-               (str ", " fixed-year)))))))
-
-(defn update-page-title [title]
-  (set! (.-title js/document) title))
-
-(defn periods-diff [first-period last-period & [interval]]
-  (let [fixed-interval (or interval default-growth-interval)
-        first-date (date-from-period first-period fixed-interval)
-        last-date (date-from-period last-period fixed-interval)]
-    (case fixed-interval
-      "quarterly" (/ (cljs-time/in-months (cljs-time/interval first-date last-date)) 3)
-      "monthly" (cljs-time/in-months (cljs-time/interval first-date last-date))
-      "weekly" (cljs-time/in-weeks (cljs-time/interval first-date last-date)))))
-
-(defn get-year [period & [interval]]
-  (let [fixed-interval (or interval "monthly")
-        date (date-from-period period fixed-interval)]
-    (cljs-time/year date)))
-
-(defn get-weekly-period-day [period]
-  (let [date (date-from-period period "weekly")]
-    (cljs-time/day date)))
-
-(defn get-month [period & [interval]]
-  (let [fixed-interval (or interval default-growth-interval)
-        date (date-from-period period fixed-interval)
-        month (add-zero (cljs-time/month date))]
-    (case interval
-      "quarterly"
-      (month-short-string month)
-      "weekly"
-      (month-short-string month)
-      ;else
-      (month-short-string month))))
-
-(defn get-month-quarter [current-month]
-  (case
-    (and (> current-month 1)
-         (< current-month 4))
-    1
-    (and (> current-month 4)
-         (< current-month 7))
-    4
-    (and (> current-month 7)
-         (< current-month 9))
-    7
-    (> current-month 9)
-    10))
-
-(defn non-zero-number?
-  "Return `true` if the arg is both a number and is not zero, otherwise return `false`."
-  [number]
-  (and (number? number)
-       (not (zero? number))))
-
-(defn no-finances-data?
-  "Return `true` if the passed finances data has no substantive data, otherwise return `false`."
-  [data]
-  (not-any? #(or (non-zero-number? (:cash %))
-                 (non-zero-number? (:revenue %))
-                 (non-zero-number? (:costs %))) data))
-
-(defn no-growth-data?
-  "Return `true` if the passed finances data has no substantive data, otherwise return `false`."
-  [data]
-  (not-any? #(non-zero-number? (:value %)) (vals data)))
-
-(defn current-growth-period [interval]
-  (let [fixed-interval (or interval default-growth-interval)
-        now (cljs-time/now)
-        year (cljs-time/year now)
-        month (cljs-time/month now)]
-    (case interval
-      "quarterly"
-      (str year "-" (add-zero (get-month-quarter month)))
-      "weekly"
-      (let [day-of-week (cljs-time/day-of-week now)
-            to-monday (dec day-of-week)
-            monday-date (cljs-time/minus now (cljs-time/days to-monday))]
-        (str
-         (cljs-time/year monday-date)
-         "-"
-         (add-zero (cljs-time/month monday-date))
-         "-"
-         (add-zero (cljs-time/day monday-date))))
-      ;; Default tp monthly
-      (str year "-" (add-zero month)))))
-
-(defn thousands-separator
-  ([number]
-    (.format (NumberFormat. nf/Format.DECIMAL) number))
-  ([number currency-code]
-    (.format (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL) number))
-  ([number currency-code decimals]
-    (-> (NumberFormat. nf/Format.CURRENCY currency-code nf/CurrencyStyle.LOCAL)
-        (.setMinimumFractionDigits (min 2 decimals))
-        (.format number))))
-
-(defn offset-top [elem]
-  (let [bound-rect (.getBoundingClientRect elem)]
-    (.-top bound-rect)))
 
 (defn scroll-to-y [scroll-y & [duration]]
   (.play
@@ -503,82 +271,8 @@
   (let [elem-scroll-top (+ (.-offsetTop elem) (or offset 0))]
     (scroll-to-y elem-scroll-top duration)))
 
-(defn scroll-top-with-id [id]
-  (offset-top (sel1 (str "#" id))))
-
-(defn scroll-to-id [id & [duration]]
-  (let [body-scroll-top (.-scrollTop (.-body js/document))
-        top (- (+ (scroll-top-with-id id) body-scroll-top) 50)]
-    (scroll-to-y top (or duration oc-animation-duration))))
-
-(defn round-2-dec [value decimals]
-  ; cut to 2 dec maximum then parse to float to use toString to remove trailing zeros
-  (.toLocaleString (js/parseFloat (gstring/format (str "%." decimals "f") value))))
-
-(defn with-metric-prefix [value]
-  (when value
-    (cond
-      ; 100M
-      (>= value 100000000)
-      (str (round-2-dec (int (/ value 1000000)) 2) "M")
-      ; 10.0M
-      (>= value 10000000)
-      (str (round-2-dec (/ value 1000000) 1) "M")
-      ; 1.00M
-      (>= value 1000000)
-      (str (round-2-dec (/ value 1000000) 2) "M")
-      ; 100K
-      (>= value 100000)
-      (str (round-2-dec (int (/ value 1000)) 2) "K")
-      ; 10.0K
-      (>= value 10000)
-      (str (round-2-dec (/ value 1000) 1) "K")
-      ; 1.00K
-      (>= value 1000)
-      (str (round-2-dec (/ value 1000) 2) "K")
-      ; 100
-      (>= value 100)
-      (str (round-2-dec (int value) 2))
-      ; 10.0
-      (>= value 10)
-      (str (round-2-dec value 1))
-      ; 1.00
-      :else
-      (str (round-2-dec value 2)))))
-
 (defn is-test-env? []
   (not (not (.-_phantom js/window))))
-
-(defonce overlay-max-win-height 670)
-
-(defn absolute-offset [element]
-  (loop [left 0
-         top 0
-         el element]
-    (if-not (and el
-                 (gobj/get el "offsetTop")
-                 (gobj/get el "offsetLeft"))
-      {:top top
-       :left left}
-      (recur (+ left (gobj/get el "offsetLeft" 0))
-             (+ top (gobj/get el "offsetTop" 0))
-             (.-offsetParent el)))))
-
-(defn medium-editor-options [placeholder hide-on-click & [show-subtitle]]
-  {:toolbar #js {:buttons (clj->js (remove nil? ["bold" "italic" (when show-subtitle "h2") "unorderedlist" "anchor"]))}
-   :buttonLabels "fontawesome"
-   :anchorPreview #js {:hideDelay 500, :previewValueSelector "a"}
-   :extensions {:autolist (js/AutoList.)}
-   :autoLink true
-   :anchor #js {:customClassOption nil
-                :customClassOptionText "Button"
-                :linkValidation true
-                :placeholderText "Paste or type a link"
-                :targetCheckbox false
-                :targetCheckboxText "Open in new window"}
-   :paste #js {:forcePlainText false
-               :cleanPastedHTML false}
-   :placeholder #js {:text (or placeholder ""), :hideOnClick hide-on-click}})
 
 (defn after [ms fn]
   (js/setTimeout fn ms))
@@ -586,35 +280,12 @@
 (defn every [ms fn]
   (js/setInterval fn ms))
 
-(defn unicode-emojis [txt]
-  (js/emojione.shortnameToUnicode txt))
-
-(defn unicode-char [unicode]
-  (js/encodeURI (str "&#x" unicode ";")))
-
 (defn emojify
   "Take a string containing either Unicode emoji (mobile device keyboard), short code emoji (web app),
   or ASCII emoji (old skool) and convert it to HTML string ready to be added to the DOM (dangerously)
   with emoji image tags via the Emoji One lib and resources."
-  [text & [plain-text]]
-  ; ;; use an SVG sprite map
-  ; (set! (.-imageType js/emojione) "png")
-  ; (set! (.-sprites js/emojione) true)
-  ; (set! (.-spritePath js/emojione) "https://d1wc0stj82keig.cloudfront.net/emojione.sprites.png")
-  ; ;; convert ascii emoji's (like  :) and :D) into emojis
-  ; (set! (.-ascii js/emojione) true)
-  ; (let [text-string (or text "") ; handle nil
-  ;       unicode-string (.toImage js/emojione text-string)
-  ;       r (js/RegExp "<span " "ig")
-  ;       with-img (.replace unicode-string r "<img ")
-  ;       without-span (.replace with-img (js/RegExp ">(.{1,2})</span>" "ig") (str "alt=\"$1\" />"))]
-
-  ;   (if plain-text
-  ;     without-span
-  ;     #js {"__html" without-span}))
-  (if plain-text
-    text
-    #js {"__html" text}))
+  [text]
+  #js {"__html" text})
 
 (defn strip-HTML-tags [text]
   (when text
@@ -633,14 +304,10 @@
 
 (defn strip-empty-tags [text]
   (when text
-    (let [reg (js/RegExp. "<[a-zA-Z]{1,}[ ]{0,}>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
+    (let [reg
+     (js/RegExp.
+      "<[a-zA-Z]{1,}[ ]{0,}(class)?[ ]{0,}([0-9a-zA-Z-]{0,}=\"[a-zA-Z\\s]{0,}\")?>[ ]{0,}</[a-zA-Z]{1,}[ ]{0,}>" "ig")]
       (.replace text reg ""))))
-
-(defn su-default-title []
-  (let [js-date (js-date)
-        month (month-string (add-zero (.getMonth js-date)))
-        year (.getFullYear js-date)]
-    (str month " " year " Update")))
 
 (defn my-uuid
   "Generate a 4 char UUID"
@@ -671,14 +338,6 @@
         (recur (.-parentElement element)))
       false)))
 
-(defn is-parent? [el child]
-  (loop [element child]
-    (if element
-      (if (= element el)
-        true
-        (recur (.-parentElement element)))
-      false)))
-
 (defn to-end-of-content-editable [content-editable-element]
   (if (.-createRange js/document)
     (let [rg (.createRange js/document)]
@@ -692,38 +351,6 @@
       (.collapse rg false)
       (.select rg))))
 
-(defn emoji-images-to-unicode [html]
-  (let [div (.createElement js/document "div")]
-    (set! (.-id div) "temp-emojing")
-    (set! (.-innerHTML div) html)
-    (.appendChild (.-body js/document) div)
-    (.replaceWith (js/$ "#temp-emojing img.emojione") (fn [_ _] (this-as this (.-alt this))))
-    (let [$div       (js/$ "#temp-emojing")
-          inner-html (.html $div)]
-      (.remove $div)
-      inner-html)))
-
-(defn medium-editor-hide-placeholder [editor editor-el]
-  (.each (js/$ (gobj/get editor "extensions"))
-    (fn [_ _]
-      (this-as this
-        (when (gobj/containsKey this "hideOnClick")
-          (let [hidePlaceholder (gobj/get this "hidePlaceholder")]
-            (hidePlaceholder editor-el)))))))
-
-(defn su-date-from-created-at [created-at]
-  (let [from-js-date (cljs-time/date-time (js-date created-at))]
-    (cljs-time-format/unparse (cljs-time-format/formatter "yyyy-MM-dd") from-js-date)))
-
-(defn remove-ending-empty-paragraph
-  "Remove the last p tag if it's empty."
-  [body-el]
-  (when-not (is-test-env?)
-    (while (and (pos? (.-length (.find (js/$ body-el) ">p:last-child")))
-                (zero? (count (clojure.string/trim (.text (.find (js/$ body-el) ">p:last-child")))))
-                (zero? (.-length (.find (js/$ body-el) ">p:last-child img"))))
-      (.remove (js/$ ">p:last-child" (js/$ body-el))))))
-
 (defn valid-email? [addr]
   (when addr
     (email/isValidAddress addr)))
@@ -735,18 +362,6 @@
 
 (defn remove-tooltips []
   (.remove (js/$ "div.tooltip")))
-
-(defn complete-su-url [relative-su-url]
-  (if (empty? relative-su-url)
-    ""
-    (let [protocol (.. js/document -location -protocol)
-          host     (.. js/document -location -host)]
-      (str protocol "//" host relative-su-url))))
-
-(defn sum-revenues [finances-data]
-  (let [cleaned-revenues (map #(-> % :revenue abs) finances-data)
-        filtered-revenues (filter number? cleaned-revenues)]
-    (apply + filtered-revenues)))
 
 (defn parse-input-email [email-address]
   (let [parsed-email (email/parse email-address)]
@@ -828,11 +443,6 @@
     (let [cleaned-url (clean-google-chart-url url)]
       (not= (.indexOf cleaned-url "://docs.google.com/spreadsheets/d/") -1))))
 
-(defn rum-dom-node [s]
-  (when-not (.-_calledComponentWillUnmount (:rum/react-component s))
-    (let [component (:rum/react-component s)]
-      (js/ReactDOM.findDOMNode component))))
-
 (defn cdn [img-src & [no-deploy-folder]]
   (let [use-cdn? (empty? ls/cdn-url)
         cdn (if use-cdn? "" (str "/" ls/cdn-url))
@@ -846,7 +456,6 @@
   (str "rgba(" (clojure.string/join "," (conj (vec (css-color rgb)) opacity)) ")"))
 
 (defn get-24h-time
-
   [js-date]
   (str (.getHours js-date) ":" (add-zero (.getMinutes js-date))))
 
@@ -943,36 +552,6 @@
     (catch :default e
       false)))
 
-(defn ordinal-suffix [i]
-  (let [j (mod i 10)
-        k (mod i 100)]
-    (cond
-      (and (= j 1) (not= k 11)) "st"
-      (and (= j 2) (not= k 12)) "nd"
-      (and (= j 3) (not= k 13)) "rd"
-      :else "th")))
-
-(defn draft-complete-date [jd]
-  (let [month (full-month-string (inc (.getMonth jd)))
-        day (.getDate jd)]
-   (str month " " day (ordinal-suffix day))))
-
-(defn draft-date [date]
-  (let [jd (js-date date)
-        now (js-date)
-        yesterday (js-date (- (.getTime now) (* 24 60 60 1000)))
-        is-today? (= (.getDate jd) (.getDate now))
-        is-yesterday? (= (.getDate jd) (.getDate yesterday))
-        same-year? (= (.getYear jd) (.getYear now))
-        partial-d (draft-complete-date jd)
-        t (format-time-string jd)]
-    (str "Edited "
-      (cond
-        is-today? (str "today, " t)
-        is-yesterday? (str "yesterday, " t)
-        same-year? partial-d
-        :else (str partial-d ", " (.getYear jd))))))
-
 (defn body-without-preview [body]
   (let [body-without-tags (-> body strip-img-tags strip-br-tags strip-empty-tags)
         hidden-class (str "activity-body-" (int (rand 10000)))
@@ -985,8 +564,6 @@
         body-without-preview (.html $hidden-div)
         _ (.remove $hidden-div)]
     body-without-preview))
-
-(def default-body "<p><br/></p>")
 
 (defn newest-org [orgs]
   (first (sort-by :created-at orgs)))
@@ -1026,9 +603,9 @@
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
         cleaned-html (.html $container)
         _ (.detach $container)]
-    (emoji-images-to-unicode (gobj/get (emojify cleaned-html) "__html"))))
+    cleaned-html))
 
-(defn your-boards-url []
+(defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
     (if-let [board-slug "all-posts"]
       ;; Repalce all-posts above with the following to go back to the last visited board

@@ -24,7 +24,7 @@
         [:div.sections-picker-group-header
           (get-section-name group)])
       (when (pos? (count group))
-        (for [b group
+        (for [b (sort-by :name group)
               :let [active (= (:slug b) active-slug)]]
           [:div.sections-picker-section.group
             {:key (str "sections-picker-" (:uuid b))
@@ -55,9 +55,9 @@
                                s)}
   [s active-slug on-change]
   (let [section-editing (drv/react s :section-editing)
-        fixed-section-editing (when (not (string/blank? (:name section-editing)))
+        fixed-section-editing (when-not (string/blank? (:name section-editing))
                                 section-editing)
-        all-sections (vals (drv/react s :editable-boards))
+        all-sections (filterv #(not= (:slug fixed-section-editing) (:slug %)) (vals (drv/react s :editable-boards)))
         team-sections (filterv #(= (:access %) "team") all-sections)
         fixed-team-sections (if (= (:access fixed-section-editing) "team")
                               (vec (concat [fixed-section-editing] team-sections))
@@ -89,7 +89,7 @@
           {:class (when should-show-headers? "show-headers")}
           [:div.sections-picker-header
             [:div.sections-picker-header-left
-              "Post to..."]
+              "Sections"]
             [:div.sections-picker-header-right
               [:button.mlb-reset.add-new-section-bt
                 {:on-click #(reset! (::show-add-section s) true)}
@@ -97,4 +97,12 @@
           [:div.sections-picker-content
             (sections-group s fixed-team-sections should-show-headers?)
             (sections-group s fixed-public-sections should-show-headers?)
-            (sections-group s fixed-private-sections should-show-headers?)]])]))
+            (sections-group s fixed-private-sections should-show-headers?)
+            (when (and (= (count all-sections) 1)
+                       (= (:slug (first all-sections)) "general"))
+              [:div.add-section-tooltip-container
+                [:div.add-section-tooltip-arrow]
+                [:div.add-section-tooltip
+                  (str
+                   "Keep posts organized by sections, e.g., "
+                   "Announcements, and Design, Sales, and Marketing.")]])]])]))

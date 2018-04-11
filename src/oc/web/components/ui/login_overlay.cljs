@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [clojure.string :as s]
+            [taoensso.timbre :as timbre]
             [goog.object :as gobj]
             [goog.style :as gstyle]
             [org.martinklepsch.derivatives :as drv]
@@ -11,8 +12,6 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.stores.user :as user-store]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.oc-colors :as occ]
-            [oc.web.components.ui.icon :as i]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.small-loading :refer (small-loading)]))
@@ -23,8 +22,8 @@
 
 (def dont-scroll
   {:will-mount (fn [s]
-                (when-not (contains? @dis/app-state :auth-settings)
-                  (utils/after 100 #(dis/dispatch! [:auth-settings-get])))
+                 (when-not (user-store/auth-settings?)
+                   (utils/after 100 #(user-actions/auth-settings-get)))
                 s)
    :before-render (fn [s]
                     (if (responsive/is-mobile-size?)
@@ -223,7 +222,7 @@
                     "Done"]]]
               [:div.group
                 [:button.mlb-reset.mlb-default.continue
-                  {:on-click #(dis/dispatch! [:password-reset])
+                  {:on-click #(user-actions/password-reset (:email (:password-reset @dis/app-state)))
                    :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))
                    :on-touch-start identity}
                   "Reset Password"]
@@ -311,7 +310,8 @@
                :on-touch-start identity
                :on-click #(do
                             (utils/event-stop %)
-                            (dis/dispatch! [:name-pswd-collect]))}
+                            (user-actions/name-password-collect
+                              (:collect-name-pswd @dis/app-state)))}
               "Let Me In"]]]]]))
 
 (rum/defcs collect-password < rum/reactive
@@ -365,7 +365,7 @@
               {:disabled (< (count (:pswd (:collect-pswd (rum/react dis/app-state)))) 8)
                :on-click #(do
                             (utils/event-stop %)
-                            (dis/dispatch! [:pswd-collect true]))
+                            (user-actions/pswd-collect (:collect-pswd @dis/app-state) true))
                :on-touch-start identity}
               "Let Me In"]]]]]))
 

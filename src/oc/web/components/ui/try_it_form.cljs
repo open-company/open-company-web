@@ -3,7 +3,7 @@
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
+            [oc.web.actions.user :as ua]
             [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]))
 
@@ -48,9 +48,9 @@
 (rum/defcs get-started-button < rum/static
                                 rum/reactive
                                 {:will-mount (fn [s]
-                                              (when-not (utils/is-test-env?)
-                                                (dis/dispatch! [:auth-settings-get]))
-                                              s)}
+                                               (when-not (utils/is-test-env?)
+                                                 (ua/auth-settings-get))
+                                               s)}
   [s {:keys [button-classes]}]
   [:div.get-started-button
     {:class (when button-classes button-classes)}

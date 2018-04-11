@@ -8,7 +8,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.team :as team-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
@@ -22,7 +25,7 @@
 (defn reset-form [s]
   (let [org-data (first (:rum/args s))
         um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
-    (dis/dispatch! [:org-edit org-data])
+    (org-actions/org-edit-setup org-data)
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
@@ -41,8 +44,8 @@
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"
-                    :solid-button-cb #(dis/dispatch! [:alert-modal-hide])}]
-    (dis/dispatch! [:alert-modal-show alert-data])))
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)))
 
 (rum/defcs org-settings-main-panel
   < rum/reactive
@@ -154,7 +157,7 @@
                     [:img.slack-logo {:src (utils/cdn "/img/slack.png")}]
                     (:name team)
                     [:button.remove-team-btn.btn-reset
-                      {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
+                      {:on-click #(team-actions/remove-team (:links team))}
                       "Remove Slack team"]]
                   (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
                     (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
@@ -167,7 +170,7 @@
                         "Add Bot"]))]))]
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
-                {:on-click #(dis/dispatch! [:slack-team-add])}
+                {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data))}
                 (str "Add "
                      (if (zero? (count (:slack-orgs team-data)))
                         "A"
@@ -192,7 +195,7 @@
                   {:key (str "email-domain-team-" (:domain team))}
                   [:span.org-settings-list-item-name (str "@" (:domain team))]
                   [:button.remove-team-btn.btn-reset
-                    {:on-click #(api/user-action (utils/link-for (:links team) "remove" "DELETE") nil)}
+                    {:on-click #(team-actions/remove-team (:links team))}
                     "Remove email domain"]])]
             [:div.org-settings-field
               {:class (when add-email-domain-team-error "error")}
@@ -207,7 +210,8 @@
             [:button.mlb-reset.mlb-default.add-email-domain-bt
               {:on-click #(let [domain (:domain um-domain-invite)]
                             (if (utils/valid-domain? domain)
-                              (dis/dispatch! [:email-domain-team-add])
+                              (team-actions/email-domain-team-add
+                               (-> @(drv/get-ref s :org-settings-team-management) :um-domain-invite :domain))
                               (dis/dispatch! [:input [:add-email-domain-team-error] true])))
                :disabled false} ;(not valid-domain-email?)}
               "Add"]])]
@@ -221,7 +225,7 @@
            :class (when (:saved org-editing) "no-disable")
            :on-click #(do
                         (reset! (::saving s) true)
-                        (dis/dispatch! [:org-edit-save]))}
+                        (org-actions/org-edit-save @(drv/get-ref s :org-editing)))}
           (if (:saved org-editing)
             "Saved!"
             (if @(::saving s)

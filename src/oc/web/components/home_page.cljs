@@ -90,11 +90,7 @@
         shared-misc/carrot-testimonials
 
         (when-not (jwt/jwt)
-          [:section.third-section
-            [:div.third-section-title
-              "Keep everyone aligned around what matters most."]
-            [:button.mlb-reset.get-started-button
-              "Get started for free"]])
+          shared-misc/keep-aligned)
       ] ; <!-- .main -->
     ] ;  <!-- #wrap -->
 

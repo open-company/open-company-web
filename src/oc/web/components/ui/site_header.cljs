@@ -13,6 +13,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.components.ui.site-mobile-menu :as site-mobile-menu]
             [oc.web.components.ui.try-it-form :refer (get-started-button)]))
 
 ;; NB: this has a clone in oc.core/nav, every change should be reflected there and vice-versa
@@ -20,7 +21,7 @@
 (defn nav! [uri e]
   (.preventDefault e)
   (when (responsive/is-mobile-size?)
-    (dis/dispatch! [:site-menu-toggle true]))
+    (site-mobile-menu/site-menu-toggle true))
   (user/show-login nil)
   (router/nav! uri))
 
@@ -28,7 +29,7 @@
   [auth-settings use-slack-signup-button]
   ; <!-- Nav Bar -->
   (let [logged-in (jwt/jwt)
-        your-boards (when logged-in (utils/your-boards-url))
+        your-digest (when logged-in (utils/your-digest-url))
         slack-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                          {:auth-source "slack"})]
     [:nav.site-navbar
@@ -39,25 +40,25 @@
         [:div.site-navbar-right.big-web-only
           (when-not logged-in
             [:a.login
-              {:href (utils/your-boards-url)
-               :class (when logged-in "your-boards")
+              {:href (utils/your-digest-url)
+               :class (when logged-in "your-digest")
                :on-click (fn [e]
                            (.preventDefault e)
                            (if logged-in
-                             (nav! (utils/your-boards-url) e)
+                             (nav! (utils/your-digest-url) e)
                              (nav! oc-urls/login e))
                            (user/show-login :login-with-slack))}
                 "Log in"])
           [:a.start
             {:href (if logged-in
-                    your-boards
+                    your-digest
                     oc-urls/sign-up)
-             :class (utils/class-set {:your-boards logged-in
+             :class (utils/class-set {:your-digest logged-in
                                       :slack-get-started use-slack-signup-button})
              :on-click (fn [e]
                          (.preventDefault e)
                          (if logged-in
-                          (nav! your-boards e)
+                          (nav! your-digest e)
                           (if use-slack-signup-button
                             (user-actions/login-with-slack slack-auth-link)
                             (nav! oc-urls/sign-up e))))}
@@ -71,9 +72,9 @@
                 "Start"))]]
         [:div.site-navbar-right.mobile-only
           (if logged-in
-            [:a.mobile-your-boards
-              {:href your-boards
-               :on-click (partial nav! your-boards)}
+            [:a.mobile-your-digest
+              {:href your-digest
+               :on-click (partial nav! your-digest)}
               [:span.go-to-digest
                 "Go to digest"]]
             [:a.start
@@ -81,7 +82,7 @@
                :on-click (fn [e]
                            (.preventDefault e)
                            (if logged-in
-                             (nav! your-boards e)
+                             (nav! your-digest e)
                              (if use-slack-signup-button
                                (user-actions/login-with-slack slack-auth-link)
                                (nav! oc-urls/sign-up e))))
@@ -92,4 +93,4 @@
                     [:span.slack-orange-icon]]
                   "Start")])]
         [:div.mobile-ham-menu.mobile-only
-          {:on-click #(dis/dispatch! [:site-menu-toggle])}]]]))
+          {:on-click #(site-mobile-menu/site-menu-toggle)}]]]))

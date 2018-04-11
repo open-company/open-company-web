@@ -1,87 +1,481 @@
-@media (min-width: 768px) { /* not mobile */
-  div#wrap.wrap-pricing {
-    min-height: calc(100vh - 40px);
+/***** Pricing ******/
+
+div#wrap {
+  background-color: $oc_gray_8;
+
+  div.main.pricing {
+    width: 100%;
+
+    @include mobile() {
+      padding: 0 32px;
+    }
+
+    section {
+      @include mobile_to_tablet(){
+        padding: 0 32px;
+      }
+    }
+
+    section.pricing-header {
+      padding-top: 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+
+      @include mobile() {
+        overflow: visible;
+      }
+
+      div.balloon {
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 1;
+
+        @include mobile() {
+          display: none;
+        }
+
+        &.big-red {
+          @include image-2x("/img/ML/pricing_balloon_big_red");
+          background-size: 111px 103px;
+          width: 111px;
+          height: 103px;
+          top: 0px;
+          left: 50%;
+          margin-left: -600px;
+        }
+
+        &.big-green {
+          @include image-2x("/img/ML/slack_balloon_big_green");
+          background-size: 172px 172px;
+          width: 172px;
+          height: 172px;
+          top: 6px;
+          right: -50px;
+        }
+
+        &.small-blue {
+          @include image-2x("/img/ML/pricing_balloon_small_blue");
+          background-size: 25px 25px;
+          width: 25px;
+          height: 25px;
+          top: 105px;
+          right: 159px;
+        }
+
+        &.big-purple {
+          @include image-2x("/img/ML/pricing_balloon_big_purple");
+          background-size: 256px 222px;
+          width: 256px;
+          height: 222px;
+          top: 225px;
+          // transform: rotate(160deg);
+          left: 50%;
+          margin-left: -558px;
+        }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow_1");
+          background-size: 135px 135px;
+          width: 135px;
+          height: 135px;
+          top: 1540px;
+          left: 50%;
+          margin-left: -438px;
+          z-index: 2;
+        }
+
+        &.small-blue-1 {
+          @include image-2x("/img/ML/balloon_small_blue_1");
+          background-size: 50px 44px;
+          width: 50px;
+          height: 44px;
+          top: 1540px;
+          left: 50%;
+          margin-left: -356px;
+          z-index: 2;
+        }
+      }
+
+      h1.pricing-headline {
+        font-size: 48px;
+        @include avenir_H();
+        color: $deep_navy;
+        min-width: 300px;
+        margin: 88px auto 0px;
+      }
+
+      div.pricing-block {
+        width: 940px;
+        padding: 32px 8px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
+        margin: 80px auto 32px;
+        position: relative;
+        z-index: 2;
+
+        @include mobile() {
+          width: 100%;
+          padding: 0px;
+          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+        }
+
+        div.pricing-block-column {
+          text-align: center;
+          float: left;
+          width: 33.33%;
+          @include avenir_H();
+          color: $deep_navy;
+          padding: 0px 40px;
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            padding: 40px 32px;
+          }
+
+          &:not(:first-child):not(:last-child) {
+            border-left: 1px solid $light_tan;
+            border-right: 1px solid $light_tan;
+
+            @include mobile() {
+              border-left: none;
+              border-right: none;
+              border-bottom: 1px solid $light_tan;
+              border-top: 1px solid $light_tan;
+            }
+          }
+
+          &.free-column {
+            div.price-column-price {
+              width: 80px;
+            }
+
+            button.price-button {
+              margin-top: 108px;
+
+              @include mobile() {
+                margin-top: 24px;
+              }
+            }
+          }
+
+          &.standard-column {
+            div.price-column-price {
+              width: 80px;
+            }
+          }
+
+          &.plus-column {
+            div.price-column-price {
+              width: 116px;
+            }
+          }
+
+          div.price-column-title {
+            font-size: 26px;
+            line-height: 42px;
+          }
+
+          div.price-column-price {
+            font-size: 56px;
+            position: relative;
+            margin: 8px auto;
+            width: 48px;
+
+            &:before {
+              content: "$";
+              color: $ui_grey;
+              font-size: 16px;
+              position: absolute;
+              top: 16px;
+              left: 0px;
+              width: 24px;
+              height: 24px;
+            }
+          }
+
+          div.price-column-description {
+            margin-top: 8px;
+            @include avenir_M();
+            font-size: 16px;
+
+            &.second-line {
+              margin-top: 16px;
+            }
+
+            &.more-info {
+              @include avenir_H();
+              position: relative;
+              margin-top: 24px;
+
+              &:after {
+                content: "";
+                position: absolute;
+                top: 1px;
+                right: 0px;
+                background-image: cdnUrl("/img/ML/pricing_more_info.svg");
+                background-size: 16px 16px;
+                background-position: center;
+                background-repeat: no-repeat;
+                width: 16px;
+                height: 16px;
+
+                //////////////
+                // Uncomment this to show the more info icon
+                display: none;
+                //////////////
+              }
+            }
+          }
+
+          button.price-button {
+            margin: 24px auto 0px;
+          }
+        }
+      }
+
+      div.enterprise-block {
+        background-color: $light_gold;
+        border-radius: 8px;
+        width: 940px;
+        margin: 40px auto 0px;
+        padding: 24px;
+        text-align: center;
+
+        @include mobile() {
+          width: 100%;
+          padding: 32px;
+        }
+
+        span.enterprise-block-title {
+          @include avenir_H();
+          color: $deep_navy;
+          font-size: 16px;
+
+          @include mobile() {
+            display: block;
+            width: 100%;
+            text-align: center;
+          }
+        }
+
+        span.enterprise-block-copy {
+          @include avenir_R();
+          color: $ui_grey;
+          font-size: 16px;
+          margin: 0px 8px;
+
+          @include mobile() {
+            margin-top: 16px;
+            display: block;
+            width: 100%;
+            text-align: center;
+          }
+        }
+
+        a.enterprise-block-link {
+          @include avenir_M();
+          font-size: 16px;
+          color: $sea_blue;
+          text-decoration: none;
+
+          @include mobile() {
+            margin-top: 8px;
+            display: block;
+            width: 100%;
+            text-align: center;
+          }
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    button.price-button {
+      margin: px auto 0px;
+      background-color: $sea_blue;
+      color: white;
+      font-size: 16px;
+      width: 175px;
+      height: 40px;
+      border-radius: 100px;
+    }
+
+    section.second-section {
+      h1.compare-plans {
+        margin: 64px auto 32px;
+        text-align: center;
+        @include avenir_M();
+        font-size: 34px;
+        color: $deep_navy;
+      }
+
+      div.pricing-table {
+        margin: 32px auto 120px;
+        padding: 0px;
+        width: 940px;
+
+        @include mobile() {
+          width: calc(100% + 64px);
+          margin-left: -32px;
+          overflow-x: auto;
+        }
+
+        div.check {
+          margin: 0px auto;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/pricing_table_check.svg");
+          background-position: center;
+          background-size: 24px 24px;
+          background-repeat: no-repeat;
+        }
+
+        div.more-info {
+          @include avenir_R();
+          font-size: 16px;
+          color: $deep_navy;
+          position: relative;
+
+          span.more-info-icon {
+            display: inline-block;
+            background-image: cdnUrl("/img/ML/pricing_more_info.svg");
+            background-size: 16px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 16px;
+            height: 16px;
+            margin-left: 8px;
+            margin-top: 2px;
+            //////////////
+            // Remove this to show the info icons
+            display: none;
+            //////////////
+          }
+
+          ////////////////
+          // Uncomment to show the info bubbles
+          // &:hover {
+          //   div.more-info-bubble {
+          //     display: block;
+          //   }
+          // }
+          ////////////////
+
+          div.more-info-bubble {
+            display: none;
+            width: 260px;
+            padding: 24px;
+            background-color: white;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba($deep_tan, 0.7);
+            border-radius: 4px;
+            position: absolute;
+            top: 20px;
+            right: -100%;
+
+            div.more-info-title {
+              @include avenir_H();
+              font-size: 14px;
+              color: $deep_navy;
+            }
+
+            div.more-info-desc {
+              margin-top: 16px;
+              @include avenir_BOOK();
+              font-size: 14px;
+              color: $deep_navy;
+            }
+          }
+        }
+
+        table {
+          margin: 0px;
+          padding: 0px;
+          border: none;
+          width: 100%;
+          text-align: center;
+          border-top: 2px solid $deep_tan;
+          border-bottom: 2px solid $deep_tan;
+          
+          @include mobile() {
+            margin: 0px 32px;
+            width: 820px;
+          }
+
+          thead {
+            padding: 0px;
+            margin: 0px;
+
+            tr {
+              padding: 0px;
+              margin: 0px;
+              height: 75px;
+              border-bottom: 1px solid $deep_tan;
+
+              th {
+                padding: 0px;
+                margin: 0px;
+                width: 25%;
+                text-align: center;
+
+                &:not(:first-child):not(:last-child) {
+                  border-left: 1px solid $deep_tan;
+                  border-right: 1px solid $deep_tan;
+                }
+              }
+            }
+          }
+
+          tbody {
+            padding: 0px;
+            margin: 0px;
+
+            tr {
+              padding: 0px;
+              margin: 0px;
+              height: 75px;
+
+              &:nth-child(odd) {
+                background-color: transparent;
+              }
+
+              &:nth-child(even) {
+                background-color: rgba($deep_tan, 0.2);
+              }
+
+              td {
+                padding: 0px;
+                margin: 0px;
+                width: 25%;
+                @include avenir_H();
+                font-size: 16px;
+                color: $deep_navy;
+                text-align: center;
+
+                & > div {
+                  padding: 0px 24px;
+                }
+
+                &:first-child {
+                  @include avenir_R();
+                  text-align: left;
+                }
+
+                &:not(:first-child):not(:last-child) {
+                  border-left: 1px solid $deep_tan;
+                  border-right: 1px solid $deep_tan;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
-
-@media (min-width: 768px) { /* not mobile */
-  div.container.pricing {
-    margin-bottom: 40px;
-  }
-}
-
-@media (max-width: 767px) { /* mobile */
-  div.container.pricing {
-    margin-bottom: 20px;
-  }
-}
-
-@media (min-width: 768px) { /* not mobile */
-  div.container.pricing div.left {
-    padding-right: 40px;
-  }
-  div.container.pricing div.right {
-    padding-left: 40px;
-  }
-}
-
-div.price-box {
-  border: 1px solid $oc_gray_5;
-  border-radius: 6px;
-  padding: 15px 30px 0px 30px;
-  height: 90%;
-}
-
-@media (min-width: 768px) { /* not mobile */
-  div.price-box {
-    margin-top: 60px;
-  }
-}
-
-@media (max-width: 767px) { /* mobile */
-  div.price-box {
-    margin-top: 20px;
-  }
-}
-
-div.container.pricing h1 {
-  @include avenir_M();
-  font-size: 24px;
-  line-height: 1.1;
-  color: $oc_gray_5;
-  text-align: center;
-}
-
-div.container.pricing span.cost {
-  @include avenir_H();
-  font-size: 24px;
-  line-height: 1.1;
-  color: $oc_gray_5;
-}
-
-@media (min-width: 768px) { /* not mobile */
-  div.row.equal {
-    display: flex;
-    flex: 1 1 auto;
-    margin-bottom: 70px;
-  }
-}
-
-@media (max-width: 767px) { /* mobile */
-  div.row.equal {
-    margin-bottom: 20px;
-  }
-}
-
-@media (min-width: 768px) { /* not mobile */
-  img#oc-logo-gold {
-    display:block;
-    margin:auto;
-    margin-top: 15px;
-    margin-bottom: 40px;
-  }
-}
-@media (max-width: 767px) { /* mobile */
-  img#oc-logo-gold {
-    display:none;
-  }}

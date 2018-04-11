@@ -5,13 +5,13 @@
             [oc.web.router :as router]))
 
 (defonce app-state (atom {:loading false
-                          :mobile-menu-open false
-                          :show-login-overlay false
-                          :trend-bar-status :hidden}))
+                          :show-login-overlay false}))
 
 ;; Data key paths
 
 (def api-entry-point-key [:api-entry-point])
+
+(def auth-settings-key [:auth-settings])
 
 (defn org-key [org-slug]
   [(keyword org-slug)])
@@ -24,9 +24,6 @@
 
 (defn all-posts-key [org-slug]
   (vec (concat (boards-key org-slug) [:all-posts :board-data])))
-
-(defn calendar-key [org-slug]
-  (vec (conj (org-key org-slug) :calendar)))
 
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
@@ -84,13 +81,10 @@
    :route               [[] route-db]
    :orgs                [[:base] (fn [base] (:orgs base))]
    :org-slug            [[:route] (fn [route] (:org route))]
-   :org-redirect        [[:base] (fn [base] (:org-redirect base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
-   :story-uuid          [[:route] (fn [route] (:activity route))]
-   :su-share            [[:base] (fn [base] (:su-share base))]
    :loading             [[:base] (fn [base] (:loading base))]
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
    :query-params        [[:route] (fn [route] (:query-params route))]
@@ -104,32 +98,16 @@
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :comment-edit        [[:base] (fn [base] (:comment-edit base))]
-   :add-comment-height  [[:base] (fn [base] (:add-comment-height base))]
    :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
                              :error (:email-verification-error base)
                              :success (:email-verification-success base)})]
-   :teams-load          [[:base :auth-settings]
-                          (fn [base auth-settings]
-                            {:teams-data-requested (:teams-data-requested base)
-                             :auth-settings auth-settings})]
-   :team-management     [[:base :query-params]
-                          (fn [base query-params]
-                            {:um-invite (:um-invite base)
-                             :private-board-invite (:private-board-invite base)
-                             :query-params query-params
-                             :teams-data (:teams-data base)
-                             :um-domain-invite (:um-domain-invite base)
-                             :add-email-domain-team-error (:add-email-domain-team-error base)
-                             :teams-data-requested (:teams-data-requested base)})]
    :jwt                 [[:base] (fn [base] (:jwt base))]
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
-   :rum-popover-data    [[:base] (fn [base] (:rum-popover-data base))]
-   :whats-new-modal     [[:base] (fn [base] (:whats-new-modal base))]
    :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
@@ -145,10 +123,11 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
-   :invite-users        [[:base :team-data :current-user-data :team-roster]
-                          (fn [base team-data current-user-data team-roster]
+   :invite-users        [[:base] (fn [base] (:invite-users base))]
+   :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
+                          (fn [base team-data current-user-data team-roster invite-users]
                             {:team-data team-data
-                             :invite-users (:invite-users base)
+                             :invite-users invite-users
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
@@ -162,10 +141,6 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (all-posts-key org-slug))))]
-   :calendar            [[:base :org-slug]
-                          (fn [base org-slug]
-                            (when (and base org-slug)
-                              (get-in base (calendar-key org-slug))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -190,6 +165,10 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
+   :section-stream-data [[:base :org-slug :board-slug]
+                          (fn [base org-slug board-slug]
+                            (when (and org-slug board-slug)
+                              (get-in base (board-data-key org-slug board-slug))))]
    :activity-data       [[:base :org-slug :board-slug :activity-uuid]
                           (fn [base org-slug board-slug activity-uuid]
                             (get-in base (activity-key org-slug board-slug activity-uuid)))]
@@ -199,9 +178,6 @@
    :comments-data       [[:base :org-slug :board-slug]
                          (fn [base org-slug board-slug]
                            (get-in base (comments-key org-slug board-slug)))]
-   :trend-bar-status    [[:base]
-                          (fn [base]
-                            (:trend-bar-status base))]
    :edit-user-profile   [[:base]
                           (fn [base]
                             {:user-data (:edit-user-profile base)
@@ -228,9 +204,6 @@
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
-   :story-editing       [[:base]
-                          (fn [base]
-                            (:story-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]
@@ -238,10 +211,10 @@
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share
                           :add-comment-focus :comment-edit :ap-initial-at
-                          :comments-data]
+                          :comments-data :show-sections-picker :section-editing]
                           (fn [base org-data activity-data activity-share
                                add-comment-focus comment-edit ap-initial-at
-                               comments-data]
+                               comments-data show-sections-picker section-editing]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
@@ -253,7 +226,9 @@
                              :add-comment-focus add-comment-focus
                              :comment-edit comment-edit
                              :comments-data comments-data
-                             :ap-initial-at ap-initial-at})]
+                             :ap-initial-at ap-initial-at
+                             :show-sections-picker show-sections-picker
+                             :section-editing section-editing})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
@@ -264,7 +239,6 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
-   :story-editing-publish [[:base] (fn [base] (:story-editing-published-url base))]
    :confirm-invitation    [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)
@@ -302,7 +276,8 @@
                                :show-section-editor show-section-editor
                                :show-section-add show-section-add
                                :show-sections-picker show-sections-picker
-                               :entry-editing-board-slug (:board-slug entry-editing)})]})
+                               :entry-editing-board-slug (:board-slug entry-editing)
+                               :mobile-navigation-sidebar (:mobile-navigation-sidebar base)})]})
 
 
 ;; Action Loop =================================================================
@@ -326,6 +301,16 @@
 
 ;; Data
 
+(defn teams-data-requested
+  ""
+  ([] (teams-data-requested @app-state))
+  ([data] (:teams-data-requested data)))
+
+(defn auth-settings
+  "Get the Auth settings data"
+  ([] (auth-settings @app-state))
+  ([data] (get-in data auth-settings-key)))
+
 (defn api-entry-point
   "Get the API entry point."
   ([] (api-entry-point @app-state))
@@ -348,15 +333,6 @@
     (all-posts-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (all-posts-key org-slug))))
-
-(defn calendar-data
-  "Get org calendar data."
-  ([]
-    (calendar-data @app-state))
-  ([data]
-    (calendar-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (calendar-key org-slug))))
 
 (defn change-data
   "Get change data."
@@ -513,9 +489,6 @@
 (defn print-entry-editing-data []
   (js/console.log (get @app-state :entry-editing)))
 
-(defn print-story-editing-data []
-  (js/console.log (get @app-state :story-editing)))
-
 (defn print-whats-new-data []
   (js/console.log (get-in @app-state whats-new-key)))
 
@@ -533,5 +506,4 @@
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
-(set! (.-OCWebPrintStoryEditingData js/window) print-story-editing-data)
 (set! (.-OCWebPrintWhatsNewData js/window) print-whats-new-data)

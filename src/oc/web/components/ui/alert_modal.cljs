@@ -6,8 +6,14 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]))
 
+(defn show-alert [modal-data]
+  (dis/dispatch! [:input [:alert-modal] modal-data]))
+
+(defn hide-alert []
+  (dis/dispatch! [:input [:alert-modal :dismiss] true]))
+
 (defn dismiss-modal []
-  (dis/dispatch! [:alert-modal-hide-done]))
+  (dis/dispatch! [:input [:alert-modal] nil]))
 
 (defn close-clicked [s]
   (reset! (::dismiss s) true)
@@ -57,7 +63,7 @@
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 action true})
        :on-click #(when-not has-buttons
-                    (dis/dispatch! [:alert-modal-hide]))}
+                    (hide-alert))}
       [:div.modal-wrapper
         [:button.carrot-modal-close.mlb-reset
           {:on-click #(if (fn? (:link-button-cb alert-modal)) (link-button-clicked alert-modal %) (close-clicked s))}]
