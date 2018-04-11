@@ -305,9 +305,7 @@
     (and ;; cookie is set
          (cook/get-cookie (router/show-invite-people-tooltip-cookie))
          ;; user is alone in the team
-         (= (count (:users team-data)) 1)
-         ;; user can invite people
-         (utils/invite-people-link (:links team-data)))))
+         (= (count (:users team-data)) 1))))
 
 (defn check-invite-people-tooltip []
   (if (should-show-invite-people-tooltip)
