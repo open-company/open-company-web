@@ -409,13 +409,14 @@
                                      ;; There were errors inviting users, show them and let the user retry
                                      (do
                                        (reset! (::invite-rand s) (rand 3))
-                                       (reset! (::invite-error s) "Error inviting the following users, please retry.")
+                                       (reset! (::invite-error s) "An error occurred inviting the following users, please try again.")
                                        (reset! (::invite-rows s) (vec invite-errors)))
                                      ;; All invites sent, redirect to dashboard
                                      (org-actions/org-redirect @(drv/get-ref s :org-data))))))
                              s)}
   [s]
-  (let [org-data (drv/react s :org-data)
+  (let [_ (drv/react s :invite-users)
+        org-data (drv/react s :org-data)
         continue-fn (fn []
                      (let [_ (check-invites s)
                            errors (filter :error @(::invite-rows s))]
