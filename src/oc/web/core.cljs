@@ -170,9 +170,7 @@
                        (keyword (:org-settings query-params))
                        (when (contains? query-params :access)
                          :main))
-        next-app-state {:nux (when show-nux (if (or (responsive/is-tablet-or-mobile?)
-                                                    (= (.. js/window -location -hash) "#nux2"))
-                                              :2 :1))
+        next-app-state {:nux (when show-nux :1)
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
