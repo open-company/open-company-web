@@ -73,6 +73,9 @@
                                   (save-window-height s)
                                   (save-content-height s)
                                   s)
+                                 :before-render (fn [s]
+                                  (activity-actions/check-invite-people-tooltip)
+                                  s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
                                   (when-not (utils/is-test-env?)
