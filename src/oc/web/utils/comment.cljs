@@ -8,9 +8,11 @@
 (defn setup-medium-editor [comment-node]
   (let [config {:toolbar false
                 :anchorPreview false
+                :imageDragging false
                 :extensions #js []
                 :autoLink true
                 :anchor false
+                :targetBlank true
                 :paste #js {:forcePlainText true}
                 :placeholder #js {:text "Share your thoughts..."
                                   :hideOnClick true}

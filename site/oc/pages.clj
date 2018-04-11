@@ -30,7 +30,7 @@
       [:div.thanks-headline "Thanks!"]
       "We’ve sent you an email to confirm."
       [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
-      [:a.carrot-early-access-link.hidden {:href "/"} "/"]]])
+      [:a.carrot-early-access-link.hidden {:href "/?no_redirect=1"} "/"]]])
 
 (defn try-it-form [form-id try-it-class]
   [:form.validate
@@ -792,7 +792,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Stay aligned"]
+          [:title "Carrot | Company digest"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -861,7 +861,7 @@
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-selectionsaverestore.js"}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script
-            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js"
+            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
              :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
@@ -888,7 +888,9 @@
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; MediumEditorMediaPicker
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]]})
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
+          ;; MediumEditorFileDragging
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js"}]]})
 
 (def prod-app-shell
   {:head [:head
@@ -902,7 +904,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Stay aligned"]
+          [:title "Carrot | Company digest"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           ;; Bootstrap CSS //getbootstrap.com/
@@ -940,7 +942,7 @@
           [:script {:src (cdn "/js/static-js.js")}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script
-            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.7.3/jquery.textcomplete.min.js"
+            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
              :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]

@@ -24,7 +24,7 @@
         [:div.sections-picker-group-header
           (get-section-name group)])
       (when (pos? (count group))
-        (for [b group
+        (for [b (sort-by :name group)
               :let [active (= (:slug b) active-slug)]]
           [:div.sections-picker-section.group
             {:key (str "sections-picker-" (:uuid b))
@@ -89,7 +89,7 @@
           {:class (when should-show-headers? "show-headers")}
           [:div.sections-picker-header
             [:div.sections-picker-header-left
-              "Post to..."]
+              "Sections"]
             [:div.sections-picker-header-right
               [:button.mlb-reset.add-new-section-bt
                 {:on-click #(reset! (::show-add-section s) true)}

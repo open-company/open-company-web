@@ -2,10 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [taoensso.timbre :as timbre]
-            [cljs-time.core :as time]
-            [cljs-time.format :as f]
             [cuerdas.core :as s]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -16,33 +13,6 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.activity-card :refer (activity-card)]))
-
-(defn new?
-  "
-  An entry is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-      -and-
-    user is not the post's author
-      -and-
-    published-at is < 30 days
-      -and-
-    published-at of the entry is newer than seen at
-      -or-
-    no seen at
-  "
-  [entry changes]
-  (let [published-at (:published-at entry)
-        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
-        seen-at (:seen-at changes)
-        user-id (jwt/get-key :user-id)
-        author-id (-> entry :author first :user-id)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
-        new? (and in-team?
-                  (not= author-id user-id)
-                  (> published-at too-old)
-                  (or (> published-at seen-at)
-                      (nil? seen-at)))]
-    new?))
 
 (defn load-more-items-next-fn [s scroll]
   (when (compare-and-set! (::loading-more s) false true)
@@ -124,9 +94,8 @@
             ; Renteder the entries in thisnrow
             [:div.entries-cards-container-row.group
               {:key (str "entries-row-" idx)}
-              (for [entry entries
-                    :let [is-new (new? entry changes)]]
-                (rum/with-key (activity-card entry has-headline has-body is-new has-attachments)
+              (for [entry entries]
+                (rum/with-key (activity-card entry has-headline has-body (:new entry) has-attachments)
                   (str "entry-latest-" (:uuid entry))))
               ; If the row contains less than 2, add a placeholder
 

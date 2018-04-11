@@ -42,7 +42,7 @@
   (let [is-currently-shown (is-currently-shown? section)]
     (when is-currently-shown
       (when (and (router/current-activity-id)
-                 (not (contains? (:entries section) (router/current-activity-id))))
+                 (not (some #(when (= (router/current-activity-id) (:uuid %)) %) (:entries section))))
         (router/nav! (oc-urls/board (router/current-org-slug) (:slug section))))
       ;; Tell the container service that we are seeing this board,
       ;; and update change-data to reflect that we are seeing this board
@@ -154,9 +154,13 @@
       (let [board-data (dispatcher/board-data)]
         (section-get (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))))
 
-(defn wc-subscribe
-  [subscriber]
-  (subscriber :container/change
+
+(defn ws-change-subscribe []
+  (ws-cc/subscribe :container/status
+    (fn [data]
+      (dispatcher/dispatch! [:container/status (:data data)])))
+
+  (ws-cc/subscribe :container/change
     (fn [data]
       (let [change-data (:data data)
             container-id (:container-id change-data)]
@@ -164,7 +168,6 @@
         (when (not= container-id (:uuid (dispatcher/org-data)))
           (section-change container-id (:change-at change-data)))))))
 
-(defn wi-subscribe
-  [subscriber]
-  (subscriber :interaction-comment/add
-              #(ws-comment-add (:data %))))
+(defn ws-interaction-subscribe []
+  (ws-ic/subscribe :interaction-comment/add
+                   #(ws-comment-add (:data %))))

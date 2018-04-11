@@ -57,27 +57,19 @@
            (not (utils/in? (:route @router/path) "secure-activity")))
       ;; Redirect to the first board if at least one is present
       (let [board-to (utils/get-default-board org-data)]
-        (utils/after 10
-          #(router/nav!
-             (if board-to
-               (oc-urls/board (:slug org-data) (:slug board-to))
-               (oc-urls/all-posts (:slug org-data))))))))
+        (router/nav!
+          (if board-to
+            (oc-urls/board (:slug org-data) (:slug board-to))
+            (oc-urls/all-posts (:slug org-data)))))))
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))
-      (sa/wc-subscribe ws-cc/subscribe)
-      (ws-cc/subscribe :container/change #(dis/dispatch! [:container/change (:data %)]))
-      (ws-cc/subscribe :container/status #(dis/dispatch! [:container/status (:data %)]))))
+      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
 
   ;; Interaction service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
-      (ws-ic/reconnect ws-link (jwt/get-key :user-id))
-      (ra/subscribe ws-ic/subscribe)
-      (ca/subscribe ws-ic/subscribe)
-      (sa/wi-subscribe ws-ic/subscribe)))
-  
+      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))  
   (dis/dispatch! [:org-loaded org-data saved?]))
 
 (defn get-org-cb [{:keys [status body success]}]
@@ -134,3 +126,15 @@
 
 (defn org-edit-save [org-data]
   (api/patch-org org-data org-edit-save-cb))
+
+(defn org-change [data]
+  (let [change-data (:data data)
+        container-id (:container-id change-data)
+        user-id (:user-id change-data)]
+    (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
+      (when (= container-id (:uuid (dis/org-data)))
+        (utils/after 1000 (fn [] (get-org)))))))
+
+;; subscribe to websocket events
+(defn subscribe []
+  (ws-cc/subscribe :container/change org-change))

@@ -53,7 +53,7 @@
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                   :title (utils/activity-date-tooltip draft)}
+                   :data-title (utils/activity-date-tooltip draft)}
                   (utils/time-since t)])]]]
         [:div.draft-card-content.group
           [:div.draft-card-title

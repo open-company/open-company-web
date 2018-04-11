@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn react-from-picker [activity-data emoji]
@@ -78,8 +79,8 @@
       (refresh-if-needed org-slug board-slug interaction-data)))
   (dis/dispatch! [:ws-interaction/reaction-delete interaction-data]))
 
-(defn subscribe [subscriber]
-  (subscriber :interaction-reaction/add
-              #(ws-interaction-reaction-add (:data %)))
-  (subscriber :interaction-reaction/delete
-              #(ws-interaction-reaction-delete (:data %))))
+(defn subscribe []
+  (ws-ic/subscribe :interaction-reaction/add
+                   #(ws-interaction-reaction-add (:data %)))
+  (ws-ic/subscribe :interaction-reaction/delete
+                   #(ws-interaction-reaction-delete (:data %))))

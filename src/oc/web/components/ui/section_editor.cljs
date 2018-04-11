@@ -9,6 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.actions.section :as section-actions]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -216,8 +217,7 @@
                 available-users (filter :user-id (:users roster))
                 addable-users (get-addable-users section-editing available-users)
                 filtered-users (filter-users addable-users @query)]
-            (when (and can-change
-                       (pos? (count addable-users)))
+            (when can-change
               [:div.section-editor-private-users-search
                 {:ref "private-users-search"}
                 [:input
@@ -230,19 +230,27 @@
                                 (reset! query q))}]
                 (when @(::show-search-results s)
                   [:div.section-editor-private-users-results
-                    (for [u filtered-users
-                          :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
-                                user (merge u team-user)
-                                user-type (utils/get-user-type user org-data section-editing)]]
-                      [:div.section-editor-private-users-result
-                        {:on-click #(do
-                                      (reset! query "")
-                                      (reset! (::show-search-results s) false)
-                                      (section-actions/private-section-user-add user user-type))
-                         :ref (str "add-user-" (:user-id user))}
-                        (user-avatar-image user)
+                    (if (pos? (count filtered-users))
+                      (for [u filtered-users
+                            :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
+                                  user (merge u team-user)
+                                  user-type (utils/get-user-type user org-data section-editing)]]
+                        [:div.section-editor-private-users-result
+                          {:on-click #(do
+                                        (reset! query "")
+                                        (reset! (::show-search-results s) false)
+                                        (section-actions/private-section-user-add user user-type))
+                           :ref (str "add-user-" (:user-id user))}
+                          (user-avatar-image user)
+                          [:div.name
+                            (utils/name-or-email user)]])
+                      [:div.section-editor-private-users-result.no-more-invites
                         [:div.name
-                          (utils/name-or-email user)]])])])))
+                          "Looks like you'll need to invite more people to your team before you can add them. You can do that in "
+                          [:a
+                            {:on-click #(org-settings/show-modal :invite)}
+                            "Carrot team settings"]
+                          "."]])])])))
         (when (and (= (:access section-editing) "private")
                    (pos? (+ (count (:authors section-editing))
                             (count (:viewers section-editing)))))
