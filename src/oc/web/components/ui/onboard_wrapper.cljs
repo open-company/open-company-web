@@ -303,14 +303,7 @@
         [:button.mlb-reset.top-continue
           {:class (when continue-disabled "disabled")
            :on-touch-start identity
-           :on-click #(when-not continue-disabled
-                        (let [org-name (clean-org-name (:name org-editing))]
-                          (dis/dispatch! [:input [:org-editing :name] org-name])
-                          (if (and (seq org-name)
-                                   (> (count org-name) 2))
-                            ;; Create org and show setup screen
-                            (org-actions/org-create @(drv/get-ref s :org-editing))
-                            (dis/dispatch! [:input [:org-editing :error] true]))))
+           :on-click continue-fn
            :aria-label "Done"}
          "Done"]]
       [:div.onboard-form
@@ -363,14 +356,9 @@
              :on-change #(dis/dispatch! [:input [:org-editing]
                           (merge org-editing {:error nil :name (.. % -target -value)})])}]
           [:button.continue
-            {:class (when (< (count (clean-org-name (:name org-editing))) 3) "disabled")
+            {:class (when continue-disabled "disabled")
              :on-touch-start identity
-             :on-click #(let [org-name (clean-org-name (:name org-editing))]
-                          (dis/dispatch! [:input [:org-editing :name] org-name])
-                          (if (and (seq org-name)
-                                   (> (count org-name) 2))
-                           (org-actions/org-create @(drv/get-ref s :org-editing))
-                           (dis/dispatch! [:input [:org-editing :error] true])))}
+             :on-click continue-fn}
             "All set!"]]]]))
 
 (def default-invite-row
