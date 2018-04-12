@@ -26,18 +26,21 @@
          [:react-from-picker/finish
           {:status status
            :activity-data activity-data
+           :activity-key (concat (dis/current-board-key) [:fixed-items (:uuid activity-data)])
            :reaction-data (if success (json->cljs body) {})}])))))
 
 (defn reaction-toggle
   [activity-data reaction-data reacting?]
-  (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data])
-  (api/toggle-reaction reaction-data reacting?
-    (fn [{:keys [status success body]}]
-      (dis/dispatch!
-       [:activity-reaction-toggle/finish
-        activity-data
-        (:reaction reaction-data)
-        (when success (json->cljs body))]))))
+  (let [section-key (concat (dis/current-board-key) [:fixed-items (:uuid activity-data)])]
+    (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data section-key])
+    (api/toggle-reaction reaction-data reacting?
+      (fn [{:keys [status success body]}]
+        (dis/dispatch!
+         [:activity-reaction-toggle/finish
+          activity-data
+          (:reaction reaction-data)
+          (when success (json->cljs body))
+          section-key])))))
 
 (defn is-activity-reaction? [org-slug board-slug interaction-data]
   (let [activity-uuid (router/current-activity-id)
