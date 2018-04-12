@@ -2,7 +2,6 @@
   (:require [taoensso.timbre :as timbre]
             [cljs-flux.dispatcher :as flux]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dispatcher]
             [oc.lib.time :as oc-time]
             [oc.web.lib.utils :as utils]))
@@ -21,17 +20,18 @@
 
 (defmethod dispatcher/action :section
   [db [_ section-data]]
-  (let [fixed-section-data (utils/fix-board section-data (dispatcher/change-data db))
+  (let [org-slug (utils/section-org-slug section-data)
+        fixed-section-data (utils/fix-board section-data (dispatcher/change-data db))
         db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
-        old-section-data (get-in db (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug section-data))))
+        old-section-data (get-in db (dispatcher/board-data-key org-slug (keyword (:slug section-data))))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
                             old-section-data
                             fixed-section-data)
         next-db (assoc-in db-loading
-                  (dispatcher/board-data-key (router/current-org-slug) (keyword (:slug section-data)))
+                  (dispatcher/board-data-key org-slug (keyword (:slug section-data)))
                   with-current-edit)]
     next-db))
 
@@ -82,7 +82,7 @@
 
 (defn- update-change-data [db section-uuid property timestamp]
   (let [org-data (dispatcher/org-data db)
-        change-data-key (dispatcher/change-data-key (router/current-org-slug))
+        change-data-key (dispatcher/change-data-key (:slug org-data))
         change-data (get-in db change-data-key)
         change-map (or (get change-data section-uuid) {})
         new-change-map (assoc change-map property timestamp)
@@ -124,7 +124,7 @@
 
 (defmethod dispatcher/action :section-edit-save/finish
   [db [_ section-data]]
-  (let [org-slug (router/current-org-slug)
+  (let [org-slug (utils/section-org-slug section-data)
         section-slug (:slug section-data)
         board-key (dispatcher/board-data-key org-slug section-slug)
         fixed-section-data (utils/fix-board section-data (dispatcher/change-data db))]
