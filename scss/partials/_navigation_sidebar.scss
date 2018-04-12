@@ -518,7 +518,7 @@ div.left-navigation-sidebar {
       }
 
       div.invite-people-tooltip-icon {
-        @include image-2x("/img/ML/happy_face_green");
+        background-image: cdnUrl("/img/ML/happy_face_green.svg");
         background-size: 48px 48px;
         background-position: center;
         background-repeat: no-repeat;
