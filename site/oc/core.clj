@@ -62,9 +62,7 @@
      {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
       :type "text/javascript"
       :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-      :crossorigin "anonymous"}]
-    ;; JWT library to decode/encode JWT
-    [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
+      :crossorigin "anonymous"}]])
 
 (defn mobile-menu
   "Mobile menu used to show the collapsable menu in the marketing site."
