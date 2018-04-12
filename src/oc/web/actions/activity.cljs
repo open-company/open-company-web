@@ -246,16 +246,31 @@
   (dis/dispatch! [:entry-modal-save]))
 
 (defn nux-next-step [next-step]
-  (let [next-url (str (oc-urls/board (router/current-org-slug) (router/current-board-slug)) "#nux" (name next-step))]
-    (.pushState (.-history js/window) (.. js/window -history -state) (.-title js/document) next-url))
   (dis/dispatch! [:nux-next-step next-step]))
+
+(defn show-invite-people-tooltip []
+  (dis/dispatch! [:input [:show-invite-people-tooltip] true]))
+
+(defn hide-invite-people-tooltip []
+  (cook/remove-cookie! (router/show-invite-people-tooltip-cookie))
+  (dis/dispatch! [:input [:show-invite-people-tooltip] false]))
 
 (defn show-add-post-tooltip []
   (dis/dispatch! [:input [:show-add-post-tooltip] true]))
 
 (defn hide-add-post-tooltip []
-  (cook/remove-cookie! (router/show-add-post-tooltip-cookie))
-  (dis/dispatch! [:input [:show-add-post-tooltip] false]))
+  (let [add-post-cookie-name (router/show-add-post-tooltip-cookie)
+        show-add-post-tooltip (cook/get-cookie add-post-cookie-name)
+        team-data (dis/team-data (:team-id (dis/org-data)))]
+    (cook/remove-cookie! (router/show-add-post-tooltip-cookie))
+    (dis/dispatch! [:input [:show-add-post-tooltip] false])
+    ;; Show the invite people tooltip if
+    (when (and ;; was showing the add post tooltip
+               show-add-post-tooltip
+               ;; the team has only the current user
+               (= (count (:users team-data)) 1))
+      (cook/set-cookie! (router/show-invite-people-tooltip-cookie) true (* 60 60 24 365))
+      (show-invite-people-tooltip))))
 
 (defn should-show-add-post-tooltip
   "Check if we need to show the add post tooltip."
@@ -288,14 +303,25 @@
     (show-add-post-tooltip)
     (hide-add-post-tooltip)))
 
+(defn should-show-invite-people-tooltip []
+  (let [org-data (dis/org-data)
+        team-data (dis/team-data (:team-id org-data))]
+    (and ;; cookie is set
+         (cook/get-cookie (router/show-invite-people-tooltip-cookie))
+         ;; user is alone in the team
+         (= (count (:users team-data)) 1))))
+
+(defn check-invite-people-tooltip []
+  (if (should-show-invite-people-tooltip)
+    (show-invite-people-tooltip)
+    (hide-invite-people-tooltip)))
+
 (defn nux-end []
   ;; Add the cookie to show the add post tooltip
   (cook/set-cookie! (router/show-add-post-tooltip-cookie) true (* 60 60 24 365))
   (check-add-post-tooltip)
   (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
-  (dis/dispatch! [:nux-end])
-  (let [next-url (oc-urls/board (router/current-org-slug) (router/current-board-slug))]
-    (.pushState (.-history js/window) (.. js/window -history -state) (.-title js/document) next-url)))
+  (dis/dispatch! [:nux-end]))
 
 (defn add-attachment [dispatch-input-key attachment-data]
   (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data]))

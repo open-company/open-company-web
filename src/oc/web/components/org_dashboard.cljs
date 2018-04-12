@@ -85,7 +85,7 @@
                 entry-editing-board-slug
                 mobile-navigation-sidebar]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :2])
+        should-show-onboard-overlay? (= nux :1)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
@@ -111,10 +111,6 @@
             (and nux-loading
                  (not nux-end)))
       [:div.org-dashboard
-        (when should-show-onboard-overlay?
-          [:div.screenshots-preload
-            [:div.screenshot-preload.screenshot-1]
-            [:div.screenshot-preload.screenshot-2]])
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
@@ -125,7 +121,7 @@
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (cond
           should-show-onboard-overlay?
-          (onboard-overlay nux)
+          (onboard-overlay)
           ;; Org settings
           org-settings-data
           (org-settings)

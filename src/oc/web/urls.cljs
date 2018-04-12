@@ -32,6 +32,11 @@
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")
 
+(defn sign-up-invite
+  ([]
+    (sign-up-invite (router/current-org-slug)))
+  ([org-slug] (str "/sign-up-invite/" (name org-slug) )))
+
 (def slack-lander-check "/slack-lander/check")
 
 (def logout "/logout")

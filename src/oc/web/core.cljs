@@ -170,9 +170,7 @@
                        (keyword (:org-settings query-params))
                        (when (contains? query-params :access)
                          :main))
-        next-app-state {:nux (when show-nux (if (or (responsive/is-tablet-or-mobile?)
-                                                    (= (.. js/window -location -hash) "#nux2"))
-                                              :2 :1))
+        next-app-state {:nux (when show-nux :1)
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
@@ -342,9 +340,27 @@
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
-      (when-not (jwt/jwt)
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+
+    (defroute signup-invite-route (urls/sign-up-invite ":org") {:as params}
+      (timbre/info "Routing signup-invite-route" (urls/sign-up-invite ":org"))
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
+
+    (defroute signup-invite-slash-route (str (urls/sign-up-invite ":org") "/") {:as params}
+      (timbre/info "Routing signup-invite-slash-route" (str (urls/sign-up-invite ":org") "/"))
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
@@ -492,6 +508,8 @@
                                  signup-profile-slash-route
                                  signup-team-route
                                  signup-team-slash-route
+                                 signup-invite-route
+                                 signup-invite-slash-route
                                  signup-route
                                  signup-slash-route
                                  ;; Signup slack
