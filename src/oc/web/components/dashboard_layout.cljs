@@ -159,7 +159,11 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         compose-fn (fn [_]
                     (utils/remove-tooltips)
-                    (activity-actions/entry-edit (get-board-for-edit s)))
+                    (activity-actions/entry-edit (get-board-for-edit s))
+                    ;; If the add post tooltip is visible
+                    (when @(drv/get-ref s :show-add-post-tooltip)
+                      ;; Dismiss it and bring up the invite people tooltip
+                      (utils/after 1000 activity-actions/hide-add-post-tooltip)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
