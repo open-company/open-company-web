@@ -19,7 +19,6 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
 --js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
 --js lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js \
---js lib/jwt_decode/jwt-decode.min.js \
 --output_wrapper "%output%
 //# sourceMappingURL=$3/oc_assets.js.map"
 
