@@ -96,7 +96,7 @@
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
-    (org-redirect org-data)))
+    (router/nav! (oc-urls/sign-up-invite (:slug org-data)))))
 
 (defn org-create-cb [{:keys [success status body]}]
   (when-let [org-data (when success (json->cljs body))]
@@ -109,8 +109,8 @@
         ; use the org name
         ; for it and patch it back
         (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
-        ; if not redirect the user to the slug)
-        (org-redirect org-data)))))
+        ; if not redirect the user to the invite page
+        (router/nav! (oc-urls/sign-up-invite (:slug org-data)))))))
 
 (defn org-create [org-data]
   (when-not (empty? (:name org-data))

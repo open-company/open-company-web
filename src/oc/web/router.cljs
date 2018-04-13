@@ -139,9 +139,14 @@
   (str "show-nux-" user-id))
 
 (defn show-add-post-tooltip-cookie
-  "Cookie to remember if the boards and journals tooltips where shown."
+  "Cookie to check if the add first post tooltip shuold be visible."
   []
   (str "add-post-tooltip-" (jwt/user-id)))
+
+(defn show-invite-people-tooltip-cookie
+  "Cookie to check if the invite people tooltip shuold be visible."
+  []
+  (str "invite-people-tooltip-" (jwt/user-id)))
 
 ;; Values for NUX cookie
 

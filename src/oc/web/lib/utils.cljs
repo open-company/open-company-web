@@ -614,11 +614,25 @@
       (oc-urls/org org-slug))
     oc-urls/login))
 
-(defn storage-url-org-slug [storage-url]
+(defn url-org-slug [storage-url]
   (let [parts (s/split storage-url "/")]
     (if (s/starts-with? storage-url "http")
       (nth parts 4)
       (nth parts 2))))
+
+(defn storage-url-org-slug [url] (url-org-slug url))
+
+(defn url-board-slug [url]
+  (let [parts (s/split url "/")]
+    (if (s/starts-with? url "http")
+      (nth parts 5)
+      (nth parts 3))))
+
+(defn section-org-slug [section-data]
+  (url-org-slug (link-for (:links section-data) ["item" "self"] "GET")))
+
+(defn post-org-slug [post-data]
+  (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
 (def default-headline "Untitled post")
 

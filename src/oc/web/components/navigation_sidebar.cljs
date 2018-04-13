@@ -9,6 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.whats-new-modal :as whats-new-modal]
             [goog.events :as events]
@@ -33,7 +34,11 @@
   (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
     (let [height (.height (js/$ navigation-sidebar-content))]
       (when (not= height @(::content-height s))
-        (reset! (::content-height s) height)))))
+        (reset! (::content-height s) height))))
+  (when-let [navigation-sidebar-footer (rum/ref-node s "left-navigation-sidebar-footer")]
+    (let [footer-height (.height (js/$ navigation-sidebar-footer))]
+      (when (not= footer-height @(::footer-height s))
+        (reset! (::footer-height s) footer-height)))))
 
 (defn filter-board [board-data]
   (let [self-link (utils/link-for (:links board-data) "self")]
@@ -55,8 +60,10 @@
                                 (drv/drv :org-data)
                                 (drv/drv :change-data)
                                 (drv/drv :mobile-navigation-sidebar)
+                                (drv/drv :show-invite-people-tooltip)
                                 ;; Locals
                                 (rum/local false ::content-height)
+                                (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
@@ -65,6 +72,9 @@
                                 {:will-mount (fn [s]
                                   (save-window-height s)
                                   (save-content-height s)
+                                  s)
+                                 :before-render (fn [s]
+                                  (activity-actions/check-invite-people-tooltip)
                                   s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
@@ -97,17 +107,13 @@
         show-invite-people (and org-slug
                                 (jwt/is-admin? (:team-id org-data)))
         is-tall-enough? (or (not @(::content-height s))
-                            (<
-                             @(::content-height s)
-                             (-
-                              @(::window-height s)
-                              sidebar-top-margin
-                              footer-button-height
-                              20
-                              (when show-invite-people
-                               footer-button-height))))]
+                            (not @(::footer-height s))
+                            (< @(::content-height s)
+                             (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
+        show-invite-people-tooltip (drv/react s :show-invite-people-tooltip)]
     [:div.left-navigation-sidebar.group
-      {:class (when mobile-navigation-sidebar "show-mobile-boards-menu")}
+      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
+                                :showing-invite-people-tooltip show-invite-people-tooltip})}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts
@@ -177,7 +183,19 @@
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       [:div.left-navigation-sidebar-footer
-        {:style {:position (if is-tall-enough? "absolute" "relative")}}
+        {:ref "left-navigation-sidebar-footer"
+         :style {:position (if is-tall-enough? "absolute" "relative")}}
+        ;; invite people tooltip
+        (when show-invite-people-tooltip
+          [:div.invite-people-tooltip-container.group
+            [:button.mlb-reset.invite-people-tooltip-dismiss
+              {:on-click #(activity-actions/hide-invite-people-tooltip)}]
+            [:div.invite-people-tooltip-icon]
+            [:div.invite-people-tooltip-title
+              "Well done on your first post!"]
+            [:div.invite-people-tooltip-description
+              "You can invite your team so they can see it."]
+            [:div.invite-people-tooltip-arrow]])
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(do
