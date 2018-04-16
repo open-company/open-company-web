@@ -9,7 +9,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.org :as org-actions]
-            [oc.web.lib.json :refer (json->cljs)]))
+            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.actions.activity :as activity-actions]))
 
 (defn roster-get [roster-link]
   (api/get-team roster-link
@@ -102,6 +103,7 @@
   (if success
     (do
       (teams-get)
+      (activity-actions/remove-invite-people-tooltip)
       (dis/dispatch! [:invite-user/success user]))
     (dis/dispatch! [:invite-user/failed user])))
 

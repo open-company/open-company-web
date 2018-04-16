@@ -189,7 +189,7 @@
         (when show-invite-people-tooltip
           [:div.invite-people-tooltip-container.group
             [:button.mlb-reset.invite-people-tooltip-dismiss
-              {:on-click #(activity-actions/hide-invite-people-tooltip)}]
+              {:on-click #(activity-actions/remove-invite-people-tooltip)}]
             [:div.invite-people-tooltip-icon]
             [:div.invite-people-tooltip-title
               "Well done on your first post!"]

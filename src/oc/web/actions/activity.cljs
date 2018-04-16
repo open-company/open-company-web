@@ -252,11 +252,31 @@
   (dis/dispatch! [:input [:show-invite-people-tooltip] true]))
 
 (defn hide-invite-people-tooltip []
-  (cook/remove-cookie! (router/show-invite-people-tooltip-cookie))
   (dis/dispatch! [:input [:show-invite-people-tooltip] false]))
+
+(defn remove-invite-people-tooltip []
+  (cook/remove-cookie! (router/show-invite-people-tooltip-cookie))
+  (hide-invite-people-tooltip))
 
 (defn show-add-post-tooltip []
   (dis/dispatch! [:input [:show-add-post-tooltip] true]))
+
+(defn should-show-invite-people-tooltip []
+  (let [org-data (dis/org-data)
+        team-data (dis/team-data (:team-id org-data))
+        board-data (dis/board-data)
+        posts (vals (:fixed-items board-data))]
+    (and ;; cookie is set
+         (cook/get-cookie (router/show-invite-people-tooltip-cookie))
+         ;; user is alone in the team
+         (= (count (:users team-data)) 1)
+         ;; has at least 1 user added post
+         (> (count posts) 1))))
+
+(defn check-invite-people-tooltip []
+  (if (should-show-invite-people-tooltip)
+    (show-invite-people-tooltip)
+    (hide-invite-people-tooltip)))
 
 (defn hide-add-post-tooltip []
   (let [add-post-cookie-name (router/show-add-post-tooltip-cookie)
@@ -270,7 +290,8 @@
                ;; the team has only the current user
                (= (count (:users team-data)) 1))
       (cook/set-cookie! (router/show-invite-people-tooltip-cookie) true (* 60 60 24 365))
-      (show-invite-people-tooltip))))
+      (when (should-show-invite-people-tooltip)
+        (check-invite-people-tooltip)))))
 
 (defn should-show-add-post-tooltip
   "Check if we need to show the add post tooltip."
@@ -302,19 +323,6 @@
   (if (should-show-add-post-tooltip)
     (show-add-post-tooltip)
     (hide-add-post-tooltip)))
-
-(defn should-show-invite-people-tooltip []
-  (let [org-data (dis/org-data)
-        team-data (dis/team-data (:team-id org-data))]
-    (and ;; cookie is set
-         (cook/get-cookie (router/show-invite-people-tooltip-cookie))
-         ;; user is alone in the team
-         (= (count (:users team-data)) 1))))
-
-(defn check-invite-people-tooltip []
-  (if (should-show-invite-people-tooltip)
-    (show-invite-people-tooltip)
-    (hide-invite-people-tooltip)))
 
 (defn nux-end []
   ;; Add the cookie to show the add post tooltip
