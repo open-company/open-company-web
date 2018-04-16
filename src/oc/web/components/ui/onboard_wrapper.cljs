@@ -151,10 +151,9 @@
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
-                                    (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
-                                    (utils/after 100
-                                     #(user-actions/user-profile-save @(drv/get-ref s :current-user-data)
-                                       @(drv/get-ref s :edit-user-profile)))
+                                    (dis/dispatch! [:user-profile-reset])
+                                    (let [avatar-with-cdn (:avatar-url @(drv/get-ref s :edit-user-profile))]
+                                      (reset! (::temp-user-avatar s) avatar-with-cdn))
                                     s)
                                    :did-mount (fn [s]
                                     (delay-focus-field-with-ref s "first-name")
@@ -526,8 +525,9 @@
                                     (rum/local false ::saving)
                                     (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                      (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
-                                       (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                      (dis/dispatch! [:user-profile-reset])
+                                      (let [avatar-with-cdn (:avatar-url @(drv/get-ref s :edit-user-profile))]
+                                        (reset! (::temp-user-avatar s) avatar-with-cdn))
                                       s)
                                      :did-mount (fn [s]
                                       (delay-focus-field-with-ref s "first-name")
