@@ -97,7 +97,6 @@ div.stream-view-item {
       }
 
       div.stream-item-headline {
-        margin-top: 16px;
         @include activity-title();
         @include avenir_H();
         font-size: 22px;
