@@ -431,6 +431,33 @@ div.section-editor {
       }
     }
 
+    div.section-editor-add-personal-note {
+      border-radius: 4px;
+      border: 1px solid $carrot_light_gray_1;
+      height: 80px;
+      width: 100%;
+      @include avenir_M();
+      font-size: 15px;
+      color: $deep_navy;
+      padding: 10px 16px;
+      position: relative;
+      cursor: text;
+      outline: none;
+      margin-top: 8px;
+
+      &:empty:before {
+        padding: 10px 16px;
+        height: 40px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        content: attr(placeholder);
+        opacity: 0.5;
+        font-style: none;
+        display: block;
+      }
+    }
+
     div.section-editor-add-footer {
       margin-top: 24px;
       height: 24px;
