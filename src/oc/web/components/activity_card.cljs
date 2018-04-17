@@ -62,36 +62,35 @@
 
                       (activity-actions/activity-modal-fade-in activity-data))))}
       ; Card header
-      [:div.activity-card-head.group
-        {:class "entry-card"}
+      [:div.activity-card-head.entry-card.group
         ; Card author
         [:div.activity-card-head-author
           (user-avatar-image (:publisher activity-data))
           [:div.name (:name (:publisher activity-data))]
           [:div.time-since
-            [:time
-              {:date-time (:published-at activity-data)
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-               :title (:time-tooltip activity-data)}
-              (:time-since activity-data)]]]
+          [:time
+            {:date-time (:published-at activity-data)
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+             :title (:time-tooltip activity-data)}
+            (:time-since activity-data)]]]
         ; Card labels
         [:div.activity-card-head-right
           (when-not nux
             (more-menu activity-data))
-          ;; TODO This will be replaced w/ new Ryan new design, be sure to clean up CSS too when this changes
-          ;;(when is-new [:div.new-tag "New"])
-          ]]
+          (when is-all-posts
+            [:div.section-tag
+              {:class (when (:new activity-data) "has-new")
+               :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}])
+          (when (:new activity-data)
+            [:div.new-tag
+              "New"])]]
       [:div.activity-card-shadow-container.group
         [:div.activity-card-content.group
-          (when is-all-posts
-            [:div.posted-in
-              {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
           ; Headline
           [:div.activity-card-headline
-            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-             :class (when is-all-posts "showing-posted-in")}]
+            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           ; Body
           (let [body-without-preview (utils/body-without-preview (:body activity-data))
                 emojied-body (utils/emojify body-without-preview)]

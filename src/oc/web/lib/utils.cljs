@@ -3,7 +3,11 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
+            [cljs-time.format :as f]
+            [cljs-time.core :as time]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dispatcher]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
@@ -490,8 +494,6 @@
         _ (.remove $hidden-div)]
     body-without-preview))
 
-(def default-body "<p><br/></p>")
-
 (defn newest-org [orgs]
   (first (sort-by :created-at orgs)))
 
@@ -532,7 +534,7 @@
         _ (.detach $container)]
     cleaned-html))
 
-(defn your-boards-url []
+(defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
     (if-let [board-slug "all-posts"]
       ;; Repalce all-posts above with the following to go back to the last visited board
@@ -541,11 +543,25 @@
       (oc-urls/org org-slug))
     oc-urls/login))
 
-(defn storage-url-org-slug [storage-url]
+(defn url-org-slug [storage-url]
   (let [parts (s/split storage-url "/")]
     (if (s/starts-with? storage-url "http")
       (nth parts 4)
       (nth parts 2))))
+
+(defn storage-url-org-slug [url] (url-org-slug url))
+
+(defn url-board-slug [url]
+  (let [parts (s/split url "/")]
+    (if (s/starts-with? url "http")
+      (nth parts 5)
+      (nth parts 3))))
+
+(defn section-org-slug [section-data]
+  (url-org-slug (link-for (:links section-data) ["item" "self"] "GET")))
+
+(defn post-org-slug [post-data]
+  (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
 (def default-headline "Untitled post")
 
@@ -579,30 +595,69 @@
   {:src (cdn (str url ".png"))
    :src-set (str (cdn (str url "@2x.png")) " 2x")})
 
+(defn post-new?
+  "
+  An entry is new if:
+    user is part of the team (we don't track new for non-team members accessing public boards)
+      -and-
+    user is not the post's author
+      -and-
+    published-at is < 30 days
+      -and-
+    published-at of the entry is newer than seen at
+      -or-
+    no seen at
+  "
+  [entry changes]
+  (let [published-at (:published-at entry)
+        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
+        seen-at (:seen-at changes)
+        user-id (jwt/get-key :user-id)
+        author-id (-> entry :author first :user-id)
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
+        new? (and in-team?
+                  (not= author-id user-id)
+                  (> published-at too-old)
+                  (or (> published-at seen-at)
+                      (nil? seen-at)))]
+    new?))
+
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-body board-data]
-  (let [creation-time (or (:published-at entry-body) (:created-at entry-body))]
-    (-> entry-body
-      (assoc :content-type "entry")
-      (assoc :read-only (readonly-entry? (:links entry-body)))
-      (assoc :board-slug (or (:board-slug entry-body) (:slug board-data)))
-      (assoc :board-name (or (:board-name entry-body) (:name board-data)))
-      (assoc :time-since (time-since creation-time))
-      (assoc :time-tooltip (activity-date-tooltip entry-body)))))
+
+  ([entry-body board-data]
+    (fix-entry entry-body board-data {}))
+
+  ([entry-body board-data changes]
+    (let [creation-time (or (:published-at entry-body) (:created-at entry-body))
+          comments-link (link-for (:links entry-body) "comments")
+          add-comment-link (link-for (:links entry-body) "create" "POST")
+          fixed-board-slug (or (:board-slug entry-body) (:slug board-data))
+          fixed-board-name (or (:board-name entry-body) (:name board-data))]
+      (-> entry-body
+        (assoc :content-type "entry")
+        (assoc :new (post-new? (:body entry-body) changes))
+        (assoc :read-only (readonly-entry? (:links entry-body)))
+        (assoc :board-slug fixed-board-slug)
+        (assoc :board-name fixed-board-name)
+        (assoc :has-comments (boolean comments-link))
+        (assoc :can-comment (boolean add-comment-link))
+        (assoc :time-since (time-since creation-time))
+        (assoc :time-tooltip (activity-date-tooltip entry-body))))))
 
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
-  [board-data]
-  (let [links (:links board-data)
-        read-only (readonly-board? links)
-        with-read-only (assoc board-data :read-only read-only)
-        fixed-entries (zipmap
-                       (map :uuid (:entries board-data))
-                       (map #(fix-entry % board-data) (:entries board-data)))
-        without-entries (dissoc with-read-only :entries)
-        with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
-    with-fixed-entries))
+  ([board-data] (fix-board board-data {}))
+
+  ([board-data changes]
+     (let [links (:links board-data)
+           read-only (readonly-board? links)
+           with-read-only (assoc board-data :read-only read-only)
+           fixed-entries (zipmap
+                          (map :uuid (:entries board-data))
+                          (map #(fix-entry % board-data changes) (:entries board-data)))
+           with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
+       with-fixed-entries)))
 
 (defn fix-activity [activity collection-data]
   (fix-entry activity collection-data))

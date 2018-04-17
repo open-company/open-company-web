@@ -303,7 +303,8 @@
                                                  (and @(::animate s)
                                                       (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
-                                :editing editing})}
+                                :editing editing
+                                :no-comments (not (:has-comments activity-data))})}
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(if editing
@@ -426,14 +427,16 @@
                       [:div.fullscreen-post-box-footer-legend-image])]]
                 (reactions activity-data))]]]
         ;; Right column
-        (let [activity-comments (-> modal-data
-                                    :comments-data
-                                    (get (:uuid activity-data))
-                                    :sorted-comments)
-              comments-data (or activity-comments (:comments activity-data))]
-          [:div.fullscreen-post-right-column.group
-            {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
-                                      :no-comments (zero? (count comments-data))})
-             :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
-            (add-comment activity-data)
-            (stream-comments activity-data comments-data)])]]))
+        (when (:has-comments activity-data)
+          (let [activity-comments (-> modal-data
+                                      :comments-data
+                                      (get (:uuid activity-data))
+                                      :sorted-comments)
+                comments-data (or activity-comments (:comments activity-data))]
+            [:div.fullscreen-post-right-column.group
+              {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
+                                        :no-comments (zero? (count comments-data))})
+               :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
+              (when (:can-comment activity-data)
+                (add-comment activity-data))
+              (stream-comments activity-data comments-data)]))]]))

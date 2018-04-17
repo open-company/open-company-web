@@ -99,6 +99,7 @@
                   http/get)]
   (method refresh-url (complete-params headers))))
 
+;; Async version of jwt-refresh
 (defn- jwt-refresh [success-cb error-cb]
   (go
    (if-let [refresh-url (j/get-key :refresh-url)]
@@ -136,9 +137,16 @@
         expired? (j/expired?)]
     (timbre/debug jwt expired?)
     (go
-      (when (and jwt expired?)
-        (jwt-refresh #(jwt-refresh-handler (:body %))
-                     #(jwt-refresh-error-hn)))
+     ;; sync refresh
+     (when (and jwt expired?)
+       (if-let [refresh-url (j/get-key :refresh-url)]
+         (let [res (<! (refresh-jwt refresh-url))]
+            (timbre/debug "jwt-refresh" res)
+            (if (:success res)
+             (jwt-refresh-handler (:body res))
+              (jwt-refresh-error-hn)))
+          (jwt-refresh-error-hn)))
+
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
@@ -227,12 +235,12 @@
       {:headers (headers-for-link org-link)}
       callback)))
 
-(defn get-board [board-link]
+(defn get-board [board-link cb]
   (when board-link
     (storage-http (method-for-link board-link) (relative-href board-link)
       {:headers (headers-for-link board-link)}
       (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:board (json->cljs body)])))))
+        (cb status body success)))))
 
 (defn get-whats-new [whats-new-link callback]
   (when whats-new-link
@@ -240,7 +248,7 @@
       {:headers (headers-for-link whats-new-link)}
       callback)))
 
-(defn patch-board [data]
+(defn patch-board [data cb]
   (when data
     (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers :private-notifications])
           json-data (cljs->json board-data)
@@ -249,13 +257,7 @@
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
         (fn [{:keys [success body status]}]
-          (if (= status 409)
-            ; Board name exists
-            (dispatcher/dispatch!
-             [:input
-              [:section-editing :section-name-error]
-              "Board name already exists or isn't allowed"])
-            (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])))))))
+          (cb success body status))))))
 
 (def org-keys [:name :logo-url :logo-width :logo-height])
 
@@ -482,7 +484,7 @@
 (defn send-invitation
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
-   Add the logo of the company if possible"
+   Add the company's logo and its size if possible."
   [complete-user-data invited-user invite-from user-type first-name last-name callback]
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
@@ -504,7 +506,9 @@
                                 :slack-org-id (:slack-org-id invited-user)})
                               (assoc json-params :email invited-user))
           with-company-name (merge with-invited-user {:org-name (:name org-data)
-                                                      :logo-url (:logo-url org-data)})]
+                                                      :logo-url (:logo-url org-data)
+                                                      :logo-width (:logo-width org-data)
+                                                      :logo-height (:logo-height org-data)})]
       (auth-http (method-for-link invitation-link) (relative-href invitation-link)
         {:json-params (cljs->json with-company-name)
          :headers (headers-for-link invitation-link)}
@@ -536,7 +540,7 @@
         (fn [{:keys [status success body]}]
           (cb status))))))
 
-(defn delete-board [board-slug]
+(defn delete-board [board-slug cb]
   (when board-slug
     (let [board-data (dispatcher/board-data @dispatcher/app-state (router/current-org-slug) board-slug)
           delete-board-link (utils/link-for (:links board-data) "delete")]
@@ -544,9 +548,7 @@
         (storage-http (method-for-link delete-board-link) (relative-href delete-board-link)
           {:headers (headers-for-link delete-board-link)}
           (fn [{:keys [status success body]}]
-            (if success
-              (router/nav! (oc-urls/org (router/current-org-slug)))
-              (.reload (.-location js/window)))))))))
+            (cb status success body)))))))
 
 (defn get-comments [activity-data callback]
   (when activity-data
@@ -688,14 +690,14 @@
         callback))))
 
 (defn remove-user-from-private-board
-  [user]
+  [user cb]
   (when user
     (let [remove-link (utils/link-for (:links user) "remove")]
       (when remove-link
         (storage-http (method-for-link remove-link) (relative-href remove-link)
          {:headers (headers-for-link remove-link)}
          (fn [{:keys [status success body]}]
-           (dispatcher/dispatch! [:private-board-kick-out-self/finish success])))))))
+          (cb status success body)))))))
 
 (defn query
   [org-uuid search-query callback]

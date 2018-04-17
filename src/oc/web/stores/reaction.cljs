@@ -2,7 +2,6 @@
   (:require [taoensso.timbre :as timbre]
             [cljs-flux.dispatcher :as flux]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dispatcher]))
 
@@ -29,10 +28,9 @@
 
 ;; Handle dispatch events
 (defn handle-reaction-to-entry-finish
-  [db activity-data reaction reaction-data]
+  [db activity-data reaction reaction-data activity-key]
   (let [activity-uuid (:uuid activity-data)
-        next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)
-        activity-key (concat (dispatcher/current-board-key) [:fixed-items activity-uuid])]
+        next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)]
     (if (nil? reaction-data)
       (let [updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)]
         (assoc-in db activity-key updated-activity-data))
@@ -50,31 +48,30 @@
                                    (assoc :reactions next-reactions-data))]
         (assoc-in db activity-key updated-activity-data)))))
 
-(defn handle-reaction-to-entry [db activity-data reaction-data]
-  (let [board-key (dispatcher/current-board-key)
-        old-reactions-loading (or (:reactions-loading activity-data) [])
+(defn handle-reaction-to-entry [db activity-data reaction-data board-key]
+  (let [old-reactions-loading (or (:reactions-loading activity-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
         updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)
         activity-key (concat board-key [:fixed-items (:uuid activity-data)])]
     (assoc-in db activity-key updated-activity-data)))
 
 (defmethod dispatcher/action :handle-reaction-to-entry
-  [db [_ activity-data reaction-data]]
-  (handle-reaction-to-entry db activity-data reaction-data))
+  [db [_ activity-data reaction-data board-key]]
+  (handle-reaction-to-entry db activity-data reaction-data board-key))
 
 (defmethod dispatcher/action :react-from-picker/finish
-  [db [_ {:keys [status activity-data reaction reaction-data]}]]
+  [db [_ {:keys [status activity-data reaction reaction-data activity-key]}]]
   (if (and (>= status 200)
            (< status 300))
     (let [reaction-key (first (keys reaction-data))
           reaction (name reaction-key)]
-      (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
+      (handle-reaction-to-entry-finish db activity-data reaction reaction-data activity-key))
     ;; Wait for the entry refresh if it didn't
     db))
 
 (defmethod dispatcher/action :activity-reaction-toggle/finish
-  [db [_ activity-data reaction reaction-data]]
-  (handle-reaction-to-entry-finish db activity-data reaction reaction-data))
+  [db [_ activity-data reaction reaction-data activity-key]]
+  (handle-reaction-to-entry-finish db activity-data reaction reaction-data activity-key))
 
 (defn- update-entry-reaction-data
   [add-event? interaction-data entry-data]
@@ -229,10 +226,10 @@
   (swap! reactions-atom index-posts org (-> body :collection :items))
   db)
 
-(defmethod reducer :board
+(defmethod reducer :section
   [db [_ board-data]]
-  (let [org (router/current-org-slug)
-        fixed-board-data (utils/fix-board board-data)]
+  (let [org (utils/section-org-slug board-data)
+        fixed-board-data (utils/fix-board board-data (dispatcher/change-data db))]
     (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
   db)
 

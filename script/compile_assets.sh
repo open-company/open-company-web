@@ -18,7 +18,7 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/rangy/rangy-classapplier.js \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
 --js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
---js lib/jwt_decode/jwt-decode.min.js \
+--js lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js \
 --output_wrapper "%output%
 //# sourceMappingURL=$3/oc_assets.js.map"
 

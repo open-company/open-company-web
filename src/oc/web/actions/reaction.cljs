@@ -2,10 +2,12 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn react-from-picker [activity-data emoji]
@@ -24,18 +26,21 @@
          [:react-from-picker/finish
           {:status status
            :activity-data activity-data
+           :activity-key (concat (dis/current-board-key) [:fixed-items (:uuid activity-data)])
            :reaction-data (if success (json->cljs body) {})}])))))
 
 (defn reaction-toggle
   [activity-data reaction-data reacting?]
-  (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data])
-  (api/toggle-reaction reaction-data reacting?
-    (fn [{:keys [status success body]}]
-      (dis/dispatch!
-       [:activity-reaction-toggle/finish
-        activity-data
-        (:reaction reaction-data)
-        (when success (json->cljs body))]))))
+  (let [section-key (concat (dis/current-board-key) [:fixed-items (:uuid activity-data)])]
+    (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data section-key])
+    (api/toggle-reaction reaction-data reacting?
+      (fn [{:keys [status success body]}]
+        (dis/dispatch!
+         [:activity-reaction-toggle/finish
+          activity-data
+          (:reaction reaction-data)
+          (when success (json->cljs body))
+          section-key])))))
 
 (defn is-activity-reaction? [org-slug board-slug interaction-data]
   (let [activity-uuid (router/current-activity-id)
@@ -61,7 +66,7 @@
     (if (and entry-data (seq (:reactions entry-data)))
       (when is-current-user
         (activity-actions/get-entry entry-data))
-      (api/get-board (utils/link-for (:links board-data) ["item" "self"] "GET")))))
+      (router/nav! (oc-urls/board (router/current-org-slug) board-slug)))))
 
 (defn ws-interaction-reaction-add [interaction-data]
   (let [org-slug (router/current-org-slug)
@@ -77,8 +82,8 @@
       (refresh-if-needed org-slug board-slug interaction-data)))
   (dis/dispatch! [:ws-interaction/reaction-delete interaction-data]))
 
-(defn subscribe [subscriber]
-  (subscriber :interaction-reaction/add
-              #(ws-interaction-reaction-add (:data %)))
-  (subscriber :interaction-reaction/delete
-              #(ws-interaction-reaction-delete (:data %))))
+(defn subscribe []
+  (ws-ic/subscribe :interaction-reaction/add
+                   #(ws-interaction-reaction-add (:data %)))
+  (ws-ic/subscribe :interaction-reaction/delete
+                   #(ws-interaction-reaction-delete (:data %))))

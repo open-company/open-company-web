@@ -167,6 +167,19 @@ div.section-editor {
 
           @include user-profile(24);
 
+          &.no-more-invites {
+            height: auto;
+
+            div.name {
+              margin-left: 0px;
+              color: $ui_grey;
+
+              a {
+                color: $carrot_green;
+              }
+            }
+          }
+
           div.user-avatar-img-container {
             float: left;
           }

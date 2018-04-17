@@ -4,7 +4,7 @@ div.onboard-wrapper-container {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     display: flex;
 
@@ -106,16 +106,37 @@ div.onboard-email-container {
     color: $carrot_orange;
   }
 
-  div.email-wall-sent-link {
-    color: $carrot_light_gray;
-    @include avenir_R();
-    font-size: 16px;
-    color: $oc_gray_7;
-    margin-top: 16px;
+  &.email-wall {
+    width: 385px;
+    color: $deep_navy;
+    @incldude avenir_H();
 
-    span.email-address {
-      @include avenir_H();
-      color: $oc_gray_7;
+    div.email-wall-icon {
+      background-image: cdnUrl("/img/ML/email_wall.svg");
+      background-size: 48px 36px;
+      background-position: center;
+      width: 48px;
+      height: 36px;
+      margin: 0 auto 32px;
+    }
+
+    div.email-wall-subtitle {
+      @include avenir_R();
+      font-size: 18px;
+      margin-top: 16px;
+    }
+
+    div.email-wall-sent-link {
+      color: $deep_navy;
+      @include avenir_R();
+      font-size: 18px;
+      margin-top: 56px;
+
+      div.email-address {
+        @include avenir_H();
+        font-size: 18px;
+        color: $deep_navy;
+      }
     }
   }
 
@@ -153,7 +174,7 @@ div.onboard-lander {
     div.title {
       @include avenir_H();
       font-size: 32px;
-      color: $carrot_dark_brown_1;
+      color: $deep_navy;
       letter-spacing: auto;
       line-height: 44px;
       margin-top: 80px;
@@ -163,7 +184,7 @@ div.onboard-lander {
         padding-top: 21px;
         @include avenir_H();
         font-size: 18px;
-        color: $carrot_dark_gray;
+        color: $deep_navy;
         height: 45px;
         line-height: 25px;
         width: 200px;
@@ -253,6 +274,22 @@ div.onboard-lander {
     width: 340px;
     margin: 0 auto 32px;
     text-align: left;
+
+    div.subtitle {
+      @include avenir_R();
+      font-size: 18px;
+      color: $deep_navy;
+      letter-spacing: auto;
+      margin-top: 24px;
+      text-align: center;
+
+      @include mobile() {
+        margin-top: 0px;
+        padding-top: 16px;
+        @include avenir_R();
+        margin: 0 auto;
+      }
+    }
 
     @include mobile() {
       width: 100%;
@@ -367,20 +404,9 @@ div.onboard-lander {
           width: 80px;
           height: 80px;
           background-color: transparent;
-          border: 2px solid $carrot_light_blue_2;
-          border-radius: 40px;
-
-          &:after {
-            content: "";
-            display: block;
-            width: 16px;
-            height: 16px;
-            @include image-2x("/img/ML/onboard_plus_icon");
-            background-repeat: no-repeat;
-            background-size: 16px;
-            margin-top: 32px;
-            margin-left: 32px;
-          }
+          background-image: cdnUrl("/img/ML/onboard_plus_icon.svg");
+          background-position: center;
+          background-size: 80px 80px;
         }
 
         div.org-avatar {
@@ -468,7 +494,7 @@ div.onboard-lander {
     div.field-label {
       @include avenir_H();
       font-size: 15px;
-      color: #8C9096;
+      color: $deep_navy;
       margin-top: 32px;
 
       span.error {
@@ -568,6 +594,7 @@ div.onboard-lander {
     }
   }
 
+
   &.lander-team {
     div.onboard-form {
       button.continue {
@@ -575,6 +602,84 @@ div.onboard-lander {
 
         @include mobile() {
           margin-top: 32px;
+        }
+      }
+    }
+  }
+
+  &.lander-invite {
+    div.onboard-form {
+      div.field-label {
+        button.add-another-invite-row {
+          color: $carrot_green;
+          float: right;
+          @include avenir_M();
+          font-size: 13px;
+        }
+      }
+
+      div.error {
+        @include avenir_H();
+        font-size: 15px;
+        margin-top: 16px;
+        color: $carrot_orange;
+      }
+
+      div.invite-rows {
+        width: 340px;
+        margin: 24px auto;
+
+        @include mobile(){
+          width: 100%;
+        }
+
+        div.invite-row {
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          border-radius: 4px;
+          background-color: white;
+          margin-top: 16px;
+          width: 100%;
+          height: 40px;
+          padding: 8px 16px;
+
+          &.error {
+            border: 1px solid $carrot_orange;
+          }
+
+          input {
+            @include avenir_BOOK();
+            font-size: 16px;
+            color: $ui_grey;
+            outline: none;
+            border: none;
+            background-color: white;
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+
+            @include placeholder() {
+              color: #99A0A7;
+            }
+          }
+        }
+      }
+
+      button.continue {
+        @include mobile() {
+          margin-bottom: 0px;
+        }
+      }
+
+      div.skip-container {
+        width: 100%;
+
+        button.skip-for-now {
+          color: $sea_blue;
+          margin: 16px auto 0;
+          width: 120px;
+          height: 25px;
+          text-align: center;
+          display: block;
         }
       }
     }

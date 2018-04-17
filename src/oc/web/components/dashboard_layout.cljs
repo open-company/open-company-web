@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -11,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.section :as section-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -157,7 +159,11 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         compose-fn (fn [_]
                     (utils/remove-tooltips)
-                    (activity-actions/entry-edit (get-board-for-edit s)))
+                    (activity-actions/entry-edit (get-board-for-edit s))
+                    ;; If the add post tooltip is visible
+                    (when @(drv/get-ref s :show-add-post-tooltip)
+                      ;; Dismiss it and bring up the invite people tooltip
+                      (utils/after 1000 activity-actions/hide-add-post-tooltip)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
@@ -172,10 +178,10 @@
                    (not (responsive/is-tablet-or-mobile?)))
           [:div.section-add
             {:class (when show-drafts "has-drafts")}
-            (section-editor nil (fn [board-data]
+           (section-editor nil (fn [board-data]
                                   (dis/dispatch! [:input [:show-section-add] false])
                                   (when board-data
-                                    (dis/dispatch! [:section-edit-save]))))])
+                                    (section-actions/section-save board-data))))])
         [:div.dashboard-layout-container.group
           (when-not is-mobile?
             (navigation-sidebar))
@@ -213,7 +219,7 @@
                          (fn [section-data]
                            (dis/dispatch! [:input [:show-section-editor] false])
                            (when section-data
-                             (dis/dispatch! [:section-edit-save])))))])
+                             (section-actions/section-save section-data)))))])
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"

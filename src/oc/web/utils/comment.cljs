@@ -2,26 +2,19 @@
   (:require [cljsjs.medium-editor]
             [goog.object :as gobj]
             [cuerdas.core :as string]
-            [defun.core :refer (defun)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]))
-
-(defun sort-comments
-  ([comments :guard nil?]
-   [])
-  ([comments :guard map?]
-   (sort-comments (vals comments)))
-  ([comments :guard sequential?]
-   (vec (reverse (sort-by :created-at comments)))))
 
 (defn setup-medium-editor [comment-node]
   (let [config {:toolbar false
                 :anchorPreview false
+                :imageDragging false
                 :extensions #js []
                 :autoLink true
                 :anchor false
+                :targetBlank true
                 :paste #js {:forcePlainText true}
-                :placeholder #js {:text "Share your thoughts..."
+                :placeholder #js {:text "Leave a comment..."
                                   :hideOnClick true}
                :keyboardCommands #js {:commands #js [
                                   #js {

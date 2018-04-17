@@ -10,58 +10,59 @@
 (def options {:contact-email contact-email
               :contact-mail-to contact-mail-to})
 
-(defn head []
+(defn head [drift?]
   [:head
-   [:meta {:charset "utf-8"}]
-   [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
-   [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
-   [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
-   ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-   [:title "Stay aligned"]
-   ;; Bootstrap - Latest compiled and minified CSS
-   [:link
+    [:meta {:charset "utf-8"}]
+    [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
+    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
+    [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
+    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
+    [:title "Carrot | Company digest"]
+    ;; Bootstrap - Latest compiled and minified CSS
+    [:link
     {:rel "stylesheet"
      :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
      :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
      :crossorigin "anonymous"}]
-   ;; Local css
-   [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
-   ;; Fallback for the CDN compacted css
-   [:link {:href (pages/cdn "/main.css") :rel "stylesheet"}]
-   ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
-   ;; WARNING: Respond.js doesn't work if you view the page via file://
-   "<!--[if lt IE 9]>
+    ;; Local css
+    [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
+    ;; Fallback for the CDN compacted css
+    [:link {:href (pages/cdn "/main.css") :rel "stylesheet"}]
+    ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
+    ;; WARNING: Respond.js doesn't work if you view the page via file://
+    "<!--[if lt IE 9]>
       <script src=\"//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js\"></script>
       <script src=\"//oss.maxcdn.com/respond/1.4.2/respond.min.js\"></script>
     <![endif]-->"
-   ;; Google fonts Open Sans / Lora
-   [:link {:type "text/css", :rel "stylesheet",
+    ;; Google fonts Open Sans / Lora
+    [:link {:type "text/css", :rel "stylesheet",
            :href "https://fonts.googleapis.com/css?family=Open+Sans:400,300"}]
-   [:link {:type "text/css", :rel "stylesheet",
+    [:link {:type "text/css", :rel "stylesheet",
            :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
-   ;; CarrotKit Font
-   [:link {:type "text/css" :rel "stylesheet" :href (pages/cdn "/css/fonts/CarrotKit.css")}]
-   ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
-   [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
-   ;; Favicon
-   [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
-   ;; jQuery needed by Bootstrap JavaScript
-   [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
-   ;; Static js files
-   [:script {:src (pages/cdn "/js/static-js.js")}]
-   ;; Google Analytics
-   [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
-   [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
-   [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
-   (pages/google-analytics-init)
-   ;; Bootstrap JavaScript //getf.com/
-   [:script
+    ;; CarrotKit Font
+    [:link {:type "text/css" :rel "stylesheet" :href (pages/cdn "/css/fonts/CarrotKit.css")}]
+    ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
+    [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+    ;; Favicon
+    [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
+    ;; jQuery needed by Bootstrap JavaScript
+    [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+    ;; Static js files
+    [:script {:src (pages/cdn "/js/static-js.js")}]
+    (when drift?
+      ;; Drift
+      [:script {:src (pages/cdn "/js/drift.js")}])
+    ;; Google Analytics
+    [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
+    [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
+    [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
+    (pages/google-analytics-init)
+    ;; Bootstrap JavaScript //getf.com/
+    [:script
      {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
       :type "text/javascript"
       :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-      :crossorigin "anonymous"}]
-   ;; jQuery textcomplete needed by Emoji One autocomplete
-   [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]])
+      :crossorigin "anonymous"}]])
 
 (defn mobile-menu
   "Mobile menu used to show the collapsable menu in the marketing site."
@@ -70,7 +71,7 @@
     [:div.site-mobile-menu-container
       [:div.site-mobile-menu-item
         [:a
-          {:href "/"
+          {:href "/?no_redirect=1"
            :class (when (= active-page "index") "active")}
           "Home"]]
       [:div.site-mobile-menu-item
@@ -104,7 +105,7 @@
     [:nav.site-navbar
       [:div.site-navbar-container
         [:a.navbar-brand-left
-          {:href "/"}]
+          {:href "/?no_redirect=1"}]
         [:div.site-navbar-right.big-web-only
           [:a.login
             {:id "site-header-login-item"
@@ -138,7 +139,7 @@
                "$('nav.navbar-bottom div.column:not(.column-company)').removeClass('expanded');"
                "$('nav.navbar-bottom div.column.column-company').toggleClass('expanded');")}
             "COMPANY"]
-          [:div.column-item [:a {:href "/"} "Home"]]
+          [:div.column-item [:a {:href "/?no_redirect=1"} "Home"]]
           [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
           [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]]
@@ -196,10 +197,10 @@
   ([content]
    (static-page content {}))
   ([content opts]
-   (let [{:keys [page title]} (-> content :entry read-edn)
+   (let [{:keys [page title drift]} (-> content :entry read-edn)
          is?    (fn [& args] ((set args) page))]
      (hp/html5 {:lang "en"}
-               (head)
+               (head drift)
                [:body
                 [:div
                  {:class "outer header"}

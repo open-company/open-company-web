@@ -10,6 +10,8 @@
 
 (def home "/")
 
+(def home-no-redirect (str home "?no_redirect=1"))
+
 (def about "/about")
 
 (def slack "/slack")
@@ -29,6 +31,11 @@
 (def sign-up "/sign-up")
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")
+
+(defn sign-up-invite
+  ([]
+    (sign-up-invite (router/current-org-slug)))
+  ([org-slug] (str "/sign-up-invite/" (name org-slug) )))
 
 (def slack-lander-check "/slack-lander/check")
 

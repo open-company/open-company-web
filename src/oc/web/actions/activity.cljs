@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.user-cache :as uc]
             [oc.web.lib.responsive :as responsive]
@@ -27,8 +28,6 @@
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
       (when should-404?
         (router/redirect-404!))
-      (utils/after 2000
-       #(dis/dispatch! [:boards-load-other (:boards org-data)]))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
@@ -66,7 +65,7 @@
     (dis/dispatch! [:org-loaded org-data])
     (if is-all-posts
       (all-posts-get org-data (:ap-initial-at @dis/app-state))
-      (api/get-board (utils/link-for (:links board-data) "self" "GET")))))
+      (sa/section-get (utils/link-for (:links board-data) "self" "GET")))))
 
 (defn refresh-org-data []
   (api/get-org (dis/org-data) refresh-org-data-cb))
@@ -201,12 +200,17 @@
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
 (defn entry-save-finish [activity-data initial-uuid edit-key]
-  (let [org-slug (router/current-org-slug)]
-    (save-last-used-section (:board-slug activity-data))
+  (let [org-slug (router/current-org-slug)
+        board-slug (:board-slug activity-data)
+        board-key (if (= (:status activity-data) "published")
+                   (dis/current-board-key)
+                   (dis/board-data-key org-slug utils/default-drafts-board-slug))]
+    (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
-    (dis/dispatch! [:entry-save/finish activity-data edit-key])))
+
+    (dis/dispatch! [:entry-save/finish activity-data edit-key board-key])))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
@@ -225,7 +229,6 @@
     (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
 
 (defn entry-modal-save [activity-data board-slug section-editing]
-  (timbre/debug section-editing)
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
            section-editing)
     (let [fixed-entry-data (dissoc activity-data :board-slug :board-name)
@@ -243,16 +246,52 @@
   (dis/dispatch! [:entry-modal-save]))
 
 (defn nux-next-step [next-step]
-  (let [next-url (str (oc-urls/board (router/current-org-slug) (router/current-board-slug)) "#nux" (name next-step))]
-    (.pushState (.-history js/window) (.. js/window -history -state) (.-title js/document) next-url))
   (dis/dispatch! [:nux-next-step next-step]))
+
+(defn show-invite-people-tooltip []
+  (dis/dispatch! [:input [:show-invite-people-tooltip] true]))
+
+(defn hide-invite-people-tooltip []
+  (dis/dispatch! [:input [:show-invite-people-tooltip] false]))
+
+(defn remove-invite-people-tooltip []
+  (cook/remove-cookie! (router/show-invite-people-tooltip-cookie))
+  (hide-invite-people-tooltip))
 
 (defn show-add-post-tooltip []
   (dis/dispatch! [:input [:show-add-post-tooltip] true]))
 
+(defn should-show-invite-people-tooltip []
+  (let [org-data (dis/org-data)
+        team-data (dis/team-data (:team-id org-data))
+        board-data (dis/board-data)
+        posts (vals (:fixed-items board-data))]
+    (and ;; cookie is set
+         (cook/get-cookie (router/show-invite-people-tooltip-cookie))
+         ;; user is alone in the team
+         (= (count (:users team-data)) 1)
+         ;; has at least 1 user added post
+         (> (count posts) 1))))
+
+(defn check-invite-people-tooltip []
+  (if (should-show-invite-people-tooltip)
+    (show-invite-people-tooltip)
+    (hide-invite-people-tooltip)))
+
 (defn hide-add-post-tooltip []
-  (cook/remove-cookie! (router/show-add-post-tooltip-cookie))
-  (dis/dispatch! [:input [:show-add-post-tooltip] false]))
+  (let [add-post-cookie-name (router/show-add-post-tooltip-cookie)
+        show-add-post-tooltip (cook/get-cookie add-post-cookie-name)
+        team-data (dis/team-data (:team-id (dis/org-data)))]
+    (cook/remove-cookie! (router/show-add-post-tooltip-cookie))
+    (dis/dispatch! [:input [:show-add-post-tooltip] false])
+    ;; Show the invite people tooltip if
+    (when (and ;; was showing the add post tooltip
+               show-add-post-tooltip
+               ;; the team has only the current user
+               (= (count (:users team-data)) 1))
+      (cook/set-cookie! (router/show-invite-people-tooltip-cookie) true (* 60 60 24 365))
+      (when (should-show-invite-people-tooltip)
+        (check-invite-people-tooltip)))))
 
 (defn should-show-add-post-tooltip
   "Check if we need to show the add post tooltip."
@@ -290,9 +329,7 @@
   (cook/set-cookie! (router/show-add-post-tooltip-cookie) true (* 60 60 24 365))
   (check-add-post-tooltip)
   (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
-  (dis/dispatch! [:nux-end])
-  (let [next-url (oc-urls/board (router/current-org-slug) (router/current-board-slug))]
-    (.pushState (.-history js/window) (.. js/window -history -state) (.-title js/document) next-url)))
+  (dis/dispatch! [:nux-end]))
 
 (defn add-attachment [dispatch-input-key attachment-data]
   (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data]))
@@ -304,7 +341,7 @@
   (api/get-entry entry-data
     (fn [{:keys [status success body]}]
       (if success
-        (dis/dispatch! [:entry (:uuid entry-data) (clj->js body)])))))
+        (dis/dispatch! [:entry (dis/current-board-key) (:uuid entry-data) (json->cljs body)])))))
 
 (defn entry-clear-local-cache [item-uuid edit-key]
   (remove-cached-item item-uuid)
@@ -367,7 +404,6 @@
   (dis/dispatch! [:entry-publish]))
 
 (defn activity-delete-finish []
-  (api/get-board (utils/link-for (:links (dis/board-data)) ["item" "self"] "GET"))
   ;; Reload the org to update the number of drafts in the navigation
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
     (refresh-org-data)
@@ -388,7 +424,7 @@
 
 (defn activity-delete [activity-data]
   (api/delete-activity activity-data activity-delete-finish)
-  (dis/dispatch! [:activity-delete activity-data]))
+  (dis/dispatch! [:activity-delete (dis/current-board-key) activity-data]))
 
 (defn activity-share-show [activity-data]
   (dis/dispatch! [:activity-share-show activity-data]))
@@ -406,17 +442,18 @@
   (api/share-activity activity-data share-data activity-share-cb)
   (dis/dispatch! [:activity-share share-data]))
 
-(defn activity-get-finish [status activity-data]
+(defn activity-get-finish [status activity-data secure-uuid]
   (when (= status 404)
     (router/redirect-404!))
-  (when (and (router/current-secure-activity-id)
+  (when (and secure-uuid
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
     (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-  (dis/dispatch! [:activity-get/finish status activity-data]))
+  (dis/dispatch! [:activity-get/finish status activity-data secure-uuid]))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
-  (activity-get-finish status (if success (json->cljs body) {})))
+  (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+
