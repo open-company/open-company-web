@@ -1,5 +1,8 @@
 div.org-settings div.org-settings-inner {
   div.org-settings-panel.org-settings-invite-panel {
+    div.org-settings-invite-panel-inner {
+      min-height: calc(100vh - 292px);
+    }
     div.org-settings-panel-row.invite-from {
 
       div.invite-from-label {
@@ -27,7 +30,6 @@ div.org-settings div.org-settings-inner {
     div.org-settings-invite-table {
       margin-top: 0px;
       margin-bottom: 0px;
-      min-height: calc(100vh - 352px);
 
       button.add-button {
         width: 32px;
