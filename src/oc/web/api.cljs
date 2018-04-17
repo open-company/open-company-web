@@ -485,7 +485,7 @@
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the company's logo and its size if possible."
-  [complete-user-data invited-user invite-from user-type first-name last-name callback]
+  [complete-user-data invited-user invite-from user-type first-name last-name note callback]
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
@@ -498,6 +498,7 @@
           companies (count (filter #(= (:rel %) "company") api-entry-point-links))
           json-params {:first-name first-name
                        :last-name last-name
+                       :note note
                        :admin (= user-type :admin)}
           with-invited-user (if (= invite-from "slack")
                               (merge

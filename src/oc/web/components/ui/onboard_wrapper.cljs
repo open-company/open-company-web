@@ -411,7 +411,7 @@
                          (reset! (::inviting s) true)
                          (reset! (::invite-error s) nil)
                          (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
-                           (team-actions/invite-users not-empty-invites)))))]
+                           (team-actions/invite-users not-empty-invites "")))))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
         [:div.title
