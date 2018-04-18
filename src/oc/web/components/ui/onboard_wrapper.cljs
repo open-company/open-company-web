@@ -564,7 +564,7 @@
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! 
+                        (iu/upload! user-utils/user-avatar-filestack-config
                           (fn [res]
                             (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
                           nil
