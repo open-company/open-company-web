@@ -313,7 +313,7 @@
             [:div.logo-upload-container.org-logo.group
               {:on-click (fn [_]
                           (if (empty? (:logo-url org-editing))
-                            (iu/upload! org-utils/org-avatar-default-config
+                            (iu/upload! org-utils/org-avatar-filestack-config
                               (fn [res]
                                 (let [url (gobj/get res "url")
                                       img (gdom/createDom "img")]
