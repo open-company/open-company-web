@@ -10,6 +10,8 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.utils.org :as org-utils]
+            [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
@@ -204,10 +206,7 @@
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
+                        (iu/upload! user-utils/user-avatar-filestack-config
                           (fn [res]
                             (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
                           nil
@@ -314,7 +313,7 @@
             [:div.logo-upload-container.org-logo.group
               {:on-click (fn [_]
                           (if (empty? (:logo-url org-editing))
-                            (iu/upload! {:accept "image/*"}
+                            (iu/upload! org-utils/org-avatar-filestack-config
                               (fn [res]
                                 (let [url (gobj/get res "url")
                                       img (gdom/createDom "img")]
@@ -565,10 +564,7 @@
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
+                        (iu/upload! 
                           (fn [res]
                             (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
                           nil
