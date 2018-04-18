@@ -326,7 +326,7 @@
                              :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure"]
                              :unwrapTags (clj->js (remove nil? ["div" "span" "label" "font" "h1"
                                                    (when-not show-subtitle "h2") "h3" "h4" "h5"
-                                                   "h6" "strong" "section" "time" "em" "main"]))}
+                                                   "h6" "strong" "section" "time" "em" "main" "u"]))}
                  :placeholder #js {:text "What would you like to share?"
                                    :hideOnClick true}
                  :keyboardCommands #js {:commands #js [
