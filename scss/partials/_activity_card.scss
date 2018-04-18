@@ -131,45 +131,13 @@ div.activity-card {
     }
 
     $right_max_width: 260;
-
     div.activity-card-head-right {
       white-space: nowrap;
       max-width: #{$right_max_width}px;
 
-      div.new-tag {
-        @include avenir_H();
-        color: $sea_blue;
-        font-size: 12px;
-        line-height: 14px;
-        padding: 6px 9px 5px 9px;
-        float: right;
-        border: 1px solid $sea_blue;
-        border-radius: 100px;
-        margin-right: 8px;
-        height: 26px;
-        margin-top: 3px;
-      }
+      @include new-tag();
 
-      div.section-tag {
-        float: right;
-        margin-right: 8px;
-        background-color: $deep_tan;
-        border-radius: 100px;
-        height: 26px;
-        color: $ui_grey;
-        @include avenir_H();
-        font-size: 12px;
-        padding: 5px 9px 6px 9px;
-        border: 1px solid $deep_tan;
-        margin-top: 3px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: #{$right_max_width - 8 - 24}px;
-
-        &.has-new {
-          max-width: #{$right_max_width - 46 - 8 - 8 - 24}px;
-        }
-      }
+      @include section-tag($right_max_width);
     }
   }
 

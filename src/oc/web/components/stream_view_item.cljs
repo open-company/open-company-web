@@ -64,7 +64,9 @@
                               (get (:uuid activity-data))
                               :sorted-comments)
                           (:comments activity-data))
-        activity-attachments (:attachments activity-data)]
+        activity-attachments (:attachments activity-data)
+        is-all-posts (or (:from-all-posts @router/path)
+                         (= (router/current-board-slug) "all-posts"))]
     [:div.stream-view-item
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
@@ -81,7 +83,14 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (more-menu activity-data)]
+        (more-menu activity-data)
+        (when is-all-posts
+          [:div.section-tag
+            {:class (when (:new activity-data) "has-new")
+             :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}])
+        (when (:new activity-data)
+          [:div.new-tag
+            "New"])]
       [:div.stream-view-item-body.group
         [:div.stream-body-left.group
           {:style {:padding-bottom (when-not is-mobile?
@@ -92,8 +101,6 @@
                                                           (when (pos? attachments-num)
                                                             (+ 32 20 attachments-height)))]
                                      (str total-padding "px")))}}
-          [:span.posted-in
-            {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}]
           [:div.stream-item-headline
             {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-item-body-container
