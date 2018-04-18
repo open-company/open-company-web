@@ -151,7 +151,7 @@
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
-                                    (dis/dispatch! [:user-profile-reset])
+                                    (user-actions/user-profile-reset)
                                     (let [avatar-with-cdn (:avatar-url @(drv/get-ref s :edit-user-profile))]
                                       (reset! (::temp-user-avatar s) avatar-with-cdn))
                                     s)
@@ -525,7 +525,7 @@
                                     (rum/local false ::saving)
                                     (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                      (dis/dispatch! [:user-profile-reset])
+                                      (user-actions/user-profile-reset)
                                       (let [avatar-with-cdn (:avatar-url @(drv/get-ref s :edit-user-profile))]
                                         (reset! (::temp-user-avatar s) avatar-with-cdn))
                                       s)

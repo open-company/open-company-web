@@ -63,7 +63,7 @@
                   (oc-urls/org first-org-slug)
                   oc-urls/login))]
     (when (:has-changes current-user-data)
-      (dis/dispatch! [:user-profile-reset]))
+      (user-actions/user-profile-reset))
     (router/nav! to-url)))
 
 (defn close-cb [orgs current-user-data]
@@ -133,7 +133,7 @@
                           (rum/local false ::password-error)
                           (rum/local false ::current-password-error)
                           {:will-mount (fn [s]
-                            (dis/dispatch! [:user-profile-reset])
+                            (user-actions/user-profile-reset)
                             s)
                            :after-render (fn [s]
                               (when-not (utils/is-test-env?)
@@ -384,7 +384,6 @@
                             (reset! (::email-error s) false)
                             (reset! (::password-error s) false)
                             (reset! (::current-password-error s) false)
-
-                            (dis/dispatch! [:user-profile-reset]))
+                            (user-actions/user-profile-reset))
                           (real-close-cb orgs current-user-data))}
             "Cancel"]]]))
