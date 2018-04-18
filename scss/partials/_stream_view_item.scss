@@ -46,6 +46,10 @@ div.stream-view-item {
 
       @include activity-author(32);
     }
+
+    @include new-tag();
+
+    @include section-tag();
   }
 
   div.stream-view-item-body {
@@ -92,14 +96,7 @@ div.stream-view-item {
         }
       }
 
-      span.posted-in {
-        @include avenir_M();
-        font-size: 14px;
-        color: $ui_grey;
-      }
-
       div.stream-item-headline {
-        margin-top: 16px;
         @include activity-title();
         @include avenir_H();
         font-size: 22px;
