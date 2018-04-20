@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.team :as team-actions]
@@ -101,7 +102,7 @@
                        [:input
                         [:org-editing]
                         (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0 :has-changes true})])
-                      (iu/upload! {:accept "image/*"}
+                      (iu/upload! org-utils/org-avatar-filestack-config
                         (fn [res]
                           (let [url (gobj/get res "url")
                                 img (gdom/createDom "img")]
