@@ -31,7 +31,12 @@
   ([comment-map :guard nil?]
     {})
   ([comment-map :guard map?]
-    (assoc comment-map :is-emoji (is-emoji (:body comment-map)))))
+    (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
+          delete-comment-link (utils/link-for (:links comment-map) "delete")]
+      (-> comment-map
+        (assoc :is-emoji (is-emoji (:body comment-map)))
+        (assoc :can-edit (boolean edit-comment-link))
+        (assoc :can-delete (boolean delete-comment-link))))))
 
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]
