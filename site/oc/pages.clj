@@ -12,6 +12,9 @@
                                   false)]
              (str "CarrotGA.init(" ga-version "," ga-tracking-id ");"))])
 
+(defn fullstory-init []
+  [:script (str "init_fullstory();")])
+
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
@@ -849,6 +852,8 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
+          [:script {:type "text/javascript" :src "/lib/fullstory.js"}]
+          (fullstory-init)
           ;; jQuery needed by Bootstrap JavaScript
           [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
           ;; Truncate html string
