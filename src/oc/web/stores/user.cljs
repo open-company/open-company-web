@@ -5,12 +5,12 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]))
 
-(def default-user-image "/img/ML/happy_face_red.svg")
+(def default-user-image "/img/ML/happy_face_red.png")
 (def other-user-images
- ["/img/ML/happy_face_green.svg"
-  "/img/ML/happy_face_blue.svg"
-  "/img/ML/happy_face_purple.svg"
-  "/img/ML/happy_face_yellow.svg"])
+ ["/img/ML/happy_face_green.png"
+  "/img/ML/happy_face_blue.png"
+  "/img/ML/happy_face_purple.png"
+  "/img/ML/happy_face_yellow.png"])
 
 (defn random-user-image []
   (first (shuffle (vec (conj other-user-images default-user-image)))))
