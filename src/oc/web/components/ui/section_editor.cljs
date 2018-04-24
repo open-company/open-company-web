@@ -352,7 +352,7 @@
              :ref "personal-note"
              :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "personal-note") %)
              :on-key-press (fn [e]
-                             (when (or (>= (count (.. e -target -innerText)) 50)
+                             (when (or (>= (count (.. e -target -innerText)) 500)
                                       (= (.-key e) "Enter"))
                               (utils/event-stop e)))
              :dangerouslySetInnerHTML {:__html ""}}])
