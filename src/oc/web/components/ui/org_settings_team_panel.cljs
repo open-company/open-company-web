@@ -53,7 +53,7 @@
       ;; Panel rows
       [:div.org-settings-team.org-settings-panel-row
         ;; Team table
-        [:table.org-settings-table
+        [:table.org-settings-table.fs-hide
           [:thead
             [:tr
               [:th "Name"]

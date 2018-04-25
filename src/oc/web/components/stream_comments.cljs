@@ -37,7 +37,7 @@
         (for [comment-data comments-data]
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data))}
-            [:div.stream-comment-header.group
+            [:div.stream-comment-header.group.fs-hide
               [:div.stream-comment-author-avatar
                 {:style {:background-image (str "url(" (:avatar-url (:author comment-data)) ")")}}]
               [:div.stream-comment-author-right

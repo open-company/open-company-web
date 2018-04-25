@@ -218,7 +218,7 @@
                 addable-users (get-addable-users section-editing available-users)
                 filtered-users (filter-users addable-users @query)]
             (when can-change
-              [:div.section-editor-private-users-search
+              [:div.section-editor-private-users-search.fs-hide
                 {:ref "private-users-search"}
                 [:input
                   {:value @query

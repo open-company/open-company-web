@@ -95,7 +95,7 @@
               [:span.error "Email already exists"]
               @(::email-error s)
               [:span.error "Email is not valid"])]
-          [:input.field
+          [:input.field.fs-hide
             {:type "email"
              :class (when (= (:error signup-with-email) 409) "error")
              :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
@@ -202,7 +202,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.group
+          [:div.logo-upload-container.group.fs-hide
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
@@ -219,14 +219,14 @@
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :ref "first-name"
              :value (or (:first-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :value (or (:last-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
@@ -310,7 +310,7 @@
           {:on-submit (fn [e]
                         (.preventDefault e))}
           (when-not is-mobile?
-            [:div.logo-upload-container.org-logo.group
+            [:div.logo-upload-container.org-logo.group.fs-hide
               {:on-click (fn [_]
                           (if (empty? (:logo-url org-editing))
                             (iu/upload! org-utils/org-avatar-filestack-config
@@ -347,7 +347,7 @@
             "Team name"
             (when (:error org-editing)
               [:span.error "Must be at least 3 characters"])]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :ref "org-name"
              :class (when (:error org-editing) "error")
@@ -434,7 +434,7 @@
               "+ Add another invitation"]]
           (when @(::invite-error s)
             [:div.error @(::invite-error s)])
-          [:div.invite-rows
+          [:div.invite-rows.fs-hide
             (for [idx (range (count @(::invite-rows s)))
                   :let [invite (get @(::invite-rows s) idx)]]
               [:div.invite-row
@@ -560,7 +560,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container
+          [:div.logo-upload-container.fs-hide
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
@@ -577,14 +577,14 @@
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :value (:last-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
@@ -622,7 +622,7 @@
           ":"
           " ")
         (if (seq email)
-          [:div.email-address email]
+          [:div.email-address.fs-hide email]
           "your email address")
         "."]]))
 

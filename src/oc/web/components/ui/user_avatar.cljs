@@ -14,7 +14,7 @@
         user-avatar-url (if (or use-default (empty? (:avatar-url user-data)))
                          (utils/cdn default-avatar)
                          (:avatar-url user-data))]
-    [:div.user-avatar-img-container
+    [:div.user-avatar-img-container.fs-hide
       [:div.user-avatar-img-helper]
       [:img.user-avatar-img
         {:src user-avatar-url

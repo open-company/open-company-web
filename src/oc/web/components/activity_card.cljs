@@ -66,7 +66,7 @@
         ; Card author
         [:div.activity-card-head-author
           (user-avatar-image (:publisher activity-data))
-          [:div.name (:name (:publisher activity-data))]
+          [:div.name.fs-hide (:name (:publisher activity-data))]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
