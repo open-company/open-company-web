@@ -59,7 +59,7 @@
     (pages/google-analytics-init)
     (when (env :fullstory)
       [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
-     (when (env :fullstory) (pages/fullstory-init))
+    (when (env :fullstory) (pages/fullstory-init))
     ;; Bootstrap JavaScript //getf.com/
     [:script
      {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
