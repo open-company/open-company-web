@@ -19,7 +19,8 @@
                                           :id (jwt/get-key :user-id)
                                           :first-name (jwt/get-key :first-name)
                                           :last-name (jwt/get-key :last-name)}))
-      (.setExtraContext js/Raven (clj->js {:clientId (.-clientid js/CarrotGA)})))))
+      (.setExtraContext js/Raven (clj->js {:clientId (.-clientid js/CarrotGA)
+                                           :FullStoryURL (.getCurrentSessionURL js/FS)})))))
 
 (defn test-raven []
   (js/setTimeout #(.captureMessage js/Raven "Message from clojure" 1000))
