@@ -575,6 +575,7 @@
     (sentry/capture-message "Error: div#app is not defined!")))
 
 (defn init []
+  (sentry/set-context)
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Setup API requests
