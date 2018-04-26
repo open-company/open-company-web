@@ -170,7 +170,13 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))]
+        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))
+        show-compose-button (or (and (or is-all-posts
+                                         is-drafts-board)
+                                     (pos? (count all-boards)))
+                                (and (not is-all-posts)
+                                     (not is-drafts-board)
+                                     (utils/link-for (:links board-data) "create")))]
       ;; Entries list
       [:div.dashboard-layout.group
         ;; Show create new section for desktop
@@ -237,10 +243,7 @@
                        :title "Visible to the world, including search engines"}
                       "Public"])]
                 ;; Add entry button
-                (when (and (not (:read-only org-data))
-                           (or (utils/link-for (:links board-data) "create")
-                               is-drafts-board
-                               is-all-posts))
+                (when show-compose-button
                   [:div.new-post-top-dropdown-container.group
                     [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                       {:on-click compose-fn}
@@ -311,10 +314,7 @@
                   :else
                   (section-stream)))
               ;; Add entry floating button
-              (when (and (not (:read-only org-data))
-                         (or (utils/link-for (:links board-data) "create")
-                             is-drafts-board
-                             is-all-posts))
+              (when show-compose-button
                 (let [opacity (if (responsive/is-tablet-or-mobile?)
                                 1
                                 (calc-opacity (document-scroll-top)))]
