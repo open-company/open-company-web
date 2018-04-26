@@ -252,8 +252,7 @@
        (fn [success body]
          (entry-point-get-finished success body
            (fn [orgs collection]
-             (if (zero? (count orgs))
-               (router/nav! oc-urls/sign-up-team)
+             (when (pos? (count orgs))
                (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
