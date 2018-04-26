@@ -16,8 +16,10 @@
     (.. js/Raven (config ls/local-dsn (ravenParameters)) install)
     (when (jwt/jwt)
       (.setUserContext js/Raven (clj->js {:user-id (jwt/get-key :user-id)
+                                          :id (jwt/get-key :user-id)
                                           :first-name (jwt/get-key :first-name)
-                                          :last-name (jwt/get-key :last-name)})))))
+                                          :last-name (jwt/get-key :last-name)}))
+      (.setExtraContext js/Raven (clj->js {:clientId (.-clientid js/CarrotGA)})))))
 
 (defn test-raven []
   (js/setTimeout #(.captureMessage js/Raven "Message from clojure" 1000))

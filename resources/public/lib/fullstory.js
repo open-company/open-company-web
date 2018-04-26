@@ -15,4 +15,7 @@ function init_fullstory() {
     g.identifyAccount=function(i,v){o='account';v=v||{};v.acctId=i;g(o,v)};
     g.clearUserCookie=function(){};
   })(window,document,window['_fs_namespace'],'script','user');
+
+  // store client id
+  FS.setUserVars({ 'clientId': CarrotGA.clientid });
 }
