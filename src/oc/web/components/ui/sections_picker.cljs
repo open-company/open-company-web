@@ -82,9 +82,9 @@
       [:button.mlb-reset.mobile-modal-close-bt
         {:on-click #(on-change nil)}]
       (if @(::show-add-section s)
-        (section-editor nil #(do
+        (section-editor nil (fn [sec-data note]
                               (reset! (::show-add-section s) false)
-                              (on-change %)))
+                              (on-change sec-data note)))
         [:div.sections-picker.group
           {:class (when should-show-headers? "show-headers")}
           [:div.sections-picker-header

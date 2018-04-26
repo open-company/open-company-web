@@ -64,12 +64,7 @@
                               (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
                                     org-data @(drv/get-ref s :org-data)
-                                    subject (str
-                                             (:name org-data)
-                                             (when (seq (:board-name activity-data))
-                                              (str " " (:board-name activity-data)))
-                                             ": "
-                                             (.text (.html (js/$ "<div />") (:headline activity-data))))]
+                                    subject (.text (.html (js/$ "<div />") (:headline activity-data)))]
                                (reset! (::email-subject s) subject)
                                (reset! (::email-data s) {:subject subject
                                                          :note ""})

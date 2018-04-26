@@ -342,6 +342,20 @@
                         (if (= user-type :author)
                           "Contributor"
                           "Viewer")])]))]])
+        (when (= (:access section-editing) "private")
+          [:div.section-editor-add-label
+            "Personal note"])
+        (when (= (:access section-editing) "private")
+          [:div.section-editor-add-personal-note
+            {:content-editable true
+             :placeholder "Add a personal note to your invitation..."
+             :ref "personal-note"
+             :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "personal-note") %)
+             :on-key-press (fn [e]
+                             (when (or (>= (count (.. e -target -innerText)) 500)
+                                      (= (.-key e) "Enter"))
+                              (utils/event-stop e)))
+             :dangerouslySetInnerHTML {:__html ""}}])
         [:div.section-editor-add-footer
           (when (and @(::editing-existing-section s)
                      (utils/link-for (:links section-data) "delete"))
@@ -371,11 +385,12 @@
             {:on-click #(let [section-node (rum/ref-node s "section-name")
                               inner-html (.-innerHTML section-node)
                               section-name (utils/strip-HTML-tags inner-html)
+                              personal-note (.-innerText (rum/ref-node s "personal-note"))
                               next-section-editing (merge section-editing {:slug utils/default-section-slug
                                                                            :name section-name})]
                           (dis/dispatch! [:input [:section-editing] next-section-editing])
                           (when (fn? on-change)
-                            (on-change next-section-editing)))}
+                            (on-change next-section-editing personal-note)))}
             (if @(::editing-existing-section s)
               "Save"
               "Create")]]]]))

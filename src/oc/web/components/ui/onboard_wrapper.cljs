@@ -153,10 +153,9 @@
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
-                                    (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
-                                    (utils/after 100
-                                     #(user-actions/user-profile-save @(drv/get-ref s :current-user-data)
-                                       @(drv/get-ref s :edit-user-profile)))
+                                    (user-actions/user-profile-reset)
+                                    (let [avatar-with-cdn (:avatar-url @(drv/get-ref s :edit-user-profile))]
+                                      (reset! (::temp-user-avatar s) avatar-with-cdn))
                                     s)
                                    :did-mount (fn [s]
                                     (delay-focus-field-with-ref s "first-name")
@@ -411,7 +410,7 @@
                          (reset! (::inviting s) true)
                          (reset! (::invite-error s) nil)
                          (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
-                           (team-actions/invite-users not-empty-invites)))))]
+                           (team-actions/invite-users not-empty-invites "")))))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
         [:div.title
@@ -567,8 +566,9 @@
                                     (rum/local false ::saving)
                                     (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                      (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
-                                       (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                      (user-actions/user-profile-reset)
+                                      (let [avatar-with-cdn (:avatar-url @(drv/get-ref s :edit-user-profile))]
+                                        (reset! (::temp-user-avatar s) avatar-with-cdn))
                                       s)
                                      :did-mount (fn [s]
                                       (delay-focus-field-with-ref s "first-name")

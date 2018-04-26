@@ -337,6 +337,9 @@
            (dis/dispatch! [:user-data (json->cljs body)])))))
     (dis/dispatch! [:user-profile-save])))
 
+(defn user-profile-reset []
+  (dis/dispatch! [:user-profile-reset]))
+
 ;; Debug
 
 (defn force-jwt-refresh []

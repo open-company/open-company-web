@@ -231,9 +231,9 @@
 (defn entry-modal-save [activity-data board-slug section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
            section-editing)
-    (let [fixed-entry-data (dissoc activity-data :board-slug :board-name)
+    (let [fixed-entry-data (dissoc activity-data :board-slug :board-name :invite-note)
           final-board-data (assoc section-editing :entries [fixed-entry-data])]
-      (api/create-board final-board-data
+      (api/create-board final-board-data (:invite-note activity-data)
         (fn [{:keys [success status body]}]
           (if (= status 409)
             ;; Board name exists
@@ -389,9 +389,10 @@
 (defn entry-publish [entry-editing section-editing]
   (if (and (= (:board-slug entry-editing) utils/default-section-slug)
            section-editing)
-    (let [fixed-entry-data (dissoc entry-editing :board-slug :board-name)
+    (let [fixed-entry-data (dissoc entry-editing :board-slug :board-name :invite-note)
           final-board-data (assoc section-editing :entries [fixed-entry-data])]
-      (api/create-board final-board-data (partial entry-publish-with-board-cb (:uuid entry-editing))))
+      (api/create-board final-board-data (:invite-note section-editing)
+       (partial entry-publish-with-board-cb (:uuid entry-editing))))
     (let [entry-exists? (seq (:links entry-editing))
           org-slug (router/current-org-slug)
           board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
