@@ -18,4 +18,5 @@ function init_fullstory() {
 
   // store client id
   FS.setUserVars({ 'clientId': CarrotGA.clientid });
+  console.log('init full story');
 }

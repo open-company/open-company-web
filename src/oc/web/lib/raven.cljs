@@ -21,7 +21,7 @@
                                           :last-name (jwt/get-key :last-name)})))))
 
 (defn set-context []
-  (.setExtraContext js/Raven (clj->js {:clientId (when js/CarrotGA (.-clientid js/CarrotGA))
+  (.setExtraContext js/Raven (clj->js {:clientId (.-clientid js/CarrotGA)
                                        :FullStoryURL (.getCurrentSessionURL js/FS)})))
 
 (defn test-raven []
