@@ -122,3 +122,5 @@ CarrotGA.metrics = {};
 CarrotGA.init = function(){};
 CarrotGA.trackEvent = function(){};
 CarrotGA.NULL_VALUE = {};
+CarrotGA.clientid = '';
+var init_fullstory = function(){};
