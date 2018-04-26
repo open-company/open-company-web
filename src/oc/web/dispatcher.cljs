@@ -240,7 +240,15 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
-   :confirm-invitation    [[:base :jwt]
+   :confirm-invitation    [[:base :route :auth-settings :jwt]
+                            (fn [base route auth-settings jwt]
+                              {:invitation-confirmed (:email-confirmed base)
+                               :invitation-error (and (contains? base :email-confirmed)
+                                                      (not (:email-confirmed base)))
+                               :auth-settings auth-settings
+                               :token (:token (:query-params route))
+                               :jwt jwt})]
+   :collect-password      [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)
                                :collect-pswd (:collect-pswd base)
