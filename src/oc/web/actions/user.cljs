@@ -57,7 +57,8 @@
     (when (jwt/jwt)
       (utils/after 100
         #(when (and (contains? @dis/app-state :orgs)
-                    (contains? @dis/app-state (first dis/auth-settings-key)))
+                    (contains? @dis/app-state (first dis/auth-settings-key))
+                    (contains? (get-in @dis/app-state dis/auth-settings-key) :status))
             (check-user-walls (dis/auth-settings) (:orgs @dis/app-state))))))
   ([auth-settings orgs]
     (let [status-response (set (map keyword (:status auth-settings)))
@@ -67,7 +68,7 @@
         (router/nav! oc-urls/confirm-invitation-password)
         (status-response :name-required)
         (if has-orgs
-          (router/nav! oc-urls/confirm-invitation-profile) 
+          (router/nav! oc-urls/confirm-invitation-profile)
           (router/nav! oc-urls/sign-up-profile))
         :else
         (when-not has-orgs
