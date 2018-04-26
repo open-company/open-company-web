@@ -361,7 +361,7 @@
                     (:board-name activity-editing)]
                   (when show-sections-picker
                     (sections-picker (:board-slug activity-editing)
-                     (fn [section-data]
+                     (fn [section-data note]
                        ;; Dismiss the picker
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        ;; Update the post if the user picked a section
@@ -369,7 +369,8 @@
                                   (seq (:name section-data)))
                         (dis/dispatch! [:input [:modal-editing-data]
                          (merge activity-editing {:board-slug (:slug section-data)
-                                                  :board-name (:name section-data)})])))))]]
+                                                  :board-name (:name section-data)
+                                                  :invite-note note})])))))]]
               [:div.fullscreen-post-box-content-board
                 {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
             [:div.fullscreen-post-box-content-headline.fs-hide

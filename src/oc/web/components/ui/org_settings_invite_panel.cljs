@@ -86,133 +86,142 @@
         team-roster (:team-roster invite-users-data)
         uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))]
     [:div.org-settings-panel.org-settings-invite-panel
-      [:div.org-settings-panel-row.invite-from.group
-        [:div.invite-from-label "Invite with:"]
-        [:div.org-settings-panel-choice
-          [:input
-            {:type "radio"
-             :on-change (partial user-type-did-change s invite-users)
-             :value "email"
-             :checked (= "email" @(::inviting-from s))
-             :id "org-settings-invit-from-medium-email"}]
-          [:label
-            {:for "org-settings-invit-from-medium-email"}
-            "Email"]]
-        (let [slack-enabled? (jwt/team-has-bot? (:team-id team-data))]
+      [:div.org-settings-invite-panel-inner
+        [:div.org-settings-panel-row.invite-from.group
+          [:div.invite-from-label "Invite with:"]
           [:div.org-settings-panel-choice
             [:input
               {:type "radio"
                :on-change (partial user-type-did-change s invite-users)
-               :value "slack"
-               :checked (= "slack" @(::inviting-from s))
-               :disabled (not slack-enabled?)
-               :id "org-settings-invit-from-medium-slack"}]
+               :value "email"
+               :checked (= "email" @(::inviting-from s))
+               :id "org-settings-invit-from-medium-email"}]
             [:label
-              {:for "org-settings-invit-from-medium-slack"
-               :style {:opacity (if slack-enabled? 1 0.4)}}
-              "Slack"]])]
-      ;; Panel rows
-      [:div.org-settings-invite-table.org-settings-panel-row
-        ;; Team table
-        [:table.org-settings-table.fs-hide
-          [:thead
-            [:tr
-              [:th "Invitee"
-                [:span.error
-                  (when-let [first-error-user (first (filter :error invite-users))]
-                    (cond
-                      (string? (:error first-error-user))
-                      (:error first-error-user)
-                      :else
-                      "Invalid user"))]]
-              [:th.role "Role "
-                [:i.mdi.mdi-information-outline
-                  {:title "Contributors and admins can view and edit. Admins manage the team, invites and billing."
-                   :data-placement "top"
-                   :data-toggle "tooltip"}]]
-              [:th ""]]]
-          [:tbody
-            {:key (str "org-settings-invite-table-" @(::rand s))}
-            (for [i (range (count invite-users))
-                  :let [user-data (get invite-users i)]]
+              {:for "org-settings-invit-from-medium-email"}
+              "Email"]]
+          (let [slack-enabled? (jwt/team-has-bot? (:team-id team-data))]
+            [:div.org-settings-panel-choice
+              [:input
+                {:type "radio"
+                 :on-change (partial user-type-did-change s invite-users)
+                 :value "slack"
+                 :checked (= "slack" @(::inviting-from s))
+                 :disabled (not slack-enabled?)
+                 :id "org-settings-invit-from-medium-slack"}]
+              [:label
+                {:for "org-settings-invit-from-medium-slack"
+                 :style {:opacity (if slack-enabled? 1 0.4)}}
+                "Slack"]])]
+        ;; Panel rows
+        [:div.org-settings-invite-table.org-settings-panel-row
+          ;; Team table
+          [:table.org-settings-table.fs-hide
+            [:thead
               [:tr
-                {:key (str "invite-users-tabe-" i "-" @(::rand s))}
-                [:td.user-field
-                  (if (= "slack" (:type user-data))
-                    [:div
-                      {:class (when (:error user-data) "error")}
-                      (rum/with-key
-                        (slack-users-dropdown {:on-change #(dis/dispatch!
-                                                            [:input
-                                                             [:invite-users i]
-                                                             (merge user-data {:user % :error nil :temp-user nil})])
-                                               :on-intermediate-change
-                                                #(dis/dispatch!
-                                                  [:input
-                                                   [:invite-users]
-                                                   (assoc
-                                                    invite-users
-                                                    i
-                                                    (merge user-data {:user nil :error nil :temp-user %}))])
-                                               :initial-value (utils/name-or-email (:user user-data))})
-                        (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
-                    [:input.org-settings-field.email-field
-                      {:type "text"
-                       :class (when (:error user-data) "error")
-                       :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
-                       :placeholder "email@example.com"
-                       :on-change #(dis/dispatch!
-                                    [:input
-                                     [:invite-users]
-                                     (assoc
-                                      invite-users
-                                      i
-                                      (merge user-data {:error nil :user (.. % -target -value)}))])
-                       :value (or (:user user-data) "")}])]
-                [:td.user-type-field
-                  [:div.user-type-dropdown
-                    (user-type-dropdown {:user-id (utils/guid)
-                                         :user-type (:role user-data)
-                                         :hide-admin (not (jwt/is-admin? (:team-id org-data)))
-                                         :on-change
-                                          #(dis/dispatch!
-                                            [:input
-                                             [:invite-users]
-                                             (assoc
-                                              invite-users
-                                              i
-                                              (merge user-data {:role % :error nil}))])})]]
-                [:td.user-remove
-                  [:button.mlb-reset.remove-user
-                    {:on-click #(let [before (subvec invite-users 0 i)
-                                      after (subvec invite-users (inc i) (count invite-users))
-                                      next-invite-users (vec (concat before after))
-                                      fixed-next-invite-users (if (zero? (count next-invite-users))
-                                                                [(assoc default-user-row :type (:type user-data))]
-                                                                next-invite-users)]
-                                  (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}
-                    [:i.mdi.mdi-delete]]]])]
-          [:tbody
-            [:tr
-              [:td
-                [:button.mlb-reset.mlb-default.add-button
-                  {:on-click
-                    #(dis/dispatch!
-                      [:input
-                       [:invite-users]
-                       (conj
-                        invite-users
-                        (assoc default-user-row :type @(::inviting-from s)))])}
-                  "+"]]
-              [:td]
-              [:td]]]]]
+                [:th "Invitee"
+                  [:span.error
+                    (when-let [first-error-user (first (filter :error invite-users))]
+                      (cond
+                        (string? (:error first-error-user))
+                        (:error first-error-user)
+                        :else
+                        "Invalid user"))]]
+                [:th.role "Role "
+                  [:i.mdi.mdi-information-outline
+                    {:title "Contributors and admins can view and edit. Admins manage the team, invites and billing."
+                     :data-placement "top"
+                     :data-toggle "tooltip"}]]
+                [:th ""]]]
+            [:tbody
+              {:key (str "org-settings-invite-table-" @(::rand s))}
+              (for [i (range (count invite-users))
+                    :let [user-data (get invite-users i)]]
+                [:tr
+                  {:key (str "invite-users-tabe-" i "-" @(::rand s))}
+                  [:td.user-field
+                    (if (= "slack" (:type user-data))
+                      [:div
+                        {:class (when (:error user-data) "error")}
+                        (rum/with-key
+                          (slack-users-dropdown {:on-change #(dis/dispatch!
+                                                              [:input
+                                                               [:invite-users i]
+                                                               (merge user-data {:user % :error nil :temp-user nil})])
+                                                 :on-intermediate-change
+                                                  #(dis/dispatch!
+                                                    [:input
+                                                     [:invite-users]
+                                                     (assoc
+                                                      invite-users
+                                                      i
+                                                      (merge user-data {:user nil :error nil :temp-user %}))])
+                                                 :initial-value (utils/name-or-email (:user user-data))})
+                          (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
+                      [:input.org-settings-field.email-field
+                        {:type "text"
+                         :class (when (:error user-data) "error")
+                         :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
+                         :placeholder "email@example.com"
+                         :on-change #(dis/dispatch!
+                                      [:input
+                                       [:invite-users]
+                                       (assoc
+                                        invite-users
+                                        i
+                                        (merge user-data {:error nil :user (.. % -target -value)}))])
+                         :value (or (:user user-data) "")}])]
+                  [:td.user-type-field
+                    [:div.user-type-dropdown
+                      (user-type-dropdown {:user-id (utils/guid)
+                                           :user-type (:role user-data)
+                                           :hide-admin (not (jwt/is-admin? (:team-id org-data)))
+                                           :on-change
+                                            #(dis/dispatch!
+                                              [:input
+                                               [:invite-users]
+                                               (assoc
+                                                invite-users
+                                                i
+                                                (merge user-data {:role % :error nil}))])})]]
+                  [:td.user-remove
+                    [:button.mlb-reset.remove-user
+                      {:on-click #(let [before (subvec invite-users 0 i)
+                                        after (subvec invite-users (inc i) (count invite-users))
+                                        next-invite-users (vec (concat before after))
+                                        fixed-next-invite-users (if (zero? (count next-invite-users))
+                                                                  [(assoc default-user-row :type (:type user-data))]
+                                                                  next-invite-users)]
+                                    (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}
+                      [:i.mdi.mdi-delete]]]])]
+            [:tbody
+              [:tr
+                [:td
+                  [:button.mlb-reset.mlb-default.add-button
+                    {:on-click
+                      #(dis/dispatch!
+                        [:input
+                         [:invite-users]
+                         (conj
+                          invite-users
+                          (assoc default-user-row :type @(::inviting-from s)))])}
+                    "+"]]
+                [:td]
+                [:td]]]]]
+        ;; Personal note
+        [:div.org-settings-panel-row.group
+          [:div.org-settings-label
+            [:label "Personal note"]]
+          [:div.org-settings-field
+            [:textarea
+              {:ref "personal-note-textarea"
+               :placeholder "Add a personal note to your invitation..."}]]]]
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
           {:on-click #(do
                         (reset! (::sending s) (count (filterv valid-user? invite-users)))
                         (reset! (::send-bt-cta s) "Sending")
-                        (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
+                        (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)) (.-value (rum/ref-node s "personal-note-textarea"))))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
            :disabled (or (not (has-valid-user? invite-users))
                          (pos? @(::sending s)))}
