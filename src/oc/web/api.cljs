@@ -393,19 +393,6 @@
          (fn [{:keys [status body success]}]
            (cb status body success))))))
 
-(defn collect-name-password [firstname lastname pswd cb]
-  (let [update-link (utils/link-for (:links (:current-user-data @dispatcher/app-state)) "partial-update" "PATCH")]
-    (when (and (or firstname lastname) pswd update-link)
-      (auth-http (method-for-link update-link) (relative-href update-link)
-        {:json-params {
-          :first-name firstname
-          :last-name lastname
-          :password pswd
-         }
-         :headers (headers-for-link update-link)}
-        (fn [{:keys [status body success]}]
-          (cb status body success))))))
-
 (defn add-email-domain [domain callback]
   (when domain
     (let [team-data (dispatcher/team-data)

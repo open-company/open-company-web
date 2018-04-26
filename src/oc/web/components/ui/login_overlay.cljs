@@ -232,88 +232,6 @@
                    :on-touch-start identity}
                   "Cancel"]])]]]]))
 
-(rum/defcs collect-name-password < rum/reactive
-                                   dont-scroll
-                                   no-scroll-mixin
-                                   (drv/drv :auth-settings)
-                                   {:will-mount (fn [s]
-                                    (dis/dispatch! [:input [:collect-name-pswd] {:firstname "" :lastname "" :pswd ""}])
-                                    s)
-                                   :did-mount (fn [s]
-                                     ; initialise the keys to string to avoid jumps in UI focus
-                                     (utils/after 500
-                                      #(dis/dispatch!
-                                        [:input
-                                         [:collect-name-pswd]
-                                         {:firstname (or
-                                                      (:first-name (:current-user-data @dis/app-state))
-                                                      "")
-                                          :lastname (or
-                                                     (:last-name (:current-user-data @dis/app-state))
-                                                     "")
-                                          :pswd (or (:pswd (:collect-name-pswd @dis/app-state)) "")}]))
-                                     (utils/after 100 #(.focus (sel1 [:input.firstname])))
-                                     s)}
-  [state]
-  (let [auth-settings (drv/react state :auth-settings)]
-    [:div.login-overlay-container.group
-      {:on-click #(utils/event-stop %)}
-      [:div.login-overlay.collect-name-pswd.group
-        [:div.login-overlay-cta.pl2.pr2.group
-          [:div.sign-in-cta "Provide Your Name and a Password"
-            (when-not auth-settings
-              (small-loading))]]
-        [:div.pt2.pl3.pr3.pb2.group
-          (when-not (nil? (:collect-name-pswd-error (rum/react dis/app-state)))
-            [:span.small-caps.red
-              "System troubles logging in."
-              [:br]
-              "Please try again, then "
-              [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
-              "."])
-          [:form.sign-in-form
-            [:div.sign-in-label-container
-              [:label.sign-in-label {:for "collect-name-pswd-firstname"} "Your Name"]]
-            [:div.sign-in-field-container.group
-              [:input.sign-in-field.firstname.half.left
-                {:value (:firstname (:collect-name-pswd (rum/react dis/app-state)))
-                 :id "collect-name-pswd-firstname"
-                 :on-change #(dis/dispatch! [:input [:collect-name-pswd :firstname] (.. % -target -value)])
-                 :placeholder "First name"
-                 :type "text"
-                 :tabIndex 1
-                 :name "firstname"}]
-              [:input.sign-in-field.lastname.half.right
-                {:value (:lastname (:collect-name-pswd (rum/react dis/app-state)))
-                 :id "collect-name-pswd-lastname"
-                 :on-change #(dis/dispatch! [:input [:collect-name-pswd :lastname] (.. % -target -value)])
-                 :placeholder "Last name"
-                 :type "text"
-                 :tabIndex 2
-                 :name "lastname"}]]
-            [:div.sign-in-label-container
-              [:label.sign-in-label {:for "signup-pswd"} "Password"]]
-            [:div.sign-in-field-container
-              [:input.sign-in-field.pswd
-                {:value (:pswd (:collect-name-pswd (rum/react dis/app-state)))
-                 :id "collect-name-pswd-pswd"
-                 :on-change #(dis/dispatch! [:input [:collect-name-pswd :pswd] (.. % -target -value)])
-                 :pattern ".{8,}"
-                 :placeholder "Minimum 8 characters"
-                 :type "password"
-                 :tabIndex 4
-                 :name "pswd"}]]
-            [:button.mlb-reset.mlb-default.continue
-              {:disabled (or (and (s/blank? (:firstname (:collect-name-pswd (rum/react dis/app-state))))
-                                  (s/blank? (:lastname (:collect-name-pswd (rum/react dis/app-state)))))
-                             (< (count (:pswd (:collect-name-pswd (rum/react dis/app-state)))) 8))
-               :on-touch-start identity
-               :on-click #(do
-                            (utils/event-stop %)
-                            (user-actions/name-password-collect
-                              (:collect-name-pswd @dis/app-state)))}
-              "Let Me In"]]]]]))
-
 (rum/defcs collect-password < rum/reactive
                               dont-scroll
                               no-scroll-mixin
@@ -387,9 +305,6 @@
     ; password reset
     (= (drv/react s user-store/show-login-overlay-key) :password-reset)
     (password-reset)
-    ; form to collect name and password
-    (= (drv/react s user-store/show-login-overlay-key) :collect-name-password)
-    (collect-name-password)
     ; form to insert a new password
     (= (drv/react s user-store/show-login-overlay-key) :collect-password)
     (collect-password)

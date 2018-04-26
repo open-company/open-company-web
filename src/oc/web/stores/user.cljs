@@ -151,20 +151,6 @@
   [db [_ jwt]]
   (assoc db :email-verification-success true))
 
-(defmethod dispatcher/action :name-pswd-collect
-  [db [_]]
-  (dissoc db :latest-entry-point :latest-auth-settings))
-
-(defmethod dispatcher/action :name-pswd-collect/finish
-  [db [_ status user-data]]
-  (if (and status
-           (>= status 200)
-           (<= status 299))
-    (do
-      (cook/remove-cookie! :show-login-overlay)
-      (dissoc (update-user-data db user-data) :show-login-overlay))
-    (assoc db :collect-name-password-error status)))
-
 (defmethod dispatcher/action :pswd-collect
   [db [_ password-reset?]]
   (-> db
