@@ -248,10 +248,11 @@
       {:headers (headers-for-link whats-new-link)}
       callback)))
 
-(defn patch-board [data cb]
+(defn patch-board [data note cb]
   (when data
     (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers :private-notifications])
-          json-data (cljs->json board-data)
+          with-personal-note (assoc board-data :note note)
+          json-data (cljs->json with-personal-note)
           board-patch-link (utils/link-for (:links data) "partial-update")]
       (storage-http (method-for-link board-patch-link) (relative-href board-patch-link)
         {:json-params json-data
@@ -449,17 +450,18 @@
          :json-params (cljs->json with-logo)}
         callback))))
 
-(defn create-board [board-data callback]
+(defn create-board [board-data note callback]
   (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")
         fixed-board-data (select-keys board-data board-allowed-keys)
         fixed-entries (map #(select-keys % (conj entry-allowed-keys :uuid :secure-uuid)) (:entries board-data))
         with-entries (if (pos? (count fixed-entries))
                        (assoc fixed-board-data :entries fixed-entries)
-                       fixed-board-data)]
+                       fixed-board-data)
+        with-personal-note (assoc with-entries :note note)]
     (when (and (:name fixed-board-data) create-board-link)
       (storage-http (method-for-link create-board-link) (relative-href create-board-link)
         {:headers (headers-for-link create-board-link)
-         :json-params (cljs->json with-entries)}
+         :json-params (cljs->json with-personal-note)}
         callback))))
 
 (defn add-author
@@ -485,7 +487,7 @@
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the company's logo and its size if possible."
-  [complete-user-data invited-user invite-from user-type first-name last-name callback]
+  [complete-user-data invited-user invite-from user-type first-name last-name note callback]
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
           team-data (dispatcher/team-data)
@@ -498,6 +500,7 @@
           companies (count (filter #(= (:rel %) "company") api-entry-point-links))
           json-params {:first-name first-name
                        :last-name last-name
+                       :note note
                        :admin (= user-type :admin)}
           with-invited-user (if (= invite-from "slack")
                               (merge

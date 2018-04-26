@@ -134,21 +134,22 @@
           ;; Mobile create a new section
           (and is-mobile?
                show-section-editor)
-          (section-editor board-data #(section-actions/section-save (:section-editing s)))
+          (section-editor board-data (fn [sec-data note] (section-actions/section-save sec-data note)))
           ;; Mobile edit current section data
           (and is-mobile?
                show-section-add)
-          (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))
+          (section-editor nil (fn [_ _] (dis/dispatch! [:input [:show-section-add] false])))
           ;; Mobile sections picker
           (and is-mobile?
                show-sections-picker)
           (sections-picker entry-editing-board-slug
-            (fn [board-data]
+            (fn [board-data note]
              (dis/dispatch! [:input [:show-sections-picker] false])
              (when board-data
               (dis/dispatch! [:update [:entry-editing]
                #(merge % {:board-slug (:slug board-data)
-                          :board-name (:name board-data)})]))))
+                          :board-name (:name board-data)
+                          :invite-note note})]))))
           ;; Entry editing
           is-entry-editing
           (entry-edit)

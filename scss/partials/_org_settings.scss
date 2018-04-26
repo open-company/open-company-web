@@ -99,6 +99,7 @@ div.org-settings {
           @include avenir_R();
           font-size: 16px;
           color: $carrot_dark_gray;
+          resize: none;
 
           &.error {
             border: 1px solid rgba($carrot_orange, 0.5);
@@ -117,7 +118,7 @@ div.org-settings {
           @include placeholder() {
             @include avenir_R();
             font-size: 16px;
-            color: $carrot_light_gray;
+            color: $light_ui_grey;
           }
 
           input, textarea {

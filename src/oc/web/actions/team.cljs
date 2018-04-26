@@ -168,7 +168,7 @@
       (invite-user-success invite-data))
     (invite-user-failed invite-data)))
 
-(defn invite-user [org-data team-data invite-data]
+(defn invite-user [org-data team-data invite-data note]
   (let [invite-from (:type invite-data)
         email (:user invite-data)
         slack-user (:user invite-data)
@@ -204,7 +204,7 @@
         (when (and user
                   (not= old-user-type user-type))
           (switch-user-type invite-data old-user-type user-type user))
-        (api/send-invitation invite-data user-value invite-from user-type first-name last-name
+        (api/send-invitation invite-data user-value invite-from user-type first-name last-name note
          (partial send-invitation-cb invite-data user-type))))))
 
 ;; Invite user helpers
@@ -230,7 +230,7 @@
 
 ;; Invite users
 
-(defn invite-users [inviting-users]
+(defn invite-users [inviting-users note]
   (let [org-data (dis/org-data)
         team-data (dis/team-data (:team-id org-data))
         filter-empty (filterv #(seq (:user %)) inviting-users)
@@ -250,7 +250,7 @@
         cleaned-inviting-users (filterv #(not (:error %)) checked-users)]
     (when (<= (count cleaned-inviting-users) (count filter-empty))
       (doseq [user cleaned-inviting-users]
-        (invite-user org-data team-data user)))
+        (invite-user org-data team-data user note)))
     (dis/dispatch! [:invite-users (vec checked-users)])))
 
 ;; User actions

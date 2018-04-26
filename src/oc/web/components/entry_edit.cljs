@@ -376,13 +376,14 @@
                     (:board-name entry-editing)]
                   (when show-sections-picker
                     (sections-picker (:board-slug entry-editing)
-                     (fn [board-data]
+                     (fn [board-data note]
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        (when (and board-data
                                   (seq (:name board-data)))
                         (dis/dispatch! [:input [:entry-editing]
                          (merge entry-editing {:board-slug (:slug board-data)
-                                               :board-name (:name board-data)})])))))]]])
+                                               :board-name (:name board-data)
+                                               :invite-note note})])))))]]])
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element

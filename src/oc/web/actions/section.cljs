@@ -92,10 +92,10 @@
     (fn [{:keys [status body success]}]
       (dispatcher/dispatch! [:org-loaded (json->cljs body)]))))
 
-(defn section-save [section-data]
+(defn section-save [section-data note]
   (timbre/debug section-data)
   (if (empty? (:links section-data))
-    (api/create-board section-data
+    (api/create-board section-data note
       (fn [{:keys [success status body]}]
         (let [section-data (when success (json->cljs body))]
           (if (= status 409)
@@ -109,7 +109,7 @@
               (utils/after 500 refresh-org-data)
               (ws-cc/container-watch [(:uuid section-data)])
               (dispatcher/dispatch! [:section-edit-save/finish section-data]))))))
-    (api/patch-board section-data (fn [success body status]
+    (api/patch-board section-data note (fn [success body status]
       (if (= status 409)
         ;; Board name exists
         (dispatcher/dispatch!

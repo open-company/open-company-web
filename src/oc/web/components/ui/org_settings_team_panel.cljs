@@ -113,7 +113,7 @@
                                                           :role user-type
                                                           :error nil}]])
                                        (reset! (::resending-invite s) true)
-                                       (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)))))}
+                                       (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)) "")))}
                         "Resend"])
                     (when (and (= "pending" (:status user))
                                (utils/link-for (:links user) "remove"))
