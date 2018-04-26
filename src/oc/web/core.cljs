@@ -131,12 +131,7 @@
                      (nil? (dis/org-data))))
         (user-actions/entry-point-get (router/current-org-slug)))
       (when (> (- now latest-auth-settings) reload-time)
-        (user-actions/auth-settings-get
-          #(when (and (utils/in? (:route @router/path) "confirm-invitation")
-                      (contains? (:query-params @router/path) :token))
-             (utils/after 100 (fn []
-               (user-actions/confirm-invitation
-                (:token (:query-params @router/path))))))))))))
+        (user-actions/auth-settings-get))))))
 
 ;; home
 (defn home-handler [target params]
@@ -405,6 +400,12 @@
         (cook/remove-cookie! :show-login-overlay))
       (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
 
+    (defroute confirm-invitation-password-route urls/confirm-invitation-password {:as params}
+      (timbre/info "Routing confirm-invitation-password-route" urls/confirm-invitation-password)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/home))
+      (simple-handler #(onboard-wrapper :invitee-lander-password) "confirm-invitation" target params))
+
     (defroute confirm-invitation-profile-route urls/confirm-invitation-profile {:as params}
       (timbre/info "Routing confirm-invitation-profile-route" urls/confirm-invitation-profile)
       (when-not (jwt/jwt)
@@ -525,6 +526,7 @@
                                  logout-route
                                  email-confirmation-route
                                  confirm-invitation-route
+                                 confirm-invitation-password-route
                                  confirm-invitation-profile-route
                                  password-reset-route
                                  ;  ; subscription-callback-route
