@@ -211,7 +211,7 @@
         [:div.org-settings-panel-row.group
           [:div.org-settings-label
             [:label "Personal note"]]
-          [:div.org-settings-field
+          [:div.org-settings-field.fs-hide
             [:textarea
               {:ref "personal-note-textarea"
                :placeholder "Add a personal note to your invitation..."}]]]]
