@@ -46,7 +46,7 @@
                 [:div.stream-comment-author-timestamp
                   (utils/time-since (:created-at comment-data))]]]
             [:div.stream-comment-content
-              [:div.stream-comment-body
+              [:div.stream-comment-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                  :class (utils/class-set {:emoji-comment (:is-emoji comment-data)})}]]
             (when-not (:is-emoji comment-data)
