@@ -385,7 +385,8 @@
             {:on-click #(let [section-node (rum/ref-node s "section-name")
                               inner-html (.-innerHTML section-node)
                               section-name (utils/strip-HTML-tags inner-html)
-                              personal-note (.-innerText (rum/ref-node s "personal-note"))
+                              personal-note-node (rum/ref-node s "personal-note")
+                              personal-note (when personal-note-node (.-innerText personal-note-node))
                               next-section-editing (merge section-editing {:slug utils/default-section-slug
                                                                            :name section-name})]
                           (dis/dispatch! [:input [:section-editing] next-section-editing])
