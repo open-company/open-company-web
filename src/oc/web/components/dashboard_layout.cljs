@@ -129,6 +129,12 @@
                                   (when @(::scroll-listener s)
                                     (events/unlistenByKey @(::scroll-listener s))
                                     (reset! (::scroll-listener s) nil)))
+                                s)
+                               :did-update (fn [s]
+                                (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
+                                  (if (clojure.string/blank? (.data $compose-button "original-title"))
+                                    (.tooltip $compose-button "disable")
+                                    (.tooltip $compose-button "enable")))
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -170,7 +176,14 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))]
+        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))
+        can-compose (or (and (or is-all-posts
+                                 is-drafts-board)
+                             (pos? (count all-boards)))
+                        (and (not is-all-posts)
+                             (not is-drafts-board)
+                             (utils/link-for (:links board-data) "create")))
+        should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
       [:div.dashboard-layout.group
         ;; Show create new section for desktop
@@ -237,16 +250,20 @@
                        :title "Visible to the world, including search engines"}
                       "Public"])]
                 ;; Add entry button
-                (when (and (not (:read-only org-data))
-                           (or (utils/link-for (:links board-data) "create")
-                               is-drafts-board
-                               is-all-posts))
+                (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
-                    [:button.mlb-reset.mlb-default.add-to-board-top-button.group
-                      {:on-click compose-fn}
-                      [:div.add-to-board-pencil]
-                      [:label.add-to-board-label
-                        "Compose"]]
+                    (let [show-tooltip? (and (not can-compose) should-show-top-compose)]
+                      [:button.mlb-reset.mlb-default.add-to-board-top-button.group
+                        {:ref :top-compose-button
+                         :on-click #(when can-compose (compose-fn %))
+                         :class (when-not can-compose "disabled")
+                         :title (when show-tooltip? "You are a view-only user.")
+                         :data-toggle (when show-tooltip? "tooltip")
+                         :data-placement (when show-tooltip? "top")
+                         :data-container (when show-tooltip? "body")}
+                        [:div.add-to-board-pencil]
+                        [:label.add-to-board-label
+                          "Compose"]])
                     (when @(::show-top-boards-dropdown s)
                       (dropdown-list
                        {:items (map
@@ -311,10 +328,7 @@
                   :else
                   (section-stream)))
               ;; Add entry floating button
-              (when (and (not (:read-only org-data))
-                         (or (utils/link-for (:links board-data) "create")
-                             is-drafts-board
-                             is-all-posts))
+              (when can-compose
                 (let [opacity (if (responsive/is-tablet-or-mobile?)
                                 1
                                 (calc-opacity (document-scroll-top)))]
