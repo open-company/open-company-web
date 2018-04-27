@@ -412,23 +412,29 @@ div.dashboard-layout {
               display: none;
             }
 
-            &:hover, &:active, &:focus, &.active {
-              background-color: $carrot_orange;
-              color: white;
-              opacity: 1;
-
-              div.add-to-board-pencil {
-                background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
-              }
-
-              label.add-to-board-label {
-                color: white;
-              }
+            &.disabled {
+              opacity: 0.4;
             }
 
-            &:active, &:focus {
-              background-color: #ED4F3B;
-              opacity: 1;
+            &:not(.disabled) {
+              &:hover, &:active, &:focus, &.active {
+                background-color: $carrot_orange;
+                color: white;
+                opacity: 1;
+
+                div.add-to-board-pencil {
+                  background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+                }
+
+                label.add-to-board-label {
+                  color: white;
+                }
+              }
+
+              &:active, &:focus {
+                background-color: #ED4F3B;
+                opacity: 1;
+              }
             }
 
             div.add-to-board-pencil {
