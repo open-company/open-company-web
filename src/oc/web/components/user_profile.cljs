@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.utils.user :as user-utils]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -63,7 +64,7 @@
                   (oc-urls/org first-org-slug)
                   oc-urls/login))]
     (when (:has-changes current-user-data)
-      (dis/dispatch! [:user-profile-reset]))
+      (user-actions/user-profile-reset))
     (router/nav! to-url)))
 
 (defn close-cb [orgs current-user-data]
@@ -82,14 +83,9 @@
       (alert-modal/show-alert alert-data))
     (real-close-cb orgs current-user-data)))
 
-(def default-user-profile-image-key {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}})
-
 (defn upload-user-profile-pictuer-clicked []
   (dis/dispatch! [:input [:edit-user-profile :avatar-url] default-user-profile])
-  (iu/upload! default-user-profile-image-key success-cb progress-cb error-cb))
+  (iu/upload! user-utils/user-avatar-filestack-config success-cb progress-cb error-cb))
 
 (defn save-clicked [s]
   (reset! (::name-error s) false)
@@ -133,7 +129,7 @@
                           (rum/local false ::password-error)
                           (rum/local false ::current-password-error)
                           {:will-mount (fn [s]
-                            (dis/dispatch! [:user-profile-reset])
+                            (user-actions/user-profile-reset)
                             s)
                            :after-render (fn [s]
                               (when-not (utils/is-test-env?)
@@ -384,7 +380,6 @@
                             (reset! (::email-error s) false)
                             (reset! (::password-error s) false)
                             (reset! (::current-password-error s) false)
-
-                            (dis/dispatch! [:user-profile-reset]))
+                            (user-actions/user-profile-reset))
                           (real-close-cb orgs current-user-data))}
             "Cancel"]]]))

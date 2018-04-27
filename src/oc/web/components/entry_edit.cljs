@@ -10,7 +10,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -377,13 +376,14 @@
                     (:board-name entry-editing)]
                   (when show-sections-picker
                     (sections-picker (:board-slug entry-editing)
-                     (fn [board-data]
+                     (fn [board-data note]
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        (when (and board-data
                                   (seq (:name board-data)))
                         (dis/dispatch! [:input [:entry-editing]
                          (merge entry-editing {:board-slug (:slug board-data)
-                                               :board-name (:name board-data)})])))))]]])
+                                               :board-name (:name board-data)
+                                               :invite-note note})])))))]]])
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element

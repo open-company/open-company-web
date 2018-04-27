@@ -373,8 +373,8 @@
       (not= (.indexOf cleaned-url "://docs.google.com/spreadsheets/d/") -1))))
 
 (defn cdn [img-src & [no-deploy-folder]]
-  (let [use-cdn? (empty? ls/cdn-url)
-        cdn (if use-cdn? "" (str "/" ls/cdn-url))
+  (let [use-cdn? (seq ls/cdn-url)
+        cdn (if use-cdn? ls/cdn-url "")
         deploy-key (if (empty? ls/deploy-key) "" (str "/" ls/deploy-key))
         with-deploy-folder (if no-deploy-folder
                              cdn
