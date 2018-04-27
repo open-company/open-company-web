@@ -122,7 +122,7 @@
         ;; or if he's in the authors list of the existing section
         can-change (or (= (:slug section-editing) utils/default-section-slug)
                        (some #{current-user-id} (:authors section-editing)))]
-    [:div.section-editor.group
+    [:div.section-editor.group.fs-hide
       {:on-click (fn [e]
                    (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
                      (reset! (::show-access-list s) false))

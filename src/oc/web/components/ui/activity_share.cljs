@@ -132,7 +132,7 @@
               [:span "Share post via..."]]
             [:div.activity-share-main-cta
               [:span "Share "]
-              [:span.activity-share-post-title
+              [:span.activity-share-post-title.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]])
           (when-not is-mobile?
             [:div.activity-share-divider-line])
@@ -181,7 +181,7 @@
               "People outside your Carrot team will not see comments."])
           [:div.activity-share-divider-line]
           (when (= @(::medium s) :email)
-            [:div.activity-share-share
+            [:div.activity-share-share.fs-hide
               [:div.mediums-box
                 [:div.medium
                   [:div.email-medium.group
@@ -281,7 +281,7 @@
                     "Copied!"
                     "Copy URL")]]])
           (when (= @(::medium s) :slack)
-            [:div.activity-share-share
+            [:div.activity-share-share.fs-hide
               [:div.mediums-box
                 [:div.medium
                   [:div.slack-medium.group

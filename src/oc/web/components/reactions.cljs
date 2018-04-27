@@ -82,7 +82,7 @@
                                                   :reacted (not reacted)})
                             reaction-data)]]
 
-              [:button.reaction-btn.btn-reset
+              [:button.reaction-btn.btn-reset.fs-hide
                 {:key (str "reaction-" (:uuid entry-data) "-" idx)
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
