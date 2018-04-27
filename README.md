@@ -89,10 +89,31 @@ Open your browser to [http://localhost:3559/](http://localhost:3559/).
 To create a **production** build run:
 
 ```console
-boot prod-build
+boot prod-build target
 ```
 
 Open `target/public/app-shell.html` in your browser. Using production rather than dev, you will not get the live reloading nor a REPL.
+
+To get a jetty server along with the production build:
+
+Download the google closure compiler.
+https://developers.google.com/closure/compiler/
+
+```console
+mkdir ~/closure_compiler
+mv <download location>/compiler_latest.zip ~/closure_compiler/
+cd ~/closure_compiler
+unzip compiler_latest.zip
+```
+
+```console
+boot dev-advanced target
+```
+
+```console
+script/compile_assets.sh <compiler version> ~/path/to/open-company-web localhost:3559
+cp ~/path/to/open-company-web/target/public/oc_assets.js* ~/path/to/open-company-way/resources/public/
+```
 
 ### Project REPL
 

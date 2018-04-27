@@ -14,8 +14,14 @@ function init_fullstory() {
     y="consent";g[y]=function(a){g(y,!arguments.length||a)};
     g.identifyAccount=function(i,v){o='account';v=v||{};v.acctId=i;g(o,v)};
     g.clearUserCookie=function(){};
-  })(window,document,window['_fs_namespace'],'script','user');
+  })(window, document, window['_fs_namespace'], 'script', 'user');
 
-  // store client id
-  FS.setUserVars({ 'clientId': CarrotGA.clientid });
+  window['_fs_ready'] = function() {
+    // store client id
+    FS.setUserVars({ 'clientId': CarrotGA.clientid });
+    Raven.setExtraContext({
+      'clientId': CarrotGA.clientid,
+      'FullStoryURL': FS.getCurrentSessionURL()
+    });
+  };
 }
