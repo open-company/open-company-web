@@ -129,7 +129,8 @@
                   (:name (:author comment-data))]
                 [:div.stream-comment-author-timestamp
                   (utils/time-since (:created-at comment-data))]]
-              (when (or (:can-edit comment-data)
+              (when (or (and (:can-edit comment-data)
+                             (not (:is-emoji comment-data)))
                         (:can-delete comment-data))
                 (let [showing-more-menu (= @(::showing-menu s) (:uuid comment-data))]
                   [:div.stream-comment-more-menu-container
@@ -141,7 +142,8 @@
                                   (reset! (::showing-menu s) (:uuid comment-data)))}]
                     (when showing-more-menu
                       [:div.stream-comment-more-menu
-                        (when (:can-edit comment-data)
+                        (when (and (:can-edit comment-data)
+                                   (not (:is-emoji comment-data)))
                           [:div.stream-comment-more-menu-item.edit
                             {:on-click #(do
                                           (reset! (::showing-menu s) false)
