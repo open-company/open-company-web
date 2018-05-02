@@ -99,18 +99,22 @@
     (router/nav! (oc-urls/sign-up-invite (:slug org-data)))))
 
 (defn org-create-cb [{:keys [success status body]}]
-  (when-let [org-data (when success (json->cljs body))]
-    (org-loaded org-data false)
-    (let [team-data (dis/team-data (:team-id org-data))]
-      (if (and (empty? (:name team-data))
-               (utils/link-for (:links team-data) "partial-update"))
-        ; if the current team has no name and
-        ; the user has write permission on it
-        ; use the org name
-        ; for it and patch it back
-        (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
-        ; if not redirect the user to the invite page
-        (router/nav! (oc-urls/sign-up-invite (:slug org-data)))))))
+  (if success
+    (when-let [org-data (when success (json->cljs body))]
+      (org-loaded org-data false)
+      (let [team-data (dis/team-data (:team-id org-data))]
+        (if (and (empty? (:name team-data))
+                 (utils/link-for (:links team-data) "partial-update"))
+          ; if the current team has no name and
+          ; the user has write permission on it
+          ; use the org name
+          ; for it and patch it back
+          (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
+          ; if not redirect the user to the invite page
+          (router/nav! (oc-urls/sign-up-invite (:slug org-data))))))
+    (when (= status 409)
+      ;; Redirect to the already available org
+      (router/nav! (oc-urls/org (:slug (first (:orgs @dis/app-state))))))))
 
 (defn org-create [org-data]
   (when-not (empty? (:name org-data))
