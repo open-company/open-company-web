@@ -86,7 +86,7 @@
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
         [:div.add-comment-internal
-          [:div.add-comment.emoji-autocomplete.emojiable
+          [:div.add-comment.emoji-autocomplete.emojiable.fs-hide
            {:ref "add-comment"
             :content-editable true}]
         (when add-comment-focus

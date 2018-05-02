@@ -69,7 +69,7 @@
         (for [comment-data comments-data]
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data))}
-            [:div.stream-comment-header.group
+            [:div.stream-comment-header.group.fs-hide
               [:div.stream-comment-author-avatar
                 {:style {:background-image (str "url(" (:avatar-url (:author comment-data)) ")")}}]
               [:div.stream-comment-author-right
@@ -78,7 +78,7 @@
                 [:div.stream-comment-author-timestamp
                   (utils/time-since (:created-at comment-data))]]]
             [:div.stream-comment-content
-              [:div.stream-comment-body
+              [:div.stream-comment-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                  :class (utils/class-set {:emoji-comment (:is-emoji comment-data)})}]]
             (when (or (not (:is-emoji comment-data))

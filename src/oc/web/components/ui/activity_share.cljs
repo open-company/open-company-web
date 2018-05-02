@@ -64,12 +64,7 @@
                               (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
                                     org-data @(drv/get-ref s :org-data)
-                                    subject (str
-                                             (:name org-data)
-                                             (when (seq (:board-name activity-data))
-                                              (str " " (:board-name activity-data)))
-                                             ": "
-                                             (.text (.html (js/$ "<div />") (:headline activity-data))))]
+                                    subject (.text (.html (js/$ "<div />") (:headline activity-data)))]
                                (reset! (::email-subject s) subject)
                                (reset! (::email-data s) {:subject subject
                                                          :note ""})
@@ -137,7 +132,7 @@
               [:span "Share post via..."]]
             [:div.activity-share-main-cta
               [:span "Share "]
-              [:span.activity-share-post-title
+              [:span.activity-share-post-title.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]])
           (when-not is-mobile?
             [:div.activity-share-divider-line])
@@ -186,7 +181,7 @@
               "People outside your Carrot team will not see comments."])
           [:div.activity-share-divider-line]
           (when (= @(::medium s) :email)
-            [:div.activity-share-share
+            [:div.activity-share-share.fs-hide
               [:div.mediums-box
                 [:div.medium
                   [:div.email-medium.group
@@ -286,7 +281,7 @@
                     "Copied!"
                     "Copy URL")]]])
           (when (= @(::medium s) :slack)
-            [:div.activity-share-share
+            [:div.activity-share-share.fs-hide
               [:div.mediums-box
                 [:div.medium
                   [:div.slack-medium.group

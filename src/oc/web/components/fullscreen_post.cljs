@@ -314,7 +314,7 @@
           [:div.header-title-container-edit-pen]
           [:div.header-title-container-edit-title
             "Edit post"]]
-        [:div.header-title-container.group
+        [:div.header-title-container.group.fs-hide
           {:style {:opacity (if (and (not editing) (:first-render-done s)) "1" "0")
                    :margin-left (when (and (not is-mobile?) (:first-render-done s))
                                   (str "-" (/ (.width (js/$ "div.header-title-container")) 2) "px"))}}
@@ -361,7 +361,7 @@
                     (:board-name activity-editing)]
                   (when show-sections-picker
                     (sections-picker (:board-slug activity-editing)
-                     (fn [section-data]
+                     (fn [section-data note]
                        ;; Dismiss the picker
                        (dis/dispatch! [:input [:show-sections-picker] false])
                        ;; Update the post if the user picked a section
@@ -369,10 +369,11 @@
                                   (seq (:name section-data)))
                         (dis/dispatch! [:input [:modal-editing-data]
                          (merge activity-editing {:board-slug (:slug section-data)
-                                                  :board-name (:name section-data)})])))))]]
+                                                  :board-name (:name section-data)
+                                                  :invite-note note})])))))]]
               [:div.fullscreen-post-box-content-board
                 {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
-            [:div.fullscreen-post-box-content-headline
+            [:div.fullscreen-post-box-content-headline.fs-hide
               {:content-editable editing
                :ref "edit-headline"
                :class (utils/class-set {:emoji-autocomplete editing
@@ -396,7 +397,7 @@
                                  :classes "emoji-autocomplete emojiable"
                                  :use-inline-media-picker false
                                  :multi-picker-container-selector "div#fullscreen-post-box-footer-multi-picker"})
-              [:div.fullscreen-post-box-content-body
+              [:div.fullscreen-post-box-content-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])

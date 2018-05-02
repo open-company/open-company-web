@@ -65,7 +65,7 @@
        :aria-labelledby "dropdown-toggle-menu"}
       [:div.top-arrow]
       [:div.menu-header
-        [:div.user-name
+        [:div.user-name.fs-hide
           (str "Hi " (jwt/get-key :first-name) "!")]
         [:div.user-type
           (cond

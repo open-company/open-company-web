@@ -130,7 +130,7 @@
                 "Please try again, then "
                 [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
                 "."]))
-          [:form.sign-in-form
+          [:form.sign-in-form {:class "fs-hide"}
             ;; Email label
             [:div.sign-in-label-container
               [:label.sign-in-label "Enter Email"]]
@@ -206,7 +206,7 @@
             [:div.sign-in-label-container
               [:label.sign-in-label "Please enter your email address"]]
             [:div.sign-in-field-container.email
-              [:input.sign-in-field
+              [:input.sign-in-field.fs-hide
                 {:value (:email (:password-reset (rum/react dis/app-state)))
                  :tabIndex 1
                  :type "email"
@@ -275,7 +275,7 @@
             [:div.sign-in-label-container
               [:label.sign-in-label {:for "collect-name-pswd-firstname"} "Your Name"]]
             [:div.sign-in-field-container.group
-              [:input.sign-in-field.firstname.half.left
+              [:input.sign-in-field.firstname.half.left.fs-hide
                 {:value (:firstname (:collect-name-pswd (rum/react dis/app-state)))
                  :id "collect-name-pswd-firstname"
                  :on-change #(dis/dispatch! [:input [:collect-name-pswd :firstname] (.. % -target -value)])
@@ -283,7 +283,7 @@
                  :type "text"
                  :tabIndex 1
                  :name "firstname"}]
-              [:input.sign-in-field.lastname.half.right
+              [:input.sign-in-field.lastname.half.right.fs-hide
                 {:value (:lastname (:collect-name-pswd (rum/react dis/app-state)))
                  :id "collect-name-pswd-lastname"
                  :on-change #(dis/dispatch! [:input [:collect-name-pswd :lastname] (.. % -target -value)])
