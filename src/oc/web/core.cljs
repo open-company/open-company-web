@@ -110,6 +110,8 @@
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
+  (when (= (:new query-params) "true")
+    (swap! dis/app-state assoc :new-slack-user true))
   (inject-loading))
 
 (defn post-routing []

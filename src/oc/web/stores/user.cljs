@@ -179,8 +179,12 @@
 (defmethod dispatcher/action :user-profile-save
   [db [_]]
   (-> db
+      ;; Loading user data
       (assoc-in [:edit-user-profile :loading] true)
-      (dissoc :latest-entry-point :latest-auth-settings)))
+      ;; Force a refresh of entry-point and auth-settings
+      (dissoc :latest-entry-point :latest-auth-settings)
+      ;; Remove the new-slack-user flag to avoid redirecting to the profile again
+      (dissoc :new-slack-user)))
 
 (defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
