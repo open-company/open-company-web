@@ -96,7 +96,7 @@
                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. e -target -value)
                                                                                       :has-changes true})]))}]]]
         ;; Org logo row
-        [:div.org-settings-panel-row.org-logo-row.group
+        [:div.org-settings-panel-row.org-logo-row.group.fs-hide
           {:on-click (fn [_]
                       (dis/dispatch!
                        [:input

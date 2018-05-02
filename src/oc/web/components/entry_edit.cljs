@@ -387,7 +387,7 @@
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element
-            [:div.entry-edit-headline.emoji-autocomplete.emojiable.group
+            [:div.entry-edit-headline.emoji-autocomplete.emojiable.group.fs-hide
               {:content-editable true
                :ref "headline"
                :placeholder utils/default-headline
@@ -409,7 +409,7 @@
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]
-                               :classes "emoji-autocomplete emojiable"})
+                               :classes "emoji-autocomplete emojiable fs-hide"})
             ; Attachments
             (stream-view-attachments (:attachments entry-editing)
              #(activity-actions/remove-attachment :entry-editing %))]

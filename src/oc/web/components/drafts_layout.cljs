@@ -55,7 +55,7 @@
                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                    :data-title (utils/activity-date-tooltip draft)}
                   (utils/time-since t)])]]]
-        [:div.draft-card-content.group
+        [:div.draft-card-content.group.fs-hide
           [:div.draft-card-title
             {:dangerouslySetInnerHTML
               (utils/emojify (utils/strip-HTML-tags (if (empty? (:headline draft))

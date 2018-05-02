@@ -66,7 +66,7 @@
         ; Card author
         [:div.activity-card-head-author
           (user-avatar-image (:publisher activity-data))
-          [:div.name (:name (:publisher activity-data))]
+          [:div.name.fs-hide (:name (:publisher activity-data))]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
@@ -90,12 +90,12 @@
       [:div.activity-card-shadow-container.group
         [:div.activity-card-content.group
           ; Headline
-          [:div.activity-card-headline
+          [:div.activity-card-headline.fs-hide
             {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           ; Body
           (let [body-without-preview (utils/body-without-preview (:body activity-data))
                 emojied-body (utils/emojify body-without-preview)]
-            [:div.activity-card-body
+            [:div.activity-card-body.fs-hide
               {:dangerouslySetInnerHTML emojied-body
                :ref "activity-body"
                :class (utils/class-set {:has-body has-body
