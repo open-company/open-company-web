@@ -18,6 +18,8 @@
 
 ;; Private section users search helpers
 
+(def min-section-name-length 3)
+
 (defn filter-user-by-query
   "Given a user and a query string, return true if first-name, last-name or email contains it."
   [user query]
@@ -78,6 +80,7 @@
                             (rum/local false ::editing-existing-section)
                             (rum/local nil ::click-listener)
                             (rum/local false ::slack-enabled)
+                            (rum/local "" ::section-name)
                             ;; Derivatives
                             (drv/drv :org-data)
                             (drv/drv :board-data)
@@ -91,6 +94,8 @@
                                     fixed-section-data (if new-section
                                                         utils/default-section
                                                         (section-for-editing initial-section-data))]
+                                (when (string? (:name fixed-section-data))
+                                  (reset! (::section-name s) (clojure.string/trim (:name fixed-section-data))))
                                 (reset! (::editing-existing-section s) (not new-section))
                                 (when-not (empty? (:name fixed-section-data))
                                   (reset! (::initial-section-name s) (:name fixed-section-data)))
@@ -142,13 +147,17 @@
       [:div.section-editor-add
         [:div.section-editor-add-label
           "Section name"]
+        (when (:section-name-error section-editing)
+          [:div.section-editor-error-label (:section-name-error section-editing)])
         [:div.section-editor-add-name
           {:content-editable true
            :placeholder "Section name"
            :ref "section-name"
            :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "section-name") %)
-           :on-key-up #(when (:section-name-error section-editing)
-                         (dis/dispatch! [:input [:section-editing :section-name-error] nil]))
+           :on-key-up (fn [e]
+                        (reset! (::section-name s) (clojure.string/trim (.. e -target -innerText)))
+                        (when (:section-name-error section-editing)
+                          (dis/dispatch! [:input [:section-editing :section-name-error] nil])))
            :on-key-press (fn [e]
                            (when (or (>= (count (.. e -target -innerText)) 50)
                                     (= (.-key e) "Enter"))
@@ -382,16 +391,20 @@
                                                (dismiss))}))}
               "Delete section"])
           [:button.mlb-reset.create-bt
-            {:on-click #(let [section-node (rum/ref-node s "section-name")
-                              inner-html (.-innerHTML section-node)
-                              section-name (utils/strip-HTML-tags inner-html)
-                              personal-note-node (rum/ref-node s "personal-note")
-                              personal-note (when personal-note-node (.-innerText personal-note-node))
-                              next-section-editing (merge section-editing {:slug utils/default-section-slug
-                                                                           :name section-name})]
-                          (dis/dispatch! [:input [:section-editing] next-section-editing])
-                          (when (fn? on-change)
-                            (on-change next-section-editing personal-note)))}
+            {:on-click (fn [_]
+                        (if (< (count @(::section-name s)) min-section-name-length)
+                          (dis/dispatch! [:section-edit/error (str "Name must be at least " min-section-name-length " characters.")])
+                          (let [section-node (rum/ref-node s "section-name")
+                                inner-html (.-innerHTML section-node)
+                                section-name (utils/strip-HTML-tags inner-html)
+                                personal-note-node (rum/ref-node s "personal-note")
+                                personal-note (when personal-note-node (.-innerText personal-note-node))
+                                next-section-editing (merge section-editing {:slug utils/default-section-slug
+                                                                             :name section-name})]
+                            (dis/dispatch! [:input [:section-editing] next-section-editing])
+                            (when (fn? on-change)
+                              (on-change next-section-editing personal-note)))))
+             :class (when (< (count @(::section-name s)) min-section-name-length) "disabled")}
             (if @(::editing-existing-section s)
               "Save"
               "Create")]]]]))
