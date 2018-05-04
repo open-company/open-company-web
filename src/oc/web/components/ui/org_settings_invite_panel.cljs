@@ -17,10 +17,12 @@
 (def default-slack-user {})
 (def default-user-role :author)
 (def default-user-row
- {:type default-user-type
-  :temp-user default-user
+ {:temp-user default-user
   :user default-user
   :role default-user-role})
+
+(defn new-user-row [s]
+  (assoc default-user-row :type @(::inviting-from s)))
 
 (defn valid-user? [user-map]
   (or (and (= (:type user-map) "email")
@@ -45,7 +47,8 @@
   (let [inviting-users-data @(drv/get-ref s :invite-data)
         invite-users (:invite-users inviting-users-data)]
     (when (zero? (count invite-users))
-      (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))]))))
+      (let [new-row (new-user-row s)]
+        (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))])))))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
@@ -55,6 +58,7 @@
     (rum/local "Send" ::send-bt-cta)
     (rum/local 0 ::sending)
     {:will-mount (fn [s]
+                   (reset! (::inviting-from s) (or (jwt/get-key :auth-source) "email"))
                    (setup-initial-rows s)
                    s)
      :after-render (fn [s]
