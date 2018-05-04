@@ -18,8 +18,6 @@
 
 ;; Private section users search helpers
 
-(def min-section-name-length 3)
-
 (defn filter-user-by-query
   "Given a user and a query string, return true if first-name, last-name or email contains it."
   [user query]
@@ -392,19 +390,14 @@
               "Delete section"])
           [:button.mlb-reset.create-bt
             {:on-click (fn [_]
-                        (if (< (count @(::section-name s)) min-section-name-length)
-                          (dis/dispatch! [:section-edit/error (str "Name must be at least " min-section-name-length " characters.")])
-                          (let [section-node (rum/ref-node s "section-name")
-                                inner-html (.-innerHTML section-node)
-                                section-name (utils/strip-HTML-tags inner-html)
-                                personal-note-node (rum/ref-node s "personal-note")
-                                personal-note (when personal-note-node (.-innerText personal-note-node))
-                                next-section-editing (merge section-editing {:slug utils/default-section-slug
-                                                                             :name section-name})]
-                            (dis/dispatch! [:input [:section-editing] next-section-editing])
-                            (when (fn? on-change)
-                              (on-change next-section-editing personal-note)))))
-             :class (when (< (count @(::section-name s)) min-section-name-length) "disabled")}
+                        (let [section-node (rum/ref-node s "section-name")
+                              section-name (.-innerText section-node)
+                              personal-note-node (rum/ref-node s "personal-note")
+                              personal-note (when personal-note-node (.-innerText personal-note-node))
+                              success-cb #(when (fn? on-change)
+                                            (on-change % personal-note))]
+                          (section-actions/section-save-create section-editing section-name success-cb)))
+             :class (when (< (count @(::section-name s)) section-actions/min-section-name-length) "disabled")}
             (if @(::editing-existing-section s)
               "Save"
               "Create")]]]]))
