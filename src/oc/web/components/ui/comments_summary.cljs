@@ -52,7 +52,7 @@
         ; Comments authors heads
         [:div.is-comments-authors.group
           {:style {:width (str (if (pos? (count comments-authors)) (+ 9 (* 15 (count comments-authors))) 0) "px")}}
-          (for [user-data (take 4 comments-authors)]
+          (for [user-data (take 3 comments-authors)]
             [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
