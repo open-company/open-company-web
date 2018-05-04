@@ -112,7 +112,7 @@
               {:on-click #(do
                            (reset! (::expanded s) true)
                            (reset! (::should-show-comments s) true))}
-              "Continue reading"]]
+              "Keep reading"]]
           (stream-view-attachments activity-attachments)
           [:div.stream-item-reactions.group
             {:ref "stream-item-reactions"}

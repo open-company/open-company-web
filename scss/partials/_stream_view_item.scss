@@ -146,16 +146,18 @@ div.stream-view-item {
 
         button.expand-button {
           margin-top: 24px;
-          width: 100%;
+          width: 134px;
           height: 40px;
-          border-radius: 100px;
-          border: 2px solid $feint_emerald;
           color: $carrot_green;
-          @include avenir_M();
+          @include avenir_H();
           font-size: 16px;
-          text-align: center;
+          text-align: left;
           display: none;
-          padding: 3px 7px 2px 7px;
+          padding: 9px 7px 9px 22px;
+          background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+          background-size: 14px 8px;
+          background-position: 0px 15px;
+          background-repeat: no-repeat;
         }
       }
 
