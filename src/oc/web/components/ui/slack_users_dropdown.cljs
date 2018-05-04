@@ -27,10 +27,9 @@
   (let [roster-data @(drv/get-ref s :team-roster)
         all-users (filterv #(= (:status %) "uninvited") (:users roster-data))
         team-roster (vals (group-by :slack-org-id all-users))
-        sorted-team-roster (vec
-                            (map
-                             (fn [team]
-                              (vec (sort-by #(str (:first-name %) " " (:last-name %)) team))) team-roster))
+        sorted-team-roster (map
+                              (fn [team]
+                                (sort-by #(str (:first-name %) " " (:last-name %)) team)) team-roster)
         all-sorted-users (vec (apply concat sorted-team-roster))]
     (when (not= @(::all-sorted-users s) all-sorted-users)
       (reset! (::all-sorted-users s) all-sorted-users))))
@@ -83,7 +82,7 @@
                                        (events/unlistenByKey @(::window-click s))
                                        s)}
   [s {:keys [disabled initial-value on-change on-intermediate-change on-focus on-blur filter-fn] :as data}]
-  (let [_ (drv/react s :team-roster) ;; Make sure the component is re-render when roster changes
+  (let [_ (drv/react s :team-roster) ; Make sure the component is re-rendered when roster changes
         all-sorted-users (get-filtered-sorted-users s)
         slack-orgs (:slack-orgs (drv/react s :team-data))
         slack-orgs-map (zipmap (map :slack-org-id slack-orgs) (map :name slack-orgs))]
