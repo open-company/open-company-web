@@ -134,11 +134,17 @@
           ;; Mobile create a new section
           (and is-mobile?
                show-section-editor)
-          (section-editor board-data (fn [sec-data note] (section-actions/section-save sec-data note)))
+          (section-editor board-data
+           (fn [sec-data note]
+            (when sec-data
+              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-editor] false])))))
           ;; Mobile edit current section data
           (and is-mobile?
                show-section-add)
-          (section-editor nil (fn [_ _] (dis/dispatch! [:input [:show-section-add] false])))
+          (section-editor nil
+           (fn [sec-data note]
+            (when sec-data
+              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-add] false])))))
           ;; Mobile sections picker
           (and is-mobile?
                show-sections-picker)
