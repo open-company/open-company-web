@@ -178,7 +178,6 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))
         can-compose (or (and (or is-all-posts
                                  is-drafts-board)
                              (pos? (count all-boards)))
@@ -315,7 +314,7 @@
                 ;; All Posts
                 (and is-all-posts
                      (= @(::board-switch s) :stream))
-                (rum/with-key (all-posts) all-posts-key)
+                (all-posts)
                 ;; Empty board
                 empty-board?
                 (empty-board)
