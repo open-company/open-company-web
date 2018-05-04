@@ -92,8 +92,7 @@
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
-(rum/defcs all-posts  < rum/static
-                        rum/reactive
+(rum/defcs all-posts  < rum/reactive
                         ;; Derivatives
                         (drv/drv :all-posts)
                         (drv/drv :ap-initial-at)
