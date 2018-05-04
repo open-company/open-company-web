@@ -156,7 +156,7 @@
     (nil? update-link)))
 
 (defn readonly-board? [links]
-  (let [new-link (link-for links "new")
+  (let [new-link (link-for links "create")
         update-link (link-for links "partial-update")
         delete-link (link-for links "delete")]
     (and (nil? new-link)
