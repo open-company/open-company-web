@@ -147,19 +147,19 @@
                       [:div
                         {:class (when (:error user-data) "error")}
                         (rum/with-key
-                          (slack-users-dropdown {:on-change #(dis/dispatch!
-                                                              [:input
-                                                               [:invite-users i]
-                                                               (merge user-data {:user % :error nil :temp-user nil})])
-                                                 :on-intermediate-change
-                                                  #(dis/dispatch!
-                                                    [:input
-                                                     [:invite-users]
-                                                     (assoc
-                                                      invite-users
-                                                      i
+                         (slack-users-dropdown
+                          {:on-change #(dis/dispatch! [:input [:invite-users i]
+                                        (merge user-data {:user % :error nil :temp-user nil})])
+                           :filter-fn (fn [user]
+                                        (let [check-fn #(or
+                                                         (not (:user %))
+                                                         (not= (:slack-org-id (:user %)) (:slack-org-id user))
+                                                         (not= (:slack-id (:user %)) (:slack-id user)))]
+                                          (every? check-fn invite-users)))
+                           :on-intermediate-change #(dis/dispatch! [:input [:invite-users]
+                                                     (assoc invite-users i
                                                       (merge user-data {:user nil :error nil :temp-user %}))])
-                                                 :initial-value (utils/name-or-email (:user user-data))})
+                            :initial-value (utils/name-or-email (:user user-data))})
                           (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                       [:input.org-settings-field.email-field
                         {:type "text"
