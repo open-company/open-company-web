@@ -112,9 +112,6 @@
     {:class (utils/class-set {:bottom-gradient @(::bottom-gradient s)})}
     [:div.stream-comments-inner
       {:ref "stream-comments-inner"}
-      (when (pos? (count comments-data))
-        [:div.stream-comments-title
-          (str (count comments-data) " Comment" (when (> (count comments-data) 1) "s"))])
       (if (pos? (count comments-data))
         (for [comment-data comments-data
               :let [is-editing? (= @(::editing? s) (:uuid comment-data))

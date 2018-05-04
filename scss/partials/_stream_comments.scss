@@ -47,22 +47,13 @@ div.stream-comments {
       height: auto;
     }
 
-    div.stream-comments-title {
-      @include avenir_H();
-      font-size: 14px;
-      color: $carrot_dark_gray;
-      margin-bottom: 16px;
-    }
-
     div.stream-comments-empty {
       display: none;
     }
 
     div.stream-comment {
-      border: 1px solid rgba($deep_tan, 0.7);
       border-radius: 6px;
       padding: 16px;
-      background-color: white;
       margin-bottom: 8px;
 
       div.stream-comment-header {
@@ -126,7 +117,6 @@ div.stream-comments {
             left: calc(100% - 164px);
             background-color: white;
             width: 136px;
-            background-color: white;
             border: 1px solid $deep_tan;
             box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
             outline: none;
