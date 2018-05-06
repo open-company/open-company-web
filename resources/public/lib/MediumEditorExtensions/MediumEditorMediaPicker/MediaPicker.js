@@ -1,6 +1,6 @@
 function log(){
-  var args = Array.prototype.slice.call(arguments);
-  console.debug("XXX MediaPicker", args);
+  // var args = Array.prototype.slice.call(arguments);
+  // console.debug("XXX MediaPicker", args);
 }
 
 function PlaceCaretAtEnd(el) {
