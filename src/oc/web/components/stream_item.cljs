@@ -1,4 +1,4 @@
-(ns oc.web.components.stream-view-item
+(ns oc.web.components.stream-item
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :refer-macros (sel1)]
@@ -17,7 +17,7 @@
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn should-show-continue-reading? [s]
   (when-not @(::expanded s)
@@ -31,26 +31,26 @@
         (.add (.-classList dom-node) "show-continue-reading")
         (.remove (.-classList dom-node) "show-continue-reading")))))
 
-(rum/defcs stream-view-item < rum/reactive
-                              ;; Derivatives
-                              (drv/drv :org-data)
-                              (drv/drv :add-comment-focus)
-                              (drv/drv :comments-data)
-                              ;; Locals
-                              (rum/local false ::more-dropdown)
-                              (rum/local false ::move-activity)
-                              (rum/local false ::expanded)
-                              (rum/local false ::should-show-comments)
-                              (rum/local false ::should-scroll-to-comments)
-                              {:after-render (fn [s]
-                                (should-show-continue-reading? s)
-                                (comment-actions/get-comments-if-needed (first (:rum/args s))
-                                 @(drv/get-ref s :comments-data))
-                                (when @(::should-scroll-to-comments s)
-                                  (utils/scroll-to-y
-                                   (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 180)
-                                  (reset! (::should-scroll-to-comments s) false))
-                                s)}
+(rum/defcs stream-item < rum/reactive
+                         ;; Derivatives
+                         (drv/drv :org-data)
+                         (drv/drv :add-comment-focus)
+                         (drv/drv :comments-data)
+                         ;; Locals
+                         (rum/local false ::more-dropdown)
+                         (rum/local false ::move-activity)
+                         (rum/local false ::expanded)
+                         (rum/local false ::should-show-comments)
+                         (rum/local false ::should-scroll-to-comments)
+                         {:after-render (fn [s]
+                           (should-show-continue-reading? s)
+                           (comment-actions/get-comments-if-needed (first (:rum/args s))
+                            @(drv/get-ref s :comments-data))
+                           (when @(::should-scroll-to-comments s)
+                             (utils/scroll-to-y
+                              (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 180)
+                             (reset! (::should-scroll-to-comments s) false))
+                           s)}
   [s activity-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -67,10 +67,10 @@
         activity-attachments (:attachments activity-data)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))]
-    [:div.stream-view-item
-      {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
+    [:div.stream-item
+      {:class (utils/class-set {(str "stream-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
-      [:div.stream-view-item-header
+      [:div.stream-item-header
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))
           [:div.name.fs-hide (:name (:publisher activity-data))]
@@ -91,7 +91,7 @@
         (when (:new activity-data)
           [:div.new-tag
             "New"])]
-      [:div.stream-view-item-body.group
+      [:div.stream-item-body.group
         [:div.stream-body-left.group.fs-hide
           {:style {:padding-bottom (when-not is-mobile?
                                      (let [initial-padding 104
@@ -113,7 +113,7 @@
                            (reset! (::expanded s) true)
                            (reset! (::should-show-comments s) true))}
               "Keep reading"]]
-          (stream-view-attachments activity-attachments)
+          (stream-attachments activity-attachments)
           [:div.stream-item-reactions.group
             {:ref "stream-item-reactions"}
             (reactions activity-data)]

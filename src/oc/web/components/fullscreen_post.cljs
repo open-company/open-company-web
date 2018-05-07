@@ -24,7 +24,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
-            [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 ;; Unsaved edits handling
 
@@ -401,7 +401,7 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
-            (stream-view-attachments activity-attachments
+            (stream-attachments activity-attachments
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             [:div.fullscreen-post-box-footer.group
               (if editing

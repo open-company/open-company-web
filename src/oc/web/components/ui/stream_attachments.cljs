@@ -1,4 +1,4 @@
-(ns oc.web.components.ui.stream-view-attachments
+(ns oc.web.components.ui.stream-attachments
   (:require [rum.core :as rum]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
@@ -7,16 +7,16 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(rum/defcs stream-view-attachments < (rum/local false ::attachments-dropdown)
+(rum/defcs stream-attachments < (rum/local false ::attachments-dropdown)
   [s attachments remove-cb]
   (let [atc-num (count attachments)
         ww (responsive/ww)
         editable? (fn? remove-cb)]
     (when (pos? atc-num)
-      [:div.stream-view-attachments
-        [:div.stream-view-attachments-title
+      [:div.stream-attachments
+        [:div.stream-attachments-title
           (str atc-num " attachment" (when (> atc-num 1) "s"))]
-        [:div.stream-view-attachments-content
+        [:div.stream-attachments-content
           (for [atch attachments
                 :let [created-at (:created-at atch)
                       size (:file-size atch)
@@ -27,7 +27,7 @@
                                     " - ")
                                   (when size
                                     (filesize size :binary false :format "%.2f")))]]
-            [:a.stream-view-attachments-item.group
+            [:a.stream-attachments-item.group
               {:class (utils/class-set {:double-line (> atc-num 1)
                                         :editable editable?})
                :key (str "attachment-" size "-" (:file-url atch))

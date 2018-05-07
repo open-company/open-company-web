@@ -1,4 +1,4 @@
-div.stream-view-attachments {
+div.stream-attachments {
   margin-top: 32px;
   width: calc(100% - 40px);
 
@@ -6,7 +6,7 @@ div.stream-view-attachments {
     width: 100%;
   }
 
-  div.stream-view-attachments-title {
+  div.stream-attachments-title {
     @include avenir_M();
     font-size: 14px;
     color: $ui_grey;
@@ -29,7 +29,7 @@ div.stream-view-attachments {
     }
   }
 
-  div.stream-view-attachments-content {
+  div.stream-attachments-content {
 
     @include mobile() {
       overflow-x: auto;
@@ -38,7 +38,7 @@ div.stream-view-attachments {
       display: flex;
     }
 
-    a.stream-view-attachments-item {
+    a.stream-attachments-item {
       display: inline-block;
       height: 50px;
       border: 1px solid #ECECEC;
