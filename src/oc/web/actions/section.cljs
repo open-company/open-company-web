@@ -92,33 +92,44 @@
     (fn [{:keys [status body success]}]
       (dispatcher/dispatch! [:org-loaded (json->cljs body)]))))
 
-(defn section-save [section-data note]
-  (timbre/debug section-data)
-  (if (empty? (:links section-data))
-    (api/create-board section-data note
-      (fn [{:keys [success status body]}]
-        (let [section-data (when success (json->cljs body))]
-          (if (= status 409)
-            ;; Board name exists
-            (dispatcher/dispatch!
-             [:input
-              [:section-editing :section-name-error]
-              "Section name already exists or isn't allowed"])
-            (do
-              (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
-              (utils/after 500 refresh-org-data)
-              (ws-cc/container-watch [(:uuid section-data)])
-              (dispatcher/dispatch! [:section-edit-save/finish section-data]))))))
-    (api/patch-board section-data note (fn [success body status]
-      (if (= status 409)
-        ;; Board name exists
-        (dispatcher/dispatch!
-         [:input
-          [:section-editing :section-name-error]
-          "Board name already exists or isn't allowed"])
-        (do
-          (refresh-org-data)
-          (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])))))))
+(defn section-name-error [status]
+  ;; Board name exists or too short
+  (dispatcher/dispatch!
+   [:input
+    [:section-editing :section-name-error]
+    (cond
+      (= status 409) "Section name already exists or isn't allowed"
+      :else "An error occurred, please retry.")]))
+
+(defn section-save
+  ([section-data note] (section-save section-data note nil))
+  ([section-data note success-cb]
+    (section-save section-data note success-cb section-name-error))
+  ([section-data note success-cb error-cb]
+    (timbre/debug section-data)
+    (if (empty? (:links section-data))
+      (api/create-board section-data note
+        (fn [{:keys [success status body]}]
+          (let [section-data (when success (json->cljs body))]
+            (if-not success
+              (when (fn? error-cb)
+                (error-cb status))
+              (do
+                (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
+                (utils/after 500 refresh-org-data)
+                (ws-cc/container-watch [(:uuid section-data)])
+                (dispatcher/dispatch! [:section-edit-save/finish section-data])
+                (when (fn? success-cb)
+                  (success-cb)))))))
+      (api/patch-board section-data note (fn [success body status]
+        (if-not success
+          (when (fn? error-cb)
+            (error-cb status))
+          (do
+            (refresh-org-data)
+            (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])
+            (when (fn? success-cb)
+              (success-cb)))))))))
 
 (defn private-section-user-add
   [user user-type]
@@ -171,3 +182,15 @@
 (defn ws-interaction-subscribe []
   (ws-ic/subscribe :interaction-comment/add
                    #(ws-comment-add (:data %))))
+
+;; Section editing
+
+(def min-section-name-length 2)
+
+(defn section-save-create [section-editing section-name success-cb]
+  (if (< (count section-name) min-section-name-length)
+    (dispatcher/dispatch! [:section-edit/error (str "Name must be at least " min-section-name-length " characters.")])
+    (let [next-section-editing (merge section-editing {:slug utils/default-section-slug
+                                                       :name section-name})]
+      (dispatcher/dispatch! [:input [:section-editing] next-section-editing])
+      (success-cb next-section-editing))))
