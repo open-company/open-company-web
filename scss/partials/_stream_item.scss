@@ -1,6 +1,8 @@
 div.stream-item {
   width: #{$board_container_width}px;
   margin-top: 16px;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
 
   @include mobile() {
     width: 100%;
@@ -54,14 +56,10 @@ div.stream-item {
 
   div.stream-item-body {
     padding: 0px;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
+    border-radius: 6px;
 
     @include mobile() {
-      border-bottom-left-radius: 0px;
-      border-bottom-right-radius: 0px;
       display: block;
-      flex-direction: unset;
     }
 
     div.stream-body-separator {
