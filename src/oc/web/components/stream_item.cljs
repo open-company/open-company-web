@@ -105,9 +105,13 @@
                            (reset! (::should-show-comments s) true))}
               "Keep reading"]]
           (stream-attachments activity-attachments)
+          [:div.stream-item-separator]
           [:div.stream-item-reactions.group
             {:ref "stream-item-reactions"}
-            (reactions activity-data)]
+            (reactions activity-data)
+            (when (and (not (zero? (count comments-data)))
+                       (not is-mobile?))
+              (comments-summary activity-data false))]
           (when (and is-mobile?
                      (not @(::should-show-comments s))
                      (pos? (count comments-data)))

@@ -148,7 +148,7 @@ $h2_top_margin: 20;
   }
 }
 
-@mixin activity-body($font-size: 16){
+@mixin activity-body($font-size: 16, $separator: $bottom_margin){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
