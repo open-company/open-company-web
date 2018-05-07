@@ -56,34 +56,43 @@ div.stream-comments {
       padding: 16px 0px;
       margin-bottom: 8px;
 
-      div.stream-comment-header {
-        height: 32px;
+      div.stream-comment-author-avatar {
+        float: left;
+        width: 40px;
+        height: 40px;
+        background-position: 50%;
+        background-size: 40px 40px;
+        border-radius: 50%;
+        background-repeat: no-repeat;
+      }
 
-        div.stream-comment-author-avatar {
-          float: left;
-          width: 32px;
-          height: 32px;
-          background-position: 50%;
-          background-size: 32px 32px;
-          border-radius: 50%;
-          background-repeat: no-repeat;
-        }
+      div.stream-comment-right {
+        margin-left: 56px;
+      }
+
+      div.stream-comment-header {
+        height: 24px;
 
         div.stream-comment-author-right {
           float: left;
-          margin-left: 16px;
+          max-width: 80%;
+          height: 24px;
 
           div.stream-comment-author-name {
             @include avenir_H();
-            font-size: 12px;
+            font-size: 14px;
             color: $deep_navy;
+            float: left;
           }
 
           div.stream-comment-author-timestamp {
-            @include avenir_M();
+            @include avenir_R();
             font-size: 12px;
             color: $ui_grey;
             opacity: 0.5;
+            float: left;
+            margin-left: 8px;
+            padding-top: 3px;
           }
         }
 
@@ -93,11 +102,11 @@ div.stream-comments {
 
           button.comment-more-menu {
             width: 24px;
-            height: 26px;
+            height: 24px;
             padding: 2px 2px 16px 2px;
             display: block;
             background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
-            background-position: 50% 4px;
+            background-position: 50% 3px;
             background-size: 20px 4px;
             background-repeat: no-repeat;
             opacity: 0.8;
@@ -169,11 +178,10 @@ div.stream-comments {
 
       div.stream-comment-content {
         text-align: left;
-        margin-top: 8px;
 
         div.stream-comment-body {
-          @include avenir_BOOK();
-          font-size: 14px;
+          @include avenir_R();
+          font-size: 16px;
           color: $deep_navy;
           white-space: pre-wrap;
           word-wrap: break-word;
@@ -182,6 +190,9 @@ div.stream-comments {
             // editing comment
             border-radius: 4px;
             border: 1px solid $ui_grey;
+            box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
+            border: 2px solid $light_ui_grey;
+            background-color: white;
             outline: none;
             padding: 4px;
           }
@@ -210,11 +221,11 @@ div.stream-comments {
       }
 
       div.stream-comment-footer {
-        height: 25px;
+        height: 24px;
 
         div.stream-comment-reaction {
-          padding-top: 8px;
-          height: 25px;
+          padding-top: 4px;
+          height: 24px;
           @include avenir_M();
           font-size: 12px;
           color: $ui_grey;
