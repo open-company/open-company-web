@@ -87,19 +87,13 @@
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
         [:div.add-comment-internal
-          (user-avatar-image current-user-data)
+          [:div.add-comment-user-avatar
+            (user-avatar-image current-user-data)]
           [:div.add-comment.emoji-autocomplete.emojiable.fs-hide
            {:ref "add-comment"
             :content-editable true}]]
         (when add-comment-focus
           [:div.add-comment-footer.group
-            [:button.mlb-reset.reply-btn
-              {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
-                                comment-body (cu/add-comment-content add-comment-div)]
-                            (comment-actions/add-comment activity-data comment-body)
-                            (set! (.-innerHTML add-comment-div) ""))
-               :disabled @(::add-button-disabled s)}
-              "Post"]
             (when (and (not (js/isIE))
                        (not (responsive/is-tablet-or-mobile?)))
               (emoji-picker {:width 32
@@ -117,4 +111,16 @@
                                                       false))
                                                    (enable-add-comment? s)))))
                              :force-enabled true
-                             :container-selector "div.add-comment-box"}))])]]))
+                             :container-selector "div.add-comment-box"}))
+            [:button.mlb-reset.reply-btn
+              {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
+                                comment-body (cu/add-comment-content add-comment-div)]
+                            (comment-actions/add-comment activity-data comment-body)
+                            (set! (.-innerHTML add-comment-div) ""))
+               :disabled @(::add-button-disabled s)}
+              "Comment"]
+            [:button.mlb-reset.cancel-btn
+              {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
+                                comment-body (cu/add-comment-content add-comment-div)]
+                            (set! (.-innerHTML add-comment-div) ""))}
+              "Cancel"]])]]))
