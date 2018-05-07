@@ -5,9 +5,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -23,7 +21,7 @@
   (when-not @(::expanded s)
     (let [item-body (rum/ref-node s "item-body")
           dom-node (rum/dom-node s)
-          should-hide-body (> (.-clientHeight item-body) 400)]
+          should-hide-body (> (.-clientHeight item-body) 418)]
       (when (and (not should-hide-body)
                  (not @(::should-show-comments s)))
         (reset! (::should-show-comments s) true))
@@ -93,16 +91,9 @@
             "New"])]
       [:div.stream-item-body.group
         [:div.stream-body-left.group.fs-hide
-          {:style {:padding-bottom (when-not is-mobile?
-                                     (let [initial-padding 104
-                                           attachments-num (count activity-attachments)
-                                           attachments-height (* (js/Math.ceil (/ attachments-num 2)) 65)
-                                           total-padding (+ initial-padding
-                                                          (when (pos? attachments-num)
-                                                            (+ 32 20 attachments-height)))]
-                                     (str total-padding "px")))}}
           [:div.stream-item-headline
-            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+            {:ref "activity-headline"
+             :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-item-body-container
             [:div.stream-item-body
               [:div.stream-item-body-inner
