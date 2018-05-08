@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.activity :as am]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -40,6 +41,8 @@
                          (rum/local false ::expanded)
                          (rum/local false ::should-show-comments)
                          (rum/local false ::should-scroll-to-comments)
+                         ;; Mixins
+                         am/truncate-comments-mixin
                          {:after-render (fn [s]
                            (should-show-continue-reading? s)
                            (comment-actions/get-comments-if-needed (first (:rum/args s))
