@@ -7,7 +7,8 @@
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
             [oc.web.actions.comment :as comment-actions]
-            [oc.web.components.ui.alert-modal :as alert-modal]))
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn stop-editing [s]
   (let [medium-editor @(::medium-editor s)]
@@ -124,7 +125,8 @@
             [:div.stream-comment
               {:key (str "stream-comment-" (:created-at comment-data))}
               [:div.stream-comment-author-avatar
-                {:style {:background-image (str "url(" (:avatar-url (:author comment-data)) ")")}}]
+                (user-avatar-image (:author comment-data))]
+
               [:div.stream-comment-right
                 [:div.stream-comment-header.group.fs-hide
                   [:div.stream-comment-author-right

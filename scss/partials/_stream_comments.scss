@@ -19,10 +19,8 @@ div.stream-comments {
         float: left;
         width: 40px;
         height: 40px;
-        background-position: 50%;
-        background-size: 40px 40px;
-        border-radius: 50%;
-        background-repeat: no-repeat;
+
+        @include user-profile(40);
       }
 
       div.stream-comment-right {
