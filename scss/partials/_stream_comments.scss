@@ -2,282 +2,281 @@ div.stream-comments {
   width: 100%;
   height: 100%;
   position: relative;
+  padding-top: 16px;
 
-  div.stream-comments-inner {
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding-right: 12px;
-    padding-top: 16px;
+  div.stream-comments-empty {
+    display: none;
+  }
 
-    @include tablet() {
-      padding-right: 0px;
-      height: auto;
-    }
+  div.stream-comments-list {
 
-    div.stream-comments-empty {
-      display: none;
-    }
+    div.stream-comment {
+      border-radius: 6px;
+      padding: 16px 0px;
+      margin-bottom: 8px;
 
-    div.stream-comments-list {
+      div.stream-comment-author-avatar {
+        float: left;
+        width: 40px;
+        height: 40px;
+        background-position: 50%;
+        background-size: 40px 40px;
+        border-radius: 50%;
+        background-repeat: no-repeat;
+      }
 
-      div.stream-comment {
-        border-radius: 6px;
-        padding: 16px 0px;
-        margin-bottom: 8px;
+      div.stream-comment-right {
+        margin-left: 56px;
+      }
 
-        div.stream-comment-author-avatar {
+      div.stream-comment-header {
+        height: 24px;
+
+        div.stream-comment-author-right {
           float: left;
-          width: 40px;
-          height: 40px;
-          background-position: 50%;
-          background-size: 40px 40px;
-          border-radius: 50%;
-          background-repeat: no-repeat;
-        }
-
-        div.stream-comment-right {
-          margin-left: 56px;
-        }
-
-        div.stream-comment-header {
+          max-width: 80%;
           height: 24px;
 
-          div.stream-comment-author-right {
+          div.stream-comment-author-name {
+            @include avenir_H();
+            font-size: 14px;
+            color: $deep_navy;
             float: left;
-            max-width: 80%;
-            height: 24px;
+          }
 
-            div.stream-comment-author-name {
+          div.stream-comment-author-timestamp {
+            @include avenir_R();
+            font-size: 12px;
+            color: $ui_grey;
+            opacity: 0.5;
+            float: left;
+            margin-left: 8px;
+            padding-top: 3px;
+          }
+        }
+
+        div.stream-comment-more-menu-container {
+          float: right;
+          position: relative;
+
+          button.comment-more-menu {
+            width: 24px;
+            height: 24px;
+            padding: 2px 2px 16px 2px;
+            display: block;
+            background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
+            background-position: 50% 3px;
+            background-size: 20px 4px;
+            background-repeat: no-repeat;
+            opacity: 0.8;
+
+            &:hover {
+              opacity: 1;
+            }
+
+            &:hover, &.active {
+              background-image: cdnUrl("/img/ML/horizontal_ellipsis_ui_grey.svg");
+            }
+          }
+
+          div.stream-comment-more-menu {
+            position: absolute;
+            top: -8px;
+            left: calc(100% - 164px);
+            background-color: white;
+            width: 136px;
+            border: 1px solid $deep_tan;
+            box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
+            outline: none;
+            z-index: 110;
+            border-radius: 5px;
+            margin: 0;
+            padding: 24px;
+
+            div.stream-comment-more-menu-item {
+              height: 18px;
               @include avenir_H();
               font-size: 14px;
               color: $deep_navy;
-              float: left;
-            }
-
-            div.stream-comment-author-timestamp {
-              @include avenir_R();
-              font-size: 12px;
-              color: $ui_grey;
-              opacity: 0.5;
-              float: left;
-              margin-left: 8px;
-              padding-top: 3px;
-            }
-          }
-
-          div.stream-comment-more-menu-container {
-            float: right;
-            position: relative;
-
-            button.comment-more-menu {
-              width: 24px;
-              height: 24px;
-              padding: 2px 2px 16px 2px;
-              display: block;
-              background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
-              background-position: 50% 3px;
-              background-size: 20px 4px;
-              background-repeat: no-repeat;
-              opacity: 0.8;
-
-              &:hover {
-                opacity: 1;
-              }
-
-              &:hover, &.active {
-                background-image: cdnUrl("/img/ML/horizontal_ellipsis_ui_grey.svg");
-              }
-            }
-
-            div.stream-comment-more-menu {
-              position: absolute;
-              top: -8px;
-              left: calc(100% - 164px);
-              background-color: white;
-              width: 136px;
-              border: 1px solid $deep_tan;
-              box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
-              outline: none;
-              z-index: 110;
-              border-radius: 5px;
-              margin: 0;
-              padding: 24px;
-
-              div.stream-comment-more-menu-item {
-                height: 18px;
-                @include avenir_H();
-                font-size: 14px;
-                color: $deep_navy;
-                cursor: pointer;
-                padding-left: 32px;
-                position: relative;
-                margin-top: 16px;
-
-                &:before {
-                  content: "";
-                  position: absolute;
-                  top: 0px;
-                  left: 0px;
-                  width: 18px;
-                  height: 18px;
-                  background-repeat: no-repeat;
-                  background-size: 18px 18px;
-                  background-position: center;
-                }
-
-                &:first-child {
-                  margin-top: 0px;
-                }
-
-                &.edit {
-                  &:before {
-                    background-image: cdnUrl("/img/ML/more_menu_edit.svg");
-                  }
-                }
-
-                &.delete {
-                  &:before {
-                    background-image: cdnUrl("/img/ML/more_menu_delete.svg");
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        div.stream-comment-content {
-          text-align: left;
-
-          div.stream-comment-body {
-            @include avenir_R();
-            font-size: 16px;
-            color: $deep_navy;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-
-            &.medium-editor-element {
-              // editing comment
-              border-radius: 4px;
-              border: 1px solid $ui_grey;
-              box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
-              border: 2px solid $light_ui_grey;
-              background-color: white;
-              outline: none;
-              padding: 4px;
-            }
-
-            * {
-              white-space: pre-wrap;
-              word-wrap: break-word;
-            }
-
-            margin-bottom: 0px;
-
-            &>*:last-child {
-              margin-bottom: 0px;
-            }
-
-            &.emoji-comment {
-              font-size: 50px;
-              height: 50px;
-
-              // & > * {
-              //   line-height: 20px;
-              //   margin-top: 20px;
-              // }
-            }
-          }
-        }
-
-        div.stream-comment-footer {
-          height: 24px;
-
-          div.stream-comment-reaction {
-            padding-top: 4px;
-            height: 24px;
-            @include avenir_M();
-            font-size: 12px;
-            color: $ui_grey;
-            float: left;
-
-            &.can-react {
               cursor: pointer;
-            }
+              padding-left: 32px;
+              position: relative;
+              margin-top: 16px;
 
-            &.reacted {
-              color: $carrot_green;
+              &:before {
+                content: "";
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                width: 18px;
+                height: 18px;
+                background-repeat: no-repeat;
+                background-size: 18px 18px;
+                background-position: center;
+              }
 
-              div.stream-comment-reaction-icon {
-                background-image: cdnUrl("/img/ML/comment_agree_on.svg");
+              &:first-child {
+                margin-top: 0px;
+              }
+
+              &.edit {
+                &:before {
+                  background-image: cdnUrl("/img/ML/more_menu_edit.svg");
+                }
+              }
+
+              &.delete {
+                &:before {
+                  background-image: cdnUrl("/img/ML/more_menu_delete.svg");
+                }
               }
             }
-
-            &.reacted.can-react:hover {
-              color: $deep_navy;
-
-              div.stream-comment-reaction-icon {
-                background-image: cdnUrl("/img/ML/comment_agree_on_hover.svg");
-              }
-            }
-
-            &.can-react:hover {
-              color: $carrot_green;
-
-              div.stream-comment-reaction-icon {
-                background-image: cdnUrl("/img/ML/comment_agree_off_hover.svg");
-              }
-            }
-
-            div.stream-comment-reaction-icon {
-              float: left;
-              width: 14px;
-              height: 14px;
-              background-repeat: no-repeat;
-              background-image: cdnUrl("/img/ML/comment_agree_off.svg");
-              background-size: 14px 14px;
-              background-position: center;
-            }
-
-            div.stream-comment-reaction-count {
-              float: left;
-              margin-left: 6px;
-              margin-top: 2px;
-            }
-          }
-        }
-
-        div.save-cancel-edit-buttons {
-          float: right;
-          padding-top: 8px;
-
-          button {
-            float: right;
           }
         }
       }
 
-      div.stream-comments-expand {
-        text-align: center;
-        cursor: pointer;
+      div.stream-comment-content {
+        text-align: left;
 
-        span.collapse-expand-list {
-          @include avenir_H();
-          font-size: 14px;
-          color: $ui_grey;
-          padding-left: 22px;
+        div.stream-comment-body {
+          @include avenir_R();
+          font-size: 16px;
+          color: $deep_navy;
+          white-space: pre-wrap;
+          word-wrap: break-word;
 
-          background-image: cdnUrl("/img/ML/expand_comments.svg");
-          background-size: 8px 14px;
-          background-position: 4px 0px;
-          background-repeat: no-repeat;
-        }
-
-        &.expanded {
-          span.collapse-expand-list {
-            background-image: cdnUrl("/img/ML/collapse_comments.svg");
+          &:hover {
+            a.read-more {
+              text-decoration: underline;
+            }
           }
+
+          a.read-more {
+            @include avenir_H();
+            font-size: 12px;
+            color: $deep_navy;
+          }
+
+          &.medium-editor-element {
+            // editing comment
+            border-radius: 4px;
+            border: 1px solid $ui_grey;
+            box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
+            border: 2px solid $light_ui_grey;
+            background-color: white;
+            outline: none;
+            padding: 4px;
+          }
+
+          * {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+          }
+
+          margin-bottom: 0px;
+
+          &>*:last-child {
+            margin-bottom: 0px;
+          }
+
+          &.emoji-comment {
+            font-size: 50px;
+            height: 50px;
+
+            // & > * {
+            //   line-height: 20px;
+            //   margin-top: 20px;
+            // }
+          }
+        }
+      }
+
+      div.stream-comment-footer {
+        height: 24px;
+
+        div.stream-comment-reaction {
+          padding-top: 4px;
+          height: 24px;
+          @include avenir_M();
+          font-size: 12px;
+          color: $ui_grey;
+          float: left;
+
+          &.can-react {
+            cursor: pointer;
+          }
+
+          &.reacted {
+            color: $carrot_green;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_on.svg");
+            }
+          }
+
+          &.reacted.can-react:hover {
+            color: $deep_navy;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_on_hover.svg");
+            }
+          }
+
+          &.can-react:hover {
+            color: $carrot_green;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_off_hover.svg");
+            }
+          }
+
+          div.stream-comment-reaction-icon {
+            float: left;
+            width: 14px;
+            height: 14px;
+            background-repeat: no-repeat;
+            background-image: cdnUrl("/img/ML/comment_agree_off.svg");
+            background-size: 14px 14px;
+            background-position: center;
+          }
+
+          div.stream-comment-reaction-count {
+            float: left;
+            margin-left: 6px;
+            margin-top: 2px;
+          }
+        }
+      }
+
+      div.save-cancel-edit-buttons {
+        float: right;
+        padding-top: 8px;
+
+        button {
+          float: right;
+        }
+      }
+    }
+
+    div.stream-comments-expand {
+      text-align: center;
+      cursor: pointer;
+
+      span.collapse-expand-list {
+        @include avenir_H();
+        font-size: 14px;
+        color: $ui_grey;
+        padding-left: 22px;
+
+        background-image: cdnUrl("/img/ML/expand_comments.svg");
+        background-size: 14px 8px;
+        background-position: 4px 0px;
+        background-repeat: no-repeat;
+      }
+
+      &.expanded {
+        span.collapse-expand-list {
+          background-image: cdnUrl("/img/ML/collapse_comments.svg");
         }
       }
     }
