@@ -111,10 +111,7 @@
           [:div.stream-item-separator]
           [:div.stream-item-reactions.group
             {:ref "stream-item-reactions"}
-            (reactions activity-data)
-            (when (and (not (zero? (count comments-data)))
-                       (not is-mobile?))
-              (comments-summary activity-data false))]
+            (reactions activity-data)]
           (when (and is-mobile?
                      (not @(::should-show-comments s))
                      (pos? (count comments-data)))
@@ -131,8 +128,9 @@
                      @(::should-show-comments s))
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              [:div.stream-comments-title
-                (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))]
+              (when (pos? (count comments-data))
+                [:div.stream-comments-title
+                  (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-mobile-" (:uuid activity-data))))
               (stream-comments activity-data comments-data)])]
