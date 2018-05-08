@@ -32,7 +32,11 @@
         #js {:height (* 22 5)
              :wrap "word"
              :watch true
-             :ellipsis "... Read more"}))
+             :ellipsis "..."
+             :callback (fn [is-truncated]
+              (this-as this
+                (when is-truncated
+                  (.append (js/$ this) "<p><a class=\"read-more\">Read More</a></p>"))))}))
     s)
    :did-remount (fn [o s]
     (reset! (:comments-truncated s) false)
