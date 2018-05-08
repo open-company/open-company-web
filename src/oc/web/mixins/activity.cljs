@@ -29,7 +29,7 @@
     (let [dom-node (rum/dom-node s)
           $collapsed-comments (.find (js/$ dom-node) "div.stream-comment-body:not(.expanded)")]
       (.dotdotdot $collapsed-comments
-        #js {:height (* 22 3)
+        #js {:height (* 22 5)
              :wrap "word"
              :watch true
              :ellipsis "... Read more"}))
