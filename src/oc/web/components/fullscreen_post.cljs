@@ -110,7 +110,8 @@
     (.clearInterval js/window @(::autosave-timer state)))
   (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
   (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
-  (when focus
+  (when (and focus
+             (= (.-activeElement js/document) (.-body js/document)))
     (utils/after 1000
       #(cond
          (= focus :body)
@@ -391,6 +392,7 @@
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)
                                  :show-placeholder true
+                                 :show-h2 true
                                  :dispatch-input-key :modal-editing-data
                                  :upload-progress-cb #(reset! (::uploading-media s) %)
                                  :media-config ["photo" "video"]
