@@ -174,23 +174,31 @@ div.activity-card {
 
     @include activity-media-preview();
 
-    $body_height: 24*3;
+    $line_height: 20;
+    $body_height: $line_height*3;
     div.activity-card-body {
       margin-top: 12px;
-      @include activity-body(16);
+      @include activity-body(16, $line_height, $line_height);
       @include avenir_M();
       color: $deep_navy;
-      line-height: 24px;
+      line-height: #{$line_height}px;
       display: block;
       max-height: #{$body_height}px;
       overflow: hidden;
 
+      h2 {
+        line-height: #{$line_height}px;
+        @include avenir_M();
+        font-size: 16px;
+        font-weight: normal;
+      }
+
       & > *:not(:last-child) {
-        margin: 24px 0px;
+        margin: #{$line_height}px 0px;
       }
 
       & > *:last-child {
-        margin: 24px 0px 0px;
+        margin: #{$line_height}px 0px 0px;
       }
 
       & > *:first-child {
@@ -219,15 +227,8 @@ div.activity-card {
         display: none;
       }
 
-      h2 {
-        @include avenir_R();
-        font-size: 16px;
-        font-weight: normal;
-      }
-
       b, strong {
         font-weight: normal;
-        @include avenir_R();
       }
 
       // // Uncomment this to programmatically add the read full update at the end of the last body tag

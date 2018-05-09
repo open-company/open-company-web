@@ -58,6 +58,7 @@
        (this-as this
          (let [$this (js/$ this)
                el-h (.outerHeight $this true) ;; Include margins in height calculation
+               line-height 20
                container-max-height (cond
                                      is-ap default-all-posts-body-height
                                      is-drafts default-draft-body-height
@@ -67,20 +68,20 @@
                truncate-height  (cond
                                   (zero? (- container-max-height prev-height))
                                   0
-                                  (<= (- container-max-height prev-height) 24)
-                                  24
-                                  (<= (- container-max-height prev-height) (* 24 2))
-                                  (* 24 2)
-                                  (<= (- container-max-height prev-height) (* 24 3))
-                                  (* 24 3)
-                                  (< (- container-max-height prev-height) (* 24 4))
-                                  (* 24 4)
-                                  (< (- container-max-height prev-height) (* 24 5))
-                                  (* 24 5)
-                                  (< (- container-max-height prev-height) (* 24 6))
-                                  (* 24 6)
+                                  (<= (- container-max-height prev-height) line-height)
+                                  line-height
+                                  (<= (- container-max-height prev-height) (* line-height 2))
+                                  (* line-height 2)
+                                  (<= (- container-max-height prev-height) (* line-height 3))
+                                  (* line-height 3)
+                                  (< (- container-max-height prev-height) (* line-height 4))
+                                  (* line-height 4)
+                                  (< (- container-max-height prev-height) (* line-height 5))
+                                  (* line-height 5)
+                                  (< (- container-max-height prev-height) (* line-height 6))
+                                  (* line-height 6)
                                   :else
-                                  (* 24 3))]
+                                  (* line-height 3))]
            (swap! partial-heights #(vec (conj % el-h)))
            (when (>= actual-height container-max-height)
              (reset! found true)
