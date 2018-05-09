@@ -71,7 +71,7 @@ div.stream-item {
 
     div.stream-body-left {
       position: relative;
-      padding: 40px 40px 40px 40px;
+      padding: 40px 68px;
       background-color: white;
 
       @include mobile() {
@@ -125,7 +125,7 @@ div.stream-item {
 
           div.stream-item-body-inner {
             margin-top: 24px;
-            @include activity-body(20, 30);
+            @include activity-body(20, 28, 28);
             @include avenir_R();
             color: $deep_navy;
             line-height: 30px;
@@ -145,10 +145,10 @@ div.stream-item {
           font-size: 16px;
           text-align: left;
           display: none;
-          padding: 8px 7px 8px 22px;
+          padding: 16px 7px 0px 22px;
           background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
           background-size: 14px 8px;
-          background-position: 0px 15px;
+          background-position: 0px 23px;
           background-repeat: no-repeat;
         }
       }
@@ -219,7 +219,7 @@ div.stream-item {
 
     div.stream-body-right {
       position: relative;
-      padding: 32px 32px 40px 32px;
+      padding: 32px;
       background-color: #FDFCFB;
       border-bottom-right-radius: 6px;
       border-bottom-left-radius: 6px;
@@ -231,24 +231,8 @@ div.stream-item {
           @include avenir_H();
           font-size: 14px;
           color: $carrot_dark_gray;
-          margin-bottom: 16px;
+          margin-bottom: 24px;
         }
-
-        &.add-comment-expanded {
-          div.stream-comments {
-            height: calc(100% - 140px);
-          }
-        }
-
-        div.stream-comments {
-          margin-top: 8px;
-          height: calc(100% - 58px);
-        }
-      }
-
-      div.add-comment-box-container {
-        width: calc(100% - 12px);
-        margin-right: 12px;
       }
     }
   }
