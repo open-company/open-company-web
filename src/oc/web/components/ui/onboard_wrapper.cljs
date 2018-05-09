@@ -724,6 +724,31 @@
       [:div.onboard-email-container.small.dot-animation
         "Verifying, please wait" [:span.dots {:ref :dots} "."]])))
 
+(rum/defcs add-to-slack < rum/reactive
+                          (drv/drv :query-params)
+  [s]
+  (let [query-params (drv/react s :query-params)]
+    [:div.onboard-add-to-slack-container
+      [:div.onboard-add-to-slack-title "Enable these Carrot features for your Slack team."]
+      [:div.onboard-add-to-slack-features
+        [:div "With carrot added to your Slack workspace, you can:"]
+        [:ul
+          [:li "Share posts with your team in Slack"]
+          [:li "Sync post comments in between Carrot and Slack"]
+          [:li "Receive optional daily or weekly summaries in Slack"]
+          [:li "Invite team members to Carrot with Slack"]]]
+      [:a {:on-click #(do
+            (.preventDefault %)
+            (user-actions/add-to-slack query-params))}
+        [:img {:alt "Add to Slack"
+               :height "40"
+               :width "139"
+               :src "https://platform.slack-edge.com/img/add_to_slack.png"
+               :srcSet "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"}]]
+      [:p "You need Slack Permission in order to add Carrot to your Slack workspace. If you don't have this permission, you can continue on to Carrot."]
+      [:a "Skip for now...."]]))
+
+
 (defn get-component [c]
   (case c
     :lander (lander)
@@ -735,6 +760,7 @@
     :email-wall (email-wall)
     :email-verified (email-verified)
     :password-reset-lander (password-reset-lander)
+    :add-to-slack (add-to-slack)
     [:div]))
 
 (rum/defc onboard-wrapper < rum/static
