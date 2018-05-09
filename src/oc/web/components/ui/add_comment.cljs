@@ -122,5 +122,6 @@
             [:button.mlb-reset.cancel-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                 comment-body (cu/add-comment-content add-comment-div)]
-                            (set! (.-innerHTML add-comment-div) ""))}
+                            (set! (.-innerHTML add-comment-div) "")
+                            (comment-actions/add-comment-focus nil))}
               "Cancel"]])]]))
