@@ -141,8 +141,9 @@
             {:class (when expanded? "expanded")}
             [:div.stream-body-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              [:div.stream-comments-title
-                (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))]
+              (when (pos? (count comments-data))
+                [:div.stream-comments-title
+                  (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
               (stream-comments activity-data comments-data)]])]]))
