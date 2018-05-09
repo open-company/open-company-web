@@ -16,9 +16,8 @@ div.activity-attachments {
     }
 
     div.activity-attachment {
-      // display: inline-block;
+      cursor: default;
       float: left;
-      // max-width: calc(33% - 16px);
       margin-right: 8px;
       height: 26px;
       background-color: $chalk_blue;

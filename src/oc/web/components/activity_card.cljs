@@ -53,11 +53,8 @@
                     (when-not
                      (or
                       nux
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-menu]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions])))
 
                       (activity-actions/activity-modal-fade-in activity-data))))}
@@ -101,8 +98,8 @@
                :class (utils/class-set {:has-body has-body
                                         :has-headline has-headline})}])
           (when has-attachments
-              [:div.activity-card-attachments
-                (activity-attachments activity-data)])]
+            [:div.activity-card-attachments
+              (activity-attachments activity-data)])]
         [:div.activity-card-footer.group
           [:div.activity-card-footer-divider-line]
           (reactions activity-data)
