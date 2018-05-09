@@ -8,12 +8,7 @@
 
 (rum/defcs activity-attachments
   [s activity-data]
-  (let [attachments [{:file-name "asjndajndjandjkandjkndjankdasjdnaskjdnjandkasndkjandjkndjsank.clj"
-                      :file-url "https:/asds.asdasda.com/sdkadasdad.coasdas.com"
-                      :file-size 12354912312421}
-                     {:file-name "hellohellohellohellohellohellohellohellohellohellohellohellohellohello.clj"
-                      :file-url "https:/asds.asdasda.com/sdkadasdad.coasdasasdad.com"
-                      :file-size 98734349873434}] ;(take 1 (:attachments activity-data))
+  (let [attachments (take 1 (:attachments activity-data))
         attachments-num (count attachments)]
     (when (pos? attachments-num)
       [:div.activity-attachments
