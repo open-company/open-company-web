@@ -97,7 +97,6 @@
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
-   :comment-edit        [[:base] (fn [base] (:comment-edit base))]
    :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
    :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
    :email-verification  [[:base :auth-settings]
@@ -211,11 +210,11 @@
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share
-                          :add-comment-focus :comment-edit :ap-initial-at
-                          :comments-data :show-sections-picker :section-editing]
+                           :add-comment-focus :ap-initial-at :comments-data
+                           :show-sections-picker :section-editing]
                           (fn [base org-data activity-data activity-share
-                               add-comment-focus comment-edit ap-initial-at
-                               comments-data show-sections-picker section-editing]
+                               add-comment-focus ap-initial-at comments-data
+                               show-sections-picker section-editing]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
@@ -225,7 +224,6 @@
                              :activity-share activity-share
                              :entry-save-on-exit (:entry-save-on-exit base)
                              :add-comment-focus add-comment-focus
-                             :comment-edit comment-edit
                              :comments-data comments-data
                              :ap-initial-at ap-initial-at
                              :show-sections-picker show-sections-picker

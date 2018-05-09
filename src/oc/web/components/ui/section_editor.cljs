@@ -78,6 +78,7 @@
                             (rum/local false ::editing-existing-section)
                             (rum/local nil ::click-listener)
                             (rum/local false ::slack-enabled)
+                            (rum/local "" ::section-name)
                             ;; Derivatives
                             (drv/drv :org-data)
                             (drv/drv :board-data)
@@ -91,6 +92,8 @@
                                     fixed-section-data (if new-section
                                                         utils/default-section
                                                         (section-for-editing initial-section-data))]
+                                (when (string? (:name fixed-section-data))
+                                  (reset! (::section-name s) (clojure.string/trim (:name fixed-section-data))))
                                 (reset! (::editing-existing-section s) (not new-section))
                                 (when-not (empty? (:name fixed-section-data))
                                   (reset! (::initial-section-name s) (:name fixed-section-data)))
@@ -142,13 +145,17 @@
       [:div.section-editor-add
         [:div.section-editor-add-label
           "Section name"]
+        (when (:section-name-error section-editing)
+          [:div.section-editor-error-label (:section-name-error section-editing)])
         [:div.section-editor-add-name
           {:content-editable true
            :placeholder "Section name"
            :ref "section-name"
            :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "section-name") %)
-           :on-key-up #(when (:section-name-error section-editing)
-                         (dis/dispatch! [:input [:section-editing :section-name-error] nil]))
+           :on-key-up (fn [e]
+                        (reset! (::section-name s) (clojure.string/trim (.. e -target -innerText)))
+                        (when (:section-name-error section-editing)
+                          (dis/dispatch! [:input [:section-editing :section-name-error] nil])))
            :on-key-press (fn [e]
                            (when (or (>= (count (.. e -target -innerText)) 50)
                                     (= (.-key e) "Enter"))
@@ -382,16 +389,15 @@
                                                (dismiss))}))}
               "Delete section"])
           [:button.mlb-reset.create-bt
-            {:on-click #(let [section-node (rum/ref-node s "section-name")
-                              inner-html (.-innerHTML section-node)
-                              section-name (utils/strip-HTML-tags inner-html)
+            {:on-click (fn [_]
+                        (let [section-node (rum/ref-node s "section-name")
+                              section-name (.-innerText section-node)
                               personal-note-node (rum/ref-node s "personal-note")
                               personal-note (when personal-note-node (.-innerText personal-note-node))
-                              next-section-editing (merge section-editing {:slug utils/default-section-slug
-                                                                           :name section-name})]
-                          (dis/dispatch! [:input [:section-editing] next-section-editing])
-                          (when (fn? on-change)
-                            (on-change next-section-editing personal-note)))}
+                              success-cb #(when (fn? on-change)
+                                            (on-change % personal-note))]
+                          (section-actions/section-save-create section-editing section-name success-cb)))
+             :class (when (< (count @(::section-name s)) section-actions/min-section-name-length) "disabled")}
             (if @(::editing-existing-section s)
               "Save"
               "Create")]]]]))

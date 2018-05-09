@@ -83,6 +83,10 @@
   [s]
   (reset! (::ww s) (responsive/ww)))
 
+(defn- update-compose-button-tooltip [s]
+  (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
+    (.tooltip $compose-button (.attr $compose-button "data-viewer"))))
+
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
@@ -123,6 +127,7 @@
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
+                                (update-compose-button-tooltip s)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -131,10 +136,7 @@
                                     (reset! (::scroll-listener s) nil)))
                                 s)
                                :did-update (fn [s]
-                                (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
-                                  (if (clojure.string/blank? (.data $compose-button "original-title"))
-                                    (.tooltip $compose-button "disable")
-                                    (.tooltip $compose-button "enable")))
+                                (update-compose-button-tooltip s)
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -176,13 +178,13 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))
         can-compose (or (and (or is-all-posts
                                  is-drafts-board)
                              (pos? (count all-boards)))
                         (and (not is-all-posts)
                              (not is-drafts-board)
-                             (utils/link-for (:links board-data) "create")))
+                             board-data
+                             (not (:read-only board-data))))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
       [:div.dashboard-layout.group
@@ -192,9 +194,9 @@
           [:div.section-add
             {:class (when show-drafts "has-drafts")}
            (section-editor nil (fn [board-data note]
-                                  (dis/dispatch! [:input [:show-section-add] false])
                                   (when board-data
-                                    (section-actions/section-save board-data note))))])
+                                    (section-actions/section-save board-data note
+                                     #(dis/dispatch! [:input [:show-section-add] false])))))])
         [:div.dashboard-layout-container.group
           (when-not is-mobile?
             (navigation-sidebar))
@@ -230,9 +232,9 @@
                                  (not (responsive/is-tablet-or-mobile?)))
                         (section-editor board-data
                          (fn [section-data note]
-                           (dis/dispatch! [:input [:show-section-editor] false])
                            (when section-data
-                             (section-actions/section-save section-data note)))))])
+                             (section-actions/section-save section-data note
+                               #(dis/dispatch! [:input [:show-section-editor] false]))))))])
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"
@@ -252,12 +254,13 @@
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
-                    (let [show-tooltip? (and (not can-compose) should-show-top-compose)]
+                    (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
                       [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                         {:ref :top-compose-button
                          :on-click #(when can-compose (compose-fn %))
                          :class (when-not can-compose "disabled")
                          :title (when show-tooltip? "You are a view-only user.")
+                         :data-viewer (if show-tooltip? "enable" "disable")
                          :data-toggle (when show-tooltip? "tooltip")
                          :data-placement (when show-tooltip? "top")
                          :data-container (when show-tooltip? "body")}
@@ -311,7 +314,7 @@
                 ;; All Posts
                 (and is-all-posts
                      (= @(::board-switch s) :stream))
-                (rum/with-key (all-posts) all-posts-key)
+                (all-posts)
                 ;; Empty board
                 empty-board?
                 (empty-board)

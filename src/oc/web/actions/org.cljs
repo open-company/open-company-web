@@ -94,9 +94,15 @@
 
 ;; Org create
 
+(defn- org-created [org-data]
+  (let [auth-source (jwt/get-key :auth-source)]
+    (if (= auth-source "email")
+      (router/nav! (oc-urls/sign-up-invite (:slug org-data)))
+      (org-redirect org-data))))
+
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
-    (router/nav! (oc-urls/sign-up-invite (:slug org-data)))))
+    (org-created org-data)))
 
 (defn org-create-cb [{:keys [success status body]}]
   (if success
@@ -111,7 +117,7 @@
           ; for it and patch it back
           (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
           ; if not redirect the user to the invite page
-          (router/nav! (oc-urls/sign-up-invite (:slug org-data))))))
+          (org-created org-data))))
     (when (= status 409)
       ;; Redirect to the already available org
       (router/nav! (oc-urls/org (:slug (first (:orgs @dis/app-state))))))))

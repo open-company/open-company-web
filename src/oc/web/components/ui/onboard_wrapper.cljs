@@ -520,7 +520,7 @@
         [:div.title
           "Join your team on Carrot"]
         [:div.subtitle
-          "Signing up as " [:span.email-address (:email jwt)]]]
+          "Signing up as " [:span.email-address.fs-hide (:email jwt)]]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
