@@ -73,7 +73,7 @@
       [:div.stream-view-item-header
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))
-          [:div.name (:name (:publisher activity-data))]
+          [:div.name.fs-hide (:name (:publisher activity-data))]
           [:div.time-since
             [:time
               {:date-time (:published-at activity-data)
@@ -91,7 +91,7 @@
           [:div.new-tag
             "New"])]
       [:div.stream-view-item-body.group
-        [:div.stream-body-left.group
+        [:div.stream-body-left.group.fs-hide
           {:style {:padding-bottom (when-not is-mobile?
                                      (let [initial-padding 104
                                            attachments-num (count activity-attachments)

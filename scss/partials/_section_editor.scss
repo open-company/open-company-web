@@ -75,6 +75,13 @@ div.section-editor {
       margin-top: 64px;
     }
 
+    div.section-editor-error-label {
+      margin-top: 8px;
+      @include avenir_M();
+      font-size: 13px;
+      color: $carrot_orange;
+    }
+
     div.section-editor-add-label {
       margin-top: 24px;
       @include avenir_H();
@@ -482,6 +489,10 @@ div.section-editor {
         color: $carrot_green;
         @include avenir_H();
         font-size: 15px;
+
+        &.disabled {
+          opacity: 0.5;
+        }
       }
     }
   }

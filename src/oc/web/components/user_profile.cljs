@@ -158,7 +158,7 @@
       [:div.user-profile-header {} "Your Profile"]
       [:div.user-profile-internal
         [:div.user-profile-content.group
-          [:div.user-profile-avatar-box.group
+          [:div.user-profile-avatar-box.group.fs-hide
             [:button.user-profile-avatar.mlb-reset
               {:on-click #(upload-user-profile-pictuer-clicked)}
               (user-avatar-image current-user-data)]
@@ -174,7 +174,7 @@
                 (when error
                   "An error occurred while saving, please try again.")]]]
           ; Left column
-          [:div.user-profile-column-left
+          [:div.user-profile-column-left.fs-hide
             ; First name
             [:div.user-profile-field-box
               [:div.user-profile-field-label
@@ -245,7 +245,7 @@
 
 
           ; Right column
-          [:div.user-profile-column-right
+          [:div.user-profile-column-right.fs-hide
             ; Last name
             [:div.user-profile-field-box
               [:div.user-profile-field-label

@@ -46,7 +46,7 @@
                                (str (- win-height default-activity-header-height) "px"))}}
         (when (drv/react s :made-with-carrot-modal)
           (made-with-carrot-modal/made-with-carrot-modal))
-        [:div.activity-header.group
+        [:div.activity-header.group.fs-hide
           (org-avatar (clojure.set/rename-keys
                        activity-data
                        {:org-logo-height :logo-height
@@ -59,9 +59,9 @@
             {:style {:min-height (when is-mobile?
                                   (str (- win-height default-activity-header-height) "px"))}}
             (when (:headline activity-data)
-              [:div.activity-title
+              [:div.activity-title.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
-            [:div.activity-author.group
+            [:div.activity-author.group.fs-hide
               [:div.activity-author-inner.group
                 (user-avatar-image activity-author)
                 [:div.posted-by
@@ -71,7 +71,7 @@
                    " "
                    (utils/activity-date (utils/js-date (:published-at activity-data)) true) ".")]]]
             (when (:body activity-data)
-              [:div.activity-body
+              [:div.activity-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])]]
         [:div.activity-content-footer
           {:on-click #(when-not is-mobile?

@@ -17,10 +17,12 @@
 (def default-slack-user {})
 (def default-user-role :author)
 (def default-user-row
- {:type default-user-type
-  :temp-user default-user
+ {:temp-user default-user
   :user default-user
   :role default-user-role})
+
+(defn new-user-row [s]
+  (assoc default-user-row :type @(::inviting-from s)))
 
 (defn valid-user? [user-map]
   (or (and (= (:type user-map) "email")
@@ -45,7 +47,8 @@
   (let [inviting-users-data @(drv/get-ref s :invite-data)
         invite-users (:invite-users inviting-users-data)]
     (when (zero? (count invite-users))
-      (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num default-user-row))]))))
+      (let [new-row (new-user-row s)]
+        (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))])))))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
@@ -55,6 +58,7 @@
     (rum/local "Send" ::send-bt-cta)
     (rum/local 0 ::sending)
     {:will-mount (fn [s]
+                   (reset! (::inviting-from s) (or (jwt/get-key :auth-source) "email"))
                    (setup-initial-rows s)
                    s)
      :after-render (fn [s]
@@ -115,7 +119,7 @@
         ;; Panel rows
         [:div.org-settings-invite-table.org-settings-panel-row
           ;; Team table
-          [:table.org-settings-table
+          [:table.org-settings-table.fs-hide
             [:thead
               [:tr
                 [:th "Invitee"
@@ -143,19 +147,19 @@
                       [:div
                         {:class (when (:error user-data) "error")}
                         (rum/with-key
-                          (slack-users-dropdown {:on-change #(dis/dispatch!
-                                                              [:input
-                                                               [:invite-users i]
-                                                               (merge user-data {:user % :error nil :temp-user nil})])
-                                                 :on-intermediate-change
-                                                  #(dis/dispatch!
-                                                    [:input
-                                                     [:invite-users]
-                                                     (assoc
-                                                      invite-users
-                                                      i
+                         (slack-users-dropdown
+                          {:on-change #(dis/dispatch! [:input [:invite-users i]
+                                        (merge user-data {:user % :error nil :temp-user nil})])
+                           :filter-fn (fn [user]
+                                        (let [check-fn #(or
+                                                         (not (:user %))
+                                                         (not= (:slack-org-id (:user %)) (:slack-org-id user))
+                                                         (not= (:slack-id (:user %)) (:slack-id user)))]
+                                          (every? check-fn invite-users)))
+                           :on-intermediate-change #(dis/dispatch! [:input [:invite-users]
+                                                     (assoc invite-users i
                                                       (merge user-data {:user nil :error nil :temp-user %}))])
-                                                 :initial-value (utils/name-or-email (:user user-data))})
+                            :initial-value (utils/name-or-email (:user user-data))})
                           (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                       [:input.org-settings-field.email-field
                         {:type "text"
@@ -211,7 +215,7 @@
         [:div.org-settings-panel-row.group
           [:div.org-settings-label
             [:label "Personal note"]]
-          [:div.org-settings-field
+          [:div.org-settings-field.fs-hide
             [:textarea
               {:ref "personal-note-textarea"
                :placeholder "Add a personal note to your invitation..."}]]]]
