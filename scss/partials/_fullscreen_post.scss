@@ -42,6 +42,19 @@ div.fullscreen-post-container {
         opacity: 1;
       }
     }
+
+    div.fullscreen-post-left-column {
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    div.fullscreen-post-separator {
+      display: none;
+    }
+
+    div.fullscreen-post-right-column {
+      display: none;
+    }
   }
 
   div.fullscreen-post-header {
@@ -50,11 +63,12 @@ div.fullscreen-post-container {
     top: 0px;
     left: 0px;
     width: 100vw;
-    height: 64px;
+    height: 56px;
     background-color: white;
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
     padding: 12px 24px;
     z-index: #{$navbar_zindex + 101};
+    text-align: center;
 
     @include tablet() {
       width: 100%;
@@ -68,9 +82,10 @@ div.fullscreen-post-container {
       background-size: 20px 15px;
       background-position: center;
       padding: 0;
-      margin: 8px 0px 0px;
-      float: left;
       transition: background-image 180ms easi-in;
+      position: absolute;
+      top: 16px;
+      left: 24px;
     }
 
     div.header-title-editing-post {
@@ -82,7 +97,7 @@ div.fullscreen-post-container {
       margin-left: -52px;
       opacity: 0;
       transition: opacity 180ms ease-in;
-      margin-top: 12px;
+      margin-top: 8px;
 
       div.header-title-container-edit-pen {
         float: left;
@@ -104,70 +119,33 @@ div.fullscreen-post-container {
     }
 
     div.header-title-container {
-      margin: 0px auto;
+      margin: 6px auto 0px;
       width: auto;
       opacity: 1;
-      position: absolute;
-      left: 50%;
       transition: opacity 180ms ease-in;
-      margin-top: 12px;
+      @include avenir_H();
+      font-size: 16px;
+      color: $deep_navy;
+      max-width: 50vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-wrap: break-word;
 
       @include tablet() {
+        margin-left: 0px;
+        max-width: initial;
         position: relative;
         left: unset;
         width: 70%;
         margin: 0px auto;
         text-align: center;
       }
-
-      @include activity-author(32);
-
-      div.user-avatar-img-container {
-        float: left;
-        margin-top: -8px;
-        margin-right: 0px;
-
-        @include tablet() {
-          display: none;
-        }
-      }
-
-      div.header-title {
-        float: left;
-        margin-left: 8px;
-        @include avenir_H();
-        font-size: 14px;
-        color: $deep_navy;
-        max-width: 50vw;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        word-wrap: break-word;
-
-        @include tablet() {
-          margin-left: 0px;
-          max-width: initial;
-          width: 100%;
-        }
-      }
-
-      div.header-timing {
-        @include avenir_M();
-        font-size: 14px;
-        color: rgba($ui_grey, 0.5);
-        margin-left: 8px;
-        float: left;
-        margin-top: 1px;
-
-        @include tablet() {
-          display: none;
-        }
-      }
     }
 
     div.fullscreen-post-header-right {
       position: absolute;
-      top: 20px;
+      top: 16px;
       right: 24px;
 
       div.more-menu {
@@ -213,23 +191,20 @@ div.fullscreen-post-container {
 
   &.editing, &.no-comments {
     div.fullscreen-post {
-      div.fullscreen-post-left-column {
-        left: 170px;
-      }
-
       div.fullscreen-post-right-column {
         opacity: 0;
-        pointer-events: none;
       }
     }
   }
 
   div.fullscreen-post {
-    margin: 100px auto 32px;
-    width: 1060px;
+    margin: 112px auto 32px;
+    width: 800px;
     position: relative;
     min-height: calc(100vh - 132px);
     height: auto;
+    box-shadow: 0px 2px 4px rgba($deep_tan, 0.5);
+    border-radius: 6px;
 
     @include tablet() {
       margin: 0px auto 32px;
@@ -241,12 +216,22 @@ div.fullscreen-post-container {
       background-color: white;
     }
 
+    div.fullscreen-post-separator {
+      opacity: 0.6;
+      background-image: linear-gradient(-180deg, #D8DBDF 0%, rgba(253,252,251,0.00) 100%);
+      width: 100%;
+      height: 4px;
+    }
+
     div.fullscreen-post-author-header {
-      display: none;
+      height: 65px;
+      background-color: $light_tan;
+      padding: 16px 24px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
 
       @include tablet() {
         display: block;
-        height: 64px;
         background-color: $light_tan;
         padding: 16px 24px;
 
@@ -270,14 +255,25 @@ div.fullscreen-post-container {
           color: $ui_grey;
         }
       }
+
+      div.fullscreen-post-author-head-author {
+        width: 55%;
+        padding-right: 20px;
+        overflow: hidden;
+        line-height: 18px;
+
+        @include activity-author(32);
+      }
+
+      @include new-tag();
+
+      @include section-tag();
     }
 
     div.fullscreen-post-left-column {
-      width: 720px;
+      width: 800px;
       position: relative;
-      left: 0px;
-      top: 0px;
-      transition: left 180ms ease-in;
+      background-color: white;
 
       @include tablet() {
         width: 100%;
@@ -286,10 +282,7 @@ div.fullscreen-post-container {
       }
 
       div.fullscreen-post-left-column-content {
-        box-shadow: 0px 2px 4px rgba($deep_tan, 0.5);
-        background-color: white;
-        border-radius: 6px;
-        padding: 40px;
+        padding: 36px 70px;
 
         @include tablet() {
           box-shadow: none;
@@ -301,6 +294,7 @@ div.fullscreen-post-container {
           @include avenir_M();
           font-size: 14px;
           color: $ui_grey;
+          margin-bottom: 16px;
 
           &.section-editing {
             color: $carrot_dark_gray;
@@ -392,7 +386,6 @@ div.fullscreen-post-container {
           font-size: 28px;
           color: $deep_navy;
           line-height: 36px;
-          margin-top: 16px;
           cursor: text;
           outline: none;
         }
@@ -410,7 +403,7 @@ div.fullscreen-post-container {
           div.rich-body-editor {
             border: none;
             outline: none;
-            margin: 24px 0px 0px;
+            margin: 22px 0px 0px;
             cursor: text;
             min-height: 85px;
             @include activity-body(18);
@@ -418,6 +411,10 @@ div.fullscreen-post-container {
             @include avenir_BOOK();
             font-size: 18px;
             line-height: 30px;
+
+            & > *:first-child {
+              margin-top: 0px;
+            }
 
             p:not(:last-child) {
               margin: 16px 0px;
@@ -444,7 +441,7 @@ div.fullscreen-post-container {
           font-size: 18px;
           color: $deep_navy;
           line-height: 30px;
-          margin-top: 32px;
+          margin-top: 22px;
 
           div.carrot-no-preview, a.carrot-no-preview {
             display: none;
@@ -519,11 +516,11 @@ div.fullscreen-post-container {
     }
 
     div.fullscreen-post-right-column {
-      width: 300px;
-      position: fixed;
-      top: 100px;
-      height: calc(100vh - 132px);
-      transition: opacity 180ms ease-in;
+      width: 800px;
+      padding: 24px 31px;
+      background-color: #FDFCFB;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
 
       @include tablet() {
         width: 100%;
@@ -553,19 +550,8 @@ div.fullscreen-post-container {
         }
       }
 
-      &.add-comment-focused {
-        div.stream-comments {
-          max-height: calc(100% - 132px);
-
-          @include tablet() {
-            max-height: initial;
-          }
-        }
-      }
-
       div.stream-comments {
         margin-top: 16px;
-        max-height: calc(100% - 64px);
 
         @include tablet() {
           background-color: white;
@@ -576,7 +562,6 @@ div.fullscreen-post-container {
         }
 
         @include tablet() {
-          max-height: initial;
 
           &:before {
             @include top-gradient(white);
@@ -589,8 +574,6 @@ div.fullscreen-post-container {
       }
 
       div.add-comment-box-container {
-        padding-right: 12px;
-        padding-top: 0px;
 
         @include tablet() {
           padding-right: 0px;

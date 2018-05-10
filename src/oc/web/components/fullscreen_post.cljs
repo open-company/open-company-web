@@ -316,43 +316,41 @@
           [:div.header-title-container-edit-title
             "Edit post"]]
         [:div.header-title-container.group.fs-hide
-          {:style {:opacity (if (and (not editing) (:first-render-done s)) "1" "0")
-                   :margin-left (when (and (not is-mobile?) (:first-render-done s))
-                                  (str "-" (/ (.width (js/$ "div.header-title-container")) 2) "px"))}}
-          (user-avatar-image (:publisher activity-data))
-          [:div.header-title
-            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          [:div.header-timing
-            [:time
-              {:date-time (:published-at activity-data)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-title (utils/activity-date-tooltip activity-data)}
-              (utils/time-since (:published-at activity-data))]]]
+          {:style {:opacity (if (and (not editing) (:first-render-done s)) "1" "0")}
+           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.fullscreen-post-header-right
-          (if editing
+          (when editing
             [:button.mlb-reset.post-publish-bt
               {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
-              "Post changes"]
-            (more-menu activity-data))]]
+              "Post changes"])]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
-        (when is-mobile?
-          [:div.fullscreen-post-author-header.group
+        [:div.fullscreen-post-author-header
+          [:div.fullscreen-post-author-head-author
             (user-avatar-image (:publisher activity-data))
-            [:div.fullscreen-post-author-header-title
-              (:name (:publisher activity-data))]
-            [:div.fullscreen-post-author-header-subtitle
-              [:time
-                {:date-time (:published-at activity-data)
-                 :title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since (:published-at activity-data))]]])
+            [:div.name.fs-hide (:name (:publisher activity-data))]
+            [:div.time-since
+              (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                [:time
+                  {:date-time t
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                   :data-title (utils/activity-date-tooltip activity-data)}
+                  (utils/time-since t)])]]
+          (more-menu activity-data)
+          [:div.section-tag
+            {:class (when (:new activity-data) "has-new")
+             :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]
+          (when (:new activity-data)
+            [:div.new-tag
+              "New"])]
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
-            (if editing
+            (when editing
               [:div.fullscreen-post-box-content-board.section-editing.group
                 [:span.posting-in-span
                   "Posted in "]
@@ -371,9 +369,7 @@
                         (dis/dispatch! [:input [:modal-editing-data]
                          (merge activity-editing {:board-slug (:slug section-data)
                                                   :board-name (:name section-data)
-                                                  :invite-note note})])))))]]
-              [:div.fullscreen-post-box-content-board
-                {:dangerouslySetInnerHTML (utils/emojify (str "Posted in " (:board-name activity-data)))}])
+                                                  :invite-note note})])))))]])
             [:div.fullscreen-post-box-content-headline.fs-hide
               {:content-editable editing
                :ref "edit-headline"
@@ -428,6 +424,8 @@
                     (when @(::show-legend s)
                       [:div.fullscreen-post-box-footer-legend-image])]]
                 (reactions activity-data))]]]
+        (when (:has-comments activity-data)
+          [:div.fullscreen-post-separator])
         ;; Right column
         (when (:has-comments activity-data)
           (let [activity-comments (-> modal-data
@@ -437,8 +435,7 @@
                 comments-data (or activity-comments (:comments activity-data))]
             [:div.fullscreen-post-right-column.group
               {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
-                                        :no-comments (zero? (count comments-data))})
-               :style {:right (when-not is-mobile? (str (/ (- (.-clientWidth (.-body js/document)) 1060) 2) "px"))}}
+                                        :no-comments (zero? (count comments-data))})}
               (when (:can-comment activity-data)
                 (add-comment activity-data))
               (stream-comments activity-data comments-data)]))]]))
