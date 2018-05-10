@@ -13,6 +13,8 @@
 
 (def auth-settings-key [:auth-settings])
 
+(def orgs-key :orgs)
+
 (defn org-key [org-slug]
   [(keyword org-slug)])
 
@@ -79,7 +81,7 @@
 (defn drv-spec [db route-db]
   {:base                [[] db]
    :route               [[] route-db]
-   :orgs                [[:base] (fn [base] (:orgs base))]
+   :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
@@ -322,6 +324,10 @@
   "Get the API entry point."
   ([] (api-entry-point @app-state))
   ([data] (get-in data api-entry-point-key)))
+
+(defn orgs-data
+  ([] (orgs-data @app-state))
+  ([data] (get data orgs-key)))
 
 (defn org-data
   "Get org data."

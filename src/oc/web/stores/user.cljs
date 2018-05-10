@@ -35,7 +35,11 @@
 
 ;; Auth Settings
 (defn auth-settings? []
-  (contains? @dispatcher/app-state :auth-settings))
+  (contains? @dispatcher/app-state (first dispatcher/auth-settings-key)))
+
+(defn auth-settings-status? []
+  (and (auth-settings?)
+       (contains? (dispatcher/auth-settings) :status)))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
@@ -212,13 +216,16 @@
   [db _]
   (dissoc db :jwt :latest-entry-point :latest-auth-settings))
 
+(defn orgs? []
+  (contains? @dispatcher/app-state dispatcher/orgs-key))
+
 ;; API entry point
 (defmethod dispatcher/action :entry-point
   [db [_ orgs collection]]
   (-> db
       (assoc :latest-entry-point (.getTime (js/Date.)))
       (dissoc :loading)
-      (assoc :orgs orgs)
+      (assoc dispatcher/orgs-key orgs)
       (assoc-in dispatcher/api-entry-point-key (:links collection))
       (dissoc :slack-lander-check-team-redirect :email-lander-check-team-redirect)))
 

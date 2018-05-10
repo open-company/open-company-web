@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local_settings :as ls]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
@@ -56,10 +57,10 @@
     ; Delay to let the last api request set the app-state data
     (when (jwt/jwt)
       (utils/after 100
-        #(when (and (contains? @dis/app-state :orgs)
-                    (contains? @dis/app-state (first dis/auth-settings-key))
-                    (contains? (get-in @dis/app-state dis/auth-settings-key) :status))
-            (check-user-walls (dis/auth-settings) (:orgs @dis/app-state))))))
+        #(when (and (user-store/orgs?)
+                    (user-store/auth-settings?)
+                    (user-store/auth-settings-status?))
+            (check-user-walls (dis/auth-settings) (dis/orgs-data))))))
   ([auth-settings orgs]
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]

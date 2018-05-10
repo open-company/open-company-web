@@ -120,7 +120,7 @@
           (org-created org-data))))
     (when (= status 409)
       ;; Redirect to the already available org
-      (router/nav! (oc-urls/org (:slug (first (:orgs @dis/app-state))))))))
+      (router/nav! (oc-urls/org (:slug (first (dis/orgs-data))))))))
 
 (defn org-create [org-data]
   (when-not (empty? (:name org-data))
