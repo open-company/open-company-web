@@ -207,7 +207,7 @@
                  :value (:domain um-domain-invite)
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                  :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-                 :placeholder "Domain, e.g. @amc.com"}]]
+                 :placeholder "Domain, e.g. @acme.com"}]]
             [:button.mlb-reset.mlb-default.add-email-domain-bt
               {:on-click #(let [domain (:domain um-domain-invite)]
                             (if (utils/valid-domain? domain)
