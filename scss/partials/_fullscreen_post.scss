@@ -148,10 +148,6 @@ div.fullscreen-post-container {
       top: 16px;
       right: 24px;
 
-      div.more-menu {
-        margin-top: 0px;
-      }
-
       button.post-publish-bt {
         position: absolute;
         top: -8px;
@@ -236,24 +232,6 @@ div.fullscreen-post-container {
         padding: 16px 24px;
 
         @include activity-author(32);
-
-        div.user-avatar-img-container {
-          float: left;
-        }
-
-        div.fullscreen-post-author-header-title {
-          margin-left: 48px;
-          @include avenir_H();
-          font-size: 14px;
-          color: $deep_navy;
-        }
-
-        div.fullscreen-post-author-header-subtitle {
-          margin-left: 48px;
-          @include avenir_M();
-          font-size: 12px;
-          color: $ui_grey;
-        }
       }
 
       div.fullscreen-post-author-head-author {
@@ -261,13 +239,19 @@ div.fullscreen-post-container {
         padding-right: 20px;
         overflow: hidden;
         line-height: 18px;
+        float: left;
 
         @include activity-author(32);
       }
 
-      @include new-tag();
+      div.fullscreen-post-author-header-right {
+        float: right;
+        width: 45%;
 
-      @include section-tag();
+        @include new-tag();
+
+        @include section-tag();
+      }
     }
 
     div.fullscreen-post-left-column {

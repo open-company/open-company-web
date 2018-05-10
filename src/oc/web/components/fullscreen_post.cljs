@@ -340,13 +340,14 @@
                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                    :data-title (utils/activity-date-tooltip activity-data)}
                   (utils/time-since t)])]]
-          (more-menu activity-data)
-          [:div.section-tag
-            {:class (when (:new activity-data) "has-new")
-             :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]
-          (when (:new activity-data)
-            [:div.new-tag
-              "New"])]
+          [:div.fullscreen-post-author-header-right
+            (more-menu activity-data)
+            [:div.section-tag
+              {:class (when (:new activity-data) "has-new")
+               :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]
+            (when (:new activity-data)
+              [:div.new-tag
+                "New"])]]
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
