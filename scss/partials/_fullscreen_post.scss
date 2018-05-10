@@ -433,7 +433,9 @@ div.fullscreen-post-container {
         }
 
         div.fullscreen-post-box-footer {
-          margin-top: 32px;
+          margin-top: 16px;
+          border-top: 1px solid #ECECEC;
+          padding-top: 16px;
 
           div.fullscreen-post-box-footer-editing {
             div.fullscreen-post-box-footer-multi-picker {
