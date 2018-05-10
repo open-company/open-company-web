@@ -65,13 +65,18 @@
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
       (cond
+        (= ["add-to-slack"] (:route @router/path))
+        false
+
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
+
         (or (status-response :name-required)
             (:new-slack-user @dis/app-state))
         (if has-orgs
           (router/nav! oc-urls/confirm-invitation-profile)
           (router/nav! oc-urls/sign-up-profile))
+
         :else
         (when-not has-orgs
           (router/nav! oc-urls/sign-up-team))))))
