@@ -47,7 +47,7 @@
                               (group-by :user-id (map :author (sort-by :created-at comments-data))))))
                            (reverse (:authors comments-link)))
         comments-count (max (count comments-data) (:count comments-link))
-        face-pile-count (min max-face-pile comments-count)]
+        face-pile-count (min max-face-pile (count comments-authors))]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))
