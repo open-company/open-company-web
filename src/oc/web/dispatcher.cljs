@@ -13,6 +13,8 @@
 
 (def auth-settings-key [:auth-settings])
 
+(def orgs-key :orgs)
+
 (defn org-key [org-slug]
   [(keyword org-slug)])
 
@@ -79,7 +81,7 @@
 (defn drv-spec [db route-db]
   {:base                [[] db]
    :route               [[] route-db]
-   :orgs                [[:base] (fn [base] (:orgs base))]
+   :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
@@ -238,7 +240,15 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
-   :confirm-invitation    [[:base :jwt]
+   :confirm-invitation    [[:base :route :auth-settings :jwt]
+                            (fn [base route auth-settings jwt]
+                              {:invitation-confirmed (:email-confirmed base)
+                               :invitation-error (and (contains? base :email-confirmed)
+                                                      (not (:email-confirmed base)))
+                               :auth-settings auth-settings
+                               :token (:token (:query-params route))
+                               :jwt jwt})]
+   :collect-password      [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)
                                :collect-pswd (:collect-pswd base)
@@ -319,6 +329,10 @@
   "Get the current logged in user info."
   ([] (current-user-data @app-state))
   ([data] (get-in data [:current-user-data])))
+
+(defn orgs-data
+  ([] (orgs-data @app-state))
+  ([data] (get data orgs-key)))
 
 (defn org-data
   "Get org data."

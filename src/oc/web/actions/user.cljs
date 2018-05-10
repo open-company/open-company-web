@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local_settings :as ls]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
@@ -45,6 +46,36 @@
 (defn get-whats-new-cb [{:keys [body success]}]
   (dis/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})]))
 
+;;User walls
+(defn- check-user-walls
+  "Check if one of the following is present and redirect to the proper wall if needed:
+  :password-required redirect to password collect
+  :name-required redirect to first and last name collect
+
+  Use the orgs value to determine if the user has already at least one org set"
+  ([]
+    ; Delay to let the last api request set the app-state data
+    (when (jwt/jwt)
+      (utils/after 100
+        #(when (and (user-store/orgs?)
+                    (user-store/auth-settings?)
+                    (user-store/auth-settings-status?))
+            (check-user-walls (dis/auth-settings) (dis/orgs-data))))))
+  ([auth-settings orgs]
+    (let [status-response (set (map keyword (:status auth-settings)))
+          has-orgs (pos? (count orgs))]
+      (cond
+        (status-response :password-required)
+        (router/nav! oc-urls/confirm-invitation-password)
+        (or (status-response :name-required)
+            (:new-slack-user @dis/app-state))
+        (if has-orgs
+          (router/nav! oc-urls/confirm-invitation-profile)
+          (router/nav! oc-urls/sign-up-profile))
+        :else
+        (when-not has-orgs
+          (router/nav! oc-urls/sign-up-team))))))
+
 ;; API Entry point
 (defn entry-point-get-finished
   ([success body] (entry-point-get-finished success body #()))
@@ -56,7 +87,8 @@
         (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
           (api/get-whats-new whats-new-link get-whats-new-cb))
         (callback orgs collection)
-        (dis/dispatch! [:entry-point orgs collection]))
+        (dis/dispatch! [:entry-point orgs collection])
+        (check-user-walls))
       (error-banner-actions/show-banner utils/generic-network-error 0)))))
 
 (defn entry-point-get [org-slug]
@@ -77,7 +109,9 @@
              ;; if so the entry point response can not include the specified org
              (when-not (router/current-secure-activity-id)
                (router/redirect-404!)))
-           (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
+           (when (and (jwt/jwt)
+                      (utils/in? (:route @router/path) "login")
+                      (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
 (defn slack-lander-new-user []
@@ -108,7 +142,8 @@
           (api/get-entry-point
            (fn [success body] (entry-point-get-finished success body
              (fn [orgs collection]
-               (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
+               (when (pos? (count orgs))
+                 (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -161,18 +196,19 @@
   (dis/dispatch! [:login-overlay-show login-type]))
 
 ;; Auth
+
 (defn auth-settings-get
-  ([] (auth-settings-get #()))
-  ([cb]
-    (api/get-auth-settings (fn [body]
-      (when body
-        ;; auth settings loaded
-        (api/get-current-user body (fn [data]
-          (dis/dispatch! [:user-data (json->cljs data)])))
-        (dis/dispatch! [:auth-settings body])
-        ;; Start teams retrieve if we have a link
-        (team-actions/teams-get)
-        (cb body))))))
+  "Entry point call for auth service."
+  []
+  (api/get-auth-settings (fn [body]
+    (when body
+      ;; auth settings loaded
+      (api/get-current-user body (fn [data]
+        (dis/dispatch! [:user-data (json->cljs data)])))
+      (dis/dispatch! [:auth-settings body])
+      (check-user-walls)
+      ;; Start teams retrieve if we have a link
+      (team-actions/teams-get)))))
 
 (defn bot-auth [org-data team-data user-data]
   (let [current (router/get-token)
@@ -186,12 +222,14 @@
 
 ;;Invitation
 (defn invitation-confirmed [status body success]
-  (when (= status 201)
-    (api/get-entry-point entry-point-get-finished)
-    (auth-settings-get))
-  (when success
-    (update-jwt body))
-  (dis/dispatch! [:invitation-confirmed (= status 201)]))
+ (when success
+    (when (= status 201)
+      (api/get-entry-point entry-point-get-finished)
+      (auth-settings-get))
+    (update-jwt body)
+    ;; Go to password setup
+    (router/nav! oc-urls/confirm-invitation-password))
+  (dis/dispatch! [:invitation-confirmed success]))
 
 (defn confirm-invitation [token]
   (api/confirm-invitation token invitation-confirmed))
@@ -247,8 +285,7 @@
        (fn [success body]
          (entry-point-get-finished success body
            (fn [orgs collection]
-             (if (zero? (count orgs))
-               (router/nav! oc-urls/sign-up-team)
+             (when (pos? (count orgs))
                (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
@@ -278,19 +315,6 @@
 
 (defn signup-with-email-reset-errors []
   (dis/dispatch! [:input [:signup-with-email] {}]))
-
-(defn name-password-collect [form-data]
-  (api/collect-name-password
-   (:firstname form-data)
-   (:lastname form-data)
-   (:pswd form-data)
-   (fn [status body success]
-     (if-not success
-       (dis/dispatch! [:name-pswd-collect/finish status nil])
-       (when success
-         (dis/dispatch! [:name-pswd-collect/finish status (json->cljs body)])
-         (utils/after 1000 jwt-refresh)))))
-  (dis/dispatch! [:name-pswd-collect]))
 
 (defn pswd-collect [form-data password-reset?]
   (api/collect-password (:pswd form-data)
