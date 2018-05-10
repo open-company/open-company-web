@@ -1,6 +1,6 @@
 div.stream-item {
   width: #{$board_container_width}px;
-  margin-top: 16px;
+  margin: 12px 0px 16px;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   border-radius: 6px;
 
@@ -124,11 +124,15 @@ div.stream-item {
           }
 
           div.stream-item-body-inner {
-            margin-top: 24px;
+            margin-top: 20px;
             @include activity-body(20, 28, 28);
             @include avenir_R();
             color: $deep_navy;
             line-height: 30px;
+
+            &>*:first-child {
+              margin-top: 0px;
+            }
 
             div.carrot-no-preview, a.carrot-no-preview {
               display: none;
@@ -150,6 +154,10 @@ div.stream-item {
           background-size: 14px 8px;
           background-position: 0px 23px;
           background-repeat: no-repeat;
+
+          &.expanded {
+            transform: rotate(180deg);
+          }
         }
       }
 

@@ -125,11 +125,6 @@ div.activity-card {
       text-overflow: ellipsis;
 
       @include activity-author(32);
-
-
-      div.user-avatar-img-container {
-        margin-right: 13px;
-      }
     }
 
     $right_max_width: 260;

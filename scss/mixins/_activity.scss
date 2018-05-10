@@ -7,7 +7,7 @@ $h2_top_margin: 24;
 @mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
     float: left;
-    margin-right: 16px;
+    margin-right: 13px;
   }
 
   @include user-profile($avatar_size);
@@ -201,7 +201,7 @@ $h2_top_margin: 24;
   }
 
   b, strong{
-    @include avenir_BOOK();
+    @include avenir_R();
     color: $deep_navy;
     font-weight: 700;
   }
@@ -216,11 +216,7 @@ $h2_top_margin: 24;
 
   h2 {
     @include avenir_H();
-    font-size: #{$font-size + 3}px;
-
-    .emojione {
-      @include emoji-size($font-size + 1);
-    }
+    font-size: #{$font-size}px;
   }
 
   a, span[data-auto-link] {

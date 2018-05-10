@@ -26,9 +26,8 @@
       (when (and (not should-hide-body)
                  (not @(::should-show-comments s)))
         (reset! (::should-show-comments s) true))
-      (if should-hide-body
-        (.add (.-classList dom-node) "show-continue-reading")
-        (.remove (.-classList dom-node) "show-continue-reading")))))
+      (when should-hide-body
+        (.add (.-classList dom-node) "show-continue-reading")))))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -103,23 +102,24 @@
                 {:ref "item-body"
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
             [:button.mlb-reset.expand-button
-              {:on-click #(do
-                           (reset! (::expanded s) true)
+              {:class (when expanded? "expanded")
+               :on-click #(do
+                           (swap! (::expanded s) not)
                            (reset! (::should-show-comments s) true))}
-              "Keep reading"]]
+              (if expanded?
+                "Show less"
+                "Keep reading")]]
           (stream-attachments activity-attachments)
           [:div.stream-item-separator]
           [:div.stream-item-reactions.group
             {:ref "stream-item-reactions"}
             (reactions activity-data)]
           (when (and is-mobile?
-                     (not @(::should-show-comments s))
                      (pos? (count comments-data)))
             [:div.stream-mobile-comments-summary
               {:on-click (fn [e]
                             (utils/event-stop e)
                             (reset! (::expanded s) true)
-                            (reset! (::should-show-comments s) true)
                             (reset! (::should-scroll-to-comments s) true))}
               (when-not (zero? (count comments-data))
                 (comments-summary activity-data false))])
