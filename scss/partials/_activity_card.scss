@@ -256,6 +256,7 @@ div.activity-card {
   }
 
   div.activity-card-attachments {
+    height: 17px;
     margin-top: 10px;
     @include avenir_M();
     font-size: 12px;
