@@ -110,7 +110,9 @@
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
-  (when (= (:new query-params) "true")
+  (when (or
+         (= (:new query-params) "true")
+         (= (:new-slack-user query-params) "true"))
     (swap! dis/app-state assoc :new-slack-user true))
   (inject-loading))
 
@@ -276,7 +278,7 @@
 
 (defn slack-lander-check-bot [params]
   (pre-routing (:query-params params) true)
-  (let [new-user (= (:new (:query-params params)) "true")]
+  (let [new-user (= (:new-slack-user (:query-params params)) "true")]
     (when new-user (user-actions/slack-lander-new-user))
     (if new-user
       (utils/after 100 #(router/nav! urls/sign-up-profile))

@@ -64,6 +64,7 @@
   ([auth-settings orgs]
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
+      (timbre/debug (:new-slack-user @dis/app-state))
       (cond
         (= ["add-to-slack"] (:route @router/path))
         false
@@ -175,11 +176,11 @@
       (router/redirect! oc-urls/logout)))))
 
 (defn add-to-slack [params]
-  (timbre/debug params)
   (let [bot-ids (clojure.string/split (:bot-ids params) #":")
         team-id (first bot-ids)
         user-id (second bot-ids)
         bot-id (last bot-ids)
+        new-user (= (:new params) "true")
         auth-link (utils/link-for (:links (dis/auth-settings))
                                   "bot"
                                   "GET"
@@ -191,10 +192,11 @@
                                  "open-company-auth:"
                                  team-id ":"
                                  user-id ":"
-                                 oc-urls/slack-lander-bot-check ":"
+                                 oc-urls/slack-lander-bot-check
+                                 (when new-user
+                                   (str "?new-slack-user=true"))
+                                 ":"
                                  bot-id))]
-    (timbre/debug auth-link)
-    (timbre/debug auth-url-with-redirect)
     (router/redirect! auth-url-with-redirect)))
 
 (defn show-login [login-type]
