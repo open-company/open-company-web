@@ -59,14 +59,14 @@ $h2_top_margin: 24;
   div.section-tag {
     float: right;
     margin-right: 8px;
-    background-color: $deep_tan;
+    background-color: #E7E6E1;
     border-radius: 100px;
     height: 26px;
     color: $ui_grey;
     @include avenir_H();
     font-size: 12px;
-    padding: 5px 9px 6px 9px;
-    border: 1px solid $deep_tan;
+    padding: 5px 12px 6px 12px;
+    border: 1px solid #E7E6E1;
     margin-top: 3px;
     overflow: hidden;
     text-overflow: ellipsis;
