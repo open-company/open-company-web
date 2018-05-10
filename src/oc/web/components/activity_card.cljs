@@ -101,6 +101,5 @@
             [:div.activity-card-attachments
               (activity-attachments activity-data)])]
         [:div.activity-card-footer.group
-          [:div.activity-card-footer-divider-line]
           (reactions activity-data)
           (comments-summary activity-data)]]]))

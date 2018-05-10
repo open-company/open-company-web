@@ -5,6 +5,12 @@ div.activity-card {
   border-radius: 6px;
   margin: 12px;
   position: relative;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+
+  * {
+    cursor: pointer;
+  }
 
   &:nth-child(even) {
     margin: 12px 0px 12px 12px;
@@ -20,20 +26,8 @@ div.activity-card {
   }
 
   &:hover, &.dropdown-active {
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
     @include big_web() {
-      div.activity-card-shadow-container {
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-      }
-
-      div.activity-card-head.entry-card {
-        background-color: $carrot_light_gray_5;
-      }
-
-      div.activity-card-head div.activity-card-head-right {
-        div.activity-tag {
-          background-color: $carrot_light_gray_6;
-        }
-      }
 
       div.activity-card-footer {
         button.post-edit {
@@ -113,10 +107,10 @@ div.activity-card {
 
   div.activity-card-head {
     width: 100%;
-    padding: 20px 24px;
+    padding: 16px 24px;
     height: 72px;
     display: flex;
-    background-color: $light_tan;
+    background-color: #E7E6E1;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
 
@@ -138,11 +132,14 @@ div.activity-card {
       @include new-tag();
 
       @include section-tag($right_max_width);
+
+      div.section-tag {
+        background-color: $carrot_light_gray_6 !important;
+      }
     }
   }
 
   div.activity-card-shadow-container {
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 
@@ -153,13 +150,12 @@ div.activity-card {
 
   div.activity-card-content {
     width: 100%;
-    padding: 32px 32px 0px;
+    padding: 24px 24px 0px;
 
     div.activity-card-headline {
       @include activity-title();
       @include avenir_H();
-      font-size: 20px;
-      line-height: 28px;
+      font-size: 18px;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
@@ -174,11 +170,11 @@ div.activity-card {
 
     @include activity-media-preview();
 
-    $line_height: 20;
+    $line_height: 18;
     $body_height: $line_height*3;
     div.activity-card-body {
-      margin-top: 12px;
-      @include activity-body(16, $line_height, $line_height);
+      margin-top: 10px;
+      @include activity-body(14, $line_height, $line_height);
       @include avenir_M();
       color: $deep_navy;
       line-height: #{$line_height}px;
@@ -189,7 +185,7 @@ div.activity-card {
       h2 {
         line-height: #{$line_height}px;
         @include avenir_M();
-        font-size: 16px;
+        font-size: 14px;
         font-weight: normal;
       }
 
@@ -228,6 +224,9 @@ div.activity-card {
       }
 
       b, strong {
+        line-height: #{$line_height}px;
+        @include avenir_M();
+        font-size: 14px;
         font-weight: normal;
       }
 
@@ -254,7 +253,7 @@ div.activity-card {
   }
 
   div.activity-card-attachments {
-    margin-top: 16px;
+    margin-top: 14px;
     height: 26px;
 
     div.activity-attachments {
@@ -264,8 +263,7 @@ div.activity-card {
 
   div.activity-card-footer {
     width: 100%;
-    padding: 16px 32px 32px;
-    min-height: 82px;
+    padding: 16px 24px 24px;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 
