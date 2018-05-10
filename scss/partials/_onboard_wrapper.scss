@@ -685,3 +685,53 @@ div.onboard-lander {
     }
   }
 }
+
+div.onboard-add-to-slack-container {
+
+  div.onboard-add-to-slack-title {
+    @include avenir_R();
+    font-size: 32px;
+    font-weight: bold;
+    margin: 100px 150px 20px 150px;
+  }
+
+  p.carrot-continue {
+    @include avenir_R();
+    margin: 60px 120px 20px 120px;
+    font-size: 14px;
+    color: rgba($oc_gray_7, 0.5);
+  }
+
+  div.onboard-add-to-slack-features {
+    margin: 0px 0px 20px 0px;
+
+    .title {
+      @include avenir_R();
+      font-size: 18px;
+      font-weight: bold;
+      padding: 10px 0px 16px 120px;
+      margin: 0px;
+      text-align: left;
+    }
+
+    ul {
+
+      list-style: none;
+      padding: 0px;
+      margin: 0px;
+
+      li {
+        @include avenir_R();
+        margin: 0px 120px 0px 120px;
+        padding: 20px 0px 20px 0px;
+        text-align: left;
+        border-top: 1px solid rgba($carrot_light_gray_1, 0.5);
+      }
+
+      li:before {
+        content: "✅";
+        padding-right: 10px;
+      }
+    }
+  }
+}
