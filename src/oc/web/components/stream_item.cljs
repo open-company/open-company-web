@@ -133,7 +133,7 @@
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-mobile-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data)])]
+              (stream-comments activity-data comments-data true)])]
         [:div.stream-body-separator]
         (when (and (not is-mobile?)
                    (:has-comments activity-data))
@@ -146,4 +146,4 @@
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data)]])]]))
+              (stream-comments activity-data comments-data true)]])]]))

@@ -109,8 +109,8 @@
                                  (events/unlistenByKey @(::click-listener s))
                                  (reset! (::click-listener s) nil))
                                s)}
-  [s activity-data comments-data]
-  (let [should-collapse-list (> (count comments-data) default-collapse-list-count)
+  [s activity-data comments-data collapse-comments]
+  (let [should-collapse-list (and collapse-comments (> (count comments-data) default-collapse-list-count))
         comments-to-render (if (and should-collapse-list
                                     @(::collapse-list s))
                             (take default-collapse-list-count comments-data)
