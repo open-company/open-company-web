@@ -761,7 +761,7 @@
   [s]
   (let [query-params (drv/react s :query-params)]
     [:div.onboard-add-to-slack-container
-      [:div.onboard-add-to-slack-title "Enable these Carrot features for your Slack team."]
+      [:div.onboard-add-to-slack-title "Enable these Carrot features for Slack."]
       [:div.onboard-add-to-slack-features
         [:div.title "With carrot added to your Slack workspace, you can:"]
         [:ul
@@ -776,7 +776,7 @@
                :height "80"
                :width "278"
                :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
-      [:p.carrot-continue "You need Slack Permission in order to add Carrot to your Slack workspace. If you don't have this permission, you can continue on to Carrot."]
+      [:p.carrot-continue "You need Slack Permission in order to add Carrot to your Slack workspace. If you don't have this permission, you can skip this."]
       [:a.carrot-skip {:href "/"} "Skip for now"]]))
 
 
