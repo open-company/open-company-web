@@ -250,7 +250,7 @@
                     [:option
                       {:value :all}
                       "Public readonly"]]]]
-              (when (= @(::url-audience s) :team)
+              (when (not= @(::url-audience s) :team)
                 [:div.url-audience-description
                   (str "Sharing this URL will allow non-registered users to access post content. "
                        "Note that activity from non-registered users will be exempt from post analytics.")])
