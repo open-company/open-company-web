@@ -133,33 +133,7 @@
                     [:div.stream-comment-author-name
                       (:name (:author comment-data))]
                     [:div.stream-comment-author-timestamp
-                      (utils/time-since (:created-at comment-data))]]
-                  (when (or (and (:can-edit comment-data)
-                                 (not (:is-emoji comment-data)))
-                            (:can-delete comment-data))
-                    (let [showing-more-menu (= @(::showing-menu s) (:uuid comment-data))]
-                      [:div.stream-comment-more-menu-container
-                        {:ref (str "comment-more-menu-" (:uuid comment-data))}
-                        [:button.comment-more-menu.mlb-reset
-                          {:class (when showing-more-menu "active")
-                           :on-click (fn [e]
-                                      (utils/event-stop e)
-                                      (reset! (::showing-menu s) (:uuid comment-data)))}]
-                        (when showing-more-menu
-                          [:div.stream-comment-more-menu
-                            (when (and (:can-edit comment-data)
-                                       (not (:is-emoji comment-data)))
-                              [:div.stream-comment-more-menu-item.edit
-                                {:on-click #(do
-                                              (reset! (::showing-menu s) false)
-                                              (start-editing s comment-data))}
-                                "Edit"])
-                            (when (:can-delete comment-data)
-                              [:div.stream-comment-more-menu-item.delete
-                                {:on-click #(do
-                                             (reset! (::showing-menu s) false)
-                                             (delete-clicked % activity-data comment-data))}
-                                "Delete"])])]))]
+                      (utils/time-since (:created-at comment-data))]]]
                 [:div.stream-comment-content
                   [:div.stream-comment-body.fs-hide
                     {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
@@ -171,6 +145,10 @@
                      :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                               :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))})}]]
                 (when (or is-editing?
+                          (and (not is-editing?)
+                               (or (and (:can-edit comment-data)
+                                        (not (:is-emoji comment-data)))
+                                   (:can-delete comment-data)))
                           (and (not is-editing?)
                                (not (:is-emoji comment-data))
                                (or (:can-react comment-data)
@@ -191,14 +169,41 @@
                           (when (pos? (:count reaction-data))
                             [:div.stream-comment-reaction-count
                               (:count reaction-data)])])
-                      (when is-editing?
-                        [:div.save-cancel-edit-buttons
-                          [:button.mlb-reset.mlb-link-green
-                            {:on-click #(edit-finished % s comment-data)}
-                            "Save"]
-                          [:button.mlb-reset.mlb-link-black
-                            {:on-click #(cancel-edit % s comment-data)}
-                            "Cancel"]])])]])
+                    (when (and (not is-editing?)
+                               (or (and (:can-edit comment-data)
+                                        (not (:is-emoji comment-data)))
+                                   (:can-delete comment-data)))
+                      (let [showing-more-menu (= @(::showing-menu s) (:uuid comment-data))]
+                        [:div.stream-comment-more-menu-container
+                          {:ref (str "comment-more-menu-" (:uuid comment-data))}
+                          [:button.comment-more-menu.mlb-reset
+                            {:class (when showing-more-menu "active")
+                             :on-click (fn [e]
+                                        (utils/event-stop e)
+                                        (reset! (::showing-menu s) (:uuid comment-data)))}]
+                          (when showing-more-menu
+                            [:div.stream-comment-more-menu
+                              (when (and (:can-edit comment-data)
+                                         (not (:is-emoji comment-data)))
+                                [:div.stream-comment-more-menu-item.edit
+                                  {:on-click #(do
+                                                (reset! (::showing-menu s) false)
+                                                (start-editing s comment-data))}
+                                  "Edit"])
+                              (when (:can-delete comment-data)
+                                [:div.stream-comment-more-menu-item.delete
+                                  {:on-click #(do
+                                               (reset! (::showing-menu s) false)
+                                               (delete-clicked % activity-data comment-data))}
+                                  "Delete"])])]))
+                    (when is-editing?
+                      [:div.save-cancel-edit-buttons
+                        [:button.mlb-reset.mlb-link-green
+                          {:on-click #(edit-finished % s comment-data)}
+                          "Save"]
+                        [:button.mlb-reset.mlb-link-black
+                          {:on-click #(cancel-edit % s comment-data)}
+                          "Cancel"]])])]])
           (when should-collapse-list
             [:div.stream-comments-expand
               {:class (if @(::collapse-list s) "collapsed" "expanded")

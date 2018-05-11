@@ -102,5 +102,6 @@
                 (when (pos? atch-num)
                   (str "+" atch-num " attachment" (when (not= atch-num 1) "s")))]))]
         [:div.activity-card-footer.group
-          (reactions activity-data)
+          (reactions activity-data (and (:has-comments activity-data)
+                                        (= (count (:reactions activity-data)) 4)))
           (comments-summary activity-data)]]]))

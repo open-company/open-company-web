@@ -28,7 +28,6 @@
               [:div.attachment-info
                 {:class (when editable? "editable")}
                 [:span.attachment-name file-name]
-                [:span.attachment-content-separator]
                 [:span.attachment-description subtitle]
                 (when editable?
                   [:button.mlb-reset.remove-attachment-bt

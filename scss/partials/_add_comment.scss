@@ -1,6 +1,7 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
+  margin-bottom: 8px;
 
   @include tablet() {
     padding: 16px 0px 0px;
@@ -40,14 +41,12 @@ div.add-comment-box-container {
       min-height: 24px;
       width: 100%;
       background-color: white;
-      border-radius: 4px;
+      border-radius: 6px;
       border: 2px solid $deep_tan;
-      box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.07);
-      padding: 10px 16px;
+      padding: 9px 16px;
 
       &:hover {
-        box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
-        border: 2px solid $light_ui_grey;
+        border: 2px solid #D8DBDF;
       }
 
       div.add-comment-user-avatar {

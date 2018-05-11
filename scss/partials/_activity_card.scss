@@ -153,7 +153,7 @@ div.activity-card {
 
   div.activity-card-content {
     width: 100%;
-    padding: 22px 24px 0px;
+    padding: 24px 24px 0px;
 
     div.activity-card-headline {
       @include activity-title();
@@ -165,6 +165,7 @@ div.activity-card {
       overflow: hidden;
       white-space: nowrap;
       max-height: 31px;
+      line-height: 20px;
 
       @include mobile() {
         margin-top: 16px;
@@ -176,7 +177,7 @@ div.activity-card {
     $line_height: 18;
     $body_height: $line_height*3;
     div.activity-card-body {
-      margin-top: 4px;
+      margin-top: 10px;
       @include activity-body(14, $line_height, $line_height);
       @include avenir_R();
       color: $deep_navy;
@@ -256,10 +257,10 @@ div.activity-card {
   }
 
   div.activity-card-attachments {
-    height: 17px;
-    margin-top: 10px;
+    margin-top: 14px;
     @include avenir_M();
     font-size: 12px;
+    line-height: 16px;
     color: $ui_grey;
   }
 
