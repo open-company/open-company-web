@@ -427,8 +427,11 @@
   (api/delete-activity activity-data activity-delete-finish)
   (dis/dispatch! [:activity-delete (dis/current-board-key) activity-data]))
 
-(defn activity-share-show [activity-data]
-  (dis/dispatch! [:activity-share-show activity-data]))
+(defn activity-share-show [activity-data & [element]]
+  (let [share-container (when element
+                          (.get (.find (.closest (js/$ element) ".activity-share-card") ".activity-share-container") 0))]
+    (js/console.log "activity-share-show:" share-container)
+    (dis/dispatch! [:activity-share-show activity-data share-container])))
 
 (defn activity-share-hide []
   (dis/dispatch! [:activity-share-hide]))

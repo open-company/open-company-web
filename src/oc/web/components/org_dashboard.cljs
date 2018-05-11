@@ -83,7 +83,8 @@
                 show-section-add
                 show-sections-picker
                 entry-editing-board-slug
-                mobile-navigation-sidebar]} (drv/react s :org-dashboard-data)
+                mobile-navigation-sidebar
+                activity-share-container]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (= nux :1)
         search-active? (drv/react s search/search-active?)
@@ -179,7 +180,9 @@
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
-          (activity-share))
+          (if activity-share-container
+            (rum/portal (activity-share) activity-share-container)
+            (activity-share)))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))

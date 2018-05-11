@@ -75,5 +75,5 @@
                 "Delete"])
             (when share-link
              [:li.share
-               {:on-click #(activity-actions/activity-share-show activity-data)}
+               {:on-click #(activity-actions/activity-share-show activity-data (.-target %))}
                "Share"])])])))

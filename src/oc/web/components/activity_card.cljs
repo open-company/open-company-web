@@ -46,7 +46,7 @@
         nux (drv/react s :nux)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))]
-    [:div.activity-card
+    [:div.activity-card.activity-share-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true})
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
@@ -61,6 +61,7 @@
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions])))
 
                       (activity-actions/activity-modal-fade-in activity-data))))}
+      [:div.activity-share-container]
       ; Card header
       [:div.activity-card-head.entry-card.group
         ; Card author

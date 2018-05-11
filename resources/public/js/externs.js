@@ -45,6 +45,7 @@ $.trigger = function(){};
 $.ajax = function(){};
 $.outerHeight = function(){};
 $.after = function(){};
+$.closest = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};

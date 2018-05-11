@@ -67,9 +67,10 @@
         activity-attachments (:attachments activity-data)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))]
-    [:div.stream-view-item
+    [:div.stream-view-item.activity-share-card
       {:class (utils/class-set {(str "stream-view-item-" (:uuid activity-data)) true
                                 :expanded expanded?})}
+      [:div.activity-share-container]
       [:div.stream-view-item-header
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))

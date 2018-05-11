@@ -336,8 +336,9 @@
                :class (when @(::entry-saving s) "loading")}
               "Post changes"]
             (more-menu activity-data))]]
-      [:div.fullscreen-post.group
+      [:div.fullscreen-post.activity-share-card.group
         {:ref "fullscreen-post"}
+        [:div.activity-share-container]
         (when is-mobile?
           [:div.fullscreen-post-author-header.group
             (user-avatar-image (:publisher activity-data))
