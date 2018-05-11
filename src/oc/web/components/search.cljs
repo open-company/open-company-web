@@ -29,14 +29,13 @@
                           :avatar-url (first (:author-url result))} false)
       [:div.title {:dangerouslySetInnerHTML title}]
       [:div.time-since
-       (let [t (or (:published-at result) (:created-at result))]
-         [:time
-          {:date-time t
-           :data-toggle "tooltip"
-           :data-placement "top"
-           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-           :data-title (utils/activity-date-tooltip result)}
-          (utils/time-since t)])]
+       [:time
+        {:date-time (or (:published-at result) (:created-at result))
+         :data-toggle "tooltip"
+         :data-placement "top"
+         :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+         :title (:time-tooltip result)}
+        (:time-since result)]]
       ]]))
 
 (rum/defcs board-display < rum/static

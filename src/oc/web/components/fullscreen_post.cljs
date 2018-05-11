@@ -325,9 +325,10 @@
             [:time
               {:date-time (:published-at activity-data)
                :data-toggle "tooltip"
-               :data-placement "top"
-               :data-title (utils/activity-date-tooltip activity-data)}
-              (utils/time-since (:published-at activity-data))]]]
+               :data-placement "bottom"
+               :data-container "body"
+               :title (:time-tooltip activity-data)}
+              (:time-since activity-data)]]]
         [:div.fullscreen-post-header-right
           (if editing
             [:button.mlb-reset.post-publish-bt
@@ -346,7 +347,7 @@
             [:div.fullscreen-post-author-header-subtitle
               [:time
                 {:date-time (:published-at activity-data)
-                 :title (utils/activity-date-tooltip activity-data)}
+                 :title (:time-tooltip activity-data)}
                 (utils/time-since (:published-at activity-data))]]])
         ;; Left column
         [:div.fullscreen-post-left-column

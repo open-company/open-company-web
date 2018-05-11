@@ -68,14 +68,13 @@
           (user-avatar-image (:publisher activity-data))
           [:div.name.fs-hide (:name (:publisher activity-data))]
           [:div.time-since
-            (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
+          [:time
+            {:date-time (:published-at activity-data)
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+             :title (:time-tooltip activity-data)}
+            (:time-since activity-data)]]]
         ; Card labels
         [:div.activity-card-head-right
           (when-not nux

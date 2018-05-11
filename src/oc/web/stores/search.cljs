@@ -1,6 +1,7 @@
 (ns oc.web.stores.search
   (:require [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dispatcher]))
 
 (def lastsearch (atom ""))
@@ -32,8 +33,9 @@
   (vec (map (fn [result]
               (let [source (:_source result)
                     new-uuid (clojure.string/replace (:uuid source)
-                                                     "entry-" "")]
-                (assoc result :_source (assoc source :uuid new-uuid))))
+                                                     "entry-" "")
+                    fixed-result (utils/fix-entry result nil)]
+                (assoc fixed-result :_source (assoc source :uuid new-uuid))))
             results)))
 
 (defmethod dispatcher/action :search-query/finish
