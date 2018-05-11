@@ -461,19 +461,61 @@
               {:on-click #(org-actions/org-redirect org-data)}
               "Skip for now"]]]]]))
 
+(defn dots-animation [s]
+  (when-let [dots-node (rum/ref-node s :dots)]
+    (let [dots (.-innerText dots-node)
+          next-dots (case dots
+                      "." ".."
+                      ".." "..."
+                      ".")]
+      (set! (.-innerText dots-node) next-dots)
+      (utils/after 800 #(dots-animation s)))))
+
+(defn confirm-invitation-when-ready [s]
+  (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]
+    (when (and (:auth-settings confirm-invitation)
+               (not @(::exchange-started s)))
+      (reset! (::exchange-started s) true)
+      (user-actions/confirm-invitation (:token confirm-invitation)))))
+
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
-                            (rum/local false ::password-error)
-                            {:did-mount (fn [s]
-                              (delay-focus-field-with-ref s "password")
+                            (rum/local false ::exchange-started)
+                            {:will-mount (fn [s]
+                              (confirm-invitation-when-ready s)
+                              s)
+                             :did-mount (fn [s]
+                              (dots-animation s)
+                              (confirm-invitation-when-ready s)
+                              s)
+                             :did-update (fn [s]
+                              (confirm-invitation-when-ready s)
                               s)}
   [s]
-  (let [confirm-invitation (drv/react s :confirm-invitation)
-        jwt (:jwt confirm-invitation)
-        collect-pswd (:collect-pswd confirm-invitation)
-        collect-pswd-error (:collect-pswd-error confirm-invitation)
-        invitation-confirmed (:invitation-confirmed confirm-invitation)]
+  (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-lander.invitee-lander
+      [:div.main-cta
+        [:div.title
+          "Join your team on Carrot"]
+        (if (:invitation-error confirm-invitation)
+          [:div.subtitle
+            "An error occurred while confirming your invitation, please try again."]
+          [:div.subtitle
+            "Please wait" [:span.dots {:ref :dots} "."]])]]))
+
+(rum/defcs invitee-lander-password < rum/reactive
+                                     (drv/drv :collect-password)
+                                     (rum/local false ::password-error)
+                                     {:did-mount (fn [s]
+                                       (delay-focus-field-with-ref s "password")
+                                       s)}
+  [s]
+  (let [collect-password (drv/react s :collect-password)
+        jwt (:jwt collect-password)
+        collect-pswd (:collect-pswd collect-password)
+        collect-pswd-error (:collect-pswd-error collect-password)
+        invitation-confirmed (:invitation-confirmed collect-password)]
+    [:div.onboard-lander.invitee-lander-password
       [:div.main-cta
         [:div.title
           "Join your team on Carrot"]
@@ -633,16 +675,6 @@
       (reset! (::exchange-started s) true)
       (user-actions/auth-with-token :email-verification))))
 
-(defn dots-animation [s]
-  (when-let [dots-node (rum/ref-node s :dots)]
-    (let [dots (.-innerText dots-node)
-          next-dots (case dots
-                      "." ".."
-                      ".." "..."
-                      ".")]
-      (set! (.-innerText dots-node) next-dots)
-      (utils/after 800 #(dots-animation s)))))
-
 (rum/defcs email-verified < rum/reactive
                             (drv/drv :email-verification)
                             (drv/drv :orgs)
@@ -731,6 +763,7 @@
     :lander-team (lander-team)
     :lander-invite (lander-invite)
     :invitee-lander (invitee-lander)
+    :invitee-lander-password (invitee-lander-password)
     :invitee-lander-profile (invitee-lander-profile)
     :email-wall (email-wall)
     :email-verified (email-verified)

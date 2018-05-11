@@ -35,7 +35,11 @@
 
 ;; Auth Settings
 (defn auth-settings? []
-  (contains? @dispatcher/app-state :auth-settings))
+  (contains? @dispatcher/app-state (first dispatcher/auth-settings-key)))
+
+(defn auth-settings-status? []
+  (and (auth-settings?)
+       (contains? (dispatcher/auth-settings) :status)))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
@@ -151,20 +155,6 @@
   [db [_ jwt]]
   (assoc db :email-verification-success true))
 
-(defmethod dispatcher/action :name-pswd-collect
-  [db [_]]
-  (dissoc db :latest-entry-point :latest-auth-settings))
-
-(defmethod dispatcher/action :name-pswd-collect/finish
-  [db [_ status user-data]]
-  (if (and status
-           (>= status 200)
-           (<= status 299))
-    (do
-      (cook/remove-cookie! :show-login-overlay)
-      (dissoc (update-user-data db user-data) :show-login-overlay))
-    (assoc db :collect-name-password-error status)))
-
 (defmethod dispatcher/action :pswd-collect
   [db [_ password-reset?]]
   (-> db
@@ -193,8 +183,12 @@
 (defmethod dispatcher/action :user-profile-save
   [db [_]]
   (-> db
+      ;; Loading user data
       (assoc-in [:edit-user-profile :loading] true)
-      (dissoc :latest-entry-point :latest-auth-settings)))
+      ;; Force a refresh of entry-point and auth-settings
+      (dissoc :latest-entry-point :latest-auth-settings)
+      ;; Remove the new-slack-user flag to avoid redirecting to the profile again
+      (dissoc :new-slack-user)))
 
 (defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
@@ -222,13 +216,16 @@
   [db _]
   (dissoc db :jwt :latest-entry-point :latest-auth-settings))
 
+(defn orgs? []
+  (contains? @dispatcher/app-state dispatcher/orgs-key))
+
 ;; API entry point
 (defmethod dispatcher/action :entry-point
   [db [_ orgs collection]]
   (-> db
       (assoc :latest-entry-point (.getTime (js/Date.)))
       (dissoc :loading)
-      (assoc :orgs orgs)
+      (assoc dispatcher/orgs-key orgs)
       (assoc-in dispatcher/api-entry-point-key (:links collection))
       (dissoc :slack-lander-check-team-redirect :email-lander-check-team-redirect)))
 
