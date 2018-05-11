@@ -28,9 +28,6 @@ div.activity-card {
   &:hover, &.dropdown-active {
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
     @include big_web() {
-      div.activity-card-head.entry-card {
-        background-color: $carrot_light_gray_5;
-      }
 
       div.activity-card-footer {
         button.post-edit {
