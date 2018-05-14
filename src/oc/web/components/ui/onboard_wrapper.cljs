@@ -773,11 +773,18 @@
             (.preventDefault %)
             (user-actions/add-to-slack query-params))}
         [:img {:alt "Add to Slack"
-               :height "80"
-               :width "278"
-               :src "https://platform.slack-edge.com/img/add_to_slack@2x.png"}]]
+               :height "48"
+               :width "174"
+               :src "https://platform.slack-edge.com/img/add_to_slack.png"
+               :srcset "https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"}]]
       [:p.carrot-continue "You need Slack Permission in order to add Carrot to your Slack workspace. If you don't have this permission, you can skip this."]
-      [:a.carrot-skip {:href "/"} "Skip for now"]]))
+      [:a.carrot-skip {:href "/"
+                       :on-click #(do
+                                    (.preventDefault %)
+                                    (if (= (:new query-params) "true")
+                                      (router/nav! oc-urls/sign-up-profile)
+                                      (router/nav! oc-urls/login)))
+                       } "Skip for now"]]))
 
 
 (defn get-component [c]
