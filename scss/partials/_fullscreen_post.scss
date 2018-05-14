@@ -213,10 +213,13 @@ div.fullscreen-post-container {
     }
 
     div.fullscreen-post-separator {
-      opacity: 0.6;
-      background-image: linear-gradient(-180deg, #D8DBDF 0%, rgba(253,252,251,0.00) 100%);
+      background-image: linear-gradient(-180deg, #F4F3F3 0%, rgba(253, 255, 255, 255) 100%);
       width: 100%;
-      height: 4px;
+      height: 8px;
+
+      @include mobile() {
+        display: none;
+      }
     }
 
     div.fullscreen-post-author-header {
@@ -504,7 +507,7 @@ div.fullscreen-post-container {
     div.fullscreen-post-right-column {
       width: 800px;
       padding: 24px 31px;
-      background-color: #FDFCFB;
+      background-color: white;
       border-bottom-left-radius: 6px;
       border-bottom-right-radius: 6px;
 
