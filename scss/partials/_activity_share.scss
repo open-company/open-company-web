@@ -8,7 +8,7 @@ div.activity-share-card {
 div.activity-share-modal-container {
   position: absolute;
   top: 0px;
-  left: 50%;
+  right: 16px;
   background-color: $carrot_modal_bg;
   z-index: 103;
   transition: opacity 180ms ease-in;
@@ -16,8 +16,7 @@ div.activity-share-modal-container {
   background-color: white;
   border-radius: 8px;
   padding: 32px 24px;
-  margin-left: -180px;
-  margin-top: 65px;
+  margin-top: 55px;
   border: 1px solid $deep_tan;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 
