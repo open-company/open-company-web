@@ -41,9 +41,11 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         nux (drv/react s :nux)
         is-all-posts (or (:from-all-posts @router/path)
-                         (= (router/current-board-slug) "all-posts"))]
-    [:div.activity-card.activity-share-card
+                         (= (router/current-board-slug) "all-posts"))
+        dom-element-id (str "activity-card-" (:uuid activity-data))]
+    [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true})
+       :id dom-element-id
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                     (when-not
@@ -73,7 +75,7 @@
         ; Card labels
         [:div.activity-card-head-right
           (when-not nux
-            (more-menu activity-data))
+            (more-menu activity-data dom-element-id))
           (when is-all-posts
             [:div.section-tag
               {:class (when (:new activity-data) "has-new")

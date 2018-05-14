@@ -180,9 +180,14 @@
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
-          (if activity-share-container
-            (rum/portal (activity-share) activity-share-container)
-            (activity-share)))
+          ;; If we have an element id find the share container inside that element
+          ;; and portal the component to that element
+          (let [portal-element (when activity-share-container
+                                  (.get (.find (js/$ (str "#" activity-share-container))
+                                         ".activity-share-container") 0))]
+            (if portal-element
+              (rum/portal (activity-share) portal-element)
+              (activity-share))))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
