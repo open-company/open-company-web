@@ -1,0 +1,78 @@
+div.stream-attachments {
+  margin-top: 24px;
+
+  @include mobile() {
+    width: 100%;
+  }
+
+  div.stream-attachments-content {
+    width: 100%;
+    height: auto;
+    min-height: 34px;
+    display: inline-block;
+
+    a.stream-attachments-item {
+      height: 26px;
+      background-color: $chalk_blue;
+      color: $sea_blue;
+      padding: 2px 10px 4px 10px;
+      margin-top: 8px;
+      border-radius: 100px;
+      margin-right: 16px;
+      float: left;
+
+      div.attachment-info {
+        max-width: 100%;
+        width: 100%;
+        display: inline;
+
+        &.editable {
+          span.attachment-name {
+            max-width: 446px;
+          }
+
+          span.attachment-description {
+            max-width: 174px;
+          }
+        }
+
+        span.attachment-name {
+          @include avenir_H();
+          font-size: 12px;
+          color: $sea_blue;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 466px;
+          display: inline-block;
+          padding-top: 4px;
+        }
+
+        span.attachment-description {
+          @include avenir_R();
+          font-size: 12px;
+          color: $sea_blue;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 194px;
+          display: inline-block;
+          padding-top: 4px;
+          opacity: 0.5;
+          margin-left: 6px;
+        }
+
+        button.remove-attachment-bt {
+          width: 20px;
+          height: 20px;
+          background-image: cdnUrl("/img/ML/clear_attachments_x.svg");
+          background-size: 6px 6px;
+          background-position: 50% 5px;
+          background-repeat: no-repeat;
+          display: inline-block;
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+}

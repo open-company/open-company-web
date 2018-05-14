@@ -16,8 +16,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.activity-attachments :refer (activity-attachments)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
 (rum/defcs activity-card < rum/reactive
                         ;; Derivatives
@@ -50,11 +49,8 @@
                     (when-not
                      (or
                       nux
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-attachments]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-menu]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :button.post-edit]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-share]))
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions])))
 
                       (activity-actions/activity-modal-fade-in activity-data))))}
@@ -99,9 +95,11 @@
                :class (utils/class-set {:has-body has-body
                                         :has-headline has-headline})}])
           (when has-attachments
+            (let [atch-num (count (:attachments activity-data))]
               [:div.activity-card-attachments
-                (activity-attachments activity-data)])]
+                (when (pos? atch-num)
+                  (str "+" atch-num " attachment" (when (not= atch-num 1) "s")))]))]
         [:div.activity-card-footer.group
-          [:div.activity-card-footer-divider-line]
-          (reactions activity-data)
+          (reactions activity-data (and (:has-comments activity-data)
+                                        (>= (count (:reactions activity-data)) 4)))
           (comments-summary activity-data)]]]))

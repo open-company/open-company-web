@@ -44,6 +44,8 @@ $.dotdotdot = function(){};
 $.trigger = function(){};
 $.ajax = function(){};
 $.outerHeight = function(){};
+$.closest = function(){};
+$.restore = function(){};
 $.after = function(){};
 $.closest = function(){};
 // WURFL

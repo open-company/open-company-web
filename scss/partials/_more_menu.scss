@@ -1,6 +1,6 @@
 div.more-menu {
   float: right;
-  width: 24px;
+  width: 20px;
   height: 24px;
   margin-top: 3px;
   transform: opacity 180ms ease-in;
@@ -8,12 +8,12 @@ div.more-menu {
   position: relative;
 
   button.more-menu-bt {
-    width: 24px;
+    width: 20px;
     height: 26px;
-    padding: 2px 10px;
+    padding: 3px 0px 3px 16px;
     display: block;
     background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-    background-position: center;
+    background-position: 16px 3px;
     background-size: 4px 20px;
     background-repeat: no-repeat;
     opacity: 0.8;

@@ -44,11 +44,14 @@
                            (events/unlistenByKey @(::window-click s))
                            (reset! (::window-click s) nil))
                          s)}
-  [s entry-data]
-  (let [reactions-data (vec (:reactions entry-data))
+  [s entry-data hide-last-reaction?]
+  (let [reactions-data (if hide-last-reaction?
+                         (vec (take (- default-reaction-number 1) (:reactions entry-data)))
+                         (vec (:reactions entry-data)))
         reactions-loading (:reactions-loading entry-data)
         react-link (utils/link-for (:links entry-data) "react")
-        should-show-picker? (and react-link
+        should-show-picker? (and (not hide-last-reaction?)
+                                 react-link
                                  (< (count reactions-data) default-reaction-number))]
     ;; If there are reactions to render or there is at least the link to add a reaction from the picker
     (when (or (seq reactions-data)

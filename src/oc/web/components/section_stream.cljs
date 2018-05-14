@@ -11,7 +11,7 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
-            [oc.web.components.stream-view-item :refer (stream-view-item)]
+            [oc.web.components.stream-item :refer (stream-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
@@ -29,6 +29,6 @@
       [:div.section-stream-cards
         [:div.section-stream-cards-inner.group
           (for [e items]
-            (rum/with-key (stream-view-item e) (str "section-stream-item-" (:uuid e))))]
+            (rum/with-key (stream-item e) (str "section-stream-item-" (:uuid e))))]
         (when (responsive/is-mobile-size?)
           (all-caught-up))]]))
