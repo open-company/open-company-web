@@ -1,17 +1,23 @@
 div.activity-card {
-  width: 454px;
+  width: 392px;
   float: left;
   background-color: white;
   border-radius: 6px;
-  margin: 12px;
+  margin: 8px;
   position: relative;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+
+  * {
+    cursor: pointer;
+  }
 
   &:nth-child(even) {
-    margin: 12px 0px 12px 12px;
+    margin-right: 0px;
   }
 
   &:nth-child(odd) {
-    margin: 12px 12px 12px 0px;
+    margin-left: 0px;
   }
 
   @include mobile() {
@@ -20,20 +26,8 @@ div.activity-card {
   }
 
   &:hover, &.dropdown-active {
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
     @include big_web() {
-      div.activity-card-shadow-container {
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-      }
-
-      div.activity-card-head.entry-card {
-        background-color: $carrot_light_gray_5;
-      }
-
-      div.activity-card-head div.activity-card-head-right {
-        div.activity-tag {
-          background-color: $carrot_light_gray_6;
-        }
-      }
 
       div.activity-card-footer {
         button.post-edit {
@@ -113,8 +107,8 @@ div.activity-card {
 
   div.activity-card-head {
     width: 100%;
-    padding: 20px 24px;
-    height: 72px;
+    padding: 16px 24px;
+    height: 65px;
     display: flex;
     background-color: $light_tan;
     border-top-left-radius: 6px;
@@ -138,11 +132,14 @@ div.activity-card {
       @include new-tag();
 
       @include section-tag($right_max_width);
+
+      div.section-tag {
+        margin-right: 0px;
+      }
     }
   }
 
   div.activity-card-shadow-container {
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 
@@ -153,19 +150,19 @@ div.activity-card {
 
   div.activity-card-content {
     width: 100%;
-    padding: 32px 32px 0px;
+    padding: 24px 24px 0px;
 
     div.activity-card-headline {
       @include activity-title();
       @include avenir_H();
-      font-size: 20px;
-      line-height: 28px;
+      font-size: 18px;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
       max-height: 31px;
+      line-height: 20px;
 
       @include mobile() {
         margin-top: 16px;
@@ -174,23 +171,31 @@ div.activity-card {
 
     @include activity-media-preview();
 
-    $body_height: 24*3;
+    $line_height: 18;
+    $body_height: $line_height*3;
     div.activity-card-body {
-      margin-top: 12px;
-      @include activity-body(16);
-      @include avenir_M();
+      margin-top: 10px;
+      @include activity-body(14, $line_height, $line_height);
+      @include avenir_R();
       color: $deep_navy;
-      line-height: 24px;
+      line-height: #{$line_height}px;
       display: block;
       max-height: #{$body_height}px;
       overflow: hidden;
 
+      h2 {
+        line-height: #{$line_height}px;
+        @include avenir_R();
+        font-size: 14px;
+        font-weight: normal;
+      }
+
       & > *:not(:last-child) {
-        margin: 24px 0px;
+        margin: #{$line_height}px 0px;
       }
 
       & > *:last-child {
-        margin: 24px 0px 0px;
+        margin: #{$line_height}px 0px 0px;
       }
 
       & > *:first-child {
@@ -202,7 +207,7 @@ div.activity-card {
       }
 
       &.has-media-preview {
-        width: calc(100% - 72px - 16px);
+        width: calc(100% - #{$line_height * 3}px - 16px);
         margin-right: 16px;
         float: left;
       }
@@ -219,15 +224,11 @@ div.activity-card {
         display: none;
       }
 
-      h2 {
-        @include avenir_R();
-        font-size: 16px;
-        font-weight: normal;
-      }
-
       b, strong {
-        font-weight: normal;
+        line-height: #{$line_height}px;
         @include avenir_R();
+        font-size: 14px;
+        font-weight: normal;
       }
 
       // // Uncomment this to programmatically add the read full update at the end of the last body tag
@@ -253,18 +254,17 @@ div.activity-card {
   }
 
   div.activity-card-attachments {
-    margin-top: 16px;
-    height: 26px;
-
-    div.activity-attachments {
-      width: 100%;
-    }
+    margin-top: 14px;
+    @include avenir_M();
+    font-size: 12px;
+    line-height: 16px;
+    height: 16px;
+    color: $ui_grey;
   }
 
   div.activity-card-footer {
     width: 100%;
-    padding: 16px 32px 32px;
-    min-height: 82px;
+    padding: 14px 24px 24px;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 
@@ -297,102 +297,6 @@ div.activity-card {
 
       @include mobile() {
         float: unset;
-      }
-    }
-
-    div.activity-share {
-      float: right;
-      position: relative;
-      margin-right: 8px;
-      margin-top: 4px;
-
-      button.activity-share-bt {
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/foc_share_icon.svg");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: 24px 24px;
-        padding: 0;
-        margin: 0px;
-        opacity: 0;
-      }
-
-      div.activity-share-dropdown {
-        position: absolute;
-        bottom: 42px;
-        right: -10px;
-        left: calc(100% - 100px + 10px);
-        min-width: 100px;
-        height: auto;
-        border: none;
-        outline: none;
-        box-shadow: none;
-        background-color: transparent;
-        overflow: visible;
-        z-index: 100;
-
-        div.triangle {
-          position: absolute;
-          bottom: -7px;
-          left: calc(100% - 30px);
-          background-color: white;
-          border-top: 1px solid rgba(177,184,192,0.50);
-          border-left: 1px solid rgba(177,184,192,0.50);
-          transform: rotate(225deg);
-          width: 15px;
-          height: 15px;
-        }
-
-        ul.activity-share-dropdown-list {
-          background-color: white;
-          border: 1px solid rgba(177,184,192,0.50);
-          box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);;
-          border-radius: 5px;
-          margin: 0px;
-          padding: 10px 13px 6px 8px;
-          min-height: 50px;
-          list-style-type: none;
-          width: 100%;
-
-          li.activity-share-dropdown-item {
-            padding: 3px 8px;
-            @include avenir_M();
-            font-size: 14px;
-            color: $carrot_light_gray_3;
-            cursor: pointer;
-            background-color: transparent;
-
-            @include big_web() {
-              &:hover {
-                background-color: rgba($carrot_light_gray_4, 0.2);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    button.post-edit {
-      float: right;
-      margin-right: -6px;
-      margin-top: 4px;
-      width: 24px;
-      height: 24px;
-      background-image: cdnUrl("/img/ML/post_edit_pencil.svg");
-      background-position: center;
-      background-size: 14px 14px;
-      background-repeat: no-repeat;
-      opacity: 0;
-
-      @include mobile() {
-        opacity: 1;
-      }
-
-      @include big_web() {
-        &:hover {
-          opacity: 1;
-        }
       }
     }
   }

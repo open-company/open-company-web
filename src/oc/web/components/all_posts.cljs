@@ -12,7 +12,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
-            [oc.web.components.stream-view-item :refer (stream-view-item)]
+            [oc.web.components.stream-item :refer (stream-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
@@ -182,7 +182,7 @@
                           s)
                          :after-render (fn [s]
                           (when-let [scroll-to @(::scroll-to-entry s)]
-                            (when-let [entry-el (sel1 [(str "div.stream-view-item-" (:uuid scroll-to))])]
+                            (when-let [entry-el (sel1 [(str "div.stream-item-" (:uuid scroll-to))])]
                               (utils/scroll-to-element entry-el 0 0))
                             (utils/after 100 #(do
                                                (reset! (::scroll-to-entry s) nil)
@@ -247,7 +247,7 @@
                 [:div.top-loading-message "Retrieving earlier activity..."])])
           (for [e items]
             (rum/with-key
-             (stream-view-item e)
+             (stream-item e)
              (str "all-posts-entry-" (:uuid e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading

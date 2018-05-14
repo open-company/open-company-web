@@ -14,7 +14,7 @@
                 :anchor false
                 :targetBlank true
                 :paste #js {:forcePlainText true}
-                :placeholder #js {:text "Leave a comment..."
+                :placeholder #js {:text "Add a comment..."
                                   :hideOnClick true}
                :keyboardCommands #js {:commands #js [
                                   #js {

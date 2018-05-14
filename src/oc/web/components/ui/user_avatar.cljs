@@ -15,6 +15,7 @@
                          (utils/cdn default-avatar)
                          (:avatar-url user-data))]
     [:div.user-avatar-img-container.fs-hide
+      {:data-user-id (:user-id user-data)}
       [:div.user-avatar-img-helper]
       [:img.user-avatar-img
         {:src user-avatar-url
