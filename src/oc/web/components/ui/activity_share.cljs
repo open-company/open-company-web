@@ -249,7 +249,7 @@
                       "Logged in team only"]
                     [:option
                       {:value :all}
-                      "Public readonly"]]]]
+                      "Public read only"]]]]
               (when (not= @(::url-audience s) :team)
                 [:div.url-audience-description
                   (str "Sharing this URL will allow non-registered users to access post content. "

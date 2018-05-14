@@ -142,7 +142,7 @@
 ;; Secure activities
 
 (defn secure-activity
-  "Secure url for activity to show readonly view."
+  "Secure url for activity to show read only view."
   ([] (secure-activity (router/current-org-slug) (router/current-activity-id)))
   ([secure-id] (secure-activity (router/current-org-slug) secure-id))
   ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))
