@@ -1,112 +1,131 @@
 div.stream-comments {
-  width: 100%;
   height: 100%;
   position: relative;
 
-  &:before {
-    content: "";
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    right: 16px;
-    height: 24px;
-    z-index: 10;
-    pointer-events: none;
-    @include top-gradient();
+  div.stream-comments-empty {
+    display: none;
   }
 
-  &.bottom-gradient:after {
-    content: "";
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: 16px;
-    height: 24px;
-    z-index: 10;
-    pointer-events: none;
-    $gradient_base_color: #FDFCFB;
-    background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
-    background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='#{$gradient_base_color}',GradientType=0 ); /* IE6-9 */
-  }
-
-  div.stream-comments-inner {
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding-right: 12px;
-    padding-top: 16px;
-
-    @include tablet() {
-      padding-right: 0px;
-      height: auto;
-    }
-
-    div.stream-comments-title {
-      @include avenir_H();
-      font-size: 14px;
-      color: $carrot_dark_gray;
-      margin-bottom: 16px;
-    }
-
-    div.stream-comments-empty {
-      display: none;
-    }
+  div.stream-comments-list {
 
     div.stream-comment {
-      border: 1px solid rgba($deep_tan, 0.7);
-      border-radius: 6px;
-      padding: 16px;
-      background-color: white;
-      margin-bottom: 8px;
+      padding: 24px 0px 0px;
 
-      div.stream-comment-header {
+      div.stream-comment-author-avatar {
+        float: left;
+        width: 32px;
         height: 32px;
 
-        div.stream-comment-author-avatar {
-          float: left;
-          width: 32px;
-          height: 32px;
-          background-position: 50%;
-          background-size: 32px 32px;
-          border-radius: 50%;
-          background-repeat: no-repeat;
-        }
+        @include user-profile(32);
+      }
+
+      div.stream-comment-right {
+        margin-left: 48px;
+      }
+
+      div.stream-comment-header {
+        height: 24px;
 
         div.stream-comment-author-right {
           float: left;
-          margin-left: 16px;
+          max-width: 80%;
+          // height: 24px;
 
           div.stream-comment-author-name {
+            @include avenir_H();
+            font-size: 14px;
+            color: $deep_navy;
+            line-height: 15px;
+            float: left;
+          }
+
+          div.stream-comment-author-timestamp {
+            @include avenir_R();
+            font-size: 14px;
+            color: $ui_grey;
+            opacity: 0.5;
+            float: left;
+            margin-left: 8px;
+            line-height: 14px;
+            text-transform: capitalize;
+          }
+        }
+      }
+
+      div.stream-comment-content {
+        text-align: left;
+
+        div.stream-comment-body {
+          @include avenir_R();
+          font-size: 16px;
+          color: $deep_navy;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          line-height: 20px;
+
+          &:hover {
+            a.read-more {
+              color: $carrot_green;
+            }
+          }
+
+          a.read-more {
             @include avenir_H();
             font-size: 12px;
             color: $deep_navy;
           }
 
-          div.stream-comment-author-timestamp {
-            @include avenir_M();
-            font-size: 12px;
-            color: $ui_grey;
-            opacity: 0.5;
+          &.medium-editor-element {
+            // editing comment
+            border-radius: 4px;
+            border: 1px solid $ui_grey;
+            box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
+            border: 2px solid $light_ui_grey;
+            background-color: white;
+            outline: none;
+            padding: 4px;
+          }
+
+          * {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+          }
+
+          margin-bottom: 0px;
+
+          &>*:last-child {
+            margin-bottom: 0px;
+          }
+
+          &.emoji-comment {
+            font-size: 50px;
+            height: 50px;
+
+            // & > * {
+            //   line-height: 20px;
+            //   margin-top: 20px;
+            // }
           }
         }
+      }
+
+      div.stream-comment-footer {
+        height: 24px;
+        margin-top: 2px;
 
         div.stream-comment-more-menu-container {
-          float: right;
+          float: left;
           position: relative;
+          margin-left: 8px;
+          margin-top: 6px;
 
           button.comment-more-menu {
             width: 24px;
-            height: 26px;
+            height: 24px;
             padding: 2px 2px 16px 2px;
             display: block;
             background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
-            background-position: 50% 4px;
+            background-position: 50% 3px;
             background-size: 20px 4px;
             background-repeat: no-repeat;
             opacity: 0.8;
@@ -123,10 +142,9 @@ div.stream-comments {
           div.stream-comment-more-menu {
             position: absolute;
             top: -8px;
-            left: calc(100% - 164px);
+            left: 100%;
             background-color: white;
             width: 136px;
-            background-color: white;
             border: 1px solid $deep_tan;
             box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
             outline: none;
@@ -175,56 +193,10 @@ div.stream-comments {
             }
           }
         }
-      }
-
-      div.stream-comment-content {
-        text-align: left;
-        margin-top: 8px;
-
-        div.stream-comment-body {
-          @include avenir_BOOK();
-          font-size: 14px;
-          color: $deep_navy;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-
-          &.medium-editor-element {
-            // editing comment
-            border-radius: 4px;
-            border: 1px solid $ui_grey;
-            outline: none;
-            padding: 4px;
-          }
-
-          * {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-          }
-
-          margin-bottom: 0px;
-
-          &>*:last-child {
-            margin-bottom: 0px;
-          }
-
-          &.emoji-comment {
-            font-size: 50px;
-            height: 50px;
-
-            // & > * {
-            //   line-height: 20px;
-            //   margin-top: 20px;
-            // }
-          }
-        }
-      }
-
-      div.stream-comment-footer {
-        height: 25px;
 
         div.stream-comment-reaction {
-          padding-top: 8px;
-          height: 25px;
+          padding-top: 4px;
+          height: 24px;
           @include avenir_M();
           font-size: 12px;
           color: $ui_grey;
@@ -282,6 +254,30 @@ div.stream-comments {
 
         button {
           float: right;
+        }
+      }
+    }
+
+    div.stream-comments-expand {
+      text-align: center;
+      cursor: pointer;
+      margin: 14px 0 8px;
+
+      span.collapse-expand-list {
+        @include avenir_H();
+        font-size: 14px;
+        color: $ui_grey;
+        padding-left: 22px;
+
+        background-image: cdnUrl("/img/ML/expand_comments.svg");
+        background-size: 14px 8px;
+        background-position: 0px 3px;
+        background-repeat: no-repeat;
+      }
+
+      &.expanded {
+        span.collapse-expand-list {
+          background-image: cdnUrl("/img/ML/collapse_comments.svg");
         }
       }
     }

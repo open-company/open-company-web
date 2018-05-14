@@ -48,47 +48,11 @@
   since this is a problem for the dotdotdot library that we are using."
   [body-el]
   (reset-truncate-body body-el)
-  (let [is-ap (= (router/current-board-slug) "all-posts")
-        is-drafts (= (router/current-board-slug) utils/default-drafts-board-slug)
-        $body-els (js/$ ">*" body-el)
-        partial-heights (atom [])
-        found (atom false)]
-    (.each $body-els (fn [idx el]
-     (when-not @found
-       (this-as this
-         (let [$this (js/$ this)
-               el-h (.outerHeight $this true) ;; Include margins in height calculation
-               container-max-height (cond
-                                     is-ap default-all-posts-body-height
-                                     is-drafts default-draft-body-height
-                                     :else default-body-height)
-               prev-height (apply + @partial-heights)
-               actual-height (+ prev-height el-h)
-               truncate-height  (cond
-                                  (zero? (- container-max-height prev-height))
-                                  0
-                                  (<= (- container-max-height prev-height) 24)
-                                  24
-                                  (<= (- container-max-height prev-height) (* 24 2))
-                                  (* 24 2)
-                                  (<= (- container-max-height prev-height) (* 24 3))
-                                  (* 24 3)
-                                  (< (- container-max-height prev-height) (* 24 4))
-                                  (* 24 4)
-                                  (< (- container-max-height prev-height) (* 24 5))
-                                  (* 24 5)
-                                  (< (- container-max-height prev-height) (* 24 6))
-                                  (* 24 6)
-                                  :else
-                                  (* 24 3))]
-           (swap! partial-heights #(vec (conj % el-h)))
-           (when (>= actual-height container-max-height)
-             (reset! found true)
-             (.dotdotdot $this
-               #js {:height truncate-height
-                    :wrap "word"
-                    :watch true
-                    :ellipsis "..."})))))))))
+  (.dotdotdot (js/$ body-el)
+    #js {:height (* 18 3)
+         :wrap "word"
+         :watch true
+         :ellipsis "..."}))
 
 (defn icon-for-mimetype
   "Thanks to https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922"

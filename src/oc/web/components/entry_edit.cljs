@@ -18,7 +18,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
-            [oc.web.components.ui.stream-view-attachments :refer (stream-view-attachments)]
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -411,7 +411,7 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})
             ; Attachments
-            (stream-view-attachments (:attachments entry-editing)
+            (stream-attachments (:attachments entry-editing)
              #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
