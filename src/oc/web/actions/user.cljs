@@ -64,7 +64,6 @@
   ([auth-settings orgs]
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
-      (timbre/debug (:new-slack-user @dis/app-state))
       (cond
         (= ["add-to-slack"] (:route @router/path))
         false

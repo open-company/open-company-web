@@ -274,7 +274,12 @@
   (let [query-params (dissoc (:query-params params) :jwt)
         new-user (= (:new (:query-params params)) "true")]
     (when new-user (user-actions/slack-lander-new-user))
-    (utils/after 100 #(router/nav! (urls/add-to-slack-check-params query-params)))))
+    (if (= (:access query-params) "bot")
+      (utils/after 100 #(router/nav! (urls/add-to-slack-check-params query-params)))
+      (if new-user
+        (utils/after 100 #(router/nav! urls/sign-up-profile))
+        (user-actions/slack-lander-check-team-redirect))
+      )))
 
 (defn slack-lander-check-bot [params]
   (pre-routing (:query-params params) true)
