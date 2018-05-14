@@ -73,6 +73,10 @@
                                                          :note ""})
                                (when (has-bot? org-data)
                                  (reset! (::medium s) :slack)))
+                              (reset! (::window-click-listener s)
+                               (events/listen js/window EventType/CLICK
+                                #(when-not (utils/event-inside? % (rum/dom-node s))
+                                   (close-clicked s))))
                              s)
                              :did-mount (fn [s]
                               (let [slack-button (rum/ref-node s "slack-button")
@@ -106,6 +110,11 @@
                                    (fn []
                                     (reset! (::shared s) false)
                                     (activity-actions/activity-share-reset)))))
+                              s)
+                             :will-unmount (fn [s]
+                              (when @(::window-click-listener s)
+                                (events/unlistenByKey @(::window-click-listener s))
+                                (reset! (::window-click-listener s) nil))
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
