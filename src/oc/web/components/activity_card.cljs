@@ -17,10 +17,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.activity-attachments :refer (activity-attachments)]
-            [goog.object :as gobj]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [oc.web.components.ui.activity-attachments :refer (activity-attachments)]))
 
 (rum/defcs activity-card < rum/reactive
                         ;; Derivatives
