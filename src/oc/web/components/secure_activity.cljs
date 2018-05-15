@@ -57,9 +57,19 @@
             [:div.separator]
             [:div.signup-login-copy
               "Want to create your own company digest? "
-              [:a "Sign up"]
+              [:a
+                {:href oc-urls/sign-up
+                 :on-click #(do
+                              (.preventDefault %)
+                              (router/nav! oc-urls/sign-up))}
+                "Sign up"]
               (str ". Are you part of the " (or (:org-name activity-data) "") " team? ")
-              [:a "Sign in"]
+              [:a
+                {:href oc-urls/login
+                 :on-click #(do
+                              (.preventDefault %)
+                              (router/nav! oc-urls/login))}
+                "Sign in"]
               "."]]])
       (when activity-data
         [:div.activity-header.group
