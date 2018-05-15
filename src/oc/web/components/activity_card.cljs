@@ -16,10 +16,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [goog.object :as gobj]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
 (rum/defcs activity-card < rum/reactive
                         ;; Derivatives
@@ -44,9 +41,11 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         nux (drv/react s :nux)
         is-all-posts (or (:from-all-posts @router/path)
-                         (= (router/current-board-slug) "all-posts"))]
+                         (= (router/current-board-slug) "all-posts"))
+        dom-element-id (str "activity-card-" (:uuid activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true})
+       :id dom-element-id
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                     (when-not
@@ -57,6 +56,7 @@
                       (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions])))
 
                       (activity-actions/activity-modal-fade-in activity-data))))}
+      [:div.activity-share-container]
       ; Card header
       [:div.activity-card-head.entry-card.group
         ; Card author
@@ -75,7 +75,7 @@
         ; Card labels
         [:div.activity-card-head-right
           (when-not nux
-            (more-menu activity-data))
+            (more-menu activity-data dom-element-id))
           (when is-all-posts
             [:div.section-tag
               {:class (when (:new activity-data) "has-new")

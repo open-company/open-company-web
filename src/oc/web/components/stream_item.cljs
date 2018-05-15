@@ -66,10 +66,13 @@
                           (:comments activity-data))
         activity-attachments (:attachments activity-data)
         is-all-posts (or (:from-all-posts @router/path)
-                         (= (router/current-board-slug) "all-posts"))]
+                         (= (router/current-board-slug) "all-posts"))
+        dom-element-id (str "stream-item-" (:uuid activity-data))]
     [:div.stream-item
       {:class (utils/class-set {(str "stream-item-" (:uuid activity-data)) true
-                                :expanded expanded?})}
+                                :expanded expanded?})
+       :id dom-element-id}
+      [:div.activity-share-container]
       [:div.stream-item-header
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))
@@ -83,7 +86,7 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (more-menu activity-data)
+        (more-menu activity-data dom-element-id)
         (when is-all-posts
           [:div.section-tag
             {:class (when (:new activity-data) "has-new")

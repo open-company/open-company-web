@@ -298,14 +298,16 @@
         editing (:modal-editing modal-data)
         activity-editing (:modal-editing-data modal-data)
         activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
-        show-sections-picker (and editing (:show-sections-picker modal-data))]
+        show-sections-picker (and editing (:show-sections-picker modal-data))
+        dom-element-id (str "fullscreen-post-" (:uuid activity-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
                                                       (not @(:first-render-done s))))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :editing editing
-                                :no-comments (not (:has-comments activity-data))})}
+                                :no-comments (not (:has-comments activity-data))})
+       :id dom-element-id}
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
           {:on-click #(if editing
@@ -327,6 +329,7 @@
               "Post changes"])]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
+        [:div.activity-share-container]
         [:div.fullscreen-post-author-header
           [:div.fullscreen-post-author-head-author
             (user-avatar-image (:publisher activity-data))
@@ -341,7 +344,7 @@
                    :data-title (utils/activity-date-tooltip activity-data)}
                   (utils/time-since t)])]]
           [:div.fullscreen-post-author-header-right
-            (more-menu activity-data)
+            (more-menu activity-data dom-element-id)
             [:div.section-tag
               {:class (when (:new activity-data) "has-new")
                :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]
