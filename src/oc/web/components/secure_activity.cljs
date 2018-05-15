@@ -1,6 +1,7 @@
 (ns oc.web.components.secure-activity
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -32,7 +33,10 @@
                              ;; Mixins
                              (ui-mixins/render-on-resize save-win-height)
 
-                             {:will-mount (fn [s]
+                             {:init (fn [s]
+                               (reset! (::show-login-header s) (not (jwt/jwt)))
+                               s)
+                              :will-mount (fn [s]
                                (utils/after 100 #(activity-actions/secure-activity-get))
                                (save-win-height s)
                               s)}
@@ -41,7 +45,6 @@
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         win-height @(::win-height s)]
-    (js/console.log "secure-activity/render" activity-data)
     [:div.secure-activity-container
       {:style {:min-height (when is-mobile?
                              (str (- win-height default-activity-header-height) "px"))}}
