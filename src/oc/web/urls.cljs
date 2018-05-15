@@ -38,6 +38,11 @@
   ([org-slug] (str "/sign-up-invite/" (name org-slug) )))
 
 (def slack-lander-check "/slack-lander/check")
+(def add-to-slack-check "/slack-lander/add-to")
+(def slack-lander-bot-check "/slack-lander/bot-check")
+
+(defn add-to-slack-check-params [params]
+  (str add-to-slack-check (when params (str "?" (params->query-string params)))))
 
 (def logout "/logout")
 

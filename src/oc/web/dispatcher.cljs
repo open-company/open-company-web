@@ -327,6 +327,11 @@
   ([] (api-entry-point @app-state))
   ([data] (get-in data api-entry-point-key)))
 
+(defn current-user-data
+  "Get the current logged in user info."
+  ([] (current-user-data @app-state))
+  ([data] (get-in data [:current-user-data])))
+
 (defn orgs-data
   ([] (orgs-data @app-state))
   ([data] (get data orgs-key)))
