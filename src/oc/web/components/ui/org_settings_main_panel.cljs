@@ -172,11 +172,12 @@
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
                 {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data))}
-                (str "Add "
-                     (if (zero? (count (:slack-orgs team-data)))
-                        "A"
-                        "Another")
-                     " Slack Team")])]
+                [:img {:alt "Add to Slack"
+                       :height "48"
+                       :width "174"
+                       :src "https://platform.slack-edge.com/img/add_to_slack.png"
+                       :srcset (str "https://platform.slack-edge.com/img/add_to_slack.png 1x, "
+                                "https://platform.slack-edge.com/img/add_to_slack@2x.png 2x")}]])]
         ;; Email domains row
         (let [valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))]
           [:div.org-settings-panel-row.email-domains-row.group
@@ -208,7 +209,7 @@
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                  :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
                  :placeholder "Domain, e.g. @acme.com"}]]
-            [:button.mlb-reset.mlb-default.add-email-domain-bt
+            [:button.mlb-reset.add-email-domain-bt
               {:on-click #(let [domain (:domain um-domain-invite)]
                             (if (utils/valid-domain? domain)
                               (team-actions/email-domain-team-add
