@@ -84,7 +84,8 @@
       (if @(::show-add-section s)
         (section-editor nil (fn [sec-data note]
                               (reset! (::show-add-section s) false)
-                              (on-change sec-data note)))
+                              (on-change sec-data note))
+         true)
         [:div.sections-picker.group
           {:class (when should-show-headers? "show-headers")}
           [:div.sections-picker-header
