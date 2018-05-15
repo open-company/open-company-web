@@ -5,11 +5,13 @@
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
@@ -25,24 +27,25 @@
 (rum/defc org-settings-tabs
   [org-slug active-tab]
   [:div.org-settings-tabs.group
+    [:div.org-settings-bottom-line]
     [:div.org-settings-tab
       {:class (when (= :main active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings org-slug)
          :on-click #(do (utils/event-stop %) (show-modal :main))}
-        "Team"]]
+        "DIGEST SETTINGS"]]
     [:div.org-settings-tab
       {:class (when (= :team active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings-team org-slug)
          :on-click #(do (utils/event-stop %) (show-modal :team))}
-        "Manage Members"]]
+        "MANAGE MEMBERS"]]
     [:div.org-settings-tab
       {:class (when (= :invite active-tab) "active")}
       [:a.org-settings-tab-link
         {;:href (oc-urls/org-settings-invite org-slug)
          :on-click #(do (utils/event-stop %) (show-modal :invite))}
-        "Invite People"]]])
+        "INVITE PEOPLE"]]])
 
 (defn close-clicked [s]
   (let [org-data @(drv/get-ref s :org-data)
@@ -94,13 +97,13 @@
       (utils/after 100 #(dismiss-modal)))
     (if org-data
       [:div.org-settings.fullscreen-page
-        [:button.mlb-reset.carrot-modal-close
-          {:on-click #(close-clicked s)}]
         (when alert-modal-data
           (alert-modal/alert-modal))
         [:div.org-settings-inner
           [:div.org-settings-header
-            "Settings"]
+            (org-avatar org-data)
+            [:div.org-name (:name org-data)]
+            [:div.org-url (str ls/web-server "/" (:slug org-data))]]
           (org-settings-tabs (:slug org-data) settings-tab)
           (case settings-tab
             :team

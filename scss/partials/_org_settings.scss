@@ -11,42 +11,48 @@ div.org-settings {
   left: 0px;
   z-index: 1000;
 
-  button.carrot-modal-close {
-    // Fallback for mobile that doesn't support fix positioning
-    position: absolute;
-    position: fixed;
-    left: 50%;
-    margin-left: #{($settings_content_width / 2 * -1) - 28}px;
-    top: 4px;
-  }
-
   div.org-settings-inner {
     width: #{$settings_content_width}px;
-    margin: 0 auto;
+    margin: 72px auto;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     background-color: white;
-    height: 100vh;
     overflow-x: visible;
     overflow-y: auto;
     position: relative;
     border-radius: 4px;
+    padding: 32px 24px;
+    max-height: calc(100vh - 144px);
 
     @include mobile() {
       width: 100%;
     }
 
-    & > div {
-      padding: 0 32px;
-    }
-
     div.org-settings-header {
       position: relative;
-      font-size: 32px;
-      font-weight: 500;
-      color: $carrot_gray;
-      background-color: $carrot_dark_bg_gray;
       height: $settings_header_height;
-      padding: 40px 32px;
+      margin-bottom: 32px;
+
+      @include org-avatar(48);
+
+      div.org-avatar {
+        float: left;
+        border: 1px solid #D8DBDF;
+        border-radius: 4px;
+      }
+
+      div.org-name {
+        margin-left: 64px;
+        @include avenir_H();
+        font-size: 22px;
+        color: $deep_navy;
+      }
+
+      div.org-url {
+        margin-left: 64px;
+        @include avenir_R();
+        font-size: 18px;
+        color: $light_ui_grey;
+      }
     }
 
     div.org-settings-footer {
@@ -208,14 +214,14 @@ div.org-settings {
 
         .org-settings-label {
           width: 100%;
-          @include avenir_H();
-          font-size: 14px;
-          color: $oc_gray_7;
+          @include avenir_M();
+          font-size: 15px;
+          color: $deep_navy;
 
           label {
-            @include avenir_H();
-            font-size: 14px;
-            color: $oc_gray_7;
+            @include avenir_M();
+            font-size: 15px;
+            color: $deep_navy;
           }
 
           .error {
@@ -235,15 +241,23 @@ div.org-settings {
 
 div.org-settings-tabs {
   min-height: 24px;
-  background-color: $carrot_dark_bg_gray;
-  padding: 0 32px;
+  position: relative;
+
+  div.org-settings-bottom-line {
+    width: 100%;
+    height: 1px;
+    background-color: rgba($deep_tan, 0.3);
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+  }
 
   div.org-settings-tab {
-    height: 28px;
+    height: 33px;
     float: left;
     width: auto;
-    margin: 0px 24px 0px 0px;
-    border-bottom: 4px solid transparent;
+    margin: 1px 24px 0px 0px;
+    border-bottom: 1px solid transparent;
 
     a.org-settings-tab-link {
       display: block;
@@ -252,10 +266,11 @@ div.org-settings-tabs {
       margin: 0;
       padding: 0;
       cursor: pointer;
-      @include avenir_M();
-      font-size: 16px;
-      color: $carrot_light_gray;
+      @include avenir_B();
+      font-size: 13px;
+      color: $ui_grey;
       text-decoration: none;
+      text-transform: uppercase;
       outline: none;
 
       @include mobile() {
@@ -268,17 +283,17 @@ div.org-settings-tabs {
     }
 
     &:hover {
-      border-bottom: 4px solid $carrot_light_gray;
+      border-bottom: 1px solid $carrot_orange;
     }
 
     &.active {
-      border-bottom: 4px solid $carrot_text_blue;
+      border-bottom: 1px solid $carrot_orange;
 
       a.org-settings-tab-link {
         padding: 0;
         @include avenir_H();
         font-size: 16px;
-        color: $carrot_text_blue;
+        color: $carrot_orange;
 
         @include mobile() {
           font-size: 14px;
