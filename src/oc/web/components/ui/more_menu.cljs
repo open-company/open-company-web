@@ -44,7 +44,7 @@
                            (events/unlistenByKey @(::click-listener s))
                            (reset! (::click-listener s) nil))
                          s)}
-  [s activity-data]
+  [s activity-data share-container-id]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")]
@@ -75,5 +75,5 @@
                 "Delete"])
             (when share-link
              [:li.share
-               {:on-click #(activity-actions/activity-share-show activity-data)}
+               {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
                "Share"])])])))

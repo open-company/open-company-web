@@ -11,6 +11,10 @@ div.org-dashboard {
     }
   }
 
+  & > div.activity-share-modal-container {
+    z-index: 1132;
+  }
+
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */

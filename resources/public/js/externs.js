@@ -47,6 +47,7 @@ $.outerHeight = function(){};
 $.closest = function(){};
 $.restore = function(){};
 $.after = function(){};
+$.closest = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};

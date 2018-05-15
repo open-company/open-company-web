@@ -110,7 +110,7 @@
                                 (events/unlistenByKey @(::click-listener s))
                                 (reset! (::click-listener s) nil))
                               s)}
-  [s initial-section-data on-change]
+  [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
         section-editing (drv/react s :section-editing)
         section-data (if (seq (:slug section-editing)) (drv/react s :board-data) section-editing)
@@ -400,4 +400,6 @@
              :class (when (< (count @(::section-name s)) section-actions/min-section-name-length) "disabled")}
             (if @(::editing-existing-section s)
               "Save"
-              "Create")]]]]))
+              (if from-section-picker
+                "Done"
+                "Create"))]]]]))

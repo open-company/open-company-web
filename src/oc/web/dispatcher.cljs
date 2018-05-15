@@ -210,6 +210,7 @@
                           (fn [base]
                             (:alert-modal base))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
+   :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share
                            :add-comment-focus :ap-initial-at :comments-data
@@ -286,7 +287,8 @@
                                :show-section-add show-section-add
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
-                               :mobile-navigation-sidebar (:mobile-navigation-sidebar base)})]})
+                               :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
+                               :activity-share-container (:activity-share-container base)})]})
 
 
 ;; Action Loop =================================================================
