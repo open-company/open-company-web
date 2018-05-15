@@ -127,57 +127,6 @@
                 "Upload logo"
                 "Change logo")]
             [:div.description "A transparent background PNG works best"]]]
-        ;; Slack teams row
-        [:div.org-settings-panel-row.slack-teams-row.group
-          [:div.org-settings-label
-            [:label
-              "Slack Teams"
-              [:i.mdi.mdi-information-outline
-                {:title "Anyone who signs up with your Slack team can contribute to team boards."
-                 :data-toggle "tooltip"
-                 :data-placement "top"}]]
-            (when (seq (:access query-params))
-              [:label
-                {:class (if (or (= "bot" (:access query-params))
-                                (= "team" (:access query-params))) "success-message" "error")}
-                (cond
-                  (= (:access query-params) "team-exists")
-                  "This team was already added."
-                  (= (:access query-params) "team")
-                  "Team successfully added."
-                  (= (:access query-params) "bot")
-                  "Bot successfully added."
-                  :else
-                  "An error occurred, please try again.")])]
-          [:div.org-settings-list
-            (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
-              (for [team (:slack-orgs team-data)]
-                [:div.org-settings-list-item.group
-                  {:key (str "slack-org-" (:slack-org-id team))}
-                  [:label.org-settings-list-item-name
-                    [:img.slack-logo {:src (utils/cdn "/img/slack.png")}]
-                    (:name team)
-                    [:button.remove-team-btn.btn-reset
-                      {:on-click #(team-actions/remove-team (:links team))}
-                      "Remove Slack team"]]
-                  (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
-                    (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
-                      [:button.org-settings-list-item-btn.btn-reset
-                        {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
-                         :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"}
-                        "Add Bot"]))]))]
-          (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
-            [:button.btn-reset.add-slack-team-bt
-                {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data))}
-                [:img {:alt "Add to Slack"
-                       :height "48"
-                       :width "174"
-                       :src "https://platform.slack-edge.com/img/add_to_slack.png"
-                       :srcset (str "https://platform.slack-edge.com/img/add_to_slack.png 1x, "
-                                "https://platform.slack-edge.com/img/add_to_slack@2x.png 2x")}]])]
         ;; Email domains row
         (let [valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))]
           [:div.org-settings-panel-row.email-domains-row.group
@@ -216,7 +165,66 @@
                                (-> @(drv/get-ref s :org-settings-team-management) :um-domain-invite :domain))
                               (dis/dispatch! [:input [:add-email-domain-team-error] true])))
                :disabled false} ;(not valid-domain-email?)}
-              "Add"]])]
+              "Add"]])
+        ;; Slack teams row
+        [:div.org-settings-panel-row.slack-teams-row.group
+          [:div.org-settings-label
+            [:label
+              "Slack team linking"
+              [:i.mdi.mdi-information-outline
+                {:title "Anyone who signs up with your Slack team can contribute to team boards."
+                 :data-toggle "tooltip"
+                 :data-placement "top"}]]
+            (when (seq (:access query-params))
+              [:label
+                {:class (if (or (= "bot" (:access query-params))
+                                (= "team" (:access query-params))) "success-message" "error")}
+                (cond
+                  (= (:access query-params) "team-exists")
+                  "This team was already added."
+                  (= (:access query-params) "team")
+                  "Team successfully added."
+                  (= (:access query-params) "bot")
+                  "Bot successfully added."
+                  :else
+                  "An error occurred, please try again.")])]
+          (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+            [:button.btn-reset.add-slack-team-bt
+                {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data))}
+                [:img {:alt "Add to Slack"
+                       :height "48"
+                       :width "174"
+                       :src "https://platform.slack-edge.com/img/add_to_slack.png"
+                       :srcset (str "https://platform.slack-edge.com/img/add_to_slack.png 1x, "
+                                "https://platform.slack-edge.com/img/add_to_slack@2x.png 2x")}]])
+          [:div.org-settings-list
+            (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
+              (for [team (:slack-orgs team-data)]
+                [:div.org-settings-list-item.group
+                  {:key (str "slack-org-" (:slack-org-id team))}
+                  (let [has-logo (seq (:logo-url team))
+                        logo-url (if has-logo
+                                   (:logo-url team)
+                                   (utils/cdn "/img/slack.png"))]
+                    [:div.logo-container
+                      [:img.slack-logo
+                        {:class (when-not has-logo "no-logo")
+                         :src logo-url}]])
+                  [:div.org-settings-list-item-name
+                    (:name team)
+                    (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
+                      (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
+                        [:button.org-settings-list-item-btn.btn-reset
+                          {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
+                           :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"}
+                          "Add Slackbot to team"
+                          [:i.mdi.mdi-information-outline]]))]
+                  [:button.remove-team-btn.btn-reset
+                    {:on-click #(team-actions/remove-team (:links team))}
+                    "Remove Slack team"]]))]]]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group

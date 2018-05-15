@@ -157,6 +157,7 @@ div.org-settings-main {
     button.add-slack-team-bt {
       margin-top: 16px;
       opacity: 0.7;
+      padding: 0px;
 
       &:hover{
         opacity: 1;
@@ -165,17 +166,62 @@ div.org-settings-main {
 
     div.org-settings-list {
       div.org-settings-list-item {
-        label.org-settings-list-item-name{
-          @include avenir_R();
-          font-size: 16px;
-          color: $carrot_dark_gray;
+        height: 68px;
+        border-top: 1px solid rgba($deep_tan, 0.3);
+        padding-top: 32px;
+        margin-top: 32px;
+
+        div.logo-container {
+          float: left;
+          width: 46px;
+          height: 46px;
+          border: 1px solid #D8DBDF;
+          border-radius: 4px;
+          margin-right: 16px;
 
           img.slack-logo {
-            width: 16px;
-            height: 16px;
-            margin-top: 3px;
-            margin-right: 8px;
-            float: left;
+            width: 40px;
+            height: 40px;
+            padding: 3px;
+
+            &.no-logo {
+              width: 20px;
+              margin-left: 10px;
+              margin-top: 10px;
+              height: 20px;
+            }
+          }
+        }
+
+        button.remove-team-btn {
+          float: none;
+          color: $carrot_orange;
+          @include avenir_M();
+          font-size: 12px;
+          margin-left: 0px !important;
+          padding: 0px !important;
+        }
+
+        div.org-settings-list-item-name{
+          @include avenir_M();
+          font-size: 15px;
+          color: $deep_navy;
+          float: none !important;
+          width: 100%;
+
+          button.org-settings-list-item-btn {
+            float: right;
+            color: $carrot_green;
+            @include avenir_M();
+            font-size: 12px;
+            padding-right: 8px;
+
+            i.mdi.mdi-information-outline {
+              color: $ui_grey;
+              &:before {
+                font-size: 14px
+              }
+            }
           }
         }
       }
