@@ -33,12 +33,10 @@
                              ;; Mixins
                              (ui-mixins/render-on-resize save-win-height)
 
-                             {:init (fn [s]
-                               (reset! (::show-login-header s) (not (jwt/jwt)))
-                               s)
-                              :will-mount (fn [s]
+                             {:will-mount (fn [s]
                                (utils/after 100 #(activity-actions/secure-activity-get))
                                (save-win-height s)
+                               (reset! (::show-login-header s) (not (jwt/jwt)))
                               s)}
   [s]
   (let [activity-data (drv/react s :secure-activity-data)
