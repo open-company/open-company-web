@@ -261,11 +261,13 @@ div.org-settings {
           @include avenir_M();
           font-size: 15px;
           color: $deep_navy;
+          margin-bottom: 8px;
 
           label {
             @include avenir_M();
             font-size: 15px;
             color: $deep_navy;
+            margin-bottom: 0px;
           }
 
           .error {

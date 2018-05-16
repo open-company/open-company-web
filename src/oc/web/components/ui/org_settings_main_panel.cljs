@@ -140,14 +140,15 @@
               (when add-email-domain-team-error
                 [:label.error
                   "Only company email domains are allowed."])]
-            [:div.org-settings-list
-              (for [team (:email-domains team-data)]
-                [:div.org-settings-list-item.group
-                  {:key (str "email-domain-team-" (:domain team))}
-                  [:span.org-settings-list-item-name (str "@" (:domain team))]
-                  [:button.remove-team-btn.btn-reset
-                    {:on-click #(team-actions/remove-team (:links team))}
-                    "Remove email domain"]])]
+            (when-not (zero? (count (:email-domains team-data)))
+              [:div.org-settings-list
+                (for [team (:email-domains team-data)]
+                  [:div.org-settings-list-item.group
+                    {:key (str "email-domain-team-" (:domain team))}
+                    [:span.org-settings-list-item-name (str "@" (:domain team))]
+                    [:button.remove-team-btn.btn-reset
+                      {:on-click #(team-actions/remove-team (:links team))}
+                      "Remove email domain"]])])
             [:div.org-settings-field
               {:class (when add-email-domain-team-error "error")}
               [:input.um-invite-field.email
@@ -197,39 +198,45 @@
                        :src "https://platform.slack-edge.com/img/add_to_slack.png"
                        :src-set (str "https://platform.slack-edge.com/img/add_to_slack.png 1x, "
                                  "https://platform.slack-edge.com/img/add_to_slack@2x.png 2x")}]])
-          [:div.org-settings-list
-            (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
-              (for [team (:slack-orgs team-data)]
-                [:div.org-settings-list-item.group
-                  {:key (str "slack-org-" (:slack-org-id team))}
-                  (let [has-logo (seq (:logo-url team))
-                        logo-url (if has-logo
-                                   (:logo-url team)
-                                   (utils/cdn "/img/slack.png"))]
-                    [:div.logo-container
-                      [:img.slack-logo
-                        {:class (when-not has-logo "no-logo")
-                         :src logo-url}]])
-                  [:div.org-settings-list-item-name
-                    (:name team)
-                    (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
-                      (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
-                        [:button.org-settings-list-item-btn.btn-reset
-                          {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
-                           :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
-                           :data-toggle "tooltip"
-                           :data-placement "top"
-                           :data-container "body"}
-                          "Add Slackbot to team"
-                          [:i.mdi.mdi-information-outline]]))]
-                  [:div.org-settings-list-item-desc
-                    "This team is linked to the "
-                    [:span.slack-domain
-                       (:slack-domain team) ".slack.com"]
-                    " team"]
-                  [:button.remove-team-btn.btn-reset
-                    {:on-click #(team-actions/remove-team (:links team))}
-                    "Remove Slack team"]]))]]]
+          (when-not (zero? (count (:slack-orgs team-data)))
+            [:div.org-settings-list
+              (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
+                (for [team (:slack-orgs team-data)]
+                  [:div.org-settings-list-item.group
+                    {:key (str "slack-org-" (:slack-org-id team))}
+                    (let [has-logo (seq (:logo-url team))
+                          logo-url (if has-logo
+                                     (:logo-url team)
+                                     (utils/cdn "/img/slack.png"))]
+                      [:div.logo-container
+                        [:img.slack-logo
+                          {:class (when-not has-logo "no-logo")
+                           :src logo-url}]])
+                    [:div.org-settings-list-item-slack-org
+                      [:div.org-settings-list-item-name
+                        (:name team)
+                        (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
+                          (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
+                            [:button.org-settings-list-item-btn.btn-reset
+                              {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
+                               :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
+                               :data-toggle "tooltip"
+                               :data-placement "top"
+                               :data-container "body"}
+                              "Add Slackbot to team"
+                              [:i.mdi.mdi-information-outline]]))]
+                      [:div.org-settings-list-item-desc.group
+                        (when (seq (:slack-domain team))
+                          [:div.slack-domain-label
+                            "This team is linked to the "
+                            [:span.slack-domain
+                               (:slack-domain team) ".slack.com"]
+                            " team."])]
+                      [:div.slack-org-self-join
+                        "Slack members can " [:span.self-join "self-join"] " this team."]
+                      [:button.remove-team-btn.btn-reset
+                        {:on-click #(team-actions/remove-team (:links team))}
+                        "Remove Slack team"]]]))])]]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
