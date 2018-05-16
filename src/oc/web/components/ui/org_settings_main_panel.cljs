@@ -193,11 +193,11 @@
             [:button.btn-reset.add-slack-team-bt
                 {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data))}
                 [:img {:alt "Add to Slack"
-                       :height "48"
-                       :width "174"
-                       :src "https://platform.slack-edge.com/img/add_to_slack.png"
-                       :src-set (str "https://platform.slack-edge.com/img/add_to_slack.png 1x, "
-                                 "https://platform.slack-edge.com/img/add_to_slack@2x.png 2x")}]])
+                       :height "40"
+                       :width "173"
+                       :src (utils/cdn "/img/ML/add_a_slack_team_bt.png")
+                       :src-set (str (utils/cdn "/img/ML/add_a_slack_team_bt.png") " 1x, "
+                                 (utils/cdn "/img/ML/add_a_slack_team_bt@2x.png") " 2x")}]])
           (when-not (zero? (count (:slack-orgs team-data)))
             [:div.org-settings-list
               (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
