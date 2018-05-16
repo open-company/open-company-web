@@ -7,8 +7,8 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.image-upload :as iu]
-            [oc.web.utils.org :as org-utils]
+            ; [oc.web.lib.image-upload :as iu]
+            ; [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.team :as team-actions]
@@ -30,23 +30,23 @@
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
-(defn logo-on-load [org-data url img]
-  (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
-                                                         :logo-url url
-                                                         :logo-width (.-width img)
-                                                         :logo-height (.-height img)})])
-  (gdom/removeNode img))
+; (defn logo-on-load [org-data url img]
+;   (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
+;                                                          :logo-url url
+;                                                          :logo-width (.-width img)
+;                                                          :logo-height (.-height img)})])
+;   (gdom/removeNode img))
 
-(defn logo-add-error
-  "Show an error alert view for failed uploads."
-  []
-  (let [alert-data {:icon "/img/ML/error_icon.png"
-                    :action "org-settings-main-logo-upload-error"
-                    :title "Sorry!"
-                    :message "An error occurred with your image."
-                    :solid-button-title "OK"
-                    :solid-button-cb #(alert-modal/hide-alert)}]
-    (alert-modal/show-alert alert-data)))
+; (defn logo-add-error
+;   "Show an error alert view for failed uploads."
+;   []
+;   (let [alert-data {:icon "/img/ML/error_icon.png"
+;                     :action "org-settings-main-logo-upload-error"
+;                     :title "Sorry!"
+;                     :message "An error occurred with your image."
+;                     :solid-button-title "OK"
+;                     :solid-button-cb #(alert-modal/hide-alert)}]
+;     (alert-modal/show-alert alert-data)))
 
 (rum/defcs org-settings-main-panel
   < rum/reactive
@@ -96,37 +96,37 @@
                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. e -target -value)
                                                                                       :has-changes true})]))}]]]
         ;; Org logo row
-        [:div.org-settings-panel-row.org-logo-row.group.fs-hide
-          {:on-click (fn [_]
-                      (dis/dispatch!
-                       [:input
-                        [:org-editing]
-                        (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0 :has-changes true})])
-                      (iu/upload! org-utils/org-avatar-filestack-config
-                        (fn [res]
-                          (let [url (gobj/get res "url")
-                                img (gdom/createDom "img")]
-                            (set! (.-onload img) #(logo-on-load org-editing url img))
-                            (set! (.-className img) "hidden")
-                            (gdom/append (.-body js/document) img)
-                            (set! (.-src img) url)))
-                        nil
-                        (fn [err]
-                          (logo-add-error))))}
-          [:div.org-logo-container
-            {:title (if (empty? (:logo-url org-editing))
-                      "Add a logo"
-                      "Change logo")
-             :data-toggle "tooltip"
-             :data-container "body"
-             :data-position "top"}
-            (org-avatar org-editing false :never)]
-          [:div.org-logo-label
-            [:div.cta
-              (if (empty? (:logo-url org-editing))
-                "Upload logo"
-                "Change logo")]
-            [:div.description "A transparent background PNG works best"]]]
+        ; [:div.org-settings-panel-row.org-logo-row.group.fs-hide
+        ;   {:on-click (fn [_]
+        ;               (dis/dispatch!
+        ;                [:input
+        ;                 [:org-editing]
+        ;                 (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0 :has-changes true})])
+        ;               (iu/upload! org-utils/org-avatar-filestack-config
+        ;                 (fn [res]
+        ;                   (let [url (gobj/get res "url")
+        ;                         img (gdom/createDom "img")]
+        ;                     (set! (.-onload img) #(logo-on-load org-editing url img))
+        ;                     (set! (.-className img) "hidden")
+        ;                     (gdom/append (.-body js/document) img)
+        ;                     (set! (.-src img) url)))
+        ;                 nil
+        ;                 (fn [err]
+        ;                   (logo-add-error))))}
+        ;   [:div.org-logo-container
+        ;     {:title (if (empty? (:logo-url org-editing))
+        ;               "Add a logo"
+        ;               "Change logo")
+        ;      :data-toggle "tooltip"
+        ;      :data-container "body"
+        ;      :data-position "top"}
+        ;     (org-avatar org-editing false :never)]
+        ;   [:div.org-logo-label
+        ;     [:div.cta
+        ;       (if (empty? (:logo-url org-editing))
+        ;         "Upload logo"
+        ;         "Change logo")]
+        ;     [:div.description "A transparent background PNG works best"]]]
         ;; Email domains row
         (let [valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))]
           [:div.org-settings-panel-row.email-domains-row.group
@@ -195,8 +195,8 @@
                        :height "48"
                        :width "174"
                        :src "https://platform.slack-edge.com/img/add_to_slack.png"
-                       :srcset (str "https://platform.slack-edge.com/img/add_to_slack.png 1x, "
-                                "https://platform.slack-edge.com/img/add_to_slack@2x.png 2x")}]])
+                       :src-set (str "https://platform.slack-edge.com/img/add_to_slack.png 1x, "
+                                 "https://platform.slack-edge.com/img/add_to_slack@2x.png 2x")}]])
           [:div.org-settings-list
             (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
               (for [team (:slack-orgs team-data)]
@@ -222,13 +222,18 @@
                            :data-container "body"}
                           "Add Slackbot to team"
                           [:i.mdi.mdi-information-outline]]))]
+                  [:div.org-settings-list-item-desc
+                    "This team is linked to the "
+                    [:span.slack-domain
+                       (:slack-domain team) ".slack.com"]
+                    " team"]
                   [:button.remove-team-btn.btn-reset
                     {:on-click #(team-actions/remove-team (:links team))}
                     "Remove Slack team"]]))]]]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
-        [:button.mlb-reset.mlb-default.save-btn
+        [:button.mlb-reset.save-btn
           {:disabled (or @(::saving s)
                          (:saved org-editing)
                          (not (:has-changes org-editing)))
@@ -241,7 +246,7 @@
             (if @(::saving s)
               "Saving..."
               "Save"))]
-        [:button.mlb-reset.mlb-link-black.cancel-btn
+        [:button.mlb-reset.cancel-btn
           {:on-click #(if (form-is-clean? s)
                         (dismiss-settings-cb)
                         (reset-form s))}
