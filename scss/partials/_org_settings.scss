@@ -10,6 +10,9 @@ div.org-settings {
   top: 0px;
   left: 0px;
   z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
 
   div.org-settings-inner {
     width: #{$settings_content_width}px;
@@ -21,7 +24,6 @@ div.org-settings {
     position: relative;
     border-radius: 4px;
     padding: 32px 24px;
-    max-height: calc(100vh - 144px);
 
     @include mobile() {
       width: 100%;
@@ -32,12 +34,41 @@ div.org-settings {
       height: $settings_header_height;
       margin-bottom: 32px;
 
-      @include org-avatar(48);
-
-      div.org-avatar {
+      div.org-settings-header-avatar {
         float: left;
         border: 1px solid #D8DBDF;
         border-radius: 4px;
+        width: 48px;
+        height: 48px;
+        cursor: pointer;
+
+        &.missing-logo {
+          &:hover {
+            background-color: $carrot_green;
+
+            @include preload_image(cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg"));
+
+            img {
+              background-image: cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg");
+            }
+          }
+
+          img {
+            background-image: cdnUrl("/img/ML/upload_avatar_placeholder.svg");
+            background-size: 22px 19px;
+            background-position: center;
+            background-repeat: no-repeat;
+          }
+        }
+
+        img {
+          max-width: 40px;
+          max-height: 40px;
+        }
+
+        &:hover {
+          border: 1px solid $carrot_green;
+        }
       }
 
       div.org-name {
@@ -45,6 +76,7 @@ div.org-settings {
         @include avenir_H();
         font-size: 22px;
         color: $deep_navy;
+        line-height: 32px;
       }
 
       div.org-url {
@@ -57,18 +89,30 @@ div.org-settings {
 
     div.org-settings-footer {
       margin-top: 64px;
-      margin-bottom: 32px;
-      height: 42px;
+      margin-bottom: 0px;
+      height: 40px;
       width: 100%;
       padding: 0px;
 
       button {
         float: right;
         margin-left: 24px;
-        height: 42px;
+        height: 40px;
+
+        &.cancel-btn {
+          background-color: transparent;
+          @include avenir_M();
+          font-size: 16px;
+          color: $ui_grey;
+        }
 
         &.save-btn {
-          width: 124px;
+          width: 100px;
+          border-radius: 100px;
+          background-color: $carrot_green;
+          color: white;
+          @include avenir_H();
+          font-size: 16px;
         }
       }
     }

@@ -1,11 +1,15 @@
 (ns oc.web.components.org-settings
   (:require [rum.core :as rum]
+            [goog.dom :as gdom]
+            [goog.object :as gobj]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.image-upload :as iu]
+            [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
@@ -71,12 +75,31 @@
         (alert-modal/show-alert alert-data))
       (dismiss-modal))))
 
+(defn logo-on-load [org-data url img]
+  (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
+                                                         :logo-url url
+                                                         :logo-width (.-width img)
+                                                         :logo-height (.-height img)})])
+  (gdom/removeNode img))
+
+(defn logo-add-error
+  "Show an error alert view for failed uploads."
+  []
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "org-settings-main-logo-upload-error"
+                    :title "Sorry!"
+                    :message "An error occurred with your image."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)))
+
 (rum/defcs org-settings
   "Org settings main component. It handles the data loading/reset and the tab logic."
   < rum/static
     rum/reactive
     ;; Derivatives
     (drv/drv :org-data)
+    (drv/drv :org-editing)
     (drv/drv :org-settings)
     (drv/drv :alert-modal)
     (drv/drv :org-editing)
@@ -85,14 +108,26 @@
     no-scroll-mixin
 
     {:will-mount (fn [s]
-                   (let [org-data @(drv/get-ref s :org-data)]
-                     (org-actions/get-org org-data)
-                     (team-actions/force-team-refresh (:team-id org-data)))
-                   s)}
+      (let [org-data @(drv/get-ref s :org-data)]
+        (org-actions/get-org org-data)
+        (team-actions/force-team-refresh (:team-id org-data)))
+      s)
+     :did-mount (fn [s]
+      (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+      s)
+     :did-update (fn [s]
+      ; FIXME: commenting out since there is a bug in bootstrap 3.3.1
+      ; (utils/after 100
+      ;  #(let [header-logo (rum/ref-node s "org-settings-header-logo")
+      ;         $header-logo (js/$ header-logo)]
+      ;     (.tooltip $header-logo (.attr $header-logo "data-ttitle"))))
+      s)}
   [s]
-  (let [settings-tab (drv/react s :org-settings)
+  (let [org-editing (drv/react s :org-editing)
+        settings-tab (drv/react s :org-settings)
         org-data (drv/react s :org-data)
-        alert-modal-data (drv/react s :alert-modal)]
+        alert-modal-data (drv/react s :alert-modal)
+        main-tab? (= settings-tab :main)]
     (when (:read-only org-data)
       (utils/after 100 #(dismiss-modal)))
     (if org-data
@@ -101,7 +136,33 @@
           (alert-modal/alert-modal))
         [:div.org-settings-inner
           [:div.org-settings-header
-            (org-avatar org-data)
+            [:div.org-settings-header-avatar.fs-hide
+              {:ref "org-settings-header-logo"
+               :data-ttitle (if (empty? (:logo-url org-editing))
+                             "Add a logo"
+                             "Change logo")
+               :data-toggle (if main-tab? "tooltip" "")
+               :data-container "body"
+               :data-position "top"
+               :on-click (fn [_]
+                          (when main-tab?
+                            (dis/dispatch!
+                             [:input
+                              [:org-editing]
+                              (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0 :has-changes true})])
+                            (iu/upload! org-utils/org-avatar-filestack-config
+                              (fn [res]
+                                (let [url (gobj/get res "url")
+                                      img (gdom/createDom "img")]
+                                  (set! (.-onload img) #(logo-on-load org-editing url img))
+                                  (set! (.-className img) "hidden")
+                                  (gdom/append (.-body js/document) img)
+                                  (set! (.-src img) url)))
+                              nil
+                              (fn [err]
+                                (logo-add-error)))))}
+              [:img.org-avatar-img
+                {:src (:logo-url (if main-tab? org-editing org-data))}]]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
           (org-settings-tabs (:slug org-data) settings-tab)
