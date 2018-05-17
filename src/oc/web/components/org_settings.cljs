@@ -93,6 +93,22 @@
                     :solid-button-cb #(alert-modal/hide-alert)}]
     (alert-modal/show-alert alert-data)))
 
+(defn- update-tooltip [s]
+  (utils/after 100
+   #(let [header-logo (rum/ref-node s "org-settings-header-logo")
+          $header-logo (js/$ header-logo)
+          org-editing @(drv/get-ref s :org-editing)
+          title (if (empty? (:logo-url org-editing))
+                  "Add a logo"
+                  "Change logo")
+          main-tab? (.hasClass $header-logo "main-panel")]
+      (if main-tab?
+        (.tooltip $header-logo #js {:title title
+                                    :trigger "hover focus"
+                                    :position "top"
+                                    :container "body"})
+        (.tooltip $header-logo "destroy")))))
+
 (rum/defcs org-settings
   "Org settings main component. It handles the data loading/reset and the tab logic."
   < rum/static
@@ -113,14 +129,11 @@
         (team-actions/force-team-refresh (:team-id org-data)))
       s)
      :did-mount (fn [s]
-      (utils/after 100 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+      (update-tooltip s)
       s)
      :did-update (fn [s]
       ; FIXME: commenting out since there is a bug in bootstrap 3.3.1
-      ; (utils/after 100
-      ;  #(let [header-logo (rum/ref-node s "org-settings-header-logo")
-      ;         $header-logo (js/$ header-logo)]
-      ;     (.tooltip $header-logo (.attr $header-logo "data-ttitle"))))
+      (update-tooltip s)
       s)}
   [s]
   (let [org-editing (drv/react s :org-editing)
@@ -138,12 +151,8 @@
           [:div.org-settings-header
             [:div.org-settings-header-avatar.fs-hide
               {:ref "org-settings-header-logo"
-               :data-ttitle (if (empty? (:logo-url org-editing))
-                             "Add a logo"
-                             "Change logo")
-               :data-toggle (if main-tab? "tooltip" "")
-               :data-container "body"
-               :data-position "top"
+               :class (utils/class-set {:missing-logo (and main-tab? (empty? (:logo-url org-editing)))
+                                        :main-panel main-tab?})
                :on-click (fn [_]
                           (when main-tab?
                             (dis/dispatch!
@@ -161,8 +170,10 @@
                               nil
                               (fn [err]
                                 (logo-add-error)))))}
-              [:img.org-avatar-img
-                {:src (:logo-url (if main-tab? org-editing org-data))}]]
+              (if (and main-tab? (empty? (:logo-url org-editing)))
+                [:div.org-avatar-img-empty]
+                [:img.org-avatar-img
+                  {:src (:logo-url (if main-tab? org-editing org-data))}])]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
           (org-settings-tabs (:slug org-data) settings-tab)

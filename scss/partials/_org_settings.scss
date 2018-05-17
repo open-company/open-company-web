@@ -40,20 +40,27 @@ div.org-settings {
         border-radius: 4px;
         width: 48px;
         height: 48px;
-        cursor: pointer;
+
+        &.main-panel {
+          cursor: pointer;
+        }
 
         &.missing-logo {
           &:hover {
             background-color: $carrot_green;
 
+            @include preload_image(cdnUrl("/img/ML/upload_avatar_placeholder.svg"));
             @include preload_image(cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg"));
 
-            img {
+            div.org-avatar-img-empty {
               background-image: cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg");
             }
           }
 
-          img {
+          div.org-avatar-img-empty {
+            width: 22px;
+            height: 19px;
+            margin: 14px auto;
             background-image: cdnUrl("/img/ML/upload_avatar_placeholder.svg");
             background-size: 22px 19px;
             background-position: center;
@@ -62,11 +69,12 @@ div.org-settings {
         }
 
         img {
-          max-width: 40px;
-          max-height: 40px;
+          max-width: 48px;
+          max-height: 48px;
+          padding: 8px;
         }
 
-        &:hover {
+        &.main-panel:hover {
           border: 1px solid $carrot_green;
         }
       }
@@ -337,8 +345,6 @@ div.org-settings-tabs {
 
       a.org-settings-tab-link {
         padding: 0;
-        @include avenir_H();
-        font-size: 16px;
         color: $carrot_orange;
 
         @include mobile() {
