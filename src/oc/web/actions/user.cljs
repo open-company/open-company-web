@@ -378,6 +378,16 @@
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
 
+(defn user-role []
+  (let [org-data (dis/org-data)
+        user-data (dis/current-user-data)
+        is-admin? (jwt/is-admin? (:team-id org-data))
+        is-author? (utils/link-for (:links org-data) "create")]
+    (cond
+      is-admin? :admin
+      is-author? :author
+      :else :viewer)))
+
 ;; Debug
 
 (defn force-jwt-refresh []
