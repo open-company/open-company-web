@@ -32,6 +32,7 @@ div.add-comment-box-container {
 
           @include tablet() {
             height: auto;
+            width: auto;
           }
         }
       }
