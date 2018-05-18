@@ -172,8 +172,7 @@
                                 (logo-add-error)))))}
               (if (and main-tab? (empty? (:logo-url org-editing)))
                 [:div.org-avatar-img-empty]
-                [:img.org-avatar-img
-                  {:src (:logo-url (if main-tab? org-editing org-data))}])]
+                (org-avatar (if main-tab? org-editing org-data) false false true))]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
           (org-settings-tabs (:slug org-data) settings-tab)
