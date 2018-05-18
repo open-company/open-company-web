@@ -30,24 +30,6 @@
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
-; (defn logo-on-load [org-data url img]
-;   (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
-;                                                          :logo-url url
-;                                                          :logo-width (.-width img)
-;                                                          :logo-height (.-height img)})])
-;   (gdom/removeNode img))
-
-; (defn logo-add-error
-;   "Show an error alert view for failed uploads."
-;   []
-;   (let [alert-data {:icon "/img/ML/error_icon.png"
-;                     :action "org-settings-main-logo-upload-error"
-;                     :title "Sorry!"
-;                     :message "An error occurred with your image."
-;                     :solid-button-title "OK"
-;                     :solid-button-cb #(alert-modal/hide-alert)}]
-;     (alert-modal/show-alert alert-data)))
-
 (rum/defcs org-settings-main-panel
   < rum/reactive
     (rum/local false ::saving)
@@ -95,38 +77,6 @@
                :on-change (fn [e]
                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. e -target -value)
                                                                                       :has-changes true})]))}]]]
-        ;; Org logo row
-        ; [:div.org-settings-panel-row.org-logo-row.group.fs-hide
-        ;   {:on-click (fn [_]
-        ;               (dis/dispatch!
-        ;                [:input
-        ;                 [:org-editing]
-        ;                 (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0 :has-changes true})])
-        ;               (iu/upload! org-utils/org-avatar-filestack-config
-        ;                 (fn [res]
-        ;                   (let [url (gobj/get res "url")
-        ;                         img (gdom/createDom "img")]
-        ;                     (set! (.-onload img) #(logo-on-load org-editing url img))
-        ;                     (set! (.-className img) "hidden")
-        ;                     (gdom/append (.-body js/document) img)
-        ;                     (set! (.-src img) url)))
-        ;                 nil
-        ;                 (fn [err]
-        ;                   (logo-add-error))))}
-        ;   [:div.org-logo-container
-        ;     {:title (if (empty? (:logo-url org-editing))
-        ;               "Add a logo"
-        ;               "Change logo")
-        ;      :data-toggle "tooltip"
-        ;      :data-container "body"
-        ;      :data-position "top"}
-        ;     (org-avatar org-editing false :never)]
-        ;   [:div.org-logo-label
-        ;     [:div.cta
-        ;       (if (empty? (:logo-url org-editing))
-        ;         "Upload logo"
-        ;         "Change logo")]
-        ;     [:div.description "A transparent background PNG works best"]]]
         ;; Email domains row
         (let [valid-domain-email? (utils/valid-domain? (:domain um-domain-invite))]
           [:div.org-settings-panel-row.email-domains-row.group
