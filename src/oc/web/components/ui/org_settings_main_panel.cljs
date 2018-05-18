@@ -82,7 +82,7 @@
           [:div.org-settings-panel-row.email-domains-row.group
             [:div.org-settings-label
               [:label
-                "Email Domains"
+                "Accepted email domains for registration"
                 [:i.mdi.mdi-information-outline
                   {:title "Anyone who signs up with this email domain can contribute to team boards."
                    :data-toggle "tooltip"
@@ -90,16 +90,7 @@
               (when add-email-domain-team-error
                 [:label.error
                   "Only company email domains are allowed."])]
-            (when-not (zero? (count (:email-domains team-data)))
-              [:div.org-settings-list
-                (for [team (:email-domains team-data)]
-                  [:div.org-settings-list-item.group
-                    {:key (str "email-domain-team-" (:domain team))}
-                    [:span.org-settings-list-item-name (str "@" (:domain team))]
-                    [:button.remove-team-btn.btn-reset
-                      {:on-click #(team-actions/remove-team (:links team))}
-                      "Remove email domain"]])])
-            [:div.org-settings-field
+            [:div.org-settings-field.org-settings-email-domain-field
               {:class (when add-email-domain-team-error "error")}
               [:input.um-invite-field.email
                 {:name "um-domain-invite"
@@ -108,15 +99,28 @@
                  :value (:domain um-domain-invite)
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                  :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-                 :placeholder "Domain, e.g. @acme.com"}]]
-            [:button.mlb-reset.add-email-domain-bt
-              {:on-click #(let [domain (:domain um-domain-invite)]
-                            (if (utils/valid-domain? domain)
-                              (team-actions/email-domain-team-add
-                               (-> @(drv/get-ref s :org-settings-team-management) :um-domain-invite :domain))
-                              (dis/dispatch! [:input [:add-email-domain-team-error] true])))
-               :disabled false} ;(not valid-domain-email?)}
-              "Add"]])
+                 :placeholder "Domain, e.g. @acme.com"}]
+              [:button.mlb-reset.add-email-domain-bt
+                {:on-click #(let [domain (:domain um-domain-invite)]
+                              (if (utils/valid-domain? domain)
+                                (team-actions/email-domain-team-add
+                                 (-> @(drv/get-ref s :org-settings-team-management) :um-domain-invite :domain))
+                                (dis/dispatch! [:input [:add-email-domain-team-error] true])))
+                 :disabled (not valid-domain-email?)}
+                "Add domain"]]
+            (when-not (zero? (count (:email-domains team-data)))
+              [:div.org-settings-list.org-settings-email-domains-list
+                (for [team (:email-domains team-data)]
+                  [:div.org-settings-list-item.group
+                    {:key (str "email-domain-team-" (:domain team))}
+                    [:span.org-settings-list-item-name
+                      (str "@" (:domain team))]
+                    [:button.remove-team-btn.btn-reset
+                      {:on-click #(team-actions/remove-team (:links team))
+                       :title "Remove"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"}]])])])
         ;; Slack teams row
         [:div.org-settings-panel-row.slack-teams-row.group
           [:div.org-settings-label
