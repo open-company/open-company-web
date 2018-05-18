@@ -84,51 +84,43 @@ div.menu {
     }
   }
 
-  a {
+  div.org-item {
+    padding: 24px 0px 3px 0px;
 
-    &:hover {
-      text-decoration: none;
+    div.org-avatar-border {
+      border: 1px solid #D8DBDF;
+      border-radius: 6px;
+      padding: 6px;
+      float: left;
+      margin-right: 16px;
+      width: 32px;
+      height: 32px;
+
+      div.org-avatar {
+        @include org-avatar(20);
+      }
     }
 
-    div.org-item {
-      padding: 24px 0px 3px 0px;
-      cursor: pointer;
+    div.org-name {
+      @include avenir_H();
+      font-size: 15px;
+      color: $deep_navy;
+      width: calc(100% - 48px);
+      line-height: 18px;
+      height: 18px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      div.org-avatar-border {
-        border: 1px solid #D8DBDF;
-        border-radius: 6px;
-        padding: 6px;
-        float: left;
-        margin-right: 16px;
-        width: 32px;
-        height: 32px;
-
-        div.org-avatar {
-          @include org-avatar(20);
-        }
-      }
-
-      div.org-name {
-        @include avenir_H();
-        font-size: 15px;
-        color: $deep_navy;
-        width: calc(100% - 48px);
-        line-height: 18px;
-        height: 18px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      div.org-url {
-        @include avenir_R();
-        font-size: 13px;
-        width: calc(100% - 48px);
-        height: 15px;
-        color: $light_ui_grey;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 15px;
-      }
+    div.org-url {
+      @include avenir_R();
+      font-size: 13px;
+      width: calc(100% - 48px);
+      height: 15px;
+      color: $light_ui_grey;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 15px;
     }
   }
 
