@@ -11,22 +11,6 @@ button.user-avatar-button{
   position: relative;
 
   &:after {
-    transition: transform 180ms;
-  }
-
-  &:hover, &[aria-expanded=true] {
-    &:after {
-      opacity: 1;
-    }
-  }
-
-  &[aria-expanded=true] {
-    &:after {
-      transform: rotate(180deg);
-    }
-  }
-
-  &:after {
     content: "";
     width: 9px;
     height: 6px;
@@ -37,7 +21,6 @@ button.user-avatar-button{
     position: absolute;
     top: #{($avatar_size - 6) / 2}px;
     right: 0px;
-    opacity: 0;
   }
 
   &.disabled-user-menu {
