@@ -15,7 +15,6 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn should-show-continue-reading? [s]
@@ -23,9 +22,6 @@
     (let [item-body (rum/ref-node s "item-body")
           dom-node (rum/dom-node s)
           should-hide-body (> (.-clientHeight item-body) 418)]
-      (when (and (not should-hide-body)
-                 (not @(::should-show-comments s)))
-        (reset! (::should-show-comments s) true))
       (when should-hide-body
         (.add (.-classList dom-node) "show-continue-reading")))))
 
@@ -38,7 +34,6 @@
                          (rum/local false ::more-dropdown)
                          (rum/local false ::move-activity)
                          (rum/local false ::expanded)
-                         (rum/local false ::should-show-comments)
                          (rum/local false ::should-scroll-to-comments)
                          ;; Mixins
                          am/truncate-comments-mixin
@@ -106,9 +101,7 @@
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
             [:button.mlb-reset.expand-button
               {:class (when expanded? "expanded")
-               :on-click #(do
-                           (swap! (::expanded s) not)
-                           (reset! (::should-show-comments s) true))}
+               :on-click #(swap! (::expanded s) not)}
               (if expanded?
                 "Show less"
                 "Keep reading")]]
@@ -118,17 +111,10 @@
             {:ref "stream-item-reactions"}
             (reactions activity-data)]
           (when (and is-mobile?
-                     (pos? (count comments-data)))
-            [:div.stream-mobile-comments-summary
-              {:on-click (fn [e]
-                            (utils/event-stop e)
-                            (reset! (::expanded s) true)
-                            (reset! (::should-scroll-to-comments s) true))}
-              (when-not (zero? (count comments-data))
-                (comments-summary activity-data false))])
+                     (:has-comments activity-data))
+            [:div.stream-item-separator])
           (when (and is-mobile?
-                     (:has-comments activity-data)
-                     @(::should-show-comments s))
+                     (:has-comments activity-data))
             [:div.stream-mobile-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
               (when (pos? (count comments-data))
