@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
@@ -60,7 +61,7 @@
   [s]
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
-        user-role (user-actions/user-role)]
+        user-role (user-store/user-role org-data current-user-data)]
     [:div.menu
       {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
                                 :mobile-menu-open (and (responsive/is-mobile-size?)
