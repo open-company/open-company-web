@@ -132,7 +132,6 @@
       (update-tooltip s)
       s)
      :did-update (fn [s]
-      ; FIXME: commenting out since there is a bug in bootstrap 3.3.1
       (update-tooltip s)
       s)}
   [s]
@@ -145,9 +144,10 @@
       (utils/after 100 #(dismiss-modal)))
     (if org-data
       [:div.org-settings.fullscreen-page
-        (when alert-modal-data
-          (alert-modal/alert-modal))
         [:div.org-settings-inner
+          (when-not alert-modal-data
+            [:button.carrot-modal-close.mlb-reset
+              {:on-click #(close-clicked s)}])
           [:div.org-settings-header
             [:div.org-settings-header-avatar.fs-hide
               {:ref "org-settings-header-logo"

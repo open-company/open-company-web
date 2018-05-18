@@ -21,12 +21,18 @@ div.org-settings {
     background-color: white;
     overflow-x: visible;
     overflow-y: auto;
+    overflow: visible;
     position: relative;
     border-radius: 4px;
     padding: 32px 24px;
 
     @include mobile() {
       width: 100%;
+    }
+
+    button.carrot-modal-close {
+      top: 4px;
+      left: -24px;
     }
 
     div.org-settings-header {
