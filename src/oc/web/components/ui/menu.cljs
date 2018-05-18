@@ -94,7 +94,7 @@
            :on-click #(router/nav! (oc-urls/org (:slug org-data)))}
           [:div.org-item
             [:div.org-avatar-border
-              (org-avatar org-data)]
+              (org-avatar org-data false false true)]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]])
       (when (and (router/current-org-slug)
