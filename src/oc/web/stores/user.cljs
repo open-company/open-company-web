@@ -250,3 +250,11 @@
     (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
       (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
     db))
+
+(defn user-role [org-data user-data]
+  (let [is-admin? (j/is-admin? (:team-id org-data))
+        is-author? (utils/link-for (:links org-data) "create")]
+    (cond
+      is-admin? :admin
+      is-author? :author
+      :else :viewer)))
