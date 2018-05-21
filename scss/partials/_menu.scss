@@ -11,6 +11,10 @@ div.menu {
   text-transform: none;
   background-color: white;
 
+  &.dropdown-menu {
+    letter-spacing: 0em;
+  }
+
   div.menu-header {
     width: 100%;
 
@@ -80,7 +84,7 @@ div.menu {
     }
 
     &:hover {
-      text-decoration: underline;
+      color: $carrot_green;
     }
   }
 
@@ -124,6 +128,40 @@ div.menu {
     }
   }
 
+  a:hover {
+    div.oc-menu-item {
+      &.personal-profile {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_personal_profile_hover.svg");
+        }
+      }
+
+      &.invite-people {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_invite_people_hover.svg");
+        }
+      }
+
+      &.digest-settings {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_digest_settings_hover.svg");
+        }
+      }
+
+      &.whats-new {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_whats_new_hover.svg");
+        }
+      }
+
+      &.logout {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_logout_hover.svg");
+        }
+      }
+    }
+  }
+
   div.oc-menu-item {
     opacity: 0.9;
     padding: 14px 0px 0px 48px;
@@ -146,36 +184,35 @@ div.menu {
     }
 
     &.personal-profile {
+      @include preload_image(cdnUrl("/img/ML/menu_personal_profile_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_personal_profile.svg");
       }
     }
 
     &.invite-people {
+      @include preload_image(cdnUrl("/img/ML/menu_invite_people_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_invite_people.svg");
       }
     }
 
     &.digest-settings {
+      @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_digest_settings.svg");
       }
     }
 
     &.whats-new {
+      @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_whats_new.svg");
       }
     }
 
-    &.support {
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_support.svg");
-      }
-    }
-
     &.logout {
+      @include preload_image(cdnUrl("/img/ML/menu_logout_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_logout.svg");
       }
