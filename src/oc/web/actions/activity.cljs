@@ -199,9 +199,8 @@
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
-(defn entry-save-finish [activity-data initial-uuid edit-key]
+(defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
   (let [org-slug (router/current-org-slug)
-        board-slug (:board-slug activity-data)
         board-key (if (= (:status activity-data) "published")
                    (dis/current-board-key)
                    (dis/board-data-key org-slug utils/default-drafts-board-slug))]
@@ -214,7 +213,7 @@
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
-    (entry-save-finish (json->cljs body) (:uuid entry-data) edit-key)
+    (entry-save-finish (:board-slug entry-data) (json->cljs body) (:uuid entry-data) edit-key)
     (dis/dispatch! [:entry-save/failed edit-key])))
 
 (defn entry-modal-save-with-board-finish [activity-data response]
@@ -356,18 +355,17 @@
       (api/create-entry edited-data :entry-editing entry-create-link create-update-entry-cb)))
   (dis/dispatch! [:entry-save]))
 
-(defn entry-publish-finish [initial-uuid edit-key activity-data]
-  (let [board-slug (:board-slug activity-data)]
-    ;; Save last used section
-    (save-last-used-section board-slug)
-    (refresh-org-data)
-    ;; Remove entry cached edits
-    (remove-cached-item initial-uuid)
-    (dis/dispatch! [:entry-publish/finish edit-key activity-data])))
+(defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
+  ;; Save last used section
+  (save-last-used-section board-slug)
+  (refresh-org-data)
+  ;; Remove entry cached edits
+  (remove-cached-item initial-uuid)
+  (dis/dispatch! [:entry-publish/finish edit-key activity-data]))
 
-(defn entry-publish-cb [entry-uuid {:keys [status success body]}]
+(defn entry-publish-cb [entry-uuid posted-to-board-slug {:keys [status success body]}]
   (if success
-    (entry-publish-finish entry-uuid :entry-editing (when success (json->cljs body)))
+    (entry-publish-finish entry-uuid :entry-editing posted-to-board-slug (when success (json->cljs body)))
     (dis/dispatch! [:entry-publish/failed  :entry-editing])))
 
 (defn entry-publish-with-board-finish [entry-uuid new-board-data]
@@ -401,7 +399,8 @@
                               (utils/link-for (:links entry-editing) "publish")
                               ;; If the entry is new, use
                               (utils/link-for (:links board-data) "create"))]
-      (api/publish-entry entry-editing publish-entry-link (partial entry-publish-cb (:uuid entry-editing)))))
+      (api/publish-entry entry-editing publish-entry-link
+       (partial entry-publish-cb (:uuid entry-editing) (:board-slug entry-editing)))))
   (dis/dispatch! [:entry-publish]))
 
 (defn activity-delete-finish []

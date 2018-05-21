@@ -138,10 +138,10 @@
                   [:div.stream-comment-body.fs-hide
                     {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                      :ref (str "comment-body-" (:uuid comment-data))
-                     :on-click #(let [elem (.-target %)
-                                      $body (.closest (js/$ elem) ".stream-comment-body")]
-                                  (.restore (.data $body "dotdotdot"))
-                                  (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data))))))
+                     :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
+                                  (when (> (.-length $body) 0)
+                                    (.restore (.data $body "dotdotdot"))
+                                    (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
                      :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                               :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))})}]]
                 (when (or is-editing?

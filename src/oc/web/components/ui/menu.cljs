@@ -89,14 +89,11 @@
             "Personal Profile"]])
       [:div.oc-menu-separator]
       (when org-data
-        [:a
-          {:href (oc-urls/org (:slug org-data))
-           :on-click #(router/nav! (oc-urls/org (:slug org-data)))}
-          [:div.org-item
-            [:div.org-avatar-border
-              (org-avatar org-data false false true)]
-            [:div.org-name (:name org-data)]
-            [:div.org-url (str ls/web-server "/" (:slug org-data))]]])
+        [:div.org-item
+          [:div.org-avatar-border
+            (org-avatar org-data false false true)]
+          [:div.org-name (:name org-data)]
+          [:div.org-url (str ls/web-server "/" (:slug org-data))]])
       (when (and (router/current-org-slug)
                  (= user-role :admin)
                  (not (responsive/is-mobile-size?)))
@@ -118,12 +115,6 @@
          :on-click whats-new-click}
         [:div.oc-menu-item.whats-new
           "What’s New"]]
-      [:a
-        {:href oc-urls/help
-         :target "_blank"}
-        [:div.oc-menu-item.support
-          "Support"]]
-
       ; (when (and (router/current-org-slug)
       ;            (= user-role :admin))
       ;   [:div.oc-menu-item
