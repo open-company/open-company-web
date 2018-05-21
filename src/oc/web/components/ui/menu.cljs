@@ -37,7 +37,7 @@
 (defn user-notifications-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notification)))
+  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
 (defn team-settings-click [e]
   (utils/event-stop e)

@@ -164,7 +164,7 @@
                          ;; this latter is used when displaying modal over AP
                          (not (:fixed-items (dis/all-posts-data)))))
         user-settings (when (and (contains? query-params :user-settings)
-                                 (#{:profile :notification} (keyword (:user-settings query-params))))
+                                 (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
         org-settings (if (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
