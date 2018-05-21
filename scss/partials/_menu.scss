@@ -136,6 +136,12 @@ div.menu {
         }
       }
 
+      &.user-notifications {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_user_notifications_hover.svg");
+        }
+      }
+
       &.invite-people {
         &:before {
           background-image: cdnUrl("/img/ML/menu_invite_people_hover.svg");
@@ -197,6 +203,7 @@ div.menu {
     }
 
     &.user-notifications {
+      @include preload_image(cdnUrl("/img/ML/menu_user_notifications_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_user_notifications.svg");
       }
