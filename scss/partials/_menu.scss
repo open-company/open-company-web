@@ -154,6 +154,12 @@ div.menu {
         }
       }
 
+      &.support {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_support_hover.svg");
+        }
+      }
+
       &.logout {
         &:before {
           background-image: cdnUrl("/img/ML/menu_logout_hover.svg");
@@ -208,6 +214,13 @@ div.menu {
       @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_whats_new.svg");
+      }
+    }
+
+    &.support {
+      @include preload_image(cdnUrl("/img/ML/menu_support_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_support.svg");
       }
     }
 
