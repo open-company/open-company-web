@@ -93,6 +93,7 @@
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (:auth-settings base))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
+   :user-settings        [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
@@ -275,6 +276,7 @@
                                :board-data board-data
                                :all-posts-data all-posts
                                :org-settings-data (:org-settings base)
+                               :user-settings (:user-settings base)
                                :whats-new-modal-data (:whats-new-modal base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))

@@ -164,6 +164,9 @@
                     (and (contains? query-params :ap)
                          ;; this latter is used when displaying modal over AP
                          (not (:fixed-items (dis/all-posts-data)))))
+        user-settings (when (and (contains? query-params :user-settings)
+                                 (#{:profile :notification} (keyword (:user-settings query-params))))
+                        (keyword (:user-settings query-params)))
         org-settings (if (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params))
@@ -173,6 +176,7 @@
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
+                        :user-settings user-settings
                         :nux-loading show-nux
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
@@ -498,7 +502,7 @@
       (router/set-route! ["user-profile"] {:query-params (:query-params params)})
       (post-routing)
       (if (jwt/jwt)
-        (drv-root user-profile target)
+        (router/redirect! (str (utils/your-digest-url) "?user-settings=profile"))
         (router/redirect! urls/home)))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}

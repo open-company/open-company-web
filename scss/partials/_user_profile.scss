@@ -1,41 +1,44 @@
 @import "vars/main";
 
 div.user-profile {
+  background-color: $carrot_modal_bg;
+  position: absolute;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
 
-  &.fullscreen-page {
-    background-color: $carrot_settings_background;
+  button.carrot-modal-close {
+    top: 4px;
+    left: -24px;
   }
 
-  button.carrot-close-bt {
-    // Fallback for mobile that doesn't support fix positioning
-    position: absolute;
-    position: fixed;
-    left: 50%;
-    margin-left: #{($settings_content_width / 2 * -1) - 32}px;
-    top: 0px;
+  div.user-profile-inner {
+    width: #{$settings_content_width}px;
+    margin: 72px auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
+    background-color: white;
+    overflow-x: visible;
+    overflow-y: auto;
+    overflow: visible;
+    position: relative;
+    border-radius: 4px;
+    padding: 32px 24px;
   }
 
   div.user-profile-header {
     position: relative;
     font-size: 32px;
-    font-weight: 500;
     color: $carrot_gray;
-    background-color: $carrot_dark_bg_gray;
-    height: $settings_header_height;
-    padding: 40px 32px;
-    width: #{$settings_content_width}px;
-    margin: 0 auto;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
   }
 
   div.user-profile-footer {
-    height: $user_profile_footer_height;
     background-color: white;
     position: relative;
-    width: #{$settings_content_width}px;
-    margin: 0 auto;
-    padding: 32px 34px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+    height: 40px;
 
     button {
       float: right;
@@ -57,22 +60,7 @@ div.user-profile {
   div.user-profile-internal {
     position: relative;
     background-color: white;
-    height: calc(100vh - $settings_header_height - $user_profile_footer_height);
-    padding: 40px 32px;
     margin: 0 auto;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
-
-    @include big_web(){
-      width: 709px;
-    }
-    /* 29px is the height below the user info */
-    min-height: calc(100vh - 114px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
-
-    @include mobile(){
-      /* 9px on mobile */
-      padding: 20px 20px 20px 20px;
-      min-height: calc(100vh - 9px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
-    }
 
     div.user-profile-content {
 
