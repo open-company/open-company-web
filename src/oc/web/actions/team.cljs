@@ -85,7 +85,7 @@
 
 ;; Invite users
 
-;; Authords
+;; Authors
 
 (defn author-change-cb [{:keys [success]}]
   (when success

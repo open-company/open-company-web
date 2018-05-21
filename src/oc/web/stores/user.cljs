@@ -46,10 +46,17 @@
   (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
     (assoc-in next-db dispatcher/auth-settings-key body)))
 
-(defn- with-fixed-avatar [user-data]
-  (if (empty? (:avatar-url user-data))
-    (merge user-data {:avatar-url (utils/cdn default-avatar-url true)})
-    user-data))
+(defn- fixed-avatar-url [avatar-url]
+  (if (empty? avatar-url)
+    (utils/cdn default-avatar-url true)
+    avatar-url))
+
+(def default-invite-type "email")
+
+(defn parse-user-data [user-data]
+  (-> user-data
+    (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
+    (assoc :default-invite-type (or (j/get-key :auth-source) default-invite-type))))
 
 (defn- fix-user-values [user-data]
   (let [with-first-name (if (empty? (:first-name user-data))
@@ -70,15 +77,15 @@
         with-timezone (if (empty? (:timezone with-email))
                        (merge with-email {:timezone (or (.. js/moment -tz guess) "")})
                        with-email)
-        with-user-avatar (with-fixed-avatar with-timezone)
-        with-has-changes (assoc with-user-avatar :has-changes false)]
+        with-has-changes (assoc with-timezone :has-changes false)]
     with-has-changes))
 
 (defn update-user-data [db user-data]
-  (-> db
-      (assoc :current-user-data (with-fixed-avatar user-data))
-      (assoc :edit-user-profile (fix-user-values user-data))
-      (dissoc :edit-user-profile-failed)))
+  (let [fixed-user-data (parse-user-data user-data)]
+    (-> db
+        (assoc :current-user-data fixed-user-data)
+        (assoc :edit-user-profile (fix-user-values fixed-user-data))
+        (dissoc :edit-user-profile-failed))))
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]

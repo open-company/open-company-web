@@ -18,12 +18,7 @@
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
     [:title "Carrot | Company digest"]
-    ;; Bootstrap - Latest compiled and minified CSS
-    [:link
-    {:rel "stylesheet"
-     :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-     :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-     :crossorigin "anonymous"}]
+    pages/bootstrap-css
     ;; Local css
     [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
     ;; Fallback for the CDN compacted css
@@ -41,8 +36,7 @@
            :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
     ;; CarrotKit Font
     [:link {:type "text/css" :rel "stylesheet" :href (pages/cdn "/css/fonts/CarrotKit.css")}]
-    ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
-    [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+    pages/font-awesome
     ;; Favicon
     [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
     ;; jQuery needed by Bootstrap JavaScript
@@ -60,12 +54,7 @@
     (when (env :fullstory)
       [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
     (when (env :fullstory) (pages/fullstory-init))
-    ;; Bootstrap JavaScript //getf.com/
-    [:script
-     {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-      :type "text/javascript"
-      :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-      :crossorigin "anonymous"}]])
+    pages/bootstrap-js])
 
 (defn mobile-menu
   "Mobile menu used to show the collapsable menu in the marketing site."

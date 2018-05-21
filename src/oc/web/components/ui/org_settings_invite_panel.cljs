@@ -34,31 +34,38 @@
 (defn has-valid-user? [users-list]
   (some valid-user? users-list))
 
-(defn user-type-did-change [s invite-users e]
-  (let [value (.. e -target -value)]
-    (reset! (::inviting-from s) value)
-    (doseq [i (range (count invite-users))
-            :let [user (get invite-users i)]]
-      (when (and (empty? (:user user))
-                 (empty? (:temp-user user)))
-        (dis/dispatch! [:input [:invite-users i :type] value])))))
+(defn user-type-did-change [s invite-users value]
+  (reset! (::inviting-from s) value)
+  (doseq [i (range (count invite-users))
+          :let [user (get invite-users i)]]
+    (when (and (empty? (:user user))
+               (empty? (:temp-user user)))
+      (dis/dispatch! [:input [:invite-users i :type] value]))))
 
 (defn setup-initial-rows [s]
   (let [inviting-users-data @(drv/get-ref s :invite-data)
-        invite-users (:invite-users inviting-users-data)]
-    (when (zero? (count invite-users))
+        invite-users (:invite-users inviting-users-data)
+        cur-user-data (:current-user-data @(drv/get-ref s :invite-data))
+        invite-from (or @(::inviting-from s) (:default-invite-type cur-user-data))]
+    ;; Setup the invite from if it's not already
+    (when (nil? @(::inviting-from s))
+      (reset! (::inviting-from s) invite-from))
+    ;; Check if there are already invite rows
+    (if (zero? (count invite-users))
+      ;; if there are no rows setup the default initial rows
       (let [new-row (new-user-row s)]
-        (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))])))))
+        (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))]))
+      ;; if there are change those w/o value to the current invite from
+      (user-type-did-change s invite-users invite-from))))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
     (drv/drv :invite-data)
-    (rum/local "email" ::inviting-from)
+    (rum/local nil ::inviting-from)
     (rum/local (int (rand 10000)) ::rand)
     (rum/local "Send" ::send-bt-cta)
     (rum/local 0 ::sending)
     {:will-mount (fn [s]
-                   (reset! (::inviting-from s) (or (jwt/get-key :auth-source) "email"))
                    (setup-initial-rows s)
                    s)
      :after-render (fn [s]
@@ -92,34 +99,22 @@
     [:div.org-settings-panel.org-settings-invite-panel
       [:div.org-settings-invite-panel-inner
         [:div.org-settings-panel-row.invite-from.group
-          [:div.invite-from-label "Invite with:"]
+          [:div.invite-from-label "Invite people via:"]
           [:div.org-settings-panel-choice
-            [:input
-              {:type "radio"
-               :on-change (partial user-type-did-change s invite-users)
-               :value "email"
-               :checked (= "email" @(::inviting-from s))
-               :id "org-settings-invit-from-medium-email"}]
-            [:label
-              {:for "org-settings-invit-from-medium-email"}
-              "Email"]]
-          (let [slack-enabled? (jwt/team-has-bot? (:team-id team-data))]
+            {:on-click #(user-type-did-change s invite-users "email")
+             :class (utils/class-set {:active (= "email" @(::inviting-from s))})}
+            "Email"]
+          (let [slack-enabled? (:can-slack-invite team-data)]
             [:div.org-settings-panel-choice
-              [:input
-                {:type "radio"
-                 :on-change (partial user-type-did-change s invite-users)
-                 :value "slack"
-                 :checked (= "slack" @(::inviting-from s))
-                 :disabled (not slack-enabled?)
-                 :id "org-settings-invit-from-medium-slack"}]
-              [:label
-                {:for "org-settings-invit-from-medium-slack"
-                 :style {:opacity (if slack-enabled? 1 0.4)}}
-                "Slack"]])]
+              {:on-click #(when slack-enabled?
+                            (user-type-did-change s invite-users "slack"))
+               :class (utils/class-set {:disabled (not slack-enabled?)
+                                        :active (= "slack" @(::inviting-from s))})}
+              "Slack"])]
         ;; Panel rows
-        [:div.org-settings-invite-table.org-settings-panel-row
+        [:div.org-settings-invite-table-container.org-settings-panel-row
           ;; Team table
-          [:table.org-settings-table.fs-hide
+          [:table.org-settings-table.org-settings-invite-table.fs-hide
             [:thead
               [:tr
                 [:th "Invitee"
@@ -200,7 +195,7 @@
             [:tbody
               [:tr
                 [:td
-                  [:button.mlb-reset.mlb-default.add-button
+                  [:button.mlb-reset.add-button
                     {:on-click
                       #(dis/dispatch!
                         [:input
@@ -208,11 +203,11 @@
                          (conj
                           invite-users
                           (assoc default-user-row :type @(::inviting-from s)))])}
-                    "+"]]
+                    "+ add another"]]
                 [:td]
                 [:td]]]]]
         ;; Personal note
-        [:div.org-settings-panel-row.group
+        [:div.org-settings-panel-row.org-setings-invite-personal-note.group
           [:div.org-settings-label
             [:label "Personal note"]]
           [:div.org-settings-field.fs-hide

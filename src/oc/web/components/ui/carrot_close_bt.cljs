@@ -5,7 +5,6 @@
 (def default-size 32)
 
 (rum/defcs carrot-close-bt < rum/static
-                             (rum/local false ::hovering)
   [s {:keys [on-click width height]}]
   (let [fixed-width (or width default-size)
         fixed-height (or height default-size)
@@ -15,9 +14,7 @@
       {:on-click on-click
        :style {:width (str fixed-width "px")
                :height (str fixed-height "px")
-               :padding-bottom (str (/ (- fixed-height image-height) 2) "px")}
-       :on-mouse-enter #(reset! (::hovering s) true)
-       :on-mouse-leave #(reset! (::hovering s) false)}
-      [:img {:src (utils/cdn (str "/img/ML/board_remove_filter" (when @(::hovering s) "_white") ".png"))
+               :padding-bottom (str (/ (- fixed-height image-height) 2) "px")}}
+      [:img {:src (utils/cdn (str "/img/ML/board_remove_filter_white.svg"))
              :style {:width (str image-width "px")
                      :height (str image-height "px")}}]]))

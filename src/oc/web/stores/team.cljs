@@ -21,11 +21,14 @@
       (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) fixed-roster-data))
     db))
 
+(defn parse-team-data [team-data]
+  (assoc team-data :can-slack-invite (j/team-has-bot? (:team-id team-data))))
+
 (defmethod dispatcher/action :team-loaded
   [db [_ team-data]]
   (if team-data
     ;; if team is the current org team, load the slack chennels
-    (assoc-in db (dispatcher/team-data-key (:team-id team-data)) team-data)
+    (assoc-in db (dispatcher/team-data-key (:team-id team-data)) (parse-team-data team-data))
     db))
 
 (defmethod dispatcher/action :channels-enumerate
