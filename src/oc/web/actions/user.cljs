@@ -378,6 +378,11 @@
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
 
+;; User profile tab
+
+(defn change-user-profile-panel [panel]
+  (dis/dispatch! [:input [:user-settings] panel]))
+
 ;; Debug
 
 (defn force-jwt-refresh []

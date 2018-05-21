@@ -35,19 +35,19 @@
     [:div.org-settings-tab
       {:class (when (= :main active-tab) "active")}
       [:a.org-settings-tab-link
-        {;:href (oc-urls/org-settings org-slug)
+        {:href "#"
          :on-click #(do (utils/event-stop %) (show-modal :main))}
         "DIGEST SETTINGS"]]
     [:div.org-settings-tab
       {:class (when (= :team active-tab) "active")}
       [:a.org-settings-tab-link
-        {;:href (oc-urls/org-settings-team org-slug)
+        {:href "#"
          :on-click #(do (utils/event-stop %) (show-modal :team))}
         "MANAGE MEMBERS"]]
     [:div.org-settings-tab
       {:class (when (= :invite active-tab) "active")}
       [:a.org-settings-tab-link
-        {;:href (oc-urls/org-settings-invite org-slug)
+        {:href "#"
          :on-click #(do (utils/event-stop %) (show-modal :invite))}
         "INVITE PEOPLE"]]])
 
