@@ -85,10 +85,7 @@
 
 ;; Invite users
 
-(defn can-invite-via-slack? [team-data]
-  (jwt/team-has-bot? (:team-id team-data)))
-
-;; Authords
+;; Authors
 
 (defn author-change-cb [{:keys [success]}]
   (when success
