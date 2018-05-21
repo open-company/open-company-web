@@ -12,6 +12,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.whats-new-modal :as whats-new-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -31,18 +32,21 @@
 (defn user-profile-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
+  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+
+(defn user-notifications-click [e]
+  (utils/event-stop e)
+  (mobile-menu-toggle)
+  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notification)))
 
 (defn team-settings-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings)))
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
 (defn invite-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-invite))))
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 
 (defn sign-in-sign-up-click [e]
@@ -83,10 +87,17 @@
       (when (and (jwt/jwt)
                  (not (responsive/is-mobile-size?)))
         [:a
-          {:href oc-urls/user-profile
+          {:href "#"
            :on-click user-profile-click}
           [:div.oc-menu-item.personal-profile
             "Personal Profile"]])
+      (when (and (jwt/jwt)
+                 (not (responsive/is-mobile-size?)))
+        [:a
+          {:href "#"
+           :on-click user-notifications-click}
+          [:div.oc-menu-item.user-notifications
+            "Notification Settings"]])
       [:div.oc-menu-separator]
       (when org-data
         [:div.org-item
@@ -98,7 +109,7 @@
                  (= user-role :admin)
                  (not (responsive/is-mobile-size?)))
         [:a
-          {:href (oc-urls/org-settings-invite)
+          {:href "#"
            :on-click invite-click}
           [:div.oc-menu-item.invite-people
             "Invite People"]])
@@ -106,7 +117,7 @@
                  (router/current-org-slug)
                  (not (responsive/is-mobile-size?)))
         [:a
-          {:href (oc-urls/org-settings)
+          {:href "#"
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
             "Digest Settings"]])

@@ -78,6 +78,7 @@
 ;; User
 
 (def user-profile "/profile")
+(def user-notifications "/profile/notifications")
 
 ;; Organizations
 
@@ -94,27 +95,6 @@
     (all-posts (router/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/all-posts")))
-
-(defn org-settings
-  "Org settings url"
-  ([]
-    (org-settings (router/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/settings")))
-
-(defn org-settings-team
-  "Team settings url"
-  ([]
-    (org-settings-team (router/current-org-slug)))
-  ([org-slug]
-    (str (org-settings org-slug) "/team")))
-
-(defn org-settings-invite
-  "Invite people to team url"
-  ([]
-    (org-settings-invite (router/current-org-slug)))
-  ([org-slug]
-    (str (org-settings org-slug) "/invite")))
 
 ;; Boards
 

@@ -151,6 +151,12 @@ div.menu {
       }
     }
 
+    &.user-notifications {
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_user_notifications.svg");
+      }
+    }
+
     &.invite-people {
       &:before {
         background-image: cdnUrl("/img/ML/menu_invite_people.svg");

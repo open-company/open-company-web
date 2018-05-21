@@ -20,6 +20,24 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
 
+(defn show-modal [& [panel]]
+  (dis/dispatch! [:input [:user-settings] (or panel :profile)]))
+
+(defn dismiss-modal []
+  (dis/dispatch! [:input [:user-settings] nil]))
+
+(defn real-close-cb [orgs current-user-data]
+  (let [last-org-slug (cook/get-cookie (router/last-org-cookie))
+        first-org-slug (:slug (first orgs))
+        to-url (if last-org-slug
+                (oc-urls/org last-org-slug)
+                (if first-org-slug
+                  (oc-urls/org first-org-slug)
+                  oc-urls/login))]
+    (when (:has-changes current-user-data)
+      (user-actions/user-profile-reset))
+    (dismiss-modal)))
+
 (def default-user-profile (oc.web.stores.user/random-user-image))
 
 (defn- img-on-load [url img]
@@ -55,18 +73,6 @@
   (reset! (::current-password-error s) false)
   (dis/dispatch! [:input [:edit-user-profile k] v])
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
-
-(defn real-close-cb [orgs current-user-data]
-  (let [last-org-slug (cook/get-cookie (router/last-org-cookie))
-        first-org-slug (:slug (first orgs))
-        to-url (if last-org-slug
-                (oc-urls/org last-org-slug)
-                (if first-org-slug
-                  (oc-urls/org first-org-slug)
-                  oc-urls/login))]
-    (when (:has-changes current-user-data)
-      (user-actions/user-profile-reset))
-    (router/nav! to-url)))
 
 (defn close-cb [orgs current-user-data]
   (dis/dispatch! [:input [:latest-entry-point] 0])
