@@ -44,21 +44,28 @@
 
 (defn setup-initial-rows [s]
   (let [inviting-users-data @(drv/get-ref s :invite-data)
-        invite-users (:invite-users inviting-users-data)]
-    (when (zero? (count invite-users))
+        invite-users (:invite-users inviting-users-data)
+        cur-user-data (:current-user-data @(drv/get-ref s :invite-data))
+        invite-from (or @(::inviting-from s) (:default-invite-type cur-user-data))]
+    ;; Setup the invite from if it's not already
+    (when (nil? @(::inviting-from s))
+      (reset! (::inviting-from s) invite-from))
+    ;; Check if there are already invite rows
+    (if (zero? (count invite-users))
+      ;; if there are no rows setup the default initial rows
       (let [new-row (new-user-row s)]
-        (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))])))))
+        (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))]))
+      ;; if there are change those w/o value to the current invite from
+      (user-type-did-change s invite-users invite-from))))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
     (drv/drv :invite-data)
-    (rum/local "email" ::inviting-from)
+    (rum/local nil ::inviting-from)
     (rum/local (int (rand 10000)) ::rand)
     (rum/local "Send" ::send-bt-cta)
     (rum/local 0 ::sending)
     {:will-mount (fn [s]
-                   (let [cur-user-data (:current-user-data @(drv/get-ref s :invite-data))]
-                    (reset! (::inviting-from s) (:default-invite-type cur-user-data)))
                    (setup-initial-rows s)
                    s)
      :after-render (fn [s]
