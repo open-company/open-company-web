@@ -65,10 +65,37 @@
           ;; Digest frequency
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "Digest Frequency " [:i.mdi.mdi-information-outline
+              "Digest delivery via " [:i.mdi.mdi-information-outline
                 {:title "Receive a digest of newly created posts."
                  :data-toggle "tooltip"
                  :data-placement "top"}]]
+            [:div.user-profile-field.digest-medium
+              [:div.dropdown.dropdown-button
+                [:button.btn-reset.user-type-btn.dropdown-toggle
+                  {:id "user-digest-medium-dropdown"
+                   :data-toggle "dropdown"
+                   :aria-haspopup true
+                   :aria-expanded false}
+                  (case (:digest-medium current-user-data)
+                    "slack"
+                    "Slack"
+                    "Email")]
+                [:ul.dropdown-menu.user-type-dropdown-menu
+                  {:aria-labelledby "user-digest-medium-dropdown"}
+                  [:li
+                    {:on-click #(change! s :digest-medium "email")}
+                    "Email"]
+                  ;; Show Slack digest option if
+                  (when (user-stores/has-slack-bot? org-data)
+                    [:li
+                      {:on-click #(change! s :digest-medium "slack")}
+                      "Slack"])]]]]]
+        ; Right column
+        [:div.user-profile-column-right.fs-hide
+          ;; Digest Medium
+          [:div.user-profile-field-box
+            [:div.user-profile-field-label
+              "Frequency"]
             [:div.user-profile-field.digest-frequency-field.digest-frequency
               [:div.dropdown.dropdown-button
                 [:button.btn-reset.user-type-btn.dropdown-toggle
@@ -92,34 +119,7 @@
                     "Weekly"]
                   [:li
                     {:on-click #(change! s :digest-frequency "never")}
-                    "Never"]]]]]]
-        ; Right column
-        [:div.user-profile-column-right.fs-hide
-          ;; Digest Medium
-          [:div.user-profile-field-box
-            [:div.user-profile-field-label
-              "Digest Type"]
-            [:div.user-profile-field.digest-medium
-              [:div.dropdown.dropdown-button
-                [:button.btn-reset.user-type-btn.dropdown-toggle
-                  {:id "user-digest-medium-dropdown"
-                   :data-toggle "dropdown"
-                   :aria-haspopup true
-                   :aria-expanded false}
-                  (case (:digest-medium current-user-data)
-                    "slack"
-                    "Slack"
-                    "Email")]
-                [:ul.dropdown-menu.user-type-dropdown-menu
-                  {:aria-labelledby "user-digest-medium-dropdown"}
-                  [:li
-                    {:on-click #(change! s :digest-medium "email")}
-                    "Email"]
-                  ;; Show Slack digest option if
-                  (when (user-stores/has-slack-bot? org-data)
-                    [:li
-                      {:on-click #(change! s :digest-medium "slack")}
-                      "Slack"])]]]]]]
+                    "Never"]]]]]]]
       [:div.user-profile-footer.group
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)

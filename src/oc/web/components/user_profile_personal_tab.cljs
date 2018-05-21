@@ -95,7 +95,7 @@
           ; First name
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "First Name"
+              "First name"
               (when @(::name-error s)
                 [:span.error "Please provide your name."])]
             [:div.user-profile-field
@@ -120,7 +120,7 @@
           (when (= (:auth-source current-user-data) "email")
             [:div.user-profile-field-box.password-update
               [:div.user-profile-field-label
-                "Current Password"
+                "Current password"
                 (when @(::current-password-error s)
                   [:span.error "Current password required"])]
                 [:div.user-profile-field
@@ -135,7 +135,7 @@
           ; Last name
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "Last Name"]
+              "Last name"]
             [:div.user-profile-field
               [:input
                 {:type "text"
@@ -145,7 +145,7 @@
           ;; Time zone
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "Time Zone"]
+              "Timezone"]
             [:div.user-profile-field.timezone
               [:select
                 {:value (:timezone current-user-data)
@@ -170,7 +170,7 @@
           (when (= (:auth-source current-user-data) "email")
             [:div.user-profile-field-box.password-update
               [:div.user-profile-field-label
-                "New Password"
+                "New password"
                 (when @(::password-error s)
                   [:span.error "Minimum 8 characters"])]
               [:div.user-profile-field
