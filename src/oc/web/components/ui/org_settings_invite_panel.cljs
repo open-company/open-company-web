@@ -34,14 +34,13 @@
 (defn has-valid-user? [users-list]
   (some valid-user? users-list))
 
-(defn user-type-did-change [s invite-users e]
-  (let [value (.. e -target -value)]
-    (reset! (::inviting-from s) value)
-    (doseq [i (range (count invite-users))
-            :let [user (get invite-users i)]]
-      (when (and (empty? (:user user))
-                 (empty? (:temp-user user)))
-        (dis/dispatch! [:input [:invite-users i :type] value])))))
+(defn user-type-did-change [s invite-users value]
+  (reset! (::inviting-from s) value)
+  (doseq [i (range (count invite-users))
+          :let [user (get invite-users i)]]
+    (when (and (empty? (:user user))
+               (empty? (:temp-user user)))
+      (dis/dispatch! [:input [:invite-users i :type] value]))))
 
 (defn setup-initial-rows [s]
   (let [inviting-users-data @(drv/get-ref s :invite-data)
@@ -95,13 +94,13 @@
         [:div.org-settings-panel-row.invite-from.group
           [:div.invite-from-label "Invite people via:"]
           [:div.org-settings-panel-choice
-            {:on-click #(reset! (::inviting-from s) "email")
+            {:on-click #(user-type-did-change s invite-users "email")
              :class (utils/class-set {:active (= "email" @(::inviting-from s))})}
             "Email"]
           (let [slack-enabled? (:can-slack-invite team-data)]
             [:div.org-settings-panel-choice
               {:on-click #(when slack-enabled?
-                            (reset! (::inviting-from s) "slack"))
+                            (user-type-did-change s invite-users "slack"))
                :class (utils/class-set {:disabled (not slack-enabled?)
                                         :active (= "slack" @(::inviting-from s))})}
               "Slack"])]

@@ -89,6 +89,10 @@ div.org-settings div.org-settings-inner {
             width: 365px;
             padding-right: 12px;
 
+            input.email-field {
+              height: 40px;
+            }
+
             div.user-avatar-img-container {
               margin-right: 16px;
               float: left;
