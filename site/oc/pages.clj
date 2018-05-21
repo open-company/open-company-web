@@ -3,6 +3,33 @@
             [oc.privacy :as privacy]
             [environ.core :refer (env)]))
 
+(def bootstrap-css
+  ;; Bootstrap CSS //getbootstrap.com/
+  [:link
+    {:rel "stylesheet"
+     :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+     :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+     :crossorigin "anonymous"}])
+
+(def bootstrap-js
+  ;; Bootstrap JavaScript //getf.com/
+  [:script
+    {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+     :type "text/javascript"
+     :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+     :crossorigin "anonymous"}])
+
+(def font-awesome
+  ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
+  [:link
+    {:rel "stylesheet"
+     :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}])
+
+(def jquery
+  [:script
+    {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"
+     :crossorigin "anonymous"}])
+
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")
@@ -798,17 +825,11 @@
           [:title "Carrot | Company digest"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
-          ;; Bootstrap CSS //getbootstrap.com/
-          [:link
-            {:rel "stylesheet"
-             :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-             :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-             :crossorigin "anonymous"}]
+          bootstrap-css
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
           [:link {:rel "stylesheet" :href "/css/normalize.css"}]
-          ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          font-awesome
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
@@ -855,7 +876,7 @@
           [:script {:type "text/javascript" :src "/lib/fullstory.js"}]
           (fullstory-init)
           ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          jquery
           ;; Truncate html string
           [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
           ;; Rangy
@@ -874,12 +895,7 @@
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
-          ;; Bootstrap JavaScript //getf.com/
-          [:script
-            {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-             :type "text/javascript"
-             :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-             :crossorigin "anonymous"}]
+          bootstrap-js
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
@@ -910,14 +926,8 @@
           [:title "Carrot | Company digest"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
-          ;; Bootstrap CSS //getbootstrap.com/
-          [:link
-            {:rel "stylesheet"
-             :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-             :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-             :crossorigin "anonymous"}]
-          ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          bootstrap-css
+          font-awesome
           ;; jQuery UI CSS
           [:link
             {:rel "stylesheet"
@@ -929,7 +939,7 @@
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          jquery
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
@@ -953,12 +963,7 @@
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
-          ;; Bootstrap JavaScript //getf.com/
-          [:script
-            {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-             :type "text/javascript"
-             :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-             :crossorigin "anonymous"}]
+          bootstrap-js
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
           ;; Compiled oc.min.js from our CDN
