@@ -202,10 +202,4 @@
                           (org-settings/show-modal :invite)
                           (close-navigation-sidebar))}
             [:div.invite-people-icon]
-            [:span "Invite people"]])
-        [:button.mlb-reset.about-carrot-btn
-          {:on-click #(do
-                        (whats-new-modal/show-modal)
-                        (close-navigation-sidebar))}
-          [:div.about-carrot-icon]
-          [:span "Support"]]]]))
+            [:span "Invite people"]])]]))
