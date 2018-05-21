@@ -14,7 +14,8 @@
             [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
-            [oc.web.components.user-profile-personal-tab :refer (user-profile-personal-tab)]))
+            [oc.web.components.user-profile-personal-tab :refer (user-profile-personal-tab)]
+            [oc.web.components.user-profile-notifications-tab :refer (user-profile-notifications-tab)]))
 
 (defn show-modal [& [panel]]
   (dis/dispatch! [:input [:user-settings] (or panel :profile)]))
@@ -147,5 +148,5 @@
             [:a.user-profile-tab-link
               "NOTIFICATIONS"]]]
         (if (= tab :notifications)
-         [:div.notificaitons-tab]
-         (user-profile-personal-tab org-data))]]))
+          (user-profile-notifications-tab org-data real-close-cb)
+          (user-profile-personal-tab real-close-cb))]]))

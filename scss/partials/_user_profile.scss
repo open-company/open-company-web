@@ -242,15 +242,16 @@ div.user-profile {
             margin: 8px 0 24px 0;
             padding: 0;
 
-             div.dropdown {
+            div.dropdown-button {
               height: 40px;
               padding: 10px 8px;
               border: 1px solid rgba($carrot_light_gray_1, 0.5);
               border-radius: 4px;
-            }
 
-            div.dropdown.dropdown-button {
-              border: 0px;
+              button {
+                width: 100%;
+                text-align: left;
+              }
             }
 
             input, select {

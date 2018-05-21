@@ -77,7 +77,7 @@
                                             (reset! (::loading new-state) false)
                                             (utils/after 2500 (fn [] (reset! (::show-success new-state) false)))))
                                         new-state)}
-  [s org-data real-close-cb]
+  [s real-close-cb]
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
@@ -128,39 +128,7 @@
                     {:type "password"
                      :tab-index 3
                      :on-change #(change! s :current-password (.. % -target -value))
-                     :value (:current-password current-user-data)}]]])
-          ;; Digest frequency
-          [:div.user-profile-field-box
-            [:div.user-profile-field-label
-              "Digest Frequency " [:i.mdi.mdi-information-outline
-                {:title "Receive a digest of newly created posts."
-                 :data-toggle "tooltip"
-                 :data-placement "top"}]]
-            [:div.user-profile-field.digest-frequency-field.digest-frequency
-              [:div.dropdown {:class "dropdown-button"}
-                [:button.btn-reset.user-type-btn.dropdown-toggle
-                  {:id "user-digest-frequency-dropdown"
-                   :data-toggle "dropdown"
-                   :aria-haspopup true
-                   :aria-expanded false}
-                  (case (:digest-frequency current-user-data)
-                    "daily"
-                    "Daily"
-                    "weekly"
-                    "Weekly"
-                    "Never")]
-                [:ul.dropdown-menu.user-type-dropdown-menu
-                  {:aria-labelledby "user-digest-frequency-dropdown"}
-                  [:li
-                    {:on-click #(change! s :digest-frequency "daily")}
-                    "Daily"]
-                  [:li
-                    {:on-click #(change! s :digest-frequency "weekly")}
-                    "Weekly"]
-                  [:li
-                    {:on-click #(change! s :digest-frequency "never")}
-                    "Never"]]]]]]
-
+                     :value (:current-password current-user-data)}]]])]
 
         ; Right column
         [:div.user-profile-column-right.fs-hide
@@ -210,78 +178,7 @@
                   {:type "password"
                    :tab-index 4
                    :on-change #(change! s :password (.. % -target -value))
-                   :value (:password current-user-data)}]]])
-          ;; Digest Medium
-          (when (user-stores/has-slack-bot? org-data)
-            [:div.user-profile-field-box
-              [:div.user-profile-field-label
-                "Digest Type"]
-              [:div.user-profile-field.digest-medium
-                [:div.dropdown {:class "dropdown-button"}
-                  [:button.btn-reset.user-type-btn.dropdown-toggle
-                    {:id "user-digest-medium-dropdown"
-                     :data-toggle "dropdown"
-                     :aria-haspopup true
-                     :aria-expanded false}
-                    (case (:digest-medium current-user-data)
-                      "slack"
-                      "Slack"
-                      "Email")]
-                  [:ul.dropdown-menu.user-type-dropdown-menu
-                    {:aria-labelledby "user-digest-medium-dropdown"}
-                    [:li
-                      {:on-click #(change! s :digest-medium "email")}
-                      "Email"]
-                    ;; Show Slack digest option if
-                    (when (and ;; at least one team has a Slack bot
-                               (some jwt/team-has-bot? (jwt/get-key :teams))
-                               ;; the user is also a Slack user
-                               (seq (jwt/get-key :slack-id)))
-                      [:li
-                        {:on-click #(change! s :digest-medium "slack")}
-                        "Slack"])]]]])]]]
-          ;; Eventually we want them to be able specify day and time of digest, but not yet
-          ; [:div.user-profile-field.digest-frequency-field.digest-day
-          ;   [:select
-          ;     {:value (:digest-day current-user-data)
-          ;      :disabled (not= (:digest-frequency current-user-data) "weekly")
-          ;      :on-change #(change! s :digest-day (.. % -target -value))}
-          ;     [:option {:value "monday"} "MONDAY"]
-          ;     [:option {:value "tuesday"} "TUESDAY"]
-          ;     [:option {:value "wednesday"} "WEDNESDAY"]
-          ;     [:option {:value "thursday"} "THURSDAY"]
-          ;     [:option {:value "friday"} "FRIDAY"]
-          ;     [:option {:value "saturday"} "SATURDAY"]
-          ;     [:option {:value "sunday"} "SUNDAY"]]]
-          ; [:div.user-profile-field.digest-frequency-field.digest-time
-          ;   [:select
-          ;     {:value (:digest-time current-user-data)
-          ;      :disabled (= (:digest-frequency current-user-data) "never")
-          ;      :on-change #(change! s :digest-time (.. % -target -value))}
-          ;     [:option {:value "7am"} "7AM"]
-          ;     [:option {:value "8am"} "8AM"]
-          ;     [:option {:value "9am"} "9AM"]
-          ;     [:option {:value "10am"} "10AM"]
-          ;     [:option {:value "11am"} "11AM"]
-          ;     [:option {:value "12pm"} "12PM"]
-          ;     [:option {:value "1pm"} "1PM"]
-          ;     [:option {:value "2pm"} "2PM"]
-          ;     [:option {:value "3pm"} "3PM"]
-          ;     [:option {:value "4pm"} "4PM"]
-          ;     [:option {:value "5pm"} "5PM"]
-          ;     [:option {:value "6pm"} "6PM"]
-          ;     [:option {:value "7pm"} "7PM"]
-          ;     [:option {:value "8pm"} "8PM"]
-          ;     [:option {:value "9pm"} "9PM"]
-          ;     [:option {:value "10pm"} "10PM"]
-          ;     [:option {:value "11pm"} "11PM"]
-          ;     [:option {:value "12am"} "12AM"]
-          ;     [:option {:value "1am"} "1AM"]
-          ;     [:option {:value "2am"} "2AM"]
-          ;     [:option {:value "3am"} "3AM"]
-          ;     [:option {:value "4am"} "4AM"]
-          ;     [:option {:value "5am"} "5AM"]
-          ;     [:option {:value "6am"} "6AM"]]]
+                   :value (:password current-user-data)}]]])]]]
       [:div.user-profile-footer.group
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)

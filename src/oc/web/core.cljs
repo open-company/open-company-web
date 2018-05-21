@@ -175,7 +175,7 @@
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
-                        :user-settings :profile
+                        :user-settings user-settings
                         :nux-loading show-nux
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
