@@ -11,9 +11,9 @@ div.user-profile {
   overflow-y: auto;
   height: 100vh;
 
-  button.carrot-modal-close {
-    top: 4px;
-    left: -24px;
+  button.settings-modal-close {
+    right: -56px;
+    top: 0px;
   }
 
   div.user-profile-inner {

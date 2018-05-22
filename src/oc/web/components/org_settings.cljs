@@ -146,7 +146,7 @@
       [:div.org-settings.fullscreen-page
         [:div.org-settings-inner
           (when-not alert-modal-data
-            [:button.carrot-modal-close.mlb-reset
+            [:button.settings-modal-close.mlb-reset
               {:on-click #(close-clicked s)}])
           [:div.org-settings-header
             [:div.org-settings-header-avatar.fs-hide

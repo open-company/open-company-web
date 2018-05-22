@@ -119,7 +119,7 @@
         org-data (drv/react s :org-data)]
     [:div.user-profile.fullscreen-page
       [:div.user-profile-inner
-        [:button.mlb-reset.carrot-modal-close
+        [:button.mlb-reset.settings-modal-close
           {:on-click #(close-cb current-user-data)}]
         [:div.user-profile-header.group
           [:div.user-profile-header-avatar

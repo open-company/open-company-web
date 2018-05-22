@@ -49,7 +49,7 @@ div.org-settings {
 
             td.user-name {
               &.has-pending {
-                max-width: 306px;
+                max-width: 202px;
               }
 
               div.user-avatar-img-container {
@@ -87,7 +87,8 @@ div.org-settings {
                   float: left;
                   font-size: 14px;
                   @include avenir_H();
-                  margin-left: 8px;
+                  padding: 0px 8px;
+                  margin-left: 0px;
                 }
               }
             }
