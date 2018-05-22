@@ -65,7 +65,7 @@
        :on-click #(when-not has-buttons
                     (hide-alert))}
       [:div.modal-wrapper
-        [:button.carrot-modal-close.mlb-reset
+        [:button.settings-modal-close.mlb-reset
           {:on-click #(if (fn? (:link-button-cb alert-modal)) (link-button-clicked alert-modal %) (close-clicked s))}]
         [:div.alert-modal
           {:class (when has-buttons "has-buttons")}

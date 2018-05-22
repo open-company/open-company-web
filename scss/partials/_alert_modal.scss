@@ -23,12 +23,16 @@ div.alert-modal-container {
     min-height: 147px;
     position: relative;
 
+    button.settings-modal-close {
+      right: -56px;
+    }
+
     @include mobile() {
       width: 100%;
       height: 100vh;
       margin: 0px;
 
-      button.carrot-modal-close {
+      button.settings-modal-close {
         display: none;
       }
     }
