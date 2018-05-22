@@ -109,7 +109,7 @@
                   (user-avatar-image user)
                   (let [display-name (utils/name-or-email user)]
                     [:div.user-name-label
-                      {:title (if (or (= (:status user) "pending") (not= display-name (:email user))) (:email user) "")
+                      {:title (:email user)
                        :data-toggle "tooltip"
                        :data-placement "top"}
                       display-name])]
