@@ -18,6 +18,10 @@ div.menu {
   div.menu-header {
     width: 100%;
 
+    @include mobile() {
+      display: none;
+    }
+
     @include user-profile(32);
 
     div.user-avatar-img-container {
@@ -68,6 +72,10 @@ div.menu {
     background-color: rgba($deep_tan, 0.6);
     margin-left: -24px;
     margin-top: 20px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   a {
@@ -90,6 +98,10 @@ div.menu {
 
   div.org-item {
     padding: 24px 0px 3px 0px;
+
+    @include mobile() {
+      display: none;
+    }
 
     div.org-avatar-border {
       border: 1px solid #D8DBDF;

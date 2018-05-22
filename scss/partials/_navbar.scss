@@ -138,8 +138,22 @@ nav.oc-navbar {
 
         button.mobile-menu {
           font-size: 24px;
-          padding: 0px;
+          padding: 0px 16px 0px 0px;
           margin-top: 2px;
+          position: relative;
+
+          &:after {
+            content: "";
+            width: 9px;
+            height: 6px;
+            background-image: cdnUrl("/img/ML/user_menu_chevron.svg");
+            background-size: 9px 6px;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            top: 12px;
+            right: 0px;
+          }
 
           @include user-profile(32);
         }

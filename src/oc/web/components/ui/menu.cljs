@@ -84,15 +84,13 @@
             "Contributor"
             :viewer
             "Viewer")]]
-      (when (and (jwt/jwt)
-                 (not (responsive/is-mobile-size?)))
+      (when (jwt/jwt)
         [:a
           {:href "#"
            :on-click user-profile-click}
           [:div.oc-menu-item.personal-profile
             "Personal Profile"]])
-      (when (and (jwt/jwt)
-                 (not (responsive/is-mobile-size?)))
+      (when (jwt/jwt)
         [:a
           {:href "#"
            :on-click user-notifications-click}
@@ -106,16 +104,14 @@
           [:div.org-name (:name org-data)]
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
       (when (and (router/current-org-slug)
-                 (= user-role :admin)
-                 (not (responsive/is-mobile-size?)))
+                 (= user-role :admin))
         [:a
           {:href "#"
            :on-click invite-click}
           [:div.oc-menu-item.invite-people
             "Invite People"]])
       (when (and (= user-role :admin)
-                 (router/current-org-slug)
-                 (not (responsive/is-mobile-size?)))
+                 (router/current-org-slug))
         [:a
           {:href "#"
            :on-click team-settings-click}

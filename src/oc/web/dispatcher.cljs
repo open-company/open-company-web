@@ -238,7 +238,9 @@
                                                                  :show-login-overlay
                                                                  :mobile-navigation-sidebar
                                                                  :current-user-data
-                                                                 :orgs-dropdown-visible])]
+                                                                 :orgs-dropdown-visible
+                                                                 :user-settings
+                                                                 :org-settings])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]

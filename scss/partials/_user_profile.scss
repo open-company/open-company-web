@@ -16,6 +16,12 @@ div.user-profile {
     top: 0px;
   }
 
+  @include mobile() {
+    background-color: white;
+    height: calc(100vh - 65px);
+    top: 65px;
+  }
+
   div.user-profile-inner {
     width: #{$settings_content_width}px;
     margin: 72px auto;
@@ -28,6 +34,14 @@ div.user-profile {
     position: relative;
     border-radius: 4px;
     padding: 32px 24px;
+
+    @include mobile() {
+      width: 100%;
+      margin: 0px auto;
+      box-shadow: none;
+      border: none;
+      border-radius: 0px;
+    }
 
     div.user-profile-header {
       position: relative;
@@ -284,12 +298,24 @@ div.user-profile {
           float: left;
           width: calc(50% - 8px);
           margin-right: 8px;
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            margin-right: 0px;
+          }
         }
 
         div.user-profile-column-right {
           float: right;
           width: calc(50% - 8px);
           margin-left: 8px;
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            margin-left: 0px;
+          }
         }
       }
     }
