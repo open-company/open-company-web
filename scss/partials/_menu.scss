@@ -205,6 +205,10 @@ div.menu {
       height: 16px;
       top: 15px;
       left: 8px;
+
+      @include mobile() {
+        top: 20px;
+      }
     }
 
     &.personal-profile {
