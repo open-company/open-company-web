@@ -64,8 +64,6 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        mobile-horizontal-carousell
-
         desktop-video
 
         [:div.core-values-list

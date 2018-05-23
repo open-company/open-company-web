@@ -86,24 +86,6 @@
          :id "mc-embedded-subscribe"}
         "Get Early Access"]]])
 
-(def mobile-horizontal-carousell
-  [:div.horizontal-carousell
-    [:div.horizontal-carousell-inner
-      [:img.horizontal-carousell-1
-        {:src (cdn "/img/ML/homepage_mobile_screenshot_1.png")
-         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_1@2x.png") " 2x")}]
-      [:img.horizontal-carousell-2
-        {:src (cdn "/img/ML/homepage_mobile_screenshot_2.png")
-         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_2@2x.png") " 2x")}]
-      [:img.horizontal-carousell-3
-        {:src (cdn "/img/ML/homepage_mobile_screenshot_3.png")
-         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_3@2x.png") " 2x")}]]])
-
-(def desktop-video
-  [:img.main-animation-container
-    {:src (cdn "/img/ML/homepage_screenshot.png")
-     :src-set (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}])
-
 (def carrot-cards
   [:div.cards-container
     [:div.cards-row.group
@@ -224,8 +206,6 @@
           [:div.carrot-box-thanks
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
-
-        desktop-video
 
         [:div.core-values-list.group
           [:div.core-value.key-announcement
@@ -627,11 +607,7 @@
               " and "
               [:a
                 {:href "/privacy"}
-                "Privacy Policy."]]]]
-
-        mobile-horizontal-carousell
-
-        desktop-video        
+                "Privacy Policy."]]]]        
 
         [:div.designed-for-container
           [:div.designed-for
