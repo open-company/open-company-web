@@ -114,6 +114,7 @@
    :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
+   :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -268,9 +269,11 @@
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
    :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
-                            :show-section-editor :show-section-add :show-sections-picker :entry-editing]
+                            :show-section-editor :show-section-add :show-sections-picker :entry-editing
+                            :mobile-menu-open]
                             (fn [base org-data board-data all-posts activity-data nux ap-initial-at
-                                 show-section-editor show-section-add show-sections-picker entry-editing]
+                                 show-section-editor show-section-add show-sections-picker entry-editing
+                                 mobile-menu-open]
                               {:nux nux
                                :nux-loading (:nux-loading base)
                                :nux-end (:nux-end base)
@@ -292,7 +295,8 @@
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
-                               :activity-share-container (:activity-share-container base)})]})
+                               :activity-share-container (:activity-share-container base)
+                               :mobile-menu-open mobile-menu-open})]})
 
 
 ;; Action Loop =================================================================
