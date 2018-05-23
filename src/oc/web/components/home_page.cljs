@@ -64,8 +64,6 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        desktop-video
-
         [:div.core-values-list
           [:div.core-value.key-announcement
             "Key announcements"]
