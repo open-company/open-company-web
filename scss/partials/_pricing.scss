@@ -75,17 +75,6 @@ div#wrap {
           margin-left: -558px;
         }
 
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow_1");
-          background-size: 135px 135px;
-          width: 135px;
-          height: 135px;
-          top: 1540px;
-          left: 50%;
-          margin-left: -438px;
-          z-index: 2;
-        }
-
         &.small-blue-1 {
           @include image-2x("/img/ML/balloon_small_blue_1");
           background-size: 50px 44px;

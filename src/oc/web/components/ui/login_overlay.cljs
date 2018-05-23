@@ -187,7 +187,7 @@
   (let [auth-settings (drv/react state :auth-settings)]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
-      [:button.carrot-modal-close.mlb-reset
+      [:button.settings-modal-close.mlb-reset
           {:on-click (partial close-overlay)}]
       [:div.login-overlay.password-reset
         {:on-click #(utils/event-stop %)}

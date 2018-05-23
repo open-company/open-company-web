@@ -92,7 +92,7 @@
             [:a
               {:href oc-urls/login
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
-              "Log in"]])
+              "Login"]])
         (when-not (responsive/is-mobile-size?)
           (bottom-footer "big-web-footer"))]
 

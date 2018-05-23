@@ -141,15 +141,6 @@ div#wrap {
           right: -55px;
         }
 
-        &.small-purple {
-          @include image-2x("/img/ML/slack_balloon_small_purple");
-          background-size: 75px 76px;
-          width: 75px;
-          height: 76px;
-          top: 122px;
-          left: 40px;
-        }
-
         &.small-yellow {
           @include image-2x("/img/ML/slack_balloon_small_yellow");
           background-size: 17px 15px;

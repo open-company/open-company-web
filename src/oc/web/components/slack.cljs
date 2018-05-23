@@ -55,22 +55,6 @@
         [:div.main.slack.group
           {:class (when (jwt/jwt) "no-get-started-button")}
           [:section.carrot-plus-slack.group
-            ;; Top Left
-            [:div.balloon.big-green]
-            [:div.balloon.small-purple]
-            [:div.balloon.small-yellow]
-            ;; Top Right
-            [:div.balloon.big-red]
-            [:div.balloon.small-yellow-face]
-            [:div.balloon.small-purple-1]
-            ;; Center Left
-            [:div.balloon.big-blue]
-            [:div.balloon.small-purple-2]
-            [:div.balloon.small-green]
-            [:div.balloon.big-purple]
-            [:div.balloon.small-red]
-
-
             [:div.carrot-plus-slack]
 
             [:h1.slack

@@ -37,6 +37,23 @@
         [:a.navbar-brand-left
           {:href oc-urls/home
            :on-click (partial nav! oc-urls/home)}]
+        [:div.navbar-brand-center
+          [:a
+            {:href oc-urls/home
+             :on-click (partial nav! oc-urls/home)}
+            "Home"]
+          [:a
+            {:href oc-urls/about
+             :on-click (partial nav! oc-urls/about)}
+            "About"]
+          [:a
+            {:href oc-urls/pricing
+             :on-click (partial nav! oc-urls/pricing)}
+            "Pricing"]
+          [:a
+            {:href oc-urls/blog
+             :target "_blank"}
+            "Blog"]]
         [:div.site-navbar-right.big-web-only
           (when-not logged-in
             [:a.login
@@ -48,7 +65,7 @@
                              (nav! (utils/your-digest-url) e)
                              (nav! oc-urls/login e))
                            (user/show-login :login-with-slack))}
-                "Log in"])
+                "Login"])
           [:a.start
             {:href (if logged-in
                     your-digest
@@ -69,7 +86,7 @@
                 [:span
                   "Sign up with "
                   [:span.slack-orange-icon]]
-                "Start"))]]
+                "Get Started"))]]
         [:div.site-navbar-right.mobile-only
           (if logged-in
             [:a.mobile-your-digest
@@ -91,6 +108,6 @@
                   [:span
                     "Sign up with "
                     [:span.slack-orange-icon]]
-                  "Start")])]
+                  "START")])]
         [:div.mobile-ham-menu.mobile-only
           {:on-click #(site-mobile-menu/site-menu-toggle)}]]]))

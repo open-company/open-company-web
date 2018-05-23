@@ -39,53 +39,44 @@
         {:class (when (jwt/jwt) "no-get-started-button")}
         ; Hope page header
         [:section.cta.group
-          [:div.balloon.big-yellow]
-          [:div.balloon.big-red]
-          [:div.balloon.big-purple]
-          [:div.balloon.big-green]
-          [:div.balloon.small-blue]
-          [:div.balloon.small-yellow-face]
-          [:div.balloon.small-purple]
-          [:div.balloon.small-red]
-          [:div.balloon.small-purple-2]
-          [:div.balloon.big-green-2]
-          [:div.balloon.small-yellow]
+        [:div.balloon.big-blue]
+        [:div.balloon.small-green]
+        [:div.balloon.big-green]
+        [:div.balloon.small-purple-face]
 
-          [:h1.headline
-            "Better informed, less noise."]
-          [:div.subheadline
-            (str
-             "Your company digest keeps everyone aligned "
-             "around what matters most.")]
-          ; (when (and (not @(::confirm s))
-          ;            (not @(::thanks-box-top s)))
-          ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
-          [:div.get-started-button-container
-            (when-not (jwt/jwt)
-              [:button.mlb-reset.get-started-button
-                {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (user/show-login :signup-with-slack)
-                              (router/nav! oc-urls/sign-up))}
-                "Get started for free"])]
-          (when (and (not @(::confirm s))
-                     @(::thanks-box-top s))
-            (carrot-box-thanks))
-          (when @(::confirm s)
-            [:div.carrot-box-container.group
-              [:div.carrot-box-thanks
-                [:div.thanks-headline "You are Confirmed!"]
-                [:div.thanks-subheadline "Thank you for subscribing."]]])
+        [:h1.headline
+          "Company digest for growing and distributed teams."]
+        [:div.subheadline
+          (str
+            "Key updates and announcements get lost in fast-moving chat and stuffed inboxes. "
+            "Carrot makes it simple to stay aligned around what matters most.")]
+        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+        [:div.get-started-button-container
+          [:button.mlb-reset.get-started-button
+            {:id "get-started-centred-bt"}
+            "Get started for free"]]
+        [:div.subheadline-2
+          "No credit card required  •  Works with Slack"]
+        (carrot-box-thanks "carrot-box-thanks-top")
+        [:div.carrot-box-container.confirm-thanks.group
+          {:style {:display "none"}}
+          [:div.carrot-box-thanks
+            [:div.thanks-headline "You are Confirmed!"]
+            [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-          shared-misc/video
+        mobile-horizontal-carousell
 
-          shared-misc/horizontal-carousell
+        desktop-video
 
-          [:div.stay-aligned-container
-            [:div.stay-aligned-icon]
-            [:div.stay-aligned-message
-              "Rise above the noise."]]
-
-          shared-misc/carrot-cards]
+        [:div.core-values-list
+          [:div.core-value.key-announcement
+            "Key announcements"]
+          [:div.core-value.company-updates
+            "Company & team updates"]
+          [:div.core-value.strategic-plans
+            "Strategic plans"]
+          [:div.core-value.ideas-discussions
+            "Ideas & follow-on discussions"]]]
 
         shared-misc/carrot-testimonials
 

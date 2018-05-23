@@ -1,112 +1,127 @@
 $illustration_min_width: 1247;
 
-button.get-started-button {
-  width: 280px;
-  height: 48px;
-  border-radius: 100px;
-  background-color: $carrot_text_blue_3;
-  color: white;
-  @include avenir_H();
-  font-size: 18px;
-  margin: 48px 16px 0;
-  padding: 0px 42px;
+div.carouselle {
   position: relative;
-  text-align: left;
+  width: 1080px;
+  height: 600px;
 
-  @include mobile(){
-    width: 100%;
-    max-width: 280px;
-    margin: 16px auto;
+  @include mobile() {
+    width: calc(100% + 64px);
     padding: 0px 32px;
+    height: 510px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    margin-top: 40px;
+    margin-left: -32px;
+  }
 
-    &.your-digest {
-      text-align: center;
+  div.carouselle-screenshot {
+    transition: opacity 280ms;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 1080px;
+    height: 600px;
+    background-size: 1080px 600px;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
+    opacity: 1;
 
-      &:after {
-        background-image: none;
+    @include mobile() {
+      top: 0px;
+      height: 510px;
+      width: 288px;
+      background-size: 288px 510px;
+    }
+
+    &.disappear {
+      opacity: 0;
+
+      @include mobile() {
+        opacity: 1;
       }
     }
   }
 
-  &:after {
-    @include image-2x("/img/ML/get_started_arrow");
-    background-size: 20px 20px;
-    background-repeat: no-repeat;
-    background-position: center;
-    content: "";
-    width: 20px;
-    height: 20px;
+  button.carouselle-left {
+    width: 64px;
+    height: 64px;
     position: absolute;
-    top: 14px;
-    right: 42px;
+    top: 50%;
+    margin-top: -32px;
+    left: -32px;
+    background-image: cdnUrl("/img/ML/carouselle_left_arrow.svg");
+    background-size: 64px 64px;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 0px;
+    border-radius: 32px;
+    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
 
-    @include mobile(){
-      right: 32px
+    @include mobile() {
+      display: none;
+    }
+  }
+  button.carouselle-right {
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    top: 50%;
+    margin-top: -32px;
+    right: -32px;
+    background-image: cdnUrl("/img/ML/carouselle_right_arrow.svg");
+    background-size: 64px 64px;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 0px;
+    border-radius: 32px;
+    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
+
+    @include mobile() {
+      display: none;
     }
   }
 }
 
+button.get-started-button {
+  width: 255px;
+  height: 48px;
+  border-radius: 100px;
+  background-color: $carrot_orange;
+  color: white;
+  @include avenir_H();
+  font-size: 20px;
+  margin: 48px 16px 0;
+  position: relative;
+  text-align: center;
+
+  @include mobile(){
+    width: 100%;
+    // max-width: 280px;
+    margin: 16px auto;
+  }
+}
+
 div#wrap {
-  background-color: $oc_gray_8;
+  background-color: #FFFDF9;
 
   div.main.home-page {
     width: 100%;
-    background-image: cdnUrl("/img/ML/homepage_blue_bg.svg");
-    background-size: 1750px 1400px;
-    background-position: center 540px;
-    background-repeat: no-repeat;
-
-    @include tablet() {
-      background-position: center 625px;
-      background-size: 1900px 1520px;
-    }
-
-    &.no-get-started-button {
-      background-position: center 469px;
-
-      @include tablet() {
-
-      }
-
-      section.cta {
-        div.balloon {
-
-          &.big-green {
-            top: 351px;
-          }
-
-          &.small-red {
-            top: 523px;
-          }
-
-          &.small-purple-2 {
-            top: 1538px;
-          }
-
-          &.big-green-2 {
-            top: 1843px;
-          }
-
-          &.small-yellow {
-            top: 2001px;
-          }
-        }
-      }
-    }
 
     @include mobile() {
-      padding: 0 32px;
+      padding: 0 0px;
     }
 
     section {
-      @include mobile_to_tablet(){
+      @include mobile(){
         padding: 0 32px;
       }
     }
 
     section.cta {
       padding-top: 162px;
-      padding-bottom: 232px;
+      padding-bottom: 120px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -129,132 +144,67 @@ div#wrap {
           display: none;
         }
 
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow");
-          background-size: 172px 172px;
-          width: 172px;
-          height: 172px;
-          top: 6px;
-          left: -76px;
+        &.big-blue {
+          @include image-2x("/img/ML/balloon_big_blue");
+          background-size: 145px 145px;
+          width: 145px;
+          height: 145px;
+          top: -94px;
+          left: 50%;
+          margin-left: -469px;
         }
 
-        &.big-purple {
-          @include image-2x("/img/ML/balloon_big_purple");
-          background-size: 111px 111px;
-          width: 111px;
-          height: 111px;
-          top: 8px;
-          right: 118px;
-        }
-
-        &.big-red {
-          @include image-2x("/img/ML/balloon_big_red");
-          background-size: 226px 208px;
-          width: 226px;
-          height: 208px;
-          top: -10px;
-          right: -55px;
+        &.small-green {
+          @include image-2x("/img/ML/balloon_small_green");
+          background-size: 15px 15px;
+          width: 15px;
+          height: 15px;
+          top: 46px;
+          left: 50%;
+          margin-left: -468px;
         }
 
         &.big-green {
           @include image-2x("/img/ML/balloon_big_green");
-          background-size: 200px 172px;
-          width: 200px;
-          height: 172px;
-          top: 422px;
-          left: 50%;
-          margin-left: -524px;
+          background-size: 226px 209px;
+          width: 226px;
+          height: 209px;
+          top: 134px;
+          right: -108px;
         }
 
-        &.small-blue {
-          @include image-2x("/img/ML/balloon_small_blue");
-          background-size: 15px 17px;
-          width: 15px;
-          height: 17px;
-          top: 164px;
-          left: 6.71%;
-        }
-
-        &.small-yellow-face {
-          @include image-2x("/img/ML/balloon_small_yellow_face");
+        &.small-purple-face {
+          @include image-2x("/img/ML/balloon_small_purple_face");
           background-size: 48px 48px;
           width: 48px;
           height: 48px;
-          top: 149px;
-          left: 78.57%;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/balloon_small_purple");
-          background-size: 23px 21px;
-          width: 23px;
-          height: 21px;
-          top: 189px;
-          left: 86.36%;
-        }
-
-        &.small-red {
-          @include image-2x("/img/ML/balloon_small_red_3");
-          background-size: 47px 48px;
-          width: 47px;
-          height: 48px;
-          top: 594px;
-          left: 9.71%;
-        }
-
-        &.small-purple-2 {
-          @include image-2x("/img/ML/why_balloon_small_purple");
-          background-size: 33px 30px;
-          width: 33px;
-          height: 30px;
-          top: 1609px;
-          left: 11.93%;
-        }
-
-        &.big-green-2 {
-          @include image-2x("/img/ML/balloon_big_green");
-          background-size: 200px 172px;
-          width: 200px;
-          height: 172px;
-          top: 1914px;
-          left: 50%;
-          margin-left: 319px;
-        }
-
-        &.small-yellow {
-          @include image-2x("/img/ML/why_balloon_small_yellow");
-          background-size: 25px 25px;
-          width: 25px;
-          height: 25px;
-          top: 2072px;
-          left: 50%;
-          margin-left: 286px;
+          top: 298px;
+          right: 124px;
         }
       }
 
       h1.headline {
-        font-size: 40px;
+        font-size: 48px;
         @include avenir_H();
-        color: $carrot_dark_brown_1;
+        color: $deep_navy;
         padding: 0 16px;
-        max-width: 800px;
+        max-width: 900px;
         margin: 0 auto;
-        line-height: 60px;
+        line-height: 56px;
         z-index: 2;
         position: relative;
 
-        @include mobile() {
-          padding: 0px;
-          font-size: 48px;
+        @include mobile(){
+          text-align: left;
         }
       }
 
       div.subheadline {
-        color: rgba($carrot_light_gray_3, 0.8);
+        color: $ui_grey;
         font-size: 24px;
-        padding: 0 16px;
+        line-height: 32px;
         @include avenir_R();
-        max-width: 590px;
+        max-width: 900px;
         margin: 4px auto 0px;
         z-index: 2;
         position: relative;
@@ -263,7 +213,17 @@ div#wrap {
           margin-top: 16px;
           font-size: 24px;
           padding: 0px;
+          text-align: left;
         }
+      }
+
+      div.subheadline-2 {
+        color: $ui_grey;
+        @include avenir_H();
+        font-size: 14px;
+        max-width: 900px;
+        text-align: center;
+        margin: 16px auto 0px;
       }
 
       div.get-started-button-container {
@@ -274,47 +234,345 @@ div#wrap {
         }
       }
 
-      div.small-teams {
-        color: $carrot_dark_blue;
-        font-size: 14px;
-        @include avenir_H();
-        margin-top: 16px;
-        z-index: 2;
-        position: relative;
-      }
-
-      div.stay-aligned-container {
-        max-width: 390px;
-        margin: 62px auto 72px;
-        text-align: right;
+      div.core-values-list {
+        width: calc(100% - 48px);
+        text-align: center;
+        margin: 0px auto;
 
         @include mobile() {
-          margin: 80px auto;
+          width: 100%;
         }
 
-        div.stay-aligned-icon {
-          width: 44px;
-          height: 44px;
-          @include image-2x("/img/ML/homepage_clarity");
-          background-size: 44px;
-          background-repeat: no-repeat;
-          background-position: center;
-          float: left;
+        div.core-value {
+          padding-left: 48px;
+          position: relative;
+          margin: 0px 16px;
+          text-align: left;
+          @include avenir_M();
+          font-size: 18px;
+          color: $deep_navy;
+          display: inline-block;
+          padding-top: 6px;
+          margin-top: 16px;
 
-          @include mobile(){
-            float: unset;
-            margin: 0px auto;
+          @include mobile() {
+            margin: 16px 0px 0px;
+            width: 100%;
+          }
+
+          &:before {
+            content: "";
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            background-image: cdnUrl("/img/ML/purple_checkmark.svg");
+            background-position: center;
+            background-size: 32px;
+            width: 32px;
+            height: 32px;
           }
         }
+      }
+    }
 
-        div.stay-aligned-message {
-          @include avenir_M();
-          font-size: 34px;
-          color: white;
-          line-height: 42px;
-          margin-top: 8px;
-          display: inline-block;
-          text-align: center;
+    section.home-keep-aligned {
+      background-color: #F8F7F3;
+      padding: 120px 24px;
+      text-align: center;
+
+      h2.home-keep-aligned-title {
+        @include avenir_H();
+        font-size: 38px;
+        line-height: 42px;
+        color: $deep_navy;
+        text-align: center;
+
+        @include mobile() {
+          text-align: left;
+        }
+      }
+
+      div.home-keep-aligned-carouselle {
+        margin: 40px auto 0px;
+
+        @include mobile() {
+          margin-top: 40px;
+          margin-left: -32px;
+        }
+
+        div.carouselle-screenshot {
+
+          &.screenshot-1 {
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+
+            @include mobile() {
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+              left: 32px;
+            }
+          }
+
+          &.screenshot-2 {
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+            transform: rotateX(180deg);
+
+            @include mobile() {
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+              left: 340px;
+            }
+          }
+
+          &.screenshot-3 {
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+            transform: rotateY(180deg);
+
+            @include mobile() {
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+              left: 648px;
+            }
+          }
+        }
+      }
+
+      div.green-values {
+        margin: 40px auto 0px;
+        text-align: center;
+        max-width: 1080px;
+
+        @include mobile() {
+          width: 100%;
+        }
+        
+        div.green-value {
+          width: 330px;
+          text-align: left;
+          float: left;
+          margin-left: 44px;
+
+          @include mobile() {
+            width: 100%;
+            margin-left: 0px;
+            float: unset;
+            margin-top: 24px;
+          }
+
+          &:first-child {
+            margin-left: 0px;
+          }
+
+          &.lamp {
+            div.green-value-icon {
+              background-image: cdnUrl("/img/ML/green_values_lamp.svg");
+            }
+          }
+
+          &.people {
+            div.green-value-icon {
+              background-image: cdnUrl("/img/ML/green_values_people.svg");
+            }
+          }
+
+          &.slack {
+            div.green-value-icon {
+              background-image: cdnUrl("/img/ML/green_values_slack.svg");
+              
+            }
+          }
+
+          div.green-value-icon {
+            width: 48px;
+            height: 48px;
+            background-size: 48px 48px;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+
+          div.green-value-title {
+            @include avenir_B();
+            font-size: 15px;
+            color: $deep_navy;
+            line-height: 20px;
+            margin-top: 16px;
+          }
+
+          div.green-value-description {
+            @include avenir_R();
+            font-size: 18px;
+            color: $ui_grey;
+            margin-top: 8px;
+            max-width: 327px;
+          }
+        } 
+      }
+    }
+
+    section.team-transparency {
+      background-color: transparent;
+      padding: 120px 24px;
+      text-align: center;
+
+      h2.team-transparency-title {
+        @include avenir_H();
+        font-size: 38px;
+        line-height: 42px;
+        color: $deep_navy;
+        text-align: center;
+
+        @include mobile() {
+          text-align: left;
+        }
+      }
+
+      div.team-transparency-carouselle {
+        margin: 40px auto 0px;
+
+        @include mobile() {
+          margin-top: 40px;
+          margin-left: -32px;
+        }
+
+        div.carouselle-screenshot {
+
+          &.screenshot-1 {
+            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
+
+            @include mobile() {
+              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
+              left: 32px;
+            }
+          }
+
+          &.screenshot-2 {
+            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
+            transform: rotateX(180deg);
+
+            @include mobile() {
+              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
+              left: 340px;
+            }
+          }
+
+          &.screenshot-3 {
+            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
+            transform: rotateY(180deg);
+
+            @include mobile() {
+              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
+              left: 648px;
+            }
+          }
+        }
+      }
+
+      div.blue-values {
+        margin: 40px auto 0px;
+        text-align: center;
+        max-width: 1080px;
+
+        @include mobile() {
+          width: 100%;
+        }
+        
+        div.blue-value {
+          width: 330px;
+          text-align: left;
+          float: left;
+          margin-left: 44px;
+
+          @include mobile() {
+            width: 100%;
+            margin-left: 0px;
+            float: unset;
+            margin-top: 24px;
+          }
+
+          &:first-child {
+            margin-left: 0px;
+          }
+
+          &.mega {
+            div.blue-value-icon {
+              background-image: cdnUrl("/img/ML/blue_values_mega.svg");
+            }
+          }
+
+          &.paperclip {
+            div.blue-value-icon {
+              background-image: cdnUrl("/img/ML/blue_values_paperclip.svg");
+            }
+          }
+
+          &.thumbup {
+            div.blue-value-icon {
+              background-image: cdnUrl("/img/ML/blue_values_thumbup.svg");
+            }
+          }
+
+          div.blue-value-icon {
+            width: 48px;
+            height: 48px;
+            background-size: 48px 48px;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+
+          div.blue-value-title {
+            @include avenir_B();
+            font-size: 15px;
+            color: $deep_navy;
+            line-height: 20px;
+            margin-top: 16px;
+          }
+
+          div.blue-value-description {
+            @include avenir_R();
+            font-size: 18px;
+            color: $ui_grey;
+            margin-top: 8px;
+            max-width: 327px;
+          }
+        } 
+      }
+    }
+
+    section.slack-comparison {
+      // max-width: 1080px;
+      padding: 120px 32px;
+      margin: 0px auto;
+      text-align: center;
+      background-color: #F8F7F3;
+
+      @include mobile() {
+        text-align: left;
+      }
+
+      div.slack-comparison-headline {
+        color: #BA61FC;
+        @include avenir_B();
+        font-size: 16px;
+        letter-spacing: 1px;
+      }
+
+      div.slack-comparison-headline-1 {
+        color: $deep_navy;
+        @include avenir_R();
+        font-size: 38px;
+        line-height: 64px;
+      }
+
+      div.slack-comparison-headline-2 {
+        color: $deep_navy;
+        @include avenir_H();
+        font-size: 38px;
+        line-height: 64px;
+      }
+
+      img.slack-comparison-screenshot {
+        max-width: 1080px;
+        box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.07);
+        margin: 24px auto;
+
+        @include mobile() {
+          width: 100%;
         }
       }
     }

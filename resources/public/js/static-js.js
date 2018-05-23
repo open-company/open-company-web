@@ -94,6 +94,49 @@ if (jwt) {
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
+  // Sticky header for marketing site
+  if ( $("nav.site-navbar").length > 0) {
+    $(window).on("scroll", function(){
+      if ($(window).scrollTop() === 0) {
+        $("nav.site-navbar").removeClass("sticky");
+      }else{
+        $("nav.site-navbar").addClass("sticky");
+      }
+    });
+  }
+
+  // Home page carouselle
+  var home_page_carouselle = $("div.carouselle");
+  if (home_page_carouselle.length > 0) {
+    home_page_carouselle.find("button.carouselle-left").click(function(){
+      var current_active = home_page_carouselle.find("div.carouselle-screenshot:not(.disappear)");
+      if (current_active.hasClass("screenshot-1")) {
+        home_page_carouselle.find("div.screenshot-1").addClass("disappear");
+        home_page_carouselle.find("div.screenshot-3").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-2")) {
+        home_page_carouselle.find("div.screenshot-2").addClass("disappear");
+        home_page_carouselle.find("div.screenshot-1").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-3")) {
+        home_page_carouselle.find("div.screenshot-3").addClass("disappear");
+        home_page_carouselle.find("div.screenshot-2").removeClass("disappear");
+      }
+    });
+
+    home_page_carouselle.find("button.carouselle-right").click(function(){
+      var current_active = home_page_carouselle.find("div.carouselle-screenshot:not(.disappear)");
+      if (current_active.hasClass("screenshot-1")) {
+        home_page_carouselle.find("div.screenshot-1").addClass("disappear");
+        home_page_carouselle.find("div.screenshot-2").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-2")) {
+        home_page_carouselle.find("div.screenshot-2").addClass("disappear");
+        home_page_carouselle.find("div.screenshot-3").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-3")) {
+        home_page_carouselle.find("div.screenshot-3").addClass("disappear");
+        home_page_carouselle.find("div.screenshot-1").removeClass("disappear");
+      }
+    });
+  }
+
   if (jwt) {
     $("#site-header-login-item").hide();
     // Move the red guy up

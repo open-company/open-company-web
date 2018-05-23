@@ -4,20 +4,9 @@
             [oc.web.lib.utils :as utils]))
 
 (def video
-  [:div.main-animation-container
-    [:video.main-animation
-      {:controls false
-       :auto-play true
-       :poster (utils/cdn "/img/ML/new_homepage_screenshot.png")
-       :loop true}
-      [:source
-        {:src (utils/cdn "/img/ML/animation.webm")
-         :type "video/webm"}]
-      [:source
-        {:src (utils/cdn "/img/ML/animation.mp4")
-         :type "video/mp4"}]
-      [:div.fallback
-        "Your browser doesn’t support this video format."]]])
+  [:img.main-animation-container
+    {:src (utils/cdn "/img/ML/homepage_screenshot.png")
+     :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}])
 
 (def horizontal-carousell
   [:div.horizontal-carousell
@@ -97,8 +86,6 @@
 
 (def carrot-testimonials
   [:section.testimonials-section
-    [:div.balloon.big-yellow-1]
-    [:div.balloon.small-blue-1]
     [:div.testimonials-section-title
       "Don’t take our word for it"]
     [:div.testimonials-section-subtitle

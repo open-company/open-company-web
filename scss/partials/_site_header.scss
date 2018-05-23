@@ -2,7 +2,7 @@
 
 span.go-to-digest {
   width: 174px;
-  height: 42px;
+  height: 40px;
   border-radius: 100px;
   background-color: $carrot_green;
   color: white;
@@ -38,16 +38,30 @@ span.go-to-digest {
 }
 
 nav.site-navbar {
-  height: 72px;
-  background-color: white;
-  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+  height: 64px;
   position: fixed;
   width: 100vw;
   z-index: 100;
+  background-color: transparent;
+  box-shadow: 0px 0px 0px 0px tranparent;
+  transform: background-color 180ms, box-shadow 180ms;
+
+  &.sticky {
+    background-color: white;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+
+    div.site-navbar-container {
+      padding: 12px 40px;
+
+      div.site-navbar-right {
+        top: 12px;
+      }
+    }
+  }
 
   div.site-navbar-container {
-    height: 72px;
-    padding: 15px 24px;
+    height: 76px;
+    padding: 24px 40px 12px;
     position: relative;
 
     div.mobile-ham-menu {
@@ -79,17 +93,17 @@ nav.site-navbar {
     }
 
     div.site-navbar-left {
-      position: absolute;
-      top: 15px;
-      left: 16px;
-      height: 42px;
+      // position: absolute;
+      // top: 15px;
+      // left: 16px;
+      // height: 40px;
+      float: left;
     }
 
     div.site-navbar-right {
       position: absolute;
-      top: 15px;
-      right: 24px;
-      height: 42px;
+      top: 30px;
+      right: 40px;
 
       a {
         margin: 0px 0px 0px 8px;
@@ -97,13 +111,13 @@ nav.site-navbar {
 
       a.login {
         min-width: 96px;
-        height: 42px;
+        height: 40px;
         color: $carrot_light_gray_3;
         @include avenir_M();
         font-size: 16px;
         padding: 10px 24px;
         text-align: center;
-        margin-top: 3px;
+        margin-top: 0px;
         border-radius: 100px;
         opacity: 0.8;
         float: left;
@@ -127,19 +141,19 @@ nav.site-navbar {
 
       a.start {
         min-width: 84px;
-        height: 42px;
-        border: 2px solid $carrot_light_blue_2;
+        height: 40px;
         border-radius: 100px;
         @include avenir_H();
         font-size: 16px;
-        color: $carrot_text_blue_3;
+        color: $carrot_orange;
+        background-color: $coral;
         padding: 10px 24px;
         text-align: center;
         margin-top: 0px;
         opacity: 0.8;
 
         &:not(.your-digest).slack-get-started {
-          height: 42px;
+          height: 40px;
           background-color: transparent;
           @include avenir_H();
           font-size: 18px;
@@ -187,10 +201,8 @@ nav.site-navbar {
     }
 
     a.navbar-brand-left {
-      position: relative;
-      top: 7px;
-      left: 0px;
-      margin: 0px;
+      float: left;
+      margin: 7px 0px 0px;
       width: 115px;
       height: 28px;
       background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
@@ -200,11 +212,33 @@ nav.site-navbar {
       display: block;
 
       @include mobile() {
-        left: 40px;
+        position: absolute;
+        float: unset;
+        left: 50%;
+        margin-left: -62px;
       }
 
       @media screen and (max-width: 320px) {
         width: 30px;
+      }
+    }
+
+    div.navbar-brand-center {
+      width: 327px;
+      height: 28px;
+      margin: 12px auto 0px;
+      text-align: center;
+
+      @include tablet() {
+        display: none;
+      }
+
+      a {
+        @include avenir_M();
+        margin: 0px 12px;
+        display: inline;
+        font-size: 16px;
+        color: $ui_grey;
       }
     }
   }
@@ -219,10 +253,10 @@ nav.site-navbar {
           background-size: 14px 14px;
         }
 
-        a.navbar-brand-left {
-          left: 50%;
-          margin-left: -62px;
-        }
+        // a.navbar-brand-left {
+        //   left: 50%;
+        //   margin-left: -62px;
+        // }
 
         div.site-navbar-right {
           opacity: 0;

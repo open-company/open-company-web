@@ -26,18 +26,6 @@
 
       [:div.main.about
         [:section.about-header.group
-          [:div.balloon.big-red]
-          [:div.balloon.big-green]
-          [:div.balloon.small-green-face]
-          [:div.balloon.small-blue]
-          [:div.balloon.small-purple]
-          [:div.balloon.big-purple]
-          [:div.balloon.small-yellow]
-          [:div.balloon.big-yellow]
-          [:div.balloon.small-purple-1]
-          [:div.balloon.small-purple-2]
-          [:div.balloon.small-blue-1]
-
           [:h1.about "About us"]
           [:div.about-subline
             "We believe real transparency and alignment requires focused communication."]
