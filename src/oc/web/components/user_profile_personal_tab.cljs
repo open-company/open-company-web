@@ -104,6 +104,16 @@
                  :tab-index 1
                  :on-change #(change! s :first-name (.. % -target -value))
                  :value (:first-name current-user-data)}]]]
+          ;; Mobile last name
+          [:div.user-profile-field-box.mobile-only
+            [:div.user-profile-field-label
+              "Last name"]
+            [:div.user-profile-field
+              [:input
+                {:type "text"
+                 :tab-index 2
+                 :on-change #(change! s :last-name (.. % -target -value))
+                 :value (:last-name current-user-data)}]]]
           ; Email
           [:div.user-profile-field-box
             [:div.user-profile-field-label
@@ -129,11 +139,10 @@
                      :tab-index 3
                      :on-change #(change! s :current-password (.. % -target -value))
                      :value (:current-password current-user-data)}]]])]
-
         ; Right column
         [:div.user-profile-column-right.fs-hide
           ; Last name
-          [:div.user-profile-field-box
+          [:div.user-profile-field-box.big-web-only
             [:div.user-profile-field-label
               "Last name"]
             [:div.user-profile-field
