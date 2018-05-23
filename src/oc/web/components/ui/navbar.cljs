@@ -67,7 +67,9 @@
                               (do
                                 (dis/dispatch! [:input [:user-settings] nil])
                                 (dis/dispatch! [:input [:org-settings] nil]))
-                              (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])))}]
+                              (if mobile-menu-open
+                                (dis/dispatch! [:input [:mobile-menu-open] (not mobile-menu-open)])
+                                (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))))}]
            (search-box)]
           [:div.navbar-center
             (orgs-dropdown)]
