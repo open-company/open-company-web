@@ -65,7 +65,8 @@
   [s]
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
-        user-role (user-store/user-role org-data current-user-data)]
+        user-role (user-store/user-role org-data current-user-data)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.menu
       {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
                                 :mobile-menu-open (and (responsive/is-mobile-size?)
@@ -103,14 +104,16 @@
             (org-avatar org-data false false true)]
           [:div.org-name (:name org-data)]
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
-      (when (and (router/current-org-slug)
+      (when (and (not is-mobile?)
+                 (router/current-org-slug)
                  (= user-role :admin))
         [:a
           {:href "#"
            :on-click invite-click}
           [:div.oc-menu-item.invite-people
             "Invite People"]])
-      (when (and (= user-role :admin)
+      (when (and (not is-mobile?)
+                 (= user-role :admin)
                  (router/current-org-slug))
         [:a
           {:href "#"
@@ -118,8 +121,8 @@
           [:div.oc-menu-item.digest-settings
             "Digest Settings"]])
       [:a
-        {:href "#"
-         :on-click whats-new-click}
+        {:href oc-urls/what-s-new
+         :target "_blank"}
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       [:a
