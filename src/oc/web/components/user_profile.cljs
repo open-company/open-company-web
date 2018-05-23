@@ -36,8 +36,8 @@
           $header-avatar (js/$ header-avatar)
           current-user-data (:user-data @(drv/get-ref s :edit-user-profile))
           title (if (empty? (:avatar-url current-user-data))
-                  "Add a profile photo"
-                  "Update your profile photo")
+                  "Add a photo"
+                  "Change photo")
           profile-tab? (.hasClass $header-avatar "profile-tab")]
       (if profile-tab?
         (.tooltip $header-avatar #js {:title title
@@ -89,7 +89,6 @@
    5000))
 
 (defn upload-user-profile-pictuer-clicked []
-  (dis/dispatch! [:input [:edit-user-profile :avatar-url] default-user-profile])
   (iu/upload! user-utils/user-avatar-filestack-config success-cb progress-cb error-cb))
 
 (rum/defcs user-profile < rum/reactive
