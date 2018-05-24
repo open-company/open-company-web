@@ -94,40 +94,40 @@
    and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-    [:nav.site-navbar
-      [:div.site-navbar-container
-        [:a.navbar-brand-left
-          {:href "/?no_redirect=1"}]
-        [:div.navbar-brand-center
-          [:a
-            {:href "/"}
-            "Home"]
-          [:a
-            {:href "/about"}
-            "About"]
-          [:a
-            {:href "/pricing"}
-            "Pricing"]
-          [:a
-            {:href "https://blog.carrot.io"
-             :target "_blank"}
-            "Blog"]]
-        [:div.site-navbar-right.big-web-only
-          [:a.login
-            {:id "site-header-login-item"
-             :href "/login"}
-              "Login"]
-          [:a.start
-            {:id "site-header-signup-item"
-             :href "/sign-up"}
-            "Get Started"]]
-        [:div.site-navbar-right.mobile-only
-          [:a.start
-            {:id "site-header-mobile-signup-item"
-             :href "/sign-up"}
-              "START"]]
-        [:div.mobile-ham-menu.mobile-only
-          {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
+  [:nav.site-navbar
+    [:div.site-navbar-container
+      [:a.navbar-brand-left
+        {:href "/?no_redirect=1"}]
+      [:div.navbar-brand-center
+        [:a
+          {:href "/"}
+          "Home"]
+        [:a
+          {:href "/about"}
+          "About"]
+        [:a
+          {:href "/pricing"}
+          "Pricing"]
+        [:a
+          {:href "https://blog.carrot.io"
+           :target "_blank"}
+          "Blog"]]
+      [:div.site-navbar-right.big-web-only
+        [:a.login
+          {:id "site-header-login-item"
+           :href "/login"}
+            "Login"]
+        [:a.start
+          {:id "site-header-signup-item"
+           :href "/sign-up"}
+          "Get Started"]]
+      [:div.site-navbar-right.mobile-only
+        [:a.start
+          {:id "site-header-mobile-signup-item"
+           :href "/sign-up"}
+            "START"]]
+      [:div.mobile-ham-menu.mobile-only
+        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
