@@ -92,66 +92,21 @@
     [:div.testimonials-section-subtitle
       "Here’s how we’re helping teams like yours."]
     [:div.testimonials-cards-container.group
-      [:div.card
-        [:div.card-content
-          (str
-           "We love Slack for spontaneous "
-           "stuff, but when it’s time to "
-           "post key updates that can’t "
-           "be missed, Carrot is awesome.")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (utils/cdn "/img/ML/happy_face_blue.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]
-      [:div.card
-        [:div.card-content
-          (str
-           "Carrot makes sure our crucial "
-           "updates aren’t drowned out "
-           "by \"taco Tuesday?\" and "
-           "silly memes!")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (utils/cdn "/img/ML/happy_face_purple.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]
-      [:div.card
-        [:div.card-content
-          (str
-           "RIP team email! 👻  With "
-           "Carrot, email is finally "
-           "obsolete for team updates "
-           "and the rest.")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (utils/cdn "/img/ML/happy_face_red.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]
-      [:div.card
-        [:div.card-content
-          (str
-           "Before Carrot, I never knew "
-           "if anyone saw my updates! "
-           "Now I know who's engaged "
-           "and aligned.  🙏")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (utils/cdn "/img/ML/happy_face_yellow.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]]])
+      [:img.card
+        {:src (utils/cdn "/img/ML/testimonial_katie.png")
+         :src-set (str (utils/cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
+      [:img.card
+        {:src (utils/cdn "/img/ML/testimonial_riley.png")
+         :src-set (str (utils/cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
+      [:img.card
+        {:src (utils/cdn "/img/ML/testimonial_matt.png")
+         :src-set (str (utils/cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
 
 (def keep-aligned
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "Keep everyone aligned around what matters most."]
+      "It’s never been easier to keep everyone on the same page"]
     [:button.mlb-reset.get-started-button
-      "Get started for free"]])
+      "Get started for free"]
+    [:div.keep-aligned-subtitle
+      "No credit card required  •  Works with Slack"]])
