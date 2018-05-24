@@ -3,7 +3,7 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
-(def desktop-video
+(def video
   [:div.main-animation-container
     [:img.main-animation
       {:src (utils/cdn "/img/ML/homepage_screenshot.webp")
