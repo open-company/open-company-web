@@ -3,10 +3,11 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
-(def video
-  [:img.main-animation-container
-    {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-     :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}])
+(def desktop-video
+  [:div.main-animation-container
+    [:img.main-animation
+      {:src (utils/cdn "/img/ML/homepage_screenshot.webp")
+       :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]])
 
 (def horizontal-carousell
   [:div.horizontal-carousell
