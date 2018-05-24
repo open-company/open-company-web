@@ -363,30 +363,30 @@ div#wrap {
           div.carouselle-screenshot {
 
             &.screenshot-1 {
-              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
 
               @include mobile() {
-                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile", ".webp");
                 // left: 24px;
               }
             }
 
             &.screenshot-2 {
-              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
               transform: rotateX(180deg);
 
               @include mobile() {
-                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2_mobile", ".webp");
                 transform: rotateX(0deg);
               }
             }
 
             &.screenshot-3 {
-              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
               transform: rotateY(180deg);
 
               @include mobile() {
-                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3_mobile", ".webp");
                 transform: rotateY(0deg);
               }
             }
@@ -505,30 +505,29 @@ div#wrap {
         div.carouselle-screenshot {
 
           &.screenshot-1 {
-            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
+            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
 
             @include mobile() {
-              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
-              // left: 24px;
+              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile", ".webp");
             }
           }
 
           &.screenshot-2 {
-            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
+            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
             transform: rotateX(180deg);
 
             @include mobile() {
-              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
+              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2_mobile", ".webp");
               transform: rotateX(0deg);
             }
           }
 
           &.screenshot-3 {
-            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
+            @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
             transform: rotateY(180deg);
 
             @include mobile() {
-              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
+              @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3_mobile", ".webp");
               transform: rotateY(0deg);
             }
           }
