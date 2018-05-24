@@ -29,8 +29,11 @@
                 show-login-overlay
                 mobile-navigation-sidebar
                 mobile-menu-open
-                orgs-dropdown-visible]
-         :as navbar-data} (drv/react s :navbar-data)]
+                orgs-dropdown-visible
+                user-settings
+                org-settings]
+         :as navbar-data} (drv/react s :navbar-data)
+         is-mobile? (responsive/is-mobile-size?)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -50,17 +53,33 @@
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:class (when mobile-navigation-sidebar "close-bt")
+              {:class (when (or mobile-navigation-sidebar
+                                mobile-menu-open
+                                (and is-mobile?
+                                     (or user-settings
+                                         org-settings)))
+                        "close-bt")
                :on-click #(do
                             (menu/mobile-menu-close)
-                            (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))}]
+                            (if (and is-mobile?
+                                     (or org-settings
+                                         user-settings))
+                              (do
+                                (dis/dispatch! [:input [:user-settings] nil])
+                                (dis/dispatch! [:input [:org-settings] nil]))
+                              (if mobile-menu-open
+                                (dis/dispatch! [:input [:mobile-menu-open] (not mobile-menu-open)])
+                                (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))))}]
            (search-box)]
           [:div.navbar-center
             (orgs-dropdown)]
           [:div.navbar-right
-            (if (responsive/is-mobile-size?)
+            (if is-mobile?
               [:button.btn-reset.mobile-menu.group
                 {:on-click #(do
+                             (when is-mobile?
+                               (dis/dispatch! [:input [:user-settings] nil])
+                               (dis/dispatch! [:input [:org-settings] nil]))
                              (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
                              (menu/mobile-menu-toggle))}
                 (user-avatar-image current-user-data)]
@@ -72,6 +91,6 @@
                   (when-not disabled-user-menu
                     (menu/menu))]
                 (login-button)))]]]
-      (when (responsive/is-mobile-size?)
+      (when is-mobile?
         ;; Render the menu here only on mobile so it can expand the navbar
         (menu/menu))]))

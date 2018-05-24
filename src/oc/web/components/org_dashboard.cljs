@@ -19,6 +19,7 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
+            [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
             [oc.web.components.fullscreen-post :refer (fullscreen-post)]
@@ -71,6 +72,7 @@
                 nux-loading
                 nux-end
                 ap-initial-at
+                user-settings
                 org-settings-data
                 whats-new-modal-data
                 made-with-carrot-modal-data
@@ -84,7 +86,8 @@
                 show-sections-picker
                 entry-editing-board-slug
                 mobile-navigation-sidebar
-                activity-share-container]} (drv/react s :org-dashboard-data)
+                activity-share-container
+                mobile-menu-open]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (= nux :1)
         search-active? (drv/react s search/search-active?)
@@ -126,6 +129,9 @@
           ;; Org settings
           org-settings-data
           (org-settings)
+          ;; User settings
+          user-settings
+          (user-profile)
           ;; About carrot
           whats-new-modal-data
           (whats-new-modal)
@@ -211,6 +217,9 @@
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when-not (and is-mobile?
-                              (and search-active? search-results?)
-                              mobile-navigation-sidebar)
+                              (or (and search-active? search-results?)
+                                  mobile-navigation-sidebar
+                                  org-settings-data
+                                  user-settings
+                                  mobile-menu-open))
                  (dashboard-layout))]]])])))

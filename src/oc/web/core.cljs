@@ -46,7 +46,6 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
-            ; [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
@@ -164,6 +163,9 @@
                     (and (contains? query-params :ap)
                          ;; this latter is used when displaying modal over AP
                          (not (:fixed-items (dis/all-posts-data)))))
+        user-settings (when (and (contains? query-params :user-settings)
+                                 (#{:profile :notifications} (keyword (:user-settings query-params))))
+                        (keyword (:user-settings query-params)))
         org-settings (if (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params))
@@ -173,6 +175,7 @@
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
+                        :user-settings user-settings
                         :nux-loading show-nux
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
@@ -441,10 +444,6 @@
         (router/redirect! urls/home))
       (simple-handler #(onboard-wrapper :invitee-lander-profile) "confirm-invitation" target params))
 
-    ; (defroute subscription-callback-route urls/subscription-callback {}
-    ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
-    ;     (router/redirect! (urls/org-settings s))))
-
     (defroute email-wall-route urls/email-wall {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-route" urls/email-wall)
       ; Email wall is shown only to not logged in users
@@ -492,13 +491,22 @@
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
 
+    (defroute user-notifications-route urls/user-notifications {:as params}
+      (timbre/info "Routing user-notifications-route" urls/user-notifications)
+      (pre-routing (:query-params params))
+      (router/set-route! ["user-profile"] {:query-params (:query-params params)})
+      (post-routing)
+      (if (jwt/jwt)
+        (router/redirect! (str (utils/your-digest-url) "?user-settings=notifications"))
+        (router/redirect! urls/home)))
+
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
       (router/set-route! ["user-profile"] {:query-params (:query-params params)})
       (post-routing)
       (if (jwt/jwt)
-        (drv-root user-profile target)
+        (router/redirect! (str (utils/your-digest-url) "?user-settings=profile"))
         (router/redirect! urls/home)))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
@@ -566,17 +574,12 @@
                                  ;; Home page
                                  home-page-route
                                  user-profile-route
+                                 user-notifications-route
                                  ;; Org routes
                                  org-route
                                  org-slash-route
                                  all-posts-route
                                  all-posts-slash-route
-                                 ; org-settings-route
-                                 ; org-settings-slash-route
-                                 ; org-settings-team-route
-                                 ; org-settings-team-slash-route
-                                 ; org-settings-invite-route
-                                 ; org-settings-invite-slash-route
                                  ; Drafts board
                                  drafts-route
                                  drafts-slash-route

@@ -12,6 +12,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.whats-new-modal :as whats-new-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -31,18 +32,21 @@
 (defn user-profile-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
+  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+
+(defn user-notifications-click [e]
+  (utils/event-stop e)
+  (mobile-menu-toggle)
+  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
 (defn team-settings-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings)))
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
 (defn invite-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-invite))))
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 
 (defn sign-in-sign-up-click [e]
@@ -61,7 +65,8 @@
   [s]
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
-        user-role (user-store/user-role org-data current-user-data)]
+        user-role (user-store/user-role org-data current-user-data)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.menu
       {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
                                 :mobile-menu-open (and (responsive/is-mobile-size?)
@@ -80,13 +85,18 @@
             "Contributor"
             :viewer
             "Viewer")]]
-      (when (and (jwt/jwt)
-                 (not (responsive/is-mobile-size?)))
+      (when (jwt/jwt)
         [:a
-          {:href oc-urls/user-profile
+          {:href "#"
            :on-click user-profile-click}
           [:div.oc-menu-item.personal-profile
             "Personal Profile"]])
+      (when (jwt/jwt)
+        [:a
+          {:href "#"
+           :on-click user-notifications-click}
+          [:div.oc-menu-item.user-notifications
+            "Notification Settings"]])
       [:div.oc-menu-separator]
       (when org-data
         [:div.org-item
@@ -94,25 +104,25 @@
             (org-avatar org-data false false true)]
           [:div.org-name (:name org-data)]
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
-      (when (and (router/current-org-slug)
-                 (= user-role :admin)
-                 (not (responsive/is-mobile-size?)))
+      (when (and (not is-mobile?)
+                 (router/current-org-slug)
+                 (= user-role :admin))
         [:a
-          {:href (oc-urls/org-settings-invite)
+          {:href "#"
            :on-click invite-click}
           [:div.oc-menu-item.invite-people
             "Invite People"]])
-      (when (and (= user-role :admin)
-                 (router/current-org-slug)
-                 (not (responsive/is-mobile-size?)))
+      (when (and (not is-mobile?)
+                 (= user-role :admin)
+                 (router/current-org-slug))
         [:a
-          {:href (oc-urls/org-settings)
+          {:href "#"
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
             "Digest Settings"]])
       [:a
-        {:href "#"
-         :on-click whats-new-click}
+        {:href oc-urls/what-s-new
+         :target "_blank"}
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       [:a
