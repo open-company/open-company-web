@@ -46,7 +46,7 @@
   (let [inviting-users-data @(drv/get-ref s :invite-data)
         invite-users (:invite-users inviting-users-data)
         cur-user-data (:current-user-data @(drv/get-ref s :invite-data))
-        invite-from (or @(::inviting-from s) (:default-invite-type cur-user-data))]
+        invite-from (or @(::inviting-from s) (:auth-source cur-user-data))]
     ;; Setup the invite from if it's not already
     (when (nil? @(::inviting-from s))
       (reset! (::inviting-from s) invite-from))

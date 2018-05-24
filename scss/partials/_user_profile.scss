@@ -1,208 +1,325 @@
 @import "vars/main";
 
 div.user-profile {
+  background-color: $carrot_modal_bg;
+  position: absolute;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
 
-  &.fullscreen-page {
-    background-color: $carrot_settings_background;
-  }
-
-  button.carrot-close-bt {
-    // Fallback for mobile that doesn't support fix positioning
-    position: absolute;
-    position: fixed;
-    left: 50%;
-    margin-left: #{($settings_content_width / 2 * -1) - 32}px;
+  button.settings-modal-close {
+    right: -56px;
     top: 0px;
   }
 
-  div.user-profile-header {
-    position: relative;
-    font-size: 32px;
-    font-weight: 500;
-    color: $carrot_gray;
-    background-color: $carrot_dark_bg_gray;
-    height: $settings_header_height;
-    padding: 40px 32px;
-    width: #{$settings_content_width}px;
-    margin: 0 auto;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+  @include mobile() {
+    background-color: white;
+    height: calc(100vh - 65px);
+    top: 65px;
+    position: absolute;
   }
 
-  div.user-profile-footer {
-    height: $user_profile_footer_height;
-    background-color: white;
-    position: relative;
+  div.user-profile-inner {
     width: #{$settings_content_width}px;
-    margin: 0 auto;
-    padding: 32px 34px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
-
-    button {
-      float: right;
-      margin-left: 24px;
-    }
-
-    button.mlb-default {
-      width: 124px;
-      &.no-disable[disabled] {
-        opacity: 1 !important;
-      }
-    }
-
-    button.mlb-link-black {
-      margin-top: 7px;
-    }
-  }
-
-  div.user-profile-internal {
-    position: relative;
+    margin: 72px auto;
+    border: 1px solid rgba($deep_tan, 0.7);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
     background-color: white;
-    height: calc(100vh - $settings_header_height - $user_profile_footer_height);
-    padding: 40px 32px;
-    margin: 0 auto;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.05);
+    overflow-x: visible;
+    overflow-y: auto;
+    overflow: visible;
+    position: relative;
+    border-radius: 4px;
+    padding: 32px 24px;
 
-    @include big_web(){
-      width: 709px;
-    }
-    /* 29px is the height below the user info */
-    min-height: calc(100vh - 114px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
-
-    @include mobile(){
-      /* 9px on mobile */
-      padding: 20px 20px 20px 20px;
-      min-height: calc(100vh - 9px - #{$back_to_dashboard_row_height}px - #{$footer_small_height}px);
+    @include mobile() {
+      width: 100%;
+      margin: 0px auto;
+      box-shadow: none;
+      border: none;
+      border-radius: 0px;
     }
 
-    div.user-profile-content {
+    div.user-profile-header {
+      position: relative;
+      color: $deep_navy;
 
-      div.user-profile-avatar-box {
-        height: 72px;
-        margin-bottom: 40px;
-        width: 338px;
+      div.user-profile-header-avatar {
+        float: left;
+        width: 48px;
+        height: 48px;
 
-        button.user-profile-avatar {
-          width: 72px;
-          height: 72px;
-          float: left;
+        &.profile-tab {
           cursor: pointer;
-          margin: 0;
-          padding: 0;
-          opacity: 1;
-
-          img.user-avatar-img {
-            width: 72px;
-            height: 72px;
-          }
         }
 
-        button.upload-photo {
-          float: right;
-          width: 236px;
-          height: 72px;
-          text-align: left;
-          margin: 0;
-          padding: 0;
-          opacity: 1;
-
-          &:hover {
-            span.user-avatar-upload-cta {
-              text-decoration: underline;
-            }
-          }
-
-          span.user-avatar-upload-cta {
-            float: left;
-            width: 100%;
-            margin-top: 6px;
-          }
-
-          span.user-avatar-upload-description {
-            color: #a3a6ab;
-            @include avenir_BOOK();
-            font-size: 14px;
-            float: left;
-            width: 100%;
-            margin-top: 8px;
-          }
-        }
+        @include user-profile(48);
       }
 
-      div.user-profile-field-box {
-        text-align: left;
+      div.user-profile-header-name {
+        @include avenir_H();
+        font-size: 22px;
+        color: $deep_navy;
+        margin-left: 64px;
+      }
 
-        div.user-profile-field-label {
-          @include avenir_H();
-          font-size: 14px;
-          color: $oc_gray_7;
-          margin-top: 32px;
+      div.user-profile-header-role {
+        @include avenir_R();
+        font-size: 18px;
+        color: $light_ui_grey;
+        margin-left: 64px;
+      }
+    }
 
-          span.error {
-            margin-left: 16px;
-            color: $carrot_orange;
+    div.user-profile-tabs-header {
+      min-height: 24px;
+      position: relative;
+      margin-top: 32px;
+      margin-bottom: 32px;
+
+      div.user-profile-bottom-line {
+        width: 100%;
+        height: 1px;
+        background-color: rgba($deep_tan, 0.3);
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+      }
+
+      div.user-profile-tab-header {
+        height: 33px;
+        float: left;
+        width: auto;
+        margin: 1px 24px 0px 0px;
+        border-bottom: 1px solid transparent;
+
+        a.user-profile-tab-link {
+          display: block;
+          width: auto;
+          height: 24px;
+          margin: 0;
+          padding: 0;
+          cursor: pointer;
+          @include avenir_B();
+          font-size: 13px;
+          color: $ui_grey;
+          text-decoration: none;
+          text-transform: uppercase;
+          outline: none;
+
+          &:active, &:hover, &:focus {
+            text-decoration: none;
           }
+        }
 
-          i.mdi.mdi-information-outline {
-            margin-left: 8px;
-            
-            &:before {
+        &:hover {
+          border-bottom: 1px solid $carrot_orange;
+        }
+
+        &.active {
+          border-bottom: 1px solid $carrot_orange;
+
+          a.user-profile-tab-link {
+            padding: 0;
+            color: $carrot_orange;
+
+            @include mobile() {
               font-size: 14px;
             }
           }
         }
+      }
+    }
 
-        div.user-profile-field {
-          margin: 8px 0 24px 0;
-          padding: 0;
+    div.user-profile-footer {
+      background-color: white;
+      position: relative;
+      height: 40px;
 
-           div.dropdown {
-            height: 40px;
-            padding: 10px 8px;
-            border: 1px solid rgba($carrot_light_gray_1, 0.5);
-            border-radius: 4px;
-          }
+      button {
+        float: right;
+        margin-left: 24px;
+        @include avenir_M();
+        font-size: 15px;
+      }
 
-          div.dropdown.dropdown-button {
-            border: 0px;
-          }
+      button.save-bt {
+        min-width: 100px;
+        background-color: $carrot_green;
+        border-radius: 100px;
+        color: white;
+        @include avenir_H();
+        font-size: 16px;
+        height: 40px;
 
-          input, select {
-            width: 100%;
-            height: 40px;
-            border-radius: 4px;
-            background-color: white;
-            border: 1px solid rgba($carrot_light_gray_1, 0.5);
-            outline: none;
-            padding: 10px 16px;
-            position: relative;
-            @include avenir_R();
-            font-size: 16px;
-            color: $carrot_dark_gray;
-
-            &:disabled {
-              opacity: 0.5;
-            }
-
-            @include placeholder() {
-              @include avenir_R();
-              font-size: 16px;
-              color: $carrot_light_gray;
-            }
-          }
+        &.no-disable[disabled] {
+          opacity: 1 !important;
         }
       }
 
-      div.user-profile-column-left {
-        float: left;
-        width: 307px;
-        min-height: 100px;
-      }
-
-      div.user-profile-column-right {
-        float: right;
-        width: 307px;
-        min-height: 100px;
+      button.cancel-bt {
+        height: 40px;
+        color: $ui_grey;
       }
     }
+
+    div.user-profile-internal {
+      position: relative;
+      background-color: white;
+      margin: 0 auto;
+
+      div.user-profile-content {
+
+        div.user-profile-avatar-box {
+          height: 72px;
+          margin-bottom: 40px;
+          width: 338px;
+
+          button.user-profile-avatar {
+            width: 72px;
+            height: 72px;
+            float: left;
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
+            opacity: 1;
+
+            img.user-avatar-img {
+              width: 72px;
+              height: 72px;
+            }
+          }
+
+          button.upload-photo {
+            float: right;
+            width: 236px;
+            height: 72px;
+            text-align: left;
+            margin: 0;
+            padding: 0;
+            opacity: 1;
+
+            &:hover {
+              span.user-avatar-upload-cta {
+                text-decoration: underline;
+              }
+            }
+
+            span.user-avatar-upload-cta {
+              float: left;
+              width: 100%;
+              margin-top: 6px;
+            }
+
+            span.user-avatar-upload-description {
+              color: #a3a6ab;
+              @include avenir_BOOK();
+              font-size: 14px;
+              float: left;
+              width: 100%;
+              margin-top: 8px;
+            }
+          }
+        }
+
+        div.user-profile-field-box {
+          text-align: left;
+
+          &.password-update {
+            margin-top: 32px;
+          }
+
+          div.user-profile-field-label {
+            @include avenir_M();
+            font-size: 15px;
+            color: $deep_navy;
+            margin-top: 32px;
+
+            span.error {
+              margin-left: 16px;
+              color: $carrot_orange;
+            }
+
+            i.mdi.mdi-information-outline {
+              margin-left: 8px;
+              
+              &:before {
+                font-size: 14px;
+              }
+            }
+          }
+
+          div.user-profile-field {
+            margin: 8px 0 24px 0;
+            padding: 0;
+
+            div.dropdown-button {
+              height: 40px;
+              padding: 10px 8px;
+              border: 1px solid rgba($carrot_light_gray_1, 0.5);
+              border-radius: 4px;
+
+              button {
+                width: 100%;
+                text-align: left;
+              }
+            }
+
+            input, select {
+              width: 100%;
+              height: 40px;
+              border-radius: 4px;
+              background-color: white;
+              border: 1px solid rgba($carrot_light_gray_1, 0.5);
+              outline: none;
+              padding: 10px 16px;
+              position: relative;
+              @include avenir_M();
+              font-size: 15px;
+              color: $deep_navy;
+
+              &:disabled {
+                opacity: 0.5;
+              }
+
+              @include placeholder() {
+                @include avenir_R();
+                font-size: 16px;
+                color: $carrot_light_gray;
+              }
+            }
+          }
+        }
+
+        div.user-profile-column-left {
+          float: left;
+          width: calc(50% - 8px);
+          margin-right: 8px;
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            margin-right: 0px;
+          }
+        }
+
+        div.user-profile-column-right {
+          float: right;
+          width: calc(50% - 8px);
+          margin-left: 8px;
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            margin-left: 0px;
+          }
+        }
+      }
+    }
+
   }
 }

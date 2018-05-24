@@ -22,6 +22,10 @@ div.media-video-modal-container {
     margin: 100px auto 50px;
     position: relative;
 
+    button.settings-modal-close {
+      right: -56px;
+    }
+
     div.media-video-modal {
       width: 552px;
       margin: 0px 0px 0px 28px;

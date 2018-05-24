@@ -74,8 +74,8 @@
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
       ;; Close X button
-      [:button.carrot-modal-close.mlb-reset
-          {:on-click (partial close-overlay)}]
+      [:button.settings-modal-close.mlb-reset
+        {:on-click (partial close-overlay)}]
       ;; Modal container
       [:div.login-overlay.login-with-email.group
         {:on-click #(utils/event-stop %)}

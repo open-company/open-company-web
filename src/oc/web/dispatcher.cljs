@@ -93,6 +93,7 @@
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (:auth-settings base))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
+   :user-settings        [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
@@ -113,6 +114,7 @@
    :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
+   :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -237,7 +239,9 @@
                                                                  :show-login-overlay
                                                                  :mobile-navigation-sidebar
                                                                  :current-user-data
-                                                                 :orgs-dropdown-visible])]
+                                                                 :orgs-dropdown-visible
+                                                                 :user-settings
+                                                                 :org-settings])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
@@ -265,9 +269,11 @@
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
    :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
-                            :show-section-editor :show-section-add :show-sections-picker :entry-editing]
+                            :show-section-editor :show-section-add :show-sections-picker :entry-editing
+                            :mobile-menu-open]
                             (fn [base org-data board-data all-posts activity-data nux ap-initial-at
-                                 show-section-editor show-section-add show-sections-picker entry-editing]
+                                 show-section-editor show-section-add show-sections-picker entry-editing
+                                 mobile-menu-open]
                               {:nux nux
                                :nux-loading (:nux-loading base)
                                :nux-end (:nux-end base)
@@ -275,6 +281,7 @@
                                :board-data board-data
                                :all-posts-data all-posts
                                :org-settings-data (:org-settings base)
+                               :user-settings (:user-settings base)
                                :whats-new-modal-data (:whats-new-modal base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
@@ -288,7 +295,8 @@
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
-                               :activity-share-container (:activity-share-container base)})]})
+                               :activity-share-container (:activity-share-container base)
+                               :mobile-menu-open mobile-menu-open})]})
 
 
 ;; Action Loop =================================================================

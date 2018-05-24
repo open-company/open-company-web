@@ -56,7 +56,7 @@
 (defn parse-user-data [user-data]
   (-> user-data
     (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
-    (assoc :default-invite-type (or (j/get-key :auth-source) default-invite-type))))
+    (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))))
 
 (defn- fix-user-values [user-data]
   (let [with-first-name (if (empty? (:first-name user-data))
@@ -258,3 +258,6 @@
       is-admin? :admin
       is-author? :author
       :else :viewer)))
+
+(defn has-slack-bot? [org-data]
+  (j/team-has-bot? (:team-id org-data)))

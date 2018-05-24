@@ -14,6 +14,12 @@ div.org-settings {
   overflow-y: auto;
   height: 100vh;
 
+  @include mobile() {
+    top: 65px;
+    background-color: white;
+    height: calc(100vh - 65px);
+  }
+
   div.org-settings-inner {
     width: #{$settings_content_width}px;
     margin: 72px auto;
@@ -28,11 +34,19 @@ div.org-settings {
 
     @include mobile() {
       width: 100%;
+      box-shadow: none;
+      border: none;
+      border-radius: 0px;
+      margin-top: 0px;
     }
 
-    button.carrot-modal-close {
-      top: 4px;
-      left: -24px;
+    button.settings-modal-close {
+      right: -56px;
+      top: 0px;
+
+      @include mobile() {
+        display: none;
+      }
     }
 
     div.org-settings-header {

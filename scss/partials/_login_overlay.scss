@@ -19,16 +19,14 @@ div.login-overlay-container {
     background-color: white;
   }
 
-  button.carrot-modal-close {
+  button.settings-modal-close {
     position: absolute;
+    top: 64px;
     left: 50%;
-    margin-left: -282px;
-    top: 90px;
+    margin-left: 268px;
 
     @include mobile(){
-      top: 20px;
-      left: 30px;
-      z-index: 99;
+      display: none;
     }
   }
 

@@ -35,19 +35,19 @@
     [:div.org-settings-tab
       {:class (when (= :main active-tab) "active")}
       [:a.org-settings-tab-link
-        {;:href (oc-urls/org-settings org-slug)
+        {:href "#"
          :on-click #(do (utils/event-stop %) (show-modal :main))}
         "DIGEST SETTINGS"]]
     [:div.org-settings-tab
       {:class (when (= :team active-tab) "active")}
       [:a.org-settings-tab-link
-        {;:href (oc-urls/org-settings-team org-slug)
+        {:href "#"
          :on-click #(do (utils/event-stop %) (show-modal :team))}
         "MANAGE MEMBERS"]]
     [:div.org-settings-tab
       {:class (when (= :invite active-tab) "active")}
       [:a.org-settings-tab-link
-        {;:href (oc-urls/org-settings-invite org-slug)
+        {:href "#"
          :on-click #(do (utils/event-stop %) (show-modal :invite))}
         "INVITE PEOPLE"]]])
 
@@ -146,7 +146,7 @@
       [:div.org-settings.fullscreen-page
         [:div.org-settings-inner
           (when-not alert-modal-data
-            [:button.carrot-modal-close.mlb-reset
+            [:button.settings-modal-close.mlb-reset
               {:on-click #(close-clicked s)}])
           [:div.org-settings-header
             [:div.org-settings-header-avatar.fs-hide
@@ -155,10 +155,6 @@
                                         :main-panel main-tab?})
                :on-click (fn [_]
                           (when main-tab?
-                            (dis/dispatch!
-                             [:input
-                              [:org-editing]
-                              (merge org-editing {:logo-url nil :logo-width 0 :logo-height 0 :has-changes true})])
                             (iu/upload! org-utils/org-avatar-filestack-config
                               (fn [res]
                                 (let [url (gobj/get res "url")
