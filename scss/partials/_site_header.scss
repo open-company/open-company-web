@@ -53,8 +53,24 @@ nav.site-navbar {
     div.site-navbar-container {
       padding: 12px 40px;
 
+      @include mobile() {
+        // padding: 8px 24px 16px;
+
+        a.navbar-brand-left {
+          margin-top: 10px;
+        }
+
+        div.mobile-ham-menu {
+          top: 20px;
+        }
+      }
+
       div.site-navbar-right {
         top: 12px;
+
+        @include mobile() {
+          top: 22px;
+        }
       }
     }
   }
@@ -105,6 +121,11 @@ nav.site-navbar {
       top: 30px;
       right: 40px;
 
+      @include mobile() {
+        top: 24px;
+        right: 24px;
+      }
+
       a {
         margin: 0px 0px 0px 8px;
       }
@@ -151,6 +172,15 @@ nav.site-navbar {
         text-align: center;
         margin-top: 0px;
         opacity: 0.8;
+
+        @include mobile() {
+          height: 24px;
+          margin-top: 2px;
+          width: 64px;
+          text-align: center;
+          padding: 4px 0px;
+          font-size: 13px;
+        }
 
         &:not(.your-digest).slack-get-started {
           height: 40px;
@@ -215,7 +245,10 @@ nav.site-navbar {
         position: absolute;
         float: unset;
         left: 50%;
-        margin-left: -62px;
+        margin: 0px 0px 0px -50px;
+        width: 99px;
+        height: 24px;
+        background-size: 99px 24px;
       }
 
       @media screen and (max-width: 320px) {

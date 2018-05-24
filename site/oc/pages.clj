@@ -86,6 +86,12 @@
          :id "mc-embedded-subscribe"}
         "Get Early Access"]]])
 
+(def desktop-video
+  [:div.main-animation-container
+    [:img.main-animation
+      {:src (cdn "/img/ML/homepage_screenshot.png")
+       :src-set (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]])
+
 (def carrot-cards
   [:div.cards-container
     [:div.cards-row.group
@@ -186,6 +192,8 @@
         [:div.balloon.small-green]
         [:div.balloon.big-green]
         [:div.balloon.small-purple-face]
+        [:div.balloon.big-yellow]
+        [:div.balloon.small-purple]
 
         [:h1.headline
           "Company digest for growing and distributed teams."]
@@ -207,6 +215,8 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
+        desktop-video
+
         [:div.core-values-list.group
           [:div.core-value.key-announcement
             "Key announcements"]
@@ -222,9 +232,10 @@
           "Carrot keeps leaders and their teams aligned"]
 
         [:div.home-keep-aligned-carouselle.carouselle
-          [:div.carouselle-screenshot.screenshot-1]
-          [:div.carouselle-screenshot.screenshot-2.disappear]
-          [:div.carouselle-screenshot.screenshot-3.disappear]
+          [:div.carouselle-screenshots
+            [:div.carouselle-screenshot.screenshot-1]
+            [:div.carouselle-screenshot.screenshot-2.disappear]
+            [:div.carouselle-screenshot.screenshot-3.disappear]]
           [:button.mlb-reset.carouselle-left]
           [:button.mlb-reset.carouselle-right]]
 
@@ -260,9 +271,10 @@
           "Carrot keeps leaders and their teams aligned"]
 
         [:div.team-transparency-carouselle.carouselle
-          [:div.carouselle-screenshot.screenshot-1]
-          [:div.carouselle-screenshot.screenshot-2.disappear]
-          [:div.carouselle-screenshot.screenshot-3.disappear]
+          [:div.carouselle-screenshots
+            [:div.carouselle-screenshot.screenshot-1]
+            [:div.carouselle-screenshot.screenshot-2.disappear]
+            [:div.carouselle-screenshot.screenshot-3.disappear]]
           [:button.mlb-reset.carouselle-left]
           [:button.mlb-reset.carouselle-right]]
 

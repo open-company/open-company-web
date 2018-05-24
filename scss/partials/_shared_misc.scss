@@ -1,13 +1,27 @@
-img.main-animation-container {
-  max-width: 1280px;
-  width: calc(100% - 48px);
-  margin: 85px auto 0px;
-  padding: 0;
-  z-index: 10;
+div.main-animation-container {
   position: relative;
 
-  @include tablet() {
+  @include mobile() {
     width: 100%;
+    margin: 40px 0px 0px;
+    height: 237px;
+  }
+
+  img.main-animation {
+    max-width: 1280px;
+    width: calc(100% - 48px);
+    margin: 85px auto 0px;
+    padding: 0;
+    z-index: 10;
+    position: relative;
+
+    @include mobile() {
+      width: 400px;
+      height: 237px;
+      position: absolute;
+      right: 0px;
+      margin: 0px;
+    }
   }
 }
 
@@ -219,13 +233,25 @@ section.testimonials-section {
     @include avenir_H();
     color: $deep_navy;
     font-size: 38px;
+    line-height: 44px;
+
+    @include mobile(){
+      font-size: 24px;
+      line-height: 30px;
+    }
   }
 
   div.testimonials-section-subtitle {
     @include avenir_R();
     font-size: 20px;
+    line-height: 26px;
     color: $ui_grey;
     margin-top: 11px;
+
+    @include mobile(){
+      font-size: 16px;
+      line-height: 22px;
+    }
   }
 
   div.testimonials-cards-container {
@@ -234,6 +260,7 @@ section.testimonials-section {
 
     @include tablet() {
       width: 100%;
+      margin: 16px auto 0px;
     }
 
     img.card {
@@ -278,8 +305,14 @@ section.keep-aligned {
   div.keep-aligned-title {
     @include avenir_M();
     font-size: 34px;
+    line-height: 38px;
     color: $deep_navy;
     margin-bottom: 20px;
+
+    @include mobile() {
+      font-size: 24px;
+      line-height: 30px;
+    }
   }
 
   button.get-started-button {
@@ -291,5 +324,10 @@ section.keep-aligned {
     color: $ui_grey;
     font-size: 14px;
     margin-top: 24px;
+    text-align: center;
+
+    @include mobile() {
+      font-size: 12px;
+    }
   }
 }

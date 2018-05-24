@@ -6,40 +6,56 @@ div.carouselle {
   height: 600px;
 
   @include mobile() {
-    width: calc(100% + 64px);
-    padding: 0px 32px;
+    width: calc(100% + 48px);
+    padding: 0px;
     height: 510px;
     overflow-y: hidden;
     overflow-x: auto;
     margin-top: 40px;
-    margin-left: -32px;
+    margin-left: -24px;
   }
 
-  div.carouselle-screenshot {
-    transition: opacity 280ms;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 1080px;
-    height: 600px;
-    background-size: 1080px 600px;
-    background-position: center;
-    background-repeat: no-repeat;
-    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
-    opacity: 1;
+  div.carouselle-screenshots {
 
     @include mobile() {
-      top: 0px;
+      width: 960px;
       height: 510px;
-      width: 288px;
-      background-size: 288px 510px;
+      padding: 0px 24px;
     }
 
-    &.disappear {
-      opacity: 0;
+    div.carouselle-screenshot {
+      transition: opacity 280ms;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 1080px;
+      height: 600px;
+      background-size: 1080px 600px;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
+      opacity: 1;
 
       @include mobile() {
-        opacity: 1;
+        position: relative;
+        // top: 0px;
+        height: 510px;
+        width: 288px;
+        background-size: 288px 510px;
+        float: left;
+        margin-left: 24px;
+
+        &:first-child {
+          margin-left: 0px;
+        }
+      }
+
+      &.disappear {
+        opacity: 0;
+
+        @include mobile() {
+          opacity: 1;
+        }
       }
     }
   }
@@ -115,7 +131,7 @@ div#wrap {
 
     section {
       @include mobile(){
-        padding: 0 32px;
+        padding: 0 24px;
       }
     }
 
@@ -181,13 +197,32 @@ div#wrap {
           top: 298px;
           right: 124px;
         }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow");
+          background-size: 400px 380px;
+          width: 400px;
+          height: 380px;
+          top: 460px;
+          left: 50%;
+          margin-left: -590px;
+        }
+
+        &.small-purple {
+          @include image-2x("/img/ML/balloon_small_purple");
+          background-size: 136px 115px;
+          width: 136px;
+          height: 115px;
+          top: 1000px;
+          left: 50%;
+          margin-left: 432px;
+        }
       }
 
       h1.headline {
         font-size: 48px;
         @include avenir_H();
         color: $deep_navy;
-        padding: 0 16px;
         max-width: 900px;
         margin: 0 auto;
         line-height: 56px;
@@ -196,6 +231,8 @@ div#wrap {
 
         @include mobile(){
           text-align: left;
+          font-size: 24px;
+          line-height: 30px;
         }
       }
 
@@ -211,7 +248,8 @@ div#wrap {
 
         @include mobile(){
           margin-top: 16px;
-          font-size: 24px;
+          font-size: 17px;
+          line-height: 23px;
           padding: 0px;
           text-align: left;
         }
@@ -224,6 +262,11 @@ div#wrap {
         max-width: 900px;
         text-align: center;
         margin: 16px auto 0px;
+
+        @include mobile() {
+          @include avenir_R();
+          font-size: 13px;
+        }
       }
 
       div.get-started-button-container {
@@ -258,6 +301,8 @@ div#wrap {
           @include mobile() {
             margin: 16px 0px 0px;
             width: 100%;
+            font-size: 16px;
+            padding-left: 32px;
           }
 
           &:before {
@@ -270,6 +315,13 @@ div#wrap {
             background-size: 32px;
             width: 32px;
             height: 32px;
+
+            @include mobile() {
+              background-size: 24px;
+              width: 24px;
+              height: 24px;
+              top: 2px;
+            }
           }
         }
       }
@@ -280,6 +332,10 @@ div#wrap {
       padding: 120px 24px;
       text-align: center;
 
+      @include mobile() {
+        padding: 40px 24px;
+      }
+
       h2.home-keep-aligned-title {
         @include avenir_H();
         font-size: 38px;
@@ -289,6 +345,8 @@ div#wrap {
 
         @include mobile() {
           text-align: left;
+          font-size: 24px;
+          line-height: 30px;
         }
       }
 
@@ -297,37 +355,40 @@ div#wrap {
 
         @include mobile() {
           margin-top: 40px;
-          margin-left: -32px;
+          margin-left: -24px;
         }
 
-        div.carouselle-screenshot {
+        div.carouselle-screenshots {
 
-          &.screenshot-1 {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+          div.carouselle-screenshot {
 
-            @include mobile() {
-              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
-              left: 32px;
+            &.screenshot-1 {
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+
+              @include mobile() {
+                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+                // left: 24px;
+              }
             }
-          }
 
-          &.screenshot-2 {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
-            transform: rotateX(180deg);
+            &.screenshot-2 {
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+              transform: rotateX(180deg);
 
-            @include mobile() {
-              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
-              left: 340px;
+              @include mobile() {
+                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+                transform: rotateX(0deg);
+              }
             }
-          }
 
-          &.screenshot-3 {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
-            transform: rotateY(180deg);
+            &.screenshot-3 {
+              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
+              transform: rotateY(180deg);
 
-            @include mobile() {
-              @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
-              left: 648px;
+              @include mobile() {
+                @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
+                transform: rotateY(0deg);
+              }
             }
           }
         }
@@ -384,6 +445,12 @@ div#wrap {
             background-size: 48px 48px;
             background-repeat: no-repeat;
             background-position: center;
+
+            @include mobile() {
+              width: 40px;
+              height: 40px;
+              background-size: 40px 40px;
+            }
           }
 
           div.green-value-title {
@@ -397,6 +464,7 @@ div#wrap {
           div.green-value-description {
             @include avenir_R();
             font-size: 18px;
+            line-height: 24px;
             color: $ui_grey;
             margin-top: 8px;
             max-width: 327px;
@@ -409,6 +477,10 @@ div#wrap {
       background-color: transparent;
       padding: 120px 24px;
       text-align: center;
+
+      @include mobile() {
+        padding: 40px 24px;
+      }
 
       h2.team-transparency-title {
         @include avenir_H();
@@ -427,7 +499,7 @@ div#wrap {
 
         @include mobile() {
           margin-top: 40px;
-          margin-left: -32px;
+          margin-left: -24px;
         }
 
         div.carouselle-screenshot {
@@ -437,7 +509,7 @@ div#wrap {
 
             @include mobile() {
               @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
-              left: 32px;
+              // left: 24px;
             }
           }
 
@@ -447,7 +519,7 @@ div#wrap {
 
             @include mobile() {
               @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
-              left: 340px;
+              transform: rotateX(0deg);
             }
           }
 
@@ -457,7 +529,7 @@ div#wrap {
 
             @include mobile() {
               @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
-              left: 648px;
+              transform: rotateY(0deg);
             }
           }
         }
@@ -513,6 +585,12 @@ div#wrap {
             background-size: 48px 48px;
             background-repeat: no-repeat;
             background-position: center;
+
+            @include mobile() {
+              width: 40px;
+              height: 40px;
+              background-size: 40px 40px;
+            }
           }
 
           div.blue-value-title {
@@ -527,6 +605,7 @@ div#wrap {
             @include avenir_R();
             font-size: 18px;
             color: $ui_grey;
+            line-height: 24px;
             margin-top: 8px;
             max-width: 327px;
           }
@@ -543,6 +622,7 @@ div#wrap {
 
       @include mobile() {
         text-align: left;
+        padding: 40px 32px;
       }
 
       div.slack-comparison-headline {
@@ -557,6 +637,12 @@ div#wrap {
         @include avenir_R();
         font-size: 38px;
         line-height: 64px;
+
+        @include mobile(){
+          font-size: 24px;
+          line-height: 30px;
+          margin-top: 16px;
+        }
       }
 
       div.slack-comparison-headline-2 {
@@ -564,6 +650,12 @@ div#wrap {
         @include avenir_H();
         font-size: 38px;
         line-height: 64px;
+
+        @include mobile(){
+          font-size: 24px;
+          line-height: 30px;
+          margin-top: 16px;
+        }
       }
 
       img.slack-comparison-screenshot {
