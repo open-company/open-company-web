@@ -14,7 +14,7 @@
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(defn get-started-button [auth-settings & [show-disclaimer]]
+(defn get-started-button [auth-settings]
   (when-not (jwt/jwt)
     [:div
       [:button.signin-with-slack.mlb-reset
@@ -23,21 +23,8 @@
                      (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                            {:auth-source "slack"})]
                        (user-actions/login-with-slack auth-link)))}
-        "Sign up with"
-        [:div.slack-white-icon]]
-      (when show-disclaimer
-        [:div.signin-with-slack-disclaimer
-          ; [:div.signin-with-slack-description
-          ;   "Securely sign in or sign up with your Slack account."]
-          [:div.signin-with-slack-description ;.second-line
-            "By signing in, you agree to the "
-            [:a
-              {:href oc-urls/terms}
-              "Terms of Use"]
-            " and "
-            [:a
-              {:href oc-urls/privacy}
-              "Privacy Policy."]]])]))
+        [:span.slack-white-icon]
+        "Add to Slack"]]))
 
 (rum/defcs slack < rum/static
                    rum/reactive
@@ -52,45 +39,49 @@
         (site-mobile-menu)
         (login-overlays-handler)
 
-        [:div.main.slack.group
-          {:class (when (jwt/jwt) "no-get-started-button")}
+        [:div.main.slack
+          ; Hope page header
           [:section.carrot-plus-slack.group
+            [:div.balloon.big-blue]
+            [:div.balloon.small-green]
+            [:div.balloon.big-green]
+            [:div.balloon.small-purple-face]
+            [:div.balloon.big-yellow]
+            [:div.balloon.small-purple]
+
             [:div.carrot-plus-slack]
 
+            [:h3.slack
+              "Slack keeps your team connected in the moment."]
+
             [:h1.slack
-              "Rise above the noise"]
+              "Carrot keeps it aligned over time."]
 
             [:div.slack-subline
               (str
-               "Slack keeps your team connected in the moment. "
-               "Carrot keeps it aligned over time.")]
+               "Key updates and announcements get lost in fast-moving chat and stuffed inboxes. "
+               "Carrot makes it simple for Slack teams to stay aligned around what matters most.")]
 
-            (get-started-button auth-settings true)
+            ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+            (get-started-button auth-settings)
+            [:div.subheadline-2
+              "No credit card required  •  Works with Slack"]
 
-            shared-misc/video
+            [:div.main-animation-container
+              [:img.main-animation
+                {:src (utils/cdn "/img/ML/slack_screenshot.webp")
+                 :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.webp") " 2x")}]]
 
-            shared-misc/horizontal-carousell
+            shared-misc/core-values-list]
 
-            [:div.designed-for-container
-              [:div.designed-for
-                "Designed for Slack"]
-              [:div.designed-for-content
-                (str
-                 "Slack is fun and awesome for real-time work, "
-                 "but gets noisy. With Carrot, what matters most "
-                 "rises above the noise to keep everyone "
-                 "on the same page.")]]
+          shared-misc/keep-aligned-section
 
-            shared-misc/carrot-cards]
+          shared-misc/team-transparency-section
 
-          shared-misc/carrot-testimonials
+          shared-misc/slack-comparison-section
 
-          (when-not (jwt/jwt)
-            [:section.keep-aligned
-              [:div.keep-aligned-title
-                "Keep everyone aligned around what matters most."]
-              (get-started-button auth-settings)])
+          shared-misc/testimonials-section
 
-          ]]
+          shared-misc/keep-aligned-bottom]]
 
         (site-footer)]))

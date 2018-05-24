@@ -179,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
     $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $(".signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner signup button
     $("#site-header-signup-item").attr("href", "/sign-up");

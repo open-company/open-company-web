@@ -124,8 +124,13 @@
       [:div.site-navbar-right.mobile-only
         [:a.start
           {:id "site-header-mobile-signup-item"
+           :class (when (= active-page "slack") "slack")
            :href "/sign-up"}
-            "START"]]
+            (if (= active-page "slack")
+              [:span
+                [:span.slack-orange-icon]
+                "ADD"]
+              "START")]]
       [:div.mobile-ham-menu.mobile-only
         {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 

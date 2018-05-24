@@ -25,46 +25,6 @@ div.main-animation-container {
   }
 }
 
-div.horizontal-carousell {
-  width: 100vw;
-  height: 482px;
-  margin-top: 64px;
-  margin-left: -32px;
-  z-index: 10;
-  overflow-x: auto;
-
-  @include big_web(){
-    display: none;
-  }
-
-  div.horizontal-carousell-inner {
-    width: calc(893px + 24px);
-    height: 482px;
-
-    img {
-      width: 271px;
-      height: 482px;
-      float: left;
-      display: inline;
-      border-radius: 8px;
-      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
-    }
-
-    img.horizontal-carousell-1 {
-      margin-left: 32px;
-    }
-
-    img.horizontal-carousell-2 {
-      margin-left: 20px;
-    }
-
-    img.horizontal-carousell-3 {
-      margin-left: 20px;
-      margin-right: 32px;
-    }
-  }
-}
-
 div.cards-container {
   max-width: 940px;
   margin: 0px auto;
@@ -328,6 +288,515 @@ section.keep-aligned {
 
     @include mobile() {
       font-size: 12px;
+    }
+  }
+}
+
+div.core-values-list {
+  width: calc(100% - 48px);
+  text-align: center;
+  margin: 0px auto;
+
+  @include mobile() {
+    width: 100%;
+  }
+
+  div.core-value {
+    padding-left: 48px;
+    position: relative;
+    margin: 0px 16px;
+    text-align: left;
+    @include avenir_M();
+    font-size: 18px;
+    color: $deep_navy;
+    display: inline-block;
+    padding-top: 6px;
+    margin-top: 16px;
+
+    @include mobile() {
+      margin: 16px 0px 0px;
+      width: 100%;
+      font-size: 16px;
+      padding-left: 32px;
+    }
+
+    &:before {
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      background-image: cdnUrl("/img/ML/purple_checkmark.svg");
+      background-position: center;
+      background-size: 32px;
+      width: 32px;
+      height: 32px;
+
+      @include mobile() {
+        background-size: 24px;
+        width: 24px;
+        height: 24px;
+        top: 2px;
+      }
+    }
+  }
+}
+
+div.carouselle {
+  position: relative;
+  width: 1080px;
+  height: 600px;
+
+  @include mobile() {
+    width: calc(100% + 48px);
+    padding: 0px;
+    height: 510px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    margin-top: 40px;
+    margin-left: -24px;
+  }
+
+  div.carouselle-screenshots {
+
+    @include mobile() {
+      width: 960px;
+      height: 510px;
+      padding: 0px 24px;
+    }
+
+    div.carouselle-screenshot {
+      transition: opacity 280ms;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 1080px;
+      height: 600px;
+      background-size: 1080px 600px;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
+      opacity: 1;
+
+      @include mobile() {
+        position: relative;
+        // top: 0px;
+        height: 510px;
+        width: 288px;
+        background-size: 288px 510px;
+        float: left;
+        margin-left: 24px;
+
+        &:first-child {
+          margin-left: 0px;
+        }
+      }
+
+      &.disappear {
+        opacity: 0;
+
+        @include mobile() {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  button.carouselle-left {
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    top: 50%;
+    margin-top: -32px;
+    left: -32px;
+    background-image: cdnUrl("/img/ML/carouselle_left_arrow.svg");
+    background-size: 64px 64px;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 0px;
+    border-radius: 32px;
+    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
+
+    @include mobile() {
+      display: none;
+    }
+  }
+  button.carouselle-right {
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    top: 50%;
+    margin-top: -32px;
+    right: -32px;
+    background-image: cdnUrl("/img/ML/carouselle_right_arrow.svg");
+    background-size: 64px 64px;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 0px;
+    border-radius: 32px;
+    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
+
+    @include mobile() {
+      display: none;
+    }
+  }
+}
+
+button.get-started-button {
+  width: 255px;
+  height: 48px;
+  border-radius: 100px;
+  background-color: $carrot_orange;
+  color: white;
+  @include avenir_H();
+  font-size: 20px;
+  margin: 48px 16px 0;
+  position: relative;
+  text-align: center;
+
+  @include mobile(){
+    width: 100%;
+    // max-width: 280px;
+    margin: 16px auto;
+  }
+}
+
+section.home-keep-aligned {
+  background-color: #F8F7F3;
+  padding: 120px 24px;
+  text-align: center;
+
+  @include mobile() {
+    padding: 40px 24px;
+  }
+
+  h2.home-keep-aligned-title {
+    @include avenir_H();
+    font-size: 38px;
+    line-height: 42px;
+    color: $deep_navy;
+    text-align: center;
+
+    @include mobile() {
+      text-align: left;
+      font-size: 24px;
+      line-height: 30px;
+    }
+  }
+
+  div.home-keep-aligned-carouselle {
+    margin: 40px auto 0px;
+
+    @include mobile() {
+      margin-top: 40px;
+      margin-left: -24px;
+    }
+
+    div.carouselle-screenshots {
+
+      div.carouselle-screenshot {
+
+        &.screenshot-1 {
+          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
+
+          @include mobile() {
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile", ".webp");
+            // left: 24px;
+          }
+        }
+
+        &.screenshot-2 {
+          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
+          transform: rotateX(180deg);
+
+          @include mobile() {
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2_mobile", ".webp");
+            transform: rotateX(0deg);
+          }
+        }
+
+        &.screenshot-3 {
+          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
+          transform: rotateY(180deg);
+
+          @include mobile() {
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3_mobile", ".webp");
+            transform: rotateY(0deg);
+          }
+        }
+      }
+    }
+  }
+
+  div.green-values {
+    margin: 40px auto 0px;
+    text-align: center;
+    max-width: 1080px;
+
+    @include mobile() {
+      width: 100%;
+    }
+    
+    div.green-value {
+      width: 330px;
+      text-align: left;
+      float: left;
+      margin-left: 44px;
+
+      @include mobile() {
+        width: 100%;
+        margin-left: 0px;
+        float: unset;
+        margin-top: 24px;
+      }
+
+      &:first-child {
+        margin-left: 0px;
+      }
+
+      &.lamp {
+        div.green-value-icon {
+          background-image: cdnUrl("/img/ML/green_values_lamp.svg");
+        }
+      }
+
+      &.people {
+        div.green-value-icon {
+          background-image: cdnUrl("/img/ML/green_values_people.svg");
+        }
+      }
+
+      &.slack {
+        div.green-value-icon {
+          background-image: cdnUrl("/img/ML/green_values_slack.svg");
+          
+        }
+      }
+
+      div.green-value-icon {
+        width: 48px;
+        height: 48px;
+        background-size: 48px 48px;
+        background-repeat: no-repeat;
+        background-position: center;
+
+        @include mobile() {
+          width: 40px;
+          height: 40px;
+          background-size: 40px 40px;
+        }
+      }
+
+      div.green-value-title {
+        @include avenir_B();
+        font-size: 15px;
+        color: $deep_navy;
+        line-height: 20px;
+        margin-top: 16px;
+      }
+
+      div.green-value-description {
+        @include avenir_R();
+        font-size: 18px;
+        line-height: 24px;
+        color: $ui_grey;
+        margin-top: 8px;
+        max-width: 327px;
+      }
+    } 
+  }
+}
+
+section.team-transparency {
+  background-color: transparent;
+  padding: 120px 24px;
+  text-align: center;
+
+  @include mobile() {
+    padding: 40px 24px;
+  }
+
+  h2.team-transparency-title {
+    @include avenir_H();
+    font-size: 38px;
+    line-height: 42px;
+    color: $deep_navy;
+    text-align: center;
+
+    @include mobile() {
+      text-align: left;
+    }
+  }
+
+  div.team-transparency-carouselle {
+    margin: 40px auto 0px;
+
+    @include mobile() {
+      margin-top: 40px;
+      margin-left: -24px;
+    }
+
+    div.carouselle-screenshot {
+
+      &.screenshot-1 {
+        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
+
+        @include mobile() {
+          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile", ".webp");
+        }
+      }
+
+      &.screenshot-2 {
+        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
+        transform: rotateX(180deg);
+
+        @include mobile() {
+          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2_mobile", ".webp");
+          transform: rotateX(0deg);
+        }
+      }
+
+      &.screenshot-3 {
+        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
+        transform: rotateY(180deg);
+
+        @include mobile() {
+          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3_mobile", ".webp");
+          transform: rotateY(0deg);
+        }
+      }
+    }
+  }
+
+  div.blue-values {
+    margin: 40px auto 0px;
+    text-align: center;
+    max-width: 1080px;
+
+    @include mobile() {
+      width: 100%;
+    }
+    
+    div.blue-value {
+      width: 330px;
+      text-align: left;
+      float: left;
+      margin-left: 44px;
+
+      @include mobile() {
+        width: 100%;
+        margin-left: 0px;
+        float: unset;
+        margin-top: 24px;
+      }
+
+      &:first-child {
+        margin-left: 0px;
+      }
+
+      &.mega {
+        div.blue-value-icon {
+          background-image: cdnUrl("/img/ML/blue_values_mega.svg");
+        }
+      }
+
+      &.paperclip {
+        div.blue-value-icon {
+          background-image: cdnUrl("/img/ML/blue_values_paperclip.svg");
+        }
+      }
+
+      &.thumbup {
+        div.blue-value-icon {
+          background-image: cdnUrl("/img/ML/blue_values_thumbup.svg");
+        }
+      }
+
+      div.blue-value-icon {
+        width: 48px;
+        height: 48px;
+        background-size: 48px 48px;
+        background-repeat: no-repeat;
+        background-position: center;
+
+        @include mobile() {
+          width: 40px;
+          height: 40px;
+          background-size: 40px 40px;
+        }
+      }
+
+      div.blue-value-title {
+        @include avenir_B();
+        font-size: 15px;
+        color: $deep_navy;
+        line-height: 20px;
+        margin-top: 16px;
+      }
+
+      div.blue-value-description {
+        @include avenir_R();
+        font-size: 18px;
+        color: $ui_grey;
+        line-height: 24px;
+        margin-top: 8px;
+        max-width: 327px;
+      }
+    } 
+  }
+}
+
+section.slack-comparison {
+  // max-width: 1080px;
+  padding: 120px 32px;
+  margin: 0px auto;
+  text-align: center;
+  background-color: #F8F7F3;
+
+  @include mobile() {
+    text-align: left;
+    padding: 40px 32px;
+  }
+
+  div.slack-comparison-headline {
+    color: #BA61FC;
+    @include avenir_B();
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+
+  div.slack-comparison-headline-1 {
+    color: $deep_navy;
+    @include avenir_R();
+    font-size: 38px;
+    line-height: 64px;
+
+    @include mobile(){
+      font-size: 24px;
+      line-height: 30px;
+      margin-top: 16px;
+    }
+  }
+
+  div.slack-comparison-headline-2 {
+    color: $deep_navy;
+    @include avenir_H();
+    font-size: 38px;
+    line-height: 64px;
+
+    @include mobile(){
+      font-size: 24px;
+      line-height: 30px;
+      margin-top: 16px;
+    }
+  }
+
+  img.slack-comparison-screenshot {
+    max-width: 1080px;
+    box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.07);
+    margin: 24px auto;
+
+    @include mobile() {
+      width: 100%;
     }
   }
 }

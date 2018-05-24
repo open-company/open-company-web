@@ -92,69 +92,16 @@
       {:src (cdn "/img/ML/homepage_screenshot.webp")
        :src-set (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]])
 
-(def carrot-cards
-  [:div.cards-container
-    [:div.cards-row.group
-      [:div.card.card-1
-        [:div.card-icon]
-        [:div.card-title
-          "Say what’s important "]
-        [:div.card-content
-          (str
-            "Space to write more "
-            "than a quick chat - like "
-            "key updates, announcements, "
-            "plans, and stories.")]]
-      [:div.card.card-2
-        [:div.card-icon]
-        [:div.card-title
-          "Read without interruptions"]
-        [:div.card-content
-          (str
-            "Stay in sync without worrying "
-            "you missed something important "
-            "in a fast-moving conversation.")]]
-      [:div.card.card-3
-        [:div.card-icon]
-        [:div.card-title
-          "Focused, topic-based discussion"]
-        [:div.card-content
-          (str
-            "Keep team reactions, comments "
-            "and questions together in one "
-            "place for better context.")]]]
-    [:div.cards-row.group
-      [:div.card.card-4
-        [:div.card-icon]
-        [:div.card-title
-          "Find anything fast"]
-        [:div.card-content
-          (str
-            "Get up to speed quickly with the "
-            "full picture in one place. Great "
-            "for distributed teams, too.")]]
-      [:div.card.card-5
-        [:div.card-icon]
-        [:div.card-title
-          "See who’s engaged"]
-        [:div.card-content
-          (str
-            "Carrot shows you who's reading "
-            "what so leaders can see if "
-            "their teams are aligned.")]]
-      [:div.card.card-6
-        [:div.card-icon]
-        [:div.card-title
-          (str
-            "In sync "
-            "with Slack")]
-        [:div.card-content
-          (str
-            "Discussions are automatically "
-            "shared to the right channels. ")
-          [:a
-            {:href "/slack"}
-            "Learn more"]]]]])
+(def core-values-list
+  [:div.core-values-list.group
+    [:div.core-value.key-announcement
+      "Key announcements"]
+    [:div.core-value.company-updates
+      "Company & team updates"]
+    [:div.core-value.strategic-plans
+      "Strategic plans"]
+    [:div.core-value.ideas-discussions
+      "Ideas & follow-on discussions"]])
 
 (def testimonials-section
   [:section.testimonials-section
@@ -173,7 +120,7 @@
         {:src (cdn "/img/ML/testimonial_matt.png")
          :src-set (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
 
-(def keep-aligned
+(def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
       "It’s never been easier to keep everyone on the same page"]
@@ -181,6 +128,101 @@
       "Get started for free"]
     [:div.keep-aligned-subtitle
       "No credit card required  •  Works with Slack"]])
+
+(def keep-aligned-section
+  [:section.home-keep-aligned
+    [:h2.home-keep-aligned-title
+      "Carrot keeps leaders and their teams aligned"]
+
+    [:div.home-keep-aligned-carouselle.carouselle
+      [:div.carouselle-screenshots
+        [:div.carouselle-screenshot.screenshot-1]
+        [:div.carouselle-screenshot.screenshot-2.disappear]
+        [:div.carouselle-screenshot.screenshot-3.disappear]]
+      [:button.mlb-reset.carouselle-left]
+      [:button.mlb-reset.carouselle-right]]
+
+    [:div.green-values.group
+      [:div.green-value.lamp
+        [:div.green-value-icon]
+        [:div.green-value-title
+          "KNOW WHAT MATTERS MOST"]
+        [:div.green-value-description
+          (str
+           "See \"must reads\" and focus on the "
+           "people and topics you can't miss.")]]
+      [:div.green-value.people
+        [:div.green-value-icon]
+        [:div.green-value-title
+          "SPARK FOLLOW-ON DISCUSSIONS"]
+        [:div.green-value-description
+          (str
+           "React, comment and ask questions, with "
+           "time and space to be more thoughtful.")]]
+      [:div.green-value.slack
+        [:div.green-value-icon]
+        [:div.green-value-title
+          "SYNC TO SLACK"]
+        [:div.green-value-description
+          (str
+           "Share posts to the relevant Slack "
+           "channel, and sync comments from Slack "
+           "back into Carrot.")]]]])
+
+(def team-transparency-section
+  [:section.team-transparency
+    [:h2.team-transparency-title
+      "Carrot keeps leaders and their teams aligned"]
+
+    [:div.team-transparency-carouselle.carouselle
+      [:div.carouselle-screenshots
+        [:div.carouselle-screenshot.screenshot-1]
+        [:div.carouselle-screenshot.screenshot-2.disappear]
+        [:div.carouselle-screenshot.screenshot-3.disappear]]
+      [:button.mlb-reset.carouselle-left]
+      [:button.mlb-reset.carouselle-right]]
+
+    [:div.blue-values.group
+      [:div.blue-value.mega
+        [:div.blue-value-icon]
+        [:div.blue-value-title
+          "POST QUICKLY"]
+        [:div.blue-value-description
+          (str
+           "It's simple and fast to share something "
+           "new with your team.")]]
+      [:div.blue-value.paperclip
+        [:div.blue-value-icon]
+        [:div.blue-value-title
+          "ADD CONTENT FROM ANYWHERE"]
+        [:div.blue-value-description
+          (str
+           "Link to external content, or add images, "
+           "video and attachments from Google "
+           "Drive, Dropbox, and others.")]]
+      [:div.blue-value.thumbup
+        [:div.blue-value-icon]
+        [:div.blue-value-title
+          "SEE WHO’S ENGAGED"]
+        [:div.blue-value-description
+          (str
+           "See who’s viewed your post to "
+           "eliminate communication gaps.")]]]])
+
+(def slack-comparison-section
+  [:section.slack-comparison
+    [:div.slack-comparison-headline
+      "PERFECT FOR SLACK TEAMS"]
+    [:div.slack-comparison-headline-1
+      "Slack keeps your team connected in the moment."]
+    [:div.slack-comparison-headline-2
+      "Carrot keeps it aligned over time."]
+    [:img.slack-comparison-screenshot.big-web-only
+      {:src (cdn "/img/ML/slack_comparison_screenshot.png")
+       :src-set (str (cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]
+    [:img.slack-comparison-screenshot.mobile-only
+      {:src (cdn "/img/ML/slack_comparison_screenshot_mobile.png")
+       :src-set (str (cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]])
 
 (defn index [options]
   [:div
@@ -215,113 +257,22 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        desktop-video
+        [:div.main-animation-container
+          [:img.main-animation
+            {:src (cdn "/img/ML/homepage_screenshot.webp")
+             :src-set (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]]
 
-        [:div.core-values-list.group
-          [:div.core-value.key-announcement
-            "Key announcements"]
-          [:div.core-value.company-updates
-            "Company & team updates"]
-          [:div.core-value.strategic-plans
-            "Strategic plans"]
-          [:div.core-value.ideas-discussions
-            "Ideas & follow-on discussions"]]]
+        core-values-list]
 
-      [:section.home-keep-aligned
-        [:h2.home-keep-aligned-title
-          "Carrot keeps leaders and their teams aligned"]
+      keep-aligned-section
 
-        [:div.home-keep-aligned-carouselle.carouselle
-          [:div.carouselle-screenshots
-            [:div.carouselle-screenshot.screenshot-1]
-            [:div.carouselle-screenshot.screenshot-2.disappear]
-            [:div.carouselle-screenshot.screenshot-3.disappear]]
-          [:button.mlb-reset.carouselle-left]
-          [:button.mlb-reset.carouselle-right]]
+      team-transparency-section
 
-        [:div.green-values.group
-          [:div.green-value.lamp
-            [:div.green-value-icon]
-            [:div.green-value-title
-              "KNOW WHAT MATTERS MOST"]
-            [:div.green-value-description
-              (str
-               "See \"must reads\" and focus on the "
-               "people and topics you can't miss.")]]
-          [:div.green-value.people
-            [:div.green-value-icon]
-            [:div.green-value-title
-              "SPARK FOLLOW-ON DISCUSSIONS"]
-            [:div.green-value-description
-              (str
-               "React, comment and ask questions, with "
-               "time and space to be more thoughtful.")]]
-          [:div.green-value.slack
-            [:div.green-value-icon]
-            [:div.green-value-title
-              "SYNC TO SLACK"]
-            [:div.green-value-description
-              (str
-               "Share posts to the relevant Slack "
-               "channel, and sync comments from Slack "
-               "back into Carrot.")]]]]
-
-      [:section.team-transparency
-        [:h2.team-transparency-title
-          "Carrot keeps leaders and their teams aligned"]
-
-        [:div.team-transparency-carouselle.carouselle
-          [:div.carouselle-screenshots
-            [:div.carouselle-screenshot.screenshot-1]
-            [:div.carouselle-screenshot.screenshot-2.disappear]
-            [:div.carouselle-screenshot.screenshot-3.disappear]]
-          [:button.mlb-reset.carouselle-left]
-          [:button.mlb-reset.carouselle-right]]
-
-        [:div.blue-values.group
-          [:div.blue-value.mega
-            [:div.blue-value-icon]
-            [:div.blue-value-title
-              "POST QUICKLY"]
-            [:div.blue-value-description
-              (str
-               "It's simple and fast to share something "
-               "new with your team.")]]
-          [:div.blue-value.paperclip
-            [:div.blue-value-icon]
-            [:div.blue-value-title
-              "ADD CONTENT FROM ANYWHERE"]
-            [:div.blue-value-description
-              (str
-               "Link to external content, or add images, "
-               "video and attachments from Google "
-               "Drive, Dropbox, and others.")]]
-          [:div.blue-value.thumbup
-            [:div.blue-value-icon]
-            [:div.blue-value-title
-              "SEE WHO’S ENGAGED"]
-            [:div.blue-value-description
-              (str
-               "See who’s viewed your post to "
-               "eliminate communication gaps.")]]]]
-
-      [:section.slack-comparison
-        [:div.slack-comparison-headline
-          "PERFECT FOR SLACK TEAMS"]
-        [:div.slack-comparison-headline-1
-          "Slack keeps your team connected in the moment."]
-        [:div.slack-comparison-headline-2
-          "Carrot keeps it aligned over time."]
-        [:img.slack-comparison-screenshot.big-web-only
-          {:src (cdn "/img/ML/slack_comparison_screenshot.png")
-           :src-set (str (cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]
-        [:img.slack-comparison-screenshot.mobile-only
-          {:src (cdn "/img/ML/slack_comparison_screenshot_mobile.png")
-           :src-set (str (cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]]
+      slack-comparison-section
 
       testimonials-section
 
-      keep-aligned
+      keep-aligned-bottom
       ]])
 
 (defn pricing
@@ -584,7 +535,7 @@
 
       testimonials-section
 
-      keep-aligned
+      keep-aligned-bottom
     ]])
 
 (defn slack
@@ -593,59 +544,61 @@
   [options]
   [:div
     {:id "wrap"}
-    [:div.main.slack.group
+    [:div.main.slack
+      ; Hope page header
       [:section.carrot-plus-slack.group
+        [:div.balloon.big-blue]
+        [:div.balloon.small-green]
+        [:div.balloon.big-green]
+        [:div.balloon.small-purple-face]
+        [:div.balloon.big-yellow]
+        [:div.balloon.small-purple]
+
         [:div.carrot-plus-slack]
 
+        [:h3.slack
+          "Slack keeps your team connected in the moment."]
+
         [:h1.slack
-          "Rise above the noise"]
+          "Carrot keeps it aligned over time."]
 
         [:div.slack-subline
           (str
-           "Slack keeps your team connected in the moment. "
-           "Carrot keeps it aligned over time.")]
+           "Key updates and announcements get lost in fast-moving chat and stuffed inboxes. "
+           "Carrot makes it simple for Slack teams to stay aligned around what matters most.")]
 
-        [:div.sigin-with-slack-container
-          [:button.signin-with-slack.mlb-reset
-            {:onClick "javascript:window.location=\"/sign-up\";"}
-            "Sign up with"
-            [:div.slack-white-icon]]
-          [:div.signin-with-slack-disclaimer
-            [:div.signin-with-slack-description
-              "By signing in, you agree to the "
-              [:a
-                {:href "/terms"}
-                "Terms of Use"]
-              " and "
-              [:a
-                {:href "/privacy"}
-                "Privacy Policy."]]]]        
+        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+        [:div.get-started-button-container
+          [:button.mlb-reset.signin-with-slack
+            {:id "get-started-centred-bt"}
+            [:span.slack-white-icon]
+            "Add to Slack"]]
+        [:div.subheadline-2
+          "No credit card required  •  Works with Slack"]
+        (carrot-box-thanks "carrot-box-thanks-top")
+        [:div.carrot-box-container.confirm-thanks.group
+          {:style {:display "none"}}
+          [:div.carrot-box-thanks
+            [:div.thanks-headline "You are Confirmed!"]
+            [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        [:div.designed-for-container
-          [:div.designed-for
-            "Designed for Slack"]
-          [:div.designed-for-content
-            (str
-             "Slack is fun and awesome for real-time work, "
-             "but gets noisy. With Carrot, what matters most "
-             "rises above the noise to keep everyone "
-             "on the same page.")]]
+        [:div.main-animation-container
+          [:img.main-animation
+            {:src (cdn "/img/ML/slack_screenshot.webp")
+             :src-set (str (cdn "/img/ML/slack_screenshot@2x.webp") " 2x")}]]
 
-        carrot-cards]
+        core-values-list]
+
+      keep-aligned-section
+
+      team-transparency-section
+
+      slack-comparison-section
 
       testimonials-section
 
-      [:section.keep-aligned
-        [:div.keep-aligned-title
-          "Keep everyone aligned around what matters most."]
-        [:div.sigin-with-slack-container
-          [:button.signin-with-slack.mlb-reset
-            {:onClick "javascript:window.location=\"/sign-up\";"}
-            "Sign up with"
-            [:div.slack-white-icon]]]]
-
-      ] ;<!-- main -->
-  ])
+      keep-aligned-bottom
+      ]])
 
 (defn about
   "About page. This is a copy of oc.web.components.about and
