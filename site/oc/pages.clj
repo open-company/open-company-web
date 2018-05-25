@@ -241,11 +241,13 @@
         [:div.balloon.small-purple]
 
         [:h1.headline
-          "Company digest for growing and distributed teams."]
+          (str
+           "More effective communication for "
+           "growing and distributed teams")]
         [:div.subheadline
           (str
-            "Key updates and announcements get lost in fast-moving chat and stuffed inboxes. "
-            "Carrot makes it simple to stay aligned around what matters most.")]
+           "Key updates and information get lost in fast-moving chat and "
+           "overstuffed inboxes. Carrot makes it simple to stay aligned.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
