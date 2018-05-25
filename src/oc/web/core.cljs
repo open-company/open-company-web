@@ -18,6 +18,7 @@
             [oc.web.stores.error-banner]
             [oc.web.stores.subscription]
             [oc.web.stores.section]
+            [oc.web.stores.notifications]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
             [oc.web.actions.team]
