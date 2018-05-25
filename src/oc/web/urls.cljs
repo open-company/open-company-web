@@ -22,7 +22,7 @@
 
 (def help "http://help.carrot.io")
 
-(def what-s-new "/carrot/what-s-new")
+(def what-s-new "/carrot-support/what-s-new")
 
 (def home-try-it-focus (str home "?tif"))
 
