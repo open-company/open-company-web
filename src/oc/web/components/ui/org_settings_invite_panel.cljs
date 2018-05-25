@@ -46,7 +46,12 @@
   (let [inviting-users-data @(drv/get-ref s :invite-data)
         invite-users (:invite-users inviting-users-data)
         cur-user-data (:current-user-data @(drv/get-ref s :invite-data))
-        invite-from (or @(::inviting-from s) (:auth-source cur-user-data))]
+        team-data (:team-data inviting-users-data)
+        invite-from-default (if (and (= (:auth-source cur-user-data) "slack")
+                                     (:can-slack-invite team-data))
+                              "slack"
+                              "email")
+        invite-from (or @(::inviting-from s) invite-from-default)]
     ;; Setup the invite from if it's not already
     (when (nil? @(::inviting-from s))
       (reset! (::inviting-from s) invite-from))
