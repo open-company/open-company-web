@@ -67,7 +67,7 @@
         ;; Org name row
         [:div.org-settings-panel-row.group
           [:div.org-settings-label
-            [:label "Team Name"]
+            [:label "Team name"]
             (when false
               [:label.error "Name can't be empty"])]
           [:div.org-settings-field
@@ -125,9 +125,9 @@
         [:div.org-settings-panel-row.slack-teams-row.group
           [:div.org-settings-label
             [:label
-              "Slack team linking"
+              "Slack integration"
               [:i.mdi.mdi-information-outline
-                {:title "Anyone who signs up with your Slack team can contribute to team boards."
+                {:title "Anyone who signs up with your Slack team can view team boards."
                  :data-toggle "tooltip"
                  :data-placement "top"}]]
             (when (seq (:access query-params))
@@ -136,11 +136,11 @@
                                 (= "team" (:access query-params))) "success-message" "error")}
                 (cond
                   (= (:access query-params) "team-exists")
-                  "This team was already added."
+                  "This Slack team was already added."
                   (= (:access query-params) "team")
-                  "Team successfully added."
+                  "Slack team was successfully added."
                   (= (:access query-params) "bot")
-                  "Bot successfully added."
+                  "Carrot Bot was successfully added."
                   :else
                   "An error occurred, please try again.")])]
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
@@ -173,7 +173,7 @@
                           (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
                             [:button.org-settings-list-item-btn.btn-reset
                               {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
-                               :title "The Carrot Slack bot enables Slack invites, assignments and sharing."
+                               :title "The Carrot Slack bot enables Slack unfurls, invites, notifications and sharing."
                                :data-toggle "tooltip"
                                :data-placement "top"
                                :data-container "body"}
@@ -187,7 +187,7 @@
                                (:slack-domain team) ".slack.com"]
                             " team."])]
                       [:div.slack-org-self-join
-                        "Slack members can " [:span.self-join "self-join"] " this team."]
+                        "Members of this Slack team can join Carrot " [:span.self-join "without an invite"] "."]
                       [:button.remove-team-btn.btn-reset
                         {:on-click #(team-actions/remove-team (:links team))}
                         "Remove Slack team"]]]))])]]

@@ -22,7 +22,7 @@
 
 (def help "https://beta.carrot.io/carrot-support/all-posts")
 
-(def what-s-new "https://beta.carrot.io/carrot/what-s-new")
+(def what-s-new "https://beta.carrot.io/carrot-support/what-s-new")
 
 (def home-try-it-focus (str home "?tif"))
 
