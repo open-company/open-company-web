@@ -1,0 +1,78 @@
+div.notifications {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 10000;
+
+  div.notification {
+    width: 289px;
+    background-color: $deep_navy;
+    border-radius: 3px;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+    transition: opacity 180ms ease-in;
+    // z-index: 10000;
+    padding: 16px;
+
+    &.will-appear {
+      opacity: 0;
+    }
+
+    &.appear {
+      opacity: 1;
+    }
+
+    &.server-error {
+      background-color: #FDAB1D;
+
+      div.notification-title {
+        color: $deep_navy;
+      }
+
+      div.notification-description {
+        color: $deep_navy;
+      }
+    }
+
+    &.app-update {
+      background-color: $sea_blue;
+
+      div.notification-title {
+        color: white;
+      }
+
+      div.notification-description {
+        color: white;
+      }
+    }
+
+    &.opac {
+      div.notification-title, div.notification-description {
+        opacity: 0.5;
+      }
+    }
+
+    span.slack-icon {
+      width: 16px;
+      height: 16px;
+      background-size: 16px;
+      background-position: 0px 0px;
+      background-image: cdnUrl("/img/ML/slack_white_icon.svg");
+      float: left;
+      margin-right: 8px;
+    }
+
+    div.notification-title {
+      @include avenir_H();
+      font-size: 14px;
+      color: white;
+    }
+
+    div.notification-description {
+      @include avenir_R();
+      font-size: 14px;
+      color: white;
+      margin-top: 4px;
+    }
+  }
+}
