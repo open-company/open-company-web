@@ -64,8 +64,7 @@
 
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             (get-started-button auth-settings)
-            [:div.subheadline-2
-              "No credit card required  •  Works with Slack"]
+            shared-misc/no-credit-card
 
             [:div.main-animation-container
               [:img.main-animation

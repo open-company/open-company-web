@@ -55,7 +55,9 @@ div.signin-with-slack-description {
   }
 }
 
-div#wrap {
+div.slack-wrap {
+  background-color: #FFFDF9;
+
   div.main.slack {
     text-align: center;
     width: 100%;
@@ -234,7 +236,7 @@ div#wrap {
         }
       }
 
-      div.subheadline-2 {
+      div.no-credit-card {
         color: $ui_grey;
         @include avenir_R();
         font-size: 14px;
@@ -276,8 +278,7 @@ div#wrap {
 
     section.keep-aligned {
       text-align: center;
-      max-width: 800px;
-      margin: 72px auto;
+      margin: 0px auto;
 
       div.keep-aligned-title {
         @include avenir_M();

@@ -1,4 +1,4 @@
-div#wrap {
+div.home-wrap {
   background-color: #FFFDF9;
 
   div.main.home-page {
@@ -134,7 +134,7 @@ div#wrap {
         }
       }
 
-      div.subheadline-2 {
+      div.no-credit-card {
         color: $ui_grey;
         @include avenir_R();
         font-size: 14px;

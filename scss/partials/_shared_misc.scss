@@ -279,7 +279,7 @@ section.keep-aligned {
     margin-top: 0px;
   }
 
-  div.keep-aligned-subtitle {
+  div.no-credit-card {
     @include avenir_R();
     color: $ui_grey;
     font-size: 14px;
@@ -376,6 +376,7 @@ div.carouselle {
       background-repeat: no-repeat;
       box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
       opacity: 1;
+      border-radius: 6px;
 
       @include mobile() {
         position: relative;
@@ -452,11 +453,12 @@ button.get-started-button {
   margin: 48px 16px 0;
   position: relative;
   text-align: center;
+  padding: 12px;
 
   @include mobile(){
     width: 100%;
-    // max-width: 280px;
     margin: 16px auto;
+    padding: 0px;
   }
 }
 
@@ -496,31 +498,26 @@ section.home-keep-aligned {
       div.carouselle-screenshot {
 
         &.screenshot-1 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
+          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
 
           @include mobile() {
             @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile", ".webp");
-            // left: 24px;
           }
         }
 
         &.screenshot-2 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
-          transform: rotateX(180deg);
+          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2");
 
           @include mobile() {
             @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2_mobile", ".webp");
-            transform: rotateX(0deg);
           }
         }
 
         &.screenshot-3 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1", ".webp");
-          transform: rotateY(180deg);
+          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3");
 
           @include mobile() {
             @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3_mobile", ".webp");
-            transform: rotateY(0deg);
           }
         }
       }
@@ -638,7 +635,7 @@ section.team-transparency {
     div.carouselle-screenshot {
 
       &.screenshot-1 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
+        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
 
         @include mobile() {
           @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile", ".webp");
@@ -646,22 +643,18 @@ section.team-transparency {
       }
 
       &.screenshot-2 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
-        transform: rotateX(180deg);
+        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2");
 
         @include mobile() {
           @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2_mobile", ".webp");
-          transform: rotateX(0deg);
         }
       }
 
       &.screenshot-3 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1", ".webp");
-        transform: rotateY(180deg);
+        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3");
 
         @include mobile() {
           @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3_mobile", ".webp");
-          transform: rotateY(0deg);
         }
       }
     }
@@ -746,8 +739,7 @@ section.team-transparency {
 }
 
 section.slack-comparison {
-  // max-width: 1080px;
-  padding: 120px 32px;
+  padding: 104px 32px 104px;
   margin: 0px auto;
   text-align: center;
   background-color: #F8F7F3;

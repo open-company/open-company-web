@@ -71,6 +71,20 @@ nav.site-navbar {
         @include mobile() {
           top: 22px;
         }
+
+        a.start {
+          background-color: $carrot_orange;
+          color: white;
+
+          &:not(.your-digest).slack-get-started {
+            background-color: $carrot_orange;
+            color: white;
+
+            span.slack-orange-icon {
+              @include image-2x("/img/ML/slack_white_icon");
+            }
+          }
+        }
       }
     }
   }
@@ -278,6 +292,10 @@ nav.site-navbar {
         display: inline;
         font-size: 16px;
         color: $ui_grey;
+
+        &.active {
+          color: #373F4F;
+        }
       }
     }
   }

@@ -90,7 +90,7 @@
   [:div.main-animation-container
     [:img.main-animation
       {:src (cdn "/img/ML/homepage_screenshot.webp")
-       :src-set (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]])
+       :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]])
 
 (def core-values-list
   [:div.core-values-list.group
@@ -112,13 +112,17 @@
     [:div.testimonials-cards-container.group
       [:img.card
         {:src (cdn "/img/ML/testimonial_katie.png")
-         :src-set (str (cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
+         :srcSet (str (cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
       [:img.card
         {:src (cdn "/img/ML/testimonial_riley.png")
-         :src-set (str (cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
+         :srcSet (str (cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
       [:img.card
         {:src (cdn "/img/ML/testimonial_matt.png")
-         :src-set (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
+         :srcSet (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
+
+(def no-credit-card
+  [:div.no-credit-card
+    "No credit card required&nbsp;&nbsp;•&nbsp;&nbsp;Works with Slack"])
 
 (def keep-aligned-bottom
   [:section.keep-aligned
@@ -126,8 +130,7 @@
       "It’s never been easier to keep everyone on the same page"]
     [:button.mlb-reset.get-started-button
       "Get started for free"]
-    [:div.keep-aligned-subtitle
-      "No credit card required  •  Works with Slack"]])
+    no-credit-card])
 
 (def keep-aligned-section
   [:section.home-keep-aligned
@@ -219,13 +222,13 @@
       "Carrot keeps it aligned over time."]
     [:img.slack-comparison-screenshot.big-web-only
       {:src (cdn "/img/ML/slack_comparison_screenshot.png")
-       :src-set (str (cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]
+       :srcSet (str (cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]
     [:img.slack-comparison-screenshot.mobile-only
       {:src (cdn "/img/ML/slack_comparison_screenshot_mobile.png")
-       :src-set (str (cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]])
+       :srcSet (str (cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]])
 
 (defn index [options]
-  [:div
+  [:div.home-wrap
     {:id "wrap"}
     [:div.main.home-page
       ; Hope page header
@@ -248,8 +251,7 @@
           [:button.mlb-reset.get-started-button
             {:id "get-started-centred-bt"}
             "Get started for free"]]
-        [:div.subheadline-2
-          "No credit card required  •  Works with Slack"]
+        no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style {:display "none"}}
@@ -260,7 +262,7 @@
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/homepage_screenshot.webp")
-             :src-set (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]]
+             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]]
 
         core-values-list]
 
@@ -278,7 +280,7 @@
 (defn pricing
   "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
   [options]
-  [:div
+  [:div.pricing-wrap
     {:id "wrap"}
     [:div.main.pricing
       [:section.pricing-header
@@ -542,7 +544,7 @@
   "Slack page. This is a copy of oc.web.components.slack and
    every change here should be reflected there and vice versa."
   [options]
-  [:div
+  [:div.slack-wrap
     {:id "wrap"}
     [:div.main.slack
       ; Hope page header
@@ -573,8 +575,7 @@
             {:id "get-started-centred-bt"}
             [:span.slack-white-icon]
             "Add to Slack"]]
-        [:div.subheadline-2
-          "No credit card required  •  Works with Slack"]
+        no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style {:display "none"}}
@@ -585,7 +586,7 @@
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/slack_screenshot.webp")
-             :src-set (str (cdn "/img/ML/slack_screenshot@2x.webp") " 2x")}]]
+             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.webp") " 2x")}]]
 
         core-values-list]
 
@@ -604,7 +605,7 @@
   "About page. This is a copy of oc.web.components.about and
    every change here should be reflected there and vice versa."
   [options]
-  [:div
+  [:div.about-wrap
     {:id "wrap"}
     [:div.main.about
       [:section.about-header

@@ -122,7 +122,6 @@
 
     div.right-column {
       float: right;
-      margin-right: 100px;
       z-index: 2;
 
       @include mobile(){
@@ -136,18 +135,16 @@
         margin-right: 40px;
         width: 100px;
 
-        @include big_web(){
-          &.column-tour {
-            width: 110px;
-          }
+        @media screen and (max-width: 1200px) {
+          margin-right: 32px;
+        }
 
-          &.column-resources {
-            width: 126px;
-          }
+        @media screen and (max-width: 1050px) {
+          margin-right: 16px;
+        }
 
-          &.column-support {
-            width: 80px;
-          }
+        @media screen and (max-width: 950px) {
+          margin-right: 0px;
         }
 
         @include mobile(){

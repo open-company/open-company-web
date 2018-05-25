@@ -20,14 +20,17 @@
         {:src (utils/cdn "/img/ML/testimonial_matt.png")
          :src-set (str (utils/cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
 
+(def no-credit-card
+  [:div.no-credit-card
+    "No credit card required&nbsp;•&nbsp;Works with Slack"])
+
 (def keep-aligned
   [:section.keep-aligned
     [:div.keep-aligned-title
       "It’s never been easier to keep everyone on the same page"]
     [:button.mlb-reset.get-started-button
       "Get started for free"]
-    [:div.keep-aligned-subtitle
-      "No credit card required  •  Works with Slack"]])
+    no-credit-card])
 
 (def core-values-list
   [:div.core-values-list.group
@@ -63,8 +66,7 @@
       "It’s never been easier to keep everyone on the same page"]
     [:button.mlb-reset.get-started-button
       "Get started for free"]
-    [:div.keep-aligned-subtitle
-      "No credit card required  •  Works with Slack"]])
+    no-credit-card])
 
 (def keep-aligned-section
   [:section.home-keep-aligned

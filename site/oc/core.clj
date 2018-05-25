@@ -100,13 +100,16 @@
         {:href "/?no_redirect=1"}]
       [:div.navbar-brand-center
         [:a
-          {:href "/"}
+          {:href "/"
+           :class (when (= active-page "index") "active")}
           "Home"]
         [:a
-          {:href "/about"}
+          {:href "/about"
+           :class (when (= active-page "about") "active")}
           "About"]
         [:a
-          {:href "/pricing"}
+          {:href "/pricing"
+           :class (when (= active-page "pricing") "active")}
           "Pricing"]
         [:a
           {:href "https://blog.carrot.io"

@@ -30,7 +30,7 @@
   [:div
     (site-header)
     (site-mobile-menu)
-    [:div
+    [:div.home-wrap
       {:id "wrap"}
       (login-overlays-handler)
       [:div.main.home-page
@@ -54,9 +54,8 @@
             [:button.mlb-reset.get-started-button
               {:id "get-started-centred-bt"}
               "Get started for free"]]
-          [:div.subheadline-2
-            "No credit card required  •  Works with Slack"]
-          (carrot-box-thanks "carrot-box-thanks-top")
+          shared-misc/no-credit-card
+          ; (carrot-box-thanks "carrot-box-thanks-top")
           [:div.carrot-box-container.confirm-thanks.group
             {:style {:display "none"}}
             [:div.carrot-box-thanks
