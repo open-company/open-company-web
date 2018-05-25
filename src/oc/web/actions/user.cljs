@@ -42,10 +42,6 @@
 (defn jwt-refresh []
   (api/jwt-refresh update-jwt logout))
 
-;; Whats new callback
-(defn get-whats-new-cb [{:keys [body success]}]
-  (dis/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})]))
-
 ;;User walls
 (defn- check-user-walls
   "Check if one of the following is present and redirect to the proper wall if needed:
@@ -89,8 +85,6 @@
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
-        (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
-          (api/get-whats-new whats-new-link get-whats-new-cb))
         (callback orgs collection)
         (dis/dispatch! [:entry-point orgs collection])
         (check-user-walls))

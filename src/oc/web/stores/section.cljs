@@ -115,13 +115,6 @@
       ;; Update change-data state that we saw the section
       (update-change-data next-db section-uuid :seen-at (oc-time/current-timestamp)))))
 
-(defmethod dispatcher/action :whats-new/finish
-  [db [_ whats-new-data]]
-  (if whats-new-data
-    (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
-      (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
-    db))
-
 (defmethod dispatcher/action :section-edit-save/finish
   [db [_ section-data]]
   (let [org-slug (utils/section-org-slug section-data)
