@@ -65,9 +65,6 @@
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
       (cond
-        (= ["add-to-slack"] (:route @router/path))
-        false
-
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
@@ -173,30 +170,6 @@
     (if success
       (update-jwt body)
       (router/redirect! oc-urls/logout)))))
-
-(defn add-to-slack [params]
-  (let [bot-ids (clojure.string/split (:bot-ids params) #":")
-        team-id (first bot-ids)
-        user-id (second bot-ids)
-        bot-id (last bot-ids)
-        new-user (= (:new params) "true")
-        auth-link (utils/link-for (:links (dis/auth-settings))
-                                  "bot"
-                                  "GET"
-                                  {:auth-source "slack"})
-        auth-url-with-redirect (clojure.string/replace
-                                (:href auth-link)
-                                "open-company-auth"
-                                (str
-                                 "open-company-auth:"
-                                 team-id ":"
-                                 user-id ":"
-                                 oc-urls/slack-lander-bot-check
-                                 (when new-user
-                                   (str "?new-slack-user=true"))
-                                 ":"
-                                 bot-id))]
-    (router/redirect! auth-url-with-redirect)))
 
 (defn show-login [login-type]
   (dis/dispatch! [:login-overlay-show login-type]))

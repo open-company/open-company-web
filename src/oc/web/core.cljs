@@ -109,9 +109,7 @@
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
-  (when (or
-         (= (:new query-params) "true")
-         (= (:new-slack-user query-params) "true"))
+  (when (= (:new query-params) "true")
     (swap! dis/app-state assoc :new-slack-user true))
   (inject-loading))
 
@@ -274,20 +272,13 @@
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
-  (let [query-params (dissoc (:query-params params) :jwt)
-        new-user (= (:new (:query-params params)) "true")]
-    (when new-user (user-actions/slack-lander-new-user))
-    (if (= (:access query-params) "bot")
-      (utils/after 100 #(router/nav! (urls/add-to-slack-check-params query-params)))
-      (if new-user
-        (utils/after 100 #(router/nav! urls/sign-up-profile))
-        (user-actions/slack-lander-check-team-redirect))
-      )))
-
-(defn slack-lander-check-bot [params]
-  (pre-routing (:query-params params) true)
-  (let [new-user (= (:new-slack-user (:query-params params)) "true")]
-    (when new-user (user-actions/slack-lander-new-user))
+  (let [new-user (= (:new (:query-params params)) "true")]
+    (when new-user
+      (cook/set-cookie!
+       (router/show-nux-cookie
+        (jwt/get-key :user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7)))
     (if new-user
       (utils/after 100 #(router/nav! urls/sign-up-profile))
       (user-actions/slack-lander-check-team-redirect))))
@@ -380,24 +371,6 @@
       (timbre/info "Routing slack-lander-check-slash-route" (str urls/slack-lander-check "/"))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
-
-    (defroute add-slack-to-carrot-route urls/add-to-slack-check {:as params}
-      (timbre/info "Routing add carrot to slack" urls/add-to-slack-check)
-      (simple-handler #(onboard-wrapper :add-to-slack) "add-to-slack" target params))
-
-    (defroute add-slack-to-carrot-slash-route (str urls/add-to-slack-check "/") {:as params}
-      (timbre/info "Routing add carrot to slack slash" urls/add-to-slack-check)
-      (simple-handler #(onboard-wrapper :add-to-slack) "add-to-slack" target params))
-
-    (defroute slack-lander-check-bot-route urls/slack-lander-bot-check {:as params}
-      (timbre/info "Routing slack-lander-check-bot-route" urls/slack-lander-bot-check)
-      ;; Check if the user already have filled the needed data or if it needs to
-      (slack-lander-check-bot params))
-
-    (defroute slack-lander-check-bot-slash-route (str urls/slack-lander-bot-check "/") {:as params}
-      (timbre/info "Routing slack-lander-check-bot-slash-route" (str urls/slack-lander-bot-check "/"))
-      ;; Check if the user already have filled the needed data or if it needs to
-      (slack-lander-check-bot params))
 
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
@@ -553,10 +526,6 @@
                                  ;; Signup slack
                                  slack-lander-check-route
                                  slack-lander-check-slash-route
-                                 add-slack-to-carrot-route
-                                 add-slack-to-carrot-slash-route
-                                 slack-lander-check-bot-route
-                                 slack-lander-check-bot-slash-route
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route
