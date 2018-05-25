@@ -173,7 +173,7 @@
                           (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
                             [:button.org-settings-list-item-btn.btn-reset
                               {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
-                               :title "The Carrot Slack bot enables Slack unfurls, invites, briefings and sharing."
+                               :title "The Carrot Slack bot enables Slack unfurls, invites, notifications and sharing."
                                :data-toggle "tooltip"
                                :data-placement "top"
                                :data-container "body"}

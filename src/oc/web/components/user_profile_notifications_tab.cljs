@@ -65,8 +65,8 @@
           ;; Digest frequency
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "Digest delivery via " [:i.mdi.mdi-information-outline
-                {:title "Receive a digest of newly created posts."
+              "Notifications by " [:i.mdi.mdi-information-outline
+                {:title "Receive notifications of newly created posts."
                  :data-toggle "tooltip"
                  :data-placement "top"}]]
             [:div.user-profile-field.digest-medium
