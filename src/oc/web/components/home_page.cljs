@@ -45,12 +45,13 @@
 
           [:h1.headline
             (str
-             "More effective communication for "
-             "growing and distributed teams")]
+             "Focused communication that keeps "
+             "distributed teams aligned.")]
           [:div.subheadline
             (str
              "Key updates and information get lost in fast-moving chat and "
-             "overstuffed inboxes. Carrot makes it simple to stay aligned.")]
+             "overstuffed inboxes. Carrot makes it simple to stay aligned, "
+             "creating happy and more engaged teams.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container
             [:button.mlb-reset.get-started-button
