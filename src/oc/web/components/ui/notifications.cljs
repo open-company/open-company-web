@@ -13,6 +13,22 @@
    (sequential? desc)
    desc))
 
+(defn button-wrapper [s bt-cb bt-title bt-style bt-dismiss]
+  (let [has-html (string? bt-title)
+        button-base-map {:on-click (fn [e]
+                                     (when bt-dismiss
+                                       (notification-actions/remove-notification (first (:rum/args s))))
+                                     (when (fn? bt-cb)
+                                       (bt-cb e)))
+                         :class (utils/class-set {:solid-green (= bt-style :solid-green)})}
+        button-map (if has-html
+                     (assoc button-base-map :dangerouslySetInnerHTML #js {"__html" bt-title})
+                     button-base-map)]
+    [:button.mlb-reset.notification-button
+      button-map
+      (when-not has-html
+        bt-title)]))
+
 (defn setup-timeout [s]
   (when @(::timeout s)
     (reset! (::timeout s) nil)
@@ -44,28 +60,33 @@
                                 ;; remove notification from list
                                 (notification-actions/remove-notification (first (:rum/args s)))))
                             s)}
-  [s notification-data]
+  [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
+             primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
+             app-update slack-bot] :as notification-data}]
   [:div.notification
     {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                               :appear (and (not @(::dismiss s)) @(:first-render-done s))
-                              :server-error (:server-error notification-data)
-                              :app-update (:app-update notification-data)
-                              :opac (:opac notification-data)
-                              :dismiss-button (:dismiss-bt notification-data)})
-     :data-notificationid (:id notification-data)}
+                              :server-error server-error
+                              :app-update app-update
+                              :slack-bot slack-bot
+                              :opac opac
+                              :dismiss-button dismiss-bt})
+     :data-notificationid id}
     [:div.notification-title.group
-      (when (:slack-icon notification-data)
+      (when slack-icon
         [:span.slack-icon])
-      (:title notification-data)]
-    (when (:dismiss notification-data)
+      title]
+    (when dismiss
       [:button.mlb-reset.notification-dismiss-bt
         {:on-click #(do
                       (reset! (::timeout s) nil)
                       (js/clearTimeout @(::timeout s))
                       (notification-actions/remove-notification notification-data))}])
-    (when-not (empty? (:description notification-data))
+    (when-not (empty? description)
       [:div.notification-description
-        (description-wrapper (:description notification-data))])])
+        (description-wrapper description)])
+    (when (seq primary-bt-title)
+      (button-wrapper s primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss))])
 
 (rum/defcs notifications < rum/static
                            rum/reactive

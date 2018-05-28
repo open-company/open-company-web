@@ -1,4 +1,5 @@
 (ns oc.web.actions.user
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -12,6 +13,7 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
+            [oc.web.components.ui.slack-bot-modal :as slack-bot-modal]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; Logout
@@ -26,11 +28,25 @@
 (defn update-jwt-cookie [jwt]
   (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
 
+(declare bot-auth)
+
 (defn dispatch-jwt []
   (when (and (cook/get-cookie :show-login-overlay)
              (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
              (not= (cook/get-cookie :show-login-overlay) "collect-password"))
     (cook/remove-cookie! :show-login-overlay))
+  (when (or (not (contains? (jwt/get-contents) :slack-bots))
+            (zero? (count (jwt/get-key :slack-bots))))
+    (notification-actions/show-notification {:title "Enable Carrot for Slack?"
+                                             :description "Share post to Slack, sync comments, invite & manage your team."
+                                             :id :slack-second-step-banner
+                                             :dismiss true
+                                             :expire 0
+                                             :slack-bot true
+                                             :primary-bt-cb #(slack-bot-modal/show-modal bot-auth)
+                                             :primary-bt-title [:span [:span.slack-icon] "Add to Slack"]
+                                             :primary-bt-style :solid-green
+                                             :primary-bt-dismiss true}))
   (utils/after 1 #(dis/dispatch! [:jwt (jwt/get-contents)])))
 
 (defn update-jwt [jbody]
