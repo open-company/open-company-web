@@ -430,8 +430,19 @@
     (when (seq user-id) (str user-id ":"))
     redirect)))
 
-(def generic-network-error
- "There may be a problem with your network, or with our servers. Please try again later.")
+(def network-error
+ {:title "Network error"
+  :description "Shoot, looks like there might be a connection issue. Please try again."
+  :server-error true
+  :id :generic-network-error
+  :dismiss true})
+
+(def app-update-error
+  {:title "App has been updated"
+   :description "You’re using an out of date version of Carrot. Please refresh your browser."
+   :app-update true
+   :id :app-update-error
+   :dismiss true})
 
 (defn clean-google-chart-url [gchart-url]
   (if (string? gchart-url)

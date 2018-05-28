@@ -864,7 +864,7 @@
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
                 [:div.oc-loading-body]]]]
-          [:div#oc-error-banner]
+          [:div#oc-notifications-container]
           [:div#oc-loading]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
@@ -949,7 +949,7 @@
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
                 [:div.oc-loading-body]]]]
-          [:div#oc-error-banner]
+          [:div#oc-notifications-container]
           [:div#oc-loading]
           ;; Static js files
           [:script {:src (cdn "/js/static-js.js")}]

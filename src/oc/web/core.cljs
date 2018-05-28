@@ -15,7 +15,6 @@
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
-            [oc.web.stores.error-banner]
             [oc.web.stores.subscription]
             [oc.web.stores.section]
             [oc.web.stores.notifications]
@@ -27,7 +26,7 @@
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
             [oc.web.actions.user :as user-actions]
-            [oc.web.actions.error-banner :as error-banner-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -47,9 +46,9 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
-            [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
-            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
+            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
+            [oc.web.components.ui.notifications :refer (notifications)]))
 
 (enable-console-print!)
 
@@ -58,7 +57,12 @@
   (ru/drv-root {:state dis/app-state
                 :drv-spec (dis/drv-spec dis/app-state router/path)
                 :component component
-                :target target}))
+                :target target})
+  (when-let [notifications-mount-point (sel1 [:div#oc-notifications-container])]
+    (ru/drv-root {:state dis/app-state
+                  :drv-spec (dis/drv-spec dis/app-state router/path)
+                  :component notifications
+                  :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
@@ -621,7 +625,7 @@
    #(user-actions/update-jwt %) ;; success jwt refresh after expire
    #(user-actions/logout) ;; failed to refresh jwt
    ;; network error
-   #(error-banner-actions/show-banner utils/generic-network-error 10000))
+   #(notification-actions/show-notification (assoc utils/network-error :expire 10)))
 
   ;; Persist JWT in App State
   (user-actions/dispatch-jwt)
@@ -635,8 +639,6 @@
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
-  ; mount the error banner
-  (drv-root error-banner (sel1 [:div#oc-error-banner]))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)

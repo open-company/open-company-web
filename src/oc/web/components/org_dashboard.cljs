@@ -22,8 +22,6 @@
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
-            [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.notifications :refer (notifications)]
             [oc.web.components.fullscreen-post :refer (fullscreen-post)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -35,32 +33,6 @@
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
-
-(def payloads
-  [{:title "Section deleted"
-    :opac false}
-   {:title "Successfully posted"
-    :opac false}
-   {:title "Creating new section..."
-    :opac true}
-   {:title "Posting..."
-    :opac true}
-   {:title "Sharing to Slack..."
-    :slack-icon true
-    :opac true}
-   {:title "Shared to #general"
-    :slack-icon true
-    :opac false}
-   {:title "Network error"
-    :description "Shoot, looks like there might be a connection issue. Please try again."
-    :server-error true}
-   {:title "App has been updated"
-    :description "You’re using an out of date version of Carrot. Please refresh your browser."
-    :app-update true}])
-
-(defn notification-payload []
-  (let [random-payload (rand-nth payloads)]
-    (assoc random-payload :expire (int (rand 10)))))
 
 (defn refresh-board-data [s]
   (when-not (router/current-activity-id)
@@ -242,9 +214,7 @@
                            show-section-editor))
           [:div.page
             (navbar)
-            (notifications)
             [:div.org-dashboard-container
-              {:on-click #(notification-actions/show-notification (notification-payload))}
               [:div.org-dashboard-inner
                (when-not (and is-mobile?
                               (or (and search-active? search-results?)

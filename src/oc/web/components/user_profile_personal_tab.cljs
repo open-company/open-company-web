@@ -11,7 +11,6 @@
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
-            [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
