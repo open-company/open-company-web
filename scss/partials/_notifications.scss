@@ -4,6 +4,13 @@ div.notifications {
   bottom: 24px;
   z-index: 10000;
 
+  @include mobile() {
+    width: 100%;
+    left: 24px;
+    bottom: 0px;
+    margin-bottom: 24px;
+  }
+
   div.notification {
     width: 289px;
     background-color: $deep_navy;
@@ -14,6 +21,10 @@ div.notifications {
     // z-index: 10000;
     padding: 16px;
     position: relative;
+
+    @include mobile() {
+      width: calc(100% - 48px);
+    }
 
     &.will-appear {
       opacity: 0;
