@@ -11,7 +11,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.actions.error-banner :as error-banner-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.user-profile-personal-tab :refer (user-profile-personal-tab)]
@@ -72,9 +72,10 @@
   (let [url    (googobj/get res "url")
         node   (gdom/createDom "img")]
     (if-not url
-      (error-banner-actions/show-banner
-        "An error has occurred while processing the image URL. Please try again."
-        5000)
+      (notification-actions/show-notification
+        {:title "Image upload error"
+         :description "An error occurred while processing the image URL. Please try again."
+         :expire 5})
       (do
         (set! (.-onload node) #(img-on-load url node))
         (set! (.-className node) "hidden")
@@ -84,9 +85,11 @@
 (defn progress-cb [res progress])
 
 (defn error-cb [res error]
-  (error-banner-actions/show-banner
-   "An error has occurred while processing the image URL. Please try again."
-   5000))
+  (notification-actions/show-notification
+    {:title "Image upload error"
+     :description "An error occurred while processing your image. Please retry."
+     :expire 5
+     :dismiss true}))
 
 (defn upload-user-profile-pictuer-clicked []
   (iu/upload! user-utils/user-avatar-filestack-config success-cb progress-cb error-cb))

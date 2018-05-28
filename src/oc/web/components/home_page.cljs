@@ -76,7 +76,7 @@
                 [:div.thanks-headline "You are Confirmed!"]
                 [:div.thanks-subheadline "Thank you for subscribing."]]])
 
-          shared-misc/video
+          ; shared-misc/video
 
           shared-misc/horizontal-carousell
 

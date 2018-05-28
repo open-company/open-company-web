@@ -13,6 +13,7 @@ div.notifications {
     transition: opacity 180ms ease-in;
     // z-index: 10000;
     padding: 16px;
+    position: relative;
 
     &.will-appear {
       opacity: 0;
@@ -32,6 +33,10 @@ div.notifications {
       div.notification-description {
         color: $deep_navy;
       }
+
+      button.notification-dismiss-bt {
+        background-image: cdnUrl("/img/ML/close_notification_black.svg"); 
+      }
     }
 
     &.app-update {
@@ -47,8 +52,15 @@ div.notifications {
     }
 
     &.opac {
-      div.notification-title, div.notification-description {
+      div.notification-title, div.notification-description, button.notification-dismiss-bt {
         opacity: 0.5;
+      }
+    }
+
+    &.dismiss-button {
+      div.notfication-title {
+        width: calc(100% - 20px);
+        float: left;
       }
     }
 
@@ -66,6 +78,18 @@ div.notifications {
       @include avenir_H();
       font-size: 14px;
       color: white;
+    }
+
+    button.notification-dismiss-bt {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      width: 12px;
+      height: 12px;
+      background-size: 12px 12px;
+      background-image: cdnUrl("/img/ML/close_notification_white.svg");
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     div.notification-description {
