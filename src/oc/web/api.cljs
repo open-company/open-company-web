@@ -242,12 +242,6 @@
       (fn [{:keys [status body success]}]
         (cb status body success)))))
 
-(defn get-whats-new [whats-new-link callback]
-  (when whats-new-link
-    (storage-http (method-for-link whats-new-link) (relative-href whats-new-link)
-      {:headers (headers-for-link whats-new-link)}
-      callback)))
-
 (defn patch-board [data note cb]
   (when data
     (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers :private-notifications])

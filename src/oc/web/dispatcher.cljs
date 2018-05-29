@@ -65,8 +65,6 @@
 (defn team-channels-key [team-id]
   [:teams-data team-id :channels])
 
-(def whats-new-key [:whats-new-data])
-
 (defn current-board-key
   "Find the board key for db based on the current path."
   []
@@ -114,7 +112,6 @@
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
-   :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
@@ -282,7 +279,6 @@
                                :all-posts-data all-posts
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
-                               :whats-new-modal-data (:whats-new-modal base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :slack-bot-modal-data (:slack-bot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
@@ -525,9 +521,6 @@
 (defn print-entry-editing-data []
   (js/console.log (get @app-state :entry-editing)))
 
-(defn print-whats-new-data []
-  (js/console.log (get-in @app-state whats-new-key)))
-
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintAllPostsData js/window) print-all-posts-data)
@@ -542,4 +535,3 @@
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
-(set! (.-OCWebPrintWhatsNewData js/window) print-whats-new-data)

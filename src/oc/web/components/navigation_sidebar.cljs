@@ -11,7 +11,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.org-settings :as org-settings]
-            [oc.web.components.ui.whats-new-modal :as whats-new-modal]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
