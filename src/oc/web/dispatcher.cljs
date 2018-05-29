@@ -13,6 +13,8 @@
 
 (def auth-settings-key [:auth-settings])
 
+(def notifications-key [:notifications-data])
+
 (def orgs-key :orgs)
 
 (defn org-key [org-slug]
@@ -89,7 +91,7 @@
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
-   :auth-settings       [[:base] (fn [base] (:auth-settings base))]
+   :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
    :user-settings        [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
@@ -100,6 +102,7 @@
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
    :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
+   :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -183,10 +186,6 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
-   :error-banner        [[:base]
-                          (fn [base]
-                            {:error-banner-message (:error-banner-message base)
-                             :error-banner-time (:error-banner-time base)})]
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
@@ -267,10 +266,10 @@
    :search-results        [[:base] (fn [base] (:search-results base))]
    :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open]
+                            :mobile-menu-open :notifications-data]
                             (fn [base org-data board-data all-posts activity-data nux ap-initial-at
                                  show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open]
+                                 mobile-menu-open notifications-data]
                               {:nux nux
                                :nux-loading (:nux-loading base)
                                :nux-end (:nux-end base)
@@ -292,7 +291,8 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open})]})
+                               :mobile-menu-open mobile-menu-open
+                               :notifications (count notifications-data)})]})
 
 
 ;; Action Loop =================================================================
@@ -315,6 +315,12 @@
   (flux/dispatch actions payload))
 
 ;; Data
+
+(defn notifications-data
+  ""
+  ([] (notifications-data @app-state))
+  ([data]
+    (get-in data notifications-key)))
 
 (defn teams-data-requested
   ""

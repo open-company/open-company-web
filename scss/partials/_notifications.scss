@@ -1,0 +1,113 @@
+div.notifications {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 10000;
+
+  @include mobile() {
+    width: 100%;
+    left: 24px;
+    bottom: 0px;
+    margin-bottom: 24px;
+  }
+
+  div.notification {
+    width: 289px;
+    background-color: $deep_navy;
+    border-radius: 3px;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+    transition: opacity 180ms ease-in;
+    // z-index: 10000;
+    padding: 16px;
+    position: relative;
+
+    @include mobile() {
+      width: calc(100% - 48px);
+    }
+
+    &.will-appear {
+      opacity: 0;
+    }
+
+    &.appear {
+      opacity: 1;
+    }
+
+    &.server-error {
+      background-color: #FDAB1D;
+
+      div.notification-title {
+        color: $deep_navy;
+      }
+
+      div.notification-description {
+        color: $deep_navy;
+      }
+
+      button.notification-dismiss-bt {
+        background-image: cdnUrl("/img/ML/close_notification_black.svg"); 
+      }
+    }
+
+    &.app-update {
+      background-color: $sea_blue;
+
+      div.notification-title {
+        color: white;
+      }
+
+      div.notification-description {
+        color: white;
+      }
+    }
+
+    &.opac {
+      div.notification-title, div.notification-description, button.notification-dismiss-bt {
+        opacity: 0.5;
+      }
+    }
+
+    &.dismiss-button {
+      div.notfication-title {
+        width: calc(100% - 20px);
+        float: left;
+      }
+    }
+
+    span.slack-icon {
+      width: 16px;
+      height: 16px;
+      background-size: 16px;
+      background-position: 0px 0px;
+      background-image: cdnUrl("/img/ML/slack_white_icon.svg");
+      float: left;
+      margin-right: 8px;
+    }
+
+    div.notification-title {
+      @include avenir_H();
+      font-size: 14px;
+      color: white;
+    }
+
+    button.notification-dismiss-bt {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      width: 12px;
+      height: 12px;
+      background-size: 12px 12px;
+      background-image: cdnUrl("/img/ML/close_notification_white.svg");
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    div.notification-description {
+      @include avenir_R();
+      font-size: 14px;
+      color: white;
+      margin-top: 4px;
+    }
+  }
+}
