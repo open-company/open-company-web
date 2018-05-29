@@ -20,11 +20,12 @@
                                        (notification-actions/remove-notification (first (:rum/args s))))
                                      (when (fn? bt-cb)
                                        (bt-cb e)))
-                         :class (utils/class-set {:solid-green (= bt-style :solid-green)})}
+                         :class (utils/class-set {:solid-green (= bt-style :solid-green)
+                                                  :default-link (= bt-style :default-link)})}
         button-map (if has-html
                      (assoc button-base-map :dangerouslySetInnerHTML #js {"__html" bt-title})
                      button-base-map)]
-    [:button.mlb-reset.notification-button
+    [:button.mlb-reset.notification-button.group
       button-map
       (when-not has-html
         bt-title)]))
@@ -62,6 +63,7 @@
                             s)}
   [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
+             secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss
              app-update slack-bot] :as notification-data}]
   [:div.notification
     {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
@@ -85,6 +87,8 @@
     (when-not (empty? description)
       [:div.notification-description
         (description-wrapper description)])
+    (when (seq secondary-bt-title)
+      (button-wrapper s secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
     (when (seq primary-bt-title)
       (button-wrapper s primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss))])
 

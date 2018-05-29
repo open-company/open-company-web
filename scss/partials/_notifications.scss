@@ -6,9 +6,8 @@ div.notifications {
 
   @include mobile() {
     width: 100%;
-    left: 24px;
+    left: 0px;
     bottom: 0px;
-    margin-bottom: 24px;
   }
 
   div.notification {
@@ -23,7 +22,8 @@ div.notifications {
     position: relative;
 
     @include mobile() {
-      width: calc(100% - 48px);
+      width: 100%;
+      border-radius: 0px;
     }
 
     &.will-appear {
@@ -153,6 +153,18 @@ div.notifications {
           top: 3px;
           position: relative;
         }
+      }
+
+      &.default-link {
+        float: unset;
+        margin-top: 8px;
+        height: 16px;
+        @include avenir_H();
+        font-size: 14px;
+        line-height: 16px;
+        color: white;
+        background-color: transparent;
+        opacity: 0.6;
       }
     }
   }
