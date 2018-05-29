@@ -173,12 +173,12 @@ div.cards-container {
 section.testimonials-section {
   background-color: #FFFDF9;
   text-align: center;
-  padding: 72px 0px;
+  padding: 72px 0px !important;
   position: relative;
 
   @include mobile() {
     width: 100%;
-    padding: 72px 32px;
+    padding: 72px 32px !important;
     padding-top: 72px !important;
     padding-bottom: 72px !important;
     text-align: left;
@@ -270,6 +270,7 @@ section.keep-aligned {
     margin-bottom: 20px;
 
     @include mobile() {
+      @include avenir_H();
       font-size: 24px;
       line-height: 30px;
     }
@@ -349,8 +350,8 @@ div.carouselle {
   @include mobile() {
     width: calc(100% + 48px);
     padding: 0px;
-    height: 510px;
-    overflow-y: hidden;
+    height: 530px;
+    overflow-y: visible;
     overflow-x: auto;
     margin-top: 40px;
     margin-left: -24px;
@@ -360,8 +361,9 @@ div.carouselle {
 
     @include mobile() {
       width: 960px;
-      height: 510px;
+      height: 530px;
       padding: 0px 24px;
+      overflow: visible;
     }
 
     div.carouselle-screenshot {
@@ -380,12 +382,14 @@ div.carouselle {
 
       @include mobile() {
         position: relative;
-        // top: 0px;
         height: 510px;
         width: 288px;
         background-size: 288px 510px;
         float: left;
         margin-left: 24px;
+        box-shadow: 0px 2px 20px 0px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+        overflow: visible;
 
         &:first-child {
           margin-left: 0px;
@@ -468,7 +472,7 @@ section.home-keep-aligned {
   text-align: center;
 
   @include mobile() {
-    padding: 40px 24px;
+    padding: 40px 24px !important;
   }
 
   h2.home-keep-aligned-title {
@@ -609,7 +613,7 @@ section.team-transparency {
   text-align: center;
 
   @include mobile() {
-    padding: 40px 24px;
+    padding: 40px 24px !important;
   }
 
   h2.team-transparency-title {
@@ -746,7 +750,7 @@ section.slack-comparison {
 
   @include mobile() {
     text-align: left;
-    padding: 40px 32px;
+    padding: 40px 32px !important;
   }
 
   div.slack-comparison-headline {

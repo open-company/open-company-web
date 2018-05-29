@@ -86,9 +86,9 @@
         font-size: 16px;
         color: $deep_navy;
 
-        @include mobile() {
-          max-width: 200px;
-        }
+        // @include mobile() {
+        //   width: 100%;
+        // }
       }
 
       div.footer-small-links {
@@ -102,8 +102,12 @@
           @include avenir_R();
           color: $carrot_green;
           font-size: 16px;
-          text-decoration: underline;
+          text-decoration: none;
           opacity: 1;
+
+          &:hover {
+            text-decoration: underline;
+          }
         }
       }
 
@@ -134,6 +138,10 @@
         float: left;
         margin-right: 40px;
         width: 100px;
+
+        @include mobile() {
+          width: 48%;
+        }
 
         @media screen and (max-width: 1200px) {
           margin-right: 32px;
@@ -183,7 +191,8 @@
             font-size: 16px;
 
             &:hover {
-              text-decoration: underline;
+              color: $carrot_green;
+              text-decoration: none;
               opacity: 1;
             }
           }

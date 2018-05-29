@@ -73,11 +73,11 @@
 
             shared-misc/core-values-list]
 
-          shared-misc/keep-aligned-section
+          shared-misc/slack-comparison-section
 
           shared-misc/team-transparency-section
 
-          shared-misc/slack-comparison-section
+          shared-misc/keep-aligned-section
 
           shared-misc/testimonials-section
 

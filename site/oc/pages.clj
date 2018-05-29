@@ -593,11 +593,11 @@
 
         core-values-list]
 
-      keep-aligned-section
+      slack-comparison-section
 
       team-transparency-section
 
-      slack-comparison-section
+      keep-aligned-section
 
       testimonials-section
 

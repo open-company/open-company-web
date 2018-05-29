@@ -89,7 +89,7 @@ div.slack-wrap {
 
     section.carrot-plus-slack {
       padding-top: 72px;
-      padding-bottom: 232px;
+      padding-bottom: 120px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -169,10 +169,10 @@ div.slack-wrap {
       }
 
       div.carrot-plus-slack {
-        width: 217px;
-        height: 81px;
+        width: 145px;
+        height: 60px;
         @include image-2x("/img/ML/carrot_plus_slack");
-        background-size: 217px 81px;
+        background-size: 145px 60px;
         background-repeat: no-repeat;
         background-position: center;
         margin: 80px auto 0px;
@@ -223,7 +223,7 @@ div.slack-wrap {
         line-height: 30px;
         color: $ui_grey;
         max-width: 890px;
-        margin: 0px auto;
+        margin: 8px auto 0px;
         text-align: center;
 
         @include tablet(){

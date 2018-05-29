@@ -54,7 +54,7 @@ nav.site-navbar {
       padding: 12px 40px;
 
       @include mobile() {
-        // padding: 8px 24px 16px;
+        padding: 12px 24px;
 
         a.navbar-brand-left {
           margin-top: 10px;
@@ -70,6 +70,10 @@ nav.site-navbar {
 
         @include mobile() {
           top: 22px;
+
+          a.your-digest {
+            margin-top: 2px;
+          }
         }
 
         a.start {
@@ -272,7 +276,8 @@ nav.site-navbar {
       }
 
       @media screen and (max-width: 320px) {
-        width: 30px;
+        width: 20px;
+        margin-left: -10px;
       }
     }
 
