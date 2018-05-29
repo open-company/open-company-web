@@ -376,15 +376,17 @@
       (fn [{:keys [status body success]}]
         (cb body)))))
 
-(def user-profile-keys [:first-name :last-name :email :password :avatar-url :timezone :digest-frequency :digest-medium])
+(def user-profile-keys [:first-name :last-name :password :avatar-url :timezone :digest-frequency :digest-medium])
 
 (defn patch-user-profile [old-user-data new-user-data cb]
   (when (and (:links old-user-data)
              (map? new-user-data))
-    (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")]
+    (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")
+          without-email (dissoc new-user-data :email)
+          safe-new-user-data (select-keys without-email user-profile-keys)]
       (auth-http (method-for-link user-update-link) (relative-href user-update-link)
         {:headers (headers-for-link user-update-link)
-         :json-params (cljs->json (select-keys new-user-data user-profile-keys))}
+         :json-params (cljs->json safe-new-user-data)}
          (fn [{:keys [status body success]}]
            (cb status body success))))))
 
