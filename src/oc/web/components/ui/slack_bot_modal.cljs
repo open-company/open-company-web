@@ -43,7 +43,7 @@
             {:on-click dismiss-modal}
             "No thanks, maybe later"]
           [:button.mlb-reset.slack-bot-modal-add
-            {:on-click #((:bot-auth-cb slack-bot-modal-data) org-data team-data current-user-data)}
+            {:on-click #((:bot-auth-cb slack-bot-modal-data) team-data current-user-data)}
             [:span
               [:span.slack-icon]
               "Add to Slack"]]]]]))

@@ -169,17 +169,17 @@
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
-        org-settings (if (and (contains? query-params :org-settings)
+        org-settings (when (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
-                       (keyword (:org-settings query-params))
-                       (when (contains? query-params :access)
-                         :main))
+                       (keyword (:org-settings query-params)))
+        bot-access (when (contains? query-params :access) :slack-success-notification)
         next-app-state {:nux (when show-nux :1)
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :user-settings user-settings
                         :nux-loading show-nux
+                        :bot-access bot-access
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
         (utils/after nux-setup-time

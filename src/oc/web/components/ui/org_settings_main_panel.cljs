@@ -7,10 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            ; [oc.web.lib.image-upload :as iu]
-            ; [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
-            [oc.web.actions.user :as user-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -172,7 +169,7 @@
                         (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
                           (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
                             [:button.org-settings-list-item-btn.btn-reset
-                              {:on-click #(user-actions/bot-auth org-data team-data cur-user-data)
+                              {:on-click #(org-actions/bot-auth team-data cur-user-data)
                                :title "The Carrot Slack bot enables Slack unfurls, invites, notifications and sharing."
                                :data-toggle "tooltip"
                                :data-placement "top"
