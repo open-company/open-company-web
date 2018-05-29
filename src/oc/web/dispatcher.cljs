@@ -318,6 +318,12 @@
 
 ;; Data
 
+(defn bot-access
+  ""
+  ([] (bot-access @app-state))
+  ([data]
+    (:bot-access data)))
+
 (defn notifications-data
   ""
   ([] (notifications-data @app-state))
