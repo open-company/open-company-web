@@ -280,16 +280,17 @@
 
 ;; Slack team add
 
-(defn slack-team-add [current-user-data]
+(defn slack-team-add [current-user-data & [redirect-to]]
   (let [org-data (dis/org-data)
         team-id (:team-id org-data)
         team-data (dis/team-data team-id)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+        redirect (or redirect-to (router/get-token))
         fixed-add-slack-team-link (utils/slack-link-with-state
                                    (:href add-slack-team-link)
                                    (:user-id current-user-data)
                                    team-id
-                                   (router/get-token))]
+                                   redirect)]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link))))
 

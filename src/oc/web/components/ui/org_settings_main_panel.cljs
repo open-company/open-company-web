@@ -142,7 +142,7 @@
                   "An error occurred, please try again.")])]
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
-                {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data))}
+                {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data) (str (router/get-token) "?org-settings=main"))}
                 [:img {:alt "Add to Slack"
                        :height "40"
                        :width "173"
@@ -169,7 +169,7 @@
                         (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
                           (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
                             [:button.org-settings-list-item-btn.btn-reset
-                              {:on-click #(org-actions/bot-auth team-data cur-user-data)
+                              {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))
                                :title "The Carrot Slack bot enables Slack unfurls, invites, notifications and sharing."
                                :data-toggle "tooltip"
                                :data-placement "top"

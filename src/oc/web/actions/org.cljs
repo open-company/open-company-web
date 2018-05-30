@@ -21,17 +21,17 @@
 ;; User related functions
 ;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
 
-(defn bot-auth [team-data user-data]
-  (let [current (router/get-token)
+(defn bot-auth [team-data user-data & [redirect-to]]
+  (let [redirect (or redirect-to (router/get-token))
         auth-link (utils/link-for (:links team-data) "bot")
         fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
-                        current)]
+                        redirect)]
     (router/redirect! fixed-auth-url)))
 
 (defn maybe-show-add-bot-notification? []
   ;; Do we need to show the add bot banner?
-  (if (or (not (contains? (jwt/get-contents) :slack-bots))
-              (zero? (count (jwt/get-key :slack-bots))))
+  (if (and (= (jwt/get-key :auth-source) "slack")
+           (empty? (jwt/get-key :slack-bots)))
     ;; Do we have the needed data loaded
     (when-let* [org-data (dis/org-data)
                 current-user-data (dis/current-user-data)
@@ -51,10 +51,11 @@
                                                :secondary-bt-title "Learn More"
                                                :secondary-bt-style :default-link
                                                :secondary-bt-dismiss true}))
-    (when (= (dis/bot-access) :slack-success-notification)
-      (notification-actions/show-notification {:title "Slack integration successful"
-                                               :slack-icon true
-                                               :id "slack-integration-succesful"})
+    (let [bot-access (dis/bot-access)]
+      (when (= bot-access :slack-bot-success-notification)
+        (notification-actions/show-notification {:title "Slack integration successful"
+                                                 :slack-icon true
+                                                 :id "slack-bot-integration-succesful"}))
       (dis/dispatch! [:input [:bot-access] nil]))))
 
 ;; Org get
