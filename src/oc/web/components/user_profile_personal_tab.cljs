@@ -123,7 +123,8 @@
               [:input
                 {:type "text"
                  :tab-index 5
-                 :on-change #(change! s :email (.. % -target -value))
+                 :read-only true
+                 :disabled true
                  :value (:email current-user-data)}]]]
           ; Current password
           (when (= (:auth-source current-user-data) "email")
