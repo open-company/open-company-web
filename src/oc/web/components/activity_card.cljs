@@ -23,7 +23,7 @@
                         (drv/drv :org-data)
                         (drv/drv :nux)
                         ;; Mixins
-                        am/truncate-body-mixin
+                        (am/truncate-body-mixin (* 18 3))
                         {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")

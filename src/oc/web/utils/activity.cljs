@@ -46,10 +46,10 @@
   of the body and truncate the first exceeded element found.
   This is to avoid truncating a DIV with multiple spaced P inside,
   since this is a problem for the dotdotdot library that we are using."
-  [body-el]
+  [body-el height]
   (reset-truncate-body body-el)
   (.dotdotdot (js/$ body-el)
-    #js {:height (* 18 3)
+    #js {:height height
          :wrap "word"
          :watch true
          :ellipsis "..."}))

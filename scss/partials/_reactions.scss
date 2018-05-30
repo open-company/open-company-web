@@ -127,7 +127,9 @@ div.reactions {
 
     div.emoji-mart {
       position: absolute;
-      bottom: -31px;
+      bottom: -26px;
+      right: 44px;
+      left: unset;
 
       @include mobile() {
         position: relative;

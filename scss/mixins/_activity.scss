@@ -15,8 +15,8 @@ $h2_top_margin: 24;
   div.name {
     overflow: hidden;
     text-overflow: ellipsis;
-    @include avenir_H();
-    color: $carrot_dark_gray;
+    @include avenir_M();
+    color: $deep_navy;
     font-size: 14px;
     white-space: nowrap;
   }
@@ -25,7 +25,7 @@ $h2_top_margin: 24;
     overflow: hidden;
     text-overflow: ellipsis;
     @include avenir_M();
-    color: $carrot_light_gray_3;
+    color: $ui_grey;
     font-size: 12px;
     white-space: nowrap;
 
@@ -148,7 +148,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-body($font-size: 16, $separator: $bottom_margin, $h2_margin: $h2_top_margin){
+@mixin activity-body($font-size: 16, $separator: $bottom_margin, $h2_margin: $h2_top_margin, $color: $deep_navy){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -171,18 +171,20 @@ $h2_top_margin: 24;
   &.medium-editor-placeholder:after {
     @include avenir_R();
     font-size: #{$font-size}px;
+    line-height: #{$separator}px;
     color: $carrot_light_gray_1;
     font-style: none !important;
   }
 
   @include avenir_R();
   font-size: #{$font-size}px;
-  color: $deep_navy;
+  line-height: #{$separator}px;
+  color: $color;
   white-space: pre-wrap;
   word-wrap: break-word;
 
   * {
-    color: $deep_navy;
+    color: $color;
   }
 
   & > *:not(:last-child) {
@@ -192,7 +194,7 @@ $h2_top_margin: 24;
   }
 
   & > *:last-child {
-    margin: 0px 0px #{$separator}px;
+    margin: 0px 0px 0px;
     padding-bottom: 0px;
   }
 
@@ -202,7 +204,7 @@ $h2_top_margin: 24;
 
   b, strong{
     @include avenir_R();
-    color: $deep_navy;
+    color: $color;
     font-weight: 700;
   }
 
@@ -217,6 +219,7 @@ $h2_top_margin: 24;
   h2 {
     @include avenir_H();
     font-size: #{$font-size}px;
+    line-height: #{$separator}px
   }
 
   a, span[data-auto-link] {
@@ -244,7 +247,7 @@ $h2_top_margin: 24;
     left: 50%;
     margin-left: -30px;
     height: 1px;
-    background-color: $deep_navy;
+    background-color: $color;
     margin-top: 0px;
     margin-bottom: 0px;
   }

@@ -12,18 +12,33 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.tile-menu :refer (tile-menu)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
+(defn expand [s expand? & [scroll-to-comments?]]
+  (let [$body (js/$ (rum/ref-node s "activity-body"))]
+    (reset! (::expanded s) expand?)
+    (reset! (::show-comments s) expand?)
+    (when (and expand?
+               scroll-to-comments?)
+      (reset! (::should-scroll-to-comments s) true))
+    (if expand?
+      (.restore (.data $body "dotdotdot"))
+      (.truncate (.data $body "dotdotdot")))))
+
 (defn should-show-continue-reading? [s]
-  (when-not @(::expanded s)
-    (let [item-body (rum/ref-node s "item-body")
-          dom-node (rum/dom-node s)
-          should-hide-body (> (.-clientHeight item-body) 418)]
-      (when should-hide-body
-        (.add (.-classList dom-node) "show-continue-reading")))))
+  (let [$item-body (js/$ (rum/ref-node s "activity-body"))]
+    (when (.hasClass $item-body "ddd-truncated")
+      (reset! (::truncated s) true))))
+
+(defn get-comments [activity-data comments-data]
+  (or (-> comments-data
+          (get (:uuid activity-data))
+          :sorted-comments)
+      (:comments activity-data)))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -31,20 +46,29 @@
                          (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
                          ;; Locals
-                         (rum/local false ::more-dropdown)
-                         (rum/local false ::move-activity)
                          (rum/local false ::expanded)
+                         (rum/local false ::truncated)
+                         (rum/local false ::show-comments)
                          (rum/local false ::should-scroll-to-comments)
                          ;; Mixins
+                         (am/truncate-body-mixin (* 30 3))
                          am/truncate-comments-mixin
-                         {:after-render (fn [s]
+                         {:did-mount (fn [s]
                            (should-show-continue-reading? s)
-                           (comment-actions/get-comments-if-needed (first (:rum/args s))
-                            @(drv/get-ref s :comments-data))
-                           (when @(::should-scroll-to-comments s)
-                             (utils/scroll-to-y
-                              (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 180)
-                             (reset! (::should-scroll-to-comments s) false))
+                           s)
+                          :after-render (fn [s]
+                           (let [activity-data (first (:rum/args s))
+                                 comments-data @(drv/get-ref s :comments-data)]
+                             (comment-actions/get-comments-if-needed activity-data comments-data)
+                             (when @(::should-scroll-to-comments s)
+                               (utils/after 180
+                                #(let [actual-comments-count (count (get-comments activity-data comments-data))
+                                       dom-node (rum/dom-node s)]
+                                  (utils/scroll-to-y
+                                   (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 30 (when (zero? actual-comments-count) 40)))
+                                  (when (zero? actual-comments-count)
+                                    (.focus (.find (js/$ dom-node) "div.add-comment")))))
+                               (reset! (::should-scroll-to-comments s) false)))
                            s)}
   [s activity-data]
   (let [org-data (drv/react s :org-data)
@@ -52,26 +76,30 @@
         edit-link (utils/link-for (:links activity-data) "partial-update")
         delete-link (utils/link-for (:links activity-data) "delete")
         share-link (utils/link-for (:links activity-data) "share")
+        truncated? @(::truncated s)
         expanded? @(::expanded s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
-        comments-data (or (-> (drv/react s :comments-data)
-                              (get (:uuid activity-data))
-                              :sorted-comments)
-                          (:comments activity-data))
+        comments-drv (drv/react s :comments-data)
+        comments-data (get-comments activity-data comments-drv)
         activity-attachments (:attachments activity-data)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))
         dom-element-id (str "stream-item-" (:uuid activity-data))]
     [:div.stream-item
       {:class (utils/class-set {(str "stream-item-" (:uuid activity-data)) true
-                                :expanded expanded?})
+                                :show-continue-reading truncated?})
        :id dom-element-id}
       [:div.activity-share-container]
-      [:div.stream-item-header
+      [:div.stream-item-header.group
         [:div.stream-header-head-author
           (user-avatar-image (:publisher activity-data))
-          [:div.name.fs-hide (:name (:publisher activity-data))]
+          [:div.name.fs-hide
+            (str (:name (:publisher activity-data))
+              (when is-all-posts
+                " in ")
+              (when is-all-posts
+                (:board-name activity-data)))]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
@@ -81,11 +109,7 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (more-menu activity-data dom-element-id)
-        (when is-all-posts
-          [:div.section-tag
-            {:class (when (:new activity-data) "has-new")
-             :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}])
+        (tile-menu activity-data dom-element-id)
         (when (:new activity-data)
           [:div.new-tag
             "New"])]
@@ -97,19 +121,22 @@
           [:div.stream-item-body-container
             [:div.stream-item-body
               [:div.stream-item-body-inner
-                {:ref "item-body"
-                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
+                {:ref "activity-body"
+                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]
+          (stream-attachments activity-attachments)
+          [:div.stream-item-footer.group
+            {:ref "stream-item-reactions"}
             [:button.mlb-reset.expand-button
               {:class (when expanded? "expanded")
-               :on-click #(swap! (::expanded s) not)}
+               :on-click #(expand s (not expanded?))}
               (if expanded?
                 "Show less"
-                "Keep reading")]]
-          (stream-attachments activity-attachments)
-          [:div.stream-item-separator]
-          [:div.stream-item-reactions.group
-            {:ref "stream-item-reactions"}
-            (reactions activity-data)]
+                "Show more")]
+            (reactions activity-data)
+            (when-not is-mobile?
+              [:div.stream-item-comments-summary
+                {:on-click #(expand s true true)}
+                (comments-summary activity-data true)])]
           (when (and is-mobile?
                      (:has-comments activity-data))
             [:div.stream-item-separator])
@@ -123,11 +150,10 @@
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-mobile-" (:uuid activity-data))))
               (stream-comments activity-data comments-data true)])]
-        [:div.stream-body-separator]
-        (when (and (not is-mobile?)
+        (when (and @(::show-comments s)
+                   (not is-mobile?)
                    (:has-comments activity-data))
           [:div.stream-body-right
-            {:class (when expanded? "expanded")}
             [:div.stream-body-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
               (when (pos? (count comments-data))

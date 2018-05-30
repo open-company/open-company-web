@@ -25,7 +25,7 @@
                                        (alert-modal/hide-alert))}]
    (alert-modal/show-alert alert-data)))
 
-(rum/defcs draft-card < am/truncate-body-mixin
+(rum/defcs draft-card < (am/truncate-body-mixin (* 18 3))
                         {:after-render (fn [s]
                           (let [draft-data (first (:rum/args s))
                                 body-sel (str "div.draft-card-" (:uuid draft-data) " div.draft-card-body")
