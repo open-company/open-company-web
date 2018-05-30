@@ -176,13 +176,13 @@
                                :data-container "body"}
                               "Add Slackbot to team"
                               [:i.mdi.mdi-information-outline]]))]
-                      [:div.org-settings-list-item-desc.group
-                        (when (seq (:slack-domain team))
+                      (when (seq (:slack-domain team))
+                        [:div.org-settings-list-item-desc.group
                           [:div.slack-domain-label
                             "This team is linked to the "
                             [:span.slack-domain
                                (:slack-domain team) ".slack.com"]
-                            " team."])]
+                            " team."]])
                       [:div.slack-org-self-join
                         "Members of this Slack team can join Carrot " [:span.self-join "without an invite"] "."]
                       [:button.remove-team-btn.btn-reset
