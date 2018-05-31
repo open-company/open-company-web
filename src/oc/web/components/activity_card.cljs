@@ -14,14 +14,21 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.tile-menu :refer (tile-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+
+(defn get-comments [activity-data comments-data]
+  (or (-> comments-data
+          (get (:uuid activity-data))
+          :sorted-comments)
+      (:comments activity-data)))
 
 (rum/defcs activity-card < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
                         (drv/drv :nux)
+                        (drv/drv :comments-data)
                         ;; Mixins
                         (am/truncate-body-mixin (* 18 3))
                         {:after-render (fn [s]
@@ -42,7 +49,8 @@
         nux (drv/react s :nux)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))
-        dom-element-id (str "activity-card-" (:uuid activity-data))]
+        dom-element-id (str "activity-card-" (:uuid activity-data))
+        comments-data (get-comments activity-data (drv/react s :comments-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true})
        :id dom-element-id
@@ -51,57 +59,41 @@
                     (when-not
                      (or
                       nux
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-menu]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.activity-tag]))
-                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.reactions])))
+                      (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu])))
 
                       (activity-actions/activity-modal-fade-in activity-data))))}
       [:div.activity-share-container]
-      ; Card header
-      [:div.activity-card-head.entry-card.group
-        ; Card author
-        [:div.activity-card-head-author
+      [:div.activity-card-preview-container
+        [:div.activity-card-preview-header.group
           (user-avatar-image (:publisher activity-data))
-          [:div.name.fs-hide (:name (:publisher activity-data))]
+          [:div.activity-card-preview-author
+            (:name (:publisher activity-data))]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
-        ; Card labels
-        [:div.activity-card-head-right
-          (when-not nux
-            (more-menu activity-data dom-element-id))
-          (when is-all-posts
-            [:div.section-tag
-              {:class (when (:new activity-data) "has-new")
-               :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}])
-          (when (:new activity-data)
-            [:div.new-tag
-              "New"])]]
-      [:div.activity-card-shadow-container.group
-        [:div.activity-card-content.group
-          ; Headline
-          [:div.activity-card-headline.fs-hide
-            {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          ; Body
-          (let [body-without-preview (utils/body-without-preview (:body activity-data))
-                emojied-body (utils/emojify body-without-preview)]
-            [:div.activity-card-body.fs-hide
-              {:dangerouslySetInnerHTML emojied-body
-               :ref "activity-body"
-               :class (utils/class-set {:has-body has-body
-                                        :has-headline has-headline})}])
-          (when has-attachments
-            (let [atch-num (count (:attachments activity-data))]
-              [:div.activity-card-attachments
-                (when (pos? atch-num)
-                  (str "+" atch-num " attachment" (when (not= atch-num 1) "s")))]))]
-        [:div.activity-card-footer.group
-          (reactions activity-data (and (:has-comments activity-data)
-                                        (>= (count (:reactions activity-data)) 4)))
-          (comments-summary activity-data)]]]))
+              (utils/time-since t))]]
+        [:div.activity-card-preview-title
+          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+        [:div.activity-card-preview-body
+          {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
+      [:div.activity-card-bottom-container.group
+        [:div.activity-card-header
+          (str (:name (:publisher activity-data))
+            " in "
+            (:board-name activity-data))]
+        [:div.activity-card-headline
+          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+        [:div.activity-card-footer-placeholder]
+        [:div.activity-card-footer
+          (tile-menu activity-data dom-element-id)
+          [:div.comments-count
+            [:span.comments-icon]
+            [:span.comments-count
+              (count comments-data)]]
+          [:div.tile-reactions
+            (for [reaction (:reactions activity-data)]
+              (when (pos? (:count reaction))
+                [:div.tile-reaction
+                  [:span.reaction
+                    (:reaction reaction)]
+                  [:span.count
+                    (:count reaction)]]))]]]]))

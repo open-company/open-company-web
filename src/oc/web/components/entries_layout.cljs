@@ -22,6 +22,8 @@
   (when (compare-and-set! (::loading-more s) false true)
     (activity-actions/all-posts-more @(::prev-link s) :down)))
 
+(def tiles-per-row 3)
+
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           (drv/drv :board-data)
@@ -81,12 +83,12 @@
           sorted-entries (vec (reverse (sort-by :published-at entries)))]
       [:div.entry-cards-container.group
         ; Get the max number of pairs
-        (let [top-index (js/Math.ceil (/ (count sorted-entries) 2))]
+        (let [top-index (js/Math.ceil (/ (count sorted-entries) tiles-per-row))]
           ; For each pair
           (for [idx (range top-index)
                 ; calc the entries that needs to render in this row
-                :let [start (* idx 2)
-                      end (min (+ start 2) (count sorted-entries))
+                :let [start (* idx tiles-per-row)
+                      end (min (+ start tiles-per-row) (count sorted-entries))
                       entries (subvec sorted-entries start end)
                       has-headline (some #(seq (:headline %)) entries)
                       has-body (some #(seq (:body %)) entries)
@@ -100,7 +102,9 @@
               ; If the row contains less than 2, add a placeholder
 
               ; div to avoid having the first cover the full width
-              (when (= (count entries) 1)
+              (when (< (count entries) 2)
+                [:div.entry-card.entry-card-placeholder])
+              (when (< (count entries) 3)
                 [:div.entry-card.entry-card-placeholder])]))
         (when (and (pos? (count entries))
                    is-mobile?)

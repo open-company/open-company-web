@@ -1,22 +1,23 @@
 div.activity-card {
-  width: 392px;
+  width: 228px;
   float: left;
-  background-color: white;
+  background-color: #F5F5F5;
   border-radius: 6px;
   margin: 8px;
   position: relative;
   cursor: pointer;
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ECECEC;
+  min-height: 195px;
 
   * {
     cursor: pointer;
   }
 
-  &:nth-child(even) {
+  &:nth-child(3n+3) {
     margin-right: 0px;
   }
 
-  &:nth-child(odd) {
+  &:nth-child(3n+1) {
     margin-left: 0px;
   }
 
@@ -25,301 +26,204 @@ div.activity-card {
     margin: 12px 0px;
   }
 
-  &:hover, &.dropdown-active {
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
-    @include big_web() {
-
+  &:hover {
+    div.activity-card-bottom-container {
       div.activity-card-footer {
-        button.post-edit {
-          opacity: 0.8;
+        div.tile-menu {
+          display: block;
         }
 
-        div.activity-share {
-          button.activity-share-bt {
-            opacity: 1;
-          }
+        div.comments-count {
+          display: none;
         }
-      }
-    }
-  }
 
-  &.activity-card-placeholder {
-    background-color: transparent;
-    box-shadow: none;
-    border: none;
-  }
-
-  &.empty-state {
-    border: none;
-    box-shadow: none;
-    background-color: transparent;
-    margin-top: 20px;
-    flex: 1;
-    text-align: center;
-    width: 100%;
-
-    div.empty-state-content {
-      height: 160px;
-      position: relative;
-      top: 50%;
-      margin-top: -80px;
-
-      @include mobile() {
-        display: none;
-      }
-
-      img {
-        width: 168px;
-        height: 120px;
-      }
-
-      div.activity-card-title {
-        font-size: 14px;
-        color: $carrot_light_gray;
-        @include avenir_H();
-        margin-top: 20px;
-        text-align: center;
-
-        button {
-          color: $carrot_text_blue;
-          padding: 0;
-          margin: 0;
-
-          &:hover, &:avtive, &:focus {
-            border: none;
-            outline: none;
-            text-decoration: underline;
-          }
+        div.tile-reactions {
+          display: none;
         }
       }
     }
   }
 
-  div.activity-card-breadcrumb {
-    @include avenir_R();
-    font-size: 14px;
-    color: $oc_gray_7;
-    padding: 24px;
-    background-color: $carrot_light_gray_2;
+  div.activity-card-preview-container {
+    margin: 20px auto 0px;
+    width: 188px;
+    background-color: white;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
-  }
+    border-top: 1px solid #ECECEC;
+    border-left: 1px solid #ECECEC;
+    border-right: 1px solid #ECECEC;
+    padding: 12px;
+    height: 101px;
+    overflow: hidden;
 
-  div.activity-card-head {
-    width: 100%;
-    padding: 16px 24px;
-    height: 65px;
-    display: flex;
-    background-color: $light_tan;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    div.activity-card-preview-header {
+      height: 12px;
 
-    div.activity-card-head-author {
-      padding-right: 20px;
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
+      @include user-profile(12);
+
+      div.user-avatar-img-container {
+        float: left;
+
+        img {
+          margin-top: -10px;
+        }
+      }
+
+      div.activity-card-preview-author {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @include avenir_M();
+        color: $deep_navy;
+        font-size: 8px;
+        line-height: 8px;
+        white-space: nowrap;
+        margin-left: 18px;
+      }
+
+      div.time-since {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @include avenir_M();
+        color: $ui_grey;
+        font-size: 6px;
+        white-space: nowrap;
+        margin-left: 18px;
+      }
+    }
+
+    div.activity-card-preview-title {
+      @include avenir_H();
+      font-size: 10px;
+      color: $deep_navy;
       text-overflow: ellipsis;
-
-      @include activity-author(32);
+      width: 100%;
+      overflow: hidden;
+      // white-space: nowrap;
+      line-height: 12px;
+      max-height: 24px;
+      margin-top: 6px;
     }
 
-    $right_max_width: 260;
-    div.activity-card-head-right {
-      white-space: nowrap;
-      max-width: #{$right_max_width}px;
-
-      @include new-tag();
-
-      @include section-tag($right_max_width);
-
-      div.section-tag {
-        margin-right: 0px;
-      }
+    div.activity-card-preview-body {
+      @include activity-body(8, 10, 10);
+      @include avenir_R();
+      color: $deep_navy;
+      line-height: 10px;
+      display: block;
+      overflow: hidden;
     }
   }
 
-  div.activity-card-shadow-container {
+  div.activity-card-bottom-container {
+    width: 100%;
+    border-top: 1px solid #ECECEC;
+    padding: 16px 24px;
+    background-color: white;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
+    height: calc(100% - 121px);
+    // position: absolute;
+    // top: 120px;
+    // bottom: 0px;
+    // left: 0px;
+    // right: 0px;
 
-    @include mobile() {
-      box-shadow: none;
+    div.activity-card-header {
+      @include avenir_M();
+      font-size: 12px;
+      color: $ui_grey;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-  }
-
-  div.activity-card-content {
-    width: 100%;
-    padding: 24px 24px 0px;
 
     div.activity-card-headline {
       @include activity-title();
       @include avenir_H();
-      font-size: 18px;
+      font-size: 16px;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
-      white-space: nowrap;
-      max-height: 31px;
-      line-height: 20px;
-
-      @include mobile() {
-        margin-top: 16px;
-      }
+      // white-space: nowrap;
+      max-height: 36px;
+      line-height: 18px;
+      margin-top: 4px;
     }
 
-    @include activity-media-preview();
+    div.activity-card-footer-placeholder {
+      height: 32px;
+    }
 
-    $line_height: 18;
-    $body_height: $line_height*3;
-    div.activity-card-body {
-      margin-top: 10px;
-      @include activity-body(14, $line_height, $line_height);
-      @include avenir_R();
-      color: $deep_navy;
-      line-height: #{$line_height}px;
-      display: block;
-      max-height: #{$body_height}px;
-      overflow: hidden;
+    div.activity-card-footer {
+      margin-top: 16px;
+      height: 16px;
+      position: absolute;
+      bottom: 16px;
 
-      h2 {
-        line-height: #{$line_height}px;
-        @include avenir_R();
-        font-size: 14px;
-        font-weight: normal;
+      div.tile-menu {
+        display: none;
+        margin-top: -6px;
+
+        button:first-child {
+          margin-left: 0px;
+        }
       }
 
-      & > *:not(:last-child) {
-        margin: #{$line_height}px 0px;
-      }
-
-      & > *:last-child {
-        margin: #{$line_height}px 0px 0px;
-      }
-
-      & > *:first-child {
-        margin-top: 0px;
-      }
-
-      &.has-body {
-        height: #{$body_height}px;
-      }
-
-      &.has-media-preview {
-        width: calc(100% - #{$line_height * 3}px - 16px);
-        margin-right: 16px;
+      div.comments-count {
+        height: 16px;
         float: left;
+
+        span.comments-icon {
+          content: "";
+          background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 14px;
+          height: 14px;
+          float: left;
+          display: block;
+        }
+
+        span.comments-count {
+          @include avenir_M();
+          font-size: 12px;
+          color: $ui_grey;
+          margin-left: 6px;
+          line-height: 14px;
+          float: left;
+          display: block;
+        }
       }
 
-      .carrot-no-preview {
-        display: none;
-      }
+      div.tile-reactions {
+        height: 16px;
+        float: left;
 
-      a:not(.read-more):hover {
-        text-decoration: none !important;
-      }
+        div.tile-reaction {
+          height: 16px;
+          margin-left: 6px;
 
-      img:not(.emojione){
-        display: none;
-      }
+          span.reaction {
+            font-size: 12px;
+            float: left;
+            display: block;
+            margin-left: 6px;
+          }
 
-      b, strong {
-        line-height: #{$line_height}px;
-        @include avenir_R();
-        font-size: 14px;
-        font-weight: normal;
-      }
-
-      // // Uncomment this to programmatically add the read full update at the end of the last body tag
-      // div:last-child, p:last-child {
-      //   &:after {
-      //     content: "Read Full Update";
-      //     @include activity-body;
-      //     color: $carrot_text_blue;
-      //     cursor: pointer;
-      //     margin-left: 5px;
-      //   }
-      // }
-
-      // &:empty {
-      //   &:after {
-      //     content: "Read Full Update";
-      //     @include activity-body;
-      //     color: $carrot_text_blue;
-      //     cursor: pointer;
-      //   }
-      // }
-    }
-  }
-
-  div.activity-card-attachments {
-    margin-top: 14px;
-    @include avenir_M();
-    font-size: 12px;
-    line-height: 16px;
-    height: 16px;
-    color: $ui_grey;
-  }
-
-  div.activity-card-footer {
-    width: 100%;
-    padding: 14px 24px 24px;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-
-    @include mobile() {
-      padding: 24px 32px 32px;
-    }
-
-    div.activity-card-footer-divider-line {
-      width: 100%;
-      height: 1px;
-      background-color: #ECECEC;
-      margin-bottom: 16px;
-
-      @include mobile() {
-        display: none;
+          span.count {
+            @include avenir_H();
+            font-size: 11px;
+            color: $ui_grey;
+            float: left;
+            display: block;
+            margin-left: 6px;
+          }
+        }
       }
     }
-
-    div.reactions {
-      float: left;
-
-      @include mobile() {
-        float: unset;
-      }
-    }
-
-    div.is-comments {
-      float: left;
-      margin-left: 16px;
-
-      @include mobile() {
-        float: unset;
-      }
-    }
-  }
-}
-/* linkAnimation for card and modal links */
-@include keyframe(linkAnimation){
-  0% {
-    background-position: right bottom;
-    background-size: 100% .1rem;
-  }
-
-  50% {
-    background-position: right bottom;
-    background-size: 0 .1rem;
-  }
-
-  51% {
-    background-position: left bottom;
-    background-size: 0 .1rem;
-  }
-
-  100% {
-    background-position: left bottom;
-    background-size: 100% .1rem;
   }
 }
