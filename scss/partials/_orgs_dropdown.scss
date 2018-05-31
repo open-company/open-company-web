@@ -11,18 +11,10 @@ div.orgs-dropdown {
     outline: none;
     background-color: transparent;
     position: relative;
-    height: 40px;
+    height: 32px;
     padding: 0;
     margin: 0;
-
-    @include mobile(){
-      height: 32px;
-      @include org-avatar(32);
-    }
-
-    @include big_web() {
-      @include org-avatar(40);
-    }
+    @include org-avatar(32);
 
     &.dropdown-toggle{
 

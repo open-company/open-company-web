@@ -34,7 +34,7 @@ div.dashboard-layout {
   }
 
   div.dashboard-layout-container {
-    padding: 40px 0px;
+    padding: 16px 0px;
     margin: 0 auto;
     width: auto;
     width: 100%;
@@ -222,7 +222,7 @@ div.dashboard-layout {
 
           div.board-name-with-icon {
             @include avenir_M();
-            font-size: 32px;
+            font-size: 28px;
             color: $carrot_gray;
             float: left;
 

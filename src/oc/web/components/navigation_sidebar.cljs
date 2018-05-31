@@ -26,7 +26,7 @@
   (router/nav! url)
   (close-navigation-sidebar))
 
-(def sidebar-top-margin 122)
+(def sidebar-top-margin 84)
 (def footer-button-height 31)
 
 (defn save-content-height [s]

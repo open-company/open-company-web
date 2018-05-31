@@ -124,14 +124,14 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - 122px);
+  max-height: calc(100vh - 84px);
   overflow-y: auto;
   overflow-x: visible;
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 118px;
+  top: 80px;
   left: 0px;
-  height: calc(100vh - 118px);
+  height: calc(100vh - 80px);
   @include no-user-select();
 
   &.showing-invite-people-tooltip {
@@ -493,7 +493,7 @@ div.left-navigation-sidebar {
       background-color: $light_gold;
       border-radius: 6px;
       padding: 32px 16px;
-      margin: 0px 0px 32px 10px;
+      margin: 0px 0px 16px 7px;
       position: relative;
       width: 192px;
 
