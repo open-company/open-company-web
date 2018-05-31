@@ -30,33 +30,33 @@
 
 (defn maybe-show-add-bot-notification? []
   ;; Do we need to show the add bot banner?
-  (if (and (= (jwt/get-key :auth-source) "slack")
-           (empty? (jwt/get-key :slack-bots)))
-    ;; Do we have the needed data loaded
-    (when-let* [org-data (dis/org-data)
-                current-user-data (dis/current-user-data)
-                team-data (dis/team-data (:team-id org-data))]
-      ;; Show the notification
-      (notification-actions/show-notification {:title "Enable Carrot for Slack?"
-                                               :description "Share post to Slack, sync comments, invite & manage your team."
-                                               :id :slack-second-step-banner
-                                               :dismiss true
-                                               :expire 0
-                                               :slack-bot true
-                                               :primary-bt-cb #(bot-auth team-data current-user-data)
-                                               :primary-bt-title [:span [:span.slack-icon] "Add to Slack"]
-                                               :primary-bt-style :solid-green
-                                               :primary-bt-dismiss true
-                                               :secondary-bt-cb #(slack-bot-modal/show-modal bot-auth)
-                                               :secondary-bt-title "Learn More"
-                                               :secondary-bt-style :default-link
-                                               :secondary-bt-dismiss true}))
-    (let [bot-access (dis/bot-access)]
-      (when (= bot-access :slack-bot-success-notification)
-        (notification-actions/show-notification {:title "Slack integration successful"
-                                                 :slack-icon true
-                                                 :id "slack-bot-integration-succesful"}))
-      (dis/dispatch! [:input [:bot-access] nil]))))
+  (when-let [org-data (dis/org-data)]
+    (if (and (= (jwt/get-key :auth-source) "slack")
+             (not (jwt/team-has-bot? (:team-id org-data))))
+      ;; Do we have the needed data loaded
+      (when-let* [current-user-data (dis/current-user-data)
+                  team-data (dis/team-data (:team-id org-data))]
+        ;; Show the notification
+        (notification-actions/show-notification {:title "Enable Carrot for Slack?"
+                                                 :description "Share post to Slack, sync comments, invite & manage your team."
+                                                 :id :slack-second-step-banner
+                                                 :dismiss true
+                                                 :expire 0
+                                                 :slack-bot true
+                                                 :primary-bt-cb #(bot-auth team-data current-user-data)
+                                                 :primary-bt-title [:span [:span.slack-icon] "Add to Slack"]
+                                                 :primary-bt-style :solid-green
+                                                 :primary-bt-dismiss true
+                                                 :secondary-bt-cb #(slack-bot-modal/show-modal bot-auth)
+                                                 :secondary-bt-title "Learn More"
+                                                 :secondary-bt-style :default-link
+                                                 :secondary-bt-dismiss true}))
+      (let [bot-access (dis/bot-access)]
+        (when (= bot-access :slack-bot-success-notification)
+          (notification-actions/show-notification {:title "Slack integration successful"
+                                                   :slack-icon true
+                                                   :id "slack-bot-integration-succesful"}))
+        (dis/dispatch! [:input [:bot-access] nil])))))
 
 ;; Org get
 
