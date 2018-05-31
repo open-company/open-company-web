@@ -298,10 +298,11 @@
                   [:button.mlb-reset.add-post-tooltip-dismiss
                     {:on-click #(activity-actions/hide-add-post-tooltip)}]
                   [:div.add-post-tooltip-icon]
-                  [:div.add-post-tooltip
-                    "Get started by creating a new post to share an update, announcement, or plans."]
-                  [:div.add-post-tooltip.second-line
-                    "The sample post below can be deleted anytime."]
+                  [:div.add-post-tooltips
+                    [:div.add-post-tooltip
+                      "Get started by creating a new post to share an update, announcement, or plans."]
+                    [:div.add-post-tooltip.second-line
+                      "The sample post below can be deleted anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
                     {:on-click compose-fn}

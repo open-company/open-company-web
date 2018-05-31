@@ -132,6 +132,7 @@ div.dashboard-layout {
           width: 48px;
           height: 48px;
           float: left;
+          margin-top: 12px;
 
           @include tablet() {
             float: unset;
@@ -139,25 +140,28 @@ div.dashboard-layout {
           }
         }
 
-        div.add-post-tooltip {
-          @include avenir_M();
-          font-size: 18px;
-          color: $deep_navy;
-          width: 699px;
-          float: left;
+        div.add-post-tooltips {
+          width: 530px;
           margin-left: 24px;
+          float: left;
 
-          &.second-line {
-            @include tablet() {
-              margin: 0px auto;
+          div.add-post-tooltip {
+            @include avenir_M();
+            font-size: 18px;
+            color: $deep_navy;
+
+            &.second-line {
+              @include tablet() {
+                margin: 0px auto;
+              }
             }
-          }
 
-          @include tablet() {
-            float: unset;
-            margin: 24px auto 0px;
-            width: 100%;
-            text-align: center;
+            @include tablet() {
+              float: unset;
+              margin: 24px auto 0px;
+              width: 100%;
+              text-align: center;
+            }
           }
         }
 
@@ -169,7 +173,7 @@ div.dashboard-layout {
           width: 32px;
           height: 38px;
           float: right;
-          margin-top: -20px;
+          margin-top: 18px;
 
           @include tablet() {
             display: none;
