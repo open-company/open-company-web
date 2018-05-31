@@ -1,4 +1,5 @@
 (ns oc.web.actions.org
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -13,7 +14,49 @@
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]))
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.slack-bot-modal :as slack-bot-modal]))
+
+;; User related functions
+;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
+
+(defn bot-auth [team-data user-data & [redirect-to]]
+  (let [redirect (or redirect-to (router/get-token))
+        auth-link (utils/link-for (:links team-data) "bot")
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
+                        redirect)]
+    (router/redirect! fixed-auth-url)))
+
+(defn maybe-show-add-bot-notification? []
+  ;; Do we need to show the add bot banner?
+  (when-let [org-data (dis/org-data)]
+    (if (and (= (jwt/get-key :auth-source) "slack")
+             (not (jwt/team-has-bot? (:team-id org-data))))
+      ;; Do we have the needed data loaded
+      (when-let* [current-user-data (dis/current-user-data)
+                  team-data (dis/team-data (:team-id org-data))]
+        ;; Show the notification
+        (notification-actions/show-notification {:title "Enable Carrot for Slack?"
+                                                 :description "Share post to Slack, sync comments, invite & manage your team."
+                                                 :id :slack-second-step-banner
+                                                 :dismiss true
+                                                 :expire 0
+                                                 :slack-bot true
+                                                 :primary-bt-cb #(bot-auth team-data current-user-data)
+                                                 :primary-bt-title [:span [:span.slack-icon] "Add to Slack"]
+                                                 :primary-bt-style :solid-green
+                                                 :primary-bt-dismiss true
+                                                 :secondary-bt-cb #(slack-bot-modal/show-modal bot-auth)
+                                                 :secondary-bt-title "Learn More"
+                                                 :secondary-bt-style :default-link
+                                                 :secondary-bt-dismiss true}))
+      (let [bot-access (dis/bot-access)]
+        (when (= bot-access :slack-bot-success-notification)
+          (notification-actions/show-notification {:title "Slack integration successful"
+                                                   :slack-icon true
+                                                   :id "slack-bot-integration-succesful"}))
+        (dis/dispatch! [:input [:bot-access] nil])))))
 
 ;; Org get
 
@@ -69,8 +112,9 @@
   ;; Interaction service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
-      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))  
-  (dis/dispatch! [:org-loaded org-data saved?]))
+      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+  (dis/dispatch! [:org-loaded org-data saved?])
+  (utils/after 100 maybe-show-add-bot-notification?))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
