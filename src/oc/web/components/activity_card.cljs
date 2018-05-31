@@ -96,4 +96,8 @@
                   [:span.reaction
                     (:reaction reaction)]
                   [:span.count
-                    (:count reaction)]]))]]]]))
+                    (:count reaction)]]))]
+          [:div.tile-attachments
+            [:span.attachments-count
+              (count (:attachments activity-data))]
+            [:span.attachments-icon]]]]]))

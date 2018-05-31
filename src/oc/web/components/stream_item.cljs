@@ -30,8 +30,10 @@
       (.truncate (.data $body "dotdotdot")))))
 
 (defn should-show-continue-reading? [s]
-  (let [$item-body (js/$ (rum/ref-node s "activity-body"))]
-    (when (.hasClass $item-body "ddd-truncated")
+  (let [activity-data (first (:rum/args s))
+        $item-body (js/$ (rum/ref-node s "activity-body"))]
+    (when (or (.hasClass $item-body "ddd-truncated")
+              (> (count (:attachments activity-data)) 3))
       (reset! (::truncated s) true))))
 
 (defn get-comments [activity-data comments-data]
@@ -123,7 +125,9 @@
               [:div.stream-item-body-inner
                 {:ref "activity-body"
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]
-          (stream-attachments activity-attachments)
+          (stream-attachments activity-attachments
+           (when (and truncated? (not expanded?))
+             #(expand s true)))
           [:div.stream-item-footer.group
             {:ref "stream-item-reactions"}
             [:button.mlb-reset.expand-button

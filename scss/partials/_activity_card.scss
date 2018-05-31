@@ -40,6 +40,10 @@ div.activity-card {
         div.tile-reactions {
           display: none;
         }
+
+        div.tile-attachments {
+          display: none;
+        }
       }
     }
   }
@@ -162,10 +166,12 @@ div.activity-card {
       height: 16px;
       position: absolute;
       bottom: 16px;
+      width: calc(100% - 48px);
 
       div.tile-menu {
         display: none;
         margin-top: -6px;
+        float: left;
 
         button:first-child {
           margin-left: 0px;
@@ -202,6 +208,8 @@ div.activity-card {
       div.tile-reactions {
         height: 16px;
         float: left;
+        max-width: 124px;
+        overflow: hidden;
 
         div.tile-reaction {
           height: 16px;
@@ -223,6 +231,30 @@ div.activity-card {
             display: block;
             margin-left: 6px;
           }
+        }
+      }
+
+      div.tile-attachments {
+        height: 16px;
+        float: right;
+
+        span.attachments-icon {
+          float: right;
+          display: block;
+          width: 12px;
+          height: 13px;
+          background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
+          background-repeat: no-repeat;
+          background-size: 12px 13px;
+          background-position: center;
+        }
+
+        span.attachments-count {
+          float: right;
+          @include avenir_M();
+          font-size: 12px;
+          color: $ui_grey;
+          margin-left: 6px;
         }
       }
     }

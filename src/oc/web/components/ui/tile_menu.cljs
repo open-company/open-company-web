@@ -31,18 +31,10 @@
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")]
-    (when (or delete-link
-              edit-link
+    (when (or edit-link
+              delete-link
               share-link)
       [:div.tile-menu
-        (when delete-link
-          [:button.mlb-reset.tile-menu-bt.tile-menu-delete-bt
-            {:type "button"
-             :ref "tile-menu-delete-bt"
-             :on-click #(delete-clicked % activity-data)
-             :data-toggle "tooltip"
-             :data-position "top"
-             :title "Delete"}])
         (when edit-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-edit-bt
             {:type "button"
@@ -51,6 +43,14 @@
              :data-toggle "tooltip"
              :data-position "top"
              :title "Edit"}])
+        (when delete-link
+          [:button.mlb-reset.tile-menu-bt.tile-menu-delete-bt
+            {:type "button"
+             :ref "tile-menu-delete-bt"
+             :on-click #(delete-clicked % activity-data)
+             :data-toggle "tooltip"
+             :data-position "top"
+             :title "Delete"}])
         (when share-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-share-bt
             {:type "button"

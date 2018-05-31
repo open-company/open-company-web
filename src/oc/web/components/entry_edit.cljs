@@ -411,7 +411,7 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})
             ; Attachments
-            (stream-attachments (:attachments entry-editing)
+            (stream-attachments (:attachments entry-editing) nil
              #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker

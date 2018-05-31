@@ -10,6 +10,15 @@ div.stream-attachments {
     height: auto;
     min-height: 34px;
 
+    div.stream-attachments-show-more {
+      cursor: pointer;
+      height: 20px;
+      margin-top: 8px;
+      @include avenir_H()
+      font-size: 12px;
+      color: $deep_navy;
+    }
+
     a.stream-attachments-item {
 
       div.attachment-info {

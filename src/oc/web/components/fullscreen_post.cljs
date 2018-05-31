@@ -403,7 +403,7 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
-            (stream-attachments activity-attachments
+            (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             [:div.fullscreen-post-box-footer.group
               (if editing
