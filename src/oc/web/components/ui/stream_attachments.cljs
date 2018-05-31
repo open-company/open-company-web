@@ -27,6 +27,7 @@
                :target "_blank"}
               [:div.attachment-info
                 {:class (when editable? "editable")}
+                [:div.attachment-icon]
                 [:span.attachment-name file-name]
                 [:span.attachment-description subtitle]
                 (when editable?
