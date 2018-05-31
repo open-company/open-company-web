@@ -38,7 +38,6 @@
       (let [team-data (when success (json->cljs body))]
         (when success
           (dis/dispatch! [:team-loaded team-data])
-          (utils/after 100 org-actions/maybe-show-add-bot-notification?)
           (enumerate-channels team-data))))))
 
 (defn force-team-refresh [team-id]

@@ -168,6 +168,13 @@
 
 ;; Auth
 
+(defn bot-auth [team-data user-data & [redirect-to]]
+  (let [redirect (or redirect-to (router/get-token))
+        auth-link (utils/link-for (:links team-data) "bot")
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
+                        redirect)]
+    (router/redirect! fixed-auth-url)))
+
 (defn auth-settings-get
   "Entry point call for auth service."
   []
@@ -175,8 +182,7 @@
     (when body
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
-        (dis/dispatch! [:user-data (json->cljs data)])
-        (utils/after 100 org-actions/maybe-show-add-bot-notification?)))
+        (dis/dispatch! [:user-data (json->cljs data)])))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link

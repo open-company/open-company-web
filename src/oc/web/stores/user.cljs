@@ -253,3 +253,7 @@
 
 (defn has-slack-bot? [org-data]
   (j/team-has-bot? (:team-id org-data)))
+
+(defmethod dispatcher/action :bot-access
+  [db [_ bot-access]]
+  (assoc-in db dispatcher/bot-access-key bot-access))
