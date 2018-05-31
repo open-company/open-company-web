@@ -52,10 +52,10 @@
                                                  :id "slack-bot-integration-succesful"}))
       (dispatcher/dispatch! [:bot-access nil]))))
 
-;; Reducers used to watch for notifications dispatch data
+;; Reducers used to watch for reaction dispatch data
 (defmulti reducer (fn [db [action-type & _]]
                     (when-not (some #{action-type} [:update :input])
-                      (timbre/debug "Dispatching notifications reducer:" action-type))
+                      (timbre/debug "Dispatching reaction reducer:" action-type))
                     action-type))
 
 (def notifications-dispatch
@@ -87,9 +87,9 @@
         next-notifications (filter #(not= (:created-at %) (:created-at notification-data)) current-notifications)]
     (assoc-in db dispatcher/notifications-key next-notifications)))
 
-;; Notifications store specific reducers
+;; Reaction store specific reducers
 (defmethod reducer :default [db payload]
-  ;; ignore state changes not specific to notifications
+  ;; ignore state changes not specific to reactions
   db)
 
 (defmethod reducer :team-loaded
