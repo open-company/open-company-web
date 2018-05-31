@@ -359,7 +359,7 @@ div.dashboard-layout {
 
         div.board-switcher {
           float: right;
-          width: 64px;
+          width: 32px;
           height: 32px;
           margin-top: 2px;
 
@@ -372,15 +372,10 @@ div.dashboard-layout {
             height: 32px;
             background-size: 16px 16px;
             background-repeat: no-repeat;
-            background-position: 0px 8px;
+            background-position: center 8px;
             float: left;
-            opacity: 0.6;
             padding: 0;
             margin: 0;
-
-            &.active {
-              opacity: 1;
-            }
 
             &.stream-view {
               background-image: cdnUrl("/img/ML/stream_view_button.svg");
