@@ -185,9 +185,7 @@
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
         (utils/after nux-setup-time
-         #(swap! dis/app-state assoc :nux-end true))
-        (when bot-access
-          (dis/dispatch! [:bot-access bot-access]))))
+         #(swap! dis/app-state assoc :nux-end true))))
 
 ;; Company list
 (defn org-handler [route target component params]

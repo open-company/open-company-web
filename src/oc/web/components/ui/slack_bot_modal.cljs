@@ -2,11 +2,10 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]))
 
-(defn show-modal []
-  (dis/dispatch! [:input [:slack-bot-modal] true]))
+(defn show-modal [bot-auth-cb]
+  (dis/dispatch! [:input [:slack-bot-modal :bot-auth-cb] bot-auth-cb]))
 
 (defn dismiss-modal []
   (dis/dispatch! [:input [:slack-bot-modal] nil]))
@@ -44,7 +43,7 @@
             {:on-click dismiss-modal}
             "No thanks, maybe later"]
           [:button.mlb-reset.slack-bot-modal-add
-            {:on-click #(user-actions/bot-auth team-data current-user-data)}
+            {:on-click #((:bot-auth-cb slack-bot-modal-data) team-data current-user-data)}
             [:span
               [:span.slack-icon]
               "Add to Slack"]]]]]))

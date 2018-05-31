@@ -15,8 +15,6 @@
 
 (def notifications-key [:notifications-data])
 
-(def bot-access-key [:bot-access])
-
 (def orgs-key :orgs)
 
 (defn org-key [org-slug]
@@ -324,7 +322,7 @@
   ""
   ([] (bot-access @app-state))
   ([data]
-    (get-in data bot-access-key)))
+    (:bot-access data)))
 
 (defn notifications-data
   ""
