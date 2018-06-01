@@ -30,7 +30,7 @@
                         (drv/drv :nux)
                         (drv/drv :comments-data)
                         ;; Mixins
-                        (am/truncate-body-mixin (* 18 3))
+                        (am/truncate-element-mixin "activity-headline" (* 18 2))
                         {:after-render (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 body-sel (str "div.activity-card-" (:uuid activity-data) " div.activity-card-body")
@@ -81,7 +81,8 @@
             " in "
             (:board-name activity-data))]
         [:div.activity-card-headline
-          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          {:ref "activity-headline"
+           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-footer-placeholder]
         [:div.activity-card-footer
           (tile-menu activity-data dom-element-id)
@@ -97,7 +98,8 @@
                     (:reaction reaction)]
                   [:span.count
                     (:count reaction)]]))]
-          [:div.tile-attachments
-            [:span.attachments-count
-              (count (:attachments activity-data))]
-            [:span.attachments-icon]]]]]))
+          (when (pos? (count (:attachments activity-data)))
+            [:div.tile-attachments
+              [:span.attachments-count
+                (count (:attachments activity-data))]
+              [:span.attachments-icon]])]]]))
