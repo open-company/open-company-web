@@ -12,11 +12,15 @@ div.tile-menu {
     display: block;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.8;
+    opacity: 0.4;
     margin-left: 16px;
     display: inline-block;
 
     &:hover {
+      opacity: 0.8;
+    }
+
+    &:active, &:focus {
       opacity: 1;
     }
 

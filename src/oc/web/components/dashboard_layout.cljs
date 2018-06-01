@@ -291,12 +291,22 @@
                       [:button.mlb-reset.board-switcher-bt.stream-view
                         {:on-click #(do
                                       (reset! (::board-switch s) :stream)
-                                      (cook/set-cookie! board-view-cookie "stream" (* 60 60 24 365)))}])
+                                      (cook/set-cookie! board-view-cookie "stream" (* 60 60 24 365)))
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title "Stream view"}])
                     (when (= @(::board-switch s) :stream)
                       [:button.mlb-reset.board-switcher-bt.grid-view
                         {:on-click #(do
                                       (reset! (::board-switch s) :grid)
-                                      (cook/set-cookie! board-view-cookie "grid" (* 60 60 24 365)))}])])]
+                                      (cook/set-cookie! board-view-cookie "grid" (* 60 60 24 365)))
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title "Grid view"}])])]
               (when (drv/react s :show-add-post-tooltip)
                 [:div.add-post-tooltip-container.group
                   [:button.mlb-reset.add-post-tooltip-dismiss
