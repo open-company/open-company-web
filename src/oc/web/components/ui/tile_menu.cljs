@@ -42,6 +42,7 @@
              :on-click #(activity-actions/activity-edit activity-data)
              :data-toggle "tooltip"
              :data-position "top"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Edit"}])
         (when delete-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-delete-bt
@@ -50,6 +51,7 @@
              :on-click #(delete-clicked % activity-data)
              :data-toggle "tooltip"
              :data-position "top"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Delete"}])
         (when share-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-share-bt
@@ -58,4 +60,5 @@
              :on-click #(activity-actions/activity-share-show activity-data share-container-id)
              :data-toggle "tooltip"
              :data-position "top"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Share"}])])))

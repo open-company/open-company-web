@@ -154,7 +154,8 @@
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
-                   :data-container "body"}])]])
+                   :data-container "body"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)

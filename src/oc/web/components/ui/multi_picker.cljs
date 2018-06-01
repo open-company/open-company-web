@@ -27,6 +27,7 @@
        :data-toggle "tooltip"
        :data-placement "top"
        :data-container "body"
+       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
        :title "Add media and attachments"
        :id toggle-button-id
        :on-click #(swap! (::show-menu s) not)}]

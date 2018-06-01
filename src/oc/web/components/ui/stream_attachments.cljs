@@ -40,6 +40,7 @@
                     {:data-toggle (when-not (responsive/is-tablet-or-mobile?) "" "tooltip")
                      :data-placement "top"
                      :data-container "body"
+                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                      :title "Remove attachment"
                      :on-click #(do
                                   (utils/event-stop %)

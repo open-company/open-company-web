@@ -225,6 +225,7 @@
                         {:data-toggle (when-not is-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (str (:name board-data) " settings")
                          :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
                       ;; Show section settings for desktop
@@ -240,6 +241,7 @@
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}
@@ -249,6 +251,7 @@
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
                       "Public"])]
                 ;; Add entry button
@@ -263,7 +266,8 @@
                          :data-viewer (if show-tooltip? "enable" "disable")
                          :data-toggle (when show-tooltip? "tooltip")
                          :data-placement (when show-tooltip? "top")
-                         :data-container (when show-tooltip? "body")}
+                         :data-container (when show-tooltip? "body")
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
                         [:div.add-to-board-pencil]
                         [:label.add-to-board-label
                           "Compose"]])
@@ -345,5 +349,6 @@
                        :data-container "body"
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :on-click compose-fn}
                       [:div.add-to-board-pencil]]]))])]]))
