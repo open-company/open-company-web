@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.activity :as au]
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.user-cache :as uc]
@@ -22,7 +23,7 @@
           org (router/current-org-slug)
           all-posts-key (dis/all-posts-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (utils/fix-all-posts (:collection all-posts-data))
+          fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
           should-404? (and from
                            (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
@@ -217,7 +218,7 @@
     (dis/dispatch! [:entry-save/failed edit-key])))
 
 (defn entry-modal-save-with-board-finish [activity-data response]
-  (let [fixed-board-data (utils/fix-board response)
+  (let [fixed-board-data (au/fix-board response)
         org-slug (router/current-org-slug)]
     (save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))

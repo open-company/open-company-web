@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
@@ -22,7 +23,9 @@
     (reset! (::expanded s) expand?)
     (when (and expand?
                scroll-to-comments?)
-      (reset! (::should-scroll-to-comments s) true)))
+      (reset! (::should-scroll-to-comments s) true))
+    (when-not expand?
+      (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70)))))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data
@@ -36,7 +39,8 @@
         comments-data (get-comments activity-data @(drv/get-ref s :comments-data))]
     (when (or (.hasClass $item-body "ddd-truncated")
               (> (count (:attachments activity-data)) 3)
-              (pos? (count comments-data)))
+              (pos? (count comments-data))
+              (:body-has-images activity-data))
       (reset! (::truncated s) true))))
 
 (rum/defcs stream-item < rum/reactive
@@ -62,8 +66,9 @@
                                (utils/after 180
                                 #(let [actual-comments-count (count (get-comments activity-data comments-data))
                                        dom-node (rum/dom-node s)]
-                                  (utils/scroll-to-y
-                                   (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 30 (when (zero? actual-comments-count) 40)))
+                                  ;; Commet out the scroll to comments for the moment
+                                  ; (utils/scroll-to-y
+                                  ;  (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 30 (when (zero? actual-comments-count) 40)))
                                   (when (zero? actual-comments-count)
                                     (.focus (.find (js/$ dom-node) "div.add-comment")))))
                                (reset! (::should-scroll-to-comments s) false)))
@@ -118,12 +123,11 @@
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-item-body-container
             [:div.stream-item-body
-              {:class (utils/class-set {:truncated truncated?
-                                        :expanded expanded?})}
+              {:class (utils/class-set {:expanded expanded?})}
               [:div.stream-item-body-inner.to-truncate
                 {:ref "activity-body"
                  :class (utils/class-set {:hide-images (and truncated? (not expanded?))})
-                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]
+                 :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
               [:div.stream-item-body-inner.no-truncate
                 {:ref "full-activity-body"
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]

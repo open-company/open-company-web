@@ -78,8 +78,10 @@
       [:div.activity-card-bottom-container.group
         [:div.activity-card-header
           (str (:name (:publisher activity-data))
-            " in "
-            (:board-name activity-data))]
+            (when is-all-posts
+              " in ")
+            (when is-all-posts
+              (:board-name activity-data)))]
         [:div.activity-card-headline
           {:ref "activity-headline"
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
@@ -91,13 +93,13 @@
             [:span.comments-count
               (count comments-data)]]
           [:div.tile-reactions
-            (for [reaction (:reactions activity-data)]
-              (when (pos? (:count reaction))
+            (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
+              (when (pos? (:count max-reaction))
                 [:div.tile-reaction
                   [:span.reaction
-                    (:reaction reaction)]
+                    (:reaction max-reaction)]
                   [:span.count
-                    (:count reaction)]]))]
+                    (:count max-reaction)]]))]
           (when (pos? (count (:attachments activity-data)))
             [:div.tile-attachments
               [:span.attachments-count

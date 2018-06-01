@@ -194,7 +194,7 @@ $h2_top_margin: 24;
   }
 
   & > *:last-child {
-    margin: 0px 0px 0px;
+    margin: #{$separator}px 0px 0px;
     padding-bottom: 0px;
   }
 

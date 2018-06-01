@@ -187,6 +187,14 @@ div.stream-item {
         div.reactions {
           float: right;
           margin-top: 4px;
+
+          div.reactions-picker-container {
+            div.emoji-mart {
+              bottom: -26px;
+              right: 44px;
+              left: unset;
+            }
+          }
         }
 
         @include mobile() {
