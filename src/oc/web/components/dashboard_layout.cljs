@@ -213,9 +213,10 @@
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:dangerouslySetInnerHTML (if is-all-posts
-                                                  #js {"__html" "All Posts"}
-                                                  (utils/emojify (:name board-data)))}])
+                      {:dangerouslySetInnerHTML (when-not is-all-posts
+                                                  (utils/emojify (:name board-data)))}
+                      (when is-all-posts
+                        (:name org-data))])
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)

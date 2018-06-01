@@ -56,6 +56,9 @@
     line-height: 1.71;
     color: $deep_navy;
     text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     span.count {
       @include avenir_M();
@@ -129,7 +132,7 @@ div.left-navigation-sidebar {
   overflow-x: visible;
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 80px;
+  top: 96px;
   left: 0px;
   height: calc(100vh - 80px);
   @include no-user-select();
