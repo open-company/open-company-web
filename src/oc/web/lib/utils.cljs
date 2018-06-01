@@ -612,6 +612,10 @@
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
+        has-empty-ending-paragraph (.match (.html (.find $container "p:last-child")) reg-ex)
+        _ (when has-empty-ending-paragraph
+            (.remove (js/$ "p:last-child" $container)))
         cleaned-html (.html $container)
         _ (.detach $container)]
     cleaned-html))
