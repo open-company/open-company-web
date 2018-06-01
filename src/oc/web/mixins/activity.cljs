@@ -3,10 +3,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-(defn truncate-body-mixin [height]
+(defn truncate-element-mixin [element-ref height]
   {:did-mount (fn [s]
     ; Truncate body text with dotdotdot
-    (let [$dom-node (js/$ (rum/ref-node s "activity-body"))]
+    (let [$dom-node (js/$ (rum/ref-node s element-ref))]
       (.dotdotdot $dom-node
         #js {:height height
              :wrap "word"
