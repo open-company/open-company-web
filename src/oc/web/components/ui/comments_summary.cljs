@@ -64,4 +64,4 @@
           {:class (str "comments-count-" (:uuid entry-data))}
           (if (responsive/is-tablet-or-mobile?)
             (comment-summary-string comments-authors)
-            (str comments-count " comment" (when (> comments-count 1) "s")))]])))
+            (str comments-count " comment" (when (not= comments-count 1) "s")))]])))
