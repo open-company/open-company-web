@@ -347,6 +347,11 @@ div.left-navigation-sidebar {
       border-bottom-right-radius: 3px;
       padding-left: 24px;
       margin: 0;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: none;
+      }
 
       @include mobile() {
         padding-left: 0px;
