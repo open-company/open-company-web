@@ -19,28 +19,25 @@
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn expand [s expand? & [scroll-to-comments?]]
-  (let [$body (js/$ (rum/ref-node s "activity-body"))]
     (reset! (::expanded s) expand?)
-    (reset! (::show-comments s) expand?)
     (when (and expand?
                scroll-to-comments?)
-      (reset! (::should-scroll-to-comments s) true))
-    (if expand?
-      (.restore (.data $body "dotdotdot"))
-      (.truncate (.data $body "dotdotdot")))))
-
-(defn should-show-continue-reading? [s]
-  (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s "activity-body"))]
-    (when (or (.hasClass $item-body "ddd-truncated")
-              (> (count (:attachments activity-data)) 3))
-      (reset! (::truncated s) true))))
+      (reset! (::should-scroll-to-comments s) true)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data
           (get (:uuid activity-data))
           :sorted-comments)
       (:comments activity-data)))
+
+(defn should-show-continue-reading? [s]
+  (let [activity-data (first (:rum/args s))
+        $item-body (js/$ (rum/ref-node s "activity-body"))
+        comments-data (get-comments activity-data @(drv/get-ref s :comments-data))]
+    (when (or (.hasClass $item-body "ddd-truncated")
+              (> (count (:attachments activity-data)) 3)
+              (pos? (count comments-data)))
+      (reset! (::truncated s) true))))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -50,10 +47,9 @@
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
-                         (rum/local false ::show-comments)
                          (rum/local false ::should-scroll-to-comments)
                          ;; Mixins
-                         (am/truncate-body-mixin (* 30 3))
+                         (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
                          {:did-mount (fn [s]
                            (should-show-continue-reading? s)
@@ -122,8 +118,14 @@
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-item-body-container
             [:div.stream-item-body
-              [:div.stream-item-body-inner
+              {:class (utils/class-set {:truncated truncated?
+                                        :expanded expanded?})}
+              [:div.stream-item-body-inner.to-truncate
                 {:ref "activity-body"
+                 :class (utils/class-set {:hide-images (and truncated? (not expanded?))})
+                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]
+              [:div.stream-item-body-inner.no-truncate
+                {:ref "full-activity-body"
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]
           (stream-attachments activity-attachments
            (when (and truncated? (not expanded?))
@@ -154,7 +156,7 @@
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-mobile-" (:uuid activity-data))))
               (stream-comments activity-data comments-data true)])]
-        (when (and @(::show-comments s)
+        (when (and expanded?
                    (not is-mobile?)
                    (:has-comments activity-data))
           [:div.stream-body-right

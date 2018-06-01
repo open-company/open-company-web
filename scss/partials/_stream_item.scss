@@ -88,12 +88,40 @@ div.stream-item {
       div.stream-item-body-container {
 
         div.stream-item-body {
+
+          &.expanded {
+            div.stream-item-body-inner.to-truncate {
+              display: none;
+            }
+
+            div.stream-item-body-inner.no-truncate {
+              display: block;
+            }
+          }
+
           div.stream-item-body-inner {
             margin-top: 8px;
-            @include activity-body(16, 22, 22, $ui_grey);
-            @include avenir_R();
-            color: $ui_grey;
-            line-height: 22px;
+
+            &.to-truncate{
+              @include activity-body(16, 22, 22, $ui_grey);
+              color: $ui_grey;
+              @include avenir_R();
+              line-height: 22px;
+
+              &.hide-images {
+                img {
+                  display: none;
+                }
+              }
+            }
+
+            &.no-truncate {
+              @include activity-body(16, 22, 22, $deep_navy);
+              color: $deep_navy;
+              @include avenir_R();
+              line-height: 22px;
+              display: none;
+            }
 
             &>*:first-child {
               margin-top: 0px;
@@ -175,7 +203,7 @@ div.stream-item {
           height: 24px;
           color: $carrot_green;
           @include avenir_H();
-          font-size: 16px;
+          font-size: 14px;
           text-align: left;
           display: none;
           padding: 6px 7px 0px 22px;
@@ -194,7 +222,7 @@ div.stream-item {
             background-repeat: no-repeat;
             width: 14px;
             height: 8px;
-            top: 13px;
+            top: 12px;
             left: 0px;
             transition: rotate 180ms;
           }
