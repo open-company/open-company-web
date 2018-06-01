@@ -25,7 +25,7 @@
                                        (alert-modal/hide-alert))}]
    (alert-modal/show-alert alert-data)))
 
-(rum/defcs draft-card < (am/truncate-body-mixin (* 18 3))
+(rum/defcs draft-card < (am/truncate-element-mixin "draft-body" (* 18 3))
                         {:after-render (fn [s]
                           (let [draft-data (first (:rum/args s))
                                 body-sel (str "div.draft-card-" (:uuid draft-data) " div.draft-card-body")
@@ -52,7 +52,7 @@
                   {:date-time t
                    :data-toggle "tooltip"
                    :data-placement "top"
-                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                    :data-title (utils/activity-date-tooltip draft)}
                   (utils/time-since t)])]]]
         [:div.draft-card-content.group.fs-hide
@@ -65,7 +65,7 @@
                 empty-body? (empty? (utils/strip-HTML-tags fixed-body))]
             [:div.draft-card-body
               {:class (utils/class-set {:empty-body empty-body?})
-               :ref "activity-body"
+               :ref "draft-body"
                :dangerouslySetInnerHTML (utils/emojify fixed-body)}])]
         [:div.draft-card-footer-last-edit
           [:span.edit "Edit"]
@@ -74,6 +74,7 @@
               {:title "Delete draft"
                :data-toggle "tooltip"
                :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :on-click (partial delete-clicked draft)}
               [:i.mdi..mdi-delete]])
           [:span.last-edit (str "Last edited " (utils/time-since (:updated-at draft)))]]
