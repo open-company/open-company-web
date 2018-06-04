@@ -80,13 +80,13 @@ nav.site-navbar {
           background-color: $carrot_orange;
           color: white;
 
+          span.slack-orange-icon {
+            @include image-2x("/img/ML/slack_white_icon");
+          }
+
           &:not(.your-digest).slack-get-started {
             background-color: $carrot_orange;
             color: white;
-
-            span.slack-orange-icon {
-              @include image-2x("/img/ML/slack_white_icon");
-            }
           }
         }
       }
@@ -202,7 +202,7 @@ nav.site-navbar {
           margin-top: 2px;
           width: 72px;
           // text-align: center;
-          padding: 4px 0px 0px;
+          padding: 2px 0px 0px;
           font-size: 13px;
           letter-spacing: 0.46px;
         }
@@ -219,7 +219,7 @@ nav.site-navbar {
           position: relative;
 
           @include mobile() {
-            top: 4px;
+            top: 2px;
           }
         }
 
