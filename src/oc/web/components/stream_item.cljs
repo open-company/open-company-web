@@ -146,7 +146,7 @@
             (when-not is-mobile?
               [:div.stream-item-comments-summary
                 {:on-click #(expand s true true)}
-                (comments-summary activity-data true)])]
+                (comments-summary activity-data)])]
           (when (and is-mobile?
                      (:has-comments activity-data))
             [:div.stream-item-separator])
