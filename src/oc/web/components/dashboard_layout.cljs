@@ -16,7 +16,6 @@
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
@@ -285,8 +284,7 @@
                                      (reset! (::show-top-boards-dropdown s) false)
                                      (activity-actions/entry-edit {:board-slug (:value item)
                                                                    :board-name (:label item)}))}))])
-                (when (and (not is-mobile?)
-                           (not is-drafts-board))
+                (when (not is-mobile?)
                   [:div.board-switcher.group
                     (when (= @(::board-switch s) :grid)
                       [:button.mlb-reset.board-switcher-bt.stream-view
@@ -337,9 +335,6 @@
                 ;; Layout boards activities
                 :else
                 (cond
-                  ;; Drafts
-                  is-drafts-board
-                  (drafts-layout board-data)
                   ;; Entries grid view
                   (= @(::board-switch s) :grid)
                   (entries-layout)

@@ -9,10 +9,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.section :as section-actions]
-            [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
-            [oc.web.components.activity-card :refer (activity-card)]))
+            [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.activity-card :refer (activity-card)]
+            [oc.web.components.ui.all-caught-up :refer (all-caught-up)]))
 
 (defn load-more-items-next-fn [s scroll]
   (when (compare-and-set! (::loading-more s) false true)

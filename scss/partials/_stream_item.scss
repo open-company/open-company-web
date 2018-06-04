@@ -177,6 +177,29 @@ div.stream-item {
         height: 32px;
         margin-top: 32px;
 
+        div.stream-body-draft-edit {
+          float: left;
+
+          button.edit-draft-bt {
+            text-align: left;
+            padding: 0px;
+            @include avenir_H();
+            font-size: 14px;
+            color: $carrot_green;
+          }
+        }
+
+        div.stream-body-draft-delete {
+          float: right;
+          button.delete-draft-bt {
+            text-align: right;
+            padding: 0px;
+            @include avenir_R();
+            font-size: 14px;
+            color: $ui_grey;
+          }
+        }
+
         div.stream-item-comments-summary {
           margin-right: 16px;
           margin-top: 4px;

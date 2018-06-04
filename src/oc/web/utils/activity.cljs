@@ -210,3 +210,9 @@
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
         with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
     with-fixed-activities))
+
+(defn get-comments [activity-data comments-data]
+  (or (-> comments-data
+          (get (:uuid activity-data))
+          :sorted-comments)
+      (:comments activity-data)))

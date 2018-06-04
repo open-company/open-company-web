@@ -5,12 +5,15 @@ div.activity-card {
   border-radius: 6px;
   margin: 8px;
   position: relative;
-  cursor: pointer;
   border: 1px solid #ECECEC;
   min-height: 195px;
 
-  * {
+  &:not(.draft), &:not(.draft) * {
     cursor: pointer;
+  }
+
+  &.draft, &.draft * {
+    cursor: default;
   }
 
   &:nth-child(3n+3) {
@@ -46,6 +49,11 @@ div.activity-card {
         }
       }
     }
+  }
+
+  &.draft {
+    background-color: #FFF6DD;
+    border: 1px solid #ECECEC;
   }
 
   div.activity-card-preview-container {
@@ -164,6 +172,26 @@ div.activity-card {
       position: absolute;
       bottom: 16px;
       width: calc(100% - 48px);
+
+      button.delete-draft-bt {
+        float: right;
+        text-align: right;
+        padding: 0px;
+        @include avenir_R();
+        font-size: 14px;
+        color: $ui_grey;
+        cursor: pointer;
+      }
+
+      button.edit-draft-bt {
+        float: left;
+        text-align: left;
+        padding: 0px;
+        @include avenir_H();
+        font-size: 14px;
+        color: $carrot_green;
+        cursor: pointer;
+      }
 
       div.tile-menu {
         display: none;
