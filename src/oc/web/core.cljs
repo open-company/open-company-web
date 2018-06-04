@@ -317,6 +317,13 @@
         (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
+    (defroute sign-up-slack-route urls/sign-up-slack {:as params}
+      (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
+      (when (and (jwt/jwt)
+                 (seq (cook/get-cookie (router/last-org-cookie))))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (simple-handler slack-lander "slack-lander" target params))
+
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
       (when (and (jwt/jwt)
@@ -407,12 +414,6 @@
     (defroute slack-route urls/slack {:as params}
       (timbre/info "Routing slack-route" urls/slack)
       (simple-handler slack "slack" target params))
-
-    (defroute slack-lander-route urls/slack-lander {:as params}
-      (timbre/info "Routing slack-lander-route" urls/slack-lander)
-      (if-not (jwt/jwt)
-        (simple-handler slack-lander "slack-lander" target params)
-        (router/redirect! urls/login)))
 
     (defroute pricing-route urls/pricing {:as params}
       (timbre/info "Routing pricing-route" urls/pricing)
@@ -549,6 +550,7 @@
       (secretary/uri-dispatcher [_loading_route
                                  login-route
                                  ;; Signup email
+                                 sign-up-slack-route
                                  signup-profile-route
                                  signup-profile-slash-route
                                  signup-team-route
@@ -569,7 +571,6 @@
                                  email-wall-slash-route
                                  ;; Marketing site components
                                  about-route
-                                 slack-lander-route
                                  slack-route
                                  pricing-route
                                  logout-route
