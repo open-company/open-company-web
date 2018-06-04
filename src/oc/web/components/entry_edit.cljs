@@ -271,20 +271,18 @@
         show-sections-picker (drv/react s :show-sections-picker)
         posting-title (if (:uuid entry-editing)
                         (if (= (:status entry-editing) "published")
-                          "Posted in: "
+                          "Posted to: "
                           "Draft for: ")
-                        "Posting in: ")]
+                        "Posting to: ")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.entry-edit-modal-header
-        [:button.mlb-reset.mobile-modal-close-bt
-          {:on-click #(cancel-clicked s)}]
+        [:button.mlb-reset.modal-close-bt
+          {:on-click #(cancel-clicked s)}
+          ""]
         [:div.entry-edit-modal-header-title
-          {:class (when (:uuid entry-editing) "editing")}
-          (if (:uuid entry-editing)
-            "Editing post"
-            "Create new post")]
+          {:dangerouslySetInnerHTML (utils/emojify (:headline entry-editing))}]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
@@ -328,13 +326,11 @@
                                     (utils/after 5000 #(.tooltip $post-btn "hide"))))))
                  :class (when disabled?
                           "disabled")}
-                (if working?
-                  (small-loading)
-                  [:div.button-icon
-                    {:class (when disabled? "disabled")}])
+                (when working?
+                  (small-loading))
                 (if published?
-                  "Save"
-                  "Post")])
+                  "SAVE"
+                  "POST")])
             (when should-show-save-button?
               [:div.mobile-buttons-divider-line])
             (when should-show-save-button?
@@ -351,39 +347,29 @@
                                 (activity-actions/entry-save @(drv/get-ref s :entry-editing))))}
                   (when working?
                     (small-loading))
-                  (str "Save " (when-not is-mobile? "to ") "draft")]))])
-          (when is-mobile?
-            [:div.entry-edit-modal-mobile-subheader
-              [:div.posting-in
-                [:span.posting-in-span
-                  posting-title]
-                [:div.boards-dropdown-caret
-                  [:div.board-name
-                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                    (:board-name entry-editing)]]]])]
+                  (str "Save " (when-not is-mobile? "to ") "draft")]))])]
       [:div.modal-wrapper
         [:div.entry-edit-modal.group
           {:ref "entry-edit-modal"}
-          (when-not is-mobile?
-            [:div.entry-edit-modal-headline
-              (user-avatar-image current-user-data)
-              [:div.posting-in
-                [:span.posting-in-span
-                  posting-title]
-                [:div.boards-dropdown-caret
-                  [:div.board-name
-                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                    (:board-name entry-editing)]
-                  (when show-sections-picker
-                    (sections-picker (:board-slug entry-editing)
-                     (fn [board-data note]
-                       (dis/dispatch! [:input [:show-sections-picker] false])
-                       (when (and board-data
-                                  (seq (:name board-data)))
-                        (dis/dispatch! [:input [:entry-editing]
-                         (merge entry-editing {:board-slug (:slug board-data)
-                                               :board-name (:name board-data)
-                                               :invite-note note})])))))]]])
+          [:div.entry-edit-modal-headline
+            (user-avatar-image current-user-data)
+            [:div.posting-in
+              [:span.posting-in-span
+                posting-title]
+              [:div.boards-dropdown-caret
+                [:div.board-name
+                  {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
+                  (:board-name entry-editing)]
+                (when show-sections-picker
+                  (sections-picker (:board-slug entry-editing)
+                   (fn [board-data note]
+                     (dis/dispatch! [:input [:show-sections-picker] false])
+                     (when (and board-data
+                                (seq (:name board-data)))
+                      (dis/dispatch! [:input [:entry-editing]
+                       (merge entry-editing {:board-slug (:slug board-data)
+                                             :board-name (:name board-data)
+                                             :invite-note note})])))))]]]
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}
             ; Headline element

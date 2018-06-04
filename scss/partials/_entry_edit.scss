@@ -28,65 +28,49 @@ div.entry-edit-modal-container {
   }
 
   div.entry-edit-modal-header {
-    height: 64px;
-    background-color: white;
+    height: 56px;
+    background-color: $sea_blue;
     width: 100vw;
     position: fixed;
     top: 0px;
     left: 0px;
     right: 0px;
     z-index: 1;
-    box-shadow: 0px 2px 6px 0px rgba($deep_tan,0.5);
-    padding: 20px 24px;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+    padding: 16px 24px;
     z-index: #{$navbar_zindex + 106};
 
     @include mobile() {
-      box-shadow: none;
-      height: 112px;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     }
 
     div.entry-edit-modal-header-title {
       @include avenir_H();
       font-size: 18px;
-      color: $deep_navy;
-      width: 162px;
-      text-align: right;
+      color: white;
+      text-align: center;
       position: relative;
       margin: 0px auto;
-
-      &.editing {
-        width: 125px;
-      }
-
-      &:before {
-        content: "";
-        position: absolute;
-        top: 2px;
-        left: 0px;
-        width: 15px;
-        height: 16px;
-        background-image: cdnUrl("/img/ML/edit_pencil.svg");
-        background-size: 15px 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
+      width: 50%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
 
       @include mobile() {
         display: none;
       }
     }
 
-    button.mobile-modal-close-bt {
-      @include image-2x("/img/ML/mobile_modal_close");
+    button.modal-close-bt {
+      background-image: cdnUrl("/img/ML/white_close.svg");
       width: 24px;
       height: 24px;
       background-repeat: no-repeat;
       background-size: 14px 14px;
       background-position: 5px 5px;
       position: absolute;
-      top: 20px;
-      left: 18px;
+      top: 17px;
+      left: 20px;
     }
 
     div.entry-edit-modal-header-right {
@@ -117,37 +101,20 @@ div.entry-edit-modal-container {
         @include avenir_H();
         font-size: 14px;
         float: right;
-        color: $carrot_green;
+        color: white;
         margin: 0px;
         position: relative;
 
-        div.button-icon {
-          position: absolute;
-          top: 10px;
-          left: 20px;
-          width: 20px;
-          height: 20px;
-          background-repeat: no-repeat;
-          background-color: transparent;
-          background-position: center;
-        }
-
         &.post-button {
           border-radius: 100px;
-          background-color: $carrot_green;
           color: white;
-          padding: 0px 32px 0px 48px;
+          padding: 0px;
           margin-left: 24px;
 
           div.small-loading {
             position: absolute;
             top: 10px;
             left: 20px;
-          }
-
-          div.button-icon {
-            background-size: 20px 20px;
-            @include image-2x("/img/ML/entry_post_button_icon_white");
           }
         }
 
@@ -157,165 +124,23 @@ div.entry-edit-modal-container {
           line-height: 24px;
           padding: 2px 0px 0px 32px;
           border-radius: 0px;
-          color: $carrot_green;
 
           &.disabled {
             color: $carrot_light_gray_3;
             opacity: 1;
           }
 
-          div.button-icon {
-            top: 2px;
-            left: 0px;
-          }
 
           &.post-button {
             margin-left: 0px;
+            padding: 0px;
+            color: white;
             background-color: transparent;
-            padding: 2px 0px 0px 32px;
-            color: $carrot_green;
-            background-color: transparent;
-
-            div.button-icon {
-              background-size: 20px 20px;
-              @include image-2x("/img/ML/entry_post_button_icon_green");
-            }
-
 
             &.disabled {
               color: $carrot_light_gray_3;
-
-              div.button-icon {
-                background-size: 20px 20px;
-                @include image-2x("/img/ML/entry_post_button_icon");
-              }
             }
           }
-
-          &.save-button {
-            &.disabled {
-              div.button-icon {
-                @include image-2x("/img/ML/entry_save_button_icon");
-              }
-            }
-
-            div.button-icon {
-              @include image-2x("/img/ML/entry_save_button_icon_green");
-              background-size: 20px 20px;
-            }
-          }
-        }
-      }
-    }
-
-    div.entry-edit-modal-mobile-subheader {
-      height: 48px;
-      margin-top: 44px;
-      width: calc(100% + 48px);
-      margin-left: -24px;
-      padding: 12px 24px;
-      border-top: 1px solid $light_tan;
-      display: none;
-
-      @include mobile() {
-        display: block;
-      }
-    }
-  }
-
-  div.posting-in {
-    @include avenir_M();
-    font-size: 16px;
-    color: $carrot_dark_gray;
-    float: left;
-    margin-top: 5px;
-    margin-left: 16px;
-
-    @include mobile() {
-      float: none;
-      margin-left: 0px;
-      font-size: 15px;
-    }
-
-    span.posting-in-span {
-      float: left;
-    }
-
-    div.boards-dropdown-caret {
-      @include avenir_M();
-      color: $carrot_green;
-      float: left;
-      margin-left: 6px;
-      cursor: pointer;
-      position: relative;
-
-      @include mobile() {
-        @include avenir_H();
-        font-size: 15px;
-        width: calc(100% - 78px);
-      }
-
-      div.board-name {
-        @include avenir_M();
-        color: $carrot_green;
-        margin-bottom: 0px;
-        cursor: pointer;
-        position: relative;
-        float: left;
-        padding-right: 28px;
-
-        @include mobile() {
-          float: unset;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        &:after {
-          position: absolute;
-          top: 0px;
-          right: 0px;
-          content: "";
-          background-image: cdnUrl("/img/ML/board_settings.svg");
-          background-size: 8px 8px;
-          background-repeat: no-repeat;
-          background-position: center;
-          background-color: $deep_tan;
-          border-radius: 10px;
-          width: 20px;
-          height: 20px;
-          opacity: 0.8;
-
-          @include mobile() {
-            margin-top: -3px;
-            background-size: 8px 5px;
-            background-position: 12px 9px;
-            top: 0px;
-            left: unset;
-            right: 0px;
-            background-color: transparent;
-            background-image: cdnUrl("/img/ML/board_chevron_green.svg");
-          }
-
-          &:hover {
-            opacity: 1;
-          }
-        }
-      }
-
-      div.sections-picker-container {
-        position: absolute;
-        top: 32px;
-        left: 50%;
-        margin-left: -180px;
-        z-index: 1000;
-
-        @include mobile() {
-          position: fixed;
-          top: 0px;
-          left: 0px;
-          margin-left: 0px;
-          z-index: 1500;
         }
       }
     }
@@ -333,7 +158,7 @@ div.entry-edit-modal-container {
       height: initial;
       width: 100%;
       margin: 0px;
-      margin-top: 136px;
+      margin-top: 56px;
     }
 
     div.entry-edit-modal {
@@ -357,11 +182,11 @@ div.entry-edit-modal-container {
       div.entry-edit-modal-headline {
         height: 88px;
         width: 100%;
-        padding: 28px 41px;
-        border-bottom: 1px solid $light_tan;
+        padding: 32px;
 
         @include mobile() {
-          display: none;
+          padding: 24px;
+          height: 68px;
         }
 
         @include user-profile(32);
@@ -377,26 +202,28 @@ div.entry-edit-modal-container {
         div.posting-in {
           @include avenir_M();
           font-size: 16px;
-          color: $carrot_dark_gray;
+          color: $ui_grey;
           float: left;
-          margin-top: 5px;
           margin-left: 16px;
 
           span {
             float: left;
           }
 
+          @include mobile() {
+            margin-left: 0px;
+          }
+
           div.boards-dropdown-caret {
             @include avenir_M();
-            color: $carrot_green;
             float: left;
+            color: $ui_grey;
             margin-left: 6px;
             cursor: pointer;
             position: relative;
 
             div.board-name {
               @include avenir_M();
-              color: $carrot_green;
               margin-bottom: 0px;
               cursor: pointer;
               position: relative;
@@ -404,7 +231,6 @@ div.entry-edit-modal-container {
 
               @include mobile() {
                 @include avenir_H();
-                color: $carrot_text_blue_3;
               }
 
               &:after {
@@ -414,8 +240,6 @@ div.entry-edit-modal-container {
                 background-size: 8px 8px;
                 background-repeat: no-repeat;
                 background-position: center;
-                background-color: $deep_tan;
-                border-radius: 10px;
                 width: 20px;
                 height: 20px;
                 margin-top: 0px;
@@ -506,9 +330,8 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-body {
         margin: 0px;
-        padding: 0px 42px 24px 42px;
+        padding: 0px 32px;
         width: 100%;
-        border-bottom: 1px solid $light_tan;
 
         @include mobile() {
           min-height: calc(100vh - 139px);
@@ -529,14 +352,13 @@ div.entry-edit-modal-container {
           color: $deep_navy;
           white-space: pre-wrap;
           word-wrap: break-word;
-          margin-top: 35px;
           min-height: 26px;
 
           @include tablet() {
             width: 100%;
             @include avenir_H();
             font-size: 20px;
-            margin: 27px 0px 0px;
+            margin: 0px;
             padding: 0px 24px;
           }
 
@@ -582,7 +404,6 @@ div.entry-edit-modal-container {
             font-size: 16px;
             margin: 16px 0;
             cursor: text;
-            min-height: 85px;
             white-space: pre-wrap;
             word-wrap: break-word;
             @include activity-body();
@@ -619,12 +440,12 @@ div.entry-edit-modal-container {
       }
 
       div.media-attachments {
-        padding: 0px 36px;
+        padding: 0px 32px;
       }
 
       div.entry-edit-modal-footer {
         height: 20px;
-        margin: 28px 36px;
+        margin: 28px 32px;
         position: relative;
 
         @include mobile() {
