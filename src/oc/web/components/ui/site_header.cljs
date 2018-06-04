@@ -101,7 +101,9 @@
               (if use-slack-signup-button
                 [:span
                   [:span.slack-orange-icon]
-                  "Add to Slack"]
+                  (if (utils/in? (:route @router/path) "slack-lander")
+                    "Sign in with Slack"
+                    "Add to Slack")]
                 "Get started"))]]
         [:div.site-navbar-right.mobile-only
           (if use-slack-signup-button

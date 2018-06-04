@@ -46,6 +46,7 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
+            [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
@@ -407,6 +408,12 @@
       (timbre/info "Routing slack-route" urls/slack)
       (simple-handler slack "slack" target params))
 
+    (defroute slack-lander-route urls/slack-lander {:as params}
+      (timbre/info "Routing slack-lander-route" urls/slack-lander)
+      (if-not (jwt/jwt)
+        (simple-handler slack-lander "slack-lander" target params)
+        (router/redirect! urls/login)))
+
     (defroute pricing-route urls/pricing {:as params}
       (timbre/info "Routing pricing-route" urls/pricing)
       (simple-handler pricing "pricing" target params))
@@ -562,6 +569,7 @@
                                  email-wall-slash-route
                                  ;; Marketing site components
                                  about-route
+                                 slack-lander-route
                                  slack-route
                                  pricing-route
                                  logout-route

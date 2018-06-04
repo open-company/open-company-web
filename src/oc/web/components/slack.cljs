@@ -34,7 +34,6 @@
     [:div
       [:div.slack-wrap
         {:id "wrap"}
-
         (site-header auth-settings true)
         (site-mobile-menu)
         (login-overlays-handler)
