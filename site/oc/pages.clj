@@ -968,6 +968,6 @@
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]
-          (when (env :fullstory)
+          (when (= (env :fullstory) "true")
             (fullstory-init))
           (google-analytics-init)]})
