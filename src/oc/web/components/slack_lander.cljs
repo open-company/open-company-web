@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.user :as user-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
@@ -40,7 +41,9 @@
               [:button.mlb-reset.get-started-button
                 {:on-click #(user-actions/login-with-slack slack-auth-link)}
                 [:span.slack-white-icon]
-                "Sign in with Slack and join your team"]]
+                (if (responsive/is-tablet-or-mobile?)
+                  "Join your team"
+                  "Sign in with Slack and join your team")]]
 
             [:div.main-animation-container
               [:img.main-animation
@@ -63,6 +66,8 @@
             [:button.mlb-reset.get-started-button
               {:on-click #(user-actions/login-with-slack slack-auth-link)}
               [:span.slack-white-icon]
-              "Sign in with Slack and join your team"]]]]
+              (if (responsive/is-tablet-or-mobile?)
+                "Join your team"
+                "Sign in with Slack and join your team")]]]]
 
       (site-footer)]))

@@ -139,6 +139,10 @@ div.slack-lander-wrap {
       width: 440px;
       padding: 6px 12px;
 
+      @include mobile() {
+        width: 100%;
+      }
+
       span.slack-white-icon {
         width: 24px;
         height: 24px;
