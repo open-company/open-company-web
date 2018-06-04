@@ -875,7 +875,7 @@
           (google-analytics-init)
           (when (= (env :fullstory) "true")
             [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
-          (when (= (env :fullstory) "true") (pages/fullstory-init))
+          (when (= (env :fullstory) "true") (fullstory-init))
 
           ;; jQuery needed by Bootstrap JavaScript
           jquery
