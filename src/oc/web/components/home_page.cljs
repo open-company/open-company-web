@@ -45,8 +45,8 @@
 
           [:h1.headline
             (str
-             "Focused communication that keeps "
-             "distributed teams aligned.")]
+             "Workplace communication that "
+             "rises above the noise.")]
           [:div.subheadline
             (str
              "Key updates and information get lost in fast-moving chat and "
