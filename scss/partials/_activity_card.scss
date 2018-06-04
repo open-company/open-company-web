@@ -30,30 +30,27 @@ div.activity-card {
   }
 
   &:hover {
-    div.activity-card-bottom-container {
-      div.activity-card-footer {
-        div.tile-menu {
-          display: block;
-        }
+    div.tile-menu {
+      display: block;
+    }
 
-        div.comments-count {
-          display: none;
-        }
-
-        div.tile-reactions {
-          display: none;
-        }
-
-        div.tile-attachments {
-          display: none;
-        }
-      }
+    div.activity-card-preview-container {
+      opacity: 0.5;
     }
   }
 
   &.draft {
     background-color: #FFF6DD;
     border: 1px solid #ECECEC;
+  }
+
+  div.tile-menu {
+    display: none;
+    float: unset;
+    position: absolute;
+    right: 20px;
+    top: 12px;
+    z-index: 3;
   }
 
   div.activity-card-preview-container {
@@ -65,6 +62,7 @@ div.activity-card {
     padding: 12px;
     height: 101px;
     overflow: hidden;
+    z-index: 2;
 
     div.activity-card-preview-header {
       height: 12px;
@@ -191,16 +189,6 @@ div.activity-card {
         font-size: 14px;
         color: $carrot_green;
         cursor: pointer;
-      }
-
-      div.tile-menu {
-        display: none;
-        margin-top: -6px;
-        float: left;
-
-        button:first-child {
-          margin-left: 0px;
-        }
       }
 
       div.comments-count {

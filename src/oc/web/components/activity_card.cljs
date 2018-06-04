@@ -61,6 +61,8 @@
                                    (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu])))
                        (activity-actions/activity-modal-fade-in activity-data))))}
       [:div.activity-share-container]
+      (when-not is-drafts-board
+        (tile-menu activity-data dom-element-id))
       [:div.activity-card-preview-container
         [:div.activity-card-preview-header.group
           (user-avatar-image publisher)
@@ -93,7 +95,6 @@
               {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
               "Delete"]]
           [:div.activity-card-footer
-            (tile-menu activity-data dom-element-id)
             [:div.comments-count
               [:span.comments-icon]
               [:span.comments-count
