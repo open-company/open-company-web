@@ -105,37 +105,43 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
-  // Home page carouselle
-  var home_page_carouselle = $("div.carouselle");
-  if (home_page_carouselle.length > 0) {
-    home_page_carouselle.find("button.carouselle-left").click(function(){
-      var current_active = home_page_carouselle.find("div.carouselle-screenshot:not(.disappear)");
+  function OCStaticSetupCarouselle($carouselle) {
+    if ($carouselle.length > 0) {
+    $carouselle.find("button.carouselle-left").click(function(){
+      var current_active = $carouselle.find("div.carouselle-screenshot:not(.disappear)");
       if (current_active.hasClass("screenshot-1")) {
-        home_page_carouselle.find("div.screenshot-1").addClass("disappear");
-        home_page_carouselle.find("div.screenshot-3").removeClass("disappear");
+        $carouselle.find("div.screenshot-1").addClass("disappear");
+        $carouselle.find("div.screenshot-3").removeClass("disappear");
       } else if (current_active.hasClass("screenshot-2")) {
-        home_page_carouselle.find("div.screenshot-2").addClass("disappear");
-        home_page_carouselle.find("div.screenshot-1").removeClass("disappear");
+        $carouselle.find("div.screenshot-2").addClass("disappear");
+        $carouselle.find("div.screenshot-1").removeClass("disappear");
       } else if (current_active.hasClass("screenshot-3")) {
-        home_page_carouselle.find("div.screenshot-3").addClass("disappear");
-        home_page_carouselle.find("div.screenshot-2").removeClass("disappear");
+        $carouselle.find("div.screenshot-3").addClass("disappear");
+        $carouselle.find("div.screenshot-2").removeClass("disappear");
       }
     });
 
-    home_page_carouselle.find("button.carouselle-right").click(function(){
-      var current_active = home_page_carouselle.find("div.carouselle-screenshot:not(.disappear)");
+    $carouselle.find("button.carouselle-right").click(function(){
+      var current_active = $carouselle.find("div.carouselle-screenshot:not(.disappear)");
       if (current_active.hasClass("screenshot-1")) {
-        home_page_carouselle.find("div.screenshot-1").addClass("disappear");
-        home_page_carouselle.find("div.screenshot-2").removeClass("disappear");
+        $carouselle.find("div.screenshot-1").addClass("disappear");
+        $carouselle.find("div.screenshot-2").removeClass("disappear");
       } else if (current_active.hasClass("screenshot-2")) {
-        home_page_carouselle.find("div.screenshot-2").addClass("disappear");
-        home_page_carouselle.find("div.screenshot-3").removeClass("disappear");
+        $carouselle.find("div.screenshot-2").addClass("disappear");
+        $carouselle.find("div.screenshot-3").removeClass("disappear");
       } else if (current_active.hasClass("screenshot-3")) {
-        home_page_carouselle.find("div.screenshot-3").addClass("disappear");
-        home_page_carouselle.find("div.screenshot-1").removeClass("disappear");
+        $carouselle.find("div.screenshot-3").addClass("disappear");
+        $carouselle.find("div.screenshot-1").removeClass("disappear");
       }
     });
+  }  
   }
+
+  // Home page carouselle
+  $("div.carouselle").each(function(){
+    OCStaticSetupCarouselle($(this));
+  });
+  
 
   if (jwt) {
     $("#site-header-login-item").hide();
