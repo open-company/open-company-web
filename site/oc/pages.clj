@@ -873,10 +873,6 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
-          (when (= (env :fullstory) "true")
-            [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
-          (when (= (env :fullstory) "true") (fullstory-init))
-
           ;; jQuery needed by Bootstrap JavaScript
           jquery
           ;; Truncate html string
@@ -972,5 +968,6 @@
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]
-          (when (env :fullstory) (fullstory-init))
+          (when (env :fullstory)
+            (fullstory-init))
           (google-analytics-init)]})
