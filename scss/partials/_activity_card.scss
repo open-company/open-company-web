@@ -30,12 +30,8 @@ div.activity-card {
   }
 
   &:hover {
-    div.tile-menu {
+    div.activity-card-menu-container {
       display: block;
-    }
-
-    div.activity-card-preview-container {
-      opacity: 0.5;
     }
   }
 
@@ -44,13 +40,22 @@ div.activity-card {
     border: 1px solid #ECECEC;
   }
 
-  div.tile-menu {
+  div.activity-card-menu-container {
     display: none;
-    float: unset;
-    position: absolute;
-    right: 20px;
-    top: 12px;
     z-index: 3;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 121px;
+    background-color: rgba(white, 0.5);
+
+    div.tile-menu {
+      position: absolute;
+      right: 20px;
+      top: 12px;
+      float: unset;
+    }
   }
 
   div.activity-card-preview-container {

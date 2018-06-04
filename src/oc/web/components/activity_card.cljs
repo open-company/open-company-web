@@ -62,7 +62,8 @@
                        (activity-actions/activity-modal-fade-in activity-data))))}
       [:div.activity-share-container]
       (when-not is-drafts-board
-        (tile-menu activity-data dom-element-id))
+        [:div.activity-card-menu-container
+          (tile-menu activity-data dom-element-id)])
       [:div.activity-card-preview-container
         [:div.activity-card-preview-header.group
           (user-avatar-image publisher)
