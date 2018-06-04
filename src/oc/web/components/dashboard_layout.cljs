@@ -82,9 +82,14 @@
   [s]
   (reset! (::ww s) (responsive/ww)))
 
-(defn- update-compose-button-tooltip [s]
+(defn- update-tooltips [s]
   (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
-    (.tooltip $compose-button (.attr $compose-button "data-viewer"))))
+    (.tooltip $compose-button (.attr $compose-button "data-viewer")))
+  (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
+    (.tooltip $board-switcher)
+    (doto $board-switcher
+     (.tooltip "hide")
+     (.tooltip "fixTitle"))))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -126,7 +131,7 @@
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
-                                (update-compose-button-tooltip s)
+                                (update-tooltips s)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -135,7 +140,7 @@
                                     (reset! (::scroll-listener s) nil)))
                                 s)
                                :did-update (fn [s]
-                                (update-compose-button-tooltip s)
+                                (update-tooltips s)
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -175,6 +180,7 @@
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
+        board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         can-compose (or (and (or is-all-posts
@@ -286,26 +292,19 @@
                                                                    :board-name (:label item)}))}))])
                 (when (not is-mobile?)
                   [:div.board-switcher.group
-                    (when (= @(::board-switch s) :grid)
-                      [:button.mlb-reset.board-switcher-bt.stream-view
-                        {:on-click #(do
-                                      (reset! (::board-switch s) :stream)
-                                      (cook/set-cookie! board-view-cookie "stream" (* 60 60 24 365)))
+                    (let [grid-view? (= @board-switch :grid)]
+                      [:button.mlb-reset.board-switcher-bt
+                        {:class (if grid-view? "stream-view" "grid-view")
+                         :ref "board-switcher"
+                         :on-click #(do
+                                      (reset! board-switch (if grid-view? :stream :grid))
+                                      (cook/set-cookie! board-view-cookie (if grid-view? "stream" "grid")
+                                       (* 60 60 24 365)))
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title "Stream view"}])
-                    (when (= @(::board-switch s) :stream)
-                      [:button.mlb-reset.board-switcher-bt.grid-view
-                        {:on-click #(do
-                                      (reset! (::board-switch s) :grid)
-                                      (cook/set-cookie! board-view-cookie "grid" (* 60 60 24 365)))
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title "Grid view"}])])]
+                         :title (if grid-view? "Stream view" "Grid view")}])])]
               (when (drv/react s :show-add-post-tooltip)
                 [:div.add-post-tooltip-container.group
                   [:button.mlb-reset.add-post-tooltip-dismiss
@@ -327,7 +326,7 @@
                 (empty-org)
                 ;; All Posts
                 (and is-all-posts
-                     (= @(::board-switch s) :stream))
+                     (= @board-switch :stream))
                 (all-posts)
                 ;; Empty board
                 empty-board?
@@ -336,7 +335,7 @@
                 :else
                 (cond
                   ;; Entries grid view
-                  (= @(::board-switch s) :grid)
+                  (= @board-switch :grid)
                   (entries-layout)
                   ;; Entries stream view
                   :else
