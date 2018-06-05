@@ -114,16 +114,16 @@
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
             "Digest Settings"]])
-      [:a
-        {:href oc-urls/what-s-new
-         :target "_blank"}
-        [:div.oc-menu-item.whats-new
-          "What’s New"]]
-      [:a
-        {:href oc-urls/help
-         :target "_blank"}
-        [:div.oc-menu-item.support
-          "Support"]]
+      ; [:a
+      ;   {:href oc-urls/what-s-new
+      ;    :target "_blank"}
+      ;   [:div.oc-menu-item.whats-new
+      ;     "What’s New"]]
+      ; [:a
+      ;   {:href oc-urls/help
+      ;    :target "_blank"}
+      ;   [:div.oc-menu-item.support
+      ;     "Support"]]
       ; (when (and (router/current-org-slug)
       ;            (= user-role :admin))
       ;   [:div.oc-menu-item
