@@ -14,6 +14,10 @@ div.stream-item {
     div.stream-item-header {
       div.tile-menu {
         display: block;
+
+        @include mobile() {
+          display: none;
+        }
       }
     }
   }
@@ -140,7 +144,6 @@ div.stream-item {
 
         div.mobile-summary {
           float: left;
-          margin-left: 6px;
           margin-top: 10px;
 
           div.mobile-comments-summary {
@@ -289,6 +292,7 @@ div.stream-item {
 
           @include mobile() {
             width: auto;
+            margin-right: 6px;
           }
 
           &:before {

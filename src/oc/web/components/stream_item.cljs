@@ -21,12 +21,13 @@
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn expand [s expand? & [scroll-to-comments?]]
-    (reset! (::expanded s) expand?)
-    (when (and expand?
-               scroll-to-comments?)
-      (reset! (::should-scroll-to-comments s) true))
-    (when-not expand?
-      (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0))))
+  (js/console.log "expand" expand?)
+  (reset! (::expanded s) expand?)
+  (when (and expand?
+             scroll-to-comments?)
+    (reset! (::should-scroll-to-comments s) true))
+  (when-not expand?
+    (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0))))
 
 (defn should-show-continue-reading? [s]
   (let [activity-data (first (:rum/args s))
@@ -157,8 +158,10 @@
               (when-not is-mobile?
                 (reactions activity-data))
               (if is-mobile?
-                (when-not expanded?
+                (if expanded?
+                  (reactions activity-data)
                   [:div.group
+                    {:on-click #(expand s true)}
                     [:div.mobile-summary
                       [:div.mobile-comments-summary
                         [:div.mobile-comments-summary-icon]
