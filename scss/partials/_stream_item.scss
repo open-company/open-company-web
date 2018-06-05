@@ -56,6 +56,15 @@ div.stream-item {
       }
     }
 
+    div.more-menu {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        float: right;
+      }
+    }
+
     div.stream-header-head-author {
       float: left;
       width: 55%;
@@ -64,7 +73,7 @@ div.stream-item {
       @include activity-author(32);
 
       @include mobile() {
-        width: 100%;
+        width: 80%;
       }
 
       div.name {

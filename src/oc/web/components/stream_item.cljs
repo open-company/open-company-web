@@ -14,6 +14,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.tile-menu :refer (tile-menu)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -112,8 +113,11 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (when-not is-drafts-board
+        (when (and (not is-mobile?)
+                   (not is-drafts-board))
           (tile-menu activity-data dom-element-id))
+        (when is-mobile?
+          (more-menu activity-data dom-element-id))
         (when (:new activity-data)
           [:div.new-tag
             "New"])]
@@ -178,7 +182,7 @@
                         [:span.attachments-count (count (:attachments activity-data))]])])
                 [:div.stream-item-comments-summary
                   {:on-click #(expand s true true)}
-                  (comments-summary activity-data)])])]
+                  (comments-summary activity-data true)])])]
         (when (and expanded?
                    (:has-comments activity-data))
           [:div.stream-body-right
