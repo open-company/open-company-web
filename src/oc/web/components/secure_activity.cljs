@@ -90,7 +90,7 @@
                     {:date-time t
                      :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "top"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
                     (utils/time-since t)])]]
             [:div.activity-content-header-right

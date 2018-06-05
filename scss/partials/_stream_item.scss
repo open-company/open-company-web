@@ -1,25 +1,31 @@
 div.stream-item {
   width: #{$board_container_width}px;
   margin: 12px 0px 16px;
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ECECEC;
   border-radius: 6px;
+  padding: 32px 40px;
+  background-color: white;
 
   @include mobile() {
     width: 100%;
   }
 
-  &:not(.expanded).show-continue-reading {
+  &:hover {
+    div.stream-item-header {
+      div.tile-menu {
+        display: block;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &.show-continue-reading {
     div.stream-item-body {
       div.stream-body-left {
-        div.stream-item-body-container {
-          div.stream-item-body {
-            overflow: hidden;
-            max-height: 418px;
-            &:after {
-              display: block;
-            }
-          }
-
+        div.stream-item-footer {
           button.expand-button {
             display: block;
           }
@@ -28,30 +34,60 @@ div.stream-item {
     }
   }
 
-  div.stream-item-header {
-    height: 65px;
-    background-color: $light_tan;
-    padding: 16px 24px;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+  div.activity-share-container {
+    div.activity-share-modal-container {
+      right: -16px;
+      margin-top: 22px;
+    }
+  }
 
+  div.stream-item-header {
     @include mobile() {
-      border-top-left-radius: 0px;
-      border-top-right-radius: 0px;
+      width: 100%;
+    }
+
+    div.tile-menu {
+      display: none;
+      margin-top: -8px;
+      margin-right: -10px;
+
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    div.more-menu {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        float: right;
+      }
     }
 
     div.stream-header-head-author {
       float: left;
       width: 55%;
-      padding-right: 20px;
       overflow: hidden;
 
       @include activity-author(32);
+
+      @include mobile() {
+        width: 80%;
+      }
+
+      div.name {
+        @include mobile() {
+          width: auto;
+        }
+      }
+
+      div.time-since {
+        @include mobile() {
+          width: auto;
+        }
+      }
     }
-
-    @include new-tag();
-
-    @include section-tag();
   }
 
   div.stream-item-body {
@@ -62,25 +98,13 @@ div.stream-item {
       display: block;
     }
 
-    div.stream-body-separator {
-      background-image: linear-gradient(-180deg, #F4F3F3 0%, rgba(253, 255, 255, 255) 100%);
-      width: 100%;
-      height: 8px;
-
-      @include mobile() {
-        display: none;
-      }
-    }
-
     div.stream-body-left {
       position: relative;
-      padding: 40px 68px;
-      background-color: white;
+      margin-top: 8px;
 
       @include mobile() {
         width: 100%;
-        padding: 32px 24px;
-        margin: 0px;
+        margin: 8px 0px 0px;
       }
 
       div.stream-attachments {
@@ -93,9 +117,9 @@ div.stream-item {
       div.stream-item-headline {
         @include activity-title();
         @include avenir_H();
-        font-size: 28px;
+        font-size: 22px;
         color: $deep_navy;
-        line-height: 36px;
+        line-height: 28px;
         
         @include mobile() {
           margin-top: 16px;
@@ -105,33 +129,40 @@ div.stream-item {
       div.stream-item-body-container {
 
         div.stream-item-body {
-          position: relative;
 
-          &:after {
-            display: none;
-            $gradient_base_color: white;
-            content: "";
-            position: absolute;
-            height: 48px;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
-            pointer-events: none;
-            background: -moz-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%, rgba($gradient_base_color,0) 100%); /* FF3.6+ */
-            background: -webkit-gradient(linear, bottom, top, color-stop(0%,rgba($gradient_base_color,0)), color-stop(100%,rgba($gradient_base_color,1))); /* Chrome,Safari4+ */
-            background: -webkit-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Chrome10+,Safari5.1+ */
-            background: -o-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* Opera 11.10+ */
-            background: -ms-linear-gradient(bottom,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* IE10+ */
-            background: linear-gradient(to top,  rgba($gradient_base_color, 1) 0%,rgba($gradient_base_color,0) 100%); /* W3C */
-            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$gradient_base_color}', endColorstr='transparent',GradientType=0 ); /* IE6-9 */
+          &.expanded {
+            div.stream-item-body-inner.to-truncate {
+              display: none;
+            }
+
+            div.stream-item-body-inner.no-truncate {
+              display: block;
+            }
           }
 
           div.stream-item-body-inner {
-            margin-top: 20px;
-            @include activity-body(20, 28, 28);
-            @include avenir_R();
-            color: $deep_navy;
-            line-height: 30px;
+            margin-top: 8px;
+
+            &.to-truncate{
+              @include activity-body(16, 22, 22, $ui_grey);
+              color: $ui_grey;
+              @include avenir_R();
+              line-height: 22px;
+
+              &.hide-images {
+                img {
+                  display: none;
+                }
+              }
+            }
+
+            &.no-truncate {
+              @include activity-body(16, 22, 22, $deep_navy);
+              color: $deep_navy;
+              @include avenir_R();
+              line-height: 22px;
+              display: none;
+            }
 
             &>*:first-child {
               margin-top: 0px;
@@ -142,82 +173,139 @@ div.stream-item {
             }
           }
         }
-
-        button.expand-button {
-          margin-top: 8px;
-          width: 134px;
-          height: 40px;
-          color: $carrot_green;
-          @include avenir_H();
-          font-size: 16px;
-          text-align: left;
-          display: none;
-          padding: 16px 7px 0px 22px;
-          background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-          background-size: 14px 8px;
-          background-position: 0px 23px;
-          background-repeat: no-repeat;
-
-          &.expanded {
-            transform: rotate(180deg);
-          }
-        }
       }
 
-      div.stream-mobile-comments {
-        background-color: #FDFCFB;
-
-        @include mobile() {
-          background-color: transparent;
-        }
-
-        div.stream-comments-title {
-          @include avenir_H();
-          font-size: 14px;
-          color: $carrot_dark_gray;
-          margin-bottom: 16px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-      }
-
-      div.stream-mobile-comments-summary {
-        margin-top: 16px;
-        border-top: 1px solid #ECECEC;
-        padding-top: 16px;
-        position: relative;
-
-        &:after {
-          content: "";
-          position: absolute;
-          width: 9px;
-          height: 15px;
-          top: 20px;
-          right: 0px;
-          background-image: cdnUrl("/img/ML/mobile_comments_chevron.svg");
-          background-size: 9px 15px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-      }
-
-      div.stream-item-separator {
-        /* Mask Copy: */
-        opacity: 0.8;
-        width: 100%;
-        height: 1px;
-        background: #ECECEC;
-        margin-top: 16px;
-      }
-
-      div.stream-item-reactions {
+      div.stream-item-footer {
         height: 32px;
-        margin-top: 16px;
+        margin-top: 32px;
 
-        div.is-comments {
-          margin-left: 16px;
+        div.mobile-summary {
+          float: left;
+          margin-top: 10px;
+
+          div.mobile-comments-summary {
+            height: 16px;
+            float: left;
+
+            div.mobile-comments-summary-icon {
+              background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
+              background-size: 14px 14px;
+              background-position: center;
+              background-repeat: no-repeat;
+              width: 14px;
+              height: 14px;
+              float: left;
+              display: block;
+            }
+
+            span {
+              margin-left: 6px;
+              font-size: 12px;
+              color: $ui_grey;
+              margin-left: 6px;
+              line-height: 14px;
+              float: left;
+              display: block;
+            }
+          }
+
+          div.mobile-summary-reaction {
+            margin-left: 6px;
+            height: 16px;
+            margin-left: 6px;
+            float: left;
+
+            span.reaction {
+              font-size: 12px;
+              float: left;
+              display: block;
+              margin-left: 6px;
+            }
+
+            span.count {
+              @include avenir_H();
+              font-size: 11px;
+              color: $ui_grey;
+              float: left;
+              display: block;
+              margin-left: 4px;
+            }
+          }
+        }
+
+        div.mobile-summary-attachments {
+          float: right;
+          text-align: right;
+          height: 16px;
+          margin-top: 10px;
+          
+          span.attachments-icon {
+            float: left;
+            display: block;
+            width: 14px;
+            height: 15px;
+            background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
+            background-repeat: no-repeat;
+            background-size: 14px 15px;
+            background-position: center;
+          }
+
+          span.attachments-count {
+            float: left;
+            display: block;
+            @include avenir_H();
+            font-size: 12px;
+            color: $ui_grey;
+            margin-left: 6px;
+          }
+        }
+
+        div.stream-body-draft-edit {
+          float: left;
+
+          button.edit-draft-bt {
+            text-align: left;
+            padding: 0px;
+            @include avenir_H();
+            font-size: 14px;
+            color: $carrot_green;
+          }
+        }
+
+        div.stream-body-draft-delete {
+          float: right;
+          button.delete-draft-bt {
+            text-align: right;
+            padding: 0px;
+            @include avenir_R();
+            font-size: 14px;
+            color: $ui_grey;
+          }
+        }
+
+        div.stream-item-comments-summary {
+          margin-right: 16px;
+          margin-top: 4px;
+          float: right;
+          cursor: pointer;
+        }
+
+        div.reactions {
+          float: right;
+          margin-top: 4px;
+
+          div.reactions-picker-container {
+            div.emoji-mart {
+              bottom: -26px;
+              right: 44px;
+              left: unset;
+
+              @include mobile(){
+                bottom: unset;
+                right: unset;
+              }
+            }
+          }
         }
 
         @include mobile() {
@@ -228,15 +316,54 @@ div.stream-item {
             float: left;
           }
         }
+
+        button.expand-button {
+          width: 134px;
+          height: 24px;
+          color: $carrot_green;
+          @include avenir_H();
+          font-size: 14px;
+          text-align: left;
+          display: none;
+          padding: 6px 7px 0px 22px;
+          position: relative;
+          overflow: visible;
+          float: left;
+
+          @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
+
+          @include mobile() {
+            width: auto;
+            margin-right: 6px;
+          }
+
+          &:before {
+            position: absolute;
+            content: "";
+            background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+            background-size: 14px 8px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 14px;
+            height: 8px;
+            top: 12px;
+            left: 0px;
+            transition: rotate 180ms;
+          }
+
+          &.expanded {
+            color: $ui_grey;
+            &:before {
+              background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+            }
+          }
+        }
       }
     }
 
     div.stream-body-right {
       position: relative;
-      padding: 24px 32px 32px;
-      background-color: white;
-      border-bottom-right-radius: 6px;
-      border-bottom-left-radius: 6px;
+      margin-top: 24px;
 
       div.stream-body-comments {
         height: 100%;

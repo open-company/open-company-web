@@ -417,7 +417,7 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})
             ; Attachments
-            (stream-attachments (:attachments entry-editing)
+            (stream-attachments (:attachments entry-editing) nil
              #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
@@ -436,6 +436,7 @@
                  :title "Shortcuts"
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :data-container "body"}]
+                 :data-container "body"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
               (when @(::show-legend s)
                 [:div.entry-edit-legend-image])]]]]]))

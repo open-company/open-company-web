@@ -16,7 +16,6 @@
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
@@ -83,9 +82,14 @@
   [s]
   (reset! (::ww s) (responsive/ww)))
 
-(defn- update-compose-button-tooltip [s]
+(defn- update-tooltips [s]
   (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
-    (.tooltip $compose-button (.attr $compose-button "data-viewer"))))
+    (.tooltip $compose-button (.attr $compose-button "data-viewer")))
+  (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
+    (.tooltip $board-switcher)
+    (doto $board-switcher
+     (.tooltip "hide")
+     (.tooltip "fixTitle"))))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -127,7 +131,7 @@
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
-                                (update-compose-button-tooltip s)
+                                (update-tooltips s)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -136,7 +140,7 @@
                                     (reset! (::scroll-listener s) nil)))
                                 s)
                                :did-update (fn [s]
-                                (update-compose-button-tooltip s)
+                                (update-tooltips s)
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -176,6 +180,7 @@
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
+        board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         can-compose (or (and (or is-all-posts
@@ -209,6 +214,7 @@
                :style board-container-style}
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
+                {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)
@@ -225,6 +231,7 @@
                         {:data-toggle (when-not is-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (str (:name board-data) " settings")
                          :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
                       ;; Show section settings for desktop
@@ -240,6 +247,7 @@
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}
@@ -249,6 +257,7 @@
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
                       "Public"])]
                 ;; Add entry button
@@ -263,7 +272,8 @@
                          :data-viewer (if show-tooltip? "enable" "disable")
                          :data-toggle (when show-tooltip? "tooltip")
                          :data-placement (when show-tooltip? "top")
-                         :data-container (when show-tooltip? "body")}
+                         :data-container (when show-tooltip? "body")
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
                         [:div.add-to-board-pencil]
                         [:label.add-to-board-label
                           "Compose"]])
@@ -280,28 +290,31 @@
                                      (reset! (::show-top-boards-dropdown s) false)
                                      (activity-actions/entry-edit {:board-slug (:value item)
                                                                    :board-name (:label item)}))}))])
-                (when (and (not is-mobile?)
-                           (not is-drafts-board))
+                (when (not is-mobile?)
                   [:div.board-switcher.group
-                    [:button.mlb-reset.board-switcher-bt.stream-view
-                      {:class (when (= @(::board-switch s) :stream) "active")
-                       :on-click #(do
-                                    (reset! (::board-switch s) :stream)
-                                    (cook/set-cookie! board-view-cookie "stream" (* 60 60 24 365)))}]
-                    [:button.mlb-reset.board-switcher-bt.grid-view
-                      {:class (when (= @(::board-switch s) :grid) "active")
-                       :on-click #(do
-                                    (reset! (::board-switch s) :grid)
-                                    (cook/set-cookie! board-view-cookie "grid" (* 60 60 24 365)))}]])]
+                    (let [grid-view? (= @board-switch :grid)]
+                      [:button.mlb-reset.board-switcher-bt
+                        {:class (if grid-view? "stream-view" "grid-view")
+                         :ref "board-switcher"
+                         :on-click #(do
+                                      (reset! board-switch (if grid-view? :stream :grid))
+                                      (cook/set-cookie! board-view-cookie (if grid-view? "stream" "grid")
+                                       (* 60 60 24 365)))
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title (if grid-view? "Stream view" "Grid view")}])])]
               (when (drv/react s :show-add-post-tooltip)
                 [:div.add-post-tooltip-container.group
                   [:button.mlb-reset.add-post-tooltip-dismiss
                     {:on-click #(activity-actions/hide-add-post-tooltip)}]
                   [:div.add-post-tooltip-icon]
-                  [:div.add-post-tooltip
-                    "Get started by creating a new post to share an update, announcement, or plans."]
-                  [:div.add-post-tooltip.second-line
-                    "The sample post below can be deleted anytime."]
+                  [:div.add-post-tooltips
+                    [:div.add-post-tooltip
+                      "Get started by creating a new post to share an update, announcement, or plans."]
+                    [:div.add-post-tooltip.second-line
+                      "The sample post below can be deleted anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
                     {:on-click compose-fn}
@@ -313,7 +326,7 @@
                 (empty-org)
                 ;; All Posts
                 (and is-all-posts
-                     (= @(::board-switch s) :stream))
+                     (= @board-switch :stream))
                 (all-posts)
                 ;; Empty board
                 empty-board?
@@ -321,11 +334,8 @@
                 ;; Layout boards activities
                 :else
                 (cond
-                  ;; Drafts
-                  is-drafts-board
-                  (drafts-layout board-data)
                   ;; Entries grid view
-                  (= @(::board-switch s) :grid)
+                  (= @board-switch :grid)
                   (entries-layout)
                   ;; Entries stream view
                   :else
@@ -344,5 +354,6 @@
                        :data-container "body"
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :on-click compose-fn}
                       [:div.add-to-board-pencil]]]))])]]))

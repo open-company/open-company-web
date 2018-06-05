@@ -343,7 +343,7 @@
                   {:date-time t
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-placement "top"
-                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                    :data-title (utils/activity-date-tooltip activity-data)}
                   (utils/time-since t)])]]
           [:div.fullscreen-post-author-header-right
@@ -406,7 +406,7 @@
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :content-editable false
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
-            (stream-attachments activity-attachments
+            (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             [:div.fullscreen-post-box-footer.group
               (if editing
@@ -427,7 +427,8 @@
                        :title "Shortcuts"
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :data-container "body"}]
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
                     (when @(::show-legend s)
                       [:div.fullscreen-post-box-footer-legend-image])]]
                 (reactions activity-data))]]]
