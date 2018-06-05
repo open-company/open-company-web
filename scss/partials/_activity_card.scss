@@ -40,6 +40,12 @@ div.activity-card {
     border: 1px solid #ECECEC;
   }
 
+  div.activity-share-container {
+    div.activity-share-modal-container {
+      margin-top: 42px;
+    }
+  }
+
   div.activity-card-menu-container {
     display: none;
     z-index: 3;
