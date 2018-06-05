@@ -61,9 +61,6 @@
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
       (cond
-        (= ["add-to-slack"] (:route @router/path))
-        false
-
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
@@ -166,30 +163,6 @@
       (update-jwt body)
       (router/redirect! oc-urls/logout)))))
 
-(defn add-to-slack [params]
-  (let [bot-ids (clojure.string/split (:bot-ids params) #":")
-        team-id (first bot-ids)
-        user-id (second bot-ids)
-        bot-id (last bot-ids)
-        new-user (= (:new params) "true")
-        auth-link (utils/link-for (:links (dis/auth-settings))
-                                  "bot"
-                                  "GET"
-                                  {:auth-source "slack"})
-        auth-url-with-redirect (clojure.string/replace
-                                (:href auth-link)
-                                "open-company-auth"
-                                (str
-                                 "open-company-auth:"
-                                 team-id ":"
-                                 user-id ":"
-                                 oc-urls/slack-lander-bot-check
-                                 (when new-user
-                                   (str "?new-slack-user=true"))
-                                 ":"
-                                 bot-id))]
-    (router/redirect! auth-url-with-redirect)))
-
 (defn show-login [login-type]
   (dis/dispatch! [:login-overlay-show login-type]))
 
@@ -202,18 +175,12 @@
     (when body
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
-        (dis/dispatch! [:user-data (json->cljs data)])))
+        (dis/dispatch! [:user-data (json->cljs data)])
+        (utils/after 100 org-actions/maybe-show-add-bot-notification?)))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
       (team-actions/teams-get)))))
-
-(defn bot-auth [org-data team-data user-data]
-  (let [current (router/get-token)
-        auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
-                        current)]
-    (router/redirect! fixed-auth-url)))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))
