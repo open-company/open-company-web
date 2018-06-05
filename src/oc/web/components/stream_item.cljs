@@ -26,7 +26,7 @@
                scroll-to-comments?)
       (reset! (::should-scroll-to-comments s) true))
     (when-not expand?
-      (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70)))))
+      (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0))))
 
 (defn should-show-continue-reading? [s]
   (let [activity-data (first (:rum/args s))
