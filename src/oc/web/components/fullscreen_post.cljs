@@ -28,6 +28,11 @@
 
 ;; Unsaved edits handling
 
+(defn remove-autosave [s]
+  (when @(::autosave-timer s)
+    (.clearInterval js/window @(::autosave-timer s))
+    (reset! (::autosave-timer s) nil)))
+
 (defn autosave [s]
   (when s
     (when-let [body-el (sel1 [:div.rich-body-editor])]
@@ -106,8 +111,7 @@
 (defn- real-start-editing [state & [focus]]
   (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :fullscreen-post-data)) true)
   (utils/after 100 #(setup-headline state))
-  (when @(::autosave-timer state)
-    (.clearInterval js/window @(::autosave-timer state)))
+  (remove-autosave state)
   (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
   (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
   (when (and focus
@@ -127,8 +131,7 @@
   (save-on-exit? state)
   (toggle-save-on-exit state false)
   (reset! (::edited-data-loaded state) false)
-  (.clearInterval js/window @(::autosave-timer state))
-  (reset! (::autosave-timer state) nil)
+  (remove-autosave state)
   (activity-actions/activity-modal-edit (:activity-data @(drv/get-ref state :fullscreen-post-data)) false)
   (when @(::headline-input-listener state)
     (events/unlistenByKey @(::headline-input-listener state))
@@ -155,9 +158,9 @@
         dismiss-fn (fn [dismiss-alert?]
                      (when dismiss-alert?
                        (alert-modal/hide-alert))
+                     (stop-editing state)
                      (activity-actions/entry-clear-local-cache (:uuid (:modal-editing-data modal-data))
                       :modal-editing-data)
-                     (stop-editing state)
                      (when dismiss-modal?
                        (close-clicked state)))]
   (if @(::uploading-media state)
