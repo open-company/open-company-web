@@ -237,7 +237,8 @@
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
                                                                  :user-settings
-                                                                 :org-settings])]
+                                                                 :org-settings
+                                                                 :search-active])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]

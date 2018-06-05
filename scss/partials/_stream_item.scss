@@ -35,11 +35,18 @@ div.stream-item {
   }
 
   div.stream-item-header {
+    @include mobile() {
+      width: 100%;
+    }
 
     div.tile-menu {
       display: none;
       margin-top: -8px;
       margin-right: -10px;
+
+      @include mobile() {
+        display: none;
+      }
     }
 
     div.stream-header-head-author {
@@ -48,9 +55,23 @@ div.stream-item {
       overflow: hidden;
 
       @include activity-author(32);
-    }
 
-    @include section-tag();
+      @include mobile() {
+        width: 100%;
+      }
+
+      div.name {
+        @include mobile() {
+          width: auto;
+        }
+      }
+
+      div.time-since {
+        @include mobile() {
+          width: auto;
+        }
+      }
+    }
   }
 
   div.stream-item-body {
@@ -262,6 +283,11 @@ div.stream-item {
               bottom: -26px;
               right: 44px;
               left: unset;
+
+              @include mobile(){
+                bottom: unset;
+                right: unset;
+              }
             }
           }
         }

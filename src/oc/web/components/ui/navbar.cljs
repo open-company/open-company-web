@@ -31,9 +31,15 @@
                 mobile-menu-open
                 orgs-dropdown-visible
                 user-settings
-                org-settings]
+                org-settings
+                search-active]
          :as navbar-data} (drv/react s :navbar-data)
-         is-mobile? (responsive/is-mobile-size?)]
+         is-mobile? (responsive/is-mobile-size?)
+         active? (and (not mobile-menu-open)
+                      (not orgs-dropdown-visible)
+                      (not org-settings)
+                      (not user-settings)
+                      (not search-active))]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -51,14 +57,15 @@
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
+          (when active?
+            [:div.mobile-underline])
           [:div.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:class (when (or mobile-navigation-sidebar
-                                mobile-menu-open
-                                (and is-mobile?
-                                     (or user-settings
-                                         org-settings)))
-                        "close-bt")
+              {:class (utils/class-set {:close-bt (or mobile-menu-open
+                                                      (and is-mobile?
+                                                           (or user-settings
+                                                               org-settings)))
+                                        :active active?})
                :on-click #(do
                             (menu/mobile-menu-close)
                             (if (and is-mobile?
@@ -67,9 +74,8 @@
                               (do
                                 (dis/dispatch! [:input [:user-settings] nil])
                                 (dis/dispatch! [:input [:org-settings] nil]))
-                              (if mobile-menu-open
-                                (dis/dispatch! [:input [:mobile-menu-open] (not mobile-menu-open)])
-                                (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))))}]
+                              (when mobile-menu-open
+                                (dis/dispatch! [:input [:mobile-menu-open] (not mobile-menu-open)]))))}]
            (search-box)]
           [:div.navbar-center
             (orgs-dropdown)]

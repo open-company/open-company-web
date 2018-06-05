@@ -214,6 +214,7 @@
                :style board-container-style}
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
+                {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)

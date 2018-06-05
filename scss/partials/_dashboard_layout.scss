@@ -70,22 +70,8 @@ div.dashboard-layout {
               white-space: nowrap;
 
               @include mobile() {
-                width: 88px;
                 margin: 0 auto;
-                text-align: right;
-
-                &:before {
-                  content: "";
-                  position: absolute;
-                  top: 0px;
-                  left: 0px;
-                  @include image-2x("/img/ML/all_posts_icon");
-                  background-size: 18px 18px;
-                  width: 18px;
-                  height: 18px;
-                  background-position: center;
-                  background-repeat: no-repeat;
-                }
+                text-align: center;
               }
             }
           }
@@ -199,6 +185,25 @@ div.dashboard-layout {
 
       div.board-name-container {
         padding: 0px 0px 8px;
+        position: relative;
+
+        &:before {
+          display: none;
+
+          @include mobile() {
+            display: block;
+            content: "";
+            width: 8px;
+            height: 14px;
+            background-image: cdnUrl("/img/ML/section_chevron.svg");
+            background-size: 8px 14px;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            top: 17px;
+            left: 32px;
+          }
+        }
 
         @include mobile() {
           width: 100%;
@@ -211,6 +216,7 @@ div.dashboard-layout {
           box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
           border-top: 1px solid $light_tan;
           padding: 15px;
+          text-align: center;
 
           &.sticky {
             position: absolute;
@@ -222,6 +228,7 @@ div.dashboard-layout {
 
           @include mobile() {
             float: unset;
+            text-align: center;
           }
 
           div.board-name-with-icon {
