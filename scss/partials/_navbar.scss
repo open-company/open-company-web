@@ -90,9 +90,9 @@ nav.oc-navbar {
         font-size: 26px;
 
         @include mobile() {
-          width: 160px;
+          width: 80px;
           height: 32px;
-          margin-left: -80px;
+          margin-left: -40px;
         }
 
         button.orgs-dropdown div.org-avatar {
