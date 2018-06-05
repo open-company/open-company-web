@@ -132,9 +132,10 @@
               [:div.stream-item-body-inner.no-truncate
                 {:ref "full-activity-body"
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]
-          (stream-attachments activity-attachments
-           (when (and truncated? (not expanded?))
-             #(expand s true)))
+          (when (or (not is-mobile?) expanded?)
+            (stream-attachments activity-attachments
+             (when (and truncated? (not expanded?))
+               #(expand s true))))
           (if is-drafts-board
             [:div.stream-item-footer.group
               [:div.stream-body-draft-edit
@@ -153,26 +154,30 @@
                 (if expanded?
                   "Show less"
                   "Show more")]
-              (reactions activity-data)
               (when-not is-mobile?
+                (reactions activity-data))
+              (if is-mobile?
+                (when-not expanded?
+                  [:div.group
+                    [:div.mobile-summary
+                      [:div.mobile-comments-summary
+                        [:div.mobile-comments-summary-icon]
+                        [:span (count comments-data)]]
+                      (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
+                        (when (pos? (:count max-reaction))
+                          [:div.mobile-summary-reaction
+                            [:span.reaction
+                              (:reaction max-reaction)]
+                            [:span.count
+                              (:count max-reaction)]]))]
+                    (when (pos? (count (:attachments activity-data)))
+                      [:div.mobile-summary-attachments
+                        [:span.attachments-icon]
+                        [:span.attachments-count (count (:attachments activity-data))]])])
                 [:div.stream-item-comments-summary
                   {:on-click #(expand s true true)}
-                  (comments-summary activity-data)])])
-          (when (and is-mobile?
-                     (:has-comments activity-data))
-            [:div.stream-item-separator])
-          (when (and is-mobile?
-                     (:has-comments activity-data))
-            [:div.stream-mobile-comments
-              {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (when (pos? (count comments-data))
-                [:div.stream-comments-title
-                  (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
-              (when (:can-comment activity-data)
-                (rum/with-key (add-comment activity-data) (str "add-comment-mobile-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data true)])]
+                  (comments-summary activity-data)])])]
         (when (and expanded?
-                   (not is-mobile?)
                    (:has-comments activity-data))
           [:div.stream-body-right
             [:div.stream-body-comments
