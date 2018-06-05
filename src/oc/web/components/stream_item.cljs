@@ -21,7 +21,6 @@
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn expand [s expand? & [scroll-to-comments?]]
-  (js/console.log "expand" expand?)
   (reset! (::expanded s) expand?)
   (when (and expand?
              scroll-to-comments?)
