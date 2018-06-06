@@ -14,6 +14,10 @@ div.stream-item {
     div.stream-item-header {
       div.tile-menu {
         display: block;
+
+        @include mobile() {
+          display: none;
+        }
       }
     }
   }
@@ -30,12 +34,35 @@ div.stream-item {
     }
   }
 
+  div.activity-share-container {
+    div.activity-share-modal-container {
+      right: -16px;
+      margin-top: 22px;
+    }
+  }
+
   div.stream-item-header {
+    @include mobile() {
+      width: 100%;
+    }
 
     div.tile-menu {
       display: none;
       margin-top: -8px;
       margin-right: -10px;
+
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    div.more-menu {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        float: right;
+      }
     }
 
     div.stream-header-head-author {
@@ -44,9 +71,23 @@ div.stream-item {
       overflow: hidden;
 
       @include activity-author(32);
-    }
 
-    @include section-tag();
+      @include mobile() {
+        width: 80%;
+      }
+
+      div.name {
+        @include mobile() {
+          width: auto;
+        }
+      }
+
+      div.time-since {
+        @include mobile() {
+          width: auto;
+        }
+      }
+    }
   }
 
   div.stream-item-body {
@@ -134,48 +175,90 @@ div.stream-item {
         }
       }
 
-      div.stream-mobile-comments {
-        background-color: #FDFCFB;
-
-        @include mobile() {
-          background-color: transparent;
-        }
-
-        div.stream-comments-title {
-          @include avenir_H();
-          font-size: 14px;
-          color: $carrot_dark_gray;
-          margin-bottom: 16px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-      }
-
-      div.stream-mobile-comments-summary {
-        margin-top: 16px;
-        border-top: 1px solid #ECECEC;
-        padding-top: 16px;
-        position: relative;
-
-        &:after {
-          content: "";
-          position: absolute;
-          width: 9px;
-          height: 15px;
-          top: 20px;
-          right: 0px;
-          background-image: cdnUrl("/img/ML/mobile_comments_chevron.svg");
-          background-size: 9px 15px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-      }
-
       div.stream-item-footer {
         height: 32px;
         margin-top: 32px;
+
+        div.mobile-summary {
+          float: left;
+          margin-top: 10px;
+
+          div.mobile-comments-summary {
+            height: 16px;
+            float: left;
+
+            div.mobile-comments-summary-icon {
+              background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
+              background-size: 14px 14px;
+              background-position: center;
+              background-repeat: no-repeat;
+              width: 14px;
+              height: 14px;
+              float: left;
+              display: block;
+            }
+
+            span {
+              margin-left: 6px;
+              font-size: 12px;
+              color: $ui_grey;
+              margin-left: 6px;
+              line-height: 14px;
+              float: left;
+              display: block;
+            }
+          }
+
+          div.mobile-summary-reaction {
+            margin-left: 6px;
+            height: 16px;
+            margin-left: 6px;
+            float: left;
+
+            span.reaction {
+              font-size: 12px;
+              float: left;
+              display: block;
+              margin-left: 6px;
+            }
+
+            span.count {
+              @include avenir_H();
+              font-size: 11px;
+              color: $ui_grey;
+              float: left;
+              display: block;
+              margin-left: 4px;
+            }
+          }
+        }
+
+        div.mobile-summary-attachments {
+          float: right;
+          text-align: right;
+          height: 16px;
+          margin-top: 10px;
+          
+          span.attachments-icon {
+            float: left;
+            display: block;
+            width: 14px;
+            height: 15px;
+            background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
+            background-repeat: no-repeat;
+            background-size: 14px 15px;
+            background-position: center;
+          }
+
+          span.attachments-count {
+            float: left;
+            display: block;
+            @include avenir_H();
+            font-size: 12px;
+            color: $ui_grey;
+            margin-left: 6px;
+          }
+        }
 
         div.stream-body-draft-edit {
           float: left;
@@ -216,6 +299,11 @@ div.stream-item {
               bottom: -26px;
               right: 44px;
               left: unset;
+
+              @include mobile(){
+                bottom: unset;
+                right: unset;
+              }
             }
           }
         }
@@ -243,6 +331,11 @@ div.stream-item {
           float: left;
 
           @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
+
+          @include mobile() {
+            width: auto;
+            margin-right: 6px;
+          }
 
           &:before {
             position: absolute;

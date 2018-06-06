@@ -214,14 +214,14 @@
                :style board-container-style}
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
+                {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:dangerouslySetInnerHTML (when-not is-all-posts
-                                                  (utils/emojify (:name board-data)))}
-                      (when is-all-posts
-                        (:name org-data))])
+                      {:dangerouslySetInnerHTML (if is-all-posts
+                                                  #js {"__html" "All Posts"}
+                                                  (utils/emojify (:name board-data)))}])
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)

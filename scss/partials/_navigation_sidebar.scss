@@ -2,8 +2,13 @@
   background-color: transparent;
 
   @include mobile() {
-    height: 70px;
-    padding: 24px;
+    height: 56px;
+    padding: 16px 32px;
+    border-top: 1px solid #ECECEC;
+
+    &:last-child {
+      border-bottom: 1px solid #ECECEC;
+    }
 
     &:not(:last-child) {
       position: relative;
@@ -30,6 +35,12 @@
       @include avenir_M();
       color: $deep_navy;
     }
+
+    @include mobile() {
+      @include avenir_H();
+      font-size: 14px;
+      color: $deep_navy;
+    }
   }
 
   div.drafts-label {
@@ -39,10 +50,21 @@
     color: $ui_grey;
     text-decoration: none;
 
+    @include mobile() {
+      @include avenir_H();
+      font-size: 14px;
+      color: $deep_navy;
+    }
+
     span.count {
       @include avenir_M();
       font-size: 16px;
       color: #C5C6C8;
+
+      @include mobile() {
+        @include avenir_H();
+        font-size: 14px;
+      }
     }
 
     &.new {
@@ -60,6 +82,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
+    @include mobile() {
+      font-size: 14px;
+    }
+
     span.count {
       @include avenir_M();
       font-size: 16px;
@@ -69,7 +95,6 @@
 }
 
 @mixin item-selected() {
-  background-color: $feint_emerald;
   border-top-right-radius: 100px;
   border-bottom-right-radius: 100px;
 
@@ -84,8 +109,18 @@
     line-height: 1.71;
     text-decoration: none;
 
+    @include mobile() {
+      @include avenir_H();
+      font-size: 14px;
+    }
+
     span.count {
       color: $carrot_green;
+
+      @include mobile() {
+        @include avenir_H();
+        font-size: 14px;
+      }
     }
   }
 
@@ -106,7 +141,7 @@
 
   .internal {
     color: $deep_navy;
-    @include avenir_M();
+    @include avenir_H();
     font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
@@ -143,7 +178,7 @@ div.left-navigation-sidebar {
 
   @include mobile() {
     position: absolute;
-    margin-top: 65px;
+    margin-top: 56px;
     top: 0px;
     left: 0px;
     width: 100%;
@@ -158,6 +193,50 @@ div.left-navigation-sidebar {
 
     &.show-mobile-boards-menu {
       display: block;
+    }
+  }
+
+  div.mobile-board-name-container {
+    position: relative;
+    display: none;
+
+    @include mobile() {
+      display: block;
+      height: 48px;
+      padding: 15px;
+      background-color: white;
+      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+      border-top: 1px solid $light_tan;
+      @include avenir_H();
+      font-size: 15px;
+      color: $deep_navy;
+
+      &:before {
+        display: block;
+        content: "";
+        width: 8px;
+        height: 14px;
+        background-image: cdnUrl("/img/ML/section_chevron.svg");
+        background-size: 8px 14px;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: absolute;
+        top: 17px;
+        left: 32px;
+        transform: rotate(180deg);
+      }
+      
+      div.board-name {
+        max-width: 350px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+        @include mobile() {
+          margin: 0 auto;
+          text-align: center;
+        }
+      }
     }
   }
 
@@ -240,7 +319,7 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         margin-left: 0px;
-        margin-top: 3px;
+        margin-top: 0px;
         opacity: 1;
       }
 
@@ -269,6 +348,10 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-top{
 
+    @include mobile() {
+      border-top: 1px solid #ECECEC;
+    }
+
     .left-navigation-sidebar-top-title {
       padding: 0px 0 0px 32px;
       margin: 0;
@@ -276,9 +359,9 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         background-color: $oc_gray_8;
-        height: 40px;
+        height: 56px;
         width: 100%;
-        padding: 13px 24px 13px 58px;
+        padding: 16px 32px;
         margin-bottom: 0px;
       }
 
@@ -291,7 +374,8 @@ div.left-navigation-sidebar {
         margin-left: 21px;
 
         @include mobile() {
-          margin-left: 0px;
+          margin-left: 34px;
+          margin-top: 7px;
         }
       }
 

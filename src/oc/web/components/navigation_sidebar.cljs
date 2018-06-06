@@ -57,6 +57,7 @@
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
+                                (drv/drv :board-data)
                                 (drv/drv :change-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :show-invite-people-tooltip)
@@ -89,12 +90,14 @@
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
+        board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
+        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
@@ -113,6 +116,13 @@
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
                                 :showing-invite-people-tooltip show-invite-people-tooltip})}
+      [:div.mobile-board-name-container
+        {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
+        [:div.board-name
+          (cond
+            is-all-posts "All Posts"
+            is-drafts-board "Drafts"
+            :else (:name board-data))]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts
@@ -125,7 +135,7 @@
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
-              (:name org-data)]])
+              "All Posts"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group

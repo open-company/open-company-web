@@ -3,10 +3,12 @@ div.search-box {
 
   @include mobile() {
     display: inline;
-    width: 40px;
+    width: auto;
     min-height: 40px;
+    margin-left: 24px;
 
     &.active {
+      margin-left: 0px;
       position: absolute;
       min-width: 160px;
       width: 100vw;
@@ -15,7 +17,7 @@ div.search-box {
       left: 0px;
       background-color: white;
       z-index: 1081;
-      padding: 24px;
+      padding: 14px 24px;
     }
   }
 

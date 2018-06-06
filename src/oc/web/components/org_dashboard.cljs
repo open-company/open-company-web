@@ -28,6 +28,7 @@
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.slack-bot-modal :refer (slack-bot-modal)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
@@ -73,6 +74,7 @@
                 ap-initial-at
                 user-settings
                 org-settings-data
+                slack-bot-modal-data
                 made-with-carrot-modal-data
                 is-entry-editing
                 is-sharing-activity
@@ -130,6 +132,9 @@
           ;; User settings
           user-settings
           (user-profile)
+          ;; Slack bot modal
+          slack-bot-modal-data
+          (slack-bot-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
