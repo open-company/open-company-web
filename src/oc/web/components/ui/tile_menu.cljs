@@ -36,6 +36,15 @@
               share-link)
       [:div.tile-menu
         (when edit-link
+          [:button.mlb-reset.tile-menu-bt.tile-menu-must-read-bt
+            {:type "button"
+             :ref "tile-menu-must-read-bt"
+             :on-click #(activity-actions/toggle-must-read activity-data)
+             :data-toggle "tooltip"
+             :data-position "top"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :title "Mart as must read"}])
+        (when edit-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-edit-bt
             {:type "button"
              :ref "tile-menu-edit-bt"

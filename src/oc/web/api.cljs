@@ -188,7 +188,7 @@
 
 ;; Allowed keys
 
-(def entry-allowed-keys [:headline :body :attachments :board-slug])
+(def entry-allowed-keys [:headline :body :attachments :board-slug :must-read])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 

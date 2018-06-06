@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -38,6 +39,8 @@
                               (.tooltip "hide")))
                           s)}
   [s activity-data has-headline has-body is-new has-attachments]
+  (timbre/debug activity-data)
+  (timbre/debug (:must-read activity-data))
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -82,7 +85,9 @@
             (when (or is-all-posts is-drafts-board)
               " in ")
             (when (or is-all-posts is-drafts-board)
-              (:board-name activity-data)))]
+              (:board-name activity-data)))
+         (when (:must-read activity-data)
+           [:div.activity-card-header-must-read])]
         [:div.activity-card-headline
           {:ref "activity-headline"
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]

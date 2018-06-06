@@ -458,3 +458,9 @@
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
+(defn toggle-must-read [activity-data]
+  (let [must-read (:must-read activity-data)
+        must-read-toggled (assoc activity-data :must-read (not must-read))]
+    (timbre/debug "toggle must read " must-read)
+    (timbre/debug must-read-toggled)
+    (api/update-entry must-read-toggled :must-read #(timbre/debug %))))
