@@ -42,7 +42,7 @@
              :ref "tile-menu-edit-bt"
              :on-click #(activity-actions/activity-edit activity-data)
              :data-toggle "tooltip"
-             :data-position fixed-tooltip-position
+             :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Edit"}])
         (when delete-link
@@ -51,7 +51,7 @@
              :ref "tile-menu-delete-bt"
              :on-click #(delete-clicked % activity-data)
              :data-toggle "tooltip"
-             :data-position fixed-tooltip-position
+             :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Delete"}])
         (when share-link
@@ -60,6 +60,6 @@
              :ref "tile-menu-share-bt"
              :on-click #(activity-actions/activity-share-show activity-data share-container-id)
              :data-toggle "tooltip"
-             :data-position fixed-tooltip-position
+             :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Share"}])])))

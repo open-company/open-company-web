@@ -265,7 +265,7 @@
                                               (oc-urls/board (:board-slug entry-edit))))
                                            ;; Dismiss editing if needed
                                            dismiss-modal-on-editing-stop
-                                           (close-clicked s)))
+                                          (close-clicked s)))
                                        (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
                                        (reset! (::entry-saving s) false)))))
                                s)
@@ -319,30 +319,32 @@
                         (dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))
                         (close-clicked s))}]
         [:div.header-title-container.group.fs-hide
-          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          {:dangerouslySetInnerHTML (utils/emojify (if editing (:headline activity-editing) (:headline activity-data)))}]
         [:div.fullscreen-post-header-right
+          [:div.activity-share-container]
           (if editing
             [:button.mlb-reset.post-publish-bt
               {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
-              "POST"]
+              "SAVE"]
             (tile-menu activity-data dom-element-id "bottom"))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
-        [:div.activity-share-container]
         (if editing
-          [:div.fullscreen-post-author-header.group
+          [:div.fullscreen-post-author-header.section-editing.group
             [:div.fullscreen-post-author-header-author
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
               (user-avatar-image (:publisher activity-data))
-              [:div.fullscreen-post-box-content-board.section-editing.group
+              [:div.fullscreen-post-box-content-board.group
                 [:span.posting-in-span
                   "Posting in "]
-                [:div.boards-dropdown-caret
-                  [:div.board-name
-                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                    (:board-name activity-editing)]
-                  (when show-sections-picker
+                [:div.board-name
+                  (:board-name activity-editing)]
+                (when show-sections-picker
+                  [:div
+                    {:ref :picker-container}
                     (sections-picker (:board-slug activity-editing)
                      (fn [section-data note]
                        ;; Dismiss the picker
@@ -353,7 +355,8 @@
                         (dis/dispatch! [:input [:modal-editing-data]
                          (merge activity-editing {:board-slug (:slug section-data)
                                                   :board-name (:name section-data)
-                                                  :invite-note note})])))))]]]]
+                                                  :has-changes true
+                                                  :invite-note note})]))))])]]]
           [:div.fullscreen-post-author-header.group
             [:div.fullscreen-post-author-header-author
               (user-avatar-image (:publisher activity-data))
@@ -432,7 +435,7 @@
                     (when @(::show-legend s)
                       [:div.fullscreen-post-box-footer-legend-image])]]]
                 [:div.fullscreen-post-box-footer.group
-                  (comments-summary activity-data true)
+                  (comments-summary activity-data)
                   (reactions activity-data)])]]
         ;; Right column
         (when (:has-comments activity-data)

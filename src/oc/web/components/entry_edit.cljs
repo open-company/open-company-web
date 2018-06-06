@@ -375,6 +375,7 @@
                       (dis/dispatch! [:input [:entry-editing]
                        (merge entry-editing {:board-slug (:slug board-data)
                                              :board-name (:name board-data)
+                                             :has-changes true
                                              :invite-note note})])))))]]]
           [:div.entry-edit-modal-body
             {:ref "entry-edit-modal-body"}

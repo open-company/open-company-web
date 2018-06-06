@@ -201,10 +201,11 @@ div.entry-edit-modal-container {
 
         div.posting-in {
           @include avenir_M();
-          font-size: 16px;
-          color: $ui_grey;
+          font-size: 14px;
+          color: $deep_navy;
           float: left;
           margin-left: 16px;
+          margin-top: 6px;
 
           span {
             float: left;
@@ -217,7 +218,7 @@ div.entry-edit-modal-container {
           div.boards-dropdown-caret {
             @include avenir_M();
             float: left;
-            color: $ui_grey;
+            color: $deep_navy;
             margin-left: 6px;
             cursor: pointer;
             position: relative;
@@ -262,6 +263,12 @@ div.entry-edit-modal-container {
                   background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
                 }
               }
+            }
+
+            div.sections-picker-container {
+              position: absolute;
+              top: 24px;
+              left: -64px;
             }
 
             div.dropdown-list-container {

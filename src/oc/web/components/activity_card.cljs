@@ -16,8 +16,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.tile-menu :refer (tile-menu)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defcs activity-card < rum/reactive
                         ;; Derivatives

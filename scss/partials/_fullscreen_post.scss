@@ -33,13 +33,21 @@ div.fullscreen-post-container {
     div.fullscreen-post-header {
       background-color: $sea_blue;
 
+      div.header-title-container {
+        color: white;
+      }
+
       button.mobile-modal-close-bt {
         background-image: cdnUrl("/img/ML/white_close.svg");
       }
     }
 
-    div.fullscreen-post-right-column {
-      display: none;
+    div.fullscreen-post {
+      padding: 32px 40px;
+
+      div.fullscreen-post-right-column {
+        display: none;
+      }
     }
   }
 
@@ -144,6 +152,14 @@ div.fullscreen-post-container {
           }
         }
       }
+
+      div.activity-share-container {
+        div.activity-share-modal-container {
+          top: 32px;
+          right: 0px;
+          margin-top: 0px;
+        }
+      }
     }
   }
 
@@ -177,45 +193,34 @@ div.fullscreen-post-container {
 
     div.fullscreen-post-author-header {
 
-      div.fullscreen-post-box-content-board {
-        @include avenir_M();
-        font-size: 14px;
-        color: $ui_grey;
-        margin-bottom: 16px;
+      &.section-editing {
 
-        &.section-editing {
-          color: $carrot_dark_gray;
+        div.fullscreen-post-author-header-author {
+          overflow: visible;
 
-          @include mobile() {
-            float: none;
-            margin-left: 0px;
-            font-size: 15px;
-          }
-
-          span.posting-in-span {
-            float: left;
-          }
-
-          div.boards-dropdown-caret {
+          div.fullscreen-post-box-content-board {
             @include avenir_M();
-            color: $carrot_green;
-            float: left;
-            margin-left: 6px;
-            cursor: pointer;
+            font-size: 14px;
+            color: $deep_navy;
+            margin-top: 6px;
             position: relative;
+            cursor: pointer;
 
             @include mobile() {
-              @include avenir_H();
+              float: none;
+              margin-left: 0px;
               font-size: 15px;
+            }
+
+            span.posting-in-span {
+              float: left;
             }
 
             div.board-name {
               @include avenir_M();
-              color: $carrot_green;
-              margin-bottom: 0px;
-              cursor: pointer;
               position: relative;
               float: left;
+              margin-left: 6px;
 
               &:after {
                 float: right;
@@ -224,22 +229,10 @@ div.fullscreen-post-container {
                 background-size: 8px 8px;
                 background-repeat: no-repeat;
                 background-position: center;
-                background-color: $deep_tan;
-                border-radius: 10px;
                 width: 20px;
                 height: 20px;
-                margin-top: 0px;
-                margin-left: 6px;
-                opacity: 0.8;
-
-                @include mobile() {
-                  width: 8px 5px;
-                  margin-top: -3px;
-                  background-size: 8px 5px;
-                  background-position: 0px 9px;
-                  background-color: transparent;
-                  background-image: cdnUrl("/img/ML/board_chevron_green.svg");
-                }
+                margin-top: -2px;
+                margin-left: 4px;
 
                 &:hover {
                   opacity: 1;
@@ -249,17 +242,15 @@ div.fullscreen-post-container {
 
             div.sections-picker-container {
               position: absolute;
-              top: 32px;
-              left: 50%;
-              margin-left: -180px;
-              z-index: 1000;
+              top: 24px;
+              left: 46px;
+              z-index: #{$navbar_zindex + 102};
 
               @include mobile() {
                 position: fixed;
                 top: 0px;
                 left: 0px;
                 margin-left: 0px;
-                z-index: 1500;
               }
             }
           }

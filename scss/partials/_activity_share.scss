@@ -16,6 +16,7 @@ div.activity-share-modal-container {
   margin-top: 55px;
   border: 1px solid $deep_tan;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  text-align: left;
 
   @include mobile() {
     position: unset;

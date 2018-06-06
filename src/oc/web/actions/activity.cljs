@@ -109,7 +109,7 @@
          (completed-cb))))))
 
 (defn activity-modal-fade-in
-  [activity-data & [editing item-load-cb]]
+  [activity-data & [editing item-load-cb dismiss-on-editing-end]]
   (let [org (router/current-org-slug)
         board (:board-slug activity-data)
         activity-uuid (:uuid activity-data)
@@ -124,7 +124,7 @@
       :from-all-posts (= (router/current-board-slug) "all-posts")}))
   (when editing
     (utils/after 100 #(load-cached-item activity-data :modal-editing-data item-load-cb)))
-  (dis/dispatch! [:activity-modal-fade-in activity-data editing]))
+  (dis/dispatch! [:activity-modal-fade-in activity-data editing dismiss-on-editing-end]))
 
 (defn activity-modal-fade-out
   [activity-board-slug]
@@ -162,7 +162,8 @@
   (if (or (responsive/is-tablet-or-mobile?)
           (not= (:status activity-data) "published"))
     (load-cached-item activity-data :entry-editing)
-    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate])))))
+    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate]))
+     (not (router/current-activity-id)))))
 
 (defn entry-edit-dismiss
   []
