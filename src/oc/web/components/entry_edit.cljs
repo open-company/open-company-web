@@ -23,14 +23,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn calc-entry-edit-modal-height
-  [s & [force-calc]]
-  (when @(:first-render-done s)
-    (when-let [entry-edit-modal (rum/ref-node s "entry-edit-modal")]
-      (when (or force-calc
-                (not= @(::entry-edit-modal-height s) (.-clientHeight entry-edit-modal)))
-        (reset! (::entry-edit-modal-height s) (.-clientHeight entry-edit-modal))))))
-
 (defn real-close [s]
   (reset! (::dismiss s) true)
   (utils/after 180 activity-actions/entry-edit-dismiss))
@@ -96,8 +88,7 @@
 
 (defn body-on-change [state]
   (toggle-save-on-exit state true)
-  (dis/dispatch! [:input [:entry-editing :has-changes] true])
-  (calc-entry-edit-modal-height state))
+  (dis/dispatch! [:input [:entry-editing :has-changes] true]))
 
 (defn- headline-on-change [state]
   (toggle-save-on-exit state true)
@@ -172,7 +163,6 @@
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
-                        (mixins/render-on-resize (fn [s _] (calc-entry-edit-modal-height s true)))
 
                         {:will-mount (fn [s]
                           (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -203,7 +193,6 @@
                             (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
                           s)
                          :before-render (fn [s]
-                          (calc-entry-edit-modal-height s)
                           ;; Set or remove the onBeforeUnload prompt
                           (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
                             (set! (.-onbeforeunload js/window)
@@ -354,76 +343,77 @@
                   (when working?
                     (small-loading))
                   (str "Save " (when-not is-mobile? "to ") "draft")]))])]
-      [:div.modal-wrapper
-        [:div.entry-edit-modal.group
-          {:ref "entry-edit-modal"}
-          [:div.entry-edit-modal-headline
-            (user-avatar-image current-user-data)
-            [:div.posting-in
-              [:span.posting-in-span
-                posting-title]
-              [:div.boards-dropdown-caret
-                [:div.board-name
-                  {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                  (:board-name entry-editing)]
-                (when show-sections-picker
-                  (sections-picker (:board-slug entry-editing)
-                   (fn [board-data note]
-                     (dis/dispatch! [:input [:show-sections-picker] false])
-                     (when (and board-data
-                                (seq (:name board-data)))
-                      (dis/dispatch! [:input [:entry-editing]
-                       (merge entry-editing {:board-slug (:slug board-data)
-                                             :board-name (:name board-data)
-                                             :has-changes true
-                                             :invite-note note})])))))]]]
-          [:div.entry-edit-modal-body
-            {:ref "entry-edit-modal-body"}
-            ; Headline element
-            [:div.entry-edit-headline.emoji-autocomplete.emojiable.group.fs-hide
-              {:content-editable true
-               :ref "headline"
-               :placeholder utils/default-headline
-               :on-paste    #(headline-on-paste s %)
-               :on-key-down #(headline-on-change s)
-               :on-click    #(headline-on-change s)
-               :on-key-press (fn [e]
-                             (when (= (.-key e) "Enter")
-                               (utils/event-stop e)
-                               (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
-               :dangerouslySetInnerHTML @(::initial-headline s)}]
-            (rich-body-editor {:on-change (partial body-on-change s)
-                               :use-inline-media-picker false
-                               :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
-                               :initial-body @(::initial-body s)
-                               :show-placeholder (not (contains? entry-editing :links))
-                               :show-h2 true
-                               :dispatch-input-key :entry-editing
-                               :upload-progress-cb (fn [is-uploading?]
-                                                     (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video"]
-                               :classes "emoji-autocomplete emojiable fs-hide"})
-            ; Attachments
-            (stream-attachments (:attachments entry-editing) nil
-             #(activity-actions/remove-attachment :entry-editing %))]
-          [:div.entry-edit-modal-footer
-            [:div.entry-edit-footer-multi-picker
-              {:id "entry-edit-footer-multi-picker"}]
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                           :width 20
-                           :height 20
-                           :position "bottom"
-                           :default-field-selector "div.entry-edit-modal div.rich-body-editor"
-                           :container-selector "div.entry-edit-modal"})
-            [:div.entry-edit-legend-container
-              {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))
-               :ref "legend-container"}
-              [:button.mlb-reset.entry-edit-legend-trigger
-                {:aria-label "Keyboard shortcuts"
-                 :title "Shortcuts"
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
-              (when @(::show-legend s)
-                [:div.entry-edit-legend-image])]]]]]))
+      [:div.entry-edit-modal.group
+        {:ref "entry-edit-modal"}
+        [:div.entry-edit-modal-headline.group
+          (user-avatar-image current-user-data)
+          [:div.posting-in
+            {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+                          (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
+            [:span.posting-in-span
+              posting-title]
+            [:div.board-name
+              (:board-name entry-editing)]
+            (when show-sections-picker
+              [:div
+                {:ref :picker-container}
+                (sections-picker (:board-slug entry-editing)
+                 (fn [board-data note]
+                   (dis/dispatch! [:input [:show-sections-picker] false])
+                   (when (and board-data
+                              (seq (:name board-data)))
+                    (dis/dispatch! [:input [:entry-editing]
+                     (merge entry-editing {:board-slug (:slug board-data)
+                                           :board-name (:name board-data)
+                                           :has-changes true
+                                           :invite-note note})]))))])]]
+        [:div.entry-edit-modal-body
+          {:ref "entry-edit-modal-body"}
+          ; Headline element
+          [:div.entry-edit-headline.emoji-autocomplete.emojiable.group.fs-hide
+            {:content-editable true
+             :ref "headline"
+             :placeholder utils/default-headline
+             :on-paste    #(headline-on-paste s %)
+             :on-key-down #(headline-on-change s)
+             :on-click    #(headline-on-change s)
+             :on-key-press (fn [e]
+                           (when (= (.-key e) "Enter")
+                             (utils/event-stop e)
+                             (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
+             :dangerouslySetInnerHTML @(::initial-headline s)}]
+          (rich-body-editor {:on-change (partial body-on-change s)
+                             :use-inline-media-picker false
+                             :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
+                             :initial-body @(::initial-body s)
+                             :show-placeholder (not (contains? entry-editing :links))
+                             :show-h2 true
+                             :dispatch-input-key :entry-editing
+                             :upload-progress-cb (fn [is-uploading?]
+                                                   (reset! (::uploading-media s) is-uploading?))
+                             :media-config ["photo" "video"]
+                             :classes "emoji-autocomplete emojiable fs-hide"})
+          ; Attachments
+          (stream-attachments (:attachments entry-editing) nil
+           #(activity-actions/remove-attachment :entry-editing %))]
+        [:div.entry-edit-modal-footer
+          [:div.entry-edit-footer-multi-picker
+            {:id "entry-edit-footer-multi-picker"}]
+          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                         :width 20
+                         :height 20
+                         :position "bottom"
+                         :default-field-selector "div.entry-edit-modal div.rich-body-editor"
+                         :container-selector "div.entry-edit-modal"})
+          [:div.entry-edit-legend-container
+            {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))
+             :ref "legend-container"}
+            [:button.mlb-reset.entry-edit-legend-trigger
+              {:aria-label "Keyboard shortcuts"
+               :title "Shortcuts"
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
+            (when @(::show-legend s)
+              [:div.entry-edit-legend-image])]]]]))

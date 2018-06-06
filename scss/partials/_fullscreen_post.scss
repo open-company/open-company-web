@@ -44,6 +44,8 @@ div.fullscreen-post-container {
 
     div.fullscreen-post {
       padding: 32px 40px;
+      border: none;
+      box-shadow: 0px 2px 4px 0px rgba(#E4E3DE, 0.5);
 
       div.fullscreen-post-right-column {
         display: none;
@@ -180,6 +182,7 @@ div.fullscreen-post-container {
     border-radius: 6px;
     background-color: white;
     padding: 32px 40px 0px;
+    box-shadow: none;
 
     @include tablet() {
       margin: 0px auto 32px;
@@ -289,7 +292,6 @@ div.fullscreen-post-container {
         padding: 16px 0px 0px;
 
         @include tablet() {
-          box-shadow: none;
           padding: 32px 24px 0px;
         }
 
@@ -302,6 +304,14 @@ div.fullscreen-post-container {
           line-height: 28px;
           cursor: text;
           outline: none;
+
+          &:empty:before {
+            content: attr(placeholder);
+            display: inline-block;
+            color: $light_ui_grey !important;
+            font-style: none;
+            height: 26px;
+          }
         }
 
         div.rich-body-editor-container {
@@ -319,8 +329,7 @@ div.fullscreen-post-container {
             outline: none;
             margin: 8px 0px 0px;
             cursor: text;
-            min-height: 85px;
-            @include activity-body(18, 22, 22, $deep_navy);
+            @include activity-body(16, 22, 22, $deep_navy);
             color: $deep_navy;
             @include avenir_R();
             font-size: 16px;
@@ -339,7 +348,7 @@ div.fullscreen-post-container {
             }
 
             &.medium-editor-placeholder:after {
-              color: $deep_navy !important;
+              color: $light_ui_grey !important;
             }
 
             &:after {
