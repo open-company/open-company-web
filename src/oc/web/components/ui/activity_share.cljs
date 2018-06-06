@@ -151,6 +151,7 @@
                                         :medium-selector-disabled slack-disabled})
                :data-placement "top"
                :data-container "body"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Enable the Slack bot in Settings"
                :ref "slack-button"
                :on-click (fn [e]
@@ -280,14 +281,7 @@
                        :read-only true
                        :content-editable false
                        :on-click #(highlight-url s)
-                       :ref "activity-share-url-field"
-                       :data-test1 url-protocol
-                       :data-test2 secure-url
-                       :data-test3 post-url
-                       :data-test4 share-url
-                       :data-test5 @(::url-audience s)
-                       :data-test6 (= @(::url-audience s) :team)
-                       :data-placement "top"}]])
+                       :ref "activity-share-url-field"}]])
                 [:button.mlb-reset.copy-btn
                   {:ref "activity-share-url-copy-btn"
                    :on-click (fn [e]

@@ -34,7 +34,7 @@ div.dashboard-layout {
   }
 
   div.dashboard-layout-container {
-    padding: 40px 0px;
+    padding: 24px 0px;
     margin: 0 auto;
     width: auto;
     width: 100%;
@@ -60,28 +60,18 @@ div.dashboard-layout {
         }
 
         div.board-name-container {
-
-          @include mobile() {
           
-            div.board-name {
+          div.board-name {
 
-              div.board-name-with-icon {
-                width: 88px;
+            div.board-name-with-icon {
+              max-width: 350px;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+
+              @include mobile() {
                 margin: 0 auto;
-                text-align: right;
-
-                &:before {
-                  content: "";
-                  position: absolute;
-                  top: 0px;
-                  left: 0px;
-                  @include image-2x("/img/ML/all_posts_icon");
-                  background-size: 18px 18px;
-                  width: 18px;
-                  height: 18px;
-                  background-position: center;
-                  background-repeat: no-repeat;
-                }
+                text-align: center;
               }
             }
           }
@@ -132,6 +122,7 @@ div.dashboard-layout {
           width: 48px;
           height: 48px;
           float: left;
+          margin-top: 12px;
 
           @include tablet() {
             float: unset;
@@ -139,25 +130,28 @@ div.dashboard-layout {
           }
         }
 
-        div.add-post-tooltip {
-          @include avenir_M();
-          font-size: 18px;
-          color: $deep_navy;
-          width: 699px;
-          float: left;
+        div.add-post-tooltips {
+          width: 530px;
           margin-left: 24px;
+          float: left;
 
-          &.second-line {
-            @include tablet() {
-              margin: 0px auto;
+          div.add-post-tooltip {
+            @include avenir_M();
+            font-size: 18px;
+            color: $deep_navy;
+
+            &.second-line {
+              @include tablet() {
+                margin: 0px auto;
+              }
             }
-          }
 
-          @include tablet() {
-            float: unset;
-            margin: 24px auto 0px;
-            width: 100%;
-            text-align: center;
+            @include tablet() {
+              float: unset;
+              margin: 24px auto 0px;
+              width: 100%;
+              text-align: center;
+            }
           }
         }
 
@@ -169,7 +163,7 @@ div.dashboard-layout {
           width: 32px;
           height: 38px;
           float: right;
-          margin-top: -20px;
+          margin-top: 18px;
 
           @include tablet() {
             display: none;
@@ -191,6 +185,25 @@ div.dashboard-layout {
 
       div.board-name-container {
         padding: 0px 0px 8px;
+        position: relative;
+
+        &:before {
+          display: none;
+
+          @include mobile() {
+            display: block;
+            content: "";
+            width: 8px;
+            height: 14px;
+            background-image: cdnUrl("/img/ML/section_chevron.svg");
+            background-size: 8px 14px;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            top: 17px;
+            left: 32px;
+          }
+        }
 
         @include mobile() {
           width: 100%;
@@ -203,6 +216,7 @@ div.dashboard-layout {
           box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
           border-top: 1px solid $light_tan;
           padding: 15px;
+          text-align: center;
 
           &.sticky {
             position: absolute;
@@ -214,11 +228,12 @@ div.dashboard-layout {
 
           @include mobile() {
             float: unset;
+            text-align: center;
           }
 
           div.board-name-with-icon {
-            @include avenir_M();
-            font-size: 32px;
+            @include avenir_H();
+            font-size: 28px;
             color: $carrot_gray;
             float: left;
 
@@ -355,7 +370,7 @@ div.dashboard-layout {
 
         div.board-switcher {
           float: right;
-          width: 64px;
+          width: 32px;
           height: 32px;
           margin-top: 2px;
 
@@ -368,15 +383,11 @@ div.dashboard-layout {
             height: 32px;
             background-size: 16px 16px;
             background-repeat: no-repeat;
-            background-position: 0px 8px;
+            background-position: center 8px;
             float: left;
-            opacity: 0.6;
             padding: 0;
             margin: 0;
-
-            &.active {
-              opacity: 1;
-            }
+            opacity: 0.7;
 
             &.stream-view {
               background-image: cdnUrl("/img/ML/stream_view_button.svg");
@@ -477,12 +488,14 @@ div.dashboard-layout {
       z-index: 1000;
 
       button.add-to-board-floating-button {
-        width: 66px;
-        height: 66px;
+        width: 56px;
+        height: 56px;
         border-radius: 33px;
         background-color: $carrot_orange_2;
         box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
         opacity: 1;
+        padding: 0px;
+        margin: 0px;
 
         &:hover, &.active {
           background-color: #FF7C6C;
@@ -496,11 +509,13 @@ div.dashboard-layout {
 
         div.add-to-board-pencil {
           background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
-          background-size: 24px 24px;
-          width: 24px;
-          height: 24px;
-          margin-left: 6px;
-          margin-top: 2px;
+          background-size: 20px 20px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 56px;
+          height: 56px;
+          // margin-left: 6px;
+          // margin-top: 2px;
         }
       }
 

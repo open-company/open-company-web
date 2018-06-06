@@ -149,6 +149,10 @@ div.notifications {
         justify-content: center;
         align-items: center;
 
+        @include mobile() {
+          padding: 9px 24px;
+        }
+
         span.slack-icon {
           top: 3px;
           position: relative;

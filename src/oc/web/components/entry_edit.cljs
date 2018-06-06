@@ -37,6 +37,11 @@
 
 ;; Local cache for outstanding edits
 
+(defn remove-autosave [s]
+  (when @(::autosave-timer s)
+    (.clearInterval js/window @(::autosave-timer s))
+    (reset! (::autosave-timer s) nil)))
+
 (defn autosave [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
         body-el (sel1 [:div.rich-body-editor])
@@ -60,6 +65,7 @@
 (defn cancel-clicked [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
         clean-fn (fn [dismiss-modal?]
+                    (remove-autosave s)
                     (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing)
                     (when dismiss-modal?
                       (alert-modal/hide-alert))
@@ -253,9 +259,7 @@
                           (when @(::window-click-listener s)
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
-                          (when @(::autosave-timer s)
-                            (.clearInterval js/window @(::autosave-timer s))
-                            (reset! (::autosave-timer s) nil))
+                          (remove-autosave s)
                           (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
@@ -305,6 +309,7 @@
                                 (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
                                       updated-entry-editing @(drv/get-ref s :entry-editing)
                                       section-editing @(drv/get-ref s :section-editing)]
+                                  (remove-autosave s)
                                   (if published?
                                     (do
                                       (reset! (::saving s) true)
@@ -346,6 +351,7 @@
                             "disabled")
                    :on-click (fn [_]
                               (when-not disabled?
+                                (remove-autosave s)
                                 (clean-body)
                                 (reset! (::saving s) true)
                                 (activity-actions/entry-save @(drv/get-ref s :entry-editing))))}
@@ -411,7 +417,7 @@
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})
             ; Attachments
-            (stream-attachments (:attachments entry-editing)
+            (stream-attachments (:attachments entry-editing) nil
              #(activity-actions/remove-attachment :entry-editing %))]
           [:div.entry-edit-modal-footer
             [:div.entry-edit-footer-multi-picker
@@ -430,6 +436,7 @@
                  :title "Shortcuts"
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :data-container "body"}]
+                 :data-container "body"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
               (when @(::show-legend s)
                 [:div.entry-edit-legend-image])]]]]]))

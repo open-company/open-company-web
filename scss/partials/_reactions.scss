@@ -16,11 +16,11 @@ div.reactions {
       cursor: default;
       padding: 4px;
       @include avenir_H();
-      border: 1px solid #ECECEC;
+      border: 1px solid #E2E3E4;
       box-shadow: none;
       font-size: 11px;
       color: $ui_grey;
-      min-width: 38px;
+      min-width: 40px;
       border-radius: 4px;
       margin-left: 4px;
 
@@ -49,20 +49,19 @@ div.reactions {
 
         @include big_web() {
           &.reacted:hover {
-            border: 1px solid $carrot_green;
-            box-shadow: 0px 2px 4px 0px rgba($feint_emerald, 0.07);
+            border: 1px solid #7ED8AA;
+            background-color: $feint_emerald;
           }
 
           &:hover {
             border: 1px solid $light_ui_grey;
-            box-shadow: 0px 2px 4px 0px rgba(black, 0.07);
           }
         }
       }
 
       &.reacted {
-        background-color: $feint_emerald;
-        border: 1px solid $carrot_green;
+        background-color: #EAFBF2;
+        border: 1px solid #7ED8AA;
 
         div.count {
           color: $carrot_green;
@@ -73,18 +72,13 @@ div.reactions {
         box-shadow: none;
 
         div.count {
-          color: $light_ui_grey;
+          color: $ui_grey;
         }
 
         @include big_web() {
           &:hover {
-            box-shadow: 0px 2px 4px 0px rgba(black, 0.07);
             background-color: transparent;
             border: 1px solid $light_ui_grey;
-
-            span.reaction {
-              background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
-            }
 
             div.count {
               color: $ui_grey;
@@ -95,7 +89,7 @@ div.reactions {
         span.reaction {
           width: 16px;
           height: 16px;
-          background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
+          background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
@@ -134,6 +128,9 @@ div.reactions {
         width: 100% !important;
         height: calc(100vh - 29px);
         bottom: unset;
+        box-shadow: none;
+        border-radius: none;
+        border: none;
 
         div.emoji-mart-scroll {
           height: calc(100vh - 29px - 46px - 29px);

@@ -3,8 +3,6 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
-            [cljs-time.format :as f]
-            [cljs-time.core :as time]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dispatcher]
@@ -155,19 +153,6 @@
   (let [update-link (link-for links "partial-update")]
     (nil? update-link)))
 
-(defn readonly-board? [links]
-  (let [new-link (link-for links "create")
-        update-link (link-for links "partial-update")
-        delete-link (link-for links "delete")]
-    (and (nil? new-link)
-         (nil? update-link)
-         (nil? delete-link))))
-
-(defn readonly-entry? [links]
-  (let [partial-update (link-for links "partial-update")
-        delete (link-for links "delete")]
-    (and (nil? partial-update) (nil? delete))))
-
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
@@ -178,77 +163,6 @@
         green (take 2 (drop 2 colors))
         blue (take 2 (drop 4 colors))]
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
-
-(defn post-new?
-  "
-  An entry is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-      -and-
-    user is not the post's author
-      -and-
-    published-at is < 30 days
-      -and-
-    published-at of the entry is newer than seen at
-      -or-
-    no seen at
-  "
-  [entry changes]
-  (let [published-at (:published-at entry)
-        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
-        seen-at (:seen-at changes)
-        user-id (jwt/get-key :user-id)
-        author-id (-> entry :author first :user-id)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
-        new? (and in-team?
-                  (not= author-id user-id)
-                  (> published-at too-old)
-                  (or (> published-at seen-at)
-                      (nil? seen-at)))]
-    new?))
-
-(defn fix-entry
-  "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-data board-data changes]
-  (let [comments-link (link-for (:links entry-data) "comments")
-        add-comment-link (link-for (:links entry-data) "create" "POST")
-        fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
-        fixed-board-name (or (:board-name entry-data) (:name board-data))]
-    (-> entry-data
-      (assoc :content-type "entry")
-      (assoc :new (post-new? (:body entry-data) changes))
-      (assoc :read-only (readonly-entry? (:links entry-data)))
-      (assoc :board-slug fixed-board-slug)
-      (assoc :board-name fixed-board-name)
-      (assoc :has-comments (boolean comments-link))
-      (assoc :can-comment (boolean add-comment-link)))))
-
-(defn fix-board
-  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
-  ([board-data] (fix-board board-data {}))
-
-  ([board-data changes]
-     (let [links (:links board-data)
-           read-only (readonly-board? links)
-           with-read-only (assoc board-data :read-only read-only)
-           fixed-entries (zipmap
-                          (map :uuid (:entries board-data))
-                          (map #(fix-entry % board-data changes) (:entries board-data)))
-           with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
-       with-fixed-entries)))
-
-(defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data {}))
-
-(defn fix-all-posts
-  "Fix org data coming from the API."
-  [all-posts-data]
-  (let [fixed-activities-list (map
-                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
-                               (:items all-posts-data))
-        without-items (dissoc all-posts-data :items)
-        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
-        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
-    with-fixed-activities))
 
 (defn scroll-to-y [scroll-y & [duration]]
   (.play
@@ -612,6 +526,12 @@
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
+        last-p-html (.html (.find $container "p:last-child"))
+        has-empty-ending-paragraph (when (seq last-p-html)
+                                     (.match last-p-html reg-ex))
+        _ (when has-empty-ending-paragraph
+            (.remove (js/$ "p:last-child" $container)))
         cleaned-html (.html $container)
         _ (.detach $container)]
     cleaned-html))
