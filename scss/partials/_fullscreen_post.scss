@@ -99,14 +99,8 @@ div.fullscreen-post-container {
       white-space: nowrap;
       word-wrap: break-word;
 
-      @include tablet() {
-        margin-left: 0px;
-        max-width: initial;
-        position: relative;
-        left: unset;
-        width: 70%;
-        margin: 0px auto;
-        text-align: center;
+      @include mobile() {
+        display: none;
       }
     }
 
@@ -182,6 +176,10 @@ div.fullscreen-post-container {
     }
 
     div.fullscreen-post-author-header {
+
+      @include mobile() {
+        padding: 24px 24px 0px;
+      }
 
       &.section-editing {
 
@@ -333,6 +331,11 @@ div.fullscreen-post-container {
             @include avenir_R();
             font-size: 16px;
             line-height: 22px;
+            min-height: 160px;
+
+            @include mobile() {
+              min-height: initial;
+            }
 
             & > *:first-child {
               margin-top: 0px;
@@ -340,10 +343,6 @@ div.fullscreen-post-container {
 
             p:not(:last-child):not(:first-child) {
               margin: 16px 0px;
-            }
-
-            div.carrot-no-preview, a.carrot-no-preview {
-              display: none;
             }
 
             &.medium-editor-placeholder:after {
@@ -365,14 +364,26 @@ div.fullscreen-post-container {
           @include avenir_R();
           font-size: 16px;
           line-height: 22px;
+          min-height: 160px;
 
-          div.carrot-no-preview, a.carrot-no-preview {
-            display: none;
+          @include mobile() {
+            min-height: initial;
           }
         }
 
         div.fullscreen-post-box-footer {
           margin-top: 32px;
+
+          @include tablet() {
+            margin-top: 16px;
+          }
+
+          &.wrap-reactions {
+            div.reactions {
+              float: left;
+              margin-top: 16px;
+            }
+          }
 
           div.reactions {
             float: right;
@@ -465,7 +476,6 @@ div.fullscreen-post-container {
         left: unset;
         top: unset;
         position: relative;
-        margin-top: 24px;
         padding: 0px 24px;
         height: auto;
         background-color: white;

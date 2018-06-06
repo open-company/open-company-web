@@ -80,7 +80,7 @@ div.entry-edit-modal-container {
       max-width: 80%;
 
       @include mobile() {
-        top: 20px;
+        top: 16px;
       }
 
       div.mobile-buttons-divider-line {
@@ -89,56 +89,63 @@ div.entry-edit-modal-container {
         @include mobile() {
           float: right;
           width: 1px;
-          background-color: $light_tan;
-          height: 64px;
-          margin: -20px 16px 0px 16px;
+          background-color: rgba(white, 0.2);
+          height: 24px;
+          margin: 0px 16px;
           display: block;
         }
       }
 
       button.header-buttons {
         height: 40px;
-        @include avenir_H();
+        @include avenir_M();
         font-size: 14px;
         float: right;
         color: white;
         margin: 0px;
         position: relative;
 
-        &.post-button {
-          border-radius: 100px;
-          color: white;
-          padding: 0px;
-          margin-left: 24px;
-
-          div.small-loading {
-            position: absolute;
-            top: 10px;
-            left: 20px;
-          }
+        div.small-loading {
+          position: absolute;
+          top: 3px;
+          left: 0px;
         }
 
-        @include mobile() {
+        &.post-button {
+          @include avenir_B();
+          color: white;
+          padding: 0px 0px 0px 24px;
+          margin-left: 24px;
+        }
+
+        @include tablet() {
           height: 24px;
           font-size: 15px;
           line-height: 24px;
-          padding: 2px 0px 0px 32px;
+          padding: 2px 0px 0px 0px;
           border-radius: 0px;
 
+          &.loading {
+            padding-left: 32px;
+          }
+
           &.disabled {
-            color: $carrot_light_gray_3;
-            opacity: 1;
+            opacity: 0.6
           }
 
 
           &.post-button {
             margin-left: 0px;
-            padding: 0px;
             color: white;
             background-color: transparent;
+            padding: 2px 0px 0px 0px;
+
+            &.loading {
+              padding-left: 32px;
+            }
 
             &.disabled {
-              color: $carrot_light_gray_3;
+              opacity: 0.6;
             }
           }
         }
@@ -157,29 +164,26 @@ div.entry-edit-modal-container {
 
     @include mobile() {
       width: 100%;
-      margin: 0px;
       border-radius: 0px;
       box-shadow: none;
       position: initial;
       height: initial;
+      padding: 0px;
+      margin: 56px auto 32px;
     }
 
     div.entry-edit-modal-headline {
       width: 100%;
 
       @include mobile() {
-        padding: 24px;
-        height: 68px;
+        padding: 24px 24px 0px;
+        height: 56px;
       }
 
       @include user-profile(32);
 
       & > div.user-avatar-img-container {
         float: left;
-
-        @include mobile() {
-          display: none;
-        }
       }
 
       div.posting-in {
@@ -192,10 +196,6 @@ div.entry-edit-modal-container {
 
         span {
           float: left;
-        }
-
-        @include mobile() {
-          margin-left: 0px;
         }
 
         div.board-name {
@@ -239,7 +239,7 @@ div.entry-edit-modal-container {
       padding: 16px 0px 0px;
 
       @include tablet() {
-        padding: 32px 24px 0px;
+        padding: 24px 24px 0px;
       }
 
       div.entry-edit-headline {
@@ -260,7 +260,6 @@ div.entry-edit-modal-container {
           @include avenir_H();
           font-size: 20px;
           margin: 0px;
-          padding: 0px 24px;
         }
 
         &:empty:before {
@@ -272,20 +271,9 @@ div.entry-edit-modal-container {
         }
       }
 
-      div.stream-attachments {
-        @include mobile(){
-          padding: 0px 24px;
-        }
-      }
-
       div.rich-body-editor-container {
         position: relative;
         overflow: visible;
-
-        @include tablet() {
-          margin: 8px 0px 0px;
-          padding: 0px 24px;
-        }
 
         div.medium-editor-media-picker {
           margin-top: 0px;
@@ -303,6 +291,7 @@ div.entry-edit-modal-container {
           @include avenir_R();
           font-size: 16px;
           line-height: 22px;
+          min-height: 160px;
 
           & > *:first-child {
             margin-top: 0px;
@@ -310,10 +299,6 @@ div.entry-edit-modal-container {
 
           p:not(:last-child):not(:first-child) {
             margin: 16px 0px;
-          }
-
-          div.carrot-no-preview, a.carrot-no-preview {
-            display: none;
           }
 
           &.medium-editor-placeholder:after {

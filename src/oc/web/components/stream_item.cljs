@@ -88,11 +88,20 @@
         dom-element-id (str "stream-item-" (:uuid activity-data))
         publisher (if is-drafts-board
                     (first (:author activity-data))
-                    (:publisher activity-data))]
+                    (:publisher activity-data))
+        dom-node-class (str "stream-item-" (:uuid activity-data))]
     [:div.stream-item
-      {:class (utils/class-set {(str "stream-item-" (:uuid activity-data)) true
+      {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board})
+       :on-click (fn [e]
+                   (let [ev-in? (partial utils/event-inside? e)]
+                     (when (and (not is-drafts-board)
+                                (not (ev-in? (sel1 [dom-node-class :div.more-menu])))
+                                (not (ev-in? (rum/ref-node s :expand-button)))
+                                (not (ev-in? (sel1 [dom-node-class :div.reactions])))
+                                (not (ev-in? (sel1 [dom-node-class :div.stream-body-comments]))))
+                       (activity-actions/activity-modal-fade-in activity-data))))
        :id dom-element-id}
       [:div.activity-share-container]
       [:div.stream-item-header.group
@@ -154,6 +163,7 @@
               {:ref "stream-item-reactions"}
               [:button.mlb-reset.expand-button
                 {:class (when expanded? "expanded")
+                 :ref :expand-button
                  :on-click #(expand s (not expanded?))}
                 (if expanded?
                   "Show less"

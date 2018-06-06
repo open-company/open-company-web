@@ -304,7 +304,12 @@
         activity-editing (:modal-editing-data modal-data)
         activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
         show-sections-picker (and editing (:show-sections-picker modal-data))
-        dom-element-id (str "fullscreen-post-" (:uuid activity-data))]
+        dom-element-id (str "fullscreen-post-" (:uuid activity-data))
+        activity-comments (-> modal-data
+                              :comments-data
+                              (get (:uuid activity-data))
+                              :sorted-comments)
+        comments-data (or activity-comments (:comments activity-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -440,18 +445,16 @@
                     (when @(::show-legend s)
                       [:div.fullscreen-post-box-footer-legend-image])]]]
                 [:div.fullscreen-post-box-footer.group
+                  {:class (when (and (pos? (count comments-data))
+                                     (> (count (:reactions activity-data)) 2))
+                            "wrap-reactions")}
                   (comments-summary activity-data)
                   (reactions activity-data)])]]
         ;; Right column
         (when (:has-comments activity-data)
-          (let [activity-comments (-> modal-data
-                                      :comments-data
-                                      (get (:uuid activity-data))
-                                      :sorted-comments)
-                comments-data (or activity-comments (:comments activity-data))]
-            [:div.fullscreen-post-right-column.group
-              {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
-                                        :no-comments (zero? (count comments-data))})}
-              (when (:can-comment activity-data)
-                (add-comment activity-data))
-              (stream-comments activity-data comments-data)]))]]))
+          [:div.fullscreen-post-right-column.group
+            {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
+                                      :no-comments (zero? (count comments-data))})}
+            (when (:can-comment activity-data)
+              (add-comment activity-data))
+            (stream-comments activity-data comments-data)])]]))

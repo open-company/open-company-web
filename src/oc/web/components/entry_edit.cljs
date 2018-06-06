@@ -318,8 +318,8 @@
                                                  :title "A title is required in order to save or share this post."})))
                                     (utils/after 10 #(.tooltip $post-btn "show"))
                                     (utils/after 5000 #(.tooltip $post-btn "hide"))))))
-                 :class (when disabled?
-                          "disabled")}
+                 :class (utils/class-set {:disabled disabled?
+                                          :loading working?})}
                 (when working?
                   (small-loading))
                 (if published?
@@ -332,8 +332,8 @@
                                   (not (:has-changes entry-editing)))
                     working? @(::saving s)]
                 [:button.mlb-reset.header-buttons.save-button
-                  {:class (when disabled?
-                            "disabled")
+                  {:class (utils/class-set {:disabled disabled?
+                                            :loading working?})
                    :on-click (fn [_]
                               (when-not disabled?
                                 (remove-autosave s)
@@ -342,7 +342,7 @@
                                 (activity-actions/entry-save @(drv/get-ref s :entry-editing))))}
                   (when working?
                     (small-loading))
-                  (str "Save " (when-not is-mobile? "to ") "draft")]))])]
+                  "Save to draft"]))])]
       [:div.entry-edit-modal.group
         {:ref "entry-edit-modal"}
         [:div.entry-edit-modal-headline.group
@@ -396,7 +396,7 @@
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
            #(activity-actions/remove-attachment :entry-editing %))]
-        [:div.entry-edit-modal-footer
+        [:div.entry-edit-modal-footer.group
           [:div.entry-edit-footer-multi-picker
             {:id "entry-edit-footer-multi-picker"}]
           (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
