@@ -44,7 +44,7 @@ div.fullscreen-post-container {
 
     div.fullscreen-post {
       padding: 32px 40px;
-      border: none;
+      border: 1px solid transparent;
       box-shadow: 0px 2px 4px 0px rgba(#E4E3DE, 0.5);
 
       div.fullscreen-post-right-column {
@@ -65,6 +65,7 @@ div.fullscreen-post-container {
     padding: 12px 24px;
     z-index: #{$navbar_zindex + 101};
     text-align: center;
+    transition: background-color 180ms ease-in;
 
     @include tablet() {
       width: 100%;
@@ -78,35 +79,21 @@ div.fullscreen-post-container {
       background-size: 14px 14px;
       background-position: center;
       padding: 0;
-      transition: background-image 180ms easi-in;
+      transition: background-image 180ms ease-in;
       position: absolute;
       top: 16px;
       left: 24px;
     }
 
     div.header-title-container {
-      margin: 0px auto;
-      width: auto;
-      margin-top: 8px;
-      max-width: 50%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-
-        @include avenir_H();
-        font-size: 16px;
-        color: $deep_navy;
-    }
-
-    div.header-title-container {
       margin: 6px auto 0px;
       width: auto;
       opacity: 1;
-      transition: opacity 180ms ease-in;
+      transition: color 180ms ease-in;
       @include avenir_H();
       font-size: 16px;
       color: $deep_navy;
-      max-width: 50vw;
+      max-width: 50%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -268,6 +255,18 @@ div.fullscreen-post-container {
         float: left;
 
         @include activity-author(32);
+
+        div.name {
+          line-height: 18px;
+          color: $deep_navy;
+        }
+
+        div.time-since {
+          @include avenir_M();
+          font-size: 12px;
+          line-height: 14px;
+          color: $ui_grey;
+        }
       }
 
       div.fullscreen-post-author-header-right {
@@ -395,6 +394,8 @@ div.fullscreen-post-container {
           div.fullscreen-post-box-footer-editing {
             div.fullscreen-post-box-footer-multi-picker {
               float: left;
+              width: 20px;
+              height: 20px;
             }
 
             div.emoji-picker {
