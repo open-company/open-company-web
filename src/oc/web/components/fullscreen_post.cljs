@@ -18,12 +18,14 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.tile-menu :refer (tile-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 ;; Unsaved edits handling
@@ -316,51 +318,26 @@
           {:on-click #(if editing
                         (dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))
                         (close-clicked s))}]
-        [:div.header-title-editing-post
-          [:div.header-title-container-edit-pen]
-          [:div.header-title-container-edit-title
-            "Edit post"]]
         [:div.header-title-container.group.fs-hide
-          {:style {:opacity (if (and (not editing) (:first-render-done s)) "1" "0")}
-           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.fullscreen-post-header-right
-          (when editing
+          (if editing
             [:button.mlb-reset.post-publish-bt
               {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
-              "Post changes"])]]
+              "POST"]
+            (tile-menu activity-data dom-element-id "bottom"))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         [:div.activity-share-container]
-        [:div.fullscreen-post-author-header
-          [:div.fullscreen-post-author-head-author
-            (user-avatar-image (:publisher activity-data))
-            [:div.name.fs-hide (:name (:publisher activity-data))]
-            [:div.time-since
-              (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                [:time
-                  {:date-time t
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-placement "top"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                   :data-title (utils/activity-date-tooltip activity-data)}
-                  (utils/time-since t)])]]
-          [:div.fullscreen-post-author-header-right
-            (more-menu activity-data dom-element-id)
-            [:div.section-tag
-              {:class (when (:new activity-data) "has-new")
-               :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]
-            (when (:new activity-data)
-              [:div.new-tag
-                "New"])]]
-        ;; Left column
-        [:div.fullscreen-post-left-column
-          [:div.fullscreen-post-left-column-content.group
-            (when editing
+        (if editing
+          [:div.fullscreen-post-author-header.group
+            [:div.fullscreen-post-author-header-author
+              (user-avatar-image (:publisher activity-data))
               [:div.fullscreen-post-box-content-board.section-editing.group
                 [:span.posting-in-span
-                  "Posted in "]
+                  "Posting in "]
                 [:div.boards-dropdown-caret
                   [:div.board-name
                     {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
@@ -376,7 +353,30 @@
                         (dis/dispatch! [:input [:modal-editing-data]
                          (merge activity-editing {:board-slug (:slug section-data)
                                                   :board-name (:name section-data)
-                                                  :invite-note note})])))))]])
+                                                  :invite-note note})])))))]]]]
+          [:div.fullscreen-post-author-header.group
+            [:div.fullscreen-post-author-header-author
+              (user-avatar-image (:publisher activity-data))
+              [:div.name.fs-hide
+                (str (:name (:publisher activity-data))
+                 " in "
+                 (:board-name activity-data))]
+              [:div.time-since
+                (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                  [:time
+                    {:date-time t
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                     :data-title (utils/activity-date-tooltip activity-data)}
+                    (utils/time-since t)])]]
+            [:div.fullscreen-post-author-header-right
+              (when (:new activity-data)
+                [:div.new-tag
+                  "New"])]])
+        ;; Left column
+        [:div.fullscreen-post-left-column
+          [:div.fullscreen-post-left-column-content.group
             [:div.fullscreen-post-box-content-headline.fs-hide
               {:content-editable editing
                :ref "edit-headline"
@@ -408,8 +408,8 @@
                  :class (when (empty? (:headline activity-data)) "no-headline")}])
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
-            [:div.fullscreen-post-box-footer.group
-              (if editing
+            (if editing
+              [:div.fullscreen-post-box-footer.group
                 [:div.fullscreen-post-box-footer-editing
                   [:div.fullscreen-post-box-footer-multi-picker
                     {:id "fullscreen-post-box-footer-multi-picker"}]
@@ -430,10 +430,10 @@
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
                     (when @(::show-legend s)
-                      [:div.fullscreen-post-box-footer-legend-image])]]
-                (reactions activity-data))]]]
-        (when (:has-comments activity-data)
-          [:div.fullscreen-post-separator])
+                      [:div.fullscreen-post-box-footer-legend-image])]]]
+                [:div.fullscreen-post-box-footer.group
+                  (comments-summary activity-data true)
+                  (reactions activity-data)])]]
         ;; Right column
         (when (:has-comments activity-data)
           (let [activity-comments (-> modal-data
