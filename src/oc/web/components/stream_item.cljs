@@ -96,7 +96,8 @@
                                 :draft is-drafts-board})
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
-                     (when (and (not is-drafts-board)
+                     (when (and is-mobile?
+                                (not is-drafts-board)
                                 (not (ev-in? (sel1 [dom-node-class :div.more-menu])))
                                 (not (ev-in? (rum/ref-node s :expand-button)))
                                 (not (ev-in? (sel1 [dom-node-class :div.reactions])))
