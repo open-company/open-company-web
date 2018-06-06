@@ -4,7 +4,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]
             [oc.lib.time :as oc-time]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]))
 
 ;; Reducers used to watch for org/section dispatch data
 (defmulti reducer (fn [db [action-type & _]]
@@ -21,7 +22,7 @@
 (defmethod dispatcher/action :section
   [db [_ section-data]]
   (let [org-slug (utils/section-org-slug section-data)
-        fixed-section-data (utils/fix-board section-data (dispatcher/change-data db))
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
         db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
@@ -73,7 +74,7 @@
         org-slug (:slug org-data)]
     (reduce #(if (dispatcher/board-data db org-slug (:slug %2))
                (let [board-key (dispatcher/board-data-key org-slug (:slug %2))
-                     board-data (utils/fix-board
+                     board-data (au/fix-board
                                  (dispatcher/board-data db org-slug (:slug %2))
                                  changes)]
                  (assoc-in %1 board-key board-data))
@@ -115,19 +116,12 @@
       ;; Update change-data state that we saw the section
       (update-change-data next-db section-uuid :seen-at (oc-time/current-timestamp)))))
 
-(defmethod dispatcher/action :whats-new/finish
-  [db [_ whats-new-data]]
-  (if whats-new-data
-    (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
-      (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
-    db))
-
 (defmethod dispatcher/action :section-edit-save/finish
   [db [_ section-data]]
   (let [org-slug (utils/section-org-slug section-data)
         section-slug (:slug section-data)
         board-key (dispatcher/board-data-key org-slug section-slug)
-        fixed-section-data (utils/fix-board section-data (dispatcher/change-data db))]
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))]
     (-> db
         (assoc-in board-key fixed-section-data)
         (dissoc :section-editing))))

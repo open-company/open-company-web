@@ -1,6 +1,10 @@
 (ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
+            [cljs-time.format :as f]
+            [cljs-time.core :as time]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
 (defn get-first-body-thumbnail
@@ -46,10 +50,10 @@
   of the body and truncate the first exceeded element found.
   This is to avoid truncating a DIV with multiple spaced P inside,
   since this is a problem for the dotdotdot library that we are using."
-  [body-el]
+  [body-el height]
   (reset-truncate-body body-el)
   (.dotdotdot (js/$ body-el)
-    #js {:height (* 18 3)
+    #js {:height height
          :wrap "word"
          :watch true
          :ellipsis "..."}))
@@ -102,3 +106,113 @@
 
 (defn get-sorted-activities [all-posts-data]
   (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))
+
+(defn readonly-board? [links]
+  (let [new-link (utils/link-for links "create")
+        update-link (utils/link-for links "partial-update")
+        delete-link (utils/link-for links "delete")]
+    (and (nil? new-link)
+         (nil? update-link)
+         (nil? delete-link))))
+
+(defn readonly-entry? [links]
+  (let [partial-update (utils/link-for links "partial-update")
+        delete (utils/link-for links "delete")]
+    (and (nil? partial-update) (nil? delete))))
+
+(defn post-new?
+  "
+  An entry is new if:
+    user is part of the team (we don't track new for non-team members accessing public boards)
+      -and-
+    user is not the post's author
+      -and-
+    published-at is < 30 days
+      -and-
+    published-at of the entry is newer than seen at
+      -or-
+    no seen at
+  "
+  [entry changes]
+  (let [published-at (:published-at entry)
+        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
+        seen-at (:seen-at changes)
+        user-id (jwt/get-key :user-id)
+        author-id (-> entry :author first :user-id)
+        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        new? (and in-team?
+                  (not= author-id user-id)
+                  (> published-at too-old)
+                  (or (> published-at seen-at)
+                      (nil? seen-at)))]
+    new?))
+
+(defn body-for-stream-view [inner-html]
+  (if (seq inner-html)
+    (let [$container (.html (js/$ "<div/>") inner-html)
+          _ (.append (js/$ (.-body js/document)) $container)
+          has-images (pos? (.-length (.find $container "img")))
+          _ (.remove (js/$ "img" $container))
+          empty-paragraph-rx (js/RegExp "^(<br\\s*/?>)?$" "i")
+          _ (.each (.find $container "p")
+             #(this-as this
+                (let [$this (js/$ this)]
+                  (when (.match (.html $this) empty-paragraph-rx)
+                    (.remove $this)))))
+          cleaned-body (.html $container)
+          _ (.detach $container)]
+      [has-images cleaned-body])
+    [false inner-html]))
+
+(defn fix-entry
+  "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
+  [entry-data board-data changes]
+  (let [comments-link (utils/link-for (:links entry-data) "comments")
+        add-comment-link (utils/link-for (:links entry-data) "create" "POST")
+        fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
+        fixed-board-name (or (:board-name entry-data) (:name board-data))
+        [has-images stream-view-body] (body-for-stream-view (:body entry-data))]
+    (-> entry-data
+      (assoc :content-type "entry")
+      (assoc :new (post-new? (:body entry-data) changes))
+      (assoc :read-only (readonly-entry? (:links entry-data)))
+      (assoc :board-slug fixed-board-slug)
+      (assoc :board-name fixed-board-name)
+      (assoc :has-comments (boolean comments-link))
+      (assoc :can-comment (boolean add-comment-link))
+      (assoc :stream-view-body stream-view-body)
+      (assoc :body-has-images has-images))))
+
+(defn fix-activity [activity collection-data]
+  (fix-entry activity collection-data {}))
+
+(defn fix-board
+  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
+  ([board-data] (fix-board board-data {}))
+
+  ([board-data changes]
+     (let [links (:links board-data)
+           read-only (readonly-board? links)
+           with-read-only (assoc board-data :read-only read-only)
+           fixed-entries (zipmap
+                          (map :uuid (:entries board-data))
+                          (map #(fix-entry % board-data changes) (:entries board-data)))
+           with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
+       with-fixed-entries)))
+
+(defn fix-all-posts
+  "Fix org data coming from the API."
+  [all-posts-data]
+  (let [fixed-activities-list (map
+                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
+                               (:items all-posts-data))
+        without-items (dissoc all-posts-data :items)
+        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
+        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
+    with-fixed-activities))
+
+(defn get-comments [activity-data comments-data]
+  (or (-> comments-data
+          (get (:uuid activity-data))
+          :sorted-comments)
+      (:comments activity-data)))

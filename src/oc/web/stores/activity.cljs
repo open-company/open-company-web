@@ -2,7 +2,8 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]))
 
 
 (defmethod dispatcher/action :activity-modal-fade-in
@@ -72,7 +73,7 @@
   (let [board-data (get db board-key)
         new-entries (assoc (get board-data :fixed-items)
                      entry-uuid
-                     (utils/fix-entry body board-data (dispatcher/change-data db)))
+                     (au/fix-entry body board-data (dispatcher/change-data db)))
         new-board-data (assoc board-data :fixed-items new-entries)]
   (assoc db board-key new-board-data)))
 
@@ -90,7 +91,7 @@
         board-slug (:board-slug activity-data)
         board-data (or (get-in db board-key) utils/default-drafts-board)
         activity-board-data (get-in db (dispatcher/board-data-key org-slug board-slug))
-        fixed-activity-data (utils/fix-entry activity-data activity-board-data (dispatcher/change-data db))
+        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))
         next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
         next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
         with-edited-key (if edit-key
@@ -116,7 +117,7 @@
   (let [org-slug (utils/section-org-slug new-board-data)
         board-slug (:slug new-board-data)
         board-key (dispatcher/board-data-key org-slug board-slug)
-        fixed-board-data (utils/fix-board new-board-data (dispatcher/change-data db))]
+        fixed-board-data (au/fix-board new-board-data (dispatcher/change-data db))]
     (-> db
       (assoc-in board-key fixed-board-data)
       (dissoc :section-editing)
@@ -130,7 +131,7 @@
   (let [board-slug (:board-slug activity-data)
         board-key (dispatcher/board-data-key (utils/post-org-slug activity-data) board-slug)
         board-data (get-in db board-key)
-        fixed-activity-data (utils/fix-entry activity-data board-data (dispatcher/change-data db))
+        fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))
         next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
     (-> db
       (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
@@ -175,7 +176,7 @@
   [db [_ success shared-data]]
   (assoc db :activity-shared-data
     (if success
-      (utils/fix-entry shared-data (:board-slug shared-data) (dispatcher/change-data db))
+      (au/fix-entry shared-data (:board-slug shared-data) (dispatcher/change-data db))
       {:error true})))
 
 (defmethod dispatcher/action :activity-get/finish
@@ -189,7 +190,7 @@
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
                        (dispatcher/activity-key org-slug board-slug activity-uuid))
-        fixed-activity-data (utils/fix-entry
+        fixed-activity-data (au/fix-entry
                              activity-data
                              {:slug (or (:board-slug activity-data) board-slug)
                               :name (:board-name activity-data)}
@@ -224,7 +225,7 @@
   [db [_ org direction all-posts-data]]
   (if all-posts-data
     (let [all-posts-key (dispatcher/all-posts-key org)
-          fixed-all-posts (utils/fix-all-posts (:collection all-posts-data))
+          fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
           old-all-posts (get-in db all-posts-key)
           next-links (vec
                       (remove

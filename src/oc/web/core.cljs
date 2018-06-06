@@ -15,9 +15,9 @@
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
-            [oc.web.stores.error-banner]
             [oc.web.stores.subscription]
             [oc.web.stores.section]
+            [oc.web.stores.notifications]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
             [oc.web.actions.team]
@@ -26,7 +26,7 @@
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
             [oc.web.actions.user :as user-actions]
-            [oc.web.actions.error-banner :as error-banner-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -47,9 +47,9 @@
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
             [oc.web.components.slack-lander :refer (slack-lander)]
-            [oc.web.components.error-banner :refer (error-banner)]
             [oc.web.components.secure-activity :refer (secure-activity)]
-            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
+            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
+            [oc.web.components.ui.notifications :refer (notifications)]))
 
 (enable-console-print!)
 
@@ -58,7 +58,12 @@
   (ru/drv-root {:state dis/app-state
                 :drv-spec (dis/drv-spec dis/app-state router/path)
                 :component component
-                :target target}))
+                :target target})
+  (when-let [notifications-mount-point (sel1 [:div#oc-notifications-container])]
+    (ru/drv-root {:state dis/app-state
+                  :drv-spec (dis/drv-spec dis/app-state router/path)
+                  :component notifications
+                  :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
@@ -110,9 +115,7 @@
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
-  (when (or
-         (= (:new query-params) "true")
-         (= (:new-slack-user query-params) "true"))
+  (when (= (:new query-params) "true")
     (swap! dis/app-state assoc :new-slack-user true))
   (inject-loading))
 
@@ -167,17 +170,19 @@
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
-        org-settings (if (and (contains? query-params :org-settings)
+        org-settings (when (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
-                       (keyword (:org-settings query-params))
-                       (when (contains? query-params :access)
-                         :main))
+                       (keyword (:org-settings query-params)))
+        bot-access (when (and (contains? query-params :access)
+                              (= (:access query-params) "bot"))
+                      :slack-bot-success-notification)
         next-app-state {:nux (when show-nux :1)
                         :loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :user-settings user-settings
                         :nux-loading show-nux
+                        :bot-access bot-access
                         :nux-end nil}]
         (utils/after 1 #(swap! dis/app-state merge next-app-state))
         (utils/after nux-setup-time
@@ -275,20 +280,13 @@
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
-  (let [query-params (dissoc (:query-params params) :jwt)
-        new-user (= (:new (:query-params params)) "true")]
-    (when new-user (user-actions/slack-lander-new-user))
-    (if (= (:access query-params) "bot")
-      (utils/after 100 #(router/nav! (urls/add-to-slack-check-params query-params)))
-      (if new-user
-        (utils/after 100 #(router/nav! urls/sign-up-profile))
-        (user-actions/slack-lander-check-team-redirect))
-      )))
-
-(defn slack-lander-check-bot [params]
-  (pre-routing (:query-params params) true)
-  (let [new-user (= (:new-slack-user (:query-params params)) "true")]
-    (when new-user (user-actions/slack-lander-new-user))
+  (let [new-user (= (:new (:query-params params)) "true")]
+    (when new-user
+      (cook/set-cookie!
+       (router/show-nux-cookie
+        (jwt/get-key :user-id))
+       (:new-user router/nux-cookie-values)
+       (* 60 60 24 7)))
     (if new-user
       (utils/after 100 #(router/nav! urls/sign-up-profile))
       (user-actions/slack-lander-check-team-redirect))))
@@ -388,24 +386,6 @@
       (timbre/info "Routing slack-lander-check-slash-route" (str urls/slack-lander-check "/"))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
-
-    (defroute add-slack-to-carrot-route urls/add-to-slack-check {:as params}
-      (timbre/info "Routing add carrot to slack" urls/add-to-slack-check)
-      (simple-handler #(onboard-wrapper :add-to-slack) "add-to-slack" target params))
-
-    (defroute add-slack-to-carrot-slash-route (str urls/add-to-slack-check "/") {:as params}
-      (timbre/info "Routing add carrot to slack slash" urls/add-to-slack-check)
-      (simple-handler #(onboard-wrapper :add-to-slack) "add-to-slack" target params))
-
-    (defroute slack-lander-check-bot-route urls/slack-lander-bot-check {:as params}
-      (timbre/info "Routing slack-lander-check-bot-route" urls/slack-lander-bot-check)
-      ;; Check if the user already have filled the needed data or if it needs to
-      (slack-lander-check-bot params))
-
-    (defroute slack-lander-check-bot-slash-route (str urls/slack-lander-bot-check "/") {:as params}
-      (timbre/info "Routing slack-lander-check-bot-slash-route" (str urls/slack-lander-bot-check "/"))
-      ;; Check if the user already have filled the needed data or if it needs to
-      (slack-lander-check-bot params))
 
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
@@ -562,10 +542,6 @@
                                  ;; Signup slack
                                  slack-lander-check-route
                                  slack-lander-check-slash-route
-                                 add-slack-to-carrot-route
-                                 add-slack-to-carrot-slash-route
-                                 slack-lander-check-bot-route
-                                 slack-lander-check-bot-slash-route
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route
@@ -629,7 +605,7 @@
    #(user-actions/update-jwt %) ;; success jwt refresh after expire
    #(user-actions/logout) ;; failed to refresh jwt
    ;; network error
-   #(error-banner-actions/show-banner utils/generic-network-error 10000))
+   #(notification-actions/show-notification (assoc utils/network-error :expire 10)))
 
   ;; Persist JWT in App State
   (user-actions/dispatch-jwt)
@@ -643,8 +619,6 @@
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
-  ; mount the error banner
-  (drv-root error-banner (sel1 [:div#oc-error-banner]))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)

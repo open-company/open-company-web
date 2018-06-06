@@ -12,7 +12,7 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
-            [oc.web.actions.error-banner :as error-banner-actions]))
+            [oc.web.actions.notifications :as notification-actions]))
 
 ;; Logout
 
@@ -42,10 +42,6 @@
 (defn jwt-refresh []
   (api/jwt-refresh update-jwt logout))
 
-;; Whats new callback
-(defn get-whats-new-cb [{:keys [body success]}]
-  (dis/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})]))
-
 ;;User walls
 (defn- check-user-walls
   "Check if one of the following is present and redirect to the proper wall if needed:
@@ -65,9 +61,6 @@
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
       (cond
-        (= ["add-to-slack"] (:route @router/path))
-        false
-
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
@@ -89,20 +82,16 @@
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
-        (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
-          (api/get-whats-new whats-new-link get-whats-new-cb))
         (callback orgs collection)
         (dis/dispatch! [:entry-point orgs collection])
         (check-user-walls))
-      (error-banner-actions/show-banner utils/generic-network-error 0)))))
+      (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug]
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (when (= status 404)
-        (error-banner-actions/show-banner (str "You have an older version of the Carrot web app, "
-                                               "please refresh your browser window!")
-         0))))
+        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
   (api/get-entry-point
    (fn [success body]
      (entry-point-get-finished success body
@@ -174,30 +163,6 @@
       (update-jwt body)
       (router/redirect! oc-urls/logout)))))
 
-(defn add-to-slack [params]
-  (let [bot-ids (clojure.string/split (:bot-ids params) #":")
-        team-id (first bot-ids)
-        user-id (second bot-ids)
-        bot-id (last bot-ids)
-        new-user (= (:new params) "true")
-        auth-link (utils/link-for (:links (dis/auth-settings))
-                                  "bot"
-                                  "GET"
-                                  {:auth-source "slack"})
-        auth-url-with-redirect (clojure.string/replace
-                                (:href auth-link)
-                                "open-company-auth"
-                                (str
-                                 "open-company-auth:"
-                                 team-id ":"
-                                 user-id ":"
-                                 oc-urls/slack-lander-bot-check
-                                 (when new-user
-                                   (str "?new-slack-user=true"))
-                                 ":"
-                                 bot-id))]
-    (router/redirect! auth-url-with-redirect)))
-
 (defn show-login [login-type]
   (dis/dispatch! [:login-overlay-show login-type]))
 
@@ -210,18 +175,12 @@
     (when body
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
-        (dis/dispatch! [:user-data (json->cljs data)])))
+        (dis/dispatch! [:user-data (json->cljs data)])
+        (utils/after 100 org-actions/maybe-show-add-bot-notification?)))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
       (team-actions/teams-get)))))
-
-(defn bot-auth [org-data team-data user-data]
-  (let [current (router/get-token)
-        auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
-                        current)]
-    (router/redirect! fixed-auth-url)))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))

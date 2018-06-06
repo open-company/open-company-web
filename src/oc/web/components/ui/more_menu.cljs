@@ -62,6 +62,7 @@
            :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
            :data-placement "left"
            :data-container "body"
+           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
            :title "More"}]
         (when @(::showing-menu s)
           [:ul.more-menu-list

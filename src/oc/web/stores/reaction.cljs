@@ -3,6 +3,7 @@
             [cljs-flux.dispatcher :as flux]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.dispatcher :as dispatcher]))
 
 ;; Store reaction and related data
@@ -229,7 +230,7 @@
 (defmethod reducer :section
   [db [_ board-data]]
   (let [org (utils/section-org-slug board-data)
-        fixed-board-data (utils/fix-board board-data (dispatcher/change-data db))]
+        fixed-board-data (au/fix-board board-data (dispatcher/change-data db))]
     (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
   db)
 

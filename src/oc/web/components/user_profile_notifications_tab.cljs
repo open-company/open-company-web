@@ -10,7 +10,6 @@
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
-            [oc.web.actions.error-banner :as error-banner-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
@@ -65,8 +64,8 @@
           ;; Digest frequency
           [:div.user-profile-field-box
             [:div.user-profile-field-label
-              "Digest delivery via " [:i.mdi.mdi-information-outline
-                {:title "Receive a digest of newly created posts."
+              "Notifications by " [:i.mdi.mdi-information-outline
+                {:title "Receive notifications of newly created posts."
                  :data-toggle "tooltip"
                  :data-placement "top"}]]
             [:div.user-profile-field.digest-medium

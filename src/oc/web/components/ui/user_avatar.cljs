@@ -23,6 +23,7 @@
          :data-toggle (if tooltip? "tooltip" "")
          :data-placement "top"
          :data-container "body"
+         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
          :title (if tooltip? (:name user-data) "")}]]))
 
 (rum/defcs user-avatar < rum/static

@@ -13,6 +13,8 @@
 
 (def auth-settings-key [:auth-settings])
 
+(def notifications-key [:notifications-data])
+
 (def orgs-key :orgs)
 
 (defn org-key [org-slug]
@@ -63,8 +65,6 @@
 (defn team-channels-key [team-id]
   [:teams-data team-id :channels])
 
-(def whats-new-key [:whats-new-data])
-
 (defn current-board-key
   "Find the board key for db based on the current path."
   []
@@ -91,7 +91,7 @@
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
-   :auth-settings       [[:base] (fn [base] (:auth-settings base))]
+   :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
    :user-settings        [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
@@ -102,6 +102,7 @@
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
    :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
+   :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -111,10 +112,10 @@
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
-   :whats-new-data      [[:base] (fn [base] (get-in base whats-new-key))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
+   :slack-bot-modal     [[:base] (fn [base] (:slack-bot-modal base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -186,10 +187,6 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
-   :error-banner        [[:base]
-                          (fn [base]
-                            {:error-banner-message (:error-banner-message base)
-                             :error-banner-time (:error-banner-time base)})]
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
@@ -241,7 +238,8 @@
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
                                                                  :user-settings
-                                                                 :org-settings])]
+                                                                 :org-settings
+                                                                 :search-active])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
@@ -270,10 +268,10 @@
    :search-results        [[:base] (fn [base] (:search-results base))]
    :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open]
+                            :mobile-menu-open :notifications-data]
                             (fn [base org-data board-data all-posts activity-data nux ap-initial-at
                                  show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open]
+                                 mobile-menu-open notifications-data]
                               {:nux nux
                                :nux-loading (:nux-loading base)
                                :nux-end (:nux-end base)
@@ -282,8 +280,8 @@
                                :all-posts-data all-posts
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
-                               :whats-new-modal-data (:whats-new-modal base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
+                               :slack-bot-modal-data (:slack-bot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
@@ -296,7 +294,8 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open})]})
+                               :mobile-menu-open mobile-menu-open
+                               :notifications (count notifications-data)})]})
 
 
 ;; Action Loop =================================================================
@@ -319,6 +318,18 @@
   (flux/dispatch actions payload))
 
 ;; Data
+
+(defn bot-access
+  ""
+  ([] (bot-access @app-state))
+  ([data]
+    (:bot-access data)))
+
+(defn notifications-data
+  ""
+  ([] (notifications-data @app-state))
+  ([data]
+    (get-in data notifications-key)))
 
 (defn teams-data-requested
   ""
@@ -517,9 +528,6 @@
 (defn print-entry-editing-data []
   (js/console.log (get @app-state :entry-editing)))
 
-(defn print-whats-new-data []
-  (js/console.log (get-in @app-state whats-new-key)))
-
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintAllPostsData js/window) print-all-posts-data)
@@ -534,4 +542,3 @@
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
-(set! (.-OCWebPrintWhatsNewData js/window) print-whats-new-data)

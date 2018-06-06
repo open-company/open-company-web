@@ -14,7 +14,6 @@
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.whats-new-modal :as whats-new-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn mobile-menu-toggle []
@@ -53,11 +52,6 @@
   (mobile-menu-toggle)
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
-
-(defn whats-new-click [e]
-  (utils/event-stop e)
-  (mobile-menu-toggle)
-  (whats-new-modal/show-modal))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
@@ -120,16 +114,17 @@
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
             "Digest Settings"]])
-      [:a
-        {:href oc-urls/what-s-new
-         :target "_blank"}
-        [:div.oc-menu-item.whats-new
-          "What’s New"]]
-      [:a
-        {:href oc-urls/help
-         :target "_blank"}
-        [:div.oc-menu-item.support
-          "Support"]]
+      ; TODO: need a better experience for these links.
+      ; [:a
+      ;   {:href oc-urls/what-s-new
+      ;    :target "_blank"}
+      ;   [:div.oc-menu-item.whats-new
+      ;     "What’s New"]]
+      ; [:a
+      ;   {:href oc-urls/help
+      ;    :target "_blank"}
+      ;   [:div.oc-menu-item.support
+      ;     "Support"]]
       ; (when (and (router/current-org-slug)
       ;            (= user-role :admin))
       ;   [:div.oc-menu-item
