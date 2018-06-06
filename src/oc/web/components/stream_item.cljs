@@ -89,7 +89,7 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
-        dom-node-class (str "stream-item-" (:uuid activity-data))]
+        dom-node-class (str "div.stream-item-" (:uuid activity-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
