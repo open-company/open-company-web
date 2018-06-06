@@ -319,7 +319,8 @@
                         (dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))
                         (close-clicked s))}]
         [:div.header-title-container.group.fs-hide
-          {:dangerouslySetInnerHTML (utils/emojify (if editing (:headline activity-editing) (:headline activity-data)))}]
+          {:key (:updated-at activity-data)
+           :dangerouslySetInnerHTML (utils/emojify (:headline (if editing activity-editing activity-data)))}]
         [:div.fullscreen-post-header-right
           [:div.activity-share-container]
           (if editing
@@ -380,20 +381,25 @@
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
-            [:div.fullscreen-post-box-content-headline.fs-hide
-              {:content-editable editing
-               :ref "edit-headline"
-               :class (utils/class-set {:emoji-autocomplete editing
-                                        :emojiable editing})
-               :placeholder utils/default-headline
-               :on-paste    #(headline-on-paste s %)
-               :on-key-down #(headline-on-change s)
-               :on-click    #(headline-on-change s)
-               :on-key-press (fn [e]
-                             (when (= (.-key e) "Enter")
-                               (utils/event-stop e)
-                               (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
-               :dangerouslySetInnerHTML @(::initial-headline s)}]
+            (if editing
+              [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable.fs-hide
+                {:content-editable true
+                 :ref "edit-headline"
+                 :key (str "fullscreen-post-headline-edit-" (:updated-at activity-data))
+                 :placeholder utils/default-headline
+                 :on-paste    #(headline-on-paste s %)
+                 :on-key-down #(headline-on-change s)
+                 :on-click    #(headline-on-change s)
+                 :on-key-press (fn [e]
+                               (when (= (.-key e) "Enter")
+                                 (utils/event-stop e)
+                                 (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
+                 :dangerouslySetInnerHTML @(::initial-headline s)}]
+              [:div.fullscreen-post-box-content-headline.fs-hide
+                {:content-editable false
+                 :ref "edit-headline"
+                 :key (str "fullscreen-post-headline-" (:updated-at activity-data))
+                 :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)
@@ -406,9 +412,8 @@
                                  :use-inline-media-picker false
                                  :multi-picker-container-selector "div#fullscreen-post-box-footer-multi-picker"})
               [:div.fullscreen-post-box-content-body.fs-hide
-                {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                 :content-editable false
-                 :class (when (empty? (:headline activity-data)) "no-headline")}])
+                {:key (str "fullscreen-post-body-" (:updated-at activity-data))
+                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             (if editing
