@@ -311,10 +311,6 @@ div.stream-item {
         @include mobile() {
           position: relative;
           bottom: unset;
-
-          div.reactions {
-            float: left;
-          }
         }
 
         button.expand-button {
