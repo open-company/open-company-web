@@ -216,8 +216,8 @@ $h2_top_margin: 24;
     margin-top: 0px;
   }
 
-  *:not(:first-child) {
-    margin-top: #{$h2_margin}px;
+  & > *:not(:first-child) {
+    margin-top: #{$separator}px;
   }
 
   h2 {
