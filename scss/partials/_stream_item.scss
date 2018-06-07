@@ -62,6 +62,12 @@ div.stream-item {
       @include mobile() {
         display: block;
         float: right;
+
+        ul.more-menu-list {
+          top: -4px;
+          left: unset;
+          right: 16px;
+        }
       }
     }
 

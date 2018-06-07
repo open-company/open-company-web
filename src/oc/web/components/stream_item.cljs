@@ -89,19 +89,21 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
-        dom-node-class (str "div.stream-item-" (:uuid activity-data))]
+        dom-node-class (str "stream-item-" (:uuid activity-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board})
        :on-click (fn [e]
-                   (let [ev-in? (partial utils/event-inside? e)]
+                   (let [ev-in? (partial utils/event-inside? e)
+                         dom-node-selector (str "div." dom-node-class)]
                      (when (and is-mobile?
                                 (not is-drafts-board)
-                                (not (ev-in? (sel1 [dom-node-class :div.more-menu])))
+                                (not (ev-in? (sel1 [dom-node-selector :div.more-menu])))
                                 (not (ev-in? (rum/ref-node s :expand-button)))
-                                (not (ev-in? (sel1 [dom-node-class :div.reactions])))
-                                (not (ev-in? (sel1 [dom-node-class :div.stream-body-comments]))))
+                                (not (ev-in? (sel1 [dom-node-selector :div.reactions])))
+                                (not (ev-in? (sel1 [dom-node-selector :div.stream-body-comments])))
+                                (not (ev-in? (sel1 [dom-node-selector :div.mobile-summary]))))
                        (activity-actions/activity-modal-fade-in activity-data))))
        :id dom-element-id}
       [:div.activity-share-container]
