@@ -300,7 +300,7 @@
                                   (if published?
                                     (do
                                       (reset! (::saving s) true)
-                                      (activity-actions/entry-save updated-entry-editing))
+                                      (activity-actions/entry-save updated-entry-editing section-editing))
                                     (do
                                       (reset! (::publishing s) true)
                                       (activity-actions/entry-publish updated-entry-editing section-editing))))
