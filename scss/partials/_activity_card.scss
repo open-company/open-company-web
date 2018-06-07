@@ -156,9 +156,13 @@ div.activity-card {
       text-overflow: ellipsis;
       white-space: nowrap;
 
-      &.activity-card-header-must-read {
+      div.activity-card-header-must-read {
         background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
-        background-size: 14px 14px;
+        background-size: 16px 14px;
+        width: 16px;
+        height: 14px;
+        display: inline-block;
+        margin-left: 5px;
       }
     }
 

@@ -31,7 +31,11 @@
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
-        fixed-tooltip-position (or tooltip-position "top")]
+        fixed-tooltip-position (or tooltip-position "top")
+        must-read (:must-read activity-data)
+        must-read-title (if must-read
+                          "Unmark as must read"
+                          "Mark as must read")]
     (when (or edit-link
               delete-link
               share-link)
@@ -44,7 +48,7 @@
              :data-toggle "tooltip"
              :data-position "top"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-             :title "Mart as must read"}])
+             :title must-read-title}])
         (when edit-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-edit-bt
             {:type "button"
