@@ -202,34 +202,6 @@ div.stream-comments {
           color: $ui_grey;
           float: left;
 
-          &.can-react {
-            cursor: pointer;
-          }
-
-          &.reacted {
-            color: $carrot_green;
-
-            div.stream-comment-reaction-icon {
-              background-image: cdnUrl("/img/ML/comment_agree_on.svg");
-            }
-          }
-
-          &.reacted.can-react:hover {
-            color: $deep_navy;
-
-            div.stream-comment-reaction-icon {
-              background-image: cdnUrl("/img/ML/comment_agree_on_hover.svg");
-            }
-          }
-
-          &.can-react:hover {
-            color: $carrot_green;
-
-            div.stream-comment-reaction-icon {
-              background-image: cdnUrl("/img/ML/comment_agree_off_hover.svg");
-            }
-          }
-
           div.stream-comment-reaction-icon {
             float: left;
             width: 14px;
@@ -244,6 +216,37 @@ div.stream-comments {
             float: left;
             margin-left: 6px;
             margin-top: 2px;
+            color: $ui_grey;
+            @include avenir_M();
+            font-size: 12px;
+          }
+
+          &.reacted {
+            color: $carrot_green;
+
+            div.stream-comment-reaction-icon {
+              background-image: cdnUrl("/img/ML/comment_agree_on.svg");
+            }
+
+            div.stream-comment-reaction-count {
+              color: $carrot_green;
+            }
+          }
+
+          &.can-react {
+            cursor: pointer;
+
+            &:hover {
+              color: $deep_navy;
+
+              div.stream-comment-reaction-icon {
+                background-image: cdnUrl("/img/ML/comment_agree_hover.svg");
+              }
+
+              div.stream-comment-reaction-count {
+                color: $deep_navy;
+              }
+            }
           }
         }
       }
