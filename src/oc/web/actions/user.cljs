@@ -90,7 +90,7 @@
 (defn entry-point-get [org-slug]
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
-      (when (= status 404)
+      (when-not (= status 404)
         (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
   (api/get-entry-point
    (fn [success body]
