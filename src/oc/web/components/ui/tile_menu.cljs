@@ -42,7 +42,8 @@
       [:div.tile-menu
         (when edit-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-must-read-bt
-            {:type "button"
+            {:class (utils/class-set {:must-read-on must-read})
+             :type "button"
              :ref "tile-menu-must-read-bt"
              :on-click #(activity-actions/toggle-must-read activity-data)
              :data-toggle "tooltip"

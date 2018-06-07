@@ -37,8 +37,6 @@
                               (.tooltip "hide")))
                           s)}
   [s activity-data has-headline has-body is-new has-attachments]
-  (timbre/debug activity-data)
-  (timbre/debug (:must-read activity-data))
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)

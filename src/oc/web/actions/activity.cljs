@@ -475,6 +475,10 @@
 (defn toggle-must-read [activity-data]
   (let [must-read (:must-read activity-data)
         must-read-toggled (assoc activity-data :must-read (not must-read))]
-    (timbre/debug "toggle must read " must-read)
-    (timbre/debug must-read-toggled)
-    (api/update-entry must-read-toggled :must-read #(timbre/debug %))))
+    (api/update-entry must-read-toggled :must-read
+                      (fn [entry-data edit-key {:keys [success body status]}]
+                        (if success
+                          (dis/dispatch! [:entry
+                                          (dis/current-board-key)
+                                          (:uuid activity-data)
+                                          (json->cljs body)]))))))
