@@ -95,10 +95,12 @@
 }
 
 @mixin item-selected() {
+  background-color: $feint_emerald;
   border-top-right-radius: 100px;
   border-bottom-right-radius: 100px;
 
   @include mobile() {
+    background-color: transparent;
     border-radius: 0px;
   }
 
@@ -141,10 +143,14 @@
 
   .internal {
     color: $deep_navy;
-    @include avenir_H();
+    @include avenir_M();
     font-size: 16px;
     line-height: 1.71;
     text-decoration: none;
+
+    @include mobile() {
+      @include avenir_M();
+    }
   }
 
   div.public, div.private, div.all-posts-icon {
@@ -326,6 +332,27 @@ div.left-navigation-sidebar {
       &.selected {
         opacity: 1;
         background-image: cdnUrl("/img/ML/digest_icon_green.svg");
+      }
+    }
+
+    div.drafts-icon {
+      display: none;
+
+      @include mobile() {
+        background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
+        background-size: 18px 18px;
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-left: 0px;
+        margin-top: 0px;
+        opacity: 1;
+        display: block;
+      }
+
+      &.selected {
+        opacity: 1;
+        background-image: cdnUrl("/img/ML/drafts_icon_green.svg");
       }
     }
   }

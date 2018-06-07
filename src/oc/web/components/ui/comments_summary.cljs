@@ -66,4 +66,4 @@
             (comment-summary-string comments-authors)
             (if (pos? comments-count)
               (str comments-count " comment" (when (not= comments-count 1) "s"))
-              (str "Add a comment")))]])))
+              [:span.add-a-comment "Add a comment"]))]])))

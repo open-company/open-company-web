@@ -50,14 +50,6 @@ div.add-comment-box-container {
         border: 2px solid #D8DBDF;
       }
 
-      div.add-comment-user-avatar {
-        float: left;
-        width: 24px;
-        height: 24px;
-
-        @include user-profile(24);
-      }
-
       div.add-comment {
         resize: none;
         border: none;
@@ -71,7 +63,7 @@ div.add-comment-box-container {
         white-space: pre-wrap;
         word-wrap: break-word;
         padding: 4px 0px 0px 0px;
-        margin: 0px 0px 0px 40px;
+        margin: 0px;
         height: auto;
 
         &.medium-editor-placeholder:after {

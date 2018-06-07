@@ -109,7 +109,7 @@
          (completed-cb))))))
 
 (defn activity-modal-fade-in
-  [activity-data & [editing item-load-cb]]
+  [activity-data & [editing item-load-cb dismiss-on-editing-end]]
   (let [org (router/current-org-slug)
         board (:board-slug activity-data)
         activity-uuid (:uuid activity-data)
@@ -124,7 +124,7 @@
       :from-all-posts (= (router/current-board-slug) "all-posts")}))
   (when editing
     (utils/after 100 #(load-cached-item activity-data :modal-editing-data item-load-cb)))
-  (dis/dispatch! [:activity-modal-fade-in activity-data editing]))
+  (dis/dispatch! [:activity-modal-fade-in activity-data editing dismiss-on-editing-end]))
 
 (defn activity-modal-fade-out
   [activity-board-slug]
@@ -162,7 +162,8 @@
   (if (or (responsive/is-tablet-or-mobile?)
           (not= (:status activity-data) "published"))
     (load-cached-item activity-data :entry-editing)
-    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate])))))
+    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate]))
+     (not (router/current-activity-id)))))
 
 (defn entry-edit-dismiss
   []
@@ -228,6 +229,12 @@
       (ws-cc/container-watch [(:uuid fixed-board-data)]))
     (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
 
+(defn board-name-exists-error [edit-key]
+  (dis/dispatch!
+   [:input
+    [edit-key :section-name-error]
+    "Board name already exists or isn't allowed"]))
+
 (defn entry-modal-save [activity-data board-slug section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
            section-editing)
@@ -237,10 +244,7 @@
         (fn [{:keys [success status body]}]
           (if (= status 409)
             ;; Board name exists
-            (dis/dispatch!
-             [:input
-              [:modal-editing-data :section-name-error]
-              "Board name already exists or isn't allowed"])
+            (board-name-exists-error :modal-editing-data)
             (entry-modal-save-with-board-finish activity-data (when success (json->cljs body)))))))
     (api/update-entry activity-data :modal-editing-data create-update-entry-cb))
   (dis/dispatch! [:entry-modal-save]))
@@ -347,9 +351,19 @@
   (remove-cached-item item-uuid)
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
-(defn entry-save [edited-data]
+(defn entry-save [edited-data & [section-editing]]
   (if (:links edited-data)
-    (api/update-entry edited-data :entry-editing create-update-entry-cb)
+    (if (and (= (:board-slug edited-data) utils/default-section-slug)
+             section-editing)
+      (let [fixed-entry-data (dissoc edited-data :board-slug :board-name :invite-note)
+            final-board-data (assoc section-editing :entries [fixed-entry-data])]
+        (api/create-board final-board-data (:invite-note edited-data)
+          (fn [{:keys [success status body] :as response}]
+            (if (= status 409)
+              ;; Board name exists
+              (board-name-exists-error :entry-editing)
+              (create-update-entry-cb edited-data :entry-editing response)))))
+      (api/update-entry edited-data :entry-editing create-update-entry-cb))
     (let [org-slug (router/current-org-slug)
           entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug edited-data))
           entry-create-link (utils/link-for (:links entry-board-data) "create")]

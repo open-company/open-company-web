@@ -27,10 +27,11 @@
     (alert-modal/show-alert alert-data)))
 
 (rum/defcs tile-menu < rum/static
-  [s activity-data share-container-id]
+  [s activity-data share-container-id tooltip-position]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
-        share-link (utils/link-for (:links activity-data) "share")]
+        share-link (utils/link-for (:links activity-data) "share")
+        fixed-tooltip-position (or tooltip-position "top")]
     (when (or edit-link
               delete-link
               share-link)
@@ -50,7 +51,7 @@
              :ref "tile-menu-edit-bt"
              :on-click #(activity-actions/activity-edit activity-data)
              :data-toggle "tooltip"
-             :data-position "top"
+             :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Edit"}])
         (when delete-link
@@ -59,7 +60,7 @@
              :ref "tile-menu-delete-bt"
              :on-click #(delete-clicked % activity-data)
              :data-toggle "tooltip"
-             :data-position "top"
+             :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Delete"}])
         (when share-link
@@ -68,6 +69,6 @@
              :ref "tile-menu-share-bt"
              :on-click #(activity-actions/activity-share-show activity-data share-container-id)
              :data-toggle "tooltip"
-             :data-position "top"
+             :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Share"}])])))

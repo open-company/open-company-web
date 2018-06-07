@@ -17,13 +17,11 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.tile-menu :refer (tile-menu)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defcs activity-card < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
-                        (drv/drv :nux)
                         (drv/drv :comments-data)
                         ;; Mixins
                         (am/truncate-element-mixin "activity-headline" (* 18 2))
@@ -44,7 +42,6 @@
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
-        nux (drv/react s :nux)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))
         dom-element-id (str "activity-card-" (:uuid activity-data))
@@ -60,7 +57,6 @@
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                      (when-not (or is-drafts-board
-                                   nux
                                    (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu])))
                        (activity-actions/activity-modal-fade-in activity-data))))}
       [:div.activity-share-container]
