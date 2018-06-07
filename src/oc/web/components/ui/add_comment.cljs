@@ -27,7 +27,6 @@
                          ;; Mixins
                          first-render-mixin
                          ;; Derivatives
-                         (drv/drv :current-user-data)
                          (drv/drv :add-comment-focus)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
@@ -81,14 +80,11 @@
                              (reset! (::blur-listener s) nil))
                            s)}
   [s activity-data]
-  (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))
-        current-user-data (drv/react s :current-user-data)]
+  (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))]
     [:div.add-comment-box-container
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
         [:div.add-comment-internal
-          [:div.add-comment-user-avatar
-            (user-avatar-image current-user-data)]
           [:div.add-comment.emoji-autocomplete.emojiable.fs-hide
            {:ref "add-comment"
             :content-editable true}]]

@@ -18,12 +18,14 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.tile-menu :refer (tile-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 ;; Unsaved edits handling
@@ -263,7 +265,7 @@
                                               (oc-urls/board (:board-slug entry-edit))))
                                            ;; Dismiss editing if needed
                                            dismiss-modal-on-editing-stop
-                                           (close-clicked s)))
+                                          (close-clicked s)))
                                        (dis/dispatch! [:input [:dismiss-modal-on-editing-stop] false])
                                        (reset! (::entry-saving s) false)))))
                                s)
@@ -302,7 +304,12 @@
         activity-editing (:modal-editing-data modal-data)
         activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
         show-sections-picker (and editing (:show-sections-picker modal-data))
-        dom-element-id (str "fullscreen-post-" (:uuid activity-data))]
+        dom-element-id (str "fullscreen-post-" (:uuid activity-data))
+        activity-comments (-> modal-data
+                              :comments-data
+                              (get (:uuid activity-data))
+                              :sorted-comments)
+        comments-data (or activity-comments (:comments activity-data))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -316,56 +323,34 @@
           {:on-click #(if editing
                         (dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))
                         (close-clicked s))}]
-        [:div.header-title-editing-post
-          [:div.header-title-container-edit-pen]
-          [:div.header-title-container-edit-title
-            "Edit post"]]
         [:div.header-title-container.group.fs-hide
-          {:style {:opacity (if (and (not editing) (:first-render-done s)) "1" "0")}
-           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          {:key (:updated-at activity-data)
+           :dangerouslySetInnerHTML (utils/emojify (:headline (if editing activity-editing activity-data)))}]
         [:div.fullscreen-post-header-right
-          (when editing
+          [:div.activity-share-container]
+          (if editing
             [:button.mlb-reset.post-publish-bt
               {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
-              "Post changes"])]]
+              "SAVE"]
+            (tile-menu activity-data dom-element-id "bottom"))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
-        [:div.activity-share-container]
-        [:div.fullscreen-post-author-header
-          [:div.fullscreen-post-author-head-author
-            (user-avatar-image (:publisher activity-data))
-            [:div.name.fs-hide (:name (:publisher activity-data))]
-            [:div.time-since
-              (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                [:time
-                  {:date-time t
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-placement "top"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                   :data-title (utils/activity-date-tooltip activity-data)}
-                  (utils/time-since t)])]]
-          [:div.fullscreen-post-author-header-right
-            (more-menu activity-data dom-element-id)
-            [:div.section-tag
-              {:class (when (:new activity-data) "has-new")
-               :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]
-            (when (:new activity-data)
-              [:div.new-tag
-                "New"])]]
-        ;; Left column
-        [:div.fullscreen-post-left-column
-          [:div.fullscreen-post-left-column-content.group
-            (when editing
-              [:div.fullscreen-post-box-content-board.section-editing.group
+        (if editing
+          [:div.fullscreen-post-author-header.section-editing.group
+            [:div.fullscreen-post-author-header-author
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
+              (user-avatar-image (:publisher activity-data))
+              [:div.fullscreen-post-box-content-board.group
                 [:span.posting-in-span
-                  "Posted in "]
-                [:div.boards-dropdown-caret
-                  [:div.board-name
-                    {:on-click #(dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)])}
-                    (:board-name activity-editing)]
-                  (when show-sections-picker
+                  "Posting in "]
+                [:div.board-name
+                  (:board-name activity-editing)]
+                (when show-sections-picker
+                  [:div
+                    {:ref :picker-container}
                     (sections-picker (:board-slug activity-editing)
                      (fn [section-data note]
                        ;; Dismiss the picker
@@ -376,21 +361,50 @@
                         (dis/dispatch! [:input [:modal-editing-data]
                          (merge activity-editing {:board-slug (:slug section-data)
                                                   :board-name (:name section-data)
-                                                  :invite-note note})])))))]])
-            [:div.fullscreen-post-box-content-headline.fs-hide
-              {:content-editable editing
-               :ref "edit-headline"
-               :class (utils/class-set {:emoji-autocomplete editing
-                                        :emojiable editing})
-               :placeholder utils/default-headline
-               :on-paste    #(headline-on-paste s %)
-               :on-key-down #(headline-on-change s)
-               :on-click    #(headline-on-change s)
-               :on-key-press (fn [e]
-                             (when (= (.-key e) "Enter")
-                               (utils/event-stop e)
-                               (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
-               :dangerouslySetInnerHTML @(::initial-headline s)}]
+                                                  :has-changes true
+                                                  :invite-note note})]))))])]]]
+          [:div.fullscreen-post-author-header.group
+            [:div.fullscreen-post-author-header-author
+              (user-avatar-image (:publisher activity-data))
+              [:div.name.fs-hide
+                (str (:name (:publisher activity-data))
+                 " in "
+                 (:board-name activity-data))]
+              [:div.time-since
+                (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                  [:time
+                    {:date-time t
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                     :data-title (utils/activity-date-tooltip activity-data)}
+                    (utils/time-since t)])]]
+            [:div.fullscreen-post-author-header-right
+              (when (:new activity-data)
+                [:div.new-tag
+                  "New"])]])
+        ;; Left column
+        [:div.fullscreen-post-left-column
+          [:div.fullscreen-post-left-column-content.group
+            (if editing
+              [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable.fs-hide
+                {:content-editable true
+                 :ref "edit-headline"
+                 :key (str "fullscreen-post-headline-edit-" (:updated-at activity-data))
+                 :placeholder utils/default-headline
+                 :on-paste    #(headline-on-paste s %)
+                 :on-key-down #(headline-on-change s)
+                 :on-click    #(headline-on-change s)
+                 :on-key-press (fn [e]
+                               (when (= (.-key e) "Enter")
+                                 (utils/event-stop e)
+                                 (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
+                 :dangerouslySetInnerHTML @(::initial-headline s)}]
+              [:div.fullscreen-post-box-content-headline.fs-hide
+                {:content-editable false
+                 :ref "edit-headline"
+                 :key (str "fullscreen-post-headline-" (:updated-at activity-data))
+                 :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)
@@ -403,13 +417,12 @@
                                  :use-inline-media-picker false
                                  :multi-picker-container-selector "div#fullscreen-post-box-footer-multi-picker"})
               [:div.fullscreen-post-box-content-body.fs-hide
-                {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
-                 :content-editable false
-                 :class (when (empty? (:headline activity-data)) "no-headline")}])
+                {:key (str "fullscreen-post-body-" (:updated-at activity-data))
+                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
-            [:div.fullscreen-post-box-footer.group
-              (if editing
+            (if editing
+              [:div.fullscreen-post-box-footer.group
                 [:div.fullscreen-post-box-footer-editing
                   [:div.fullscreen-post-box-footer-multi-picker
                     {:id "fullscreen-post-box-footer-multi-picker"}]
@@ -430,20 +443,18 @@
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
                     (when @(::show-legend s)
-                      [:div.fullscreen-post-box-footer-legend-image])]]
-                (reactions activity-data))]]]
-        (when (:has-comments activity-data)
-          [:div.fullscreen-post-separator])
+                      [:div.fullscreen-post-box-footer-legend-image])]]]
+                [:div.fullscreen-post-box-footer.group
+                  {:class (when (and (pos? (count comments-data))
+                                     (> (count (:reactions activity-data)) 2))
+                            "wrap-reactions")}
+                  (comments-summary activity-data)
+                  (reactions activity-data)])]]
         ;; Right column
         (when (:has-comments activity-data)
-          (let [activity-comments (-> modal-data
-                                      :comments-data
-                                      (get (:uuid activity-data))
-                                      :sorted-comments)
-                comments-data (or activity-comments (:comments activity-data))]
-            [:div.fullscreen-post-right-column.group
-              {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
-                                        :no-comments (zero? (count comments-data))})}
-              (when (:can-comment activity-data)
-                (add-comment activity-data))
-              (stream-comments activity-data comments-data)]))]]))
+          [:div.fullscreen-post-right-column.group
+            {:class (utils/class-set {:add-comment-focused (:add-comment-focus modal-data)
+                                      :no-comments (zero? (count comments-data))})}
+            (when (:can-comment activity-data)
+              (add-comment activity-data))
+            (stream-comments activity-data comments-data)])]]))

@@ -187,13 +187,17 @@ $h2_top_margin: 24;
     color: $color;
   }
 
+  & > *:first-child {
+    margin: 0px;
+  }
+
   & > *:not(:last-child) {
     margin: #{$separator}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
-  & > *:last-child {
+  & > *:last-child:not(:first-child) {
     margin: #{$separator}px 0px 0px;
     padding-bottom: 0px;
   }
@@ -208,12 +212,12 @@ $h2_top_margin: 24;
     font-weight: 700;
   }
 
-  h2:first-child {
+  *:first-child {
     margin-top: 0px;
   }
 
-  h2:not(:first-child) {
-    margin-top: #{$h2_margin}px;
+  & > *:not(:first-child) {
+    margin-top: #{$separator}px;
   }
 
   h2 {

@@ -7,12 +7,12 @@
 
 
 (defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ activity-data editing]]
+  [db [_ activity-data editing dismiss-on-editing-end]]
   (if (get-in db [:search-active])
     db
     (-> db
       (assoc :activity-modal-fade-in (:uuid activity-data))
-      (assoc :dismiss-modal-on-editing-stop editing)
+      (assoc :dismiss-modal-on-editing-stop (and editing dismiss-on-editing-end))
       ;; Make sure the seen-at is not reset when navigating to modal view
       (assoc :no-reset-seen-at true))))
 
