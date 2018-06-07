@@ -170,11 +170,7 @@
             {:class (when (= @(::medium s) :email) "selected")
              :on-click #(when-not @(::sharing s)
                          (reset! (::medium s) :email))}
-            "Email"]
-          ]
-        (when is-mobile?
-          [:div.activity-share-subheadline
-            "People outside your Carrot team will not see comments."])
+            "Email"]]
         [:div.activity-share-divider-line]
         (when (= @(::medium s) :email)
           [:div.activity-share-share.fs-hide
@@ -261,10 +257,12 @@
                       {:value :all}
                       "Public read only"]]
                   [:div.chevron]]]
-              (when (not= @(::url-audience s) :team)
-                [:div.url-audience-description
-                  (str "Sharing this URL will allow non-registered users to access post content. "
-                       "Note that activity from non-registered users will be exempt from post analytics.")])
+              [:div.url-audience-description
+                (if (= @(::url-audience s) :team)
+                  (str "Sharing this URL will allow your team members to access the post and comments.")
+                  (str
+                   "Sharing this URL will allow non-team members to view the post. "
+                   "Comments will not be visible."))]
               [:div.medium-row.url-field-row.group
                 [:div.labels
                   "Share post URL"]
