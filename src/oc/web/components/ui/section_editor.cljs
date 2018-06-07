@@ -216,6 +216,9 @@
                             (reset! (::show-access-list s) false)
                             (dis/dispatch! [:input [:section-editing :access] "public"]))}
               public-access]])
+        (when (= (:access section-editing) "public")
+          [:div.sectoin-editor-access-public-description
+            "Public sections are visible to the world, including search engines."])
         (when (= (:access section-editing) "private")
           [:div.section-editor-add-label
             "Add members to this private section"])
