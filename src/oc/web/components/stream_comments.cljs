@@ -144,23 +144,21 @@
                         (and (not is-editing?)
                              (not (:is-emoji comment-data))
                              (or (:can-react comment-data)
-                                 ;(pos? (:count reaction-data))
-                                 )))
+                                 (pos? (:count reaction-data)))))
                 [:div.stream-comment-footer.group
                   (when (and (not is-editing?)
                              (not (:is-emoji comment-data))
                              (or (:can-react comment-data)
-                                 ; (pos? (:count reaction-data))
-                                 ))
+                                 (pos? (:count reaction-data))))
                     [:div.stream-comment-reaction
                       {:class (utils/class-set {:reacted (:reacted reaction-data)
                                                 :can-react (:can-react comment-data)})}
-                        (when (or true ;(pos? (:count reaction-data))
+                        (when (or (pos? (:count reaction-data))
                                   (:can-react comment-data))
                           [:div.stream-comment-reaction-icon
                             {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
                               reaction-data (not (:reacted reaction-data)))}])
-                        (when true ;(pos? (:count reaction-data))
+                        (when (pos? (:count reaction-data))
                           [:div.stream-comment-reaction-count
                             (:count reaction-data)])])
                   (when (and (not is-editing?)
