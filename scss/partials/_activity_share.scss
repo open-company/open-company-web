@@ -23,11 +23,11 @@ div.activity-share-modal-container {
     top: unset;
     left: unset;
     height: auto;
-    text-align: center;
     margin: 0px;
     width: 100%;
     border: none;
     box-shadow: none;
+    padding: 0px;
   }
 
   &.will-appear {
@@ -57,6 +57,14 @@ div.activity-share-modal-container {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-align: center;
+
+      @include mobile() {
+        width: 100%;
+        height: 56px;
+        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        padding: 20px 24px;
+      }
 
       button.mobile-modal-close-bt {
         display: none;
@@ -70,8 +78,8 @@ div.activity-share-modal-container {
           background-size: 14px 14px;
           background-position: 5px 5px;
           position: absolute;
-          top: 0px;
-          left: 0px;
+          top: 16px;
+          left: 24px;
         }
       }
     }
@@ -79,6 +87,10 @@ div.activity-share-modal-container {
     div.activity-share-divider-line {
       height: 1px;
       background-color: rgba($carrot_light_gray, 0.2);
+
+      @include mobile(){
+        margin: 0px 24px;
+      }
     }
 
     div.activity-share-subheadline {
@@ -101,6 +113,10 @@ div.activity-share-modal-container {
       width: 100%;
       height: 33px;
       margin-top: 24px;
+
+      @include mobile() {
+        padding: 0px 24px;
+      }
 
       div.activity-share-medium-selector {
         height: 33px;
@@ -136,6 +152,10 @@ div.activity-share-modal-container {
     }
 
     div.activity-share-share {
+
+      @include mobile() {
+        padding: 0px 24px;
+      }
 
       div.mediums-box {
         
@@ -321,6 +341,10 @@ div.activity-share-modal-container {
     div.activity-share-modal-shared {
       margin-top: 24px;
 
+      @include mobile() {
+        padding: 0px 24px;
+      }
+
       select.url-audience {
         height: 40px;
         width: 100%;
@@ -364,23 +388,19 @@ div.activity-share-modal-container {
         border-left: 1px solid rgba($carrot_light_gray_1, 0.5);
         border-bottom: 1px solid rgba($carrot_light_gray_1, 0.5);
         padding: 7px 4px 7px 8px;
-        width: 222px;
+        width: calc(100% - 72px);
         height: 40px;
         float: left;
         border-top-left-radius: 4px;
         border-bottom-left-radius: 4px;
         margin-top: 8px;
 
-        @include mobile() {
-          width: 62%;
-        }
-
         input {
           border: none;
           outline: none;
           padding: 0;
           margin: 0;
-          width: 204px;
+          width: 100%;
           @include avenir_M();
           color: $deep_navy;
           font-size: 15px;
