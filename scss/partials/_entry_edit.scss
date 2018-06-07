@@ -193,6 +193,7 @@ div.entry-edit-modal-container {
         float: left;
         margin-left: 16px;
         margin-top: 6px;
+        position: relative;
 
         span {
           float: left;
@@ -228,7 +229,8 @@ div.entry-edit-modal-container {
         div.sections-picker-container {
           position: absolute;
           top: 24px;
-          left: -64px;
+          left: 0px;
+          z-index: 1000;
         }
       }
     }
