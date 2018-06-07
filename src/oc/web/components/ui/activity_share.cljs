@@ -255,7 +255,8 @@
                       "Logged in team only"]
                     [:option
                       {:value :all}
-                      "Public read only"]]]]
+                      "Public read only"]]
+                  [:div.chevron]]]
               [:div.url-audience-description
                 (if (= @(::url-audience s) :team)
                   (str "Sharing this URL will allow your team members to access the post and comments.")

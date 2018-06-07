@@ -353,6 +353,25 @@ div.activity-share-modal-container {
         font-size: 15px;
         color: $deep_navy;
         margin-top: 8px;
+        padding: 0px 12px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -o-appearance: none;
+        display: block;
+        position: relative;
+      }
+
+      div.chevron {
+        width: 8px;
+        height: 5px;
+        background-image: cdnUrl("/img/ML/section_access_chevron.svg");
+        background-size: 8px 5px;
+        background-position: center;
+        background-repeat: no-repeat;
+        pointer-events: none;
+        float: right;
+        margin-top: -22px;
+        margin-right: 12px;
       }
 
       div.url-audience-description {
