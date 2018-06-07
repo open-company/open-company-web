@@ -126,7 +126,6 @@
          :data-placement "top"
          :data-container "body"
          :data-toggle "tooltip"
-         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
          :disabled (and (not default-field-selector) (not force-enabled) @(::disabled s))
          :on-mouse-down #(when (or default-field-selector force-enabled (not @(::disabled s)))
                            (save-caret-position s)

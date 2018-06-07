@@ -440,8 +440,7 @@
                        :title "Shortcuts"
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
+                       :data-container "body"}]
                     (when @(::show-legend s)
                       [:div.fullscreen-post-box-footer-legend-image])]]]
                 [:div.fullscreen-post-box-footer.group
