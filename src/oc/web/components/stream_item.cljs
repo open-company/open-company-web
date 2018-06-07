@@ -179,7 +179,10 @@
                     [:div.mobile-summary
                       [:div.mobile-comments-summary
                         [:div.mobile-comments-summary-icon]
-                        [:span (count comments-data)]]
+                        [:span
+                          (if (zero? (count comments-data))
+                            "Add a comment"
+                            (count comments-data))]]
                       (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
                         (when (pos? (:count max-reaction))
                           [:div.mobile-summary-reaction
