@@ -218,7 +218,7 @@
               public-access]])
         (when (= (:access section-editing) "private")
           [:div.section-editor-add-label
-            "Invite member"])
+            "Add members to this private section"])
         (when (= (:access section-editing) "private")
           (let [query  (::query s)
                 available-users (filter :user-id (:users roster))
@@ -230,7 +230,7 @@
                 [:input
                   {:value @query
                    :type "text"
-                   :placeholder "Add a team member to this section"
+                   :placeholder "Select a member..."
                    :on-focus #(reset! (::show-search-results s) true)
                    :on-change #(let [q (.. % -target -value)]
                                 (reset! (::show-search-results s) (seq q))
