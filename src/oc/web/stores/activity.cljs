@@ -75,7 +75,7 @@
                      entry-uuid
                      (au/fix-entry body board-data (dispatcher/change-data db)))
         new-board-data (assoc board-data :fixed-items new-entries)]
-  (assoc db board-key new-board-data)))
+    (assoc db board-key new-board-data)))
 
 (defmethod dispatcher/action :entry-clear-local-cache
   [db [_ edit-key]]
