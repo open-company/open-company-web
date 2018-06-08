@@ -18,7 +18,11 @@ div.stream-attachments {
       color: $deep_navy;
     }
 
-    a.stream-attachments-item {
+    div.stream-attachments-item {
+
+      a {
+        float: left;
+      }
 
       div.attachment-info {
         margin-top: 8px;
@@ -39,8 +43,10 @@ div.stream-attachments {
           font-size: 14px;
           color: $deep_navy;
           white-space: nowrap;
-          display: inline-block;
-          margin-left: 8px;
+          display: block;
+          float: left;
+          margin-left: 6px;
+          margin-top: 2px;
         }
 
         span.attachment-description {
@@ -48,19 +54,23 @@ div.stream-attachments {
           font-size: 12px;
           color: $light_ui_grey;
           white-space: nowrap;
-          display: inline-block;
+          display: block;
+          float: left;
           margin-left: 6px;
+          margin-top: 4px;
         }
 
         button.remove-attachment-bt {
-          width: 20px;
+          width: 28px;
           height: 20px;
-          background-image: cdnUrl("/img/ML/clear_attachments_x.svg");
-          background-size: 6px 6px;
-          background-position: 50% 5px;
+          background-image: cdnUrl("/img/ML/remove_attachment.svg");
+          background-size: 16px 16px;
+          background-position: center;
           background-repeat: no-repeat;
           display: inline-block;
           margin-left: 8px;
+          padding-left: 8px;
+          border-left: 1px solid $light_ui_grey;
         }
       }
     }
