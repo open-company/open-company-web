@@ -222,6 +222,13 @@ div.section-editor {
       }
     }
 
+    div.sectoin-editor-access-public-description {
+      @include avenir_R();
+      font-size: 14px;
+      color: $ui_grey;
+      margin-top: 8px;
+    }
+
     div.section-editor-add-access {
       border-radius: 4px;
       border: 1px solid $carrot_light_gray_1;

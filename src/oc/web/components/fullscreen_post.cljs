@@ -17,7 +17,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.tile-menu :refer (tile-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -440,8 +439,7 @@
                        :title "Shortcuts"
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
+                       :data-container "body"}]
                     (when @(::show-legend s)
                       [:div.fullscreen-post-box-footer-legend-image])]]]
                 [:div.fullscreen-post-box-footer.group

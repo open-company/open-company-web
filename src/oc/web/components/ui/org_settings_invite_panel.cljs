@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -72,6 +73,7 @@
     (rum/local 0 ::sending)
     {:will-mount (fn [s]
                    (setup-initial-rows s)
+                   (activity-actions/remove-invite-people-tooltip)
                    s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
