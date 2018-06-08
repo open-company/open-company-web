@@ -148,14 +148,18 @@
            "See who’s viewed your post to "
            "eliminate communication gaps.")]]]])
 
-(def slack-comparison-section
+(defn slack-comparison-section [& [slack-version?]]
   [:section.slack-comparison
     [:div.slack-comparison-headline
       "PERFECT FOR SLACK TEAMS"]
-    [:div.slack-comparison-headline-1
-      "Slack keeps your team connected in the moment."]
-    [:div.slack-comparison-headline-2
-      "Carrot keeps it aligned over time."]
+    (when-not slack-version?
+      [:div.slack-comparison-headline-1
+        "Slack keeps your team connected in the moment."])
+    (if slack-version? 
+      [:div.slack-comparison-headline-2
+        "Designed to keep Slackers on the same page with fewer distractions."]
+      [:div.slack-comparison-headline-2
+        "Carrot keeps it aligned over time."])
     [:img.slack-comparison-screenshot.big-web-only
       {:src (utils/cdn "/img/ML/slack_comparison_screenshot.png")
        :src-set (str (utils/cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]

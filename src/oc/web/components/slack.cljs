@@ -72,7 +72,7 @@
 
             shared-misc/core-values-list]
 
-          shared-misc/slack-comparison-section
+          (shared-misc/slack-comparison-section true)
 
           shared-misc/team-transparency-section
 

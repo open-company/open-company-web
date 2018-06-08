@@ -55,7 +55,8 @@
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container
             [:button.mlb-reset.get-started-button
-              {:id "get-started-centred-bt"}
+              {:id "get-started-centred-bt"
+               :on-click #(router/nav! oc-urls/sign-up)}
               "Get started for free"]]
           shared-misc/no-credit-card
           ; (carrot-box-thanks "carrot-box-thanks-top")
@@ -158,19 +159,7 @@
                  "See who’s viewed your post to "
                  "eliminate communication gaps.")]]]]
 
-        [:section.slack-comparison
-          [:div.slack-comparison-headline
-            "PERFECT FOR SLACK TEAMS"]
-          [:div.slack-comparison-headline-1
-            "Slack keeps your team connected in the moment."]
-          [:div.slack-comparison-headline-2
-            "Carrot keeps it aligned over time."]
-          [:img.slack-comparison-screenshot.big-web-only
-            {:src (utils/cdn "/img/ML/slack_comparison_screenshot.png")
-             :src-set (str (utils/cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]
-          [:img.slack-comparison-screenshot.mobile-only
-            {:src (utils/cdn "/img/ML/slack_comparison_screenshot_mobile.png")
-             :src-set (str (utils/cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]]
+        (shared-misc/slack-comparison-section)
 
         shared-misc/carrot-testimonials
 
