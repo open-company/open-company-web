@@ -505,7 +505,7 @@ section.home-keep-aligned {
           @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
 
           @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile", ".webp");
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
           }
         }
 
@@ -513,7 +513,7 @@ section.home-keep-aligned {
           @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2");
 
           @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2_mobile", ".webp");
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2_mobile");
           }
         }
 
@@ -521,7 +521,7 @@ section.home-keep-aligned {
           @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3");
 
           @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3_mobile", ".webp");
+            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3_mobile");
           }
         }
       }
@@ -642,7 +642,7 @@ section.team-transparency {
         @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
 
         @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile", ".webp");
+          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
         }
       }
 
@@ -650,7 +650,7 @@ section.team-transparency {
         @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2");
 
         @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2_mobile", ".webp");
+          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2_mobile");
         }
       }
 
@@ -658,7 +658,7 @@ section.team-transparency {
         @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3");
 
         @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3_mobile", ".webp");
+          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3_mobile");
         }
       }
     }

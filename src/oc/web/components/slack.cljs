@@ -67,8 +67,8 @@
 
             [:div.main-animation-container
               [:img.main-animation
-                {:src (utils/cdn "/img/ML/slack_screenshot.webp")
-                 :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.webp") " 2x")}]]
+                {:src (utils/cdn "/img/ML/slack_screenshot.png")
+                 :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
             shared-misc/core-values-list]
 

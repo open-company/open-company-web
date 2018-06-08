@@ -89,8 +89,8 @@
 (def desktop-video
   [:div.main-animation-container
     [:img.main-animation
-      {:src (cdn "/img/ML/homepage_screenshot.webp")
-       :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]])
+      {:src (cdn "/img/ML/homepage_screenshot.png")
+       :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]])
 
 (def core-values-list
   [:div.core-values-list.group
@@ -264,8 +264,8 @@
 
         [:div.main-animation-container
           [:img.main-animation
-            {:src (cdn "/img/ML/homepage_screenshot.webp")
-             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.webp") " 2x")}]]
+            {:src (cdn "/img/ML/homepage_screenshot.png")
+             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
         core-values-list]
 
@@ -588,8 +588,8 @@
 
         [:div.main-animation-container
           [:img.main-animation
-            {:src (cdn "/img/ML/slack_screenshot.webp")
-             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.webp") " 2x")}]]
+            {:src (cdn "/img/ML/slack_screenshot.png")
+             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
         core-values-list]
 
