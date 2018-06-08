@@ -37,6 +37,9 @@
                          (reset! (::click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(when (not (utils/event-inside? % (rum/ref-node s "more-menu-bt")))
+                               (let [will-close (:will-close (nth (:rum/args s) 2))]
+                                 (when (fn? will-close)
+                                   (will-close)))
                                (reset! (::showing-menu s) false))))
                          s)
                         :will-unmount (fn [s]
@@ -44,7 +47,8 @@
                            (events/unlistenByKey @(::click-listener s))
                            (reset! (::click-listener s) nil))
                          s)}
-  [s activity-data share-container-id]
+  [s activity-data share-container-id
+   {:keys [will-open will-close]}]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")]
@@ -57,7 +61,13 @@
            :ref "more-menu-bt"
            :on-click (fn [_]
                        (utils/remove-tooltips)
-                       (reset! (::showing-menu s) (not @(::showing-menu s))))
+                       (let [next-showing-menu (not @(::showing-menu s))]
+                        (if next-showing-menu
+                          (when (fn? will-open)
+                            (will-open))
+                          (when (fn? will-close)
+                            (will-close)))
+                        (reset! (::showing-menu s) next-showing-menu)))
            :class (when @(::showing-menu s) "active")
            :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
            :data-placement "left"

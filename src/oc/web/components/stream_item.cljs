@@ -48,6 +48,7 @@
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
                          (rum/local false ::should-scroll-to-comments)
+                         (rum/local false ::more-menu-open)
                          ;; Mixins
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
@@ -98,6 +99,7 @@
                    (let [ev-in? (partial utils/event-inside? e)
                          dom-node-selector (str "div." dom-node-class)]
                      (when (and is-mobile?
+                                (not @(::more-menu-open s))
                                 (not is-drafts-board)
                                 (not (ev-in? (sel1 [dom-node-selector :div.more-menu])))
                                 (not (ev-in? (rum/ref-node s :expand-button)))
@@ -129,7 +131,9 @@
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))
         (when is-mobile?
-          (more-menu activity-data dom-element-id))
+          (more-menu activity-data dom-element-id
+           {:will-open #(reset! (::more-menu-open s) true)
+            :will-close #(reset! (::more-menu-open s) false)}))
         (when (:new activity-data)
           [:div.new-tag
             "New"])]
