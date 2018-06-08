@@ -22,7 +22,9 @@
   (vec (sort-by :name boards)))
 
 (defn anchor-nav! [e url]
-  (utils/event-stop e)
+  (when (and e
+             (.-preventDefault e))
+    (.preventDefault e))
   (router/nav! url)
   (close-navigation-sidebar))
 
