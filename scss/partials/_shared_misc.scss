@@ -778,8 +778,6 @@ section.slack-comparison {
     @include avenir_H();
     font-size: 38px;
     line-height: 64px;
-    max-width: 810px;
-    margin: 0px auto;
 
     @include mobile(){
       font-size: 24px;

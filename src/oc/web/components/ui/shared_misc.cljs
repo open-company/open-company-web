@@ -157,7 +157,7 @@
         "Slack keeps your team connected in the moment."])
     (if slack-version? 
       [:div.slack-comparison-headline-2
-        "Designed to keep Slackers on the same page with fewer distractions."]
+        "Keep Slackers on the same page with fewer distractions."]
       [:div.slack-comparison-headline-2
         "Carrot keeps it aligned over time."])
     [:img.slack-comparison-screenshot.big-web-only
