@@ -193,15 +193,15 @@ div.dashboard-layout {
           @include mobile() {
             display: block;
             content: "";
-            width: 8px;
-            height: 14px;
+            width: 14px;
+            height: 8px;
             background-image: cdnUrl("/img/ML/section_chevron.svg");
-            background-size: 8px 14px;
+            background-size: 14px 8px;
             background-repeat: no-repeat;
             background-position: center;
             position: absolute;
-            top: 17px;
-            left: 32px;
+            top: 21px;
+            left: 28px;
           }
         }
 
