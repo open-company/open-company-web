@@ -109,6 +109,11 @@
                  ;; 404 only if the user is not looking at a secure post page
                  ;; if so the entry point response can not include the specified org
                  (when-not (router/current-secure-activity-id)
+                   ;; avoid infinite loop of the Go to digest button
+                   ;; by changing the value of the last visited slug
+                   (if (pos? (count orgs))
+                     (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+                     (cook/remove-cookie! (router/last-org-cookie)))
                    (router/redirect-404!)))))
            (when (and (jwt/jwt)
                       (utils/in? (:route @router/path) "login")

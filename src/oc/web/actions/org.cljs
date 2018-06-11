@@ -77,7 +77,13 @@
         ;; Load all posts only if not coming from a digest url
         ;; in that case do not load since we already have the results we need
         (aa/all-posts-get org-data ap-initial-at)
-        (router/redirect-404!))
+        (let [orgs (dis/orgs-data)]
+           ;; avoid infinite loop of the Go to digest button
+           ;; by changing the value of the last visited slug
+          (if (pos? (count orgs))
+            (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+            (cook/remove-cookie! (router/last-org-cookie)))
+          (router/redirect-404!)))
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
