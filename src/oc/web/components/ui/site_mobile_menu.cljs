@@ -85,7 +85,7 @@
                           (user/show-login :login-with-slack)
                           (router/nav! oc-urls/login)))
              :on-touch-start identity}
-            "Log In"])
+            "Login"])
         [:button.mlb-reset.get-started-button
           {:class (when (jwt/jwt) "your-digest")
            :on-touch-start identity

@@ -2,9 +2,6 @@
 
 (defn terms [{contact-mail-to :contact-mail-to contact-email :contact-email}]
   [:div.container.terms-of-service-page
-    [:div.balloon.big-yellow]
-    [:div.balloon.big-red]
-    [:div.balloon.big-purple]
 
     [:div.legal-link "Click here to see OpenCompany " [:a {:href "/privacy"} "Privacy Policy"] "."]
     [:div.readable-content-container
