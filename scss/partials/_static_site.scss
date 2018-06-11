@@ -19,15 +19,6 @@ div.container {
       display: none;
     }
 
-    &.big-yellow {
-      @include image-2x("/img/ML/balloon_big_yellow");
-      background-size: 172px 172px;
-      width: 172px;
-      height: 172px;
-      top: -46px;
-      left: -57px;
-    }
-
     &.big-purple {
       @include image-2x("/img/ML/balloon_big_purple");
       background-size: 111px 111px;

@@ -28,11 +28,6 @@
 
       [:div.main.pricing
         [:section.pricing-header.group
-          [:div.balloon.big-red]
-          [:div.balloon.big-green]
-          [:div.balloon.small-blue]
-          [:div.balloon.big-purple]
-
           [:h1.pricing-headline
             "Pricing guide"]
 
