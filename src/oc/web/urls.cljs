@@ -31,6 +31,7 @@
 
 (def login "/login")
 (def sign-up "/sign-up")
+(def sign-up-slack "/sign-up/slack")
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")
 

@@ -2,6 +2,8 @@
   "Component for the site header. This is copied into oc.core/nav
    and every change here should be reflected there and vice versa."
   (:require [rum.core :as rum]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -25,18 +27,49 @@
   (user/show-login nil)
   (router/nav! uri))
 
-(rum/defc site-header < rum/static
-  [auth-settings use-slack-signup-button]
+(rum/defcs site-header < rum/static
+                         (rum/local nil ::scroll-listener)
+                         (rum/local false ::sticky-navbar)
+                         {:will-mount (fn [s]
+                          (reset! (::scroll-listener s)
+                           (events/listen js/window EventType/SCROLL
+                            #(let [scroll-top (.scrollTop (js/$ js/window))]
+                               (reset! (::sticky-navbar s) (pos? scroll-top)))))
+                          s)
+                          :will-unmount (fn [s]
+                           (when @(::scroll-listener s)
+                             (events/unlistenByKey @(::scroll-listener s))
+                             (reset! (::scroll-listener s) nil))
+                           s)}
+  [s auth-settings use-slack-signup-button]
   ; <!-- Nav Bar -->
   (let [logged-in (jwt/jwt)
         your-digest (when logged-in (utils/your-digest-url))
         slack-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                          {:auth-source "slack"})]
     [:nav.site-navbar
+      {:class (when @(::sticky-navbar s) "sticky")}
       [:div.site-navbar-container
         [:a.navbar-brand-left
-          {:href oc-urls/home
-           :on-click (partial nav! oc-urls/home)}]
+          {:href oc-urls/home-no-redirect
+           :on-click (partial nav! oc-urls/home-no-redirect)}]
+        [:div.navbar-brand-center
+          [:a
+            {:href oc-urls/home
+             :on-click (partial nav! oc-urls/home)}
+            "Home"]
+          [:a
+            {:href oc-urls/about
+             :on-click (partial nav! oc-urls/about)}
+            "About"]
+          [:a
+            {:href oc-urls/pricing
+             :on-click (partial nav! oc-urls/pricing)}
+            "Pricing"]
+          [:a
+            {:href oc-urls/blog
+             :target "_blank"}
+            "Blog"]]
         [:div.site-navbar-right.big-web-only
           (when-not logged-in
             [:a.login
@@ -48,11 +81,11 @@
                              (nav! (utils/your-digest-url) e)
                              (nav! oc-urls/login e))
                            (user/show-login :login-with-slack))}
-                "Log in"])
+                "Login"])
           [:a.start
             {:href (if logged-in
-                    your-digest
-                    oc-urls/sign-up)
+                     your-digest
+                     oc-urls/sign-up)
              :class (utils/class-set {:your-digest logged-in
                                       :slack-get-started use-slack-signup-button})
              :on-click (fn [e]
@@ -67,30 +100,22 @@
                 "Go to digest"]
               (if use-slack-signup-button
                 [:span
-                  "Sign up with "
-                  [:span.slack-orange-icon]]
-                "Start"))]]
+                  [:span.slack-orange-icon]
+                  (if (utils/in? (:route @router/path) "slack-lander")
+                    "Sign in with Slack"
+                    "Add to Slack")]
+                "Get started"))]]
         [:div.site-navbar-right.mobile-only
-          (if logged-in
-            [:a.mobile-your-digest
-              {:href your-digest
-               :on-click (partial nav! your-digest)}
-              [:span.go-to-digest
-                "Go to digest"]]
+          (if use-slack-signup-button
             [:a.start
-              {:href oc-urls/sign-up
-               :on-click (fn [e]
-                           (.preventDefault e)
-                           (if logged-in
-                             (nav! your-digest e)
-                             (if use-slack-signup-button
-                               (user-actions/login-with-slack slack-auth-link)
-                               (nav! oc-urls/sign-up e))))
-               :class (when use-slack-signup-button "slack-get-started")}
-                (if use-slack-signup-button
-                  [:span
-                    "Sign up with "
-                    [:span.slack-orange-icon]]
-                  "Start")])]
+              {:id "site-header-mobile-signup-item"
+               :href "/sign-up"}
+                [:span
+                  [:span.slack-orange-icon]
+                  "ADD"]]
+            [:a.start
+              {:id "site-header-mobile-signup-item"
+               :href "/sign-up"}
+                "START"])]
         [:div.mobile-ham-menu.mobile-only
           {:on-click #(site-mobile-menu/site-menu-toggle)}]]]))
