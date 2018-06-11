@@ -76,13 +76,14 @@
 
 ;; API Entry point
 (defn entry-point-get-finished
-  ([success body] (entry-point-get-finished success body #()))
+  ([success body] (entry-point-get-finished success body nil))
 
   ([success body callback]
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
-        (callback orgs collection)
+        (when (fn? callback)
+          (callback orgs collection))
         (dis/dispatch! [:entry-point orgs collection])
         (check-user-walls))
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
@@ -99,10 +100,16 @@
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (org-actions/get-org org-data)
-             ;; 404 only if the user is not looking at a secure post page
-             ;; if so the entry point response can not include the specified org
-             (when-not (router/current-secure-activity-id)
-               (router/redirect-404!)))
+             (let [ap-initial-at (:ap-initial-at @dis/app-state)
+                   currently-logged-in (jwt/jwt)]
+               (if (and (or (router/current-activity-id)
+                            ap-initial-at)
+                        (not currently-logged-in))
+                 (dis/dispatch! [:input [:show-activity-not-found] true])
+                 ;; 404 only if the user is not looking at a secure post page
+                 ;; if so the entry point response can not include the specified org
+                 (when-not (router/current-secure-activity-id)
+                   (router/redirect-404!)))))
            (when (and (jwt/jwt)
                       (utils/in? (:route @router/path) "login")
                       (pos? (count orgs)))
