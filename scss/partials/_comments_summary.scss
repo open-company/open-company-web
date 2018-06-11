@@ -44,13 +44,20 @@ div.is-comments {
     // max-width: 74%;
     overflow: hidden;
     text-overflow: ellipsis;
+    opacity: 0.3;
 
     @include mobile() {
       max-width: 68vw;
+      opacity: 1;
+    }
+
+    &:hover {
+      opacity: 1;
     }
 
     span.add-a-comment {
       padding-left: 6px;
+      color: $deep_navy;
 
       &:before {
         content: "";
