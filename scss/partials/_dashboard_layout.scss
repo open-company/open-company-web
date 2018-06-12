@@ -405,7 +405,6 @@ div.dashboard-layout {
           margin-left: 24px;
 
           button.add-to-board-top-button {
-            width: 143px;
             height: 42px;
             background-color: $carrot_orange_light;
             color: $carrot_orange;
@@ -417,6 +416,9 @@ div.dashboard-layout {
             transition: 0ms;
             cursor: pointer;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
             // Remove to show settings button on mobile
             @include mobile() {
@@ -433,8 +435,8 @@ div.dashboard-layout {
                 color: white;
                 opacity: 1;
 
-                div.add-to-board-pencil {
-                  background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
+                div.add-to-board-plus {
+                  background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
                 }
 
                 label.add-to-board-label {
@@ -448,26 +450,26 @@ div.dashboard-layout {
               }
             }
 
-            div.add-to-board-pencil {
-              background-image: cdnUrl("/img/ML/add_to_board_pencil_orange.svg");
-              background-size: 14px 14px;
+            div.add-to-board-plus {
+              background-image: cdnUrl("/img/ML/add_to_board_plus_orange.svg");
+              background-size: 12px 12px;
               background-repeat: no-repeat;
-              width: 14px;
-              height: 14px;
-              position: absolute;
-              top: 13px;
-              left: 24px;
-              cursor: pointer;
+              width: 12px;
+              height: 12px;
+              position: relative;
+              top: -2px;
+              pointer-events: none;
+
+              @include preload_image(cdnUrl("/img/ML/add_to_board_plus_white.svg"));
             }
 
             label.add-to-board-label {
               @include avenir_H();
               font-size: 16px;
               color: $carrot_orange;
-              position: absolute;
-              left: 46px;
-              top: 8px;
-              cursor: pointer;
+              margin-left: 6px;
+              margin-bottom: 0px;
+              pointer-events: none;
             }
           }
 
@@ -493,7 +495,7 @@ div.dashboard-layout {
         height: 56px;
         border-radius: 33px;
         background-color: $carrot_orange_2;
-        box-shadow: 0px 4px 6px 0px rgba(#807D76, 0.4);
+        box-shadow: 0px 2px 4px 0px rgba(0,0,0, 0.24);
         opacity: 1;
         padding: 0px;
         margin: 0px;
@@ -508,15 +510,13 @@ div.dashboard-layout {
           opacity: 1;
         }
 
-        div.add-to-board-pencil {
-          background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
-          background-size: 20px 20px;
+        div.add-to-board-plus {
+          background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+          background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
           width: 56px;
           height: 56px;
-          // margin-left: 6px;
-          // margin-top: 2px;
         }
       }
 
