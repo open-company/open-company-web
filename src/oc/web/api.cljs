@@ -436,7 +436,7 @@
 (defn create-board [board-data note callback]
   (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")
         fixed-board-data (select-keys board-data board-allowed-keys)
-        fixed-entries (map #(select-keys % (conj entry-allowed-keys :uuid :secure-uuid)) (:entries board-data))
+        fixed-entries (map #(select-keys % (conj entry-allowed-keys :uuid :secure-uuid :status)) (:entries board-data))
         with-entries (if (pos? (count fixed-entries))
                        (assoc fixed-board-data :entries fixed-entries)
                        fixed-board-data)
