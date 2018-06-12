@@ -94,6 +94,55 @@ if (jwt) {
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
+  // Sticky header for marketing site
+  if ( $("nav.site-navbar").length > 0) {
+    $(window).on("scroll", function(){
+      if ($(window).scrollTop() === 0) {
+        $("nav.site-navbar").removeClass("sticky");
+      }else{
+        $("nav.site-navbar").addClass("sticky");
+      }
+    });
+  }
+
+  function OCStaticSetupCarouselle($carouselle) {
+    if ($carouselle.length > 0) {
+    $carouselle.find("button.carouselle-left").click(function(){
+      var current_active = $carouselle.find("div.carouselle-screenshot:not(.disappear)");
+      if (current_active.hasClass("screenshot-1")) {
+        $carouselle.find("div.screenshot-1").addClass("disappear");
+        $carouselle.find("div.screenshot-3").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-2")) {
+        $carouselle.find("div.screenshot-2").addClass("disappear");
+        $carouselle.find("div.screenshot-1").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-3")) {
+        $carouselle.find("div.screenshot-3").addClass("disappear");
+        $carouselle.find("div.screenshot-2").removeClass("disappear");
+      }
+    });
+
+    $carouselle.find("button.carouselle-right").click(function(){
+      var current_active = $carouselle.find("div.carouselle-screenshot:not(.disappear)");
+      if (current_active.hasClass("screenshot-1")) {
+        $carouselle.find("div.screenshot-1").addClass("disappear");
+        $carouselle.find("div.screenshot-2").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-2")) {
+        $carouselle.find("div.screenshot-2").addClass("disappear");
+        $carouselle.find("div.screenshot-3").removeClass("disappear");
+      } else if (current_active.hasClass("screenshot-3")) {
+        $carouselle.find("div.screenshot-3").addClass("disappear");
+        $carouselle.find("div.screenshot-1").removeClass("disappear");
+      }
+    });
+  }  
+  }
+
+  // Home page carouselle
+  $("div.carouselle").each(function(){
+    OCStaticSetupCarouselle($(this));
+  });
+  
+
   if (jwt) {
     $("#site-header-login-item").hide();
     // Move the red guy up
@@ -136,6 +185,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
     $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $(".signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner signup button
     $("#site-header-signup-item").attr("href", "/sign-up");

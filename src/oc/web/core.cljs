@@ -46,6 +46,7 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
+            [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
             [oc.web.components.ui.notifications :refer (notifications)]))
@@ -314,6 +315,13 @@
         (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
+    (defroute sign-up-slack-route urls/sign-up-slack {:as params}
+      (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
+      (when (and (jwt/jwt)
+                 (seq (cook/get-cookie (router/last-org-cookie))))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (simple-handler slack-lander "slack-lander" target params))
+
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
       (when (and (jwt/jwt)
@@ -522,6 +530,7 @@
       (secretary/uri-dispatcher [_loading_route
                                  login-route
                                  ;; Signup email
+                                 sign-up-slack-route
                                  signup-profile-route
                                  signup-profile-slash-route
                                  signup-team-route
