@@ -415,4 +415,8 @@
                :data-placement "top"
                :data-container "body"}]
             (when @(::show-legend s)
-              [:div.entry-edit-legend-image])]]]]))
+              [:div.entry-edit-legend-image])]
+          [:div.entry-edit-footer-separator]
+          [:button.mlb-reset.video-record-bt
+            [:span.video-recorder-icon]
+            "Record video"]]]]))

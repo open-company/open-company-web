@@ -362,11 +362,13 @@ div.entry-edit-modal-container {
         float: left;
         margin-left: 16px;
         position: relative;
+        width: 20px;
+        height: 20px;
 
         button.entry-edit-legend-trigger {
           width: 20px;
           height: 20px;
-          @include image-2x("/img/ML/new_post_legend_button");
+          background-image: cdnUrl("/img/ML/new_post_legend_button.svg");
           background-repeat: no-repeat;
           background-size: 20px 20px;
           background-position: 0px 0px;
@@ -386,6 +388,38 @@ div.entry-edit-modal-container {
           background-size: 212px 281px;
           background-position: center;
           background-repeat: no-repeat;
+        }
+      }
+
+      div.entry-edit-footer-separator {
+        width: 1px;
+        height: 20px;
+        background-color: $light_ui_grey;
+        margin: 0px 16px;
+        float: left;
+      }
+
+      button.video-record-bt {
+        @include avenir_M();
+        color: $light_ui_grey;
+        font-size: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        float: left;
+        padding: 2px 0px;
+        height: 20px;
+
+        span.video-recorder-icon {
+          width: 18px;
+          height: 12px;
+          background-image: cdnUrl("/img/ML/video_recorder_icon.svg");
+          background-size: 18px 12px;
+          background-repeat: no-repeat;
+          background-position: center;
+          margin-right: 6px;
+          position: relative;
+          top: -2px;
         }
       }
     }

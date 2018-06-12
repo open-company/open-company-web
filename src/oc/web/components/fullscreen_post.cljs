@@ -441,7 +441,11 @@
                        :data-placement "top"
                        :data-container "body"}]
                     (when @(::show-legend s)
-                      [:div.fullscreen-post-box-footer-legend-image])]]]
+                      [:div.fullscreen-post-box-footer-legend-image])]
+                  [:div.fullscreen-post-box-footer-separator]
+                  [:button.mlb-reset.video-record-bt
+                    [:span.video-recorder-icon]
+                    "Record video"]]]
                 [:div.fullscreen-post-box-footer.group
                   {:class (when (and (pos? (count comments-data))
                                      (> (count (:reactions activity-data)) 2))
