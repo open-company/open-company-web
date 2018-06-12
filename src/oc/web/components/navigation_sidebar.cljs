@@ -29,7 +29,6 @@
   (close-navigation-sidebar))
 
 (def sidebar-top-margin 84)
-(def footer-button-height 31)
 
 (defn save-content-height [s]
   (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
@@ -46,7 +45,9 @@
     (and (not= (:slug board-data) utils/default-drafts-board-slug)
          (or (not (contains? self-link :count))
              (and (contains? self-link :count)
-                  (pos? (:count self-link)))))))
+                  (pos? (:count self-link))))
+         (or (not (contains? board-data :draft))
+             (not (:draft board-data))))))
 
 (defn filter-boards [all-boards]
   (filterv filter-board all-boards))
