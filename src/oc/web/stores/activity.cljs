@@ -246,3 +246,8 @@
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-posts-key new-all-posts))
     db))
+
+(defmethod dispatcher/action :must-read-get/finish
+  [db [_ org-slug must-read-posts]]
+  (let [must-read-key (dispatcher/must-read-key org-slug)]
+    (assoc-in db must-read-key must-read-posts)))

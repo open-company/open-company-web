@@ -479,6 +479,14 @@
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
 
+    (defroute must-read-route (urls/must-read ":org") {:as params}
+      (timbre/info "Routing must-read-route" (urls/must-read ":org"))
+      (org-handler "must-read" target org-dashboard (assoc-in params [:params :board] "must-read")))
+
+    (defroute must-read-slash-route (str (urls/must-read ":org") "/") {:as params}
+      (timbre/info "Routing must-read-slash-route" (str (urls/must-read ":org") "/"))
+      (org-handler "must-read" target org-dashboard (assoc-in params [:params :board] "must-read")))
+
     (defroute user-notifications-route urls/user-notifications {:as params}
       (timbre/info "Routing user-notifications-route" urls/user-notifications)
       (pre-routing (:query-params params))

@@ -72,7 +72,7 @@
     }
   }
 
-  div.all-posts-label {
+  div.all-posts-label, div.must-read-label {
     @include avenir_H();
     font-size: 16px;
     line-height: 1.71;
@@ -104,7 +104,7 @@
     border-radius: 0px;
   }
 
-  .internal, div.all-posts-label, div.drafts-label {
+  .internal, div.all-posts-label, div.drafts-label, div.must-read-label {
     color: $carrot_green;
     @include avenir_M();
     font-size: 16px;
@@ -126,7 +126,7 @@
     }
   }
 
-  div.all-posts-label {
+  div.all-posts-label, div.must-read {
     @include avenir_H();
   }
 }
@@ -153,11 +153,11 @@
     }
   }
 
-  div.public, div.private, div.all-posts-icon {
+  div.public, div.private, div.all-posts-icon, div.must-read-icon {
     opacity: 1;
   }
 
-  div.all-posts-label, div.drafts-label {
+  div.all-posts-label, div.drafts-label, div.must-read-label {
     color: $deep_navy;
     font-size: 16px;
     line-height: 1.71;
@@ -258,7 +258,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts {
+  a.all-posts, a.must-read {
     margin-bottom: 40px;
 
     @include mobile() {
@@ -270,7 +270,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts, a.drafts {
+  a.all-posts, a.drafts, a.must-read {
     display: block;
     background-color: transparent;
     border: none;
@@ -301,7 +301,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-posts-label, div.drafts-label {
+    div.all-posts-label, div.drafts-label, div.must-read {
       padding: 7px 5px 2px 5px;
       width: 148px;
       text-align: left;
@@ -332,6 +332,28 @@ div.left-navigation-sidebar {
       &.selected {
         opacity: 1;
         background-image: cdnUrl("/img/ML/digest_icon_green.svg");
+      }
+    }
+
+    div.must-read-icon {
+      background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
+      background-size: 18px 18px;
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-left: -4px;
+      margin-right: 6px;
+      margin-top: 2px;
+
+      @include mobile() {
+        margin-left: 0px;
+        margin-top: 0px;
+        opacity: 1;
+      }
+
+      &.selected {
+        opacity: 1;
+        background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
       }
     }
 

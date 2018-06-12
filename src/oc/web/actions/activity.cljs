@@ -15,8 +15,24 @@
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]))
 
-;; All Posts
+(defn save-last-used-section [section-slug]
+  (let [org-slug (router/current-org-slug)
+        last-board-cookie (router/last-used-board-slug-cookie org-slug)]
+    (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))))
 
+(defn watch-boards [posts-data]
+  (when (jwt/jwt) ; only for logged in users
+    (let [board-slugs (distinct (map :board-slug
+                                     (map second (:fixed-items posts-data))))
+          org-data (dis/org-data)
+          org-boards (:boards org-data)
+          org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
+      (ws-ic/board-unwatch (fn [rep]
+        (doseq [board-slug board-slugs]
+          (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
+          (ws-ic/board-watch (org-board-map board-slug))))))))
+
+;; All Posts
 (defn all-posts-get-finish [from {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
@@ -31,18 +47,8 @@
         (router/redirect-404!))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
-
-      (when (jwt/jwt) ; only for logged in users
-        (let [board-slugs (distinct (map :board-slug
-                                     (map second (:fixed-items fixed-all-posts))))
-              org-data (dis/org-data)
-              org-boards (:boards org-data)
-              org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
-          (ws-ic/board-unwatch (fn [rep]
-            (doseq [board-slug board-slugs]
-              (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
-              (ws-ic/board-watch (org-board-map board-slug)))))))
+        (save-last-used-section "all-posts"))
+      (watch-boards fixed-all-posts)
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
 (defn all-posts-get [org-data ap-initial-at]
@@ -56,8 +62,27 @@
   (api/load-more-all-posts more-link direction (partial all-posts-more-finish direction))
   (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
 
-;; Referesh org when needed
+;; Must read
+(defn must-read-get-finish
+  [{:keys [success body]}]
+    (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          must-read-data (when success (json->cljs body))
+          must-read-posts (au/fix-all-posts (:collection must-read-data))]
+      (when (= (router/current-board-slug) "must-read")
+        (save-last-used-section "must-read"))
+      (watch-boards must-read-posts)
+      (dis/dispatch! [:must-read-get/finish org must-read-posts]))))
 
+(defn must-read-get [org-data]
+  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
+    (let [activity-href (:href activity-link)
+          must-read-filter (str activity-href "?must-read=true")
+          must-read-link (assoc activity-link :href must-read-filter)]
+      (api/get-all-posts must-read-link nil (partial must-read-get-finish)))))
+
+;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
         is-all-posts (or (:from-all-posts @router/path)
@@ -72,12 +97,6 @@
   (api/get-org (dis/org-data) refresh-org-data-cb))
 
 ;; Entry
-
-(defn save-last-used-section [section-slug]
-  (let [org-slug (router/current-org-slug)
-        last-board-cookie (router/last-used-board-slug-cookie org-slug)]
-    (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))))
-
 (defn get-entry-cache-key
   [entry-uuid]
   (str (or

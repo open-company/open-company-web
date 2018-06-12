@@ -29,6 +29,9 @@
 (defn all-posts-key [org-slug]
   (vec (concat (boards-key org-slug) [:all-posts :board-data])))
 
+(defn must-read-key [org-slug]
+  (vec (concat (boards-key org-slug) [:must-read :board-data])))
+
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
@@ -70,11 +73,18 @@
   []
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
-        ;; if we are coming from all-posts
-        (if (or (:from-all-posts @router/path) (= board-slug "all-posts"))
-          ;; We need to update the entry in all-posts data, not in the board data
-          (all-posts-key org-slug)
-          (board-data-key org-slug board-slug))))
+        ;; if we are coming from all-posts, must-read
+    (cond
+
+     (or (:from-all-posts @router/path) (= board-slug "all-posts"))
+     ;; We need to update the entry in all-posts data, not in the board data
+     (all-posts-key org-slug)
+
+     (= board-slug "must-read")
+     (must-read-key org-slug)
+
+     :default
+     (board-data-key org-slug board-slug))))
 
 ;; Derived Data ================================================================
 
@@ -146,6 +156,11 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (all-posts-key org-slug))))]
+   :must-read        [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (must-read-key org-slug))))]
+
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -266,10 +281,10 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
+   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at :must-read
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :notifications-data]
-                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at
+                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at must-read
                                  show-section-editor show-section-add show-sections-picker entry-editing
                                  mobile-menu-open notifications-data]
                               {:nux nux
@@ -278,6 +293,7 @@
                                :org-data org-data
                                :board-data board-data
                                :all-posts-data all-posts
+                               :must-read-data must-read
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
@@ -372,6 +388,15 @@
     (all-posts-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (all-posts-key org-slug))))
+
+(defn must-read-data
+  "Get org must-read data."
+  ([]
+    (must-read-data @app-state))
+  ([data]
+    (must-read-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (must-read-key org-slug))))
 
 (defn change-data
   "Get change data."

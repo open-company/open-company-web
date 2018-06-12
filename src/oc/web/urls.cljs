@@ -94,6 +94,13 @@
   ([org-slug]
     (str (org org-slug) "/all-posts")))
 
+(defn must-read
+  "Org must read url"
+  ([]
+    (must-read (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/must-read")))
+
 ;; Boards
 
 (defn board
