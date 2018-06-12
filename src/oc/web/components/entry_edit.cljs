@@ -339,7 +339,7 @@
                                 (remove-autosave s)
                                 (clean-body)
                                 (reset! (::saving s) true)
-                                (activity-actions/entry-save @(drv/get-ref s :entry-editing) @(drv/get-ref s :section-editing))))}
+                                (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
                     (small-loading))
                   "Save to draft"]))])]
