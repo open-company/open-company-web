@@ -364,10 +364,20 @@
               (board-name-exists-error :entry-editing)
               (create-update-entry-cb edited-data :entry-editing response)))))
       (api/update-entry edited-data :entry-editing create-update-entry-cb))
-    (let [org-slug (router/current-org-slug)
-          entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug edited-data))
-          entry-create-link (utils/link-for (:links entry-board-data) "create")]
-      (api/create-entry edited-data :entry-editing entry-create-link create-update-entry-cb)))
+    (if (and (= (:board-slug edited-data) utils/default-section-slug)
+             section-editing)
+      (let [fixed-entry-data (dissoc edited-data :board-slug :board-name :invite-note)
+            final-board-data (assoc section-editing :entries [fixed-entry-data])]
+        (api/create-board final-board-data (:invite-note edited-data)
+          (fn [{:keys [success status body] :as response}]
+            (if (= status 409)
+              ;; Board name exists
+              (board-name-exists-error :entry-editing)
+              (create-update-entry-cb edited-data :entry-editing response)))))
+      (let [org-slug (router/current-org-slug)
+            entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug edited-data))
+            entry-create-link (utils/link-for (:links entry-board-data) "create")]
+        (api/create-entry edited-data :entry-editing entry-create-link create-update-entry-cb))))
   (dis/dispatch! [:entry-save]))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
