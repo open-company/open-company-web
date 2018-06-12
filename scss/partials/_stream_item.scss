@@ -62,6 +62,12 @@ div.stream-item {
       @include mobile() {
         display: block;
         float: right;
+
+        ul.more-menu-list {
+          top: -4px;
+          left: unset;
+          right: 16px;
+        }
       }
     }
 
@@ -188,7 +194,7 @@ div.stream-item {
             float: left;
 
             div.mobile-comments-summary-icon {
-              background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
+              background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
               background-size: 14px 14px;
               background-position: center;
               background-repeat: no-repeat;
@@ -201,7 +207,7 @@ div.stream-item {
             span {
               margin-left: 6px;
               font-size: 12px;
-              color: $ui_grey;
+              color: $light_ui_grey;
               margin-left: 6px;
               line-height: 14px;
               float: left;
@@ -311,10 +317,6 @@ div.stream-item {
         @include mobile() {
           position: relative;
           bottom: unset;
-
-          div.reactions {
-            float: left;
-          }
         }
 
         button.expand-button {

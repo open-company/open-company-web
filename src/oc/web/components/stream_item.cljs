@@ -48,6 +48,7 @@
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
                          (rum/local false ::should-scroll-to-comments)
+                         (rum/local false ::more-menu-open)
                          ;; Mixins
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
@@ -88,11 +89,24 @@
         dom-element-id (str "stream-item-" (:uuid activity-data))
         publisher (if is-drafts-board
                     (first (:author activity-data))
-                    (:publisher activity-data))]
+                    (:publisher activity-data))
+        dom-node-class (str "stream-item-" (:uuid activity-data))]
     [:div.stream-item
-      {:class (utils/class-set {(str "stream-item-" (:uuid activity-data)) true
+      {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board})
+       :on-click (fn [e]
+                   (let [ev-in? (partial utils/event-inside? e)
+                         dom-node-selector (str "div." dom-node-class)]
+                     (when (and is-mobile?
+                                (not @(::more-menu-open s))
+                                (not is-drafts-board)
+                                (not (ev-in? (sel1 [dom-node-selector :div.more-menu])))
+                                (not (ev-in? (rum/ref-node s :expand-button)))
+                                (not (ev-in? (sel1 [dom-node-selector :div.reactions])))
+                                (not (ev-in? (sel1 [dom-node-selector :div.stream-body-comments])))
+                                (not (ev-in? (sel1 [dom-node-selector :div.mobile-summary]))))
+                       (activity-actions/activity-modal-fade-in activity-data))))
        :id dom-element-id}
       [:div.activity-share-container]
       [:div.stream-item-header.group
@@ -117,7 +131,9 @@
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))
         (when is-mobile?
-          (more-menu activity-data dom-element-id))
+          (more-menu activity-data dom-element-id
+           {:will-open #(reset! (::more-menu-open s) true)
+            :will-close #(reset! (::more-menu-open s) false)}))
         (when (:new activity-data)
           [:div.new-tag
             "New"])]
@@ -154,6 +170,7 @@
               {:ref "stream-item-reactions"}
               [:button.mlb-reset.expand-button
                 {:class (when expanded? "expanded")
+                 :ref :expand-button
                  :on-click #(expand s (not expanded?))}
                 (if expanded?
                   "Show less"
@@ -168,7 +185,10 @@
                     [:div.mobile-summary
                       [:div.mobile-comments-summary
                         [:div.mobile-comments-summary-icon]
-                        [:span (count comments-data)]]
+                        [:span
+                          (if (zero? (count comments-data))
+                            "Add a comment"
+                            (count comments-data))]]
                       (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
                         (when (pos? (:count max-reaction))
                           [:div.mobile-summary-reaction

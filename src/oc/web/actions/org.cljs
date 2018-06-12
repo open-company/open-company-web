@@ -68,6 +68,7 @@
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)]
+    (sa/load-other-sections (:boards org-data))
     (cond
       ;; If it's all posts page, loads all posts for the current org
       (or (= (router/current-board-slug) "all-posts")
@@ -75,10 +76,14 @@
       (if (utils/link-for (:links org-data) "activity")
         ;; Load all posts only if not coming from a digest url
         ;; in that case do not load since we already have the results we need
-        (do
-           (aa/all-posts-get org-data ap-initial-at)
-           (sa/load-other-sections (:boards org-data)))
-        (router/redirect-404!))
+        (aa/all-posts-get org-data ap-initial-at)
+        (let [orgs (dis/orgs-data)]
+           ;; avoid infinite loop of the Go to digest button
+           ;; by changing the value of the last visited slug
+          (if (pos? (count orgs))
+            (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+            (cook/remove-cookie! (router/last-org-cookie)))
+          (router/redirect-404!)))
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
@@ -88,7 +93,13 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
-          (router/nav! (oc-urls/org (router/current-org-slug)))))
+          (if (router/current-activity-id) ;; user is asking for a specific post
+            (if (jwt/jwt)
+              ;; Show the activity removed
+              (dis/dispatch! [:input [:show-activity-removed] true])
+              ;; Show the activity not found/login screen
+              (dis/dispatch! [:input [:show-activity-not-found] true]))
+            (router/redirect-404!))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
            (not (utils/in? (:route @router/path) "org-settings-team"))

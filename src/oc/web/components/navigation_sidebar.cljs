@@ -22,7 +22,9 @@
   (vec (sort-by :name boards)))
 
 (defn anchor-nav! [e url]
-  (utils/event-stop e)
+  (when (and e
+             (.-preventDefault e))
+    (.preventDefault e))
   (router/nav! url)
   (close-navigation-sidebar))
 
@@ -146,6 +148,8 @@
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
                :on-click #(anchor-nav! % board-url)}
+              [:div.drafts-icon
+                {:class (when is-drafts-board "selected")}]
               [:div.drafts-label.group
                 "Drafts "
                 [:span.count "(" (:count drafts-link) ")"]]]))

@@ -142,7 +142,10 @@
 
 (defmethod dispatcher/action :login-with-email/success
   [db [_]]
-  (dissoc db show-login-overlay-key))
+  (-> db
+    (dissoc show-login-overlay-key)
+    (dissoc :show-activity-not-found)
+    (dissoc :show-activity-removed)))
 
 ;; Auth actions
 
