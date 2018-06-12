@@ -26,13 +26,14 @@
 
 (defn container-watch
   ([]
-    (container-watch @container-ids))
+    (container-watch nil))
 
   ([watch-ids]
     (when @chsk-send!
       (timbre/debug "Sending container/watch for:" watch-ids)
-      (swap! container-ids conj watch-ids)
-      (@chsk-send! [:container/watch watch-ids] 1000))))
+      (when watch-ids
+        (swap! container-ids conj watch-ids))
+      (@chsk-send! [:container/watch @container-ids] 1000))))
 
 (defn container-seen [container-id]
   (when @chsk-send!
