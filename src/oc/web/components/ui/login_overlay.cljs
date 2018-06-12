@@ -141,7 +141,6 @@
                 {:value (:email (:login-with-email (rum/react dis/app-state)))
                  :on-change #(dis/dispatch! [:input [:login-with-email :email] (.. % -target -value)])
                  :type "email"
-                 :id "sign-in-email"
                  :auto-focus true
                  :tabIndex 1
                  :autoCapitalize "none"
@@ -153,7 +152,6 @@
                 {:value (:pswd (:login-with-email (rum/react dis/app-state)))
                  :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.. % -target -value)])
                  :type "password"
-                 :id "sign-in-pswd"
                  :tabIndex 2
                  :name "pswd"}]
               [:div.left.forgot-password

@@ -29,9 +29,12 @@
             [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.slack-bot-modal :refer (slack-bot-modal)]
+            [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data [s]
@@ -97,7 +100,9 @@
                 entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
-                mobile-menu-open]} (drv/react s :org-dashboard-data)
+                mobile-menu-open
+                show-activity-not-found
+                show-activity-removed]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (= nux :1)
         search-active? (drv/react s search/search-active?)
@@ -105,38 +110,49 @@
                          (count
                           (:results (drv/react s search/search-key))))]
     ;; Show loading if
-    (if (or ;; the org data are not loaded yet
-            (not org-data)
-            ;; No board specified
-            (and (not (router/current-board-slug))
-                 ;; but there are some
-                 (pos? (count (:boards org-data))))
-            ;; Board specified
-            (and (not= (router/current-board-slug) "all-posts")
-                 (not= (router/current-board-slug) "must-read")
-                 (not ap-initial-at)
-                 ;; But no board data yet
-                 (not board-data))
-            ;; All posts
-            (and (or (= (router/current-board-slug) "all-posts")
-                     ap-initial-at)
-                 ;; But no all-posts data yet
-                 (not all-posts-data))
-            (and (= (router/current-board-slug) "must-read")
-                 (not must-read-data))
-            ;; First ever user nux, not enough time
-            (and nux-loading
-                 (not nux-end)))
+    (if (and (not show-activity-not-found)
+             (not show-activity-removed)
+             (or ;; the org data are not loaded yet
+                 (not org-data)
+                 ;; No board specified
+                 (and (not (router/current-board-slug))
+                      ;; but there are some
+                      (pos? (count (:boards org-data))))
+                 ;; Board specified
+                 (and (not= (router/current-board-slug) "all-posts")
+                      (not ap-initial-at)
+                      ;; But no board data yet
+                      (not board-data))
+                 ;; All posts
+                 (and (or (= (router/current-board-slug) "all-posts")
+                          ap-initial-at)
+                      ;; But no all-posts data yet
+                      (not all-posts-data))
+                 (and (= (router/current-board-slug) "must-read")
+                      (not must-read-data))
+                 ;; First ever user nux, not enough time
+                 (and nux-loading
+                      (not nux-end))))
       [:div.org-dashboard
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :modal-activity-view (router/current-activity-id)
                                   :mobile-or-tablet is-mobile?
+                                  :activity-not-found show-activity-not-found
+                                  :activity-removed show-activity-removed
                                   :no-scroll (and (not is-mobile?)
                                                   (router/current-activity-id))})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
+        (login-overlays-handler)
         (cond
+          ;; Activity removed
+          show-activity-removed
+          (activity-removed)
+          ;; Activity not found
+          show-activity-not-found
+          (activity-not-found)
+          ;; Onboard overlay
           should-show-onboard-overlay?
           (onboard-overlay)
           ;; Org settings

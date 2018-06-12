@@ -113,6 +113,7 @@
    :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
    :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
+   :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -281,12 +282,14 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
+   :show-activity-not-found [[:base] (fn [base] (:show-activity-not-found base))]
+   :show-activity-removed [[:base] (fn [base] (:show-activity-removed base))]
    :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at :must-read
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :notifications-data]
+                            :mobile-menu-open :notifications-data :show-activity-not-found :show-activity-removed]
                             (fn [base org-data board-data all-posts activity-data nux ap-initial-at must-read
                                  show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open notifications-data]
+                                 mobile-menu-open notifications-data show-activity-not-found show-activity-removed]
                               {:nux nux
                                :nux-loading (:nux-loading base)
                                :nux-end (:nux-end base)
@@ -311,7 +314,9 @@
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
                                :mobile-menu-open mobile-menu-open
-                               :notifications (count notifications-data)})]})
+                               :notifications (count notifications-data)
+                               :show-activity-not-found show-activity-not-found
+                               :show-activity-removed show-activity-removed})]})
 
 
 ;; Action Loop =================================================================
