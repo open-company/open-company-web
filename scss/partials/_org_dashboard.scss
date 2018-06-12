@@ -15,6 +15,10 @@ div.org-dashboard {
     z-index: 1132;
   }
 
+  &.activity-not-found div.page, &.activity-removed div.page {
+    display: none;
+  }
+
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */
