@@ -418,5 +418,7 @@
               [:div.entry-edit-legend-image])]
           [:div.entry-edit-footer-separator]
           [:button.mlb-reset.video-record-bt
-            [:span.video-recorder-icon]
-            "Record video"]]]]))
+            {:data-toggle "tooltip"
+             :data-placement "top"
+             :data-container "body"
+             :title "Record video"}]]]]))
