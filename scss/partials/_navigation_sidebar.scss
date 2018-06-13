@@ -168,7 +168,7 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - 84px);
+  max-height: calc(100vh - 96px);
   overflow-y: auto;
   overflow-x: visible;
   padding-bottom: 20px;
@@ -614,7 +614,7 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-footer {
     margin-left: 20px;
     position: relative;
-    bottom: 46px;
+    padding-bottom: 46px;
 
     @include mobile() {
       // Temp remove bottom links on mobile
@@ -627,6 +627,12 @@ div.left-navigation-sidebar {
         width: 100%;
         text-align: left;
       }
+    }
+
+    &.navigation-sidebar-overflow {
+      position: absolute;
+      bottom: 46px;
+      padding-bottom: 0px;
     }
 
     div.invite-people-tooltip-container {
