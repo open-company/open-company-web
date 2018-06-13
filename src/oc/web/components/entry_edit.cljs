@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -421,4 +422,5 @@
             {:data-toggle "tooltip"
              :data-placement "top"
              :data-container "body"
-             :title "Record video"}]]]]))
+             :title "Record video"
+             :on-click (fn [] (iu/upload! {:fromSources ["local_file_system" "webcam"]} #(js/console.log %) #(js/console.log %) #(js/console.log %)))}]]]]))
