@@ -70,12 +70,12 @@
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
 
 (defmethod dispatcher/action :entry [db [_ board-key entry-uuid body]]
-  (let [board-data (get db board-key)
+  (let [board-data (get-in db board-key)
         new-entries (assoc (get board-data :fixed-items)
                      entry-uuid
                      (au/fix-entry body board-data (dispatcher/change-data db)))
         new-board-data (assoc board-data :fixed-items new-entries)]
-    (assoc db board-key new-board-data)))
+    (assoc-in db board-key new-board-data)))
 
 (defmethod dispatcher/action :entry-clear-local-cache
   [db [_ edit-key]]

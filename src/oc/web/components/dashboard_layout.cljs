@@ -149,6 +149,7 @@
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
+        is-must-read (utils/in? (:route route) "must-read")
         nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -219,12 +220,19 @@
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:dangerouslySetInnerHTML (if is-all-posts
-                                                  #js {"__html" "All Posts"}
-                                                  (utils/emojify (:name board-data)))}])
+                      {:dangerouslySetInnerHTML (cond
+                                                 is-all-posts
+                                                 #js {"__html" "All Posts"}
+
+                                                 is-must-read
+                                                 #js {"__html" "Must Read"}
+
+                                                 :default
+                                                 (utils/emojify (:name board-data)))}])
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)
+                             (not is-must-read)
                              (not (:read-only board-data)))
                     [:div.board-settings-container.group
                       [:button.mlb-reset.board-settings-bt
