@@ -607,6 +607,12 @@ div.left-navigation-sidebar {
       }
     }
 
+    &.navigation-sidebar-overflow {
+      position: absolute;
+      bottom: 46px;
+      padding-bottom: 0px;
+    }
+
     div.invite-people-tooltip-container {
       border: 2px dashed $carrot_gold;
       background-color: $light_gold;

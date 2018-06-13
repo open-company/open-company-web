@@ -37,7 +37,7 @@
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height))))
   (when-let [navigation-sidebar-footer (rum/ref-node s "left-navigation-sidebar-footer")]
-    (let [footer-height (.height (js/$ navigation-sidebar-footer))]
+    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 86)]
       (when (not= footer-height @(::footer-height s))
         (reset! (::footer-height s) footer-height)))))
 
@@ -198,7 +198,7 @@
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
-         :style {:position (if is-tall-enough? "absolute" "relative")}}
+         :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
         ;; invite people tooltip
         (when show-invite-people-tooltip
           [:div.invite-people-tooltip-container.group
