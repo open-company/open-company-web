@@ -303,7 +303,7 @@
                                       (activity-actions/entry-save updated-entry-editing section-editing))
                                     (do
                                       (reset! (::publishing s) true)
-                                      (activity-actions/entry-publish updated-entry-editing section-editing))))
+                                      (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
                                 (when (zero? (count fixed-headline))
                                   (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
                                     (when-not (.data $post-btn "bs.tooltip")
