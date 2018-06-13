@@ -42,7 +42,7 @@
   (let [is-currently-shown (is-currently-shown? section)]
     (when is-currently-shown
       (when (and (router/current-activity-id)
-                 (not (some #(when (= (router/current-activity-id) (:uuid %)) %) (:entries section))))
+                 (not-any? #(when (= (router/current-activity-id) (:uuid %)) %) (:entries section)))
         ;; If the activity requested is not found
         (if (jwt/jwt)
           ;; Show the activity removed

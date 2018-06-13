@@ -290,7 +290,7 @@
                                      (reset! (::show-top-boards-dropdown s) false)
                                      (activity-actions/entry-edit {:board-slug (:value item)
                                                                    :board-name (:label item)}))}))])
-                (when (not is-mobile?)
+                (when-not is-mobile?
                   [:div.board-switcher.group
                     (let [grid-view? (= @board-switch :grid)]
                       [:button.mlb-reset.board-switcher-bt
