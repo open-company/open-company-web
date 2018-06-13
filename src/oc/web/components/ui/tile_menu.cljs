@@ -47,7 +47,7 @@
              :ref "tile-menu-must-read-bt"
              :on-click #(activity-actions/toggle-must-read activity-data)
              :data-toggle "tooltip"
-             :data-position fixed-tooltip-position
+             :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title must-read-title}])
         (when edit-link
