@@ -81,6 +81,7 @@
               (:board-name activity-data)))]
         [:div.activity-card-headline
           {:ref "activity-headline"
+           :data-uuid (:uuid activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-footer-placeholder]
         (if is-drafts-board

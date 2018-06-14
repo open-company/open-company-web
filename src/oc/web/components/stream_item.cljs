@@ -141,6 +141,7 @@
         [:div.stream-body-left.group.fs-hide
           [:div.stream-item-headline
             {:ref "activity-headline"
+             :data-uuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-item-body-container
             [:div.stream-item-body
