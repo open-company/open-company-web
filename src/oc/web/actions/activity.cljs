@@ -1,4 +1,5 @@
 (ns oc.web.actions.activity
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -8,9 +9,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
+            [oc.web.lib.user-cache :as uc]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.user-cache :as uc]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]))
@@ -472,3 +474,42 @@
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
+;; Change service actions
+
+(defn- send-item-seen
+  "Actually send the seen at. Needs to get the activity data from the app-state
+  to read the published-at and make sure it's still inside the TTL."
+  [activity-uuid]
+  (let [board-data (get-in @dis/app-state (dis/current-board-key))
+        activity-data (get-in board-data [:fixed-items activity-uuid])]
+    (when-let* [published-at (:published-at activity-data)
+                published-at-ts (.getTime (utils/js-date published-at))
+                today-ts (.getTime (utils/js-date))
+                ap-seen-ttl-ms (* ls/ap-seen-ttl 24 60 60 1000)
+                item-ttl (- today-ts ap-seen-ttl-ms)]
+      (when (> published-at-ts published-at)
+        ;; Send the seen because:
+        ;; 1. item is published
+        ;; 2. item is newer than TTL
+        (ws-cc/container-seen activity-uuid)))))
+
+(def timeouts-list (atom {}))
+(def wait-interval 3)
+
+(defn ap-seen-gate
+  "Gate to throttle too many seen call for the same UUID.
+  Set a timeout to wait-interval seconds every time it's called with a new UUID,
+  if there was already a timeout for that item remove the old one.
+  Once the timeout finishes it means no other events were fired for it so we can send a seen.
+  It will send seen every 3 seconds or more."
+  [activity-uuid]
+  (let [wait-interval-ms (* wait-interval 1000)]
+    ;; Remove the old timeout if there is
+    (when-let [uuid-timeout (get @timeouts-list activity-uuid)]
+      (.clearTimeout js/window uuid-timeout))
+    ;; Set the new timeout
+    (swap! timeouts-list assoc activity-uuid
+     (utils/after wait-interval-ms
+      (fn []
+       (swap! timeouts-list dissoc activity-uuid)
+       (send-item-seen activity-uuid))))))
