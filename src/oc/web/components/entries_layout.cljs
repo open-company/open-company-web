@@ -24,6 +24,10 @@
 
 (def tiles-per-row 3)
 
+(defn- item-scrolled-into-view-cb [state item-uuid]
+  ;; only in case of AP
+  (activity-actions/ap-seen-gate item-uuid))
+
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           (drv/drv :board-data)
@@ -33,6 +37,8 @@
                           (rum/local nil ::next-link)
                           ;; Mixins
                           (mixins/load-more-items 400)
+                          (when (utils/in? (:route @router/path) "all-posts")
+                            (mixins/ap-seen-mixin "div.activity-card-headline" item-scrolled-into-view-cb))
 
                           {:init (fn [s]
                             (-> s

@@ -92,6 +92,9 @@
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
+(defn- item-scrolled-into-view-cb [state item-uuid]
+  (activity-actions/ap-seen-gate item-uuid))
+
 (rum/defcs all-posts  < rum/reactive
                         ;; Derivatives
                         (drv/drv :all-posts)
@@ -110,6 +113,7 @@
                         (rum/local nil ::last-direction)
                         ;; Mixins
                         mixins/first-render-mixin
+                        (mixins/ap-seen-mixin "div.stream-item-headline" item-scrolled-into-view-cb)
                         {:will-mount (fn [s]
                           (let [all-posts-data @(drv/get-ref s :all-posts)
                                 sorted-items (activity-utils/get-sorted-activities all-posts-data)
