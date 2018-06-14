@@ -150,9 +150,7 @@
          ;; Item right is less than the screen width
          (<= (.-right rect) win-width))))
 
-(def _scroll-intervanl 0)
-
-(defn ref-is-visible-while-scrolling
+(defn ap-seen-mixin
   "Give a selector for the items to check under the component root.
   Wait for user to scroll, when it stops for _scroll-intervanl seconds it checks the visible items
   and call the passed callback with the element uuid (got via data-uuid set to the element)."
@@ -164,31 +162,19 @@
                            (.each $all-items (fn [idx el]
                              (when (and (fn? item-is-visible-cb)
                                         (is-element-visible? el))
-                               (item-is-visible-cb s (.-uuid (.-dataset el))))))))
-         _last-timeout (atom nil)]
+                               (item-is-visible-cb s (.-uuid (.-dataset el))))))))]
      {:will-mount (fn [s]
        (assoc s scroll-listener-kw
         (events/listen js/window EventType/SCROLL
-         (fn []
-          (.clearTimeout js/window @_last-timeout)
-          (reset! _last-timeout
-           (utils/after (* _scroll-intervanl 1000)
-            #(check-items-fn s)))))))
+         #(check-items-fn s))))
       :did-mount (fn [s]
        (check-items-fn s)
-       (when @_last-timeout
-         (.clearTimeout js/window @_last-timeout))
        s)
       :did-remount (fn [_ s]
-       (when @_last-timeout
-         (.clearTimeout js/window @_last-timeout))
        (check-items-fn s)
        s)
       :will-unmount (fn [s]
-       (when @_last-timeout
-         (.clearTimeout js/window @_last-timeout)
-         (reset! _last-timeout nil)
-         (check-items-fn s))
+       (check-items-fn s)
        (if-let [scroll-listener (get s scroll-listener-kw)]
          (do
            (events/unlistenByKey scroll-listener)
