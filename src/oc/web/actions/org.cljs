@@ -59,6 +59,14 @@
         (dis/dispatch! [:input [:bot-access] nil])))))
 
 ;; Org get
+(defn digest-button-check []
+  (let [orgs (dis/orgs-data)]
+    ;; avoid infinite loop of the Go to digest button
+    ;; by changing the value of the last visited slug
+    (if (pos? (count orgs))
+      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+      (cook/remove-cookie! (router/last-org-cookie)))
+    (router/redirect-404!)))
 
 (defn org-loaded [org-data saved?]
   ;; Save the last visited org
@@ -77,13 +85,16 @@
         ;; Load all posts only if not coming from a digest url
         ;; in that case do not load since we already have the results we need
         (aa/all-posts-get org-data ap-initial-at)
-        (let [orgs (dis/orgs-data)]
-           ;; avoid infinite loop of the Go to digest button
-           ;; by changing the value of the last visited slug
-          (if (pos? (count orgs))
-            (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
-            (cook/remove-cookie! (router/last-org-cookie)))
-          (router/redirect-404!)))
+        (digest-button-check))
+
+      ;; If it's the must see page, loads must sees for the current org
+      (= (router/current-board-slug) "must-see")
+      (if (utils/link-for (:links org-data) "activity")
+        ;; Load all posts only if not coming from a digest url
+        ;; in that case do not load since we already have the results we need
+        (aa/must-read-get org-data)
+        (digest-button-check))
+
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]

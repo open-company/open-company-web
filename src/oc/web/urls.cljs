@@ -99,7 +99,7 @@
   ([]
     (must-read (router/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/must-read")))
+    (str (org org-slug) "/must-see")))
 
 ;; Boards
 

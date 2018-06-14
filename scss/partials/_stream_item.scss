@@ -89,6 +89,25 @@ div.stream-item {
       }
 
       div.time-since {
+        display: inline;
+        @include mobile() {
+          width: auto;
+        }
+      }
+      div.must-read {
+        display: inline;
+        padding-left: 16px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @include avenir_M();
+        color: $ui_grey;
+        font-size: 12px;
+        white-space: nowrap;
+        background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
+        background-size: 12px 10px;
+        background-repeat: no-repeat;
+        margin-left: 10px;
+
         @include mobile() {
           width: auto;
         }

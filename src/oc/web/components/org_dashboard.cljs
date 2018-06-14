@@ -51,7 +51,7 @@
           (utils/after 2000
             #(section-actions/load-other-sections (:boards org-data))))
 
-        (= (router/current-board-slug) "must-read")
+        (= (router/current-board-slug) "must-see")
         (do
           (activity-actions/must-read-get org-data)
           (utils/after 2000
@@ -80,7 +80,7 @@
   (let [{:keys [org-data
                 board-data
                 all-posts-data
-                must-read-data
+                must-see-data
                 nux
                 nux-loading
                 nux-end
@@ -120,6 +120,7 @@
                       (pos? (count (:boards org-data))))
                  ;; Board specified
                  (and (not= (router/current-board-slug) "all-posts")
+                      (not= (router/current-board-slug) "must-see")
                       (not ap-initial-at)
                       ;; But no board data yet
                       (not board-data))
@@ -128,8 +129,8 @@
                           ap-initial-at)
                       ;; But no all-posts data yet
                       (not all-posts-data))
-                 (and (= (router/current-board-slug) "must-read")
-                      (not must-read-data))
+                 (and (= (router/current-board-slug) "must-see")
+                      (not must-see-data))
                  ;; First ever user nux, not enough time
                  (and nux-loading
                       (not nux-end))))

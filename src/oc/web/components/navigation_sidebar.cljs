@@ -99,7 +99,7 @@
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
-        is-must-read (= (router/current-board-slug) "must-read")
+        is-must-read (= (router/current-board-slug) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
@@ -125,6 +125,7 @@
           (cond
             is-all-posts "All Posts"
             is-drafts-board "Drafts"
+            is-must-read "Must See"
             :else (:name board-data))]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -139,6 +140,16 @@
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
               "All Posts"]])
+        (when show-all-posts
+           [:a.must-read.hover-item.group
+             {:class (utils/class-set {:item-selected is-must-read
+                                      :showing-drafts show-drafts})
+              :href (oc-urls/must-read)
+              :on-click #(anchor-nav! % (oc-urls/must-read))}
+             [:div.must-read-icon
+               {:class (when is-must-read "selected")}]
+             [:div.must-read-label
+               "Must See"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group
@@ -154,16 +165,6 @@
               [:div.drafts-label.group
                 "Drafts "
                 [:span.count "(" (:count drafts-link) ")"]]]))
-        (when show-all-posts
-          [:a.must-read.hover-item.group
-            {:class (utils/class-set {:item-selected is-must-read
-                                      :showing-drafts show-drafts})
-             :href (oc-urls/must-read)
-             :on-click #(anchor-nav! % (oc-urls/must-read))}
-            [:div.must-read-icon
-              {:class (when is-must-read "selected")}]
-            [:div.must-read-label
-              "Must Read"]])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group

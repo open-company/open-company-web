@@ -71,8 +71,9 @@
         route @(drv/get-ref s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
+        is-must-see (utils/in? (:route route) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
-    (if (or is-drafts-board is-all-posts)
+    (if (or is-drafts-board is-all-posts is-must-see)
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -97,6 +98,7 @@
                               (drv/drv :org-data)
                               (drv/drv :board-data)
                               (drv/drv :all-posts)
+                              (drv/drv :must-see)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
@@ -144,12 +146,19 @@
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data (drv/react s :board-data)
+        board-data-react (drv/react s :board-data)
         all-posts-data (drv/react s :all-posts)
+        must-see-data (drv/react s :must-see)
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
-        is-must-read (utils/in? (:route route) "must-read")
+        is-must-read (utils/in? (:route route) "must-see")
+        board-data (cond
+                     is-must-read
+                     must-see-data
+
+                     :default
+                     board-data-react)
         nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -225,7 +234,7 @@
                                                  #js {"__html" "All Posts"}
 
                                                  is-must-read
-                                                 #js {"__html" "Must Read"}
+                                                 #js {"__html" "Must See"}
 
                                                  :default
                                                  (utils/emojify (:name board-data)))}])

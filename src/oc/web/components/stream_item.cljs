@@ -126,7 +126,9 @@
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
+                (utils/time-since t)])]
+         (when (:must-read activity-data)
+           [:div.must-read "Must read"])]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))

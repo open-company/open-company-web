@@ -70,8 +70,8 @@
           org (router/current-org-slug)
           must-read-data (when success (json->cljs body))
           must-read-posts (au/fix-all-posts (:collection must-read-data))]
-      (when (= (router/current-board-slug) "must-read")
-        (save-last-used-section "must-read"))
+      (when (= (router/current-board-slug) "must-see")
+        (save-last-used-section "must-see"))
       (watch-boards must-read-posts)
       (dis/dispatch! [:must-read-get/finish org must-read-posts]))))
 

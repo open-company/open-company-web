@@ -258,7 +258,10 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts, a.must-read {
+  a.all-posts {
+    margin-botton: 0px;
+  }
+  a.must-read {
     margin-bottom: 40px;
 
     @include mobile() {

@@ -34,8 +34,8 @@
         fixed-tooltip-position (or tooltip-position "top")
         must-read (:must-read activity-data)
         must-read-title (if must-read
-                          "Unmark as must read"
-                          "Mark as must read")]
+                          "Unmark as must see"
+                          "Mark as must see")]
     (when (or edit-link
               delete-link
               share-link)

@@ -97,7 +97,7 @@
                 "KNOW WHAT MATTERS MOST"]
               [:div.green-value-description
                 (str
-                 "See \"must reads\" and focus on the "
+                 "See \"must sees\" and focus on the "
                  "people and topics you can't miss.")]]
             [:div.green-value.people
               [:div.green-value-icon]

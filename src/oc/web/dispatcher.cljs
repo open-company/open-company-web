@@ -30,7 +30,7 @@
   (vec (concat (boards-key org-slug) [:all-posts :board-data])))
 
 (defn must-read-key [org-slug]
-  (vec (concat (boards-key org-slug) [:must-read :board-data])))
+  (vec (concat (boards-key org-slug) [:must-see :board-data])))
 
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
@@ -80,7 +80,7 @@
      ;; We need to update the entry in all-posts data, not in the board data
      (all-posts-key org-slug)
 
-     (= board-slug "must-read")
+     (= board-slug "must-see")
      (must-read-key org-slug)
 
      :default
@@ -157,7 +157,7 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (all-posts-key org-slug))))]
-   :must-read        [[:base :org-slug]
+   :must-see        [[:base :org-slug]
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (must-read-key org-slug))))]
@@ -284,10 +284,10 @@
    :search-results        [[:base] (fn [base] (:search-results base))]
    :show-activity-not-found [[:base] (fn [base] (:show-activity-not-found base))]
    :show-activity-removed [[:base] (fn [base] (:show-activity-removed base))]
-   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at :must-read
+   :org-dashboard-data    [[:base :org-data :board-data :all-posts :activity-data :nux :ap-initial-at :must-see
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :notifications-data :show-activity-not-found :show-activity-removed]
-                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at must-read
+                            (fn [base org-data board-data all-posts activity-data nux ap-initial-at must-see
                                  show-section-editor show-section-add show-sections-picker entry-editing
                                  mobile-menu-open notifications-data show-activity-not-found show-activity-removed]
                               {:nux nux
@@ -296,7 +296,7 @@
                                :org-data org-data
                                :board-data board-data
                                :all-posts-data all-posts
-                               :must-read-data must-read
+                               :must-see-data must-see
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
