@@ -41,18 +41,14 @@
   A board is new if:
     user is part of the team (we don't track new for non-team members accessing public boards)
      -and-
-    change-at is newer than seen at
-      -or-
-    we have a change-at and no seen at
+    there at least un unseen item in the container
   "
   [change-data board]
   (let [changes (get change-data (:uuid board))
-        change-at (:change-at changes)
-        nav-at (:nav-at changes)
+        unseen (:unseen changes)
         in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
         new? (and in-team?
-                  (or (and change-at nav-at (> change-at nav-at))
-                      (and change-at (not nav-at))))]
+                  (seq unseen))]
     new?))
 
 (defn add-new-to-sections
