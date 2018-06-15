@@ -155,7 +155,7 @@ div.entry-edit-modal-container {
 
   div.entry-edit-modal {
     width: 720px;
-    margin: 112px auto 32px;
+    margin: 112px auto 0px;
     position: relative;
     background-color: white;
     border-radius: 6px;
@@ -293,7 +293,20 @@ div.entry-edit-modal-container {
           @include avenir_R();
           font-size: 16px;
           line-height: 22px;
-          min-height: 160px;
+
+          @media screen and (min-height: 556px) {
+            min-height: 240px;
+            max-height: calc(100vh - 315px);
+            overflow-y: auto;
+            overflow-x: hidden;
+          }
+
+          @include mobile() {
+            min-height: initial;
+            max-height: initial;
+            overflow-x: auto;
+            overflow-y: auto;
+          }
 
           & > *:first-child {
             margin-top: 0px;
