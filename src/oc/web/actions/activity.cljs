@@ -486,8 +486,8 @@
                 published-at-ts (.getTime (utils/js-date published-at))
                 today-ts (.getTime (utils/js-date))
                 ap-seen-ttl-ms (* ls/ap-seen-ttl 24 60 60 1000)
-                item-ttl (- today-ts ap-seen-ttl-ms)]
-      (when (> published-at-ts published-at)
+                minimum-ttl (- today-ts ap-seen-ttl-ms)]
+      (when (> published-at-ts minimum-ttl)
         ;; Send the seen because:
         ;; 1. item is published
         ;; 2. item is newer than TTL
