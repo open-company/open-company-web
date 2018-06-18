@@ -46,7 +46,7 @@
                          s)}
   [s entry-data hide-last-reaction?]
   (let [reactions-data (if hide-last-reaction?
-                         (vec (take (- default-reaction-number 1) (:reactions entry-data)))
+                         (vec (take (dec default-reaction-number) (:reactions entry-data)))
                          (vec (:reactions entry-data)))
         reactions-loading (:reactions-loading entry-data)
         react-link (utils/link-for (:links entry-data) "react")

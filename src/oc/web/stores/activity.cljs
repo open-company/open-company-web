@@ -98,7 +98,7 @@
                           (update-in next-db [edit-key] dissoc :loading)
                           next-db)
         without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)]
-    without-entry-save-on-exit))
+    (dissoc without-entry-save-on-exit :section-editing)))
 
 (defmethod dispatcher/action :entry-save/failed
   [db [_ edit-key]]

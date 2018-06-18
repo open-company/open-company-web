@@ -352,23 +352,34 @@
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
 (defn entry-save [edited-data & [section-editing]]
-  (if (:links edited-data)
-    (if (and (= (:board-slug edited-data) utils/default-section-slug)
-             section-editing)
-      (let [fixed-entry-data (dissoc edited-data :board-slug :board-name :invite-note)
-            final-board-data (assoc section-editing :entries [fixed-entry-data])]
-        (api/create-board final-board-data (:invite-note edited-data)
-          (fn [{:keys [success status body] :as response}]
-            (if (= status 409)
-              ;; Board name exists
-              (board-name-exists-error :entry-editing)
-              (create-update-entry-cb edited-data :entry-editing response)))))
-      (api/update-entry edited-data :entry-editing create-update-entry-cb))
-    (let [org-slug (router/current-org-slug)
-          entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug edited-data))
-          entry-create-link (utils/link-for (:links entry-board-data) "create")]
-      (api/create-entry edited-data :entry-editing entry-create-link create-update-entry-cb)))
-  (dis/dispatch! [:entry-save]))
+  (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))]
+    (if (:links fixed-edited-data)
+      (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+               section-editing)
+        (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
+              final-board-data (assoc section-editing :entries [fixed-entry-data])]
+          (api/create-board final-board-data (:invite-note fixed-edited-data)
+            (fn [{:keys [success status body] :as response}]
+              (if (= status 409)
+                ;; Board name exists
+                (board-name-exists-error :entry-editing)
+                (create-update-entry-cb fixed-edited-data :entry-editing response)))))
+        (api/update-entry fixed-edited-data :entry-editing create-update-entry-cb))
+      (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+               section-editing)
+        (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
+              final-board-data (assoc section-editing :entries [fixed-entry-data])]
+          (api/create-board final-board-data (:invite-note fixed-edited-data)
+            (fn [{:keys [success status body] :as response}]
+              (if (= status 409)
+                ;; Board name exists
+                (board-name-exists-error :entry-editing)
+                (create-update-entry-cb fixed-edited-data :entry-editing response)))))
+        (let [org-slug (router/current-org-slug)
+              entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
+              entry-create-link (utils/link-for (:links entry-board-data) "create")]
+          (api/create-entry fixed-edited-data :entry-editing entry-create-link create-update-entry-cb))))
+    (dis/dispatch! [:entry-save])))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
@@ -400,23 +411,24 @@
     (entry-publish-with-board-finish entry-uuid (when success (json->cljs body)))))
 
 (defn entry-publish [entry-editing section-editing]
-  (if (and (= (:board-slug entry-editing) utils/default-section-slug)
-           section-editing)
-    (let [fixed-entry-data (dissoc entry-editing :board-slug :board-name :invite-note)
-          final-board-data (assoc section-editing :entries [fixed-entry-data])]
-      (api/create-board final-board-data (:invite-note section-editing)
-       (partial entry-publish-with-board-cb (:uuid entry-editing))))
-    (let [entry-exists? (seq (:links entry-editing))
-          org-slug (router/current-org-slug)
-          board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
-          publish-entry-link (if entry-exists?
-                              ;; If the entry already exists use the publish link in it
-                              (utils/link-for (:links entry-editing) "publish")
-                              ;; If the entry is new, use
-                              (utils/link-for (:links board-data) "create"))]
-      (api/publish-entry entry-editing publish-entry-link
-       (partial entry-publish-cb (:uuid entry-editing) (:board-slug entry-editing)))))
-  (dis/dispatch! [:entry-publish]))
+  (let [fixed-entry-editing (assoc entry-editing :status "published")]
+    (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
+             section-editing)
+      (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
+            final-board-data (assoc section-editing :entries [fixed-entry-data])]
+        (api/create-board final-board-data (:invite-note section-editing)
+         (partial entry-publish-with-board-cb (:uuid fixed-entry-editing))))
+      (let [entry-exists? (seq (:links fixed-entry-editing))
+            org-slug (router/current-org-slug)
+            board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-entry-editing))
+            publish-entry-link (if entry-exists?
+                                ;; If the entry already exists use the publish link in it
+                                (utils/link-for (:links fixed-entry-editing) "publish")
+                                ;; If the entry is new, use
+                                (utils/link-for (:links board-data) "create"))]
+        (api/publish-entry fixed-entry-editing publish-entry-link
+         (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing)))))
+    (dis/dispatch! [:entry-publish])))
 
 (defn activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation

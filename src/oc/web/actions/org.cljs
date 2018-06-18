@@ -178,7 +178,7 @@
       (router/nav! (oc-urls/org (:slug (first (dis/orgs-data))))))))
 
 (defn org-create [org-data]
-  (when-not (empty? (:name org-data))
+  (when (seq (:name org-data))
     (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data) org-create-cb)))
 
 ;; Org edit
@@ -198,7 +198,7 @@
         user-id (:user-id change-data)]
     (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
       (when (= container-id (:uuid (dis/org-data)))
-        (utils/after 1000 (fn [] (get-org)))))))
+        (utils/after 1000 get-org)))))
 
 ;; subscribe to websocket events
 (defn subscribe []
