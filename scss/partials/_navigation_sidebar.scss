@@ -96,8 +96,7 @@
 
 @mixin item-selected() {
   background-color: $feint_emerald;
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
+  border-radius: 6px;
 
   @include mobile() {
     background-color: transparent;
@@ -133,8 +132,7 @@
 
 @mixin item-hover(){
   background-color: rgba($carrot_light_gray_4, 0.2);
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
+  border-radius: 6px;
 
   @include mobile() {
     background-color: transparent;
@@ -174,7 +172,6 @@ div.left-navigation-sidebar {
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
   top: 96px;
-  left: 0px;
   height: calc(100vh - 80px);
   @include no-user-select();
 

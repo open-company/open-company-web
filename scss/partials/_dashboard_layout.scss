@@ -38,6 +38,8 @@ div.dashboard-layout {
     margin: 0 auto;
     width: auto;
     width: 100%;
+    position: relative;
+    max-width: 944px;
 
     @include mobile(){
       padding: 0px;
@@ -47,6 +49,7 @@ div.dashboard-layout {
       width: #{$board_container_width}px;
       background-color: $oc_gray_8;
       position: relative;
+      float: right;
 
       @include mobile() {
         width: 100%;
