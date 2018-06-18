@@ -107,7 +107,8 @@
                             (utils/link-for (:links org-data) "activity"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-drafts (pos? (:count drafts-link))
+        show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)
+                        (pos? (:count drafts-link)))
         org-slug (router/current-org-slug)
         show-invite-people (and org-slug
                                 (jwt/is-admin? (:team-id org-data)))
@@ -153,7 +154,8 @@
                 {:class (when is-drafts-board "selected")}]
               [:div.drafts-label.group
                 "Drafts "
-                [:span.count "(" (:count drafts-link) ")"]]]))
+                (when (pos? (:count drafts-link))
+                  [:span.count "(" (:count drafts-link) ")"])]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
