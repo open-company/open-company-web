@@ -19,7 +19,7 @@
   ;; We need to remove the boards that are no longer in the org except all-posts and drafts
   (let [boards-key (dispatcher/boards-key (:slug org-data))
         old-boards (get-in db boards-key)
-        board-slugs (set (concat (map (comp keyword :slug) (:boards org-data)) [:all-posts :drafts]))
+        board-slugs (set (map (comp keyword :slug) (:boards org-data)))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))]
