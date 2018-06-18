@@ -40,6 +40,11 @@
     (timbre/debug "Sending container/seen for:" container-id)
     (@chsk-send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}] 1000)))
 
+(defn item-seen [publisher-id container-id item-id]
+  (when @chsk-send!
+    (timbre/debug "Sending container/seen for container:" container-id "item:" item-id)
+    (@chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}] 1000)))
+
 (defn subscribe
   [topic handler-fn]
   (let [ws-cc-chan (chan)]
