@@ -104,21 +104,23 @@
       "Ideas & follow-on discussions"]])
 
 (def testimonials-section
-  [:section.testimonials-section
-    [:div.testimonials-section-title
-      "Don’t take our word for it"]
-    [:div.testimonials-section-subtitle
-      "Here’s how we’re helping teams like yours."]
-    [:div.testimonials-cards-container.group
-      [:img.card
-        {:src (cdn "/img/ML/testimonial_katie.png")
-         :srcSet (str (cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
-      [:img.card
-        {:src (cdn "/img/ML/testimonial_riley.png")
-         :srcSet (str (cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
-      [:img.card
-        {:src (cdn "/img/ML/testimonial_matt.png")
-         :srcSet (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
+  [:div.hidden]
+  ; [:section.testimonials-section
+  ;   [:div.testimonials-section-title
+  ;     "Don’t take our word for it"]
+  ;   [:div.testimonials-section-subtitle
+  ;     "Here’s how we’re helping teams like yours."]
+  ;   [:div.testimonials-cards-container.group
+  ;     [:img.card
+  ;       {:src (cdn "/img/ML/testimonial_katie.png")
+  ;        :srcSet (str (cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
+  ;     [:img.card
+  ;       {:src (cdn "/img/ML/testimonial_riley.png")
+  ;        :srcSet (str (cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
+  ;     [:img.card
+  ;       {:src (cdn "/img/ML/testimonial_matt.png")
+  ;        :srcSet (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]]
+  )
 
 (def no-credit-card
   [:div.no-credit-card
