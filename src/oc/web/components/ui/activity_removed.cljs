@@ -17,9 +17,9 @@
         [:div.activity-removed-right-content
           [:div.info-icon]
           [:div.content-title
-            "Post removed"]
+            "Post Not Available"]
           [:div.content-description
-            "Looks like the post you’re trying to access was removed."]
+            "Looks like you don't have access to the post or it doesn't exist."]
           [:button.mlb-reset.go-to-homepage-btn
             {:aria-label "Homepage"
              :on-click #(do
