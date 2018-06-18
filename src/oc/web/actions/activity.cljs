@@ -352,7 +352,7 @@
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
 (defn entry-save [edited-data & [section-editing]]
-  (let [fixed-edited-data (assoc :status edited-data (or (:status edited-data) "draft"))]
+  (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))]
     (if (:links fixed-edited-data)
       (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                section-editing)
