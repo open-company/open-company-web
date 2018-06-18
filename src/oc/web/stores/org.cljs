@@ -15,12 +15,20 @@
   (read-only-org org-data))
 
 (defmethod dispatcher/action :org-loaded
-  [db [_ org-data saved?]]  
-  (-> db
-    (assoc-in (dispatcher/org-data-key (:slug org-data)) (fix-org org-data))
-    (assoc :org-editing (-> org-data
-                            (assoc :saved saved?)
-                            (dissoc :has-changes)))))
+  [db [_ org-data saved?]]
+  ;; We need to remove the boards that are no longer in the org except all-posts and drafts
+  (let [boards-key (dispatcher/boards-key (:slug org-data))
+        old-boards (get-in db boards-key)
+        board-slugs (set (map (comp keyword :slug) (:boards org-data)))
+        filter-board (fn [[k v]]
+                       (board-slugs k))
+        next-boards (into {} (filter filter-board old-boards))]
+    (-> db
+      (assoc-in (dispatcher/org-data-key (:slug org-data)) (fix-org org-data))
+      (assoc :org-editing (-> org-data
+                              (assoc :saved saved?)
+                              (dissoc :has-changes)))
+      (assoc-in boards-key next-boards))))
 
 (defmethod dispatcher/action :org-create
   [db [_]]

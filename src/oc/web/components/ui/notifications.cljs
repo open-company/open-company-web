@@ -84,7 +84,7 @@
                       (reset! (::timeout s) nil)
                       (js/clearTimeout @(::timeout s))
                       (notification-actions/remove-notification notification-data))}])
-    (when-not (empty? description)
+    (when (seq description)
       [:div.notification-description
         (description-wrapper description)])
     (when (seq secondary-bt-title)
