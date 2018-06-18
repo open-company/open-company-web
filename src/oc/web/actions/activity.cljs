@@ -481,7 +481,7 @@
   to read the published-at and make sure it's still inside the TTL."
   [publisher-id container-id activity-id]
   (let [board-data (get-in @dis/app-state (dis/current-board-key))
-        activity-data (get-in board-data [:fixed-items activity-uuid])]
+        activity-data (get-in board-data [:fixed-items activity-id])]
     (when-let* [published-at (:published-at activity-data)
                 published-at-ts (.getTime (utils/js-date published-at))
                 today-ts (.getTime (utils/js-date))
