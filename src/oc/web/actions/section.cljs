@@ -89,7 +89,9 @@
   (api/delete-board section-slug (fn [status success body]
     (if success
       (let [org-slug (router/current-org-slug)]
-        (dispatcher/dispatch! [:section-delete org-slug section-slug]))
+        (if (= section-slug (router/current-board-slug))
+          (router/redirect! (oc-urls/all-posts org-slug))
+          (dispatcher/dispatch! [:section-delete org-slug section-slug])))
       (.reload (.-location js/window))))))
 
 (defn refresh-org-data []

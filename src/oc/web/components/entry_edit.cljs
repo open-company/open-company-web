@@ -402,7 +402,7 @@
           (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                          :width 20
                          :height 20
-                         :position "bottom"
+                         :position "top"
                          :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                          :container-selector "div.entry-edit-modal"})
           [:div.entry-edit-legend-container

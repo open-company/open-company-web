@@ -44,14 +44,11 @@
           [:div.balloon.small-purple]
 
           [:h1.headline
-            (str
-             "Workplace communication that "
-             "rises above the noise.")]
+            "Keep your team informed with fewer distractions."]
           [:div.subheadline
             (str
-             "Key updates and information get lost in fast-moving chat and "
-             "overstuffed inboxes. Carrot makes it simple to stay aligned, "
-             "creating happy and more engaged teams.")]
+             "Carrot rises above the noise of real-time chat so it's simple "
+             "to stay aligned, creating happy and engaged teams.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container
             [:button.mlb-reset.get-started-button
