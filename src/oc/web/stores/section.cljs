@@ -51,18 +51,11 @@
                   (seq unseen))]
     new?))
 
-(defn add-new-to-sections
-  [org-data change-data]
-  (let [section-data (:boards org-data)
-        new-section-data (for [section section-data]
-                           (assoc section :new (new? change-data section)))]
-    (assoc org-data :boards new-section-data)))
-
 (defn fix-org-section-data
   [db org-data changes]
   (assoc-in db
             (dispatcher/org-data-key (:slug org-data))
-            (add-new-to-sections org-data changes)))
+            org-data))
 
 (defn fix-sections
   [db org-data changes]
@@ -166,10 +159,10 @@
     db))
 
 (defmethod dispatcher/action :container/section-change
-  [db [_ {container-uuid :container-id change-at :change-at user-id :user-id}]]
+  [db [_ {container-id :container-id change-at :change-at user-id :user-id}]]
   (if (not= (jwt/user-id) user-id) ; no need to respond to our own events
-    (if (not= container-uuid (:uuid (dispatcher/org-data)))
-      (update-change-data db container-uuid :change-at change-at)
+    (if (not= container-id (:uuid (dispatcher/org-data)))
+      (update-change-data db container-id :change-at change-at)
       db)
     db))
 

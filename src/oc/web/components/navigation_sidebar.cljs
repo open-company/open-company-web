@@ -174,7 +174,8 @@
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (= (router/current-board-slug) (:slug board))]]
+                        is-current-board (= (router/current-board-slug) (:slug board))
+                        board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-posts) is-current-board) "item-selected")
                  :data-board (name (:slug board))
@@ -192,7 +193,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (:new board)
+                    {:class (utils/class-set {:new (seq (:unseen board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
