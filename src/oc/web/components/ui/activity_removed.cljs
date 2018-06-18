@@ -22,7 +22,5 @@
             "Looks like you don't have access to the post or it doesn't exist."]
           [:button.mlb-reset.go-to-homepage-btn
             {:aria-label "Homepage"
-             :on-click #(do
-                          (dis/dispatch! [:input [:show-activity-removed] false])
-                          (router/nav! (utils/your-digest-url)))}
+             :on-click #(router/nav! (utils/your-digest-url))}
             "Go to homepage"]]]]])
