@@ -92,8 +92,8 @@
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
-(defn- item-scrolled-into-view-cb [state item-uuid]
-  (activity-actions/ap-seen-gate item-uuid))
+(defn- item-scrolled-into-view-cb [_ publisher-id container-id item-uuid]
+  (activity-actions/ap-seen-gate publisher-id container-id item-uuid))
 
 (rum/defcs all-posts  < rum/reactive
                         ;; Derivatives

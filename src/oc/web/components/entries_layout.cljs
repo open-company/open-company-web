@@ -24,9 +24,9 @@
 
 (def tiles-per-row 3)
 
-(defn- item-scrolled-into-view-cb [state item-uuid]
+(defn- item-scrolled-into-view-cb [_ publisher-id container-id item-uuid]
   ;; only in case of AP
-  (activity-actions/ap-seen-gate item-uuid))
+  (activity-actions/ap-seen-gate publisher-id container-id item-uuid))
 
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)

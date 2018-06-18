@@ -479,7 +479,7 @@
 (defn- send-item-seen
   "Actually send the seen at. Needs to get the activity data from the app-state
   to read the published-at and make sure it's still inside the TTL."
-  [activity-uuid]
+  [publisher-id container-id activity-id]
   (let [board-data (get-in @dis/app-state (dis/current-board-key))
         activity-data (get-in board-data [:fixed-items activity-uuid])]
     (when-let* [published-at (:published-at activity-data)
@@ -491,7 +491,7 @@
         ;; Send the seen because:
         ;; 1. item is published
         ;; 2. item is newer than TTL
-        (ws-cc/container-seen activity-uuid)))))
+        (ws-cc/item-seen publisher-id container-id activity-id)))))
 
 (def timeouts-list (atom {}))
 (def wait-interval 3)
@@ -502,14 +502,14 @@
   if there was already a timeout for that item remove the old one.
   Once the timeout finishes it means no other events were fired for it so we can send a seen.
   It will send seen every 3 seconds or more."
-  [activity-uuid]
+  [publisher-id container-id activity-id]
   (let [wait-interval-ms (* wait-interval 1000)]
     ;; Remove the old timeout if there is
-    (when-let [uuid-timeout (get @timeouts-list activity-uuid)]
+    (when-let [uuid-timeout (get @timeouts-list activity-id)]
       (.clearTimeout js/window uuid-timeout))
     ;; Set the new timeout
-    (swap! timeouts-list assoc activity-uuid
+    (swap! timeouts-list assoc activity-id
      (utils/after wait-interval-ms
       (fn []
-       (swap! timeouts-list dissoc activity-uuid)
-       (send-item-seen activity-uuid))))))
+       (swap! timeouts-list dissoc activity-id)
+       (send-item-seen publisher-id container-id activity-id))))))
