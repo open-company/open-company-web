@@ -428,7 +428,7 @@
                   (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                                  :width 20
                                  :height 20
-                                 :position "bottom"
+                                 :position "top"
                                  :default-field-selector "div.fullscreen-post div.rich-body-editor"
                                  :container-selector "div.fullscreen-post"})
                   [:div.fullscreen-post-box-footer-legend-container

@@ -274,9 +274,9 @@
                          :data-placement (when show-tooltip? "top")
                          :data-container (when show-tooltip? "body")
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-                        [:div.add-to-board-pencil]
+                        [:div.add-to-board-plus]
                         [:label.add-to-board-label
-                          "Compose"]])
+                          "New"]])
                     (when @(::show-top-boards-dropdown s)
                       (dropdown-list
                        {:items (map
@@ -356,4 +356,4 @@
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :on-click compose-fn}
-                      [:div.add-to-board-pencil]]]))])]]))
+                      [:div.add-to-board-plus]]]))])]]))
