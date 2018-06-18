@@ -169,6 +169,7 @@
   [entry-data board-data changes]
   (let [comments-link (utils/link-for (:links entry-data) "comments")
         add-comment-link (utils/link-for (:links entry-data) "create" "POST")
+        fixed-board-uuid (or (:board-uuid entry-data) (:uuid board-data))
         fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))]
@@ -176,6 +177,7 @@
       (assoc :content-type "entry")
       (assoc :new (post-new? (:body entry-data) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
+      (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)
       (assoc :board-name fixed-board-name)
       (assoc :has-comments (boolean comments-link))
