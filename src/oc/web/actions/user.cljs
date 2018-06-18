@@ -102,10 +102,11 @@
              (org-actions/get-org org-data)
              (let [ap-initial-at (:ap-initial-at @dis/app-state)
                    currently-logged-in (jwt/jwt)]
-               (if (and (or (router/current-activity-id)
-                            ap-initial-at)
-                        (not currently-logged-in))
-                 (dis/dispatch! [:input [:show-activity-not-found] true])
+               (if (or (router/current-activity-id)
+                       ap-initial-at)
+                 (if currently-logged-in
+                  (dis/dispatch! [:input [:show-activity-removed] true])
+                  (dis/dispatch! [:input [:show-activity-not-found] true]))
                  ;; 404 only if the user is not looking at a secure post page
                  ;; if so the entry point response can not include the specified org
                  (when-not (router/current-secure-activity-id)
