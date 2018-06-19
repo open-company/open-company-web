@@ -1,4 +1,7 @@
 (ns oc.web.events.expand-event
+  "Expand event triggered by the stream-item component when a
+  body is being expanded or collapsed.
+  Loosly inspired by https://stackoverflow.com/a/9089803/561744"
   (:require [goog :as g]
             [goog.events :as events]))
 

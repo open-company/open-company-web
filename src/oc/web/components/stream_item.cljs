@@ -151,7 +151,7 @@
           [:div.stream-item-headline
             {:ref "activity-headline"
              :data-itemuuid (:uuid activity-data)
-             :dangerouslySetInnerHTML (utils/emojify (str (:headline activity-data) " - " (:uuid activity-data)))}]
+             :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-item-body-container
             [:div.stream-item-body
               {:class (utils/class-set {:expanded expanded?
