@@ -42,8 +42,13 @@
 
 (defn item-seen [publisher-id container-id item-id]
   (when @chsk-send!
-    (timbre/debug "Sending container/seen for container:" container-id "item:" item-id)
+    (timbre/debug "Sending item/seen for container:" container-id "item:" item-id)
     (@chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}] 1000)))
+
+(defn item-read [publisher-id container-id item-id]
+  (when @chsk-send!
+    (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
+    (@chsk-send! [:item/read {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}] 1000)))
 
 (defn subscribe
   [topic handler-fn]
