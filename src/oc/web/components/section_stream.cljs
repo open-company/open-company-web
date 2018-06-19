@@ -9,6 +9,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.stream-item :refer (stream-item)]
@@ -16,12 +17,17 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
+(defn- wrt-stream-item-mixin-cb [_ item-uuid]
+  (activity-actions/wrt-events-gate item-uuid))
+
 (rum/defcs section-stream < rum/static
                             rum/reactive
                             ;; Derivatives
                             (drv/drv :section-stream-data)
                             ;; Mixins
                             mixins/first-render-mixin
+                            (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner"
+                             wrt-stream-item-mixin-cb)
   [s]
   (let [section-data (drv/react s :section-stream-data)
         items (activity-utils/get-sorted-activities section-data)]
