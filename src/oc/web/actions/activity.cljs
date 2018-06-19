@@ -491,37 +491,38 @@
 (defn- send-item-seen
   "Actually send the seen at. Needs to get the activity data from the app-state
   to read the published-at and make sure it's still inside the TTL."
-  [publisher-id container-id activity-id]
-  (let [board-data (get-in @dis/app-state (dis/current-board-key))
-        activity-data (get-in board-data [:fixed-items activity-id])]
-    (when-let* [published-at (:published-at activity-data)
-                published-at-ts (.getTime (utils/js-date published-at))
-                today-ts (.getTime (utils/js-date))
-                ap-seen-ttl-ms (* ls/ap-seen-ttl 24 60 60 1000)
-                minimum-ttl (- today-ts ap-seen-ttl-ms)]
-      (when (> published-at-ts minimum-ttl)
-        ;; Send the seen because:
-        ;; 1. item is published
-        ;; 2. item is newer than TTL
-        (ws-cc/item-seen publisher-id container-id activity-id)))))
+  [activity-id]
+  (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
+              activity-data (get-in @dis/app-state activity-key)
+              publisher-id (:user-id (:publisher activity-data))
+              container-id (:board-uuid activity-data)
+              published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
+              today-ts (.getTime (utils/js-date))
+              ap-seen-ttl-ms (* ls/ap-seen-ttl 24 60 60 1000)
+              minimum-ttl (- today-ts ap-seen-ttl-ms)]
+    (when (> published-at-ts minimum-ttl)
+      ;; Send the seen because:
+      ;; 1. item is published
+      ;; 2. item is newer than TTL
+      (ws-cc/item-seen publisher-id container-id activity-id))))
 
-(def timeouts-list (atom {}))
-(def wait-interval 3)
+(def ap-seen-timeouts-list (atom {}))
+(def ap-seen-wait-interval 3)
 
-(defn ap-seen-gate
+(defn ap-seen-events-gate
   "Gate to throttle too many seen call for the same UUID.
-  Set a timeout to wait-interval seconds every time it's called with a new UUID,
+  Set a timeout to ap-seen-wait-interval seconds every time it's called with a new UUID,
   if there was already a timeout for that item remove the old one.
   Once the timeout finishes it means no other events were fired for it so we can send a seen.
   It will send seen every 3 seconds or more."
-  [publisher-id container-id activity-id]
-  (let [wait-interval-ms (* wait-interval 1000)]
+  [activity-id]
+  (let [wait-interval-ms (* ap-seen-wait-interval 1000)]
     ;; Remove the old timeout if there is
-    (when-let [uuid-timeout (get @timeouts-list activity-id)]
+    (when-let [uuid-timeout (get @ap-seen-timeouts-list activity-id)]
       (.clearTimeout js/window uuid-timeout))
     ;; Set the new timeout
-    (swap! timeouts-list assoc activity-id
+    (swap! ap-seen-timeouts-list assoc activity-id
      (utils/after wait-interval-ms
       (fn []
-       (swap! timeouts-list dissoc activity-id)
-       (send-item-seen publisher-id container-id activity-id))))))
+       (swap! ap-seen-timeouts-list dissoc activity-id)
+       (send-item-seen activity-id))))))
