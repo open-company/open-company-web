@@ -488,8 +488,10 @@
 
 ;; Change service actions
 
+;; AP Seen
+
 (defn- send-item-seen
-  "Actually send the seen at. Needs to get the activity data from the app-state
+  "Actually send the seen. Needs to get the activity data from the app-state
   to read the published-at and make sure it's still inside the TTL."
   [activity-id]
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
@@ -529,6 +531,18 @@
          (swap! ap-seen-timeouts-list dissoc activity-id)
          (send-item-seen activity-id)))))))
 
+;; WRT read
+
+(defn- send-item-read
+  "Actually send the read. Needs to get the activity data from the app-state
+  to read the published-id and the board uuid."
+  [activity-id]
+  (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
+              activity-data (get-in @dis/app-state activity-key)
+              publisher-id (:user-id (:publisher activity-data))
+              container-id (:board-uuid activity-data)]
+    (ws-cc/item-read publisher-id container-id activity-id)))
+
 (def wrt-timeouts-list (atom {}))
 (def wrt-wait-interval 3)
 
@@ -548,4 +562,4 @@
      (utils/after wait-interval-ms
       (fn []
        (swap! wrt-timeouts-list dissoc activity-id)
-       (send-item-seen activity-id))))))
+       (send-item-read activity-id))))))
