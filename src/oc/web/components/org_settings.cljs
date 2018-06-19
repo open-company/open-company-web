@@ -141,7 +141,7 @@
         alert-modal-data (drv/react s :alert-modal)
         main-tab? (= settings-tab :main)]
     (when (:read-only org-data)
-      (utils/after 100 #(dismiss-modal)))
+      (utils/after 100 dismiss-modal))
     (if org-data
       [:div.org-settings.fullscreen-page
         [:div.org-settings-inner

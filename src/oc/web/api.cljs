@@ -188,7 +188,7 @@
 
 ;; Allowed keys
 
-(def entry-allowed-keys [:headline :body :attachments :board-slug])
+(def entry-allowed-keys [:headline :body :attachments :board-slug :status])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
@@ -600,8 +600,8 @@
 (defn publish-entry
   [entry-data publish-entry-link callback]
   (when (and entry-data
-             (not= (:status entry-data) "published"))
-    (let [cleaned-entry-data (-> entry-data (select-keys entry-allowed-keys) (assoc :status "published"))]
+             publish-entry-link)
+    (let [cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
       (storage-http (method-for-link publish-entry-link) (relative-href publish-entry-link)
         {:headers (headers-for-link publish-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
