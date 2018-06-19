@@ -526,3 +526,24 @@
       (fn []
        (swap! ap-seen-timeouts-list dissoc activity-id)
        (send-item-seen activity-id))))))
+
+(def wrt-timeouts-list (atom {}))
+(def wrt-wait-interval 3)
+
+(defn wrt-events-gate
+  "Gate to throttle too many wrt call for the same UUID.
+  Set a timeout to wrt-wait-interval seconds every time it's called with a certain UUID,
+  if there was already a timeout for that item remove it and reset it.
+  Once the timeout finishes it means no other events were fired for it so we can send a seen.
+  It will send seen every 3 seconds or more."
+  [activity-id]
+  (let [wait-interval-ms (* wrt-wait-interval 1000)]
+    ;; Remove the old timeout if there is
+    (when-let [uuid-timeout (get @wrt-timeouts-list activity-id)]
+      (.clearTimeout js/window uuid-timeout))
+    ;; Set the new timeout
+    (swap! wrt-timeouts-list assoc activity-id
+     (utils/after wait-interval-ms
+      (fn []
+       (swap! wrt-timeouts-list dissoc activity-id)
+       (send-item-seen activity-id))))))
