@@ -21,6 +21,7 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
             [oc.web.actions.team]
+            [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.reaction :as ra]
@@ -611,6 +612,7 @@
   (user-actions/dispatch-jwt)
 
   ;; Subscribe to websocket client events
+  (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
   (sa/ws-interaction-subscribe)
   (oa/subscribe)
