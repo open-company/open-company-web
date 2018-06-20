@@ -342,110 +342,6 @@ div.core-values-list {
   }
 }
 
-div.carouselle {
-  position: relative;
-  width: 1080px;
-  height: 600px;
-
-  @include mobile() {
-    width: calc(100% + 48px);
-    padding: 0px;
-    height: 530px;
-    overflow-y: visible;
-    overflow-x: auto;
-    margin-top: 40px;
-    margin-left: -24px;
-  }
-
-  div.carouselle-screenshots {
-
-    @include mobile() {
-      width: 960px;
-      height: 530px;
-      padding: 0px 24px;
-      overflow: visible;
-    }
-
-    div.carouselle-screenshot {
-      transition: opacity 280ms;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 1080px;
-      height: 600px;
-      background-size: 1080px 600px;
-      background-position: center;
-      background-repeat: no-repeat;
-      box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
-      opacity: 1;
-      border-radius: 6px;
-
-      @include mobile() {
-        position: relative;
-        height: 510px;
-        width: 288px;
-        background-size: 288px 510px;
-        float: left;
-        margin-left: 24px;
-        box-shadow: 0px 2px 20px 0px rgba(0, 0, 0, 0.1);
-        margin-top: 10px;
-        overflow: visible;
-
-        &:first-child {
-          margin-left: 0px;
-        }
-      }
-
-      &.disappear {
-        opacity: 0;
-
-        @include mobile() {
-          opacity: 1;
-        }
-      }
-    }
-  }
-
-  button.carouselle-left {
-    width: 64px;
-    height: 64px;
-    position: absolute;
-    top: 50%;
-    margin-top: -32px;
-    left: -32px;
-    background-image: cdnUrl("/img/ML/carouselle_left_arrow.svg");
-    background-size: 64px 64px;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 0px;
-    border-radius: 32px;
-    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
-
-    @include mobile() {
-      display: none;
-    }
-  }
-  button.carouselle-right {
-    width: 64px;
-    height: 64px;
-    position: absolute;
-    top: 50%;
-    margin-top: -32px;
-    right: -32px;
-    background-image: cdnUrl("/img/ML/carouselle_right_arrow.svg");
-    background-size: 64px 64px;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 0px;
-    border-radius: 32px;
-    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
-
-    @include mobile() {
-      display: none;
-    }
-  }
-}
-
 button.get-started-button {
   width: 255px;
   height: 48px;
@@ -475,7 +371,7 @@ section.home-keep-aligned {
     padding: 40px 24px !important;
   }
 
-  h2.home-keep-aligned-title {
+  h2.keep-aligned-title {
     @include avenir_H();
     font-size: 38px;
     line-height: 42px;
@@ -489,256 +385,208 @@ section.home-keep-aligned {
     }
   }
 
-  div.home-keep-aligned-carouselle {
-    margin: 40px auto 0px;
+  div.keep-aligned-section {
+    margin: 0px auto;
 
-    @include mobile() {
-      margin-top: 40px;
-      margin-left: -24px;
-    }
+    div.keep-aligned-section-row {
+      width: 1080px;
+      height: 354px;
+      margin: 120px auto 0px;
 
-    div.carouselle-screenshots {
+      @include mobile() {
+        width: 100%;
+        height: auto;
+        margin: 40px auto 0px;
+      }
 
-      div.carouselle-screenshot {
+      div.keep-aligned-section-screenshot {
+        box-shadow: 0px 4px 20px 0px rgba(0,0,0,0.2);
+        width: 640px;
+        height: 354px;
+        background-size: 640px 354px;
+        background-position: center;
+        background-repeat: no-repeat;
 
         &.screenshot-1 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
-
-          @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
-          }
+          @include image-2x("/img/ML/keep_aligned_screenshot_1");
         }
 
         &.screenshot-2 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2");
-
-          @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2_mobile");
-          }
+          @include image-2x("/img/ML/keep_aligned_screenshot_2");
         }
 
         &.screenshot-3 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3");
+          @include image-2x("/img/ML/keep_aligned_screenshot_3");
+        }
 
-          @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3_mobile");
+        &.screenshot-4 {
+          @include image-2x("/img/ML/keep_aligned_screenshot_4");
+        }
+
+        @include mobile() {
+          box-shadow: 0px 2px 20px 0px rgba(0,0,0,0.1);
+          width: 247px;
+          height: 440px;
+          background-size: 247px 440px;
+          margin: 0px auto;
+
+          &.screenshot-1 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_1");
+          }
+
+          &.screenshot-2 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_2");
+          }
+
+          &.screenshot-3 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_3");
+          }
+
+          &.screenshot-4 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_4");
+          }
+        }
+      }
+
+      div.keep-aligned-section-copy {
+        margin-top: 82px;
+        width: 400px;
+        text-align: left;
+
+        @include mobile() {
+          width: 100%;
+          margin-top: 32px;
+        }
+
+        div.keep-aligned-section-copy-title {
+          @include avenir_H();
+          font-size: 24px;
+          color: $deep_navy;
+          line-height: 42px;
+        }
+
+        div.keep-aligned-section-list-item {
+          padding-left: 24px;
+          position: relative;
+          @include avenir_R();
+          font-size: 16px;
+          line-height: 22px;
+          color: $deep_navy;
+          margin-top: 8px;
+
+          &:before {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            background-image: cdnUrl("/img/ML/keep_aligned_copy_checkmark.svg");
+            background-size: 16px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            content: "";
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+
+      @include big_web() {
+        &:nth-child(odd) {
+          div.keep-aligned-section-screenshot {
+            float: left;
+          }
+
+          div.keep-aligned-section-copy {
+            float: right;
+          }
+        }
+
+        &:nth-child(even) {
+          div.keep-aligned-section-screenshot {
+            float: right;
+          }
+
+          div.keep-aligned-section-copy {
+            float: left;
           }
         }
       }
     }
   }
-
-  div.green-values {
-    margin: 40px auto 0px;
-    text-align: center;
-    max-width: 1080px;
-
-    @include mobile() {
-      width: 100%;
-    }
-    
-    div.green-value {
-      width: 330px;
-      text-align: left;
-      float: left;
-      margin-left: 44px;
-
-      @include mobile() {
-        width: 100%;
-        margin-left: 0px;
-        float: unset;
-        margin-top: 24px;
-      }
-
-      &:first-child {
-        margin-left: 0px;
-      }
-
-      &.lamp {
-        div.green-value-icon {
-          background-image: cdnUrl("/img/ML/green_values_lamp.svg");
-        }
-      }
-
-      &.people {
-        div.green-value-icon {
-          background-image: cdnUrl("/img/ML/green_values_people.svg");
-        }
-      }
-
-      &.slack {
-        div.green-value-icon {
-          background-image: cdnUrl("/img/ML/green_values_slack.svg");
-          
-        }
-      }
-
-      div.green-value-icon {
-        width: 48px;
-        height: 48px;
-        background-size: 48px 48px;
-        background-repeat: no-repeat;
-        background-position: center;
-
-        @include mobile() {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-        }
-      }
-
-      div.green-value-title {
-        @include avenir_B();
-        font-size: 15px;
-        color: $deep_navy;
-        line-height: 20px;
-        margin-top: 16px;
-      }
-
-      div.green-value-description {
-        @include avenir_R();
-        font-size: 18px;
-        line-height: 24px;
-        color: $ui_grey;
-        margin-top: 8px;
-        max-width: 327px;
-      }
-    } 
-  }
 }
 
-section.team-transparency {
-  background-color: transparent;
-  padding: 120px 24px;
-  text-align: center;
+section.access-anywhere-section {
+  background-color: #FFFDF9;
+  position: relative;
+  padding: 156px 0px;
+  width: 1080px;
+  height: 400px;
+  margin: 0px auto;
 
   @include mobile() {
-    padding: 40px 24px !important;
+    width: 100%;
+    height: auto;
+    padding: 40px 24px 0px !important;
   }
 
-  h2.team-transparency-title {
-    @include avenir_H();
-    font-size: 38px;
-    line-height: 42px;
-    color: $deep_navy;
-    text-align: center;
+  div.access-anywhere-screenshot {
+    width: 417px;
+    height: 320px;
+    position: absolute;
+    top: 80px;
+    left: 97px;
+    @include image-2x("/img/ML/access_anywhere_screenshot");
+    background-size: 417px 320px;
+    background-repeat: no-repeat;
+    background-position: center;
 
     @include mobile() {
-      text-align: left;
+      position: relative;
+      top: unset;
+      left: unset;
+      width: 327px;
+      height: 254px;
+      margin: 32px auto 0px;
+      background-size: 327px 254px;
     }
   }
 
-  div.team-transparency-carouselle {
-    margin: 40px auto 0px;
+  div.access-anywhere-copy {
+    width: 406px;
+    height: 98px;
+    position: absolute;
+    top: 156px;
+    left: 578px;
+    text-align: left;
 
     @include mobile() {
-      margin-top: 40px;
-      margin-left: -24px;
-    }
-
-    div.carouselle-screenshot {
-
-      &.screenshot-1 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
-
-        @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
-        }
-      }
-
-      &.screenshot-2 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2");
-
-        @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2_mobile");
-        }
-      }
-
-      &.screenshot-3 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3");
-
-        @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3_mobile");
-        }
-      }
-    }
-  }
-
-  div.blue-values {
-    margin: 40px auto 0px;
-    text-align: center;
-    max-width: 1080px;
-
-    @include mobile() {
+      position: relative;
+      top: unset;
+      left: unset;
       width: 100%;
+      height: auto;
     }
-    
-    div.blue-value {
-      width: 330px;
-      text-align: left;
-      float: left;
-      margin-left: 44px;
 
-      @include mobile() {
-        width: 100%;
-        margin-left: 0px;
-        float: unset;
-        margin-top: 24px;
+    div.access-anywhere-copy-title {
+      @include avenir_H();
+      font-size: 28px;
+      line-height: 32px;
+      color: $deep_navy;
+
+      @include mobile(){
+        font-size: 24px;
       }
+    }
 
-      &:first-child {
-        margin-left: 0px;
+    div.access-anywhere-copy-subtitle {
+      @include avenir_R();
+      font-size: 18px;
+      line-height: 26px;
+      color: $deep_navy;
+
+      @include mobile(){
+        font-size: 17px;
       }
-
-      &.mega {
-        div.blue-value-icon {
-          background-image: cdnUrl("/img/ML/blue_values_mega.svg");
-        }
-      }
-
-      &.paperclip {
-        div.blue-value-icon {
-          background-image: cdnUrl("/img/ML/blue_values_paperclip.svg");
-        }
-      }
-
-      &.thumbup {
-        div.blue-value-icon {
-          background-image: cdnUrl("/img/ML/blue_values_thumbup.svg");
-        }
-      }
-
-      div.blue-value-icon {
-        width: 48px;
-        height: 48px;
-        background-size: 48px 48px;
-        background-repeat: no-repeat;
-        background-position: center;
-
-        @include mobile() {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-        }
-      }
-
-      div.blue-value-title {
-        @include avenir_B();
-        font-size: 15px;
-        color: $deep_navy;
-        line-height: 20px;
-        margin-top: 16px;
-      }
-
-      div.blue-value-description {
-        @include avenir_R();
-        font-size: 18px;
-        color: $ui_grey;
-        line-height: 24px;
-        margin-top: 8px;
-        max-width: 327px;
-      }
-    } 
+    }
   }
 }
 

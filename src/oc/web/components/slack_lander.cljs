@@ -45,8 +45,8 @@
 
             [:div.main-animation-container
               [:img.main-animation
-                {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-                 :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
+                {:src (utils/cdn "/img/ML/slack_screenshot.png")
+                 :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
             [:div.core-values-list.group
               [:div.core-value.key-announcement

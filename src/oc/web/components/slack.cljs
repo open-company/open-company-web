@@ -74,8 +74,6 @@
 
           (shared-misc/slack-comparison-section true)
 
-          shared-misc/team-transparency-section
-
           shared-misc/keep-aligned-section
 
           shared-misc/testimonials-section

@@ -136,83 +136,68 @@
 
 (def keep-aligned-section
   [:section.home-keep-aligned
-    [:h2.home-keep-aligned-title
+    [:h2.keep-aligned-title
       "Carrot keeps leaders and their teams aligned"]
 
-    [:div.home-keep-aligned-carouselle.carouselle
-      [:div.carouselle-screenshots
-        [:div.carouselle-screenshot.screenshot-1]
-        [:div.carouselle-screenshot.screenshot-2.disappear]
-        [:div.carouselle-screenshot.screenshot-3.disappear]]
-      [:button.mlb-reset.carouselle-left]
-      [:button.mlb-reset.carouselle-right]]
+    [:div.keep-aligned-section
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-1]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Know what’s important"]
+          [:div.keep-aligned-section-list-item
+            "Must see updates rise to the top"]
+          [:div.keep-aligned-section-list-item
+            "Follow people and topics you can’t miss"]
+          [:div.keep-aligned-section-list-item
+            "See what’s trending to stay in the loop"]
+          [:div.keep-aligned-section-list-item
+            "Receive a morning digest with key updates"]]]
 
-    [:div.green-values.group
-      [:div.green-value.lamp
-        [:div.green-value-icon]
-        [:div.green-value-title
-          "KNOW WHAT MATTERS MOST"]
-        [:div.green-value-description
-          (str
-           "See \"must reads\" and focus on the "
-           "people and topics you can't miss.")]]
-      [:div.green-value.people
-        [:div.green-value-icon]
-        [:div.green-value-title
-          "SPARK FOLLOW-ON DISCUSSIONS"]
-        [:div.green-value-description
-          (str
-           "React, comment and ask questions, with "
-           "time and space to be more thoughtful.")]]
-      [:div.green-value.slack
-        [:div.green-value-icon]
-        [:div.green-value-title
-          "SYNC TO SLACK"]
-        [:div.green-value-description
-          (str
-           "Share posts to the relevant Slack "
-           "channel, and sync comments from Slack "
-           "back into Carrot.")]]]])
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-2]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Update your team in seconds"]
+          [:div.keep-aligned-section-list-item
+            "Create compelling updates people want to read"]
+          [:div.keep-aligned-section-list-item
+            "Capture video updates to add a human touch"]
+          [:div.keep-aligned-section-list-item
+            "Attachments from Google, Dropbox, & others"]]]
 
-(def team-transparency-section
-  [:section.team-transparency
-    [:h2.team-transparency-title
-      "Carrot keeps leaders and their teams aligned"]
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-3]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Spark better follow-on discussions"]
+          [:div.keep-aligned-section-list-item
+            "Encourage thoughtful comments and questions"]
+          [:div.keep-aligned-section-list-item
+            "Keep interactions together for greater context"]
+          [:div.keep-aligned-section-list-item
+            "Sync to Slack so discussions can happen anywhere"]]]
 
-    [:div.team-transparency-carouselle.carouselle
-      [:div.carouselle-screenshots
-        [:div.carouselle-screenshot.screenshot-1]
-        [:div.carouselle-screenshot.screenshot-2.disappear]
-        [:div.carouselle-screenshot.screenshot-3.disappear]]
-      [:button.mlb-reset.carouselle-left]
-      [:button.mlb-reset.carouselle-right]]
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-4]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Know who’s up to date"]
+          [:div.keep-aligned-section-list-item
+            "Eliminate communication gaps"]
+          [:div.keep-aligned-section-list-item
+            "Send reminders with a single click"]
+          [:div.keep-aligned-section-list-item
+            "AI ensures alignment on important items"]]]]])
 
-    [:div.blue-values.group
-      [:div.blue-value.mega
-        [:div.blue-value-icon]
-        [:div.blue-value-title
-          "POST QUICKLY"]
-        [:div.blue-value-description
-          (str
-           "It's simple and fast to share something "
-           "new with your team.")]]
-      [:div.blue-value.paperclip
-        [:div.blue-value-icon]
-        [:div.blue-value-title
-          "ADD CONTENT FROM ANYWHERE"]
-        [:div.blue-value-description
-          (str
-           "Link to external content, or add images, "
-           "video and attachments from Google "
-           "Drive, Dropbox, and others.")]]
-      [:div.blue-value.thumbup
-        [:div.blue-value-icon]
-        [:div.blue-value-title
-          "SEE WHO’S ENGAGED"]
-        [:div.blue-value-description
-          (str
-           "See who’s viewed your post to "
-           "eliminate communication gaps.")]]]])
+(def access-anywhere-section
+  [:section.access-anywhere-section
+    [:div.access-anywhere-copy
+      [:div.access-anywhere-copy-title
+        "Stay up to date on the go. Access Carrot from anywhere."]
+      [:div.access-anywhere-copy-subtitle
+        "Fully responsive web app. No app install required."]]
+    [:div.access-anywhere-screenshot]])
 
 (defn slack-comparison-section
   [& [slack-version?]]
@@ -275,7 +260,7 @@
 
       keep-aligned-section
 
-      team-transparency-section
+      access-anywhere-section
 
       (slack-comparison-section)
 
@@ -599,9 +584,9 @@
 
       (slack-comparison-section true)
 
-      team-transparency-section
-
       keep-aligned-section
+
+      access-anywhere-section
 
       testimonials-section
 
