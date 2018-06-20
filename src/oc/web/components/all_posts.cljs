@@ -252,7 +252,7 @@
           (for [e items]
             (rum/with-key
              (stream-item e)
-             (str "all-posts-entry-" (:uuid e))))]
+             (str "all-posts-entry-" (:uuid e) "-" (:updated-at e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Retrieving activity..."])
