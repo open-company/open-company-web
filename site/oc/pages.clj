@@ -233,11 +233,11 @@
         [:div.balloon.small-purple]
 
         [:h1.headline
-          "Keep your team informed with fewer distractions."]
+          "Keep your team informed without distractions."]
         [:div.subheadline
           (str
-           "Carrot rises above the noise of real-time chat so it's simple "
-           "to stay aligned, creating happy and engaged teams.")]
+           "Rise above the noise of real-time chat and overstuffed inboxes "
+           "to keep growing and distributed teams aligned.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
