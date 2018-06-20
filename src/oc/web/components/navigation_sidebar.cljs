@@ -122,12 +122,12 @@
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
                                 :showing-invite-people-tooltip show-invite-people-tooltip})
        :style {:left (when-not is-mobile?
-                      (str (/ (- @(::window-width s) 944) 2) "px"))}}
+                      (str (/ (- @(::window-width s) 952) 2) "px"))}}
       [:div.mobile-board-name-container
         {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
         [:div.board-name
           (cond
-            is-all-posts "All Posts"
+            is-all-posts "All posts"
             is-drafts-board "Drafts"
             :else (:name board-data))]]
       [:div.left-navigation-sidebar-content
@@ -142,7 +142,7 @@
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
-              "All Posts"]])
+              "All posts"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group
