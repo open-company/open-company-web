@@ -97,12 +97,11 @@ div.home-wrap {
       }
 
       h1.headline {
-        font-size: 48px;
+        font-size: 40px;
         @include avenir_H();
         color: $deep_navy;
-        max-width: 760px;
+        max-width: 900px;
         margin: 0 auto;
-        line-height: 56px;
         z-index: 2;
         position: relative;
 
