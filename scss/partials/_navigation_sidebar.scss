@@ -26,7 +26,7 @@
 
   .internal {
     @include avenir_M();
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.71;
     color: $ui_grey;
     text-decoration: none;
@@ -45,7 +45,7 @@
 
   div.drafts-label {
     @include avenir_M();
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.71;
     color: $ui_grey;
     text-decoration: none;
@@ -58,7 +58,7 @@
 
     span.count {
       @include avenir_M();
-      font-size: 16px;
+      font-size: 15px;
       color: #C5C6C8;
 
       @include mobile() {
@@ -74,7 +74,7 @@
 
   div.all-posts-label {
     @include avenir_H();
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.71;
     color: $deep_navy;
     text-decoration: none;
@@ -88,7 +88,7 @@
 
     span.count {
       @include avenir_M();
-      font-size: 16px;
+      font-size: 15px;
       color: #C5C6C8;
     }
   }
@@ -96,8 +96,7 @@
 
 @mixin item-selected() {
   background-color: $feint_emerald;
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
+  border-radius: 6px;
 
   @include mobile() {
     background-color: transparent;
@@ -107,7 +106,7 @@
   .internal, div.all-posts-label, div.drafts-label {
     color: $carrot_green;
     @include avenir_M();
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.71;
     text-decoration: none;
 
@@ -126,6 +125,10 @@
     }
   }
 
+  div.all-posts-label, div.drafts-label {
+    font-size: 15px;
+  }
+
   div.all-posts-label {
     @include avenir_H();
   }
@@ -133,8 +136,7 @@
 
 @mixin item-hover(){
   background-color: rgba($carrot_light_gray_4, 0.2);
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
+  border-radius: 6px;
 
   @include mobile() {
     background-color: transparent;
@@ -144,7 +146,7 @@
   .internal {
     color: $deep_navy;
     @include avenir_M();
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.71;
     text-decoration: none;
 
@@ -159,7 +161,7 @@
 
   div.all-posts-label, div.drafts-label {
     color: $deep_navy;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.71;
     text-decoration: none;
   }
@@ -174,7 +176,6 @@ div.left-navigation-sidebar {
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
   top: 96px;
-  left: 0px;
   height: calc(100vh - 80px);
   @include no-user-select();
 
@@ -302,7 +303,7 @@ div.left-navigation-sidebar {
     }
 
     div.all-posts-label, div.drafts-label {
-      padding: 7px 5px 2px 5px;
+      padding: 2px 5px 1px 5px;
       width: 148px;
       text-align: left;
       margin-left: 16px;
@@ -316,12 +317,12 @@ div.left-navigation-sidebar {
 
     div.all-posts-icon {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
-      background-size: 18px 18px;
-      width: 18px;
-      height: 18px;
+      background-size: 18px 16px;
+      width: 16px;
+      height: 16px;
       float: left;
       margin-left: -4px;
-      margin-top: 8px;
+      margin-top: 6px;
 
       @include mobile() {
         margin-left: 0px;
@@ -340,9 +341,9 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-        background-size: 18px 18px;
-        width: 18px;
-        height: 18px;
+        background-size: 16px 16px;
+        width: 16px;
+        height: 16px;
         float: left;
         margin-left: 0px;
         margin-top: 0px;
@@ -655,7 +656,7 @@ div.left-navigation-sidebar {
 
       div.invite-people-tooltip-title {
         @include avenir_H();
-        font-size: 16px;
+        font-size: 15px;
         color: $deep_navy;
         width: 100%;
         margin: 24px auto 0px;

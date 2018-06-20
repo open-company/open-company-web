@@ -25,7 +25,7 @@
         fixed-notification-data (if dup
                                   (if (or (zero? (:expire notification-data)) (zero? (:expire dup)))
                                     (assoc notification-data :expire 0)
-                                    (assoc notification-data :expire (max (:expire notification-data) (:expire dup))))
+                                    (update-in notification-data [:expire] max (:expire dup)))
                                   notification-data)
         next-notifications (conj old-notifications fixed-notification-data)]
     (assoc-in db dispatcher/notifications-key next-notifications)))

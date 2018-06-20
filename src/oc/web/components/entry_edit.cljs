@@ -303,7 +303,7 @@
                                       (activity-actions/entry-save updated-entry-editing section-editing))
                                     (do
                                       (reset! (::publishing s) true)
-                                      (activity-actions/entry-publish updated-entry-editing section-editing))))
+                                      (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
                                 (when (zero? (count fixed-headline))
                                   (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
                                     (when-not (.data $post-btn "bs.tooltip")
@@ -339,7 +339,7 @@
                                 (remove-autosave s)
                                 (clean-body)
                                 (reset! (::saving s) true)
-                                (activity-actions/entry-save @(drv/get-ref s :entry-editing))))}
+                                (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
                     (small-loading))
                   "Save to draft"]))])]

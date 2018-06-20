@@ -29,7 +29,6 @@
   (close-navigation-sidebar))
 
 (def sidebar-top-margin 84)
-(def footer-button-height 31)
 
 (defn save-content-height [s]
   (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
@@ -46,15 +45,18 @@
     (and (not= (:slug board-data) utils/default-drafts-board-slug)
          (or (not (contains? self-link :count))
              (and (contains? self-link :count)
-                  (pos? (:count self-link)))))))
+                  (pos? (:count self-link))))
+         (or (not (contains? board-data :draft))
+             (not (:draft board-data))))))
 
 (defn filter-boards [all-boards]
   (filterv filter-board all-boards))
 
-(defn save-window-height
+(defn save-window-size
   "Save the window height in the local state."
   [s]
-  (reset! (::window-height s) (.-innerHeight js/window)))
+  (reset! (::window-height s) (.-innerHeight js/window))
+  (reset! (::window-width s) (.-innerWidth js/window)))
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
@@ -67,12 +69,13 @@
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
+                                (rum/local nil ::window-width)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
-                                (ui-mixins/render-on-resize save-window-height)
+                                (ui-mixins/render-on-resize save-window-size)
 
                                 {:will-mount (fn [s]
-                                  (save-window-height s)
+                                  (save-window-size s)
                                   (save-content-height s)
                                   s)
                                  :before-render (fn [s]
@@ -106,7 +109,8 @@
                             (utils/link-for (:links org-data) "activity"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-drafts (pos? (:count drafts-link))
+        show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)
+                        (pos? (:count drafts-link)))
         org-slug (router/current-org-slug)
         show-invite-people (and org-slug
                                 (jwt/is-admin? (:team-id org-data)))
@@ -114,15 +118,18 @@
                             (not @(::footer-height s))
                             (< @(::content-height s)
                              (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
-        show-invite-people-tooltip (drv/react s :show-invite-people-tooltip)]
+        show-invite-people-tooltip (drv/react s :show-invite-people-tooltip)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :showing-invite-people-tooltip show-invite-people-tooltip})}
+                                :showing-invite-people-tooltip show-invite-people-tooltip})
+       :style {:left (when-not is-mobile?
+                      (str (/ (- @(::window-width s) 952) 2) "px"))}}
       [:div.mobile-board-name-container
         {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
         [:div.board-name
           (cond
-            is-all-posts "All Posts"
+            is-all-posts "All posts"
             is-drafts-board "Drafts"
             :else (:name board-data))]]
       [:div.left-navigation-sidebar-content
@@ -137,7 +144,7 @@
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
-              "All Posts"]])
+              "All posts"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group
@@ -152,7 +159,8 @@
                 {:class (when is-drafts-board "selected")}]
               [:div.drafts-label.group
                 "Drafts "
-                [:span.count "(" (:count drafts-link) ")"]]]))
+                (when (pos? (:count drafts-link))
+                  [:span.count "(" (:count drafts-link) ")"])]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
@@ -167,7 +175,7 @@
                                (close-navigation-sidebar))
                    :title "Create a new section"
                    :data-placement "top"
-                   :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
+                   :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}])]])
         (when show-boards
