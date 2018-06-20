@@ -61,7 +61,8 @@
               (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
         ; Comments count
         [:div.is-comments-summary.fs-hide
-          {:class (str "comments-count-" (:uuid entry-data))}
+          {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
+                                    :add-a-comment (not (pos? comments-count))})}
           (if (responsive/is-tablet-or-mobile?)
             (comment-summary-string comments-authors)
             (if (pos? comments-count)

@@ -164,18 +164,6 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         empty-board? (and (not nux)
                           (zero? (count (:fixed-items board-data))))
-        sidebar-width (+ responsive/left-navigation-sidebar-width
-                         responsive/left-navigation-sidebar-minimum-right-margin)
-        board-container-style {:marginLeft (if is-mobile?
-                                             "0px"
-                                             (str (max
-                                                   sidebar-width
-                                                   (+
-                                                    (/
-                                                     (- @(::ww s) responsive/dashboard-container-width sidebar-width)
-                                                     2)
-                                                    sidebar-width))
-                                             "px"))}
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
@@ -220,8 +208,7 @@
           (when (or (not is-mobile?)
                     (not mobile-navigation-sidebar))
             [:div.board-container.group
-              {:class (when is-all-posts "all-posts-container")
-               :style board-container-style}
+              {:class (when is-all-posts "all-posts-container")}
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
@@ -231,10 +218,10 @@
                     [:div.board-name-with-icon
                       {:dangerouslySetInnerHTML (cond
                                                  is-all-posts
-                                                 #js {"__html" "All Posts"}
+                                                 #js {"__html" "All posts"}
 
                                                  is-must-read
-                                                 #js {"__html" "Must See"}
+                                                 #js {"__html" "Must see"}
 
                                                  :default
                                                  (utils/emojify (:name board-data)))}])
