@@ -67,7 +67,9 @@
             (:name publisher)]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              (utils/time-since t))]]
+              [:time
+                {:date-time t}
+                (utils/time-since t)])]]
         [:div.activity-card-preview-title
           {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-preview-body

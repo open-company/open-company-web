@@ -20,16 +20,18 @@
     (when (pos? atc-num)
       [:div.stream-attachments
         [:div.stream-attachments-content
-          (for [atch attachments-list
-                :let [created-at (:created-at atch)
+          (for [idx (range (count attachments-list))
+                :let [atch (nth attachments-list idx)
+                      atch-key (str "attachment-" idx "-" (:file-url atch))
+                      created-at (:created-at atch)
                       file-name (:file-name atch)
                       size (:file-size atch)
                       subtitle (when size
                                  (filesize size :binary false :format "%.2f"))]]
             [:div.stream-attachments-item.group
+              {:key atch-key}
               [:a.group
-                {:key (str "attachment-" size "-" (:file-url atch))
-                 :href (:file-url atch)
+                {:href (:file-url atch)
                  :target "_blank"}
                 [:div.attachment-info
                   {:class (when editable? "editable")}
