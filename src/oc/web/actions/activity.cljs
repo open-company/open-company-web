@@ -346,8 +346,7 @@
 (defn get-entry [entry-data]
   (api/get-entry entry-data
     (fn [{:keys [status success body]}]
-      (if success
-        (dis/dispatch! [:entry (dis/current-board-key) (:uuid entry-data) (json->cljs body)])))))
+      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil (= (router/current-board-slug) "all-posts")]))))
 
 (defn entry-clear-local-cache [item-uuid edit-key]
   (remove-cached-item item-uuid)
@@ -478,7 +477,7 @@
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
     (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-  (dis/dispatch! [:activity-get/finish status activity-data secure-uuid]))
+  (dis/dispatch! [:activity-get/finish (router/current-org-slug) status activity-data secure-uuid]))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
   (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
@@ -486,7 +485,29 @@
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
+;; Change reaction
+
+(defn activity-change [section-uuid activity-uuid]
+  (let [org-data (dis/org-data)
+        section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
+        activity-key (dis/activity-key (:slug org-data) (:slug section-data) activity-uuid)
+        activity-data (get-in @dis/app-state activity-key)]
+    (when activity-data
+      (get-entry activity-data))))
+
 ;; Change service actions
+
+(defn ws-change-subscribe []
+  (ws-cc/subscribe :item/change
+    (fn [data]
+      (let [change-data (:data data)
+            activity-uuid (:item-id change-data)
+            section-uuid (:container-id change-data)
+            change-type (:change-type change-data)]
+        ;; Refresh the section only in case of items added or removed
+        ;; let the activity handle the item update case
+        (when (= change-type :update)
+          (activity-change section-uuid activity-uuid))))))
 
 (defn- send-item-seen
   "Actually send the seen at. Needs to get the activity data from the app-state
