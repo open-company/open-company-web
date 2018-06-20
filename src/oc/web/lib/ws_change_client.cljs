@@ -79,6 +79,11 @@
   (timbre/debug "Change event:" body)
   (go (>! ch-pub { :topic :container/change :data body })))
 
+(defmethod event-handler :item/change
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :item/change :data body })))
+
 ;; ----- Sente event handlers -----
 
 (defmulti -event-msg-handler
