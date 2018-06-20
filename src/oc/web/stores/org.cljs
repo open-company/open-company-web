@@ -1,6 +1,7 @@
 (ns oc.web.stores.org
   (:require [oc.web.lib.utils :as utils]
             [taoensso.timbre :as timbre]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dispatcher]))
 
 (defn read-only-org
@@ -19,7 +20,10 @@
   ;; We need to remove the boards that are no longer in the org except all-posts and drafts
   (let [boards-key (dispatcher/boards-key (:slug org-data))
         old-boards (get-in db boards-key)
-        board-slugs (set (map (comp keyword :slug) (:boards org-data)))
+        keep-boards (case (router/current-board-slug)
+                     "all-posts" [:all-posts]
+                     [])
+        board-slugs (set (concat (map (comp keyword :slug) (:boards org-data)) keep-boards))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))]
