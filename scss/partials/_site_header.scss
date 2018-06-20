@@ -202,9 +202,10 @@ nav.site-navbar {
           margin-top: 2px;
           width: 72px;
           // text-align: center;
-          padding: 2px 0px 0px;
+          padding: 4px 0px 0px;
           font-size: 13px;
           letter-spacing: 0.46px;
+          min-width: 64px;
         }
 
         span.slack-orange-icon {

@@ -62,7 +62,7 @@
 (defn section-change
   [section-uuid change-at]
   (timbre/debug "Section change:" section-uuid "at:" change-at)
-  (utils/after 1000 (fn []
+  (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)]
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
@@ -181,10 +181,23 @@
   (ws-cc/subscribe :container/change
     (fn [data]
       (let [change-data (:data data)
-            container-id (:container-id change-data)]
-        ;; not an org data change
-        (when (not= container-id (:uuid (dispatcher/org-data)))
-          (section-change container-id (:change-at change-data)))))))
+            section-uuid (:item-id change-data)
+            change-type (:change-type change-data)
+            change-at (:change-at change-data)]
+        ;; Refresh the section only in case of an update, let the org
+        ;; handle the add and delete cases
+        (when (= change-type :update)
+          (section-change section-uuid change-at)))))
+  (ws-cc/subscribe :item/change
+    (fn [data]
+      (let [change-data (:data data)
+            section-uuid (:container-id change-data)
+            change-type (:change-type change-data)]
+        ;; Refresh the section only in case of items added or removed
+        ;; let the activity handle the item update case
+        (when (or (= change-type :add)
+                  (= change-type :delete))
+          (section-change section-uuid (:change-at change-data)))))))
 
 (defn ws-interaction-subscribe []
   (ws-ic/subscribe :interaction-comment/add

@@ -103,7 +103,7 @@
               {:key (str "entries-row-" idx)}
               (for [entry entries]
                 (rum/with-key (activity-card entry has-headline has-body (:new entry) has-attachments)
-                  (str "entry-latest-" (:uuid entry))))
+                  (str "entry-latest-" (:uuid entry) "-" (:updated-at entry))))
               ; If the row contains less than 2, add a placeholder
 
               ; div to avoid having the first cover the full width

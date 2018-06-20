@@ -35,6 +35,6 @@
       [:div.section-stream-cards
         [:div.section-stream-cards-inner.group
           (for [e items]
-            (rum/with-key (stream-item e) (str "section-stream-item-" (:uuid e))))]
+            (rum/with-key (stream-item e) (str "section-stream-item-" (:uuid e) "-" (:updated-at e))))]
         (when (responsive/is-mobile-size?)
           (all-caught-up))]]))

@@ -69,14 +69,6 @@
         next-attachments (filterv #(not= (:file-url %) (:file-url attachment-data)) old-attachments)]
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
 
-(defmethod dispatcher/action :entry [db [_ board-key entry-uuid body]]
-  (let [board-data (get db board-key)
-        new-entries (assoc (get board-data :fixed-items)
-                     entry-uuid
-                     (au/fix-entry body board-data (dispatcher/change-data db)))
-        new-board-data (assoc board-data :fixed-items new-entries)]
-  (assoc db board-key new-board-data)))
-
 (defmethod dispatcher/action :entry-clear-local-cache
   [db [_ edit-key]]
   (dissoc db :entry-save-on-exit))
@@ -180,12 +172,11 @@
       {:error true})))
 
 (defmethod dispatcher/action :activity-get/finish
-  [db [_ status activity-data secure-uuid]]
+  [db [_ status org-slug activity-data secure-uuid is-ap?]]
   (let [next-db (if (= status 404)
                   (dissoc db :latest-entry-point)
                   db)
         activity-uuid (:uuid activity-data)
-        org-slug (:org-slug activity-data)
         board-slug (:board-slug activity-data)
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
@@ -194,10 +185,12 @@
                              activity-data
                              {:slug (or (:board-slug activity-data) board-slug)
                               :name (:board-name activity-data)}
-                             (dispatcher/change-data db))]
-    (-> next-db
-      (dissoc :activity-loading)
-      (assoc-in activity-key fixed-activity-data))))
+                             (dispatcher/change-data db))
+        ap-activity-key (dispatcher/activity-key org-slug :all-posts activity-uuid)
+        with-fixed-ap (if is-ap?
+                        (assoc-in next-db ap-activity-key fixed-activity-data)
+                        next-db)]
+    (assoc-in with-fixed-ap activity-key fixed-activity-data)))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug fixed-board-data]]

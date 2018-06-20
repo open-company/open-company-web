@@ -202,4 +202,15 @@
 
 ;; subscribe to websocket events
 (defn subscribe []
-  (ws-cc/subscribe :container/change org-change))
+  (ws-cc/subscribe :org/status
+    (fn [data]
+      (get-org)))
+  (ws-cc/subscribe :container/change
+    (fn [data]
+      (let [change-data (:data data)
+            change-type (:change-type change-data)]
+        ;; Handle only the section add and delete cases
+        ;; Let the section handle the update case
+        (when (or (= change-type :add)
+                  (= change-type :delete))
+          (org-change data))))))
