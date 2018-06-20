@@ -324,6 +324,11 @@
 
 ;; Data
 
+(defn ap-initial-at
+  "Get ap-initial-at."
+  ([] (ap-initial-at @app-state))
+  ([data] (:ap-initial-at data)))
+
 (defn bot-access
   ""
   ([] (bot-access @app-state))
