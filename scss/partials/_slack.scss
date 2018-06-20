@@ -87,6 +87,14 @@ div.slack-wrap {
       }
     }
 
+    section.home-keep-aligned {
+      background-color: #FFFDF9;
+    }
+
+    section.access-anywhere-section {
+      background-color: #F8F7F3;
+    }
+
     section.carrot-plus-slack {
       padding-top: 72px;
       padding-bottom: 120px;
@@ -277,6 +285,7 @@ div.slack-wrap {
     section.keep-aligned {
       text-align: center;
       margin: 0px auto;
+      background-color: #FFFDF9;
 
       div.keep-aligned-title {
         @include avenir_M();

@@ -364,7 +364,7 @@ button.get-started-button {
 
 section.home-keep-aligned {
   background-color: #F8F7F3;
-  padding: 120px 24px;
+  padding: 100px 24px;
   text-align: center;
 
   @include mobile() {
@@ -377,6 +377,7 @@ section.home-keep-aligned {
     line-height: 42px;
     color: $deep_navy;
     text-align: center;
+    margin: 0px;
 
     @include mobile() {
       text-align: left;
@@ -518,9 +519,7 @@ section.access-anywhere-section {
   background-color: #FFFDF9;
   position: relative;
   padding: 156px 0px;
-  width: 1080px;
   height: 400px;
-  margin: 0px auto;
 
   @include mobile() {
     width: 100%;
@@ -528,63 +527,72 @@ section.access-anywhere-section {
     padding: 40px 24px 0px !important;
   }
 
-  div.access-anywhere-screenshot {
-    width: 417px;
-    height: 320px;
-    position: absolute;
-    top: 80px;
-    left: 97px;
-    @include image-2x("/img/ML/access_anywhere_screenshot");
-    background-size: 417px 320px;
-    background-repeat: no-repeat;
-    background-position: center;
+  div.access-anywhere-section-container {
+    width: 1080px;
+    margin: 0px auto;
 
     @include mobile() {
-      position: relative;
-      top: unset;
-      left: unset;
-      width: 327px;
-      height: 254px;
-      margin: 32px auto 0px;
-      background-size: 327px 254px;
-    }
-  }
-
-  div.access-anywhere-copy {
-    width: 406px;
-    height: 98px;
-    position: absolute;
-    top: 156px;
-    left: 578px;
-    text-align: left;
-
-    @include mobile() {
-      position: relative;
-      top: unset;
-      left: unset;
       width: 100%;
-      height: auto;
     }
 
-    div.access-anywhere-copy-title {
-      @include avenir_H();
-      font-size: 28px;
-      line-height: 32px;
-      color: $deep_navy;
+    div.access-anywhere-screenshot {
+      width: 417px;
+      height: 320px;
+      position: absolute;
+      top: 80px;
+      left: 97px;
+      @include image-2x("/img/ML/access_anywhere_screenshot");
+      background-size: 417px 320px;
+      background-repeat: no-repeat;
+      background-position: center;
 
-      @include mobile(){
-        font-size: 24px;
+      @include mobile() {
+        position: relative;
+        top: unset;
+        left: unset;
+        width: 327px;
+        height: 254px;
+        margin: 32px auto 0px;
+        background-size: 327px 254px;
       }
     }
 
-    div.access-anywhere-copy-subtitle {
-      @include avenir_R();
-      font-size: 18px;
-      line-height: 26px;
-      color: $deep_navy;
+    div.access-anywhere-copy {
+      width: 406px;
+      height: 98px;
+      position: absolute;
+      top: 156px;
+      left: 578px;
+      text-align: left;
 
-      @include mobile(){
-        font-size: 17px;
+      @include mobile() {
+        position: relative;
+        top: unset;
+        left: unset;
+        width: 100%;
+        height: auto;
+      }
+
+      div.access-anywhere-copy-title {
+        @include avenir_H();
+        font-size: 28px;
+        line-height: 32px;
+        color: $deep_navy;
+
+        @include mobile(){
+          font-size: 24px;
+        }
+      }
+
+      div.access-anywhere-copy-subtitle {
+        @include avenir_R();
+        font-size: 18px;
+        line-height: 26px;
+        color: $deep_navy;
+
+        @include mobile(){
+          font-size: 17px;
+        }
       }
     }
   }

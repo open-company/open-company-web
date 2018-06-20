@@ -55,7 +55,7 @@
                             (reset! (::expanded s) :support)))}
             "Support"]
           [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
-          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          ; [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         [:div.column.column-integrations

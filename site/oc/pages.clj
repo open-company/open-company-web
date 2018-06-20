@@ -137,7 +137,7 @@
 (def keep-aligned-section
   [:section.home-keep-aligned
     [:h2.keep-aligned-title
-      "Carrot keeps leaders and their teams aligned"]
+      "Carrot keeps leaders and teams aligned"]
 
     [:div.keep-aligned-section
       [:div.keep-aligned-section-row
@@ -150,9 +150,7 @@
           [:div.keep-aligned-section-list-item
             "Follow people and topics you can’t miss"]
           [:div.keep-aligned-section-list-item
-            "See what’s trending to stay in the loop"]
-          [:div.keep-aligned-section-list-item
-            "Receive a morning digest with key updates"]]]
+            "See what’s trending to stay in the loop"]]]
 
       [:div.keep-aligned-section-row
         [:div.keep-aligned-section-screenshot.screenshot-2]
@@ -192,12 +190,13 @@
 
 (def access-anywhere-section
   [:section.access-anywhere-section
-    [:div.access-anywhere-copy
-      [:div.access-anywhere-copy-title
-        "Stay up to date on the go. Access Carrot from anywhere."]
-      [:div.access-anywhere-copy-subtitle
-        "Fully responsive web app. No app install required."]]
-    [:div.access-anywhere-screenshot]])
+    [:div.access-anywhere-section-container
+      [:div.access-anywhere-copy
+        [:div.access-anywhere-copy-title
+          "Stay up to date on the go. Access Carrot from anywhere."]
+        [:div.access-anywhere-copy-subtitle
+          "Fully responsive web app. No app install required."]]
+      [:div.access-anywhere-screenshot]]])
 
 (defn slack-comparison-section
   [& [slack-version?]]
@@ -209,7 +208,7 @@
         "Slack keeps your team connected in the moment."])
     (if slack-version? 
       [:div.slack-comparison-headline-2
-        "Keep Slackers on the same page with fewer distractions."]
+        "Keep your team informed without distractions."]
       [:div.slack-comparison-headline-2
         "Carrot keeps it aligned over time."])
     [:img.slack-comparison-screenshot.big-web-only
