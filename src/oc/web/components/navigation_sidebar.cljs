@@ -108,6 +108,7 @@
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
+        show-must-see (pos? (:must-see-count org-data))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -132,7 +133,7 @@
           (cond
             is-all-posts "All posts"
             is-drafts-board "Drafts"
-            is-must-read "Must See"
+            is-must-read "Must see"
             :else (:name board-data))]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -140,6 +141,7 @@
         (when show-all-posts
           [:a.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-all-posts
+                                      :showing-must-see show-must-see
                                       :showing-drafts show-drafts})
              :href (oc-urls/all-posts)
              :on-click #(anchor-nav! % (oc-urls/all-posts))}
@@ -147,16 +149,16 @@
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
               "All posts"]])
-        (when show-all-posts
+        (when show-must-see
            [:a.must-read.hover-item.group
-             {:class (utils/class-set {:item-selected is-must-read
+            {:class (utils/class-set {:item-selected is-must-read
                                       :showing-drafts show-drafts})
               :href (oc-urls/must-read)
               :on-click #(anchor-nav! % (oc-urls/must-read))}
              [:div.must-read-icon
                {:class (when is-must-read "selected")}]
              [:div.must-read-label
-               "Must See"]])
+               "Must see"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group

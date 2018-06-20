@@ -42,6 +42,7 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))
+        is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "activity-card-" (:uuid activity-data))
         comments-data (au/get-comments activity-data (drv/react s :comments-data))
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -78,9 +79,9 @@
       [:div.activity-card-bottom-container.group
         [:div.activity-card-header
           (str (:name publisher)
-            (when (or is-all-posts is-drafts-board)
+            (when (or is-all-posts is-drafts-board is-must-see)
               " in ")
-            (when (or is-all-posts is-drafts-board)
+            (when (or is-all-posts is-drafts-board is-must-see)
               (:board-name activity-data)))
          (when (:must-read activity-data)
            [:div.activity-card-header-must-read])]

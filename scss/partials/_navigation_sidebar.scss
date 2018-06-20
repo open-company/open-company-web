@@ -260,8 +260,13 @@ div.left-navigation-sidebar {
   }
 
   a.all-posts {
-    margin-botton: 0px;
+    margin-bottom: 40px;
+
+    &.showing-must-see {
+      margin-bottom: 0px;
+    }
   }
+
   a.must-read {
     margin-bottom: 40px;
 

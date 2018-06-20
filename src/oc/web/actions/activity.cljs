@@ -505,10 +505,26 @@
 
 (defn toggle-must-read [activity-data]
   (let [must-read (:must-read activity-data)
-        must-read-toggled (assoc activity-data :must-read (not must-read))]
+        must-read-toggled (assoc activity-data :must-read (not must-read))
+        org-data (dis/org-data)
+        must-read-count (:must-read-count dis/org-data)
+        new-must-read-count (if (not must-read)
+                              (+ must-read-count 1)
+                              (- must-read-count 1))]
+    (dis/dispatch! [:org-loaded
+                    (assoc org-data :must-read-count new-must-read-count)
+                    false])
+    (dis/dispatch! [:entry
+                    (dis/current-board-key)
+                    (:uuid activity-data)
+                    must-read-toggled])
     (api/update-entry must-read-toggled :must-read
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success
+                          (api/get-org org-data
+                            (fn [{:keys [status body success]}]
+                              (let [api-org-data (json->cljs body)]
+                                (dis/dispatch! [:org-loaded api-org-data false]))))
                           (dis/dispatch! [:entry
                                           (dis/current-board-key)
                                           (:uuid activity-data)
