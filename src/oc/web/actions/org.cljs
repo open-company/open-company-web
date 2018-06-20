@@ -202,6 +202,9 @@
 
 ;; subscribe to websocket events
 (defn subscribe []
+  (ws-cc/subscribe :org/status
+    (fn [data]
+      (get-org)))
   (ws-cc/subscribe :container/change
     (fn [data]
       (let [change-data (:data data)

@@ -74,6 +74,11 @@
   (timbre/debug "Status event:" body)
   (go (>! ch-pub { :topic :container/status :data body })))
 
+(defmethod event-handler :org/change
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :org/change :data body })))
+
 (defmethod event-handler :container/change
   [_ body]
   (timbre/debug "Change event:" body)
