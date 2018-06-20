@@ -498,14 +498,27 @@
 ;; Change service actions
 
 (defn ws-change-subscribe []
+  (ws-cc/subscribe :container/change
+    (fn [data]
+      (let [change-data (:data data)
+            section-uuid (:item-id change-data)
+            change-type (:change-type change-data)
+            change-at (:change-at change-data)]
+        ;; Refresh AP if user is looking at it
+        (when (= (router/current-board-slug) "all-posts")
+          (all-posts-get (dis/org-data) (dis/ap-initial-at))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
             activity-uuid (:item-id change-data)
             section-uuid (:container-id change-data)
             change-type (:change-type change-data)]
-        ;; Refresh the section only in case of items added or removed
-        ;; let the activity handle the item update case
+        ;; Refresh the AP in case of items added or removed
+        (when (and (or (= change-type :add)
+                       (= change-type :delete))
+                   (= (router/current-board-slug) "all-posts"))
+          (all-posts-get (dis/org-data) (dis/ap-initial-at)))
+        ;; Refresh the activity in case of an item update
         (when (= change-type :update)
           (activity-change section-uuid activity-uuid))))))
 
