@@ -161,6 +161,7 @@
                         (rum/local false ::window-click-listener)
                         (rum/local nil ::autosave-timer)
                         (rum/local false ::show-legend)
+                        (rum/local false ::record-video)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -383,6 +384,11 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
+          ;; Video element
+          (when @(::record-video s)
+            [:div.ziggeo-video
+              {:dangerouslySetInnerHTML #js {"__html"
+              (str "<ziggeo ziggeo-modes=\"recorder,rerecorder\" ziggeo-video=\"" (:uuid entry-editing) "\"></ziggeo>")}}])
           (rich-body-editor {:on-change (partial body-on-change s)
                              :use-inline-media-picker false
                              :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
@@ -423,4 +429,5 @@
              :data-placement "top"
              :data-container "body"
              :title "Record video"
-             :on-click (fn [] (iu/upload! {:fromSources ["local_file_system" "webcam"]} #(js/console.log %) #(js/console.log %) #(js/console.log %)))}]]]]))
+             :on-click (fn []
+                        (reset! (::record-video s) true))}]]]]))

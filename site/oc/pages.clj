@@ -30,6 +30,15 @@
     {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"
      :crossorigin "anonymous"}])
 
+(def ziggeo-css
+  [:link {:rel "stylesheet" :href "//assets-cdn.ziggeo.com/v1-stable/ziggeo.css"}])
+
+(def ziggeo-js
+  [:script {:src "//assets-cdn.ziggeo.com/v1-stable/ziggeo.js"}])
+
+(def ziggeo-setup
+  [:script "ZiggeoApi.token = \"c9b611b2b996ee5a1f318d3bacc36b27\";"])
+
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")
@@ -799,7 +808,11 @@
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
-          [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]]
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
+          ;; Ziggeo
+          ziggeo-css
+          ziggeo-js
+          ziggeo-setup]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -882,7 +895,11 @@
           jquery
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
-          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
+          ;; Ziggeo
+          ziggeo-css
+          ziggeo-js
+          ziggeo-setup]
    :body [:body
           [:div#app
             [:div.oc-loading.active
