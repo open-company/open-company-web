@@ -31,25 +31,11 @@
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
-        fixed-tooltip-position (or tooltip-position "top")
-        must-read (:must-read activity-data)
-        must-read-title (if must-read
-                          "Unmark as must see"
-                          "Mark as must see")]
+        fixed-tooltip-position (or tooltip-position "top")]
     (when (or edit-link
               delete-link
               share-link)
       [:div.tile-menu
-        (when edit-link
-          [:button.mlb-reset.tile-menu-bt.tile-menu-must-read-bt
-            {:class (utils/class-set {:must-read-on must-read})
-             :type "button"
-             :ref "tile-menu-must-read-bt"
-             :on-click #(activity-actions/toggle-must-read activity-data)
-             :data-toggle "tooltip"
-             :data-placement fixed-tooltip-position
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-             :title must-read-title}])
         (when edit-link
           [:button.mlb-reset.tile-menu-bt.tile-menu-edit-bt
             {:type "button"

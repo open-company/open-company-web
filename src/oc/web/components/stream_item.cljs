@@ -127,8 +127,12 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
-         (when (:must-read activity-data)
-           [:div.must-read "Must see"])]
+         [:div.must-read
+          {:class (utils/class-set {:must-see-on (:must-read activity-data)})
+           :on-click #(do
+                        (utils/event-stop %)
+                        (activity-actions/toggle-must-read activity-data))}
+           (when (:must-read activity-data) "Must see")]]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))

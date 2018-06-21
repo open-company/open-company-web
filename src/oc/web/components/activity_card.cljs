@@ -83,8 +83,11 @@
               " in ")
             (when (or is-all-posts is-drafts-board is-must-see)
               (:board-name activity-data)))
-         (when (:must-read activity-data)
-           [:div.activity-card-header-must-read])]
+         [:div.activity-card-header-must-read
+          {:class (utils/class-set {:must-see-on (:must-read activity-data)})
+           :on-click #(do
+                        (utils/event-stop %)
+                        (activity-actions/toggle-must-read activity-data))}]]
         [:div.activity-card-headline
           {:ref "activity-headline"
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]

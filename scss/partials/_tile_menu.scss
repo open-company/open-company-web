@@ -38,14 +38,5 @@ div.tile-menu {
       background-image: cdnUrl("/img/ML/stream_tile_share.svg");
       background-size: 14px 14px;
     }
-
-    &.must-read-on {
-      opacity: 1;
-    }
-
-    &.tile-menu-must-read-bt {
-      background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
-      background-size: 16px 14px;
-    }
   }
 }

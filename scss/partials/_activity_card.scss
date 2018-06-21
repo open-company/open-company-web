@@ -157,13 +157,25 @@ div.activity-card {
       white-space: nowrap;
 
       div.activity-card-header-must-read {
-        background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
+        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
         background-size: 16px 14px;
         width: 16px;
         height: 14px;
         display: inline-block;
         margin-left: 5px;
         opacity: 0.4;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.must-see-on {
+          opacity: 1;
+
+          &:hover {
+            opacity: 0.4;
+          }
+        }
       }
     }
 

@@ -345,7 +345,7 @@ div.left-navigation-sidebar {
     }
 
     div.must-read-icon {
-      background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
+      background-image: cdnUrl("/img/ML/must_see_bolt.svg");
       background-size: 18px 18px;
       width: 18px;
       height: 18px;
@@ -362,7 +362,7 @@ div.left-navigation-sidebar {
 
       &.selected {
         opacity: 1;
-        background-image: cdnUrl("/img/ML/stream_tile_glasses.svg");
+        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
       }
     }
 
