@@ -102,9 +102,9 @@ div.slack-wrap {
       position: relative;
       overflow: hidden;
 
-      @include tablet(){
+      @include tablet() {
         overflow: visible;
-        padding: 80px 24px;
+        padding: 120px 24px;
       }
 
       div.balloon {
@@ -202,6 +202,7 @@ div.slack-wrap {
           line-height: 30px;
           text-align: left;
           padding: 0px;
+          margin: 0px;
         }
       }
 
@@ -285,11 +286,11 @@ div.slack-wrap {
     section.keep-aligned {
       text-align: center;
       margin: 0px auto;
-      background-color: #FFFDF9;
+      // background-color: #FFFDF9;
 
       div.keep-aligned-title {
-        @include avenir_M();
-        font-size: 34px;
+        @include avenir_H();
+        font-size: 28px;
         color: $deep_navy;
       }
     }

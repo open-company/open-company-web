@@ -59,10 +59,6 @@ nav.site-navbar {
         a.navbar-brand-left {
           margin-top: 10px;
         }
-
-        div.mobile-ham-menu {
-          top: 20px;
-        }
       }
 
       div.site-navbar-right {
@@ -94,9 +90,13 @@ nav.site-navbar {
   }
 
   div.site-navbar-container {
-    height: 76px;
-    padding: 24px 40px 12px;
+    height: 72px;
+    padding: 22px 40px;
     position: relative;
+
+    @include mobile() {
+      padding: 22px 24px;
+    }
 
     div.mobile-ham-menu {
       @include mobile() {
@@ -104,10 +104,10 @@ nav.site-navbar {
         width: 32px;
         height: 32px;
         background-image: cdnUrl("/img/ML/mobile_ham_menu.svg");
-        background-size: 18px 14px;
+        background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center;
-        top: 22px;
+        top: 16px;
         left: 24px;
       }
     }
@@ -191,18 +191,12 @@ nav.site-navbar {
         margin-top: 0px;
         opacity: 0.8;
 
-        &.slack {
-          @include mobile() {
-            padding: 0px 0px;
-          }
-        }
-
         @include mobile() {
           height: 24px;
           margin-top: 2px;
           width: 72px;
           // text-align: center;
-          padding: 2px 0px 0px;
+          padding: 4px 0px 0px;
           font-size: 13px;
           letter-spacing: 0.46px;
         }
@@ -219,7 +213,7 @@ nav.site-navbar {
           position: relative;
 
           @include mobile() {
-            top: 2px;
+            top: 4px;
           }
         }
 
@@ -273,6 +267,13 @@ nav.site-navbar {
         width: 99px;
         height: 24px;
         background-size: 99px 24px;
+
+        &.is-slack-header {
+          float: left;
+          position: relative;
+          left: unset;
+          margin: 7px 0px 0px;
+        }
       }
 
       @media screen and (max-width: 320px) {

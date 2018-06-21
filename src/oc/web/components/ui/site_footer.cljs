@@ -13,8 +13,8 @@
 
 (rum/defcs site-footer  < (rum/local nil ::expanded)
   [s]
-
   [:footer.navbar.navbar-default.navbar-bottom
+    {:class (when (utils/in? (:route @router/path) "slack-lander") "light-background")}
     [:div.container-fluid.group
       [:div.footer-balloon.big-green]
       [:div.footer-balloon.small-purple]

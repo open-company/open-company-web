@@ -93,55 +93,57 @@
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
    and every change here should be reflected there."
   [active-page]
-  ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-  [:nav.site-navbar
-    [:div.site-navbar-container
-      [:a.navbar-brand-left
-        {:href "/?no_redirect=1"}]
-      [:div.navbar-brand-center
-        [:a
-          {:href "/"
-           :class (when (= active-page "index") "active")}
-          "Home"]
-        [:a
-          {:href "/about"
-           :class (when (= active-page "about") "active")}
-          "About"]
-        [:a
-          {:href "/pricing"
-           :class (when (= active-page "pricing") "active")}
-          "Pricing"]
-        [:a
-          {:href "https://blog.carrot.io"
-           :target "_blank"}
-          "Blog"]]
-      [:div.site-navbar-right.big-web-only
-        [:a.login
-          {:id "site-header-login-item"
-           :href "/login"}
-            "Login"]
-        [:a.start
-          {:id "site-header-signup-item"
-           :href "/sign-up"
-           :class (when (= active-page "slack")
-                    "slack-get-started")}
-          (if (= active-page "slack")
-            [:span
-              [:span.slack-orange-icon]
-              "Add to Slack"]
-            "Get Started")]]
-      [:div.site-navbar-right.mobile-only
-        [:a.start
-          {:id "site-header-mobile-signup-item"
-           :class (when (= active-page "slack") "slack")
-           :href "/sign-up"}
+  (let [show-navigation? (not= (name active-page) "slack")]
+    ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
+    [:nav.site-navbar
+      [:div.site-navbar-container
+        [:a.navbar-brand-left
+          {:class (when-not show-navigation? "is-slack-header")
+           :href "/?no_redirect=1"}]
+        (when show-navigation?
+          [:div.navbar-brand-center
+            [:a
+              {:href "/"
+               :class (when (= active-page "index") "active")}
+              "Home"]
+            [:a
+              {:href "/about"
+               :class (when (= active-page "about") "active")}
+              "About"]
+            [:a
+              {:href "/pricing"
+               :class (when (= active-page "pricing") "active")}
+              "Pricing"]
+            [:a
+              {:href "https://blog.carrot.io"
+               :target "_blank"}
+              "Blog"]])
+        [:div.site-navbar-right.big-web-only
+          [:a.login
+            {:id "site-header-login-item"
+             :href "/login"}
+              "Login"]
+          [:a.start
+            {:id "site-header-signup-item"
+             :href "/sign-up"
+             :class (when (= active-page "slack")
+                      "slack-get-started")}
             (if (= active-page "slack")
               [:span
                 [:span.slack-orange-icon]
-                "ADD"]
-              "START")]]
-      [:div.mobile-ham-menu.mobile-only
-        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
+                "Add to Slack"]
+              "Get Started")]]
+        [:div.site-navbar-right.mobile-only
+          [:a.start
+            {:id "site-header-mobile-signup-item"
+             :class (when (= active-page "slack") "slack")
+             :href "/sign-up"}
+              (if (= active-page "slack")
+                "ADD"
+                "START")]]
+        (when show-navigation?
+          [:div.mobile-ham-menu.mobile-only
+            {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}])]]))
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer

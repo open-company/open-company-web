@@ -17,7 +17,7 @@ div.slack-lander-wrap {
     }
 
     section.cta {
-      padding-top: 162px;
+      padding-top: 128px;
       padding-bottom: 120px;
       text-align: center;
       position: relative;
@@ -79,7 +79,7 @@ div.slack-lander-wrap {
           background-size: 400px 380px;
           width: 400px;
           height: 380px;
-          top: 610px;
+          top: 370px;
           left: 50%;
           margin-left: -590px;
         }
@@ -157,10 +157,11 @@ div.slack-lander-wrap {
     section.keep-aligned {
       text-align: center;
       margin: 0px auto;
+      background-color: #F8F7F3;
 
       div.keep-aligned-title {
-        @include avenir_M();
-        font-size: 34px;
+        @include avenir_H();
+        font-size: 28px;
         color: $deep_navy;
       }
     }

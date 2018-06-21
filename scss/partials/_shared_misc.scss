@@ -3,14 +3,14 @@ div.main-animation-container {
 
   @include mobile() {
     width: 100%;
-    margin: 40px 0px 0px;
+    margin: 80px 0px 0px;
     height: 237px;
   }
 
   img.main-animation {
     max-width: 1280px;
     width: calc(100% - 48px);
-    margin: 85px auto 0px;
+    margin: 120px auto 0px;
     padding: 0;
     z-index: 10;
     position: relative;
@@ -178,9 +178,9 @@ section.testimonials-section {
 
   @include mobile() {
     width: 100%;
-    padding: 72px 32px !important;
-    padding-top: 72px !important;
-    padding-bottom: 72px !important;
+    padding: 80px 24px !important;
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
     text-align: left;
   }
 
@@ -246,9 +246,9 @@ section.testimonials-section {
 }
 
 section.keep-aligned {
-  padding: 72px 0px;
+  padding: 120px 0px;
   text-align: center;
-  background-color: #F8F7F3;
+  background-color: #FFFDF9;
 
   @include mobile() {
     width: 100%;
@@ -263,8 +263,8 @@ section.keep-aligned {
   }
 
   div.keep-aligned-title {
-    @include avenir_M();
-    font-size: 34px;
+    @include avenir_H();
+    font-size: 28px;
     line-height: 38px;
     color: $deep_navy;
     margin-bottom: 20px;
@@ -273,6 +273,7 @@ section.keep-aligned {
       @include avenir_H();
       font-size: 24px;
       line-height: 30px;
+      margin-bottom: 24px;
     }
   }
 
@@ -289,6 +290,7 @@ section.keep-aligned {
 
     @include mobile() {
       font-size: 12px;
+      margin-top: 0px;
     }
   }
 }
@@ -296,10 +298,11 @@ section.keep-aligned {
 div.core-values-list {
   width: calc(100% - 48px);
   text-align: center;
-  margin: 0px auto;
+  margin: 10px auto 0px;
 
   @include mobile() {
     width: 100%;
+    margin: 24px auto 0px;
   }
 
   div.core-value {
@@ -359,16 +362,17 @@ button.get-started-button {
     width: 100%;
     margin: 16px auto;
     padding: 0px;
+    font-size: 16px;
   }
 }
 
 section.home-keep-aligned {
   background-color: #F8F7F3;
-  padding: 100px 24px;
+  padding: 120px 24px 160px;
   text-align: center;
 
   @include mobile() {
-    padding: 40px 24px !important;
+    padding: 80px 24px !important;
   }
 
   h2.keep-aligned-title {
@@ -394,19 +398,28 @@ section.home-keep-aligned {
       height: 354px;
       margin: 120px auto 0px;
 
+      &:first-child {
+        margin: 80px auto 0px;
+
+        @include mobile() {
+          margin: 40px auto 0px
+        }
+      }
+
       @include mobile() {
         width: 100%;
         height: auto;
-        margin: 40px auto 0px;
+        margin: 80px auto 0px
       }
 
       div.keep-aligned-section-screenshot {
         box-shadow: 0px 4px 20px 0px rgba(0,0,0,0.2);
-        width: 640px;
-        height: 354px;
-        background-size: 640px 354px;
+        width: 600px;
+        height: 330px;
+        background-size: 600px 330px;
         background-position: center;
         background-repeat: no-repeat;
+        border-radius: 6px;
 
         &.screenshot-1 {
           @include image-2x("/img/ML/keep_aligned_screenshot_1");
@@ -456,7 +469,7 @@ section.home-keep-aligned {
 
         @include mobile() {
           width: 100%;
-          margin-top: 32px;
+          margin-top: 40px;
         }
 
         div.keep-aligned-section-copy-title {
@@ -517,32 +530,32 @@ section.home-keep-aligned {
 
 section.access-anywhere-section {
   background-color: #FFFDF9;
-  position: relative;
-  padding: 156px 0px;
-  height: 400px;
+  height: 460px;
 
   @include mobile() {
     width: 100%;
     height: auto;
-    padding: 40px 24px 0px !important;
+    padding: 80px 24px !important;
   }
 
   div.access-anywhere-section-container {
     width: 1080px;
     margin: 0px auto;
+    position: relative;
 
     @include mobile() {
       width: 100%;
     }
 
     div.access-anywhere-screenshot {
-      width: 417px;
-      height: 320px;
+      width: 235px;
+      height: 300px;
       position: absolute;
       top: 80px;
-      left: 97px;
+      left: 50%;
+      margin-left: -335px;
       @include image-2x("/img/ML/access_anywhere_screenshot");
-      background-size: 417px 320px;
+      background-size: 235px 300px;
       background-repeat: no-repeat;
       background-position: center;
 
@@ -550,10 +563,10 @@ section.access-anywhere-section {
         position: relative;
         top: unset;
         left: unset;
-        width: 327px;
-        height: 254px;
-        margin: 32px auto 0px;
-        background-size: 327px 254px;
+        width: 235px;
+        height: 309px;
+        margin: 40px auto 0px;
+        background-size: 235px 309px;
       }
     }
 
@@ -561,14 +574,16 @@ section.access-anywhere-section {
       width: 406px;
       height: 98px;
       position: absolute;
-      top: 156px;
-      left: 578px;
+      top: 181px;
+      left: 50%;
+      margin-left: -60px;
       text-align: left;
 
       @include mobile() {
         position: relative;
         top: unset;
         left: unset;
+        margin-left: 0px;
         width: 100%;
         height: auto;
       }
@@ -599,14 +614,14 @@ section.access-anywhere-section {
 }
 
 section.slack-comparison {
-  padding: 104px 32px 104px;
+  padding: 120px 32px;
   margin: 0px auto;
   text-align: center;
   background-color: #F8F7F3;
 
   @include mobile() {
     text-align: left;
-    padding: 40px 32px !important;
+    padding: 80px 32px !important;
   }
 
   div.slack-comparison-headline {
@@ -620,12 +635,13 @@ section.slack-comparison {
     color: $deep_navy;
     @include avenir_R();
     font-size: 38px;
-    line-height: 64px;
+    line-height: 54px;
+    margin-top: 8px;
 
     @include mobile(){
       font-size: 24px;
       line-height: 30px;
-      margin-top: 16px;
+      margin-top: 24px;
     }
   }
 
@@ -633,19 +649,18 @@ section.slack-comparison {
     color: $deep_navy;
     @include avenir_H();
     font-size: 38px;
-    line-height: 64px;
+    line-height: 54px;
 
     @include mobile(){
-      font-size: 24px;
+      font-size: 20px;
       line-height: 30px;
-      margin-top: 16px;
     }
   }
 
   img.slack-comparison-screenshot {
     max-width: 1080px;
     box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.07);
-    margin: 24px auto;
+    margin: 40px auto 0px;
 
     @include mobile() {
       width: 100%;

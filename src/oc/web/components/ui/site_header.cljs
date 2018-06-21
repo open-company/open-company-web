@@ -45,31 +45,37 @@
   ; <!-- Nav Bar -->
   (let [logged-in (jwt/jwt)
         your-digest (when logged-in (utils/your-digest-url))
+        is-slack-lander? (utils/in? (:route @router/path) "slack-lander")
+        is-slack? (utils/in? (:route @router/path) "slack")
         slack-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                         {:auth-source "slack"})]
+                         {:auth-source "slack"})
+        show-navigation? (and (not is-slack-lander?)
+                              (not is-slack?))]
     [:nav.site-navbar
       {:class (when @(::sticky-navbar s) "sticky")}
       [:div.site-navbar-container
         [:a.navbar-brand-left
           {:href oc-urls/home-no-redirect
+           :class (when-not show-navigation? "is-slack-header")
            :on-click (partial nav! oc-urls/home-no-redirect)}]
-        [:div.navbar-brand-center
-          [:a
-            {:href oc-urls/home
-             :on-click (partial nav! oc-urls/home)}
-            "Home"]
-          [:a
-            {:href oc-urls/about
-             :on-click (partial nav! oc-urls/about)}
-            "About"]
-          [:a
-            {:href oc-urls/pricing
-             :on-click (partial nav! oc-urls/pricing)}
-            "Pricing"]
-          [:a
-            {:href oc-urls/blog
-             :target "_blank"}
-            "Blog"]]
+        (when show-navigation?
+          [:div.navbar-brand-center
+            [:a
+              {:href oc-urls/home
+               :on-click (partial nav! oc-urls/home)}
+              "Home"]
+            [:a
+              {:href oc-urls/about
+               :on-click (partial nav! oc-urls/about)}
+              "About"]
+            [:a
+              {:href oc-urls/pricing
+               :on-click (partial nav! oc-urls/pricing)}
+              "Pricing"]
+            [:a
+              {:href oc-urls/blog
+               :target "_blank"}
+              "Blog"]])
         [:div.site-navbar-right.big-web-only
           (when-not logged-in
             [:a.login
@@ -87,7 +93,8 @@
                      your-digest
                      oc-urls/sign-up)
              :class (utils/class-set {:your-digest logged-in
-                                      :slack-get-started use-slack-signup-button})
+                                      :slack-get-started use-slack-signup-button
+                                      :slack is-slack-lander?})
              :on-click (fn [e]
                          (.preventDefault e)
                          (if logged-in
@@ -101,7 +108,7 @@
               (if use-slack-signup-button
                 [:span
                   [:span.slack-orange-icon]
-                  (if (utils/in? (:route @router/path) "slack-lander")
+                  (if is-slack-lander?
                     "Sign in with Slack"
                     "Add to Slack")]
                 "Get started"))]]
@@ -110,12 +117,11 @@
             [:a.start
               {:id "site-header-mobile-signup-item"
                :href "/sign-up"}
-                [:span
-                  [:span.slack-orange-icon]
-                  "ADD"]]
+                "ADD"]
             [:a.start
               {:id "site-header-mobile-signup-item"
                :href "/sign-up"}
                 "START"])]
-        [:div.mobile-ham-menu.mobile-only
-          {:on-click #(site-mobile-menu/site-menu-toggle)}]]]))
+        (when show-navigation?
+          [:div.mobile-ham-menu.mobile-only
+            {:on-click #(site-mobile-menu/site-menu-toggle)}])]]))
