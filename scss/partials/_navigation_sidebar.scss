@@ -81,7 +81,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    // padding-top: 2px;
 
     @include mobile() {
       font-size: 14px;
@@ -502,8 +501,6 @@ div.left-navigation-sidebar {
 
       div.public {
         float: left;
-        // margin-left: 8px;
-        // margin-top: 10px;
         width: 16px;
         height: 28px;
         background-image: cdnUrl("/img/ML/board_public.svg");
@@ -513,8 +510,6 @@ div.left-navigation-sidebar {
         opacity: 0.5;
 
         @include mobile() {
-          margin-left: 4px;
-          margin-top: 6px;
           opacity: 1;
         }
 
@@ -526,8 +521,6 @@ div.left-navigation-sidebar {
 
       div.private {
         float: left;
-        // margin-left: 9px;
-        // margin-top: 9px;
         width: 16px;
         height: 28px;
         background-image: cdnUrl("/img/ML/board_private.svg");
@@ -537,8 +530,6 @@ div.left-navigation-sidebar {
         opacity: 0.5;
 
         @include mobile() {
-          margin-left: 4px;
-          margin-top: 6px;
           opacity: 1;
         }
 
@@ -562,12 +553,7 @@ div.left-navigation-sidebar {
 
           @include mobile() {
             width: auto;
-            padding: 0px 0px 0px 2px;
             margin-left: 0px;
-
-            &.has-icon {
-              margin-left: 8px;
-            }
           }
 
           .emojione {
