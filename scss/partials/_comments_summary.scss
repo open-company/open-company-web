@@ -44,7 +44,10 @@ div.is-comments {
     // max-width: 74%;
     overflow: hidden;
     text-overflow: ellipsis;
-    opacity: 0.3;
+
+    &.add-a-comment {
+      opacity: 0.3;
+    }
 
     @include mobile() {
       max-width: 68vw;
