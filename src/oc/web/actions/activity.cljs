@@ -527,14 +527,30 @@
   to read the published-at and make sure it's still inside the TTL."
   [activity-id]
   (js/console.log "DBG: send-item-seen" activity-id)
+  (let [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
+        activity-data (get-in @dis/app-state activity-key)
+        publisher-id (:user-id (:publisher activity-data))
+        container-id (:board-uuid activity-data)
+        published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
+        today-ts (.getTime (utils/js-date))
+        oc-seen-ttl-ms (* ls/oc-seen-ttl 24 60 60 1000)
+        minimum-ttl (- today-ts oc-seen-ttl-ms)]
+    (js/console.log "DBG:    activity-key" activity-key)
+    (js/console.log "DBG:    activity-data" activity-data)
+    (js/console.log "DBG:    publisher-id" publisher-id)
+    (js/console.log "DBG:    published-at-ts" published-at-ts)
+    (js/console.log "DBG:    today-ts" today-ts)
+    (js/console.log "DBG:    oc-seen-ttl-ms" oc-seen-ttl-ms)
+    (js/console.log "DBG:    minimum-ttl" minimum-ttl)
+    (js/console.log "DBG:    time check:" (> published-at-ts minimum-ttl)))
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               publisher-id (:user-id (:publisher activity-data))
               container-id (:board-uuid activity-data)
               published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
               today-ts (.getTime (utils/js-date))
-              ap-seen-ttl-ms (* ls/ap-seen-ttl 24 60 60 1000)
-              minimum-ttl (- today-ts ap-seen-ttl-ms)]
+              oc-seen-ttl-ms (* ls/oc-seen-ttl 24 60 60 1000)
+              minimum-ttl (- today-ts oc-seen-ttl-ms)]
     (when (> published-at-ts minimum-ttl)
       ;; Send the seen because:
       ;; 1. item is published

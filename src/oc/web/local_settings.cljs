@@ -56,4 +56,4 @@
 (def mailchimp-api-endpoint "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
 
 ;; AP seen TTL in days
-(def ap-seen-ttl 30)
+(def oc-seen-ttl 30)
