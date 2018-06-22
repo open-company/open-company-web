@@ -37,7 +37,10 @@
   [:script {:src "//assets-cdn.ziggeo.com/v1-stable/ziggeo.js"}])
 
 (def ziggeo-setup
-  [:script "ZiggeoApi.token = \"c9b611b2b996ee5a1f318d3bacc36b27\";"])
+  [:script
+    (str
+     "ZiggeoApi.token = \"c9b611b2b996ee5a1f318d3bacc36b27\";\n"
+     "ZiggeoApi.Config.webrtc = true;")])
 
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
