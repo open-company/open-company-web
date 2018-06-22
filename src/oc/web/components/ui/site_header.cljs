@@ -102,12 +102,13 @@
                           (if use-slack-signup-button
                             (user-actions/login-with-slack slack-auth-link)
                             (nav! oc-urls/sign-up e))))}
+            (when (and (not logged-in)
+                       use-slack-signup-button
+                       is-slack-lander?)
+              [:span.slack-orange-icon])
             (if logged-in
               [:span.go-to-digest
                 "Go to digest"]
-              (when (and use-slack-signup-button
-                         is-slack-lander?)
-                [:span.slack-orange-icon])
               [:span.start-copy
                 (if use-slack-signup-button
                   (if is-slack-lander?
