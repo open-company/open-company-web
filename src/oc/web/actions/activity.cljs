@@ -526,23 +526,6 @@
   "Actually send the seen at. Needs to get the activity data from the app-state
   to read the published-at and make sure it's still inside the TTL."
   [activity-id]
-  (js/console.log "DBG: send-item-seen" activity-id)
-  (let [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
-        activity-data (get-in @dis/app-state activity-key)
-        publisher-id (:user-id (:publisher activity-data))
-        container-id (:board-uuid activity-data)
-        published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
-        today-ts (.getTime (utils/js-date))
-        oc-seen-ttl-ms (* ls/oc-seen-ttl 24 60 60 1000)
-        minimum-ttl (- today-ts oc-seen-ttl-ms)]
-    (js/console.log "DBG:    activity-key" activity-key)
-    (js/console.log "DBG:    activity-data" activity-data)
-    (js/console.log "DBG:    publisher-id" publisher-id)
-    (js/console.log "DBG:    published-at-ts" published-at-ts)
-    (js/console.log "DBG:    today-ts" today-ts)
-    (js/console.log "DBG:    oc-seen-ttl-ms" oc-seen-ttl-ms)
-    (js/console.log "DBG:    minimum-ttl" minimum-ttl)
-    (js/console.log "DBG:    time check:" (> published-at-ts minimum-ttl)))
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               publisher-id (:user-id (:publisher activity-data))
@@ -555,7 +538,6 @@
       ;; Send the seen because:
       ;; 1. item is published
       ;; 2. item is newer than TTL
-      (js/console.log "DBG:    -" publisher-id container-id activity-id)
       (ws-cc/item-seen publisher-id container-id activity-id))))
 
 (def ap-seen-timeouts-list (atom {}))
@@ -568,7 +550,6 @@
   Once the timeout finishes it means no other events were fired for it so we can send a seen.
   It will send seen every 3 seconds or more."
   [activity-id]
-  (js/console.log "DBG: ap-seen-events-gate" activity-id)
   ;; Discard everything if we are not on AP
   (when (= :all-posts (keyword (router/current-board-slug)))
     (let [wait-interval-ms (* ap-seen-wait-interval 1000)]

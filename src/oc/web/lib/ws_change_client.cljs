@@ -43,7 +43,6 @@
 (defn item-seen [publisher-id container-id item-id]
   (when @chsk-send!
     (timbre/debug "Sending container/seen for container:" container-id "item:" item-id)
-    (js/console.log "DBG: ws-change-client/item-seen" publisher-id container-id item-id)
     (@chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}] 1000)))
 
 (defn subscribe

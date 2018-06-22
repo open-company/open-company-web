@@ -160,10 +160,8 @@
                          (let [dom-node (rum/dom-node s)
                                $all-items (js/$ items-selector dom-node)]
                            (.each $all-items (fn [idx el]
-                             (js/console.log "DBG: check-items" el)
                              (when (and (fn? item-is-visible-cb)
                                         (is-element-visible? el))
-                               (js/console.log "DBG:    item is visible" (.attr (js/$ el) "data-itemuuid"))
                                (item-is-visible-cb s (.attr (js/$ el) "data-itemuuid")))))))]
      {:will-mount (fn [s]
        (assoc s scroll-listener-kw
