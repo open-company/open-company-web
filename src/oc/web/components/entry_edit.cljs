@@ -161,7 +161,7 @@
 
 (defn video-uploaded-cb [data]
   (js/console.log "XXX video-uploaded-cb" data (.. data -video -token) (aget (aget data "video") "token"))
-  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id (.. data -video -token)
+  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id (aget (aget data "video") "token")
                                                       :has-changes true})]))
 
 (rum/defcs entry-edit < rum/reactive
