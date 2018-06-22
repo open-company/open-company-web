@@ -221,15 +221,15 @@
   (str
    "<ziggeoplayer "
      "ziggeo-video=\"" video-id "\" "
-     "ziggeo-width=" (or width 320) " "
-     "ziggeo-height=" (or height 180) " "
+     "ziggeo-width=" (or width 640) " "
+     "ziggeo-height=" (or height 360) " "
      "ziggeo-theme=\"modern\" "
      "ziggeo-themecolor=\"red\"></ziggeoplayer>"))
 
 (defn ziggeo-recorder [& [width height]]
   (str
    "<ziggeorecorder "
-     "ziggeo-width=" (or width 320) " "
-     "ziggeo-height=" (or height 180) " "
+     "ziggeo-width=" (or width 640) " "
+     "ziggeo-height=" (or height 360) " "
      "ziggeo-theme=\"modern\" "
      "ziggeo-themecolor=\"red\"></ziggeorecorder>"))

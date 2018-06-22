@@ -196,6 +196,29 @@
         (reset! (::initial-headline s) initial-headline)
         (reset! (::edited-data-loaded s) true)))))
 
+(defn video-record-clicked [s]
+  (let [modal-data @(drv/get-ref s :fullscreen-post-data)
+        activity-editing (:modal-editing-data modal-data)
+        start-recording-fn #(reset! (::record-video s) true)]
+    (if (:video-id activity-editing)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "rerecord-video"
+                        :message "You sure you want to replace the current video?"
+                        :link-button-title "Keep"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Yes"
+                        :solid-button-cb (fn []
+                                          (dis/dispatch! [:input [:modal-editing-data :video-id] nil])
+                                          (dis/dispatch! [:input [:modal-editing-data :has-changes] true])
+                                          (start-recording-fn))}]
+        (alert-modal/show-alert alert-data))
+      (start-recording-fn))))
+
+(defn vide-uploaded-cb [data]
+  (dis/dispatch! [:input [:modal-editing-data :video-id] (.. data -video -token)])
+  (dis/dispatch! [:input [:modal-editing-data :has-changes] true]))
+
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
                              (drv/drv :fullscreen-post-data)
@@ -215,6 +238,7 @@
                              (rum/local false ::edited-data-loaded)
                              (rum/local nil ::autosave-timer)
                              (rum/local false ::show-legend)
+                             (rum/local false ::record-video)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
@@ -272,6 +296,7 @@
                                (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
                                  ;; Force comments reload
                                  (comment-actions/get-comments (:activity-data modal-data)))
+                               (.on (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -291,6 +316,7 @@
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
                                (set! (.-onbeforeunload js/window) nil)
+                               (.off (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
                                s)}
   [s]
   (let [modal-data (drv/react s :fullscreen-post-data)
@@ -302,6 +328,7 @@
         editing (:modal-editing modal-data)
         activity-editing (:modal-editing-data modal-data)
         activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
+        video-id (if editing (:video-id activity-editing) (:video-id activity-data))
         show-sections-picker (and editing (:show-sections-picker modal-data))
         dom-element-id (str "fullscreen-post-" (:uuid activity-data))
         activity-comments (-> modal-data
@@ -325,6 +352,16 @@
         [:div.header-title-container.group.fs-hide
           {:key (:updated-at activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline (if editing activity-editing activity-data)))}]
+        ;; Video element
+        (when (and video-id
+                   (not @(::record-video s)))
+          [:div.ziggeo-player
+            {:data-videoid video-id
+             :key (str "fullscreen-video-id-" video-id)
+             :dangerouslySetInnerHTML #js {:__html (au/ziggeo-player video-id)}}])
+        (when @(::record-video s)
+            [:div.ziggeo-recorder
+              {:dangerouslySetInnerHTML #js {"__html" (au/ziggeo-recorder)}}])
         [:div.fullscreen-post-header-right
           [:div.activity-share-container]
           (if editing
@@ -447,7 +484,8 @@
                     {:data-toggle "tooltip"
                      :data-placement "top"
                      :data-container "body"
-                     :title "Record video"}]]]
+                     :title (if (:video-id activity-data) "Replace video" "Record video")
+                     :on-click #(video-record-clicked s)}]]]
                 [:div.fullscreen-post-box-footer.group
                   {:class (when (and (pos? (count comments-data))
                                      (> (count (:reactions activity-data)) 2))

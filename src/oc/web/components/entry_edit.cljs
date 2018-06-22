@@ -157,6 +157,10 @@
         (alert-modal/show-alert alert-data))
       (start-recording-fn))))
 
+(defn vide-uploaded-cb [data]
+  (dis/dispatch! [:input [:entry-editing :video-id] (.. data -video -token)])
+  (dis/dispatch! [:input [:entry-editing :has-changes] true]))
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
@@ -196,12 +200,7 @@
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline))
-                          (.on (.-Events js/ZiggeoApi) "submitted"
-                           (fn [data]
-                            (js/console.log "XXX entry-edit/ recorded: " data)
-                            (js/console.log "XXX Ziggeo video token:" (.. data -video -token))
-                            (dis/dispatch! [:input [:entry-editing :video-id] (.. data -video -token)])
-                            (dis/dispatch! [:input [:entry-editing :has-changes] true])))
+                          (.on (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -277,6 +276,7 @@
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
                           (set! (.-onbeforeunload js/window) nil)
+                          (.off (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)
@@ -457,5 +457,5 @@
             {:data-toggle "tooltip"
              :data-placement "top"
              :data-container "body"
-             :title "Record video"
+             :title (if (:video-id entry-editing) "Replace video" "Record video")
              :on-click #(video-record-clicked s)}]]]]))

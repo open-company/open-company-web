@@ -158,7 +158,7 @@
         (when has-video
           [:div.ziggeo-player
             {:class (when expanded? "expanded")}
-            (activity-utils/ziggeo-player (:video-id activity-data) (if expanded? 320 200) (if expanded? 180 112))])
+            (activity-utils/ziggeo-player (:video-id activity-data) (if expanded? 638 200) (if expanded? 359 112))])
         (when (or (not is-mobile?) expanded?)
           (stream-attachments activity-attachments
            (when (and truncated? (not expanded?))
