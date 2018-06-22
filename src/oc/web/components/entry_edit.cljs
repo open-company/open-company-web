@@ -281,7 +281,7 @@
   [s]
   (let [org-data          (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
-        entry-editing     (assoc (drv/react s :entry-editing) :video-id "b523000d5ee41d4860bfd8da77fd8049")
+        entry-editing     (drv/react s :entry-editing)
         new-entry?        (empty? (:uuid entry-editing))
         is-mobile? (responsive/is-tablet-or-mobile?)
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
