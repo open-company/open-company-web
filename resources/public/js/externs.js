@@ -130,5 +130,5 @@ var init_fullstory = function(){};
 var FS = function(){};
 // Ziggeo
 var ZiggeoApi = function(){};
-var ZiggeoApi.Events = {};
-var ZiggeoApi.Events.on = function(){};
+ZiggeoApi.Events = {};
+ZiggeoApi.Events.on = function(){};
