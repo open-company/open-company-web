@@ -37,7 +37,7 @@
                           (rum/local nil ::next-link)
                           ;; Mixins
                           (mixins/load-more-items 400)
-                          (mixins/ap-seen-mixin "div.activity-card-headline" item-scrolled-into-view-cb)
+                          (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
 
                           {:init (fn [s]
                             (-> s

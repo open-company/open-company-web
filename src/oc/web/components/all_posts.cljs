@@ -113,7 +113,7 @@
                         (rum/local nil ::last-direction)
                         ;; Mixins
                         mixins/first-render-mixin
-                        (mixins/ap-seen-mixin "div.stream-item-headline" item-scrolled-into-view-cb)
+                        (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
                         {:will-mount (fn [s]
                           (let [all-posts-data @(drv/get-ref s :all-posts)
                                 sorted-items (activity-utils/get-sorted-activities all-posts-data)

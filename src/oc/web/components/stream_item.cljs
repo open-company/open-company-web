@@ -139,7 +139,7 @@
             "New"])]
       [:div.stream-item-body.group
         [:div.stream-body-left.group.fs-hide
-          [:div.stream-item-headline
+          [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"
              :data-itemuuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
