@@ -128,11 +128,12 @@
              :href "/sign-up"
              :class (when (= active-page "slack")
                       "slack-get-started")}
-            (if (= active-page "slack")
-              [:span
-                [:span.slack-orange-icon]
-                "Add to Slack"]
-              "Get Started")]]
+            (when (= active-page "slack")
+              [:span.slack-orange-icon])
+            [:span.start-copy
+              (if (= active-page "slack")
+                "Add to Slack"
+                "Get Started")]]]
         [:div.site-navbar-right.mobile-only
           [:a.start
             {:id "site-header-mobile-signup-item"

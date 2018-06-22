@@ -80,6 +80,11 @@ nav.site-navbar {
             @include image-2x("/img/ML/slack_white_icon");
           }
 
+          span.start-copy {
+            position: relative;
+            top: 0px;
+          }
+
           &:not(.your-digest).slack-get-started {
             background-color: $carrot_orange;
             color: white;

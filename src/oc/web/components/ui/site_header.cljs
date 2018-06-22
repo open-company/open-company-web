@@ -105,13 +105,15 @@
             (if logged-in
               [:span.go-to-digest
                 "Go to digest"]
-              (if use-slack-signup-button
-                [:span
-                  [:span.slack-orange-icon]
+              (when (and use-slack-signup-button
+                         is-slack-lander?)
+                [:span.slack-orange-icon])
+              [:span.start-copy
+                (if use-slack-signup-button
                   (if is-slack-lander?
                     "Sign in with Slack"
-                    "Add to Slack")]
-                "Get started"))]]
+                    "Add to Slack")
+                  "Get started")])]]
         [:div.site-navbar-right.mobile-only
           (if use-slack-signup-button
             [:a.start

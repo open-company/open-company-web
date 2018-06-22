@@ -39,9 +39,10 @@
               [:button.mlb-reset.get-started-button
                 {:on-click #(user-actions/login-with-slack slack-auth-link)}
                 [:span.slack-white-icon]
-                (if (responsive/is-tablet-or-mobile?)
-                  "Join your team"
-                  "Sign in with Slack and join your team")]]
+                [:span.slack-copy
+                  (if (responsive/is-tablet-or-mobile?)
+                    "Join your team"
+                    "Sign in with Slack and join your team")]]]
 
             [:div.main-animation-container
               [:img.main-animation
@@ -64,8 +65,9 @@
             [:button.mlb-reset.get-started-button
               {:on-click #(user-actions/login-with-slack slack-auth-link)}
               [:span.slack-white-icon]
-              (if (responsive/is-tablet-or-mobile?)
-                "Join your team"
-                "Sign in with Slack and join your team")]]]]
+              [:span.slack-copy
+                (if (responsive/is-tablet-or-mobile?)
+                  "Join your team"
+                  "Sign in with Slack and join your team")]]]]]
 
       (site-footer)]))

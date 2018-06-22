@@ -565,7 +565,7 @@
           [:button.mlb-reset.signin-with-slack
             {:id "get-started-centred-bt"}
             [:span.slack-white-icon]
-            "Add to Slack"]]
+            [:span.slack-copy "Add to Slack"]]]
         no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group

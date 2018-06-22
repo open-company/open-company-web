@@ -17,6 +17,11 @@ button.signin-with-slack {
     font-size: 18px;
   }
 
+  span.slack-copy {
+    position: relative;
+    top: 0px;
+  }
+
   span.slack-white-icon {
     width: 24px;
     height: 24px;
@@ -25,7 +30,7 @@ button.signin-with-slack {
     background-size: 24px 24px;
     margin-right: 8px;
     display: inline-block;
-    top: 4px;
+    top: 5px;
     position: relative;
   }
 }
