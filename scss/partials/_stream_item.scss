@@ -24,11 +24,9 @@ div.stream-item {
 
   &.show-continue-reading {
     div.stream-item-body {
-      div.stream-body-left {
-        div.stream-item-footer {
-          button.expand-button {
-            display: block;
-          }
+      div.stream-item-footer {
+        button.expand-button {
+          display: block;
         }
       }
     }
@@ -104,20 +102,26 @@ div.stream-item {
       display: block;
     }
 
+    div.stream-attachments {
+      @include mobile() {
+        position: relative;
+        bottom: unset;
+      }
+    }
+
     div.stream-body-left {
       position: relative;
       margin-top: 8px;
 
+      &.has-video {
+        float: left;
+        width: 400px;
+        min-height: 112px;
+      }
+
       @include mobile() {
         width: 100%;
         margin: 8px 0px 0px;
-      }
-
-      div.stream-attachments {
-        @include mobile() {
-          position: relative;
-          bottom: unset;
-        }
       }
 
       div.stream-item-headline {
@@ -180,186 +184,198 @@ div.stream-item {
           }
         }
       }
+    }
 
-      div.stream-item-footer {
-        height: 32px;
-        margin-top: 32px;
+    div.stream-item-footer {
+      height: 32px;
+      margin-top: 32px;
 
-        div.mobile-summary {
-          float: left;
-          margin-top: 10px;
+      div.mobile-summary {
+        float: left;
+        margin-top: 10px;
 
-          div.mobile-comments-summary {
-            height: 16px;
-            float: left;
-
-            div.mobile-comments-summary-icon {
-              background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
-              background-size: 14px 14px;
-              background-position: center;
-              background-repeat: no-repeat;
-              width: 14px;
-              height: 14px;
-              float: left;
-              display: block;
-            }
-
-            span {
-              margin-left: 6px;
-              font-size: 12px;
-              color: $light_ui_grey;
-              margin-left: 6px;
-              line-height: 14px;
-              float: left;
-              display: block;
-            }
-          }
-
-          div.mobile-summary-reaction {
-            margin-left: 6px;
-            height: 16px;
-            margin-left: 6px;
-            float: left;
-
-            span.reaction {
-              font-size: 12px;
-              float: left;
-              display: block;
-              margin-left: 6px;
-            }
-
-            span.count {
-              @include avenir_H();
-              font-size: 11px;
-              color: $ui_grey;
-              float: left;
-              display: block;
-              margin-left: 4px;
-            }
-          }
-        }
-
-        div.mobile-summary-attachments {
-          float: right;
-          text-align: right;
+        div.mobile-comments-summary {
           height: 16px;
-          margin-top: 10px;
-          
-          span.attachments-icon {
-            float: left;
-            display: block;
-            width: 14px;
-            height: 15px;
-            background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
-            background-repeat: no-repeat;
-            background-size: 14px 15px;
-            background-position: center;
-          }
-
-          span.attachments-count {
-            float: left;
-            display: block;
-            @include avenir_H();
-            font-size: 12px;
-            color: $ui_grey;
-            margin-left: 6px;
-          }
-        }
-
-        div.stream-body-draft-edit {
           float: left;
 
-          button.edit-draft-bt {
-            text-align: left;
-            padding: 0px;
+          div.mobile-comments-summary-icon {
+            background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
+            background-size: 14px 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 14px;
+            height: 14px;
+            float: left;
+            display: block;
+          }
+
+          span {
+            margin-left: 6px;
+            font-size: 12px;
+            color: $light_ui_grey;
+            margin-left: 6px;
+            line-height: 14px;
+            float: left;
+            display: block;
+          }
+        }
+
+        div.mobile-summary-reaction {
+          margin-left: 6px;
+          height: 16px;
+          margin-left: 6px;
+          float: left;
+
+          span.reaction {
+            font-size: 12px;
+            float: left;
+            display: block;
+            margin-left: 6px;
+          }
+
+          span.count {
             @include avenir_H();
-            font-size: 14px;
-            color: $carrot_green;
-          }
-        }
-
-        div.stream-body-draft-delete {
-          float: right;
-          button.delete-draft-bt {
-            text-align: right;
-            padding: 0px;
-            @include avenir_R();
-            font-size: 14px;
+            font-size: 11px;
             color: $ui_grey;
+            float: left;
+            display: block;
+            margin-left: 4px;
           }
         }
+      }
 
-        div.stream-item-comments-summary {
-          margin-right: 16px;
-          margin-top: 4px;
-          float: right;
-          cursor: pointer;
+      div.mobile-summary-attachments {
+        float: right;
+        text-align: right;
+        height: 16px;
+        margin-top: 10px;
+        
+        span.attachments-icon {
+          float: left;
+          display: block;
+          width: 14px;
+          height: 15px;
+          background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
+          background-repeat: no-repeat;
+          background-size: 14px 15px;
+          background-position: center;
         }
 
-        div.reactions {
-          float: right;
-          margin-top: 4px;
-
-          div.reactions-picker-container {
-            div.emoji-mart {
-              bottom: -26px;
-              right: 44px;
-              left: unset;
-
-              @include mobile(){
-                bottom: unset;
-                right: unset;
-              }
-            }
-          }
+        span.attachments-count {
+          float: left;
+          display: block;
+          @include avenir_H();
+          font-size: 12px;
+          color: $ui_grey;
+          margin-left: 6px;
         }
+      }
 
-        @include mobile() {
-          position: relative;
-          bottom: unset;
-        }
+      div.stream-body-draft-edit {
+        float: left;
 
-        button.expand-button {
-          width: 134px;
-          height: 24px;
-          color: $carrot_green;
+        button.edit-draft-bt {
+          text-align: left;
+          padding: 0px;
           @include avenir_H();
           font-size: 14px;
-          text-align: left;
-          display: none;
-          padding: 6px 7px 0px 22px;
-          position: relative;
-          overflow: visible;
-          float: left;
+          color: $carrot_green;
+        }
+      }
 
-          @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
+      div.stream-body-draft-delete {
+        float: right;
+        button.delete-draft-bt {
+          text-align: right;
+          padding: 0px;
+          @include avenir_R();
+          font-size: 14px;
+          color: $ui_grey;
+        }
+      }
 
-          @include mobile() {
-            width: auto;
-            margin-right: 6px;
-          }
+      div.stream-item-comments-summary {
+        margin-right: 16px;
+        margin-top: 4px;
+        float: right;
+        cursor: pointer;
+      }
 
-          &:before {
-            position: absolute;
-            content: "";
-            background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-            background-size: 14px 8px;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 14px;
-            height: 8px;
-            top: 12px;
-            left: 0px;
-            transition: rotate 180ms;
-          }
+      div.reactions {
+        float: right;
+        margin-top: 4px;
 
-          &.expanded {
-            color: $ui_grey;
-            &:before {
-              background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+        div.reactions-picker-container {
+          div.emoji-mart {
+            bottom: -26px;
+            right: 44px;
+            left: unset;
+
+            @include mobile(){
+              bottom: unset;
+              right: unset;
             }
           }
         }
+      }
+
+      @include mobile() {
+        position: relative;
+        bottom: unset;
+      }
+
+      button.expand-button {
+        width: 134px;
+        height: 24px;
+        color: $carrot_green;
+        @include avenir_H();
+        font-size: 14px;
+        text-align: left;
+        display: none;
+        padding: 6px 7px 0px 22px;
+        position: relative;
+        overflow: visible;
+        float: left;
+
+        @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
+
+        @include mobile() {
+          width: auto;
+          margin-right: 6px;
+        }
+
+        &:before {
+          position: absolute;
+          content: "";
+          background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+          background-size: 14px 8px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 14px;
+          height: 8px;
+          top: 12px;
+          left: 0px;
+          transition: rotate 180ms;
+        }
+
+        &.expanded {
+          color: $ui_grey;
+          &:before {
+            background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+          }
+        }
+      }
+    }
+
+    div.ziggeo-player {
+      width: 200px;
+      height: 112px;
+      float: right;
+
+      &.expanded {
+        width: 100%;
+        height: 180px;
+        margin-top: 16px;
       }
     }
 
