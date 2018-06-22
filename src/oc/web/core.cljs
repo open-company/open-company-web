@@ -600,7 +600,6 @@
 (defn ziggeo-init []
   (try
     ;; Ziggeo setup
-    (js/console.log "XXX Ziggeo setup")
     (set! (.-token js/ZiggeoApi) "c9b611b2b996ee5a1f318d3bacc36b27")
     (set! (.. js/ZiggeoApi -Config -webrtc) true)
     (catch  :default e

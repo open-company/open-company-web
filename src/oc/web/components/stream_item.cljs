@@ -140,25 +140,33 @@
           [:div.new-tag
             "New"])]
       [:div.stream-item-body.group
-        [:div.stream-body-left.group.fs-hide
-          {:class (when (and has-video (not expanded?)) "has-video")}
-          [:div.stream-item-headline.ap-seen-item-headline
-            {:ref "activity-headline"
-             :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          [:div.stream-item-body-container
-            [:div.stream-item-body
-              {:class (utils/class-set {:expanded expanded?})}
-              [:div.stream-item-body-inner.to-truncate
-                {:ref "activity-body"
-                 :class (utils/class-set {:hide-images (and truncated? (not expanded?))})
-                 :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
-              [:div.stream-item-body-inner.no-truncate
-                {:ref "full-activity-body"
-                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
-        (when has-video
-          [:div.ziggeo-player
-            {:class (when expanded? "expanded")}
-            (activity-utils/ziggeo-player (:video-id activity-data) (if expanded? 638 200) (if expanded? 359 112))])
+        [:div.group
+          [:div.stream-body-left.group.fs-hide
+            {:class (when (and has-video (not expanded?)) "has-video")}
+            [:div.stream-item-headline.ap-seen-item-headline
+              {:ref "activity-headline"
+               :data-itemuuid (:uuid activity-data)
+               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+            (when (and has-video
+                       expanded?)
+              [:div.ziggeo-player.expanded
+                {:dangerouslySetInnerHTML #js {"__html" (activity-utils/ziggeo-player (:video-id activity-data)
+                                                         638 359)}}])
+            [:div.stream-item-body-container
+              [:div.stream-item-body
+                {:class (utils/class-set {:expanded expanded?})}
+                [:div.stream-item-body-inner.to-truncate
+                  {:ref "activity-body"
+                   :class (utils/class-set {:hide-images (and truncated? (not expanded?))})
+                   :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
+                [:div.stream-item-body-inner.no-truncate
+                  {:ref "full-activity-body"
+                   :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
+          (when (and has-video
+                     (not expanded?))
+            [:div.ziggeo-player
+              {:dangerouslySetInnerHTML #js {"__html" (activity-utils/ziggeo-player (:video-id activity-data)
+                                                       200 112)}}])]
         (when (or (not is-mobile?) expanded?)
           (stream-attachments activity-attachments
            (when (and truncated? (not expanded?))

@@ -209,15 +209,17 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (dis/dispatch! [:input [:modal-editing-data :video-id] nil])
-                                          (dis/dispatch! [:input [:modal-editing-data :has-changes] true])
-                                          (start-recording-fn))}]
+                                          (dis/dispatch! [:update [:modal-editing-data]
+                                           #(merge % {:video-id nil
+                                                      :has-changes true})])
+                                          (start-recording-fn)
+                                          (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data))
       (start-recording-fn))))
 
 (defn vide-uploaded-cb [data]
-  (dis/dispatch! [:input [:modal-editing-data :video-id] (.. data -video -token)])
-  (dis/dispatch! [:input [:modal-editing-data :has-changes] true]))
+  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id (.. data -video -token)
+                                                      :has-changes true})]))
 
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
@@ -352,16 +354,6 @@
         [:div.header-title-container.group.fs-hide
           {:key (:updated-at activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline (if editing activity-editing activity-data)))}]
-        ;; Video element
-        (when (and video-id
-                   (not @(::record-video s)))
-          [:div.ziggeo-player
-            {:data-videoid video-id
-             :key (str "fullscreen-video-id-" video-id)
-             :dangerouslySetInnerHTML #js {:__html (au/ziggeo-player video-id)}}])
-        (when @(::record-video s)
-            [:div.ziggeo-recorder
-              {:dangerouslySetInnerHTML #js {"__html" (au/ziggeo-recorder)}}])
         [:div.fullscreen-post-header-right
           [:div.activity-share-container]
           (if editing
@@ -441,6 +433,16 @@
                  :ref "edit-headline"
                  :key (str "fullscreen-post-headline-" (:updated-at activity-data))
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+            ;; Video element
+            (when (and video-id
+                       (not @(::record-video s)))
+              [:div.ziggeo-player
+                {:data-videoid video-id
+                 :key (str "fullscreen-video-id-" video-id)
+                 :dangerouslySetInnerHTML #js {:__html (au/ziggeo-player video-id)}}])
+            (when @(::record-video s)
+                [:div.ziggeo-recorder
+                  {:dangerouslySetInnerHTML #js {"__html" (au/ziggeo-recorder)}}])
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)

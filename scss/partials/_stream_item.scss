@@ -373,9 +373,10 @@ div.stream-item {
       float: right;
 
       &.expanded {
-        width: 100%;
-        height: 180px;
+        width: 638px;
+        height: 359px;
         margin-top: 16px;
+        float: unset;
       }
     }
 

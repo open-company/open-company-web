@@ -151,15 +151,17 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (dis/dispatch! [:input [:entry-editing :video-id] nil])
-                                          (dis/dispatch! [:input [:entry-editing :has-changes] true])
-                                          (start-recording-fn))}]
+                                          (dis/dispatch! [:update [:entry-editing]
+                                           #(merge % {:video-id nil
+                                                      :has-changes true})])
+                                          (start-recording-fn)
+                                          (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data))
       (start-recording-fn))))
 
-(defn vide-uploaded-cb [data]
-  (dis/dispatch! [:input [:entry-editing :video-id] (.. data -video -token)])
-  (dis/dispatch! [:input [:entry-editing :has-changes] true]))
+(defn video-uploaded-cb [data]
+  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id (.. data -video -token)
+                                                      :has-changes true})]))
 
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
@@ -200,7 +202,7 @@
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline))
-                          (.on (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
+                          (.on (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -276,7 +278,7 @@
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
                           (set! (.-onbeforeunload js/window) nil)
-                          (.off (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
+                          (.off (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)
