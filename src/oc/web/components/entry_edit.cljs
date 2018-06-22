@@ -386,9 +386,11 @@
              :dangerouslySetInnerHTML @(::initial-headline s)}]
           ;; Video element
           (when @(::record-video s)
-            [:div.ziggeo-video
-              {:dangerouslySetInnerHTML #js {"__html"
-              (str "<ziggeo ziggeo-modes=\"recorder,rerecorder\" ziggeo-video=\"" (:uuid entry-editing) "\"></ziggeo>")}}])
+            (let [video-id (or (:uuid entry-editing) (str (jwt/user-id) "-new-post-video"))]
+              [:div.ziggeo-video
+                {:data-ziggeoid video-id
+                 :dangerouslySetInnerHTML #js {"__html"
+                (str "<ziggeo ziggeo-modes=\"recorder,rerecorder\" ziggeo-video=\"" video-id "\"></ziggeo>")}}]))
           (rich-body-editor {:on-change (partial body-on-change s)
                              :use-inline-media-picker false
                              :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
