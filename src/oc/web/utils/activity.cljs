@@ -216,3 +216,20 @@
           (get (:uuid activity-data))
           :sorted-comments)
       (:comments activity-data)))
+
+(defn ziggeo-player [video-id & [width height]]
+  (str
+   "<ziggeoplayer "
+     "ziggeo-video=\"" video-id "\" "
+     "ziggeo-width=" (or width 320) " "
+     "ziggeo-height=" (or height 180) " "
+     "ziggeo-theme=\"modern\" "
+     "ziggeo-themecolor=\"red\"></ziggeoplayer>"))
+
+(defn ziggeo-recorder [& [width height]]
+  (str
+   "<ziggeorecorder "
+     "ziggeo-width=" (or width 320) " "
+     "ziggeo-height=" (or height 180) " "
+     "ziggeo-theme=\"modern\" "
+     "ziggeo-themecolor=\"red\"></ziggeorecorder>"))

@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
@@ -138,6 +139,24 @@
     (string/trim value)
     value))
 
+(defn video-record-clicked [s]
+  (let [entry-editing @(drv/get-ref s :entry-editing)
+        start-recording-fn #(reset! (::record-video s) true)]
+    (if (:video-id entry-editing)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "rerecord-video"
+                        :message "You sure you want to replace the current video?"
+                        :link-button-title "Keep"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Yes"
+                        :solid-button-cb (fn []
+                                          (dis/dispatch! [:input [:entry-editing :video-id] nil])
+                                          (dis/dispatch! [:input [:entry-editing :has-changes] true])
+                                          (start-recording-fn))}]
+        (alert-modal/show-alert alert-data))
+      (start-recording-fn))))
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
@@ -180,7 +199,9 @@
                           (.on (.-Events js/ZiggeoApi) "submitted"
                            (fn [data]
                             (js/console.log "XXX entry-edit/ recorded: " data)
-                            (js/console.log "XXX Ziggeo video token:" (.. data -video -token))))
+                            (js/console.log "XXX Ziggeo video token:" (.. data -video -token))
+                            (dis/dispatch! [:input [:entry-editing :video-id] (.. data -video -token)])
+                            (dis/dispatch! [:input [:entry-editing :has-changes] true])))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -260,7 +281,7 @@
   [s]
   (let [org-data          (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
-        entry-editing     (drv/react s :entry-editing)
+        entry-editing     (assoc (drv/react s :entry-editing) :video-id "b523000d5ee41d4860bfd8da77fd8049")
         new-entry?        (empty? (:uuid entry-editing))
         is-mobile? (responsive/is-tablet-or-mobile?)
         fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
@@ -389,12 +410,14 @@
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
           ;; Video element
+          (when (and (:video-id entry-editing)
+                     (not @(::record-video s)))
+            [:div.ziggeo-player
+              {:data-videoid (:video-id entry-editing)
+               :dangerouslySetInnerHTML #js {:__html (au/ziggeo-player (:video-id entry-editing))}}])
           (when @(::record-video s)
-            (let [video-id (or (:uuid entry-editing) (str (jwt/user-id) "-new-post-video"))]
-              [:div.ziggeo-video
-                {:data-ziggeoid video-id
-                 :dangerouslySetInnerHTML #js {"__html"
-                (str "<ziggeo ziggeo-modes=\"recorder,rerecorder\" ziggeo-video=\"" video-id "\"></ziggeo>")}}]))
+            [:div.ziggeo-recorder
+              {:dangerouslySetInnerHTML #js {"__html" (au/ziggeo-recorder)}}])
           (rich-body-editor {:on-change (partial body-on-change s)
                              :use-inline-media-picker false
                              :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
@@ -435,5 +458,4 @@
              :data-placement "top"
              :data-container "body"
              :title "Record video"
-             :on-click (fn []
-                        (reset! (::record-video s) true))}]]]]))
+             :on-click #(video-record-clicked s)}]]]]))
