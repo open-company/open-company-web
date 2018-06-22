@@ -36,12 +36,6 @@
 (def ziggeo-js
   [:script {:src "//assets-cdn.ziggeo.com/v1-stable/ziggeo.js"}])
 
-(def ziggeo-setup
-  [:script
-    (str
-     "ZiggeoApi.token = \"c9b611b2b996ee5a1f318d3bacc36b27\";\n"
-     "ZiggeoApi.Config.webrtc = true;")])
-
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")
@@ -814,8 +808,7 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js
-          ziggeo-setup]
+          ziggeo-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -901,8 +894,7 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js
-          ziggeo-setup]
+          ziggeo-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active

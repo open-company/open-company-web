@@ -600,6 +600,10 @@
 (defn init []
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
+  ;; Ziggeo setup
+  (js/console.log "XXX Ziggeo setup")
+  (set! (.-token js/ZiggeoApi) "c9b611b2b996ee5a1f318d3bacc36b27")
+  (set! (.. js/ZiggeoApi -Config -webrtc) true)
   ;; Setup API requests
   (api/config-request
    #(user-actions/update-jwt %) ;; success jwt refresh after expire
