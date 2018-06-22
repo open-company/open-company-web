@@ -132,3 +132,7 @@ var FS = function(){};
 var ZiggeoApi = function(){};
 ZiggeoApi.Events = {};
 ZiggeoApi.Events.on = function(){};
+ZiggeoApi.token = {};
+ZiggeoApi.Config = {};
+ZiggeoApi.Config.webrtc = {};
+var OCZiggeoSetup = function(){};

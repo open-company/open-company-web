@@ -597,13 +597,20 @@
     (timbre/error "Error: div#app is not defined!")
     (sentry/capture-message "Error: div#app is not defined!")))
 
+(defn ziggeo-init []
+  (try
+    ;; Ziggeo setup
+    (js/console.log "XXX Ziggeo setup")
+    (set! (.-token js/ZiggeoApi) "c9b611b2b996ee5a1f318d3bacc36b27")
+    (set! (.. js/ZiggeoApi -Config -webrtc) true)
+    (catch  :default e
+      (js/console.error "Error setting up ziggeo:" e))))
+
+(set! (.-OCZiggeoSetup js/window) ziggeo-init)
+
 (defn init []
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
-  ;; Ziggeo setup
-  (js/console.log "XXX Ziggeo setup")
-  (set! (.-token js/ZiggeoApi) "c9b611b2b996ee5a1f318d3bacc36b27")
-  (set! (.. js/ZiggeoApi -Config -webrtc) true)
   ;; Setup API requests
   (api/config-request
    #(user-actions/update-jwt %) ;; success jwt refresh after expire
@@ -626,7 +633,8 @@
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
-    (router/setup-navigation! handle-url-change route-dispatch!)))
+    (router/setup-navigation! handle-url-change route-dispatch!))
+  (ziggeo-init))
 
 (defn on-js-reload []
   (.clear js/console)
