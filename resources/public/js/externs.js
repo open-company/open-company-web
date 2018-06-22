@@ -128,3 +128,7 @@ CarrotGA.NULL_VALUE = {};
 CarrotGA.clientid = '';
 var init_fullstory = function(){};
 var FS = function(){};
+// Ziggeo
+var ZiggeoApi = function(){};
+var ZiggeoApi.Events = {};
+var ZiggeoApi.Events.on = function(){};

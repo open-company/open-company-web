@@ -177,6 +177,10 @@
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline))
+                          (.on (.-Events js/ZiggeoApi) "submitted"
+                           (fn [data]
+                            (js/console.log "XXX entry-edit/ recorded: " data)
+                            (js/console.log "XXX Ziggeo video token:" (.. data -video -token))))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
