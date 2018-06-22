@@ -203,7 +203,7 @@
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline))
-                          (.on (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
+                          (.on (.-Events js/ZiggeoApi) "submitted" #(video-uploaded-cb %))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -279,7 +279,7 @@
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
                           (set! (.-onbeforeunload js/window) nil)
-                          (.off (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
+                          ; (.off (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)

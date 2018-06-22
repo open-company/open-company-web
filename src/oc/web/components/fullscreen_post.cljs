@@ -217,9 +217,10 @@
         (alert-modal/show-alert alert-data))
       (start-recording-fn))))
 
-(defn vide-uploaded-cb [data]
-  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id (.. data -video -token)
-                                                      :has-changes true})]))
+(defn video-uploaded-cb [data]
+  (js/console.log "XXX video-uploaded-cb" data (.. data -video -token) (aget (aget data "video") "token"))
+  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id (aget (aget data "video") "token")
+                                                           :has-changes true})]))
 
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
@@ -298,7 +299,7 @@
                                (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
                                  ;; Force comments reload
                                  (comment-actions/get-comments (:activity-data modal-data)))
-                               (.on (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
+                               (.on (.-Events js/ZiggeoApi) "submitted" #(video-uploaded-cb %))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -318,7 +319,7 @@
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
                                (set! (.-onbeforeunload js/window) nil)
-                               (.off (.-Events js/ZiggeoApi) "submitted" vide-uploaded-cb)
+                               ; (.off (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
                                s)}
   [s]
   (let [modal-data (drv/react s :fullscreen-post-data)
