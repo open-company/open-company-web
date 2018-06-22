@@ -160,6 +160,7 @@
       (start-recording-fn))))
 
 (defn video-uploaded-cb [data]
+  (js/console.log "XXX video-uploaded-cb" data (.. data -video -token) (aget (aget data "video") "token"))
   (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id (.. data -video -token)
                                                       :has-changes true})]))
 
