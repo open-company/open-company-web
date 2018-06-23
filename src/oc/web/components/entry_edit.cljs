@@ -203,7 +203,8 @@
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline))
-                          (.on (.-Events js/ZiggeoApi) "submitted" #(video-uploaded-cb %))
+                          (.on (.-Events js/ZiggeoApi) "submitted" #(do (js/console.log "XXX ZiggeoApi submitted") (video-uploaded-cb %)))
+                          (.on (.-Events js/ZiggeoApi) "manually_submitted" #(do (js/console.log "XXX ZiggeoApi manually_submitted") (video-uploaded-cb %)))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
