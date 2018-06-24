@@ -31,10 +31,10 @@
      :crossorigin "anonymous"}])
 
 (def ziggeo-css
-  [:link {:rel "stylesheet" :href "//assets-cdn.ziggeo.com/v1-stable/ziggeo.css"}])
+  [:link {:rel "stylesheet" :href "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.css"}])
 
 (def ziggeo-js
-  [:script {:src "//assets-cdn.ziggeo.com/v1-stable/ziggeo.js"}])
+  [:script {:src "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.js"}])
 
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
