@@ -32,6 +32,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.ziggeo :as ziggeo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -597,16 +598,6 @@
     (timbre/error "Error: div#app is not defined!")
     (sentry/capture-message "Error: div#app is not defined!")))
 
-(defn ziggeo-init []
-  (try
-    ;; Ziggeo setup
-    (set! (.-token js/ZiggeoApi) "c9b611b2b996ee5a1f318d3bacc36b27")
-    (set! (.. js/ZiggeoApi -Config -webrtc) true)
-    (catch  :default e
-      (js/console.error "Error setting up ziggeo:" e))))
-
-(set! (.-OCZiggeoSetup js/window) ziggeo-init)
-
 (defn init []
   ;; Setup timbre log level
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
@@ -633,7 +624,9 @@
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
     (router/setup-navigation! handle-url-change route-dispatch!))
-  (ziggeo-init))
+  (let [ziggeo-app (ziggeo/init-ziggeo true)]
+    (js/console.log "XXX ziggeo-app" ziggeo-app)
+    (dis/dispatch! [:input [:ziggeo-app] ziggeo-app])))
 
 (defn on-js-reload []
   (.clear js/console)
