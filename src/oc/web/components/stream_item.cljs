@@ -20,7 +20,8 @@
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]))
 
 (defn expand [s expand? & [scroll-to-comments?]]
   (reset! (::expanded s) expand?)
@@ -149,9 +150,7 @@
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             (when (and has-video
                        expanded?)
-              [:div.ziggeo-player.expanded
-                {:dangerouslySetInnerHTML #js {"__html" (activity-utils/ziggeo-player (:video-id activity-data)
-                                                         638 359)}}])
+              (ziggeo-player (:video-id activity-data) 638 359))
             [:div.stream-item-body-container
               [:div.stream-item-body
                 {:class (utils/class-set {:expanded expanded?})}
@@ -164,9 +163,7 @@
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
           (when (and has-video
                      (not expanded?))
-            [:div.ziggeo-player
-              {:dangerouslySetInnerHTML #js {"__html" (activity-utils/ziggeo-player (:video-id activity-data)
-                                                       200 112)}}])]
+            (ziggeo-player (:video-id activity-data) 200 112))]
         (when (or (not is-mobile?) expanded?)
           (stream-attachments activity-attachments
            (when (and truncated? (not expanded?))

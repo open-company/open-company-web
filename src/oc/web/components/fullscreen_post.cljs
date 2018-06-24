@@ -25,6 +25,7 @@
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 ;; Unsaved edits handling
@@ -217,9 +218,9 @@
         (alert-modal/show-alert alert-data))
       (start-recording-fn))))
 
-(defn video-uploaded-cb [data]
-  (js/console.log "XXX video-uploaded-cb" data (.. data -video -token) (aget (aget data "video") "token"))
-  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id (aget (aget data "video") "token")
+(defn video-uploaded-cb [video-token]
+  (js/console.log "XXX video-uploaded-cb" video-token)
+  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id video-token
                                                            :has-changes true})]))
 
 (rum/defcs fullscreen-post < rum/reactive
@@ -299,8 +300,6 @@
                                (let [modal-data @(drv/get-ref s :fullscreen-post-data)]
                                  ;; Force comments reload
                                  (comment-actions/get-comments (:activity-data modal-data)))
-                               (.on (.-Events js/ZiggeoApi) "submitted" #(do (js/console.log "XXX ZiggeoApi submitted") (video-uploaded-cb %)))
-                               (.on (.-Events js/ZiggeoApi) "manually_submitted" #(do (js/console.log "XXX ZiggeoApi manually_submitted") (video-uploaded-cb %)))
                                s)
                               :did-mount (fn [s]
                                (reset! (::window-click s)
@@ -320,7 +319,6 @@
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
                                (set! (.-onbeforeunload js/window) nil)
-                               ; (.off (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
                                s)}
   [s]
   (let [modal-data (drv/react s :fullscreen-post-data)
@@ -438,13 +436,9 @@
             ;; Video element
             (when (and video-id
                        (not @(::record-video s)))
-              [:div.ziggeo-player
-                {:data-videoid video-id
-                 :key (str "fullscreen-video-id-" video-id)
-                 :dangerouslySetInnerHTML #js {:__html (au/ziggeo-player video-id)}}])
+              (ziggeo-player video-id))
             (when @(::record-video s)
-                [:div.ziggeo-recorder
-                  {:dangerouslySetInnerHTML #js {"__html" (au/ziggeo-recorder)}}])
+              (ziggeo-recorder video-uploaded-cb))
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)

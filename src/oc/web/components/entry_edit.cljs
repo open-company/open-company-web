@@ -20,6 +20,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -159,9 +160,9 @@
         (alert-modal/show-alert alert-data))
       (start-recording-fn))))
 
-(defn video-uploaded-cb [data]
-  (js/console.log "XXX video-uploaded-cb" data (.. data -video -token) (aget (aget data "video") "token"))
-  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id (aget (aget data "video") "token")
+(defn video-uploaded-cb [video-token]
+  (js/console.log "XXX video-uploaded-cb" video-token)
+  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id video-token
                                                       :has-changes true})]))
 
 (rum/defcs entry-edit < rum/reactive
@@ -203,8 +204,6 @@
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline))
-                          (.on (.-Events js/ZiggeoApi) "submitted" #(do (js/console.log "XXX ZiggeoApi submitted") (video-uploaded-cb %)))
-                          (.on (.-Events js/ZiggeoApi) "manually_submitted" #(do (js/console.log "XXX ZiggeoApi manually_submitted") (video-uploaded-cb %)))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -280,7 +279,6 @@
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
                           (set! (.-onbeforeunload js/window) nil)
-                          ; (.off (.-Events js/ZiggeoApi) "submitted" video-uploaded-cb)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)
@@ -413,15 +411,12 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          ;; Video element
+          ;; Video elements
           (when (and (:video-id entry-editing)
                      (not @(::record-video s)))
-            [:div.ziggeo-player
-              {:data-videoid (:video-id entry-editing)
-               :dangerouslySetInnerHTML #js {:__html (au/ziggeo-player (:video-id entry-editing))}}])
+            (ziggeo-player (:video-id entry-editing)))
           (when @(::record-video s)
-            [:div.ziggeo-recorder
-              {:dangerouslySetInnerHTML #js {"__html" (au/ziggeo-recorder)}}])
+            (ziggeo-recorder video-uploaded-cb))
           (rich-body-editor {:on-change (partial body-on-change s)
                              :use-inline-media-picker false
                              :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
