@@ -625,8 +625,7 @@
   (when (and handle-url-change route-dispatch!)
     (router/setup-navigation! handle-url-change route-dispatch!))
   (let [ziggeo-app (ziggeo/init-ziggeo true)]
-    (js/console.log "XXX ziggeo-app" ziggeo-app)
-    (dis/dispatch! [:input [:ziggeo-app] ziggeo-app])))
+    (js/console.log "XXX ziggeo-app" ziggeo-app)))
 
 (defn on-js-reload []
   (.clear js/console)
