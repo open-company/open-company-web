@@ -100,4 +100,4 @@
     [:div.notifications
       (for [idx (range (count notifications-data))
             :let [n (nth notifications-data idx)]]
-        (rum/with-key (notification n) (str "notif-" (:created-at n))))]))
+        (rum/with-key (notification n) (str "notif-" (:id n))))]))

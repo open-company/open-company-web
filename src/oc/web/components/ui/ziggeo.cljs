@@ -1,5 +1,7 @@
 (ns oc.web.components.ui.ziggeo
-  (:require [rum.core :as rum]))
+  (:require [rum.core :as rum]
+            [oc.web.actions.notifications :as na]
+            [clojure.contrib.humanize :refer (filesize)]))
 
 (rum/defcs ziggeo-player < {:did-mount (fn [s]
                             (let [args (into [] (:rum/args s))
@@ -53,18 +55,37 @@
                                      (js/console.log "XXX ziggeo-recorder upload_selected fired" (.get recorder-instance "video"))
                                      (when (fn? start-cb)
                                        (start-cb (.get recorder-instance "video")))))
+                                   (.on recorder-instance "upload_progress"
+                                    (fn [a b]
+                                     (js/console.log "XXX ziggeo-recorder upload_progress fired" (.get recorder-instance "video") a b)
+                                     (na/show-notification {:title "Video is uploading."
+                                                            :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")
+                                                            :id :ziggeo-video-upload
+                                                            :expire (if (< (- b a) 1000) 5 0)})))
                                    (.on recorder-instance "recording"
                                     (fn []
                                      (js/console.log "XXX ziggeo-recorder recording fired" (.get recorder-instance "video"))
                                      (when (fn? start-cb)
                                        (start-cb (.get recorder-instance "video")))))
+                                   (.on recorder-instance "processing"
+                                    (fn [a]
+                                     (js/console.log "XXX ziggeo-recorder recording fired" (.get recorder-instance "video"))
+                                     (na/remove-notification-by-id :ziggeo-video-upload)
+                                     (na/show-notification {:title "Video is processing."
+                                                            :description (str "Progress: " (int a) "%.")
+                                                            :id :ziggeo-video-processing
+                                                            :expire (if (> a 99) 5 0)})))
                                    (.on recorder-instance "error"
                                     (fn []
                                      (js/console.log "XXX ziggeo-recorder error fired" (.get recorder-instance "video"))
+                                     (na/remove-notification-by-id :ziggeo-video-upload)
+                                     (na/remove-notification-by-id :ziggeo-video-processing)
                                      (when (fn? cancel-cb)
                                        (cancel-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processed"
                                     (fn []
+                                     (na/remove-notification-by-id :ziggeo-video-upload)
+                                     (na/remove-notification-by-id :ziggeo-video-processing)
                                      (js/console.log "XXX ziggeo-recorder processed fired" (.get recorder-instance "video") submit-cb)
                                      (submit-cb (.get recorder-instance "video"))))))
                                s)} 
