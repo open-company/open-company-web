@@ -3,9 +3,9 @@
 
 (rum/defcs ziggeo-player < {:did-mount (fn [s]
                             (let [args (into [] (:rum/args s))
-                                  video-id (first args)
-                                  width (get args 1 640)
-                                  height (get args 2 360)
+                                  video-id (get args 0)
+                                  width (get args 2 640)
+                                  height (get args 3 360)
                                   player-el (rum/ref-node s :ziggeo-player)]
                               (js/console.log "XXX ziggeo-player player-el" player-el "args" video-id width height)
                               (let [config {:element player-el
