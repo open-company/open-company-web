@@ -18,9 +18,18 @@
                                     player-instance (Player. (clj->js config))]
                                 (.activate player-instance)))
                             s)} 
-  [s video-id width height]
+  [s video-id remove-video-cb width height]
   [:div.ziggeo-player
-    {:ref :ziggeo-player}])
+    (when (fn? remove-video-cb)
+      [:button.mlb-reset.remove-video-bt
+        {:on-click (fn [] (when (fn? remove-video-cb)
+                            (remove-video-cb video-id)))
+         :data-toggle "tooltip"
+         :data-placement "top"
+         :data-container "body"
+         :title "Remove video"}])
+    [:div.ziggeo-player-embed
+      {:ref :ziggeo-player}]])
 
 (rum/defcs ziggeo-recorder < {:did-mount (fn [s]
                                (let [args (:rum/args s)

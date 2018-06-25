@@ -223,6 +223,21 @@
   (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id video-token
                                                            :has-changes true})]))
 
+(defn- remove-video-cb []
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "rerecord-video"
+                        :message "You sure you want to remove the current video?"
+                        :link-button-title "Keep"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Yes"
+                        :solid-button-cb (fn []
+                                          (dis/dispatch! [:update [:modal-editing-data]
+                                           #(merge % {:video-id nil
+                                                      :has-changes true})])
+                                          (alert-modal/hide-alert))}]
+        (alert-modal/show-alert alert-data)))
+
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
                              (drv/drv :fullscreen-post-data)
@@ -436,7 +451,7 @@
             ;; Video element
             (when (and video-id
                        (not @(::record-video s)))
-              (ziggeo-player video-id))
+              (ziggeo-player video-id (when editing remove-video-cb)))
             (when @(::record-video s)
               (ziggeo-recorder video-uploaded-cb))
             (if editing
