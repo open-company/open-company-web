@@ -38,7 +38,8 @@
     (when (or (.hasClass $item-body "ddd-truncated")
               (> (count (:attachments activity-data)) 3)
               (pos? (count comments-data))
-              (:body-has-images activity-data))
+              (:body-has-images activity-data)
+              (:video-id activity-data))
       (reset! (::truncated s) true))))
 
 (rum/defcs stream-item < rum/reactive
