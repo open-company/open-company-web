@@ -151,7 +151,7 @@
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             (when (and has-video
                        expanded?)
-              (ziggeo-player (:video-id activity-data) nil 638 419))
+              (ziggeo-player (:video-id activity-data) nil 638 459))
             [:div.stream-item-body-container
               [:div.stream-item-body
                 {:class (utils/class-set {:expanded expanded?})}
@@ -164,7 +164,7 @@
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
           (when (and has-video
                      (not expanded?))
-            (ziggeo-player (:video-id activity-data) nil 200 131))]
+            (ziggeo-player (:video-id activity-data) nil 200 143))]
         (when (or (not is-mobile?) expanded?)
           (stream-attachments activity-attachments
            (when (and truncated? (not expanded?))
