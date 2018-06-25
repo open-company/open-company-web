@@ -80,6 +80,10 @@
                                      (js/console.log "XXX ziggeo-recorder error fired" (.get recorder-instance "video"))
                                      (na/remove-notification-by-id :ziggeo-video-upload)
                                      (na/remove-notification-by-id :ziggeo-video-processing)
+                                     (na/show-notification {:title "Error processing your video."
+                                                            :description "An error occurred while processing your video, please try again."
+                                                            :id :ziggeo-video-error
+                                                            :expire 10})
                                      (when (fn? cancel-cb)
                                        (cancel-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processed"
