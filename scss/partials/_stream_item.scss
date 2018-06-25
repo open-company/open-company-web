@@ -119,6 +119,13 @@ div.stream-item {
         min-height: 112px;
       }
 
+      div.ziggeo-player {
+        width: 638px;
+        height: 359px;
+        margin-top: 16px;
+        float: unset;
+      }
+
       @include mobile() {
         width: 100%;
         margin: 8px 0px 0px;
@@ -371,13 +378,6 @@ div.stream-item {
       width: 200px;
       height: 112px;
       float: right;
-
-      &.expanded {
-        width: 638px;
-        height: 359px;
-        margin-top: 16px;
-        float: unset;
-      }
     }
 
     div.stream-body-right {
