@@ -232,7 +232,7 @@
         [:div.balloon.small-purple]
 
         [:h1.headline
-          "Thoughtful team communication."]
+          "Thoughtful team communication"]
         [:div.subheadline
           (str
            "Rise above the noise of real-time chat and overstuffed inboxes "
