@@ -5,7 +5,6 @@
             [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.stores.search :as search]
@@ -123,19 +122,19 @@
         section-not-found (and (not org-not-found)
                                org-data
                                (not (seq (filterv #(= (:slug %) (router/current-board-slug)) (:boards org-data)))))
-        activity-not-found (and (not section-not-found)
-                                board-data
-                                (not (seq (filterv #(= % (router/current-activity-id)) (keys (:fixed-items board-data))))))
-        show-activity-not-found (and jwt
+        entry-not-found (and (not section-not-found)
+                             board-data
+                             (not (seq (filterv #(= % (router/current-activity-id)) (keys (:fixed-items board-data))))))
+        show-activity-not-found (and (not jwt)
                                      (router/current-activity-id)
                                      (or org-not-found
                                          section-not-found
-                                         activity-not-found))
-        show-activity-removed (and (not jwt)
+                                         entry-not-found))
+        show-activity-removed (and jwt
                                    (router/current-activity-id)
                                    (or org-not-found
                                        section-not-found
-                                       activity-not-found))
+                                       entry-not-found))
         is-loading (and (not show-activity-not-found)
                         (not show-activity-removed)
                         loading?)]
