@@ -5,7 +5,7 @@
                             (let [args (into [] (:rum/args s))
                                   video-id (get args 0)
                                   width (get args 2 640)
-                                  height (get args 3 360)
+                                  height (get args 3 420)
                                   player-el (rum/ref-node s :ziggeo-player)]
                               (js/console.log "XXX ziggeo-player player-el" player-el "args" video-id width height)
                               (let [config {:element player-el
@@ -37,7 +37,7 @@
                                      start-cb (get args 1)
                                      cancel-cb (get args 2)
                                      width (get args 3 640)
-                                     height (get args 4 360)
+                                     height (get args 4 420)
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
                                  (js/console.log "XXX ziggeo-recorder recorder-el" recorder-el "args" args submit-cb width height)
                                  (let [config {:element recorder-el
