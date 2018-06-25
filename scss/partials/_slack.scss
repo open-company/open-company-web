@@ -6,9 +6,12 @@ button.signin-with-slack {
   color: white;
   @include avenir_H();
   font-size: 20px;
-  margin: 48px 16px 0;
+  margin: 48px auto 0;
   position: relative;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   @include mobile(){
     width: 100%;
@@ -29,8 +32,6 @@ button.signin-with-slack {
     background-repeat: no-repeat;
     background-size: 24px 24px;
     margin-right: 8px;
-    display: inline-block;
-    top: 5px;
     position: relative;
   }
 }

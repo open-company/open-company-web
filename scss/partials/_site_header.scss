@@ -46,35 +46,80 @@ nav.site-navbar {
   box-shadow: 0px 0px 0px 0px tranparent;
   transform: background-color 180ms, box-shadow 180ms;
 
+  @include mobile() {
+    height: 72px;
+  }
+
   &.sticky {
     background-color: white;
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    height: 56px;
 
     div.site-navbar-container {
       padding: 12px 40px;
+      height: 56px;
 
       @include mobile() {
-        padding: 12px 24px;
+        padding: 14px 24px;
+      }
 
-        a.navbar-brand-left {
-          margin-top: 10px;
+      div.mobile-ham-menu {
+        @include mobile() {
+          position: absolute;
+          height: 24px;
+          top: 16px;
         }
+      }
+
+      a.navbar-brand-left {
+        margin: 4px 0px 0px;
+        width: 99px;
+        height: 24px;
+        background-size: 99px 24px;
+
+        @include mobile() {
+          margin: 2px 0px 0px -50px;
+        }
+      }
+
+      div.navbar-brand-center {
+        margin: 2px auto 0px;
       }
 
       div.site-navbar-right {
         top: 12px;
+        height: 32px;
 
         @include mobile() {
-          top: 22px;
+          top: 16px;
+          height: 24px;
 
           a.your-digest {
-            margin-top: 2px;
+            margin-top: 0px;
+            height: 32px;
+          }
+        }
+
+        a.login {
+          height: 32px;
+          padding: 6px 24px;
+
+          @include mobile() {
+            height: 24px;
+            padding: 2px 12px;
           }
         }
 
         a.start {
           background-color: $carrot_orange;
           color: white;
+          height: 32px;
+          padding: 6px 24px;
+
+          @include mobile() {
+            height: 24px;
+            padding: 2px 12px;
+          }
 
           span.slack-orange-icon {
             @include image-2x("/img/ML/slack_white_icon");
@@ -88,6 +133,8 @@ nav.site-navbar {
           &:not(.your-digest).slack-get-started {
             background-color: $carrot_orange;
             color: white;
+            height: 32px;
+            padding: 4px 24px;
           }
         }
       }
@@ -95,24 +142,25 @@ nav.site-navbar {
   }
 
   div.site-navbar-container {
-    height: 72px;
-    padding: 22px 40px;
+    height: 64px;
+    padding: 24px 40px 0px;
     position: relative;
 
     @include mobile() {
       padding: 22px 24px;
+      height: 72px;
     }
 
     div.mobile-ham-menu {
       @include mobile() {
         position: absolute;
         width: 32px;
-        height: 32px;
+        height: 28px;
         background-image: cdnUrl("/img/ML/mobile_ham_menu.svg");
         background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center;
-        top: 16px;
+        top: 22px;
         left: 24px;
       }
     }
@@ -141,12 +189,13 @@ nav.site-navbar {
 
     div.site-navbar-right {
       position: absolute;
-      top: 30px;
+      top: 24px;
       right: 40px;
 
       @include mobile() {
-        top: 24px;
+        top: 22px;
         right: 24px;
+        height: 28px;
       }
 
       a {
@@ -193,18 +242,30 @@ nav.site-navbar {
         background-color: $coral;
         padding: 10px 24px;
         text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-top: 0px;
         opacity: 0.8;
 
         @include mobile() {
-          height: 24px;
-          margin-top: 2px;
-          width: 72px;
-          // text-align: center;
-          padding: 4px 0px 0px;
+          height: 28px;
+          width: auto;
+          text-align: center;
+          padding: 4px 12px;
           font-size: 13px;
           letter-spacing: 0.46px;
           min-width: 64px;
+
+          span.slack-copy {
+            top: 2px;
+            position: relative;
+          }
+
+          span.copy {
+            top: 2px;
+            position: relative; 
+          }
         }
 
         span.slack-orange-icon {
@@ -214,13 +275,7 @@ nav.site-navbar {
           background-repeat: no-repeat;
           background-size: 16px 16px;
           margin-right: 6px;
-          display: inline-block;
-          top: 2px;
           position: relative;
-
-          @include mobile() {
-            top: 4px;
-          }
         }
 
         &:not(.your-digest).slack-get-started {
@@ -256,7 +311,7 @@ nav.site-navbar {
 
     a.navbar-brand-left {
       float: left;
-      margin: 7px 0px 0px;
+      margin: 6px 0px 0px;
       width: 115px;
       height: 28px;
       background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
@@ -269,7 +324,7 @@ nav.site-navbar {
         position: absolute;
         float: unset;
         left: 50%;
-        margin: 0px 0px 0px -50px;
+        margin: 2px 0px 0px -50px;
         width: 99px;
         height: 24px;
         background-size: 99px 24px;
@@ -278,7 +333,7 @@ nav.site-navbar {
           float: left;
           position: relative;
           left: unset;
-          margin: 7px 0px 0px;
+          margin: 2px 0px 0px;
         }
       }
 
@@ -291,7 +346,7 @@ nav.site-navbar {
     div.navbar-brand-center {
       width: 327px;
       height: 28px;
-      margin: 12px auto 0px;
+      margin: 6px auto 0px;
       text-align: center;
 
       @include tablet() {
@@ -300,10 +355,13 @@ nav.site-navbar {
 
       a {
         @include avenir_M();
-        margin: 0px 12px;
-        display: inline;
+        padding: 4px 12px;
+        display: inline-block;
         font-size: 16px;
+        line-height: 20px;
         color: $ui_grey;
+        margin: 0px;
+        height: 28px;
 
         &.active {
           color: #373F4F;

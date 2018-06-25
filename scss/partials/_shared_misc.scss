@@ -353,9 +353,12 @@ button.get-started-button {
   color: white;
   @include avenir_H();
   font-size: 20px;
-  margin: 48px 16px 0;
+  margin: 48px auto 0;
   position: relative;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 12px;
 
   @include mobile(){

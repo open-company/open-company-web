@@ -46,19 +46,16 @@
   (let [logged-in (jwt/jwt)
         your-digest (when logged-in (utils/your-digest-url))
         is-slack-lander? (utils/in? (:route @router/path) "slack-lander")
-        is-slack? (utils/in? (:route @router/path) "slack")
         slack-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                         {:auth-source "slack"})
-        show-navigation? (and (not is-slack-lander?)
-                              (not is-slack?))]
+                         {:auth-source "slack"})]
     [:nav.site-navbar
       {:class (when @(::sticky-navbar s) "sticky")}
       [:div.site-navbar-container
         [:a.navbar-brand-left
           {:href oc-urls/home-no-redirect
-           :class (when-not show-navigation? "is-slack-header")
+           :class (when is-slack-lander? "is-slack-header")
            :on-click (partial nav! oc-urls/home-no-redirect)}]
-        (when show-navigation?
+        (when-not is-slack-lander?
           [:div.navbar-brand-center
             [:a
               {:href oc-urls/home
@@ -117,14 +114,26 @@
                   "Get started")])]]
         [:div.site-navbar-right.mobile-only
           (if use-slack-signup-button
+            (if is-slack-lander?
+              [:a.start
+                {:href "/sign-up"
+                 :on-click #(do
+                              (.preventDefault %)
+                              (if logged-in
+                                (nav! your-digest %)
+                                (if use-slack-signup-button
+                                  (user-actions/login-with-slack slack-auth-link)
+                                  (nav! oc-urls/sign-up %))))}
+                [:span.slack-orange-icon]
+                [:span.slack-copy "SIGN IN"]]
+              [:a.start
+                {:id "site-header-mobile-signup-item"
+                 :href "/sign-up"}
+                  [:span.copy "ADD"]])
             [:a.start
               {:id "site-header-mobile-signup-item"
                :href "/sign-up"}
-                "ADD"]
-            [:a.start
-              {:id "site-header-mobile-signup-item"
-               :href "/sign-up"}
-                "START"])]
-        (when show-navigation?
+                [:span.copy "START"]])]
+        (when-not is-slack-lander?
           [:div.mobile-ham-menu.mobile-only
             {:on-click #(site-mobile-menu/site-menu-toggle)}])]]))

@@ -25,7 +25,7 @@ div.slack-lander-wrap {
 
       @include tablet(){
         overflow: visible;
-        padding: 80px 24px;
+        padding: 152px 24px;
       }
 
       div.balloon {
@@ -148,8 +148,6 @@ div.slack-lander-wrap {
         background-repeat: no-repeat;
         background-size: 24px 24px;
         margin-right: 8px;
-        display: inline-block;
-        top: 4px;
         position: relative;
       }
     }
