@@ -44,7 +44,7 @@
           [:div.balloon.small-purple]
 
           [:h1.headline
-            "Keep your team informed without distractions."]
+            "Thoughtful team communication."]
           [:div.subheadline
             (str
              "Rise above the noise of real-time chat and overstuffed inboxes "

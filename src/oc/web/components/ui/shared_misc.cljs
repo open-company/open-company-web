@@ -81,7 +81,7 @@
           [:div.keep-aligned-section-copy-title
             "Know what’s important"]
           [:div.keep-aligned-section-list-item
-            "Must see updates rise to the top"]
+            "“Must see” updates rise to the top"]
           [:div.keep-aligned-section-list-item
             "Follow people and topics you can’t miss"]
           [:div.keep-aligned-section-list-item
@@ -93,9 +93,9 @@
           [:div.keep-aligned-section-copy-title
             "Update your team in seconds"]
           [:div.keep-aligned-section-list-item
-            "Create compelling updates people want to read"]
+            "Create more compelling updates"]
           [:div.keep-aligned-section-list-item
-            "Capture video updates to add a human touch"]
+            "Capture video to add a human touch"]
           [:div.keep-aligned-section-list-item
             "Attachments from Google, Dropbox, & others"]]]
 
@@ -105,7 +105,7 @@
           [:div.keep-aligned-section-copy-title
             "Spark better follow-on discussions"]
           [:div.keep-aligned-section-list-item
-            "Encourage thoughtful comments and questions"]
+            "Encourage more comments and questions"]
           [:div.keep-aligned-section-list-item
             "Keep interactions together for greater context"]
           [:div.keep-aligned-section-list-item
