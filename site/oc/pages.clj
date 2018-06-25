@@ -193,9 +193,9 @@
     [:div.access-anywhere-section-container
       [:div.access-anywhere-copy
         [:div.access-anywhere-copy-title
-          "Stay up to date on the go. Access Carrot from anywhere."]
+          "Stay up to date on the go."]
         [:div.access-anywhere-copy-subtitle
-          "Fully responsive web app. No app install required."]]
+          "Fully responsive mobile web app. No app install required."]]
       [:div.access-anywhere-screenshot]]])
 
 (defn slack-comparison-section
