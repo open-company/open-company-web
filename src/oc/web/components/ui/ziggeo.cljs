@@ -32,14 +32,14 @@
       {:ref :ziggeo-player}]])
 
 (rum/defcs ziggeo-recorder < {:did-mount (fn [s]
-                               (let [args (:rum/args s)
+                               (let [args (into [] (:rum/args s))
                                      submit-cb (get args 0)
                                      start-cb (get args 1)
                                      cancel-cb (get args 2)
                                      width (get args 3 640)
                                      height (get args 4 360)
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
-                                 (js/console.log "XXX ziggeo-recorder recorder-el" recorder-el "args" submit-cb width height)
+                                 (js/console.log "XXX ziggeo-recorder recorder-el" recorder-el "args" args submit-cb width height)
                                  (let [config {:element recorder-el
                                                :attrs #js {:width width
                                                            :height height
@@ -65,7 +65,7 @@
                                        (cancel-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processed"
                                     (fn []
-                                     (js/console.log "XXX ziggeo-recorder processed fired" (.get recorder-instance "video") recorder-instance)
+                                     (js/console.log "XXX ziggeo-recorder processed fired" (.get recorder-instance "video") submit-cb)
                                      (submit-cb (.get recorder-instance "video"))))))
                                s)} 
   [s submit-cb start-cb cancel-cb width height]
