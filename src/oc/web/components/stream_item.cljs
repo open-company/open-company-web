@@ -10,7 +10,7 @@
             [oc.web.mixins.activity :as am]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.wst :refer (wst)]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.events.expand-event :as expand-event]
             [oc.web.actions.activity :as activity-actions]
@@ -23,7 +23,7 @@
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
-(defn wst-list [self-user]
+(defn wrt-list [self-user]
  [{:seen false
    :user-id "0000-0000-0000"
    :name "Alia Atreidis"
@@ -145,11 +145,11 @@
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
           (let [current-user-data (drv/react s :current-user-data)
-                users-list (wst-list current-user-data)]
+                users-list (wrt-list current-user-data)]
             (js/console.log "XXX current-user-data" current-user-data)
             (js/console.log "XXX users-list" users-list)
-            [:div.stream-item-wst
-              (wst users-list)])]
+            [:div.stream-item-wrt
+              (wrt users-list)])]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))

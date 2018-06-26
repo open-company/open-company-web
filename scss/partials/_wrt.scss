@@ -1,14 +1,14 @@
-div.wst-container {
+div.wrt-container {
   position: relative;
 
-  div.wst-count {
+  div.wrt-count {
     @include avenir_M();
     font-size: 12px;
     color: $deep_navy;
     margin-left: 8px;
   }
 
-  div.wst-popup {
+  div.wrt-popup {
     width: 360px;
     background-color: white;
     border-radius: 6px;
@@ -23,13 +23,13 @@ div.wst-container {
     z-index: 2;
     max-height: calc(100vh - #{$navbar_height}px);
 
-    div.wst-popup-title {
+    div.wrt-popup-title {
       @include avenir_M();
       font-size: 14px;
       color: $deep_navy;
     }
 
-    input.wst-popup-query {
+    input.wrt-popup-query {
       width: 100%;
       height: 40px;
       border: 1px solid rgba($carrot_light_gray_1, 0.5);
@@ -46,14 +46,14 @@ div.wst-container {
       }
     }
 
-    div.wst-popup-list {
+    div.wrt-popup-list {
       margin: 24px 0px 0px 0px;
       width: calc(100% + 48px);
       margin-left: -24px;
       padding: 0px 24px;
       border-top: 1px solid #ECECEC;
 
-      div.wst-popup-list-row {
+      div.wrt-popup-list-row {
         padding: 16px 0px;
         padding: 16px 0px;
         height: 64px;
@@ -66,7 +66,7 @@ div.wst-container {
           height: 48px;
         }
 
-        div.wst-popup-list-row-avatar {
+        div.wrt-popup-list-row-avatar {
           float: left;
           position: relative;
           width: 32px;
@@ -88,7 +88,7 @@ div.wst-container {
           }
         }
 
-        div.wst-popup-list-row-name {
+        div.wrt-popup-list-row-name {
           float: left;
           margin-left: 8px;
           @include avenir_R();
@@ -100,7 +100,7 @@ div.wst-container {
           max-width: calc(100% - 32px - 8px - 8px - 58px);
         }
 
-        div.wst-popup-list-row-seen {
+        div.wrt-popup-list-row-seen {
           @include avenir_R();
           font-size: 14px;
           color: $deep_navy;
