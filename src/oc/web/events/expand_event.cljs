@@ -2,8 +2,7 @@
   "Expand event triggered by the stream-item component when a
   body is being expanded or collapsed.
   Loosly inspired by https://stackoverflow.com/a/9089803/561744"
-  (:require [goog :as g]
-            [goog.events :as events]))
+  (:require [goog.events :as events]))
 
 (def EXPAND "stream-item-expand")
 
@@ -11,11 +10,11 @@
   (this-as this
     (.call events/Event this EXPAND)
     (set! (.-expanding this) expanding?)))
-(g/inherits ExpandEvent events/Event)
+(goog/inherits ExpandEvent events/Event)
 
 (defn ExpandEventTarget []
   (this-as this
     (.call events/EventTarget this)))
-(g/inherits ExpandEventTarget events/EventTarget)
+(goog/inherits ExpandEventTarget events/EventTarget)
 
 (def expand-event-target (ExpandEventTarget.))

@@ -4,7 +4,6 @@
             [dommy.core :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [goog :as g]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
