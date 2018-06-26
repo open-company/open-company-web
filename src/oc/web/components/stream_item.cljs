@@ -17,11 +17,19 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.tile-menu :refer (tile-menu)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.wst :refer (wst)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+
+(defn wst-list [self-user]
+ [{:seen false
+   :user-id "0000-0000-0000"
+   :name "Alia Atreidis"
+   :avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_red.svg"}
+  (assoc self-user :seen true)])
 
 (defn expand [s expand? & [scroll-to-comments?]]
   (reset! (::expanded s) expand?)
@@ -52,6 +60,7 @@
                          (drv/drv :org-data)
                          (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
+                         (drv/drv :current-user-data)
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
@@ -135,7 +144,13 @@
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
+                (utils/time-since t)])]
+          (let [current-user-data (drv/react s :current-user-data)
+                users-list (wst-list current-user-data)]
+            (js/console.log "XXX current-user-data" current-user-data)
+            (js/console.log "XXX users-list" users-list)
+            [:div.stream-item-wst
+              (wst users-list)])]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))
