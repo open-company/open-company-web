@@ -116,9 +116,10 @@
                         (rum/local nil ::last-direction)
                         ;; Mixins
                         mixins/first-render-mixin
-                        (mixins/ap-seen-mixin "div.stream-item-headline" ap-seen-mixin-cb)
+                        (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
                         (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner"
                          wrt-stream-item-mixin-cb)
+
                         {:will-mount (fn [s]
                           (let [all-posts-data @(drv/get-ref s :all-posts)
                                 sorted-items (activity-utils/get-sorted-activities all-posts-data)

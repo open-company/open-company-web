@@ -163,7 +163,7 @@
                            (.each $all-items (fn [idx el]
                              (when (and (fn? item-is-visible-cb)
                                         (is-element-visible? el))
-                               (item-is-visible-cb s (.-itemuuid (.-dataset el))))))))]
+                               (item-is-visible-cb s (.attr (js/$ el) "data-itemuuid")))))))]
      {:will-mount (fn [s]
        (assoc s scroll-listener-kw
         (events/listen js/window EventType/SCROLL

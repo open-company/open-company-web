@@ -534,8 +534,8 @@
               container-id (:board-uuid activity-data)
               published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
               today-ts (.getTime (utils/js-date))
-              ap-seen-ttl-ms (* ls/ap-seen-ttl 24 60 60 1000)
-              minimum-ttl (- today-ts ap-seen-ttl-ms)]
+              oc-seen-ttl-ms (* ls/oc-seen-ttl 24 60 60 1000)
+              minimum-ttl (- today-ts oc-seen-ttl-ms)]
     (when (> published-at-ts minimum-ttl)
       ;; Send the seen because:
       ;; 1. item is published

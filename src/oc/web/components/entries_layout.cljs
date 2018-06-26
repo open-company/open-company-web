@@ -24,7 +24,7 @@
 
 (def tiles-per-row 3)
 
-(defn- item-scrolled-into-view-cb [item-uuid]
+(defn- item-scrolled-into-view-cb [_ item-uuid]
   ;; only in case of AP
   (activity-actions/ap-seen-events-gate item-uuid))
 
@@ -37,7 +37,7 @@
                           (rum/local nil ::next-link)
                           ;; Mixins
                           (mixins/load-more-items 400)
-                          (mixins/ap-seen-mixin "div.activity-card-headline" item-scrolled-into-view-cb)
+                          (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
 
                           {:init (fn [s]
                             (-> s

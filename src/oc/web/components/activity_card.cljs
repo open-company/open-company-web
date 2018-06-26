@@ -81,7 +81,7 @@
               " in ")
             (when (or is-all-posts is-drafts-board)
               (:board-name activity-data)))]
-        [:div.activity-card-headline
+        [:div.activity-card-headline.ap-seen-item-headline
           {:ref "activity-headline"
            :data-itemuuid (:uuid activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
