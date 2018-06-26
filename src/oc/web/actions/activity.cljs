@@ -580,9 +580,11 @@
   [activity-id]
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
-              publisher-id (:user-id (:publisher activity-data))
-              container-id (:board-uuid activity-data)]
-    (ws-cc/item-read publisher-id container-id activity-id)))
+              org-id (:uuid (dis/org-data))
+              container-id (:board-uuid activity-data)
+              user-name (jwt/get-key :name)
+              avatar-url (jwt/get-key :avatar-url)]
+    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (def wrt-timeouts-list (atom {}))
 (def wrt-wait-interval 3)
