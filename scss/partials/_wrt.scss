@@ -30,7 +30,7 @@ div.wrt-container {
     top: 100%;
     left: 0px;
     z-index: 2;
-    max-height: calc(100vh - #{$navbar_height}px);
+    max-height: calc(100vh - #{$navbar_height}px - 100px);
     display: none;
 
     div.wrt-popup-title {
