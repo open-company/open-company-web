@@ -96,7 +96,6 @@
   (activity-actions/ap-seen-events-gate item-uuid))
 
 (defn- wrt-stream-item-mixin-cb [_ item-uuid]
-  (js/console.log "DBG wrt-stream-item-mixin-cb" item-uuid)
   (activity-actions/wrt-events-gate item-uuid))
 
 (rum/defcs all-posts  < rum/reactive

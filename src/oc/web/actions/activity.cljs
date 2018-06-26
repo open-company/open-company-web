@@ -581,14 +581,12 @@
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
   [activity-id]
-  (js/console.log "DBG send-item-read" activity-id)
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               org-id (:uuid (dis/org-data))
               container-id (:board-uuid activity-data)
               user-name (jwt/get-key :name)
               avatar-url (jwt/get-key :avatar-url)]
-    (js/console.log "DBG    - sending" org-id container-id activity-id user-name avatar-url)
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (def wrt-timeouts-list (atom {}))
@@ -601,7 +599,6 @@
   Once the timeout finishes it means no other events were fired for it so we can send a seen.
   It will send seen every 3 seconds or more."
   [activity-id]
-  (js/console.log "DBG wrt-events-gate" activity-id)
   (let [wait-interval-ms (* wrt-wait-interval 1000)]
     ;; Remove the old timeout if there is
     (when-let [uuid-timeout (get @wrt-timeouts-list activity-id)]

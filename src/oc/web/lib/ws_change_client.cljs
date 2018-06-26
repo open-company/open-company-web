@@ -48,7 +48,6 @@
 (defn item-read [org-id container-id item-id user-name avatar-url]
   (when @chsk-send!
     (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
-    (js/console.log "DBG ws-cc/item-read" org-id container-id item-id user-name avatar-url)
     (@chsk-send! [:item/read {:org-id org-id
                               :container-id container-id
                               :item-id item-id
