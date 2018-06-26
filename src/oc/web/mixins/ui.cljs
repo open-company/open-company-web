@@ -228,7 +228,7 @@
                                              (.contains (.-classList el) "wrt-expanded")))
                                     ;; and the bottom of the element is visible at screen
                                     (is-element-bottom-visible? el))
-                          (item-read-cb s (.-itemuuid (.-dataset el)))))
+                          (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s]
                          (let [dom-node (rum/dom-node s)
                                $all-items (js/$ items-selector dom-node)]
