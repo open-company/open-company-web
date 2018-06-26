@@ -219,7 +219,6 @@
       (start-recording-fn))))
 
 (defn video-uploaded-cb [video-token]
-  (js/console.log "XXX video-uploaded-cb" video-token)
   (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id video-token
                                                            :has-changes true})]))
 

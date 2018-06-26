@@ -624,8 +624,7 @@
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
     (router/setup-navigation! handle-url-change route-dispatch!))
-  (let [ziggeo-app (ziggeo/init-ziggeo true)]
-    (js/console.log "XXX ziggeo-app" ziggeo-app)))
+  (ziggeo/init-ziggeo true))
 
 (defn on-js-reload []
   (.clear js/console)
