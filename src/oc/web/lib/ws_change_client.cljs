@@ -60,6 +60,11 @@
     (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
     (@chsk-send! [:item/who-read-count item-ids] 1000)))
 
+(defn who-read [item-ids]
+  (when @chsk-send!
+    (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
+    (@chsk-send! [:item/who-read item-ids] 1000)))
+
 (defn subscribe
   [topic handler-fn]
   (let [ws-cc-chan (chan)]
@@ -108,6 +113,11 @@
   [_ body]
   (timbre/debug "Change event:" body)
   (go (>! ch-pub { :topic :item/counts :data body })))
+
+(defmethod event-handler :item/status
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :item/status :data body })))
 
 ;; ----- Sente event handlers -----
 

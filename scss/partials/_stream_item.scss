@@ -95,6 +95,15 @@ div.stream-item {
         }
       }
 
+      div.separator {
+        width: 4px;
+        height: 4px;
+        border-radius: 4px;
+        background-color: $ui_grey;
+        margin: 6px 8px 0px;
+        float: left;
+      }
+
       div.stream-item-wrt {
         float: left;
       }

@@ -78,8 +78,8 @@
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
-(def read-counts-key
-  [:read-counts])
+(def activities-read-key
+  [:activities-read])
 
 ;; Derived Data ================================================================
 
@@ -306,7 +306,7 @@
                                :notifications (count notifications-data)
                                :show-activity-not-found show-activity-not-found
                                :show-activity-removed show-activity-removed})]
-   :read-counts           [[:base] (fn [base] (get-in base read-counts-key))]})
+   :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]})
 
 
 ;; Action Loop =================================================================
@@ -481,17 +481,17 @@
   ([data org-slug]
     (get-in data (change-data-key org-slug))))
 
-(defn read-counts-data
+(defn activities-read-data
   "Get the read counts of all the items."
   ([]
-    (read-counts-data nil @app-state))
+    (activities-read-data nil @app-state))
   ([item-ids]
-    (read-counts-data @app-state item-ids))
+    (activities-read-data @app-state item-ids))
   ([item-ids data]
-    (let [all-read-counts (get-in data read-counts-key)]
+    (let [all-activities-read (get-in data activities-read-key)]
       (if item-ids
-        (select-keys all-read-counts item-ids)
-        all-read-counts))))
+        (select-keys all-activities-read item-ids)
+        all-activities-read))))
 
 ;; Debug functions
 
@@ -513,8 +513,8 @@
 (defn print-change-data []
   (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
 
-(defn print-read-counts-data []
-  (js/console.log (get-in @app-state read-counts-key)))
+(defn print-activities-read-data []
+  (js/console.log (get-in @app-state activities-read-key)))
 
 (defn print-board-data []
   (js/console.log
@@ -567,7 +567,7 @@
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
-(set! (.-OCWebPrintReadCountsData js/window) print-read-counts-data)
+(set! (.-OCWebPrintActivitiesReadData js/window) print-activities-read-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)

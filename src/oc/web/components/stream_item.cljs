@@ -59,7 +59,7 @@
                          (drv/drv :org-data)
                          (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
-                         (drv/drv :current-user-data)
+                         (drv/drv :team-data)
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
@@ -87,7 +87,7 @@
                                     (.focus (.find (js/$ dom-node) "div.add-comment")))))
                                (reset! (::should-scroll-to-comments s) false)))
                            s)}
-  [s activity-data read-count]
+  [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         edit-link (utils/link-for (:links activity-data) "partial-update")
@@ -107,7 +107,8 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
-        dom-node-class (str "stream-item-" (:uuid activity-data))]
+        dom-node-class (str "stream-item-" (:uuid activity-data))
+        team-data (drv/react s :team-data)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
@@ -144,10 +145,10 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
-          (let [current-user-data (drv/react s :current-user-data)
-                users-list (wrt-list current-user-data)]
-            [:div.stream-item-wrt
-              (wrt read-count users-list)])]
+          (when read-data
+            [:div.separator])
+          [:div.stream-item-wrt
+            (wrt read-data (:users team-data))]]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))

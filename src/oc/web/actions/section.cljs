@@ -49,7 +49,7 @@
 
     ;; Retrieve reads count
     (when (not= (:slug section) utils/default-drafts-board-slug)
-      (su/request-read-counts (map :uuid (:entries section))))
+      (su/request-reads-count (map :uuid (:entries section))))
 
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
 

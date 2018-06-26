@@ -11,43 +11,47 @@
       (string/includes? (string/lower (:last-name user)) query)))
 
 (rum/defcs wrt < (rum/local "" ::query)
-                 (rum/local false ::showing-popup)
-  [s read-count wrt-list]
-  (let [seen-users (filter #(:seen %) wrt-list)
-        read-count (:count read-count)
+  [s read-data team-users]
+  (let [seen-users (into [] (sort-by utils/name-or-email (map #(assoc % :seen true) (:reads read-data))))
+        seen-ids (set (map :user-id seen-users))
+        all-ids (set (map :user-id team-users))
+        unseen-ids (clojure.set/difference all-ids seen-ids)
+        unseen-users (into [] (sort-by utils/name-or-email (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids)))
+        all-users (sort-by utils/name-or-email (concat seen-users unseen-users))
+        read-count (or (count seen-users) (:count read-data))
         query (::query s)
         lower-query (string/lower @query)
         filtered-users (if (seq @query)
                          (case lower-query
                            "seen" seen-users
-                           "unseen" (filter #(not (:seen %)) wrt-list)
-                           (filterv #(filter-by-query % (string/lower @query)) wrt-list))
-                         wrt-list)]
-    [:div.wrt-container
-      {:on-mouse-enter #(reset! (::showing-popup s) true)
-       :on-mouse-leave #(reset! (::showing-popup s) false)}
-      [:div.wrt-count
-        (str read-count " view" (when (> read-count 1) "s"))]
-      [:div.wrt-popup
-        {:class (when-not @(::showing-popup s) "hidden")}
-        [:div.wrt-popup-title
-          "Who read this post"]
-        [:input.wrt-popup-query
-          {:value @query
-           :type "text"
-           :placeholder "Find a person or seen/unseen..."
-           :on-change #(reset! query (.. % -target -value))}]
-        [:div.wrt-popup-list
-          (for [u filtered-users]
-            [:div.wrt-popup-list-row
-              {:key (str "wrt-popup-row-" (:user-id u))}
-              [:div.wrt-popup-list-row-avatar
-                {:class (when (:seen u) "seen")}
-                (user-avatar-image u)]
-              [:div.wrt-popup-list-row-name
-                (utils/name-or-email u)]
-              [:div.wrt-popup-list-row-seen
-                {:class (when (:seen u) "seen")}
-                (if (:seen u)
-                  "Viewed"
-                  "Not seen")]])]]]))
+                           "unseen" (filter #(not (:seen %)) unseen-users)
+                           (filterv #(filter-by-query % (string/lower @query)) all-users))
+                         all-users)]
+    (when read-data
+      [:div.wrt-container
+        {:class (when seen-users "has-read-list")}
+        [:div.wrt-count
+          (str read-count " view" (when (not= read-count 1) "s"))]
+        (when filtered-users
+          [:div.wrt-popup
+            [:div.wrt-popup-title
+              "Who read this post"]
+            [:input.wrt-popup-query
+              {:value @query
+               :type "text"
+               :placeholder "Find a person or seen/unseen..."
+               :on-change #(reset! query (.. % -target -value))}]
+            [:div.wrt-popup-list
+              (for [u filtered-users]
+                [:div.wrt-popup-list-row
+                  {:key (str "wrt-popup-row-" (:user-id u))}
+                  [:div.wrt-popup-list-row-avatar
+                    {:class (when (:seen u) "seen")}
+                    (user-avatar-image u)]
+                  [:div.wrt-popup-list-row-name
+                    (utils/name-or-email u)]
+                  [:div.wrt-popup-list-row-seen
+                    {:class (when (:seen u) "seen")}
+                    (if (:seen u)
+                      "Viewed"
+                      "Not seen")]])]])])))

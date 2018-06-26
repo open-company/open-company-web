@@ -46,7 +46,7 @@
             (doseq [board-slug board-slugs]
               (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
               (ws-ic/board-watch (org-board-map board-slug)))))))
-      (su/request-read-counts (keys (:fixed-items fixed-all-posts)))
+      (su/request-reads-count (keys (:fixed-items fixed-all-posts)))
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
 (defn all-posts-get [org-data ap-initial-at]
@@ -55,7 +55,7 @@
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
-    (su/request-read-counts (map :uuid (:items (json->cljs body)))))
+    (su/request-reads-count (map :uuid (:items (json->cljs body)))))
   (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
@@ -527,7 +527,10 @@
           (activity-change section-uuid activity-uuid)))))
   (ws-cc/subscribe :item/counts
     (fn [data]
-      (dis/dispatch! [:item/counts (:data data)]))))
+      (dis/dispatch! [:activities-count (:data data)])))
+  (ws-cc/subscribe :item/status
+    (fn [data]
+      (dis/dispatch! [:activity-reads (:data data)]))))
 
 ;; AP Seen
 

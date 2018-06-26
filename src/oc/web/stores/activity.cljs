@@ -240,9 +240,16 @@
       (assoc-in db all-posts-key new-all-posts))
     db))
 
-(defmethod dispatcher/action :item/counts data
-  [db [_ item-counts]]
-  (let [ks (into [] (map :item-id item-counts))
-        vs (map #(select-keys % [:count]) item-counts)
-        new-item-counts (zipmap ks vs)]
-    (update-in db dispatcher/read-counts-key merge new-item-counts)))
+(defmethod dispatcher/action :activities-count
+  [db [_ items-count]]
+  (let [old-reads-data (get-in db dispatcher/activities-read-key)
+        ks (into [] (map :item-id items-count))
+        vs (map #(zipmap [:count :reads] [(:count %) (get-in old-reads-data [(:item-id %) :reads])]) items-count)
+        new-items-count (zipmap ks vs)]
+    (update-in db dispatcher/activities-read-key merge new-items-count)))
+
+(defmethod dispatcher/action :activity-reads
+  [db [_ item-data]]
+  (let [read-data (into [] (:reads item-data))
+        item-id (:item-id item-data)]
+    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads read-data})))
