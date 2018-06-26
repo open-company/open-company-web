@@ -24,17 +24,20 @@
                             rum/reactive
                             ;; Derivatives
                             (drv/drv :section-stream-data)
+                            (drv/drv :read-counts)
                             ;; Mixins
                             mixins/first-render-mixin
                             (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner"
                              wrt-stream-item-mixin-cb)
   [s]
   (let [section-data (drv/react s :section-stream-data)
-        items (activity-utils/get-sorted-activities section-data)]
+        items (activity-utils/get-sorted-activities section-data)
+        read-counts (drv/react s :read-counts)]
     [:div.section-stream.group
       [:div.section-stream-cards
         [:div.section-stream-cards-inner.group
-          (for [e items]
-            (rum/with-key (stream-item e) (str "section-stream-item-" (:uuid e) "-" (:updated-at e))))]
+          (for [e items
+                :let [read-count (get read-counts (:uuid e))]]
+            (rum/with-key (stream-item e read-count) (str "section-stream-item-" (:uuid e) "-" (:updated-at e))))]
         (when (responsive/is-mobile-size?)
           (all-caught-up))]]))

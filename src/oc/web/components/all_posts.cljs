@@ -102,6 +102,7 @@
                         ;; Derivatives
                         (drv/drv :all-posts)
                         (drv/drv :ap-initial-at)
+                        (drv/drv :read-counts)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -237,7 +238,8 @@
                           s)}
   [s]
   (let [all-posts-data (drv/react s :all-posts)
-        items (activity-utils/get-sorted-activities all-posts-data)]
+        items (activity-utils/get-sorted-activities all-posts-data)
+        read-counts (drv/react s :read-counts)]
     [:div.all-posts.group
       [:div.all-posts-cards
         (when @(::top-loading s)
@@ -255,9 +257,10 @@
               (when (or @(::top-loading s)
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])
-          (for [e items]
+          (for [e items
+                :let [read-count (get read-counts (:uuid e))]]
             (rum/with-key
-             (stream-item e)
+             (stream-item e read-count)
              (str "all-posts-entry-" (:uuid e) "-" (:updated-at e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading

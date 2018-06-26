@@ -12,9 +12,9 @@
 
 (rum/defcs wrt < (rum/local "" ::query)
                  (rum/local false ::showing-popup)
-  [s wrt-list]
+  [s read-count wrt-list]
   (let [seen-users (filter #(:seen %) wrt-list)
-        seen-count (count seen-users)
+        read-count (:count read-count)
         query (::query s)
         lower-query (string/lower @query)
         filtered-users (if (seq @query)
@@ -27,7 +27,7 @@
       {:on-mouse-enter #(reset! (::showing-popup s) true)
        :on-mouse-leave #(reset! (::showing-popup s) false)}
       [:div.wrt-count
-        (str seen-count " view" (when (> seen-count 1) "s"))]
+        (str read-count " view" (when (> read-count 1) "s"))]
       [:div.wrt-popup
         {:class (when-not @(::showing-popup s) "hidden")}
         [:div.wrt-popup-title

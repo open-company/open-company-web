@@ -35,7 +35,7 @@
                               (.tooltip "fixTitle")
                               (.tooltip "hide")))
                           s)}
-  [s activity-data has-headline has-body is-new has-attachments]
+  [s activity-data read-count has-headline has-body is-new has-attachments]
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)

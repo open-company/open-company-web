@@ -87,7 +87,7 @@
                                     (.focus (.find (js/$ dom-node) "div.add-comment")))))
                                (reset! (::should-scroll-to-comments s) false)))
                            s)}
-  [s activity-data]
+  [s activity-data read-count]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         edit-link (utils/link-for (:links activity-data) "partial-update")
@@ -146,10 +146,8 @@
                 (utils/time-since t)])]
           (let [current-user-data (drv/react s :current-user-data)
                 users-list (wrt-list current-user-data)]
-            (js/console.log "XXX current-user-data" current-user-data)
-            (js/console.log "XXX users-list" users-list)
             [:div.stream-item-wrt
-              (wrt users-list)])]
+              (wrt read-count users-list)])]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))

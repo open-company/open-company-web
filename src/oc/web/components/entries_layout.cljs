@@ -31,6 +31,7 @@
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           (drv/drv :board-data)
+                          (drv/drv :read-counts)
                           (rum/local nil ::board-uuid)
                           (rum/local false ::loading-more)
                           (rum/local nil ::prev-link)
@@ -85,7 +86,8 @@
           changes (get change-data board-uuid)
           is-mobile? (responsive/is-mobile-size?)
           entries (vals (:fixed-items board-data))
-          sorted-entries (vec (reverse (sort-by :published-at entries)))]
+          sorted-entries (vec (reverse (sort-by :published-at entries)))
+          read-counts (drv/react s :read-counts)]
       [:div.entry-cards-container.group
         ; Get the max number of pairs
         (let [top-index (js/Math.ceil (/ (count sorted-entries) tiles-per-row))]
@@ -101,8 +103,9 @@
             ; Renteder the entries in thisnrow
             [:div.entries-cards-container-row.group
               {:key (str "entries-row-" idx)}
-              (for [entry entries]
-                (rum/with-key (activity-card entry has-headline has-body (:new entry) has-attachments)
+              (for [entry entries
+                    :let [read-count (get read-counts (:uuid entry))]]
+                (rum/with-key (activity-card entry read-count has-headline has-body (:new entry) has-attachments)
                   (str "entry-latest-" (:uuid entry) "-" (:updated-at entry))))
               ; If the row contains less than 2, add a placeholder
 
