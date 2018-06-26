@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.section :as su]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
             [oc.web.local-settings :as ls]
@@ -45,6 +46,7 @@
             (doseq [board-slug board-slugs]
               (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
               (ws-ic/board-watch (org-board-map board-slug)))))))
+      (su/request-read-counts (keys (:fixed-items fixed-all-posts)))
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
 (defn all-posts-get [org-data ap-initial-at]
@@ -52,6 +54,8 @@
     (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
+  (when success
+    (su/request-read-counts (map :uuid (:items (json->cljs body)))))
   (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
@@ -520,7 +524,10 @@
           (all-posts-get (dis/org-data) (dis/ap-initial-at)))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
-          (activity-change section-uuid activity-uuid))))))
+          (activity-change section-uuid activity-uuid)))))
+  (ws-cc/subscribe :item/counts
+    (fn [data]
+      (dis/dispatch! [:item/counts (:data data)]))))
 
 ;; AP Seen
 

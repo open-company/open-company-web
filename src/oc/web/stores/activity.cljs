@@ -239,3 +239,10 @@
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-posts-key new-all-posts))
     db))
+
+(defmethod dispatcher/action :item/counts data
+  [db [_ item-counts]]
+  (let [ks (into [] (map :item-id item-counts))
+        vs (map #(select-keys % [:count]) item-counts)
+        new-item-counts (zipmap ks vs)]
+    (update-in db dispatcher/read-counts-key merge new-item-counts)))

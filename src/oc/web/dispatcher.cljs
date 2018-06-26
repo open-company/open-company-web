@@ -29,9 +29,6 @@
 (defn all-posts-key [org-slug]
   (vec (concat (boards-key org-slug) [:all-posts :board-data])))
 
-(defn change-data-key [org-slug]
-  (vec (conj (org-key org-slug) :change-data)))
-
 (defn board-key [org-slug board-slug]
   (vec (conj (boards-key org-slug) (keyword board-slug))))
 
@@ -75,6 +72,14 @@
           ;; We need to update the entry in all-posts data, not in the board data
           (all-posts-key org-slug)
           (board-data-key org-slug board-slug))))
+
+;; Change related keys
+
+(defn change-data-key [org-slug]
+  (vec (conj (org-key org-slug) :change-data)))
+
+(def read-counts-key
+  [:read-counts])
 
 ;; Derived Data ================================================================
 
@@ -300,7 +305,8 @@
                                :mobile-menu-open mobile-menu-open
                                :notifications (count notifications-data)
                                :show-activity-not-found show-activity-not-found
-                               :show-activity-removed show-activity-removed})]})
+                               :show-activity-removed show-activity-removed})]
+   :read-counts           [[:base] (fn [base] (get-in base read-counts-key))]})
 
 
 ;; Action Loop =================================================================
@@ -383,15 +389,6 @@
   ([data org-slug]
     (get-in data (all-posts-key org-slug))))
 
-(defn change-data
-  "Get change data."
-  ([]
-    (change-data @app-state))
-  ([data]
-    (change-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (change-data-key org-slug))))
-
 (defn board-data
   "Get board data."
   ([]
@@ -473,6 +470,29 @@
   ([team-id] (team-channels team-id @app-state))
   ([team-id data] (get-in data (team-channels-key team-id))))
 
+;; Change related
+
+(defn change-data
+  "Get change data."
+  ([]
+    (change-data @app-state))
+  ([data]
+    (change-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (change-data-key org-slug))))
+
+(defn read-counts-data
+  "Get the read counts of all the items."
+  ([]
+    (read-counts-data nil @app-state))
+  ([item-ids]
+    (read-counts-data @app-state item-ids))
+  ([item-ids data]
+    (let [all-read-counts (get-in data read-counts-key)]
+      (if item-ids
+        (select-keys all-read-counts item-ids)
+        all-read-counts))))
+
 ;; Debug functions
 
 (defn print-app-state []
@@ -492,6 +512,9 @@
 
 (defn print-change-data []
   (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
+
+(defn print-read-counts-data []
+  (js/console.log (get-in @app-state read-counts-key)))
 
 (defn print-board-data []
   (js/console.log
@@ -544,6 +567,7 @@
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
+(set! (.-OCWebPrintReadCountsData js/window) print-read-counts-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
