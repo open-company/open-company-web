@@ -148,7 +148,7 @@
           (when read-data
             [:div.separator])
           [:div.stream-item-wrt
-            (wrt read-data (:users team-data))]]
+            (wrt (:uuid activity-data) read-data (:users team-data))]]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))
