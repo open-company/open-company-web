@@ -93,12 +93,7 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
-          (if (router/current-activity-id) ;; user is asking for a specific post
-            (if (jwt/jwt)
-              ;; Show the activity removed
-              (dis/dispatch! [:input [:show-activity-removed] true])
-              ;; Show the activity not found/login screen
-              (dis/dispatch! [:input [:show-activity-not-found] true]))
+          (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (router/redirect-404!))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))

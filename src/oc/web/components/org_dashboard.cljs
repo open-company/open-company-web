@@ -5,7 +5,6 @@
             [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.stores.search :as search]
@@ -68,7 +67,9 @@
                              (refresh-board-data s)
                              s)}
   [s]
-  (let [{:keys [org-data
+  (let [{:keys [orgs
+                org-data
+                jwt
                 board-data
                 all-posts-data
                 nux
@@ -90,37 +91,55 @@
                 entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
-                mobile-menu-open
-                show-activity-not-found
-                show-activity-removed]} (drv/react s :org-dashboard-data)
+                mobile-menu-open]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         should-show-onboard-overlay? (= nux :1)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
-                          (:results (drv/react s search/search-key))))]
+                          (:results (drv/react s search/search-key))))
+        loading? (or ;; the org data are not loaded yet
+                     (not org-data)
+                     ;; No board specified
+                     (and (not (router/current-board-slug))
+                          ;; but there are some
+                          (pos? (count (:boards org-data))))
+                     ;; Board specified
+                     (and (not= (router/current-board-slug) "all-posts")
+                          (not ap-initial-at)
+                          ;; But no board data yet
+                          (not board-data))
+                     ;; All posts
+                     (and (or (= (router/current-board-slug) "all-posts")
+                              ap-initial-at)
+                          ;; But no all-posts data yet
+                         (not all-posts-data))
+                     ;; First ever user nux, not enough time
+                     (and nux-loading
+                          (not nux-end)))
+        org-not-found (and orgs
+                           (not (seq (filterv #(= (:slug %) (router/current-org-slug)) orgs))))
+        section-not-found (and (not org-not-found)
+                               org-data
+                               (not (seq (filterv #(= (:slug %) (router/current-board-slug)) (:boards org-data)))))
+        entry-not-found (and (not section-not-found)
+                             board-data
+                             (not (seq (filterv #(= % (router/current-activity-id)) (keys (:fixed-items board-data))))))
+        show-activity-not-found (and (not jwt)
+                                     (router/current-activity-id)
+                                     (or org-not-found
+                                         section-not-found
+                                         entry-not-found))
+        show-activity-removed (and jwt
+                                   (router/current-activity-id)
+                                   (or org-not-found
+                                       section-not-found
+                                       entry-not-found))
+        is-loading (and (not show-activity-not-found)
+                        (not show-activity-removed)
+                        loading?)]
     ;; Show loading if
-    (if (and (not show-activity-not-found)
-             (not show-activity-removed)
-             (or ;; the org data are not loaded yet
-                 (not org-data)
-                 ;; No board specified
-                 (and (not (router/current-board-slug))
-                      ;; but there are some
-                      (pos? (count (:boards org-data))))
-                 ;; Board specified
-                 (and (not= (router/current-board-slug) "all-posts")
-                      (not ap-initial-at)
-                      ;; But no board data yet
-                      (not board-data))
-                 ;; All posts
-                 (and (or (= (router/current-board-slug) "all-posts")
-                          ap-initial-at)
-                      ;; But no all-posts data yet
-                      (not all-posts-data))
-                 ;; First ever user nux, not enough time
-                 (and nux-loading
-                      (not nux-end))))
+    (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
       [:div
