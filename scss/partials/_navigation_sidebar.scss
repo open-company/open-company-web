@@ -565,7 +565,7 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-footer {
-    margin-left: 20px;
+    margin-left: 16px;
     position: relative;
     padding-bottom: 23px;
 
@@ -702,6 +702,8 @@ div.left-navigation-sidebar {
       @include avenir_M();
       width: 100%;
       text-align: left;
+      padding: 2px 0px;
+      height: 28px;
 
       &:hover {
         text-decoration: underline;
@@ -711,12 +713,10 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/invite_people.svg");
         background-size: 16px auto;
         background-repeat: no-repeat;
-        background-position: center;
+        background-position: center 5px;
         width: 16px;
-        height: 16px;
-        margin-right: 5px;
+        height: 28px;
         float: left;
-        margin-top: 1px;
         opacity: 0.6;
 
         @include mobile() {
@@ -726,9 +726,11 @@ div.left-navigation-sidebar {
 
       span {
         font-size: 14px;
-        line-height: 25px;
+        line-height: 28px;
         color: $ui_grey;
-        margin-left: 5px;
+        display: block;
+        float: left;
+        margin-left: 16px;
 
         @include mobile() {
           color: white;
