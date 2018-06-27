@@ -207,6 +207,8 @@
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
+(declare send-item-read)
+
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
   (let [org-slug (router/current-org-slug)
         board-key (if (= (:status activity-data) "published")
@@ -216,8 +218,10 @@
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
-
-    (dis/dispatch! [:entry-save/finish activity-data edit-key board-key])))
+    (dis/dispatch! [:entry-save/finish activity-data edit-key board-key])
+    ;; Send item read
+    (when (= (:status activity-data) "published")
+      (send-item-read (:uuid activity-data)))))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
@@ -226,14 +230,17 @@
 
 (defn entry-modal-save-with-board-finish [activity-data response]
   (let [fixed-board-data (au/fix-board response)
-        org-slug (router/current-org-slug)]
+        org-slug (router/current-org-slug)
+        saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
     (save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid fixed-board-data)]))
-    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
+    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])
+    (when (= (:status saved-activity-data) "published")
+      (send-item-read (:uuid saved-activity-data)))))
 
 (defn board-name-exists-error [edit-key]
   (dis/dispatch!
@@ -392,7 +399,9 @@
   (refresh-org-data)
   ;; Remove entry cached edits
   (remove-cached-item initial-uuid)
-  (dis/dispatch! [:entry-publish/finish edit-key activity-data]))
+  (dis/dispatch! [:entry-publish/finish edit-key activity-data])
+  ;; Send item read
+  (send-item-read (:uuid activity-data)))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug {:keys [status success body]}]
   (if success
@@ -400,14 +409,17 @@
     (dis/dispatch! [:entry-publish/failed  :entry-editing])))
 
 (defn entry-publish-with-board-finish [entry-uuid new-board-data]
-  (let [board-slug (:slug new-board-data)]
+  (let [board-slug (:slug new-board-data)
+        saved-activity-data (first (:entries new-board-data))]
     (save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch [(:uuid new-board-data)]))
-    (dis/dispatch! [:entry-publish-with-board/finish new-board-data])))
+    (dis/dispatch! [:entry-publish-with-board/finish new-board-data])
+    ;; Send item read
+    (send-item-read (:uuid saved-activity-data))))
 
 (defn entry-publish-with-board-cb [entry-uuid {:keys [status success body]}]
   (if (= status 409)
