@@ -622,6 +622,10 @@ section.access-anywhere-section {
           text-align: center;
           max-width: 294px;
           margin: 6px auto 0px;
+
+          &.second-line {
+            margin-top: 0px;
+          }
         }
       }
     }

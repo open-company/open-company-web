@@ -130,7 +130,9 @@
         [:div.access-anywhere-copy-title
           "Stay informed on the go."]
         [:div.access-anywhere-copy-subtitle
-          "Fully responsive mobile web app. No app install required."]]
+          "Fully responsive mobile web app."]
+        [:div.access-anywhere-copy-subtitle.second-line
+          "No app install required."]]
       [:div.access-anywhere-screenshot]]])
 
 (defn slack-comparison-section [& [slack-version?]]
