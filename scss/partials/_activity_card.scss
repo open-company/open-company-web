@@ -34,10 +34,8 @@ div.activity-card {
       display: block;
     }
     div.activity-card-bottom-container {
-      div.activity-card-header {
-        div.activity-card-header-must-read {
-          display: inline-block;
-        }
+      div.activity-card-must-read {
+        display: inline-block;
       }
     }
   }
@@ -158,35 +156,13 @@ div.activity-card {
       text-overflow: ellipsis;
       white-space: nowrap;
 
-      div.activity-card-header-must-read {
-        background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-        background-size: 12px 16px;
-        background-repeat: no-repeat;
-        background-position: 2px;
-        width: 16px;
-        height: 12px;
-        display: none;
-        margin-left: 5px;
-
-        &:hover {
-          background-image: cdnUrl("/img/ML/must_see_bolt.svg");
-        }
-
-        &.must-see-on {
-          background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-          display: inline-block;
-
-          &:hover {
-            background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-          }
-        }
-      }
     }
 
     div.activity-card-headline {
       @include activity-title();
       @include avenir_H();
       font-size: 16px;
+      display: inline;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
@@ -195,6 +171,30 @@ div.activity-card {
       max-height: 36px;
       line-height: 18px;
       margin-top: 4px;
+    }
+
+    div.activity-card-must-read {
+      background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+      background-size: 12px 16px;
+      background-repeat: no-repeat;
+      background-position: 2px;
+      width: 16px;
+      height: 12px;
+      display: none;
+      margin-left: 5px;
+
+      &:hover {
+        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
+      }
+
+      &.must-see-on {
+        background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+        display: inline-block;
+
+        &:hover {
+          background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+        }
+      }
     }
 
     div.activity-card-footer-placeholder {

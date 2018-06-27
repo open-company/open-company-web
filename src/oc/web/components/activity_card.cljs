@@ -82,8 +82,11 @@
             (when (or is-all-posts is-drafts-board is-must-see)
               " in ")
             (when (or is-all-posts is-drafts-board is-must-see)
-              (:board-name activity-data)))
-         [:div.activity-card-header-must-read
+              (:board-name activity-data)))]
+        [:div.activity-card-headline
+          {:ref "activity-headline"
+           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+        [:div.activity-card-must-read
           {:class (utils/class-set {:must-see-on (:must-read activity-data)})
            :on-click #(do
                         (utils/event-stop %)
@@ -93,10 +96,7 @@
            :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
            :data-title (if (:must-read activity-data)
                          "Demote to regular post"
-                         "Promote to must see post")}]]
-        [:div.activity-card-headline
-          {:ref "activity-headline"
-           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+                         "Promote to must see post")}]
         [:div.activity-card-footer-placeholder]
         (if is-drafts-board
           [:div.activity-card-footer.group
