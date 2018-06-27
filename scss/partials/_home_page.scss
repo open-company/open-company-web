@@ -107,8 +107,8 @@ div.home-wrap {
 
         @include mobile(){
           text-align: left;
-          font-size: 24px;
-          line-height: 30px;
+          font-size: 34px;
+          line-height: 40px;
         }
       }
 
@@ -124,10 +124,11 @@ div.home-wrap {
 
         @include mobile(){
           margin-top: 16px;
-          font-size: 17px;
+          font-size: 18px;
           line-height: 23px;
           padding: 0px;
           text-align: left;
+          color: $deep_navy;
         }
       }
 

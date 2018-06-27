@@ -4,7 +4,6 @@ div.main-animation-container {
   @include mobile() {
     width: 100%;
     margin: 80px 0px 0px;
-    height: 237px;
   }
 
   img.main-animation {
@@ -16,11 +15,10 @@ div.main-animation-container {
     position: relative;
 
     @include mobile() {
-      width: 400px;
-      height: 237px;
-      position: absolute;
-      right: 0px;
-      margin: 0px;
+      width: 100%;
+      height: auto;
+      margin: 0px auto;
+      max-width: 327px;
     }
   }
 }
@@ -271,9 +269,10 @@ section.keep-aligned {
 
     @include mobile() {
       @include avenir_H();
-      font-size: 24px;
-      line-height: 30px;
+      font-size: 22px;
+      line-height: 26px;
       margin-bottom: 24px;
+      text-align: center;
     }
   }
 
@@ -301,7 +300,7 @@ div.core-values-list {
   margin: 10px auto 0px;
 
   @include mobile() {
-    width: 100%;
+    width: 251px;
     margin: 24px auto 0px;
   }
 
@@ -489,7 +488,12 @@ section.home-keep-aligned {
           font-size: 18px;
           line-height: 22px;
           color: $deep_navy;
-          margin-top: 8px;
+          margin-top: 12px;
+
+          @include mobile() {
+            padding-top: 12px;
+            border-top: 1px solid #E3E4E2;
+          }
 
           &:before {
             position: absolute;
@@ -502,6 +506,10 @@ section.home-keep-aligned {
             content: "";
             width: 16px;
             height: 16px;
+
+            @include mobile() {
+              top: 14px;
+            }
           }
         }
       }
@@ -599,6 +607,8 @@ section.access-anywhere-section {
 
         @include mobile(){
           font-size: 24px;
+          line-height: 30px;
+          text-align: center;
         }
       }
 
@@ -609,7 +619,9 @@ section.access-anywhere-section {
         color: $deep_navy;
 
         @include mobile(){
-          font-size: 17px;
+          text-align: center;
+          max-width: 294px;
+          margin: 6px auto 0px;
         }
       }
     }
@@ -657,6 +669,7 @@ section.slack-comparison {
     @include mobile(){
       font-size: 20px;
       line-height: 30px;
+      margin-top: 24px;
     }
   }
 

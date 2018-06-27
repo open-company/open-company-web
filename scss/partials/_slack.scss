@@ -16,7 +16,7 @@ button.signin-with-slack {
   @include mobile(){
     width: 100%;
     // max-width: 280px;
-    margin: 16px auto;
+    margin: 24px auto 16px;
     font-size: 18px;
   }
 
@@ -102,7 +102,7 @@ div.slack-wrap {
     }
 
     section.carrot-plus-slack {
-      padding-top: 72px;
+      padding-top: 184px;
       padding-bottom: 120px;
       text-align: center;
       position: relative;
@@ -110,7 +110,7 @@ div.slack-wrap {
 
       @include tablet() {
         overflow: visible;
-        padding: 120px 24px;
+        padding: 152px 24px 80px;
       }
 
       div.balloon {
@@ -241,7 +241,7 @@ div.slack-wrap {
 
         @include tablet(){
           width: 100%;
-          margin: 16px auto 0;
+          margin: 24px auto 0;
           padding: 0px;
           font-size: 17px;
           line-height: 23px;
