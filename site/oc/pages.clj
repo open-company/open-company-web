@@ -141,40 +141,40 @@
 
     [:div.keep-aligned-section
       [:div.keep-aligned-section-row
-        [:div.keep-aligned-section-screenshot.screenshot-1]
-        [:div.keep-aligned-section-copy
-          [:div.keep-aligned-section-copy-title
-            "Know what’s important"]
-          [:div.keep-aligned-section-list-item
-            "“Must see” updates rise to the top"]
-          [:div.keep-aligned-section-list-item
-            "Follow people and topics you can’t miss"]
-          [:div.keep-aligned-section-list-item
-            "See what’s trending to stay in the loop"]]]
-
-      [:div.keep-aligned-section-row
         [:div.keep-aligned-section-screenshot.screenshot-2]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
-            "Update your team in seconds"]
+            "Create engaging updates"]
           [:div.keep-aligned-section-list-item
-            "Create more compelling updates"]
+            "Room for more than a quick chat"]
           [:div.keep-aligned-section-list-item
             "Capture video to add a human touch"]
           [:div.keep-aligned-section-list-item
             "Attachments from Google, Dropbox, & others"]]]
 
       [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-1]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Get up to speed quickly"]
+          [:div.keep-aligned-section-list-item
+            "“Must see” updates rise to the top"]
+          [:div.keep-aligned-section-list-item
+            "Follow people and topics you can’t miss"]
+          [:div.keep-aligned-section-list-item
+            "Organized and easy to browse"]]]
+
+      [:div.keep-aligned-section-row
         [:div.keep-aligned-section-screenshot.screenshot-3]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
-            "Spark better follow-on discussions"]
+            "Spark better discussions"]
           [:div.keep-aligned-section-list-item
             "Encourage more comments and questions"]
           [:div.keep-aligned-section-list-item
             "Keep interactions together for greater context"]
           [:div.keep-aligned-section-list-item
-            "Sync to Slack so discussions can happen anywhere"]]]
+            "Sync to Slack to discuss anywhere"]]]
 
       [:div.keep-aligned-section-row
         [:div.keep-aligned-section-screenshot.screenshot-4]
@@ -186,14 +186,14 @@
           [:div.keep-aligned-section-list-item
             "Send reminders with a single click"]
           [:div.keep-aligned-section-list-item
-            "AI ensures alignment on important items"]]]]])
+            "Ensures alignment on important items"]]]]])
 
 (def access-anywhere-section
   [:section.access-anywhere-section
     [:div.access-anywhere-section-container
       [:div.access-anywhere-copy
         [:div.access-anywhere-copy-title
-          "Stay up to date on the go."]
+          "Stay informed on the go."]
         [:div.access-anywhere-copy-subtitle
           "Fully responsive mobile web app. No app install required."]]
       [:div.access-anywhere-screenshot]]])
