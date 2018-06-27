@@ -144,7 +144,8 @@ div.stream-item {
       div.must-read {
         display: none;
         padding-left: 16px;
-        padding-bottom: 40px;
+        padding-bottom: 10px;
+        padding-top: 6px;
         overflow: hidden;
         text-overflow: ellipsis;
         @include avenir_M();
@@ -154,7 +155,8 @@ div.stream-item {
         background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
         background-size: 12px 16px;
         background-repeat: no-repeat;
-        margin-left: 10px;
+        background-position: 4px 0px;
+        margin-left: 8px;
         cursor: pointer;
 
         &:hover {
