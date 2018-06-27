@@ -20,6 +20,14 @@ div.stream-item {
         }
       }
     }
+
+    div.stream-item-body {
+      div.stream-body-left {
+        div.must-read {
+          display: inline;
+        }
+      }
+    }
   }
 
   &.show-continue-reading {
@@ -94,38 +102,6 @@ div.stream-item {
           width: auto;
         }
       }
-      div.must-read {
-        display: inline;
-        padding-left: 16px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        @include avenir_M();
-        color: $ui_grey;
-        font-size: 12px;
-        white-space: nowrap;
-        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
-        background-size: 12px 10px;
-        background-repeat: no-repeat;
-        margin-left: 10px;
-        opacity: 0.4;
-        cursor: pointer;
-
-        &:hover {
-          opacity: 1;
-        }
-
-        &.must-see-on {
-          opacity: 1;
-
-          &:hover {
-            opacity: 0.4;
-          }
-        }
-
-        @include mobile() {
-          width: auto;
-        }
-      }
     }
   }
 
@@ -159,9 +135,42 @@ div.stream-item {
         font-size: 22px;
         color: $deep_navy;
         line-height: 28px;
-        
+        display: inline;
         @include mobile() {
           margin-top: 16px;
+        }
+      }
+
+      div.must-read {
+        display: none;
+        padding-left: 16px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @include avenir_M();
+        color: $ui_grey;
+        font-size: 12px;
+        white-space: nowrap;
+        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
+        background-size: 12px 10px;
+        background-repeat: no-repeat;
+        margin-left: 10px;
+        opacity: 0.4;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.must-see-on {
+          opacity: 1;
+
+          &:hover {
+            opacity: 0.4;
+          }
+        }
+
+        @include mobile() {
+          width: auto;
         }
       }
 
