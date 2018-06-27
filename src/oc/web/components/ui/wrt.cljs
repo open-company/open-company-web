@@ -17,9 +17,17 @@
         win-height (.-innerHeight js/window)]
     (>= fixed-top-position (/ win-height 2))))
 
+(defn calc-left-position [el]
+  (let [el-offset-left (aget (.offset (js/$ el)) "left")
+        win-width (.-innerWidth js/window)]
+    (if (> (+ el-offset-left 360) (- win-width 40))
+      (- (- win-width 40) (+ el-offset-left 360))
+      0)))
+
 (rum/defcs wrt < (rum/local "" ::query)
                  (rum/local false ::showing-popup)
                  (rum/local false ::under-middle-screen)
+                 (rum/local 0 ::left-position)
   [s item-id read-data team-users]
   (let [seen-users (into [] (sort-by utils/name-or-email (map #(assoc % :seen true) (:reads read-data))))
         seen-ids (set (map :user-id seen-users))
@@ -42,7 +50,8 @@
                         (su/request-reads-data item-id))
        :on-mouse-enter #(do
                           (reset! (::showing-popup s) true)
-                          (reset! (::under-middle-screen s) (under-middle-screen? (rum/ref-node s :wrt-count))))
+                          (reset! (::under-middle-screen s) (under-middle-screen? (rum/ref-node s :wrt-count)))
+                          (reset! (::left-position s) (calc-left-position (rum/ref-node s :wrt-count))))
        :on-mouse-leave #(reset! (::showing-popup s) false)}
       [:div.wrt-count
         {:ref :wrt-count}
@@ -52,7 +61,8 @@
       (when (and @(::showing-popup s)
                  (:reads read-data))
         [:div.wrt-popup
-          {:class (when @(::under-middle-screen s) "top")}
+          {:class (when @(::under-middle-screen s) "top")
+           :style {:left (str @(::left-position s) "px")}}
           [:div.wrt-popup-title
             "Who saw this"]
           [:input.wrt-popup-query
