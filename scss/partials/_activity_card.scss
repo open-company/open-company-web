@@ -33,6 +33,13 @@ div.activity-card {
     div.activity-card-menu-container {
       display: block;
     }
+    div.activity-card-bottom-container {
+      div.activity-card-header {
+        div.activity-card-header-must-read {
+          display: inline-block;
+        }
+      }
+    }
   }
 
   &.draft {
@@ -141,11 +148,6 @@ div.activity-card {
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
     height: calc(100% - 121px);
-    // position: absolute;
-    // top: 120px;
-    // bottom: 0px;
-    // left: 0px;
-    // right: 0px;
 
     div.activity-card-header {
       @include avenir_M();
@@ -157,23 +159,22 @@ div.activity-card {
       white-space: nowrap;
 
       div.activity-card-header-must-read {
-        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
+        background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
         background-size: 16px 14px;
         width: 16px;
         height: 14px;
-        display: inline-block;
+        display: none;
         margin-left: 5px;
-        opacity: 0.4;
 
         &:hover {
-          opacity: 1;
+          background-image: cdnUrl("/img/ML/must_see_bolt.svg");
         }
 
         &.must-see-on {
-          opacity: 1;
+          background-image: cdnUrl("/img/ML/must_see_bolt.svg");
 
           &:hover {
-            opacity: 0.4;
+            background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
           }
         }
       }

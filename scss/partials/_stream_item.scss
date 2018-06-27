@@ -144,28 +144,28 @@ div.stream-item {
       div.must-read {
         display: none;
         padding-left: 16px;
+        padding-bottom: 40px;
         overflow: hidden;
         text-overflow: ellipsis;
         @include avenir_M();
         color: $ui_grey;
         font-size: 12px;
         white-space: nowrap;
-        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
-        background-size: 12px 10px;
+        background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+        background-size: 12px 16px;
         background-repeat: no-repeat;
         margin-left: 10px;
-        opacity: 0.4;
         cursor: pointer;
 
         &:hover {
-          opacity: 1;
+          background-image: cdnUrl("/img/ML/must_see_bolt.svg");
         }
 
         &.must-see-on {
-          opacity: 1;
+          background-image: cdnUrl("/img/ML/must_see_bolt.svg");
 
           &:hover {
-            opacity: 0.4;
+            background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
           }
         }
 
