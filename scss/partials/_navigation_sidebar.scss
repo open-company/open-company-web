@@ -27,7 +27,7 @@
   .internal {
     @include avenir_M();
     font-size: 14px;
-    line-height: 1.71;
+    line-height: 25px;
     color: $ui_grey;
     text-decoration: none;
 
@@ -46,7 +46,7 @@
   div.drafts-label {
     @include avenir_M();
     font-size: 15px;
-    line-height: 1.71;
+    line-height: 25px;
     color: $ui_grey;
     text-decoration: none;
 
@@ -75,7 +75,7 @@
   div.all-posts-label, div.must-read-label {
     @include avenir_H();
     font-size: 15px;
-    line-height: 1.71;
+    line-height: 25px;
     color: $deep_navy;
     text-decoration: none;
     white-space: nowrap;
@@ -107,7 +107,7 @@
     color: $carrot_green;
     @include avenir_M();
     font-size: 14px;
-    line-height: 1.71;
+    line-height: 25px;
     text-decoration: none;
 
     @include mobile() {
@@ -147,7 +147,7 @@
     color: $deep_navy;
     @include avenir_M();
     font-size: 14px;
-    line-height: 1.71;
+    line-height: 25px;
     text-decoration: none;
 
     @include mobile() {
@@ -162,7 +162,7 @@
   div.all-posts-label, div.drafts-label, div.must-read-label {
     color: $deep_navy;
     font-size: 15px;
-    line-height: 1.71;
+    line-height: 25px;
     text-decoration: none;
   }
 }
@@ -260,7 +260,7 @@ div.left-navigation-sidebar {
   }
 
   a.all-posts {
-    margin-bottom: 40px;
+    margin-bottom: 16px;
 
     &.showing-must-see {
       margin-bottom: 0px;
@@ -286,7 +286,7 @@ div.left-navigation-sidebar {
     outline: none;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
-    padding-left: 32px;
+    padding-left: 16px;
 
     @include mobile() {
       padding-left: 0px;
@@ -311,10 +311,10 @@ div.left-navigation-sidebar {
     }
 
     div.all-posts-label, div.drafts-label, div.must-read {
-      padding: 2px 5px 1px 5px;
+      padding: 3px 0px 0px;
       width: 148px;
       text-align: left;
-      margin-left: 16px;
+      margin-left: 32px;
 
       @include mobile() {
         margin-left: 34px;
@@ -326,11 +326,11 @@ div.left-navigation-sidebar {
     div.all-posts-icon {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
       background-size: 18px 16px;
+      background-repeat: no-repeat;
+      background-position: center;
       width: 16px;
-      height: 16px;
+      height: 28px;
       float: left;
-      margin-left: -4px;
-      margin-top: 6px;
 
       @include mobile() {
         margin-left: 0px;
@@ -371,12 +371,11 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-        background-size: 16px 16px;
+        background-repeat: no-repeat;
+        background-position: center;
         width: 16px;
-        height: 16px;
+        height: 28px;
         float: left;
-        margin-left: 0px;
-        margin-top: 0px;
         opacity: 1;
         display: block;
       }
@@ -389,7 +388,7 @@ div.left-navigation-sidebar {
   }
 
   a.drafts {
-    margin-bottom: 40px;
+    margin-bottom: 16px;
 
     @include mobile() {
       margin-bottom: 0px;
@@ -411,9 +410,9 @@ div.left-navigation-sidebar {
     }
 
     .left-navigation-sidebar-top-title {
-      padding: 0px 0 0px 32px;
+      padding: 0px 0px 0px 48px;
       margin: 0;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
 
       @include mobile() {
         background-color: $oc_gray_8;
@@ -429,7 +428,6 @@ div.left-navigation-sidebar {
         color: $light_ui_grey;
         float: left;
         cursor: default;
-        margin-left: 21px;
 
         @include mobile() {
           margin-left: 34px;
@@ -490,7 +488,7 @@ div.left-navigation-sidebar {
       cursor: default;
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
-      padding-left: 24px;
+      padding-left: 16px;
       margin: 0;
       text-decoration: none;
 
@@ -533,17 +531,15 @@ div.left-navigation-sidebar {
 
       div.public {
         float: left;
-        margin-left: 8px;
-        margin-top: 10px;
-        width: 12px;
-        height: 12px;
+        width: 16px;
+        height: 28px;
         background-image: cdnUrl("/img/ML/board_public.svg");
         background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
         opacity: 0.5;
 
         @include mobile() {
-          margin-left: 4px;
-          margin-top: 6px;
           opacity: 1;
         }
 
@@ -553,19 +549,17 @@ div.left-navigation-sidebar {
         }
       }
 
-      div.private{
+      div.private {
         float: left;
-        margin-left: 9px;
-        margin-top: 9px;
-        width: 9px;
-        height: 11px;
+        width: 16px;
+        height: 28px;
         background-image: cdnUrl("/img/ML/board_private.svg");
         background-size: 9px 11px;
+        background-position: center;
+        background-repeat: no-repeat;
         opacity: 0.5;
 
         @include mobile() {
-          margin-left: 4px;
-          margin-top: 6px;
           opacity: 1;
         }
 
@@ -576,25 +570,10 @@ div.left-navigation-sidebar {
       }
 
       div.board-name {
-        margin-left: 24px;
-
-        @include mobile() {
-
-          &.team-board {
-            margin-left: 32px;
-          }
-
-          &.private-board {
-            margin-left: 24px;
-          }
-
-          &.public-board {
-            margin-left: 24px;
-          }
-        }
+        margin-left: 32px;
 
         div.internal {
-          padding: 4px 5px 1px 4px;
+          padding: 3px 0px 0px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -604,12 +583,7 @@ div.left-navigation-sidebar {
 
           @include mobile() {
             width: auto;
-            padding: 0px 0px 0px 2px;
             margin-left: 0px;
-
-            &.has-icon {
-              margin-left: 8px;
-            }
           }
 
           .emojione {
@@ -621,9 +595,9 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-footer {
-    margin-left: 20px;
+    margin-left: 16px;
     position: relative;
-    padding-bottom: 46px;
+    padding-bottom: 23px;
 
     @include mobile() {
       // Temp remove bottom links on mobile
@@ -640,7 +614,7 @@ div.left-navigation-sidebar {
 
     &.navigation-sidebar-overflow {
       position: absolute;
-      bottom: 46px;
+      bottom: 23px;
       padding-bottom: 0px;
     }
 
@@ -744,7 +718,7 @@ div.left-navigation-sidebar {
 
       span {
         font-size: 14px;
-        line-height: 1.71;
+        line-height: 25px;
         color: $ui_grey;
         margin-left: 5px;
 
@@ -758,6 +732,8 @@ div.left-navigation-sidebar {
       @include avenir_M();
       width: 100%;
       text-align: left;
+      padding: 2px 0px;
+      height: 28px;
 
       &:hover {
         text-decoration: underline;
@@ -767,12 +743,10 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/invite_people.svg");
         background-size: 16px auto;
         background-repeat: no-repeat;
-        background-position: center;
+        background-position: center 5px;
         width: 16px;
-        height: 16px;
-        margin-right: 5px;
+        height: 28px;
         float: left;
-        margin-top: 1px;
         opacity: 0.6;
 
         @include mobile() {
@@ -782,9 +756,11 @@ div.left-navigation-sidebar {
 
       span {
         font-size: 14px;
-        line-height: 1.71;
+        line-height: 28px;
         color: $ui_grey;
-        margin-left: 5px;
+        display: block;
+        float: left;
+        margin-left: 16px;
 
         @include mobile() {
           color: white;
