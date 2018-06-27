@@ -567,7 +567,7 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-footer {
     margin-left: 20px;
     position: relative;
-    padding-bottom: 46px;
+    padding-bottom: 23px;
 
     @include mobile() {
       // Temp remove bottom links on mobile
@@ -584,7 +584,7 @@ div.left-navigation-sidebar {
 
     &.navigation-sidebar-overflow {
       position: absolute;
-      bottom: 46px;
+      bottom: 23px;
       padding-bottom: 0px;
     }
 
