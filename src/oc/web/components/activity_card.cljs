@@ -13,6 +13,7 @@
             [oc.web.mixins.activity :as am]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.tile-menu :refer (tile-menu)]
@@ -22,6 +23,7 @@
                         ;; Derivatives
                         (drv/drv :org-data)
                         (drv/drv :comments-data)
+                        (drv/drv :team-data)
                         ;; Mixins
                         (am/truncate-element-mixin "activity-headline" (* 18 2))
                         {:after-render (fn [s]
@@ -35,7 +37,7 @@
                               (.tooltip "fixTitle")
                               (.tooltip "hide")))
                           s)}
-  [s activity-data read-count has-headline has-body is-new has-attachments]
+  [s activity-data read-data has-headline has-body is-new has-attachments]
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -46,7 +48,9 @@
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         publisher (if is-drafts-board
                     (first (:author activity-data))
-                    (:publisher activity-data))]
+                    (:publisher activity-data))
+        team-data (drv/react s :team-data)
+        activity-time (or (:published-at activity-data) (:created-at activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :draft is-drafts-board})
@@ -54,7 +58,8 @@
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                      (when-not (or is-drafts-board
-                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu])))
+                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu]))
+                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.wrt-container])))
                        (activity-actions/activity-modal-fade-in activity-data))))}
       [:div.activity-share-container]
       (when-not is-drafts-board
@@ -66,21 +71,23 @@
           [:div.activity-card-preview-author
             (:name publisher)]
           [:div.time-since
-            (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t}
-                (utils/time-since t)])]]
+            [:time
+              {:date-time activity-time}
+              (utils/time-since activity-time)]]]
         [:div.activity-card-preview-title
           {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-preview-body
           {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
       [:div.activity-card-bottom-container.group
         [:div.activity-card-header
-          (str (:name publisher)
-            (when (or is-all-posts is-drafts-board)
-              " in ")
-            (when (or is-all-posts is-drafts-board)
-              (:board-name activity-data)))]
+          [:span (:name publisher)]
+          [:div.separator]
+          [:span (utils/time-since activity-time)]]
+        [:div.activity-card-header-hover
+          [:span.board-name (:board-name activity-data)]
+          [:div.separator]
+          [:div.activity-card-wrt
+            (wrt (:uuid activity-data) read-data (:users team-data))]]
         [:div.activity-card-headline.ap-seen-item-headline
           {:ref "activity-headline"
            :data-itemuuid (:uuid activity-data)
