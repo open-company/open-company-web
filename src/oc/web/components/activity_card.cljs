@@ -87,7 +87,13 @@
           {:class (utils/class-set {:must-see-on (:must-read activity-data)})
            :on-click #(do
                         (utils/event-stop %)
-                        (activity-actions/toggle-must-read activity-data))}]]
+                        (activity-actions/toggle-must-read activity-data))
+                            :data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+           :data-title (if (:must-read activity-data)
+                         "Demote to regular post"
+                         "Promote to must see post")}]]
         [:div.activity-card-headline
           {:ref "activity-headline"
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]

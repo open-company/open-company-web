@@ -146,7 +146,12 @@
             {:class (utils/class-set {:must-see-on (:must-read activity-data)})
              :on-click #(do
                           (utils/event-stop %)
-                          (activity-actions/toggle-must-read activity-data))}]
+                          (activity-actions/toggle-must-read activity-data))
+             :data-placement "top"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :data-title (if (:must-read activity-data)
+                           "Demote to regular post"
+                           "Promote to must see post")}]
           [:div.stream-item-body-container
             [:div.stream-item-body
               {:class (utils/class-set {:expanded expanded?})}
