@@ -162,7 +162,8 @@ div.stream-item {
         }
 
         &.must-see-on {
-          background-image: cdnUrl("/img/ML/must_see_bolt.svg");
+          background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+          display: inline;
 
           &:hover {
             background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
