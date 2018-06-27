@@ -196,6 +196,17 @@
         (reset! (::initial-headline s) initial-headline)
         (reset! (::edited-data-loaded s) true)))))
 
+(defn send-item-read-if-needed [s]
+  (let [post-data @(drv/get-ref s :fullscreen-post-data)
+        editing (:modal-editing post-data)
+        activity-data (:activity-data post-data)]
+    (when (and (= (:status activity-data) "published")
+               (not editing))
+      ;; Check if the page is at the bottom of the scroll
+      (let [body-el (rum/ref-node s :fullscreen-post-box-content-body)]
+        (when (au/is-element-bottom-visible? body-el)
+          (activity-actions/wrt-events-gate (:uuid activity-data)))))))
+
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
                              (drv/drv :fullscreen-post-data)
@@ -205,6 +216,7 @@
                              (rum/local false ::showing-dropdown)
                              (rum/local false ::move-activity)
                              (rum/local nil ::window-click)
+                             (rum/local nil ::window-scroll)
                              ;; Editing locals
                              (rum/local "" ::initial-headline)
                              (rum/local "" ::initial-body)
@@ -282,6 +294,12 @@
                                    (when (and @(::show-legend s)
                                               (not (utils/event-inside? e (rum/ref-node s "legend-container"))))
                                       (reset! (::show-legend s) false)))))
+                               (reset! (::window-scroll s)
+                                (events/listen
+                                 (rum/ref-node s :fullscreen-post-container)
+                                 EventType/SCROLL
+                                 #(send-item-read-if-needed s)))
+                               (send-item-read-if-needed s)
                                s)
                               :will-unmount (fn [s]
                                (when @(::window-click s)
@@ -290,6 +308,9 @@
                                (when @(::headline-input-listener s)
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
+                               (when @(::window-scroll s)
+                                 (events/unlistenByKey @(::window-scroll s))
+                                 (reset! (::window-scroll s) nil))
                                (set! (.-onbeforeunload js/window) nil)
                                s)}
   [s]
@@ -316,6 +337,7 @@
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :editing editing
                                 :no-comments (not (:has-comments activity-data))})
+       :ref :fullscreen-post-container
        :id dom-element-id}
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
@@ -417,6 +439,7 @@
                                  :multi-picker-container-selector "div#fullscreen-post-box-footer-multi-picker"})
               [:div.fullscreen-post-box-content-body.fs-hide
                 {:key (str "fullscreen-post-body-" (:updated-at activity-data))
+                 :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))

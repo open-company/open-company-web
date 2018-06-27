@@ -5,7 +5,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]))
 
 (defn get-first-body-thumbnail
   "Given an entry body get the first thumbnail available.
@@ -218,3 +219,44 @@
           (get (:uuid activity-data))
           :sorted-comments)
       (:comments activity-data)))
+
+(defn- is-element-visible?
+   "Given a DOM element return true if it's actually visible in the viewport."
+  [el]
+  (let [rect (.getBoundingClientRect el)
+        zero-pos? #(or (zero? %)
+                       (pos? %))
+        doc-element (.-documentElement js/document)
+        win-height (or (.-innerHeight js/window)
+                       (.-clientHeight doc-element))
+        win-width (or (.-innerWidth js/window)
+                      (.-clientWidth doc-element))]
+    (and ;; Item starts below the navbar
+         (>= (.-top rect) responsive/navbar-height)
+         ;; Item left is not out of the screen
+         (zero-pos? (.-left rect))
+         ;; Item bottom is less than the screen height
+         (<= (.-bottom rect) win-height)
+         ;; Item right is less than the screen width
+         (<= (.-right rect) win-width))))
+
+(defn- is-element-bottom-visible?
+   "Given a DOM element return true if it's actually visible in the viewport."
+  [el]
+  (let [rect (.getBoundingClientRect el)
+        zero-pos? #(or (zero? %)
+                       (pos? %))
+        doc-element (.-documentElement js/document)
+        win-height (or (.-innerHeight js/window)
+                       (.-clientHeight doc-element))
+        win-width (or (.-innerWidth js/window)
+                      (.-clientWidth doc-element))]
+    (and ;; Item left is not out of the screen
+         (zero-pos? (.-left rect))
+         ;; Item bottom is less than the screen height
+         (and (<= (.-bottom rect) win-height)
+              ;; and more than the navigation bar to
+              ;; make sure it's not hidden behind it
+              (> (.-bottom rect) responsive/navbar-height))
+         ;; Item right is less than the screen width
+         (<= (.-right rect) win-width))))

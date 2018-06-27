@@ -4,6 +4,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.events.expand-event :as expand-event]))
 
@@ -131,26 +132,6 @@
         (events/unlistenByKey (:render-on-resize-listener s)))
       (dissoc s :render-on-resize-listener)))})
 
-(defn- is-element-visible?
-   "Given a DOM element return true if it's actually visible in the viewport."
-  [el]
-  (let [rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
-        doc-element (.-documentElement js/document)
-        win-height (or (.-innerHeight js/window)
-                       (.-clientHeight doc-element))
-        win-width (or (.-innerWidth js/window)
-                      (.-clientWidth doc-element))]
-    (and ;; Item starts below the navbar
-         (>= (.-top rect) responsive/navbar-height)
-         ;; Item left is not out of the screen
-         (zero-pos? (.-left rect))
-         ;; Item bottom is less than the screen height
-         (<= (.-bottom rect) win-height)
-         ;; Item right is less than the screen width
-         (<= (.-right rect) win-width))))
-
 (defn ap-seen-mixin
   "Give a selector for the items to check under the component root.
   On each scroll event checks which items are visible with the given selector
@@ -162,7 +143,7 @@
                                $all-items (js/$ items-selector dom-node)]
                            (.each $all-items (fn [idx el]
                              (when (and (fn? item-is-visible-cb)
-                                        (is-element-visible? el))
+                                        (au/is-element-visible? el))
                                (item-is-visible-cb s (.attr (js/$ el) "data-itemuuid")))))))]
      {:will-mount (fn [s]
        (assoc s scroll-listener-kw
@@ -181,27 +162,6 @@
            (events/unlistenByKey scroll-listener)
            (dissoc s scroll-listener-kw))
          s))}))
-
-(defn- is-element-bottom-visible?
-   "Given a DOM element return true if it's actually visible in the viewport."
-  [el]
-  (let [rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
-        doc-element (.-documentElement js/document)
-        win-height (or (.-innerHeight js/window)
-                       (.-clientHeight doc-element))
-        win-width (or (.-innerWidth js/window)
-                      (.-clientWidth doc-element))]
-    (and ;; Item left is not out of the screen
-         (zero-pos? (.-left rect))
-         ;; Item bottom is less than the screen height
-         (and (<= (.-bottom rect) win-height)
-              ;; and more than the navigation bar to
-              ;; make sure it's not hidden behind it
-              (> (.-bottom rect) responsive/navbar-height))
-         ;; Item right is less than the screen width
-         (<= (.-right rect) win-width))))
 
 (defn wrt-stream-item-mixin
   "Give a selector for the items to check under the component root.
@@ -227,7 +187,7 @@
                                              ;; (so this body is actually visible, not the other body item)
                                              (.contains (.-classList el) "wrt-expanded")))
                                     ;; and the bottom of the element is visible at screen
-                                    (is-element-bottom-visible? el))
+                                    (au/is-element-bottom-visible? el))
                           (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s]
                          (let [dom-node (rum/dom-node s)
