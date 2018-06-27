@@ -3,24 +3,22 @@ div.main-animation-container {
 
   @include mobile() {
     width: 100%;
-    margin: 40px 0px 0px;
-    height: 237px;
+    margin: 80px 0px 0px;
   }
 
   img.main-animation {
     max-width: 1280px;
     width: calc(100% - 48px);
-    margin: 85px auto 0px;
+    margin: 120px auto 0px;
     padding: 0;
     z-index: 10;
     position: relative;
 
     @include mobile() {
-      width: 400px;
-      height: 237px;
-      position: absolute;
-      right: 0px;
-      margin: 0px;
+      width: 100%;
+      height: auto;
+      margin: 0px auto;
+      max-width: 327px;
     }
   }
 }
@@ -178,9 +176,9 @@ section.testimonials-section {
 
   @include mobile() {
     width: 100%;
-    padding: 72px 32px !important;
-    padding-top: 72px !important;
-    padding-bottom: 72px !important;
+    padding: 80px 24px !important;
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
     text-align: left;
   }
 
@@ -246,9 +244,9 @@ section.testimonials-section {
 }
 
 section.keep-aligned {
-  padding: 72px 0px;
+  padding: 120px 0px;
   text-align: center;
-  background-color: #F8F7F3;
+  background-color: #FFFDF9;
 
   @include mobile() {
     width: 100%;
@@ -263,16 +261,18 @@ section.keep-aligned {
   }
 
   div.keep-aligned-title {
-    @include avenir_M();
-    font-size: 34px;
+    @include avenir_H();
+    font-size: 28px;
     line-height: 38px;
     color: $deep_navy;
     margin-bottom: 20px;
 
     @include mobile() {
       @include avenir_H();
-      font-size: 24px;
-      line-height: 30px;
+      font-size: 22px;
+      line-height: 26px;
+      margin-bottom: 24px;
+      text-align: center;
     }
   }
 
@@ -289,6 +289,7 @@ section.keep-aligned {
 
     @include mobile() {
       font-size: 12px;
+      margin-top: 0px;
     }
   }
 }
@@ -296,10 +297,11 @@ section.keep-aligned {
 div.core-values-list {
   width: calc(100% - 48px);
   text-align: center;
-  margin: 0px auto;
+  margin: 10px auto 0px;
 
   @include mobile() {
-    width: 100%;
+    width: 251px;
+    margin: 24px auto 0px;
   }
 
   div.core-value {
@@ -342,110 +344,6 @@ div.core-values-list {
   }
 }
 
-div.carouselle {
-  position: relative;
-  width: 1080px;
-  height: 600px;
-
-  @include mobile() {
-    width: calc(100% + 48px);
-    padding: 0px;
-    height: 530px;
-    overflow-y: visible;
-    overflow-x: auto;
-    margin-top: 40px;
-    margin-left: -24px;
-  }
-
-  div.carouselle-screenshots {
-
-    @include mobile() {
-      width: 960px;
-      height: 530px;
-      padding: 0px 24px;
-      overflow: visible;
-    }
-
-    div.carouselle-screenshot {
-      transition: opacity 280ms;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 1080px;
-      height: 600px;
-      background-size: 1080px 600px;
-      background-position: center;
-      background-repeat: no-repeat;
-      box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
-      opacity: 1;
-      border-radius: 6px;
-
-      @include mobile() {
-        position: relative;
-        height: 510px;
-        width: 288px;
-        background-size: 288px 510px;
-        float: left;
-        margin-left: 24px;
-        box-shadow: 0px 2px 20px 0px rgba(0, 0, 0, 0.1);
-        margin-top: 10px;
-        overflow: visible;
-
-        &:first-child {
-          margin-left: 0px;
-        }
-      }
-
-      &.disappear {
-        opacity: 0;
-
-        @include mobile() {
-          opacity: 1;
-        }
-      }
-    }
-  }
-
-  button.carouselle-left {
-    width: 64px;
-    height: 64px;
-    position: absolute;
-    top: 50%;
-    margin-top: -32px;
-    left: -32px;
-    background-image: cdnUrl("/img/ML/carouselle_left_arrow.svg");
-    background-size: 64px 64px;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 0px;
-    border-radius: 32px;
-    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
-
-    @include mobile() {
-      display: none;
-    }
-  }
-  button.carouselle-right {
-    width: 64px;
-    height: 64px;
-    position: absolute;
-    top: 50%;
-    margin-top: -32px;
-    right: -32px;
-    background-image: cdnUrl("/img/ML/carouselle_right_arrow.svg");
-    background-size: 64px 64px;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 0px;
-    border-radius: 32px;
-    box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.2);
-
-    @include mobile() {
-      display: none;
-    }
-  }
-}
-
 button.get-started-button {
   width: 255px;
   height: 48px;
@@ -454,33 +352,38 @@ button.get-started-button {
   color: white;
   @include avenir_H();
   font-size: 20px;
-  margin: 48px 16px 0;
+  margin: 48px auto 0;
   position: relative;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 12px;
 
   @include mobile(){
     width: 100%;
     margin: 16px auto;
     padding: 0px;
+    font-size: 16px;
   }
 }
 
 section.home-keep-aligned {
   background-color: #F8F7F3;
-  padding: 120px 24px;
+  padding: 120px 24px 160px;
   text-align: center;
 
   @include mobile() {
-    padding: 40px 24px !important;
+    padding: 80px 24px !important;
   }
 
-  h2.home-keep-aligned-title {
+  h2.keep-aligned-title {
     @include avenir_H();
     font-size: 38px;
     line-height: 42px;
     color: $deep_navy;
     text-align: center;
+    margin: 0px;
 
     @include mobile() {
       text-align: left;
@@ -489,268 +392,255 @@ section.home-keep-aligned {
     }
   }
 
-  div.home-keep-aligned-carouselle {
-    margin: 40px auto 0px;
+  div.keep-aligned-section {
+    margin: 0px auto;
 
-    @include mobile() {
-      margin-top: 40px;
-      margin-left: -24px;
-    }
+    div.keep-aligned-section-row {
+      width: 1080px;
+      height: 354px;
+      margin: 120px auto 0px;
 
-    div.carouselle-screenshots {
+      &:first-child {
+        margin: 80px auto 0px;
 
-      div.carouselle-screenshot {
+        @include mobile() {
+          margin: 40px auto 0px
+        }
+      }
+
+      @include mobile() {
+        width: 100%;
+        height: auto;
+        margin: 80px auto 0px
+      }
+
+      div.keep-aligned-section-screenshot {
+        box-shadow: 0px 4px 20px 0px rgba(0,0,0,0.2);
+        width: 600px;
+        height: 330px;
+        background-size: 600px 330px;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 6px;
 
         &.screenshot-1 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1");
-
-          @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_1_mobile");
-          }
+          @include image-2x("/img/ML/keep_aligned_screenshot_1");
         }
 
         &.screenshot-2 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2");
-
-          @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_2_mobile");
-          }
+          @include image-2x("/img/ML/keep_aligned_screenshot_2");
         }
 
         &.screenshot-3 {
-          @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3");
+          @include image-2x("/img/ML/keep_aligned_screenshot_3");
+        }
+
+        &.screenshot-4 {
+          @include image-2x("/img/ML/keep_aligned_screenshot_4");
+        }
+
+        @include mobile() {
+          box-shadow: 0px 2px 20px 0px rgba(0,0,0,0.1);
+          width: 247px;
+          height: 440px;
+          background-size: 247px 440px;
+          margin: 0px auto;
+
+          &.screenshot-1 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_1");
+          }
+
+          &.screenshot-2 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_2");
+          }
+
+          &.screenshot-3 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_3");
+          }
+
+          &.screenshot-4 {
+            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_4");
+          }
+        }
+      }
+
+      div.keep-aligned-section-copy {
+        margin-top: 82px;
+        width: 400px;
+        text-align: left;
+
+        @include mobile() {
+          width: 100%;
+          margin-top: 40px;
+        }
+
+        div.keep-aligned-section-copy-title {
+          @include avenir_H();
+          font-size: 24px;
+          color: $deep_navy;
+          line-height: 42px;
+        }
+
+        div.keep-aligned-section-list-item {
+          padding-left: 24px;
+          position: relative;
+          @include avenir_R();
+          font-size: 18px;
+          line-height: 22px;
+          color: $deep_navy;
+          margin-top: 12px;
 
           @include mobile() {
-            @include image-2x("/img/ML/keep_aligned_carouselle_screenshot_3_mobile");
+            padding-top: 12px;
+            border-top: 1px solid #E3E4E2;
+          }
+
+          &:before {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            background-image: cdnUrl("/img/ML/keep_aligned_copy_checkmark.svg");
+            background-size: 16px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            content: "";
+            width: 16px;
+            height: 16px;
+
+            @include mobile() {
+              top: 14px;
+            }
+          }
+        }
+      }
+
+      @include big_web() {
+        &:nth-child(odd) {
+          div.keep-aligned-section-screenshot {
+            float: left;
+          }
+
+          div.keep-aligned-section-copy {
+            float: right;
+          }
+        }
+
+        &:nth-child(even) {
+          div.keep-aligned-section-screenshot {
+            float: right;
+          }
+
+          div.keep-aligned-section-copy {
+            float: left;
           }
         }
       }
     }
   }
-
-  div.green-values {
-    margin: 40px auto 0px;
-    text-align: center;
-    max-width: 1080px;
-
-    @include mobile() {
-      width: 100%;
-    }
-    
-    div.green-value {
-      width: 330px;
-      text-align: left;
-      float: left;
-      margin-left: 44px;
-
-      @include mobile() {
-        width: 100%;
-        margin-left: 0px;
-        float: unset;
-        margin-top: 24px;
-      }
-
-      &:first-child {
-        margin-left: 0px;
-      }
-
-      &.lamp {
-        div.green-value-icon {
-          background-image: cdnUrl("/img/ML/green_values_lamp.svg");
-        }
-      }
-
-      &.people {
-        div.green-value-icon {
-          background-image: cdnUrl("/img/ML/green_values_people.svg");
-        }
-      }
-
-      &.slack {
-        div.green-value-icon {
-          background-image: cdnUrl("/img/ML/green_values_slack.svg");
-          
-        }
-      }
-
-      div.green-value-icon {
-        width: 48px;
-        height: 48px;
-        background-size: 48px 48px;
-        background-repeat: no-repeat;
-        background-position: center;
-
-        @include mobile() {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-        }
-      }
-
-      div.green-value-title {
-        @include avenir_B();
-        font-size: 15px;
-        color: $deep_navy;
-        line-height: 20px;
-        margin-top: 16px;
-      }
-
-      div.green-value-description {
-        @include avenir_R();
-        font-size: 18px;
-        line-height: 24px;
-        color: $ui_grey;
-        margin-top: 8px;
-        max-width: 327px;
-      }
-    } 
-  }
 }
 
-section.team-transparency {
-  background-color: transparent;
-  padding: 120px 24px;
-  text-align: center;
+section.access-anywhere-section {
+  background-color: #FFFDF9;
+  height: 460px;
 
   @include mobile() {
-    padding: 40px 24px !important;
+    width: 100%;
+    height: auto;
+    padding: 80px 24px !important;
   }
 
-  h2.team-transparency-title {
-    @include avenir_H();
-    font-size: 38px;
-    line-height: 42px;
-    color: $deep_navy;
-    text-align: center;
-
-    @include mobile() {
-      text-align: left;
-    }
-  }
-
-  div.team-transparency-carouselle {
-    margin: 40px auto 0px;
-
-    @include mobile() {
-      margin-top: 40px;
-      margin-left: -24px;
-    }
-
-    div.carouselle-screenshot {
-
-      &.screenshot-1 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1");
-
-        @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_1_mobile");
-        }
-      }
-
-      &.screenshot-2 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2");
-
-        @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_2_mobile");
-        }
-      }
-
-      &.screenshot-3 {
-        @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3");
-
-        @include mobile() {
-          @include image-2x("/img/ML/team_transparency_carouselle_screenshot_3_mobile");
-        }
-      }
-    }
-  }
-
-  div.blue-values {
-    margin: 40px auto 0px;
-    text-align: center;
-    max-width: 1080px;
+  div.access-anywhere-section-container {
+    width: 1080px;
+    margin: 0px auto;
+    position: relative;
 
     @include mobile() {
       width: 100%;
     }
-    
-    div.blue-value {
-      width: 330px;
-      text-align: left;
-      float: left;
-      margin-left: 44px;
+
+    div.access-anywhere-screenshot {
+      width: 235px;
+      height: 300px;
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      margin-left: -335px;
+      @include image-2x("/img/ML/access_anywhere_screenshot");
+      background-size: 235px 300px;
+      background-repeat: no-repeat;
+      background-position: center;
 
       @include mobile() {
+        position: relative;
+        top: unset;
+        left: unset;
+        width: 235px;
+        height: 309px;
+        margin: 40px auto 0px;
+        background-size: 235px 309px;
+      }
+    }
+
+    div.access-anywhere-copy {
+      width: 406px;
+      height: 98px;
+      position: absolute;
+      top: 181px;
+      left: 50%;
+      margin-left: -60px;
+      text-align: left;
+
+      @include mobile() {
+        position: relative;
+        top: unset;
+        left: unset;
+        margin-left: 0px;
         width: 100%;
-        margin-left: 0px;
-        float: unset;
-        margin-top: 24px;
+        height: auto;
       }
 
-      &:first-child {
-        margin-left: 0px;
-      }
-
-      &.mega {
-        div.blue-value-icon {
-          background-image: cdnUrl("/img/ML/blue_values_mega.svg");
-        }
-      }
-
-      &.paperclip {
-        div.blue-value-icon {
-          background-image: cdnUrl("/img/ML/blue_values_paperclip.svg");
-        }
-      }
-
-      &.thumbup {
-        div.blue-value-icon {
-          background-image: cdnUrl("/img/ML/blue_values_thumbup.svg");
-        }
-      }
-
-      div.blue-value-icon {
-        width: 48px;
-        height: 48px;
-        background-size: 48px 48px;
-        background-repeat: no-repeat;
-        background-position: center;
-
-        @include mobile() {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-        }
-      }
-
-      div.blue-value-title {
-        @include avenir_B();
-        font-size: 15px;
+      div.access-anywhere-copy-title {
+        @include avenir_H();
+        font-size: 28px;
+        line-height: 32px;
         color: $deep_navy;
-        line-height: 20px;
-        margin-top: 16px;
+
+        @include mobile(){
+          font-size: 24px;
+          line-height: 30px;
+          text-align: center;
+        }
       }
 
-      div.blue-value-description {
+      div.access-anywhere-copy-subtitle {
         @include avenir_R();
         font-size: 18px;
-        color: $ui_grey;
-        line-height: 24px;
-        margin-top: 8px;
-        max-width: 327px;
+        line-height: 26px;
+        color: $deep_navy;
+
+        @include mobile(){
+          text-align: center;
+          max-width: 294px;
+          margin: 6px auto 0px;
+
+          &.second-line {
+            margin-top: 0px;
+          }
+        }
       }
-    } 
+    }
   }
 }
 
 section.slack-comparison {
-  padding: 104px 32px 104px;
+  padding: 120px 32px;
   margin: 0px auto;
   text-align: center;
   background-color: #F8F7F3;
 
   @include mobile() {
     text-align: left;
-    padding: 40px 32px !important;
+    padding: 80px 32px !important;
   }
 
   div.slack-comparison-headline {
@@ -764,12 +654,13 @@ section.slack-comparison {
     color: $deep_navy;
     @include avenir_R();
     font-size: 38px;
-    line-height: 64px;
+    line-height: 54px;
+    margin-top: 8px;
 
     @include mobile(){
       font-size: 24px;
       line-height: 30px;
-      margin-top: 16px;
+      margin-top: 24px;
     }
   }
 
@@ -777,19 +668,19 @@ section.slack-comparison {
     color: $deep_navy;
     @include avenir_H();
     font-size: 38px;
-    line-height: 64px;
+    line-height: 54px;
 
     @include mobile(){
-      font-size: 24px;
+      font-size: 20px;
       line-height: 30px;
-      margin-top: 16px;
+      margin-top: 24px;
     }
   }
 
   img.slack-comparison-screenshot {
     max-width: 1080px;
     box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.07);
-    margin: 24px auto;
+    margin: 40px auto 0px;
 
     @include mobile() {
       width: 100%;

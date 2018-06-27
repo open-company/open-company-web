@@ -24,7 +24,7 @@
                                            {:auth-source "slack"})]
                        (user-actions/login-with-slack auth-link)))}
         [:span.slack-white-icon]
-        "Add to Slack"]]))
+        [:span.slack-copy "Add to Slack"]]]))
 
 (rum/defcs slack < rum/static
                    rum/reactive
@@ -73,8 +73,6 @@
             shared-misc/core-values-list]
 
           (shared-misc/slack-comparison-section true)
-
-          shared-misc/team-transparency-section
 
           shared-misc/keep-aligned-section
 

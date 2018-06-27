@@ -1,13 +1,17 @@
 .navbar-bottom {
-  background-color: #FFFDF9 !important;
+  background-color: #F8F7F3 !important;
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
   padding: 60px 120px;
   overflow: hidden;
 
+  &.light-background {
+    background-color: #FFFDF9 !important;
+  }
+
   @include mobile(){
-    padding: 20px 0;
+    padding: 80px 0;
   }
 
   div.mobile-footer {
@@ -98,12 +102,16 @@
         font-size: 16px;
 
         a {
-          margin: 5px;
+          margin: 0px 5px;
           @include avenir_R();
           color: $carrot_green;
           font-size: 16px;
           text-decoration: none;
           opacity: 1;
+
+          &:first-child {
+            margin-left: 0px;
+          }
 
           &:hover {
             text-decoration: underline;
@@ -141,6 +149,10 @@
 
         @include mobile() {
           width: 48%;
+
+          &:nth-child(2), &:nth-child(3) {
+            float: right;
+          }
         }
 
         @media screen and (max-width: 1200px) {
@@ -173,7 +185,7 @@
           @include mobile(){
             border-bottom: 1px solid rgba(255,255,255,0.5);
             padding: 2px 0px;
-            margin-top: 24px;
+            margin-top: 0px;
             margin-bottom: 0px;
           }
         }
