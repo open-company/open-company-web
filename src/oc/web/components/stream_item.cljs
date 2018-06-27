@@ -145,8 +145,7 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
-          (when read-data
-            [:div.separator])
+          [:div.separator]
           [:div.stream-item-wrt
             (wrt (:uuid activity-data) read-data (:users team-data))]]
         (when (and (not is-mobile?)

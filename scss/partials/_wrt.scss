@@ -5,10 +5,6 @@ div.wrt-container {
     div.wrt-count.has-read-list {
       color: $deep_navy;
     }
-
-    div.wrt-popup {
-      display: block;
-    }
   }
 
   div.wrt-count {
@@ -30,8 +26,12 @@ div.wrt-container {
     top: 100%;
     left: 0px;
     z-index: 2;
-    max-height: calc(100vh - #{$navbar_height}px - 100px);
-    display: none;
+    max-height: calc(50vh - #{$navbar_height}px);
+
+    &.top {
+      top: unset;
+      bottom: 100%;
+    }
 
     div.wrt-popup-title {
       @include avenir_M();
