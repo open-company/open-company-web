@@ -38,7 +38,7 @@
                          (reset! (::click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(when (not (utils/event-inside? % (rum/ref-node s "more-menu-bt")))
-                               (when-let* [delegate-methods (nth (:rum/args s) 2)
+                               (when-let* [delegate-methods (get (:rum/args s) 2)
                                            will-close (:will-close delegate-methods)]
                                  (when (fn? will-close)
                                    (will-close)))
