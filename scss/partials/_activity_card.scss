@@ -30,12 +30,18 @@ div.activity-card {
   }
 
   &:hover {
-    div.activity-card-menu-container {
-      display: block;
-    }
-    div.activity-card-bottom-container {
-      div.activity-card-must-read {
-        display: inline-block;
+    div.activity-card-footer {
+
+      div.comments-count, div.tile-reactions, div.activity-card-footer-right {
+        display: none;
+      }
+
+      div.activity-card-menu-container {
+        display: block;
+
+        div.more-menu {
+          display: block;
+        }
       }
     }
   }
@@ -59,7 +65,6 @@ div.activity-card {
     left: 0px;
     width: 100%;
     height: 121px;
-    background-color: rgba(white, 0.5);
 
     div.tile-menu {
       position: absolute;
@@ -173,30 +178,6 @@ div.activity-card {
       margin-top: 4px;
     }
 
-    div.activity-card-must-read {
-      background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-      background-size: 12px 16px;
-      background-repeat: no-repeat;
-      background-position: 2px;
-      width: 16px;
-      height: 12px;
-      display: none;
-      margin-left: 5px;
-
-      &:hover {
-        background-image: cdnUrl("/img/ML/must_see_bolt.svg");
-      }
-
-      &.must-see-on {
-        background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-        display: inline-block;
-
-        &:hover {
-          background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-        }
-      }
-    }
-
     div.activity-card-footer-placeholder {
       height: 32px;
     }
@@ -284,27 +265,51 @@ div.activity-card {
         }
       }
 
-      div.tile-attachments {
-        height: 16px;
+      div.activity-card-footer-right {
         float: right;
 
-        span.attachments-icon {
-          float: right;
-          display: block;
-          width: 12px;
-          height: 13px;
-          background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
-          background-repeat: no-repeat;
-          background-size: 12px 13px;
-          background-position: center;
+        div.tile-attachments {
+          height: 16px;
+          display: inline;
+          float: left;
+          span.attachments-icon {
+            display: block;
+            width: 12px;
+            height: 13px;
+            background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
+            background-repeat: no-repeat;
+            background-size: 12px 13px;
+            background-position: center;
+          }
+
+          span.attachments-count {
+            @include avenir_M();
+            font-size: 12px;
+            color: $ui_grey;
+            margin-left: 16px;
+            float: left;
+          }
         }
 
-        span.attachments-count {
+        div.activity-card-must-read {
+          background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+          background-size: 12px 16px;
+          background-repeat: no-repeat;
+          background-position: 2px;
+          width: 18px;
+          height: 14px;
+          display: inline-block;
           float: right;
-          @include avenir_M();
-          font-size: 12px;
-          color: $ui_grey;
-          margin-left: 6px;
+          &:hover {
+            background-image: cdnUrl("/img/ML/must_see_bolt.svg");
+          }
+
+          &.must-see-on {
+            background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+          }
+          &:hover {
+            background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+          }
         }
       }
     }

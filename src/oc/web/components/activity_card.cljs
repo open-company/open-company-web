@@ -16,7 +16,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.components.ui.tile-menu :refer (tile-menu)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defcs activity-card < rum/reactive
@@ -56,12 +56,9 @@
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                      (when-not (or is-drafts-board
-                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu])))
+                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-menu])))
                        (activity-actions/activity-modal-fade-in activity-data))))}
       [:div.activity-share-container]
-      (when-not is-drafts-board
-        [:div.activity-card-menu-container
-          (tile-menu activity-data dom-element-id)])
       [:div.activity-card-preview-container
         [:div.activity-card-preview-header.group
           (user-avatar-image publisher)
@@ -86,17 +83,6 @@
         [:div.activity-card-headline
           {:ref "activity-headline"
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-        [:div.activity-card-must-read
-          {:class (utils/class-set {:must-see-on (:must-read activity-data)})
-           :on-click #(do
-                        (utils/event-stop %)
-                        (activity-actions/toggle-must-read activity-data))
-                            :data-toggle (when-not is-mobile? "tooltip")
-           :data-placement "top"
-           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-           :data-title (if (:must-read activity-data)
-                         "Demote to regular post"
-                         "Promote to must see post")}]
         [:div.activity-card-footer-placeholder]
         (if is-drafts-board
           [:div.activity-card-footer.group
@@ -107,6 +93,9 @@
               {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
               "Delete"]]
           [:div.activity-card-footer
+            (when-not is-drafts-board
+              [:div.activity-card-menu-container
+                (more-menu activity-data dom-element-id)])
             [:div.comments-count
               [:span.comments-icon]
               [:span.comments-count
@@ -119,8 +108,13 @@
                       (:reaction max-reaction)]
                     [:span.count
                       (:count max-reaction)]]))]
-            (when (pos? (count (:attachments activity-data)))
-              [:div.tile-attachments
-                [:span.attachments-count
-                  (count (:attachments activity-data))]
-                [:span.attachments-icon]])])]]))
+            [:div.activity-card-footer-right
+              (when (pos? (count (:attachments activity-data)))
+                [:div.tile-attachments
+                  [:span.attachments-count
+                    (count (:attachments activity-data))]
+                  [:span.attachments-icon]])
+              (when (:must-read activity-data)
+                [:div.activity-card-must-read
+                 {:class (utils/class-set {:must-see-on
+                                           (:must-read activity-data)})}])]])]]))

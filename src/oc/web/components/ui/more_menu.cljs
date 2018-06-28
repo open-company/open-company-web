@@ -87,4 +87,14 @@
             (when share-link
              [:li.share
                {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
-               "Share"])])])))
+              "Share"])
+            (when edit-link
+              [:li.must-see
+               {:on-click #(do
+                             (utils/event-stop %)
+                             (activity-actions/toggle-must-read activity-data))}
+               (if (:must-read activity-data)
+                 "Unmark must see"
+                 "Must see")]
+              )
+           ])])))

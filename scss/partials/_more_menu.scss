@@ -12,9 +12,8 @@ div.more-menu {
     height: 30px;
     padding: 5px 0px 3px 26px;
     display: block;
-    background-image: cdnUrl("/img/ML/vertical_ellipsis.svg");
-    background-position: 26px 3px;
-    background-size: 4px 20px;
+    background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
+    background-size: 20px 4px;
     background-repeat: no-repeat;
     opacity: 0.8;
 
@@ -23,18 +22,18 @@ div.more-menu {
     }
 
     &:hover, &.active {
-      background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
+      background-image: cdnUrl("/img/ML/horizontal_ellipsis_ui_grey.svg");
     }
   }
 
   ul.more-menu-list {
     position: absolute;
-    top: 36px;
+    top: 16px;
     left: calc(100% - 136px);
-    width: 136px;
+    width: 146px;
     outline: none;
     z-index: 110;
-    background-color: white;
+    background-color: black;
     border: 1px solid $deep_tan;
     box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
     border-radius: 5px;
@@ -46,7 +45,7 @@ div.more-menu {
       height: 18px;
       @include avenir_H();
       font-size: 14px;
-      color: $deep_navy;
+      color: white;
       cursor: pointer;
       padding-left: 32px;
       position: relative;
@@ -71,6 +70,12 @@ div.more-menu {
       &.share {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_share.svg");
+        }
+      }
+
+      &.must-see {
+        &:before {
+          background-image: cdnUrl("/img/ML/more_menu_mustsee.svg");
         }
       }
 

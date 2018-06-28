@@ -116,6 +116,7 @@
                           (pos? (count (:boards org-data))))
                      ;; Board specified
                      (and (not= (router/current-board-slug) "all-posts")
+                          (not= (router/current-board-slug) "must-see")
                           (not ap-initial-at)
                           ;; But no board data yet
                           (not board-data))
@@ -124,6 +125,9 @@
                               ap-initial-at)
                           ;; But no all-posts data yet
                          (not all-posts-data))
+                     (and (= (router/current-board-slug) "must-see")
+                          ;; But no must-see-data data yet
+                         (not must-see-data))
                      ;; First ever user nux, not enough time
                      (and nux-loading
                           (not nux-end)))
