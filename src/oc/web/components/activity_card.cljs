@@ -84,11 +84,11 @@
            :data-itemuuid (:uuid activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-footer-placeholder]
+        [:div.activity-share-container]
         [:div.activity-card-footer-hover.group
           (when-not is-drafts-board
             [:div.activity-card-menu-container
-              (tile-menu activity-data dom-element-id)
-              [:div.activity-share-container]])]
+              (tile-menu activity-data dom-element-id)])]
         (if is-drafts-board
           [:div.activity-card-footer.group
             [:button.mlb-reset.edit-draft-bt
