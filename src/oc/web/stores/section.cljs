@@ -195,6 +195,41 @@
       (fix-sections org-data new-status-data)
       (assoc-in (dispatcher/change-data-key (:slug org-data)) new-status-data))))
 
+
+(defmethod dispatcher/action :item-delete/unseen
+  [db [_ org-slug change-data]]
+  (let [item-id (:item-id change-data)
+        container-id (:container-id change-data)
+        change-key (dispatcher/change-data-key org-slug)
+        old-change-data (get-in db change-key)
+        old-container-change-data (get old-change-data container-id)
+        old-unseen (or (:unseen old-container-change-data) [])
+        next-unseen (filter #(not= % item-id) old-unseen)
+        next-container-change-data (if old-container-change-data
+                                     (assoc old-container-change-data :unseen next-unseen)
+                                     {:container-id container-id
+                                      :unseen next-unseen
+                                      :nav-at nil})
+        next-change-data (assoc old-change-data container-id next-container-change-data)]
+    (assoc-in db change-key next-change-data)))
+
+(defmethod dispatcher/action :item-add/unseen
+  [db [_ org-slug change-data]]
+  (let [item-id (:item-id change-data)
+        container-id (:container-id change-data)
+        change-key (dispatcher/change-data-key org-slug)
+        old-change-data (get-in db change-key)
+        old-container-change-data (get old-change-data container-id)
+        old-unseen (or (:unseen old-container-change-data) [])
+        next-unseen (into [] (seq (conj old-unseen item-id)))
+        next-container-change-data (if old-container-change-data
+                                     (assoc old-container-change-data :unseen next-unseen)
+                                     {:container-id container-id
+                                      :unseen next-unseen
+                                      :nav-at nil})
+        next-change-data (assoc old-change-data container-id next-container-change-data)]
+    (assoc-in db change-key next-change-data)))
+
 ;; Section store specific reducers
 (defmethod reducer :default [db payload]
   ;; ignore state changes not specific to reactions

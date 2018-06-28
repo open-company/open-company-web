@@ -166,7 +166,6 @@
       (let [board-data (dispatcher/board-data)]
         (section-get (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))))
 
-
 (defn ws-change-subscribe []
   (ws-cc/subscribe :container/status
     (fn [data]
@@ -191,7 +190,13 @@
         ;; let the activity handle the item update case
         (when (or (= change-type :add)
                   (= change-type :delete))
-          (section-change section-uuid (:change-at change-data)))))))
+          (section-change section-uuid (:change-at change-data)))
+        ;; On item/change :add let's add the UUID to the unseen list of
+        ;; the specified container to make sure it's marked as seen
+        (when (= change-type :add)
+          (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
+        (when (= change-type :delete)
+          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))))))
 
 (defn ws-interaction-subscribe []
   (ws-ic/subscribe :interaction-comment/add
