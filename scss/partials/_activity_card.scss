@@ -307,9 +307,6 @@ div.activity-card {
           &.must-see-on {
             background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
           }
-          &:hover {
-            background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-          }
         }
       }
     }
