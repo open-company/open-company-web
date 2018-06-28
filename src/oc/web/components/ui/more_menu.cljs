@@ -91,8 +91,11 @@
                {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
               "Share"])
             (when edit-link
-              [:li.must-see
-               {:on-click #(do
+              [:li
+               {:class (utils/class-set
+                         {:must-see (not (:must-read activity-data))
+                          :must-see-on (:must-read activity-data)})
+                :on-click #(do
                              (utils/event-stop %)
                              (activity-actions/toggle-must-read activity-data))}
                (if (:must-read activity-data)

@@ -2,7 +2,6 @@ div.more-menu {
   float: right;
   width: 30px;
   height: 30px;
-  margin-top: 7px;
   transform: opacity 180ms ease-in;
   opacity: 1;
   position: relative;
@@ -10,10 +9,10 @@ div.more-menu {
   button.more-menu-bt {
     width: 30px;
     height: 30px;
-    padding: 5px 0px 3px 26px;
     display: block;
     background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
-    background-size: 20px 4px;
+    background-size: 40px 4px;
+    background-position: 0px 12px;
     background-repeat: no-repeat;
     opacity: 0.8;
 
@@ -28,7 +27,7 @@ div.more-menu {
 
   ul.more-menu-list {
     position: absolute;
-    top: 16px;
+    top: 26px;
     left: calc(100% - 136px);
     width: 146px;
     outline: none;
@@ -76,6 +75,12 @@ div.more-menu {
       &.must-see {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_mustsee.svg");
+        }
+      }
+
+      &.must-see-on {
+        &:before {
+          background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
         }
       }
 
