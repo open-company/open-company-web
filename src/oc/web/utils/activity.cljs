@@ -121,31 +121,12 @@
     (and (nil? partial-update) (nil? delete))))
 
 (defn post-new?
-  "
-  An entry is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-      -and-
-    user is not the post's author
-      -and-
-    published-at is < 30 days
-      -and-
-    published-at of the entry is newer than seen at
-      -or-
-    no seen at
-  "
+  "An entry is new if its uuid is contained in container's unseen."
   [entry changes]
-  (let [published-at (:published-at entry)
-        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
-        seen-at (:seen-at changes)
-        user-id (jwt/get-key :user-id)
-        author-id (-> entry :author first :user-id)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
-        new? (and in-team?
-                  (not= author-id user-id)
-                  (> published-at too-old)
-                  (or (> published-at seen-at)
-                      (nil? seen-at)))]
-    new?))
+  (let [board-uuid (:board-uuid entry)
+        board-change-data (get changes board-uuid {})
+        board-unseen (:unseen board-change-data)]
+    (utils/in? board-unseen (:uuid entry))))
 
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
@@ -175,7 +156,7 @@
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
-      (assoc :new (post-new? (:body entry-data) changes))
+      (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
       (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)
