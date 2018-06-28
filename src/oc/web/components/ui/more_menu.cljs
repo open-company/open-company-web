@@ -96,7 +96,6 @@
                              (utils/event-stop %)
                              (activity-actions/toggle-must-read activity-data))}
                (if (:must-read activity-data)
-                 "Unmark must see"
+                 "Unmark"
                  "Must see")]
-              )
-           ])])))
+              )])])))
