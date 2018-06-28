@@ -116,7 +116,7 @@
               (do
                 (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
                 (utils/after 500 refresh-org-data)
-                (ws-cc/container-watch [(:uuid section-data)])
+                (ws-cc/container-watch (:uuid section-data))
                 (dispatcher/dispatch! [:section-edit-save/finish section-data])
                 (when (fn? success-cb)
                   (success-cb)))))))
