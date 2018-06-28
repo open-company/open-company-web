@@ -8,6 +8,7 @@ div.stream-item {
 
   @include mobile() {
     width: 100%;
+    padding: 24px 16px;
   }
 
   &:hover {
@@ -185,6 +186,10 @@ div.stream-item {
         height: 32px;
         margin-top: 32px;
 
+        @include mobile() {
+          margin-top: 16px;
+        }
+
         div.mobile-summary {
           float: left;
           margin-top: 10px;
@@ -205,7 +210,7 @@ div.stream-item {
             }
 
             span {
-              margin-left: 6px;
+              margin-left: 8px;
               font-size: 12px;
               color: $light_ui_grey;
               margin-left: 6px;
@@ -336,7 +341,7 @@ div.stream-item {
 
           @include mobile() {
             width: auto;
-            margin-right: 6px;
+            margin-right: 24px;
           }
 
           &:before {
