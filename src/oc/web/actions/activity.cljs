@@ -237,7 +237,7 @@
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
-      (ws-cc/container-watch [(:uuid fixed-board-data)]))
+      (ws-cc/container-watch (:uuid fixed-board-data)))
     (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])
     (when (= (:status saved-activity-data) "published")
       (send-item-read (:uuid saved-activity-data)))))
@@ -416,7 +416,7 @@
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
-      (ws-cc/container-watch [(:uuid new-board-data)]))
+      (ws-cc/container-watch (:uuid new-board-data)))
     (dis/dispatch! [:entry-publish-with-board/finish new-board-data])
     ;; Send item read
     (send-item-read (:uuid saved-activity-data))))

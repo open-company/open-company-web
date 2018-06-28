@@ -1,6 +1,7 @@
 (ns oc.web.lib.ws-change-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
+            [defun.core :refer (defun)]
             [taoensso.sente :as s]
             [taoensso.timbre :as timbre]
             [taoensso.encore :as encore :refer-macros (have)]
@@ -24,15 +25,20 @@
 
 ;; ----- Actions -----
 
-(defn container-watch
-  ([]
-    (container-watch nil))
+(defun container-watch
+  ([watch-id :guard string?]
+    (timbre/debug "Adding container/watch for:" watch-id)
+    (swap! container-ids conj watch-id)
+    (container-watch))
 
-  ([watch-ids]
+  ([watch-ids :guard sequential?]
+    (timbre/debug "Adding container/watch for:" watch-ids)
+    (swap! container-ids concat watch-ids)
+    (container-watch))
+
+  ([]
     (when @chsk-send!
-      (timbre/debug "Sending container/watch for:" watch-ids)
-      (when watch-ids
-        (swap! container-ids conj watch-ids))
+      (timbre/debug "Sending container/watch for:" @container-ids)
       (@chsk-send! [:container/watch @container-ids] 1000))))
 
 (defn container-seen [container-id]

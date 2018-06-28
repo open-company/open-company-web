@@ -41,17 +41,18 @@ $h2_top_margin: 24;
 
 @mixin new-tag() {
   div.new-tag {
-    @include avenir_H();
-    color: $sea_blue;
-    font-size: 12px;
-    line-height: 14px;
-    padding: 6px 9px 5px 9px;
-    float: right;
-    border: 1px solid $sea_blue;
-    border-radius: 100px;
-    margin-right: 8px;
-    height: 26px;
-    margin-top: 3px;
+    @include avenir_B();
+    color: #FFB03D;
+    font-size: 11px;
+    line-height: 15px;
+    padding: 2px 0px 0px;
+    border-radius: 4px;
+    height: 18px;
+    width: 36px;
+    background-color: rgba(#FFB03D, 0.2);
+    text-transform: uppercase;
+    text-align: center;
+    margin-left: 8px;
   }
 }
 

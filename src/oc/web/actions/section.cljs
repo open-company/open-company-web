@@ -31,14 +31,6 @@
   [section]
   (let [is-currently-shown (is-currently-shown? section)]
     (when is-currently-shown
-      (when (and (router/current-activity-id)
-                 (not-any? #(when (= (router/current-activity-id) (:uuid %)) %) (:entries section)))
-        ;; If the activity requested is not found
-        (if (jwt/jwt)
-          ;; Show the activity removed
-          (dispatcher/dispatch! [:input [:show-activity-removed] true])
-          ;; Show the activity not found/login screen
-          (dispatcher/dispatch! [:input [:show-activity-not-found] true])))
       ;; Tell the container service that we are seeing this board,
       ;; and update change-data to reflect that we are seeing this board
       (when-let [section-uuid (:uuid section)]
@@ -126,7 +118,7 @@
               (do
                 (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
                 (utils/after 500 refresh-org-data)
-                (ws-cc/container-watch [(:uuid section-data)])
+                (ws-cc/container-watch (:uuid section-data))
                 (dispatcher/dispatch! [:section-edit-save/finish section-data])
                 (when (fn? success-cb)
                   (success-cb)))))))
