@@ -49,17 +49,15 @@
                     (:publisher activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                                :draft is-drafts-board})
+                                :draft is-drafts-board
+                                :new-item (:new activity-data)})
        :id dom-element-id
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                      (when-not (or is-drafts-board
                                    (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu])))
                        (activity-actions/activity-modal-fade-in activity-data))))}
-      [:div.activity-share-container]
-      (when-not is-drafts-board
-        [:div.activity-card-menu-container
-          (tile-menu activity-data dom-element-id)])
+      [:div.new-tag "NEW"]
       [:div.activity-card-preview-container
         [:div.activity-card-preview-header.group
           (user-avatar-image publisher)
@@ -86,6 +84,11 @@
            :data-itemuuid (:uuid activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-footer-placeholder]
+        [:div.activity-card-footer-hover.group
+          (when-not is-drafts-board
+            [:div.activity-card-menu-container
+              (tile-menu activity-data dom-element-id)
+              [:div.activity-share-container]])]
         (if is-drafts-board
           [:div.activity-card-footer.group
             [:button.mlb-reset.edit-draft-bt

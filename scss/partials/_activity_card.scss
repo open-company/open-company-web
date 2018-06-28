@@ -30,9 +30,30 @@ div.activity-card {
   }
 
   &:hover {
-    div.activity-card-menu-container {
+    div.activity-card-bottom-container {
+      div.activity-card-footer {
+        display: none;
+      }
+
+      div.activity-card-footer-hover {
+        display: block;
+      }
+    }
+  }
+
+  &.new-item {
+    div.new-tag {
       display: block;
     }
+  }
+
+  @include new-tag();
+
+  div.new-tag {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: none;
   }
 
   &.draft {
@@ -42,25 +63,7 @@ div.activity-card {
 
   div.activity-share-container {
     div.activity-share-modal-container {
-      margin-top: 42px;
-    }
-  }
-
-  div.activity-card-menu-container {
-    display: none;
-    z-index: 3;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 121px;
-    background-color: rgba(white, 0.5);
-
-    div.tile-menu {
-      position: absolute;
-      right: 20px;
-      top: 12px;
-      float: unset;
+      margin-top: 16px;
     }
   }
 
@@ -173,6 +176,26 @@ div.activity-card {
 
     div.activity-card-footer-placeholder {
       height: 32px;
+    }
+
+    div.activity-card-footer-hover {
+      display: none;
+      margin-top: 16px;
+      height: 16px;
+      position: absolute;
+      bottom: 16px;
+      width: calc(100% - 48px);
+
+      div.activity-card-menu-container {
+        div.tile-menu {
+          margin-top: -6px;
+          float: left;
+          button.tile-menu-bt {
+            margin-left: 0px;
+            margin-right: 16px;
+          }
+        }
+      }
     }
 
     div.activity-card-footer {

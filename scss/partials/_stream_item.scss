@@ -10,6 +10,16 @@ div.stream-item {
     width: 100%;
   }
 
+  &.new-item {
+    div.stream-item-header {
+      div.stream-header-head-author {
+        div.new-tag {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
   &:hover {
     div.stream-item-header {
       div.tile-menu {
@@ -92,6 +102,12 @@ div.stream-item {
         @include mobile() {
           width: auto;
         }
+      }
+
+      @include new-tag();
+
+      div.new-tag {
+        display: none;
       }
     }
   }

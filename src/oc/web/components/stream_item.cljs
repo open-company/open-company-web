@@ -94,7 +94,8 @@
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
-                                :draft is-drafts-board})
+                                :draft is-drafts-board
+                                :new-item (:new activity-data)})
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)
                          dom-node-selector (str "div." dom-node-class)]
@@ -117,7 +118,8 @@
               (when (or is-all-posts is-drafts-board)
                 " in ")
               (when (or is-all-posts is-drafts-board)
-                (:board-name activity-data)))]
+                (:board-name activity-data)))
+            [:div.new-tag "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
@@ -133,10 +135,7 @@
         (when is-mobile?
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
-            :will-close #(reset! (::more-menu-open s) false)}))
-        (when (:new activity-data)
-          [:div.new-tag
-            "New"])]
+            :will-close #(reset! (::more-menu-open s) false)}))]
       [:div.stream-item-body.group
         [:div.stream-body-left.group.fs-hide
           [:div.stream-item-headline.ap-seen-item-headline
