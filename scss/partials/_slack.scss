@@ -6,15 +6,23 @@ button.signin-with-slack {
   color: white;
   @include avenir_H();
   font-size: 20px;
-  margin: 48px 16px 0;
+  margin: 48px auto 0;
   position: relative;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   @include mobile(){
     width: 100%;
     // max-width: 280px;
-    margin: 16px auto;
+    margin: 24px auto 16px;
     font-size: 18px;
+  }
+
+  span.slack-copy {
+    position: relative;
+    top: 0px;
   }
 
   span.slack-white-icon {
@@ -24,8 +32,6 @@ button.signin-with-slack {
     background-repeat: no-repeat;
     background-size: 24px 24px;
     margin-right: 8px;
-    display: inline-block;
-    top: 4px;
     position: relative;
   }
 }
@@ -87,16 +93,24 @@ div.slack-wrap {
       }
     }
 
+    section.home-keep-aligned {
+      background-color: #FFFDF9;
+    }
+
+    section.access-anywhere-section {
+      background-color: #F8F7F3;
+    }
+
     section.carrot-plus-slack {
-      padding-top: 72px;
+      padding-top: 184px;
       padding-bottom: 120px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
-      @include tablet(){
+      @include tablet() {
         overflow: visible;
-        padding: 80px 24px;
+        padding: 152px 24px 80px;
       }
 
       div.balloon {
@@ -194,6 +208,7 @@ div.slack-wrap {
           line-height: 30px;
           text-align: left;
           padding: 0px;
+          margin: 0px;
         }
       }
 
@@ -226,7 +241,7 @@ div.slack-wrap {
 
         @include tablet(){
           width: 100%;
-          margin: 16px auto 0;
+          margin: 24px auto 0;
           padding: 0px;
           font-size: 17px;
           line-height: 23px;
@@ -277,10 +292,11 @@ div.slack-wrap {
     section.keep-aligned {
       text-align: center;
       margin: 0px auto;
+      // background-color: #FFFDF9;
 
       div.keep-aligned-title {
-        @include avenir_M();
-        font-size: 34px;
+        @include avenir_H();
+        font-size: 28px;
         color: $deep_navy;
       }
     }

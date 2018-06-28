@@ -46,12 +46,13 @@ div.entry-edit-modal-container {
 
     div.entry-edit-modal-header-title {
       @include avenir_H();
-      font-size: 18px;
+      font-size: 16px;
+      line-height: 24px;
       color: white;
       text-align: center;
       position: relative;
-      margin: 0px auto;
-      width: 50%;
+      margin: 2px auto 0px;
+      max-width: 50%;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -63,19 +64,20 @@ div.entry-edit-modal-container {
 
     button.modal-close-bt {
       background-image: cdnUrl("/img/ML/white_close.svg");
-      width: 24px;
+      width: 16px;
       height: 24px;
       background-repeat: no-repeat;
       background-size: 14px 14px;
-      background-position: 5px 5px;
+      background-position: center;
       position: absolute;
-      top: 17px;
-      left: 20px;
+      padding: 0px;
+      top: 16px;
+      left: 24px;
     }
 
     div.entry-edit-modal-header-right {
       position: absolute;
-      top: 12px;
+      top: 16px;
       right: 24px;
       max-width: 80%;
 
@@ -97,13 +99,20 @@ div.entry-edit-modal-container {
       }
 
       button.header-buttons {
-        height: 40px;
+        height: 24px;
         @include avenir_M();
         font-size: 14px;
         float: right;
         color: white;
         margin: 0px;
         position: relative;
+        padding: 0px;
+        opacity: 0.6;
+        padding-top: 4px;
+
+        &:hover {
+          opacity: 1;
+        }
 
         div.small-loading {
           position: absolute;
@@ -114,8 +123,12 @@ div.entry-edit-modal-container {
         &.post-button {
           @include avenir_B();
           color: white;
-          padding: 0px 0px 0px 24px;
           margin-left: 24px;
+          opacity: 0.8;
+
+          &:hover {
+            opacity: 1;
+          }
         }
 
         @include tablet() {

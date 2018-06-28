@@ -125,21 +125,21 @@
            :href "/sign-up"
            :class (when (= active-page "slack")
                     "slack-get-started")}
-          (if (= active-page "slack")
-            [:span
-              [:span.slack-orange-icon]
-              "Add to Slack"]
-            "Get Started")]]
+          (when (= active-page "slack")
+            [:span.slack-orange-icon])
+          [:span.start-copy
+            (if (= active-page "slack")
+              "Add to Slack"
+              "Get Started")]]]
       [:div.site-navbar-right.mobile-only
         [:a.start
           {:id "site-header-mobile-signup-item"
            :class (when (= active-page "slack") "slack")
            :href "/sign-up"}
-            (if (= active-page "slack")
-              [:span
-                [:span.slack-orange-icon]
-                "ADD"]
-              "START")]]
+            [:span.copy
+              (if (= active-page "slack")
+                "ADD"
+                "START")]]]
       [:div.mobile-ham-menu.mobile-only
         {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 
@@ -185,7 +185,7 @@
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "Support"]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
-          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          ; [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
           [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
 
         [:div.column.column-integrations
