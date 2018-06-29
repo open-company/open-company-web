@@ -23,13 +23,6 @@
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
-(defn wrt-list [self-user]
- [{:seen false
-   :user-id "0000-0000-0000"
-   :name "Alia Atreidis"
-   :avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_red.svg"}
-  (assoc self-user :seen true)])
-
 (defn expand [s expand? & [scroll-to-comments?]]
   (reset! (::expanded s) expand?)
   (when (and expand?
