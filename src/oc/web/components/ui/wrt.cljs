@@ -29,7 +29,7 @@
                  (rum/local false ::showing-popup)
                  (rum/local false ::under-middle-screen)
                  (rum/local 0 ::left-position)
-                 (rum/local :viewed ::list-view)
+                 (rum/local :seen ::list-view)
 
   [s item-id read-data team-users]
   (let [seen-users (into [] (sort-by utils/name-or-email (map #(assoc % :seen true) (:reads read-data))))
@@ -42,7 +42,7 @@
         query (::query s)
         lower-query (string/lower @query)
         list-view (::list-view s)
-        unsorted-list (if (= @list-view :viewed)
+        unsorted-list (if (= @list-view :seen)
                         seen-users
                         unseen-users)
         filtered-users (if (seq @query)
@@ -79,9 +79,9 @@
              :on-change #(reset! query (.. % -target -value))}]
           [:div.wrt-popup-tabs
             [:button.mlb-reset.wrt-popup-tab.viewed
-              {:class (when (= @list-view :viewed) "active")
-               :on-click #(reset! list-view :viewed)}
-              "Viewed"]
+              {:class (when (= @list-view :seen) "active")
+               :on-click #(reset! list-view :seen)}
+              "Seen"]
             [:button.mlb-reset.wrt-popup-tab.unseen
               {:class (when (= @list-view :unseen) "active")
                :on-click #(reset! list-view :unseen)}
@@ -99,10 +99,10 @@
                   [:div.wrt-popup-list-row-seen
                     {:class (when (:seen u) "seen")}
                     (if (:seen u)
-                      "Viewed"
+                      "Seen"
                       "Not seen")]])
               [:div.wrt-popup-list-row.empty-list
-                {:class (if (= @list-view :viewed) "viewed" "unseen")}
-                (if (= @list-view :viewed)
+                {:class (if (= @list-view :seen) "viewed" "unseen")}
+                (if (= @list-view :seen)
                   [:div.empty-copy.no-viewed "No one has seen this post yet…"]
                   [:div.empty-copy.no-unseen "Everyone has seen this post!"])])]])]))
