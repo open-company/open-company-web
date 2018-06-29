@@ -65,7 +65,7 @@
                 [:div.user-position
                   "Software Engineer"]
                 [:a.linkedin-link
-                  {:href "https://www.linkedin.com/in/iacopocarraro/"
+                  {:href "https://linkedin.com/in/iacopocarraro/"
                    :target "_blank"}]]
               [:div.team-card.sean-johnson
                 [:div.user-avatar]
@@ -76,6 +76,16 @@
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/snootymonkey/"
                    :target "_blank"}]]
+              [:div.team-card.georgiana-laudi
+                [:div.user-avatar]
+                [:div.user-name
+                  "Georgiana Laudi"]
+                [:div.user-position
+                  "Marketing and CX Advisor"]
+                [:a.linkedin-link
+                  {:href "https://linkedin.com/in/georgianalaudi/"
+                   :target "_blank"}]]]
+            [:div.team-row.group.two-cards
               [:div.team-card.stuart-levinson
                 [:div.user-avatar]
                 [:div.user-name
@@ -84,8 +94,7 @@
                   "CEO and co-founder"]
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/stuartlevinson/"
-                   :target "_blank"}]]]
-            [:div.team-row.group.two-cards
+                   :target "_blank"}]]
               [:div.team-card.ryan-le-roux
                 [:div.user-avatar]
                 [:div.user-name
@@ -93,7 +102,7 @@
                 [:div.user-position
                   "CDO"]
                 [:a.linkedin-link
-                  {:href "https://www.linkedin.com/in/ryanleroux/"
+                  {:href "https://linkedin.com/in/ryanleroux/"
                    :target "_blank"}]]
               [:div.team-card.nathan-zorn
                 [:div.user-avatar]
@@ -102,7 +111,7 @@
                 [:div.user-position
                   "Software Engineer"]
                 [:a.linkedin-link
-                  {:href "https://www.linkedin.com/in/nathanzorn/"
+                  {:href "https://linkedin.com/in/nathanzorn/"
                    :target "_blank"}]]]]
 
           [:div.other-cards.group
