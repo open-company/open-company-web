@@ -75,7 +75,7 @@
            :on-click #(show-hide-menu s will-open will-close)
            :class (when @(::showing-menu s) "active")
            :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-           :data-placement "left"
+           :data-placement "top"
            :data-container "body"
            :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
            :title "More"}]
