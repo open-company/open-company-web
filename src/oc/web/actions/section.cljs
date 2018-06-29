@@ -193,7 +193,8 @@
           (section-change section-uuid (:change-at change-data)))
         ;; On item/change :add let's add the UUID to the unseen list of
         ;; the specified container to make sure it's marked as seen
-        (when (= change-type :add)
+        (when (and (= change-type :add)
+                   (not= (:user-id change-data) (jwt/user-id)))
           (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
         (when (= change-type :delete)
           (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))))))
