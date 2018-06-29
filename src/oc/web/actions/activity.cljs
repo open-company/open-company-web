@@ -332,7 +332,7 @@
                     (= (count (:fixed-items board-data)) 1)
                     first-post
                     ;; from CarrotHQ
-                    (= (:user-id first-post-author) "0000-0000-0000"))
+                    (= (:user-id first-post-author) "1111-1111-1111"))
                 ;; has no posts
                (zero? (count (:fixed-items board-data))))))))
 

@@ -63,7 +63,7 @@ div.fullscreen-post-container {
     height: 56px;
     background-color: white;
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
-    padding: 12px 24px;
+    padding: 16px 24px;
     z-index: #{$navbar_zindex + 101};
     text-align: center;
     transition: background-color 180ms ease-in;
@@ -74,7 +74,7 @@ div.fullscreen-post-container {
 
     button.mobile-modal-close-bt {
       background-image: cdnUrl("/img/ML/fullscreen_closing_x.svg");
-      width: 24px;
+      width: 16px;
       height: 24px;
       background-repeat: no-repeat;
       background-size: 14px 14px;
@@ -87,12 +87,13 @@ div.fullscreen-post-container {
     }
 
     div.header-title-container {
-      margin: 6px auto 0px;
+      margin: 2px auto 0px;
       width: auto;
       opacity: 1;
       transition: color 180ms ease-in;
       @include avenir_H();
       font-size: 16px;
+      line-height: 22px;
       color: $deep_navy;
       max-width: 50%;
       overflow: hidden;
@@ -110,16 +111,23 @@ div.fullscreen-post-container {
       top: 16px;
       right: 24px;
 
+      div.tile-menu {
+        margin-top: 0px;
+      }
+
       button.post-publish-bt {
-        position: absolute;
-        top: -8px;
-        right: 0px;
-        height: 40px;
-        padding: 8px 0px 8px 52px;
+        float: right;
+        height: 24px;
+        padding-top: 4px;
         color: white;
         @include avenir_B();
         font-size: 14px;
         transition: opacity 180ms ease-in;
+        opacity: 0.8;
+
+        &:hover {
+          opacity: 1;
+        }
 
         &.loading {
           &:before {
