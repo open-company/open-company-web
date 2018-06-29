@@ -16,7 +16,7 @@ div.more-menu {
     display: inline;
     background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
     background-size: 40px 4px;
-    background-position: 0px 14px;
+    background-position: 0px 15px;
     background-repeat: no-repeat;
     opacity: 0.8;
 
@@ -38,7 +38,7 @@ div.more-menu {
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0.4;
-    margin-left: 6px;
+    margin-left: 7px;
     display: inline-block;
 
     &:hover {
@@ -57,7 +57,7 @@ div.more-menu {
     width: 146px;
     outline: none;
     z-index: 110;
-    background-color: black;
+    background-color: $deep_navy;
     border: 1px solid $deep_tan;
     box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
     border-radius: 5px;
@@ -76,6 +76,7 @@ div.more-menu {
       position: relative;
       margin-top: 16px;
       border-bottom: 1px solid $deep_tan;
+      opacity: 0.9;
 
       &:first-child {
         margin-top: 0px;
