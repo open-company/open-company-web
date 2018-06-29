@@ -15,10 +15,6 @@ div.stream-item {
     div.stream-item-header {
       div.more-menu {
         display: block;
-
-        @include mobile() {
-          display: none;
-        }
       }
     }
 

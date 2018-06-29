@@ -86,7 +86,7 @@
               [:li.delete
                 {:on-click #(delete-clicked % activity-data)}
                 "Delete"])
-            (when share-link
+            (when (and share-link (responsive/is-tablet-or-mobile?))
              [:li.share
                {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
               "Share"])
@@ -101,4 +101,15 @@
                (if (:must-read activity-data)
                  "Unmark"
                  "Must see")]
-              )])])))
+              )])
+          (when (and share-link (not (responsive/is-tablet-or-mobile?)))
+            [:button.mlb-reset.more-menu-share-bt
+              {:type "button"
+               :ref "tile-menu-share-bt"
+               :on-click #(activity-actions/activity-share-show
+                           activity-data
+                           share-container-id)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Share"}])])))
