@@ -31,6 +31,14 @@ div.activity-card {
 
   &:hover {
     div.activity-card-bottom-container {
+      div.activity-card-header {
+        display: none;
+      }
+
+      div.activity-card-header-hover {
+        display: block;
+      }
+
       div.activity-card-footer {
         display: none;
       }
@@ -44,16 +52,6 @@ div.activity-card {
   &.new-item {
     div.new-tag {
       display: block;
-    }
-
-    div.activity-card-bottom-container {
-      div.activity-card-header {
-        display: none;
-      }
-
-      div.activity-card-header-hover {
-        display: block;
-      }
     }
   }
 
