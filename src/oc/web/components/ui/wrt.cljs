@@ -27,6 +27,9 @@
       (- (- win-width 40) (+ el-offset-left 360))
       0)))
 
+(def default-appear-delay 100)
+(def default-disappear-delay 500)
+
 (rum/defcs wrt < rum/reactive
                  ;; Derivatives
                  (drv/drv :team-roster)
@@ -36,6 +39,7 @@
                  (rum/local false ::under-middle-screen)
                  (rum/local 0 ::left-position)
                  (rum/local :seen ::list-view)
+                 (rum/local nil ::show-delay)
 
                  {:after-render (fn [s] (.tooltip (js/$ "[data-toggle=\"tooltip\"]")) s)}
 
@@ -66,11 +70,29 @@
        :on-mouse-over #(when (and (not is-mobile?)
                                   (not (:reads read-data)))
                         (su/request-reads-data item-id))
-       :on-mouse-enter #(when-not is-mobile?
-                          (reset! (::showing-popup s) true)
-                          (reset! (::under-middle-screen s) (under-middle-screen? (rum/ref-node s :wrt-count)))
-                          (reset! (::left-position s) (calc-left-position (rum/ref-node s :wrt-count))))
-       :on-mouse-leave #(reset! (::showing-popup s) false)}
+       :on-mouse-enter (fn [_]
+                         (when-not is-mobile?
+                           (reset! (::under-middle-screen s) (under-middle-screen? (rum/ref-node s :wrt-count)))
+                           (reset! (::left-position s) (calc-left-position (rum/ref-node s :wrt-count)))
+                           (if @(::show-delay s)
+                             (do
+                               (.clearInterval js/window @(::show-delay s))
+                               (reset! (::show-delay s) nil))
+                             (reset! (::show-delay s)
+                              (utils/after default-appear-delay
+                               #(do
+                                 (reset! (::show-delay s) false)
+                                 (reset! (::showing-popup s) true)))))))
+       :on-mouse-leave (fn [_]
+                         (if @(::show-delay s)
+                          (do
+                            (.clearInterval js/window @(::show-delay s))
+                            (reset! (::show-delay s) nil))
+                          (reset! (::show-delay s)
+                           (utils/after default-disappear-delay
+                            #(do
+                              (reset! (::show-delay s) nil)
+                              (reset! (::showing-popup s) false))))))}
       [:div.wrt-count
         {:ref :wrt-count}
         (if read-count
