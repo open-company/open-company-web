@@ -126,8 +126,9 @@
                                       (reset! (::showing-popup s) false)
                                       ;; Show the share popup
                                       (activity-actions/activity-share-show activity-data share-container-id share-medium))}])]])
-              [:div.wrt-popup-list-row.empty-list
-                {:class (if (= @list-view :seen) "viewed" "unseen")}
-                (if (= @list-view :seen)
-                  [:div.empty-copy.no-viewed "No one has seen this post yet…"]
-                  [:div.empty-copy.no-unseen "Everyone has seen this post!"])])]])]))
+              (when-not (seq @query)
+                [:div.wrt-popup-list-row.empty-list
+                  {:class (if (= @list-view :seen) "viewed" "unseen")}
+                  (if (= @list-view :seen)
+                    [:div.empty-copy.no-viewed "No one has seen this post yet…"]
+                    [:div.empty-copy.no-unseen "Everyone has seen this post!"])]))]])]))
