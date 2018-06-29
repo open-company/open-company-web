@@ -37,7 +37,7 @@ div.more-menu {
     box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
     border-radius: 5px;
     margin: 0;
-    padding: 24px;
+    padding: 12px 24px 12px 24px;
     list-style-type: none;
 
     li {
@@ -47,8 +47,10 @@ div.more-menu {
       color: white;
       cursor: pointer;
       padding-left: 32px;
+      padding-bottom: 32px;
       position: relative;
       margin-top: 16px;
+      border-bottom: 1px solid $deep_tan;
 
       &:first-child {
         margin-top: 0px;
@@ -76,12 +78,16 @@ div.more-menu {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_mustsee.svg");
         }
+        border: none;
+        padding-bottom: 0px;
       }
 
       &.must-see-on {
         &:before {
           background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
         }
+        border: none;
+        padding-bottom: 0px;
       }
 
       &:before {
