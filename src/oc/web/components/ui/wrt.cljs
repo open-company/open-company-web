@@ -27,7 +27,7 @@
       (- (- win-width 40) (+ el-offset-left 360))
       0)))
 
-(def default-appear-delay 100)
+(def default-appear-delay 30)
 (def default-disappear-delay 500)
 
 (rum/defcs wrt < rum/reactive
