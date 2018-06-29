@@ -13,7 +13,7 @@ div.stream-item {
 
   &:hover {
     div.stream-item-header {
-      div.tile-menu {
+      div.more-menu {
         display: block;
 
         @include mobile() {
@@ -53,16 +53,6 @@ div.stream-item {
   div.stream-item-header {
     @include mobile() {
       width: 100%;
-    }
-
-    div.tile-menu {
-      display: none;
-      margin-top: -8px;
-      margin-right: -10px;
-
-      @include mobile() {
-        display: none;
-      }
     }
 
     div.more-menu {
@@ -142,7 +132,7 @@ div.stream-item {
       }
 
       div.must-read {
-        display: none;
+        display: inline;
         padding-left: 16px;
         padding-bottom: 10px;
         padding-top: 6px;
@@ -157,19 +147,9 @@ div.stream-item {
         background-repeat: no-repeat;
         background-position: 4px 0px;
         margin-left: 8px;
-        cursor: pointer;
-
-        &:hover {
-          background-image: cdnUrl("/img/ML/must_see_bolt.svg");
-        }
 
         &.must-see-on {
           background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-          display: inline;
-
-          &:hover {
-            background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-          }
         }
 
         @include mobile() {
