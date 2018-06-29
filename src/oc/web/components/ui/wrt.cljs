@@ -3,6 +3,7 @@
             [cuerdas.core :as string]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.section :as su]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn filter-by-query [user query]
@@ -43,12 +44,14 @@
                            "seen" seen-users
                            "unseen" (filter #(not (:seen %)) unseen-users)
                            (filterv #(filter-by-query % (string/lower @query)) all-users))
-                         all-users)]
+                         all-users)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-container
       {:class (when seen-users "has-read-list")
-       :on-mouse-over #(when-not (:reads read-data)
+       :on-mouse-over #(when (and (not is-mobile?)
+                                  (not (:reads read-data)))
                         (su/request-reads-data item-id))
-       :on-mouse-enter #(do
+       :on-mouse-enter #(when-not is-mobile?
                           (reset! (::showing-popup s) true)
                           (reset! (::under-middle-screen s) (under-middle-screen? (rum/ref-node s :wrt-count)))
                           (reset! (::left-position s) (calc-left-position (rum/ref-node s :wrt-count))))
