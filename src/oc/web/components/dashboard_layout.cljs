@@ -299,9 +299,9 @@
                   [:div.add-post-tooltip-icon]
                   [:div.add-post-tooltips
                     [:div.add-post-tooltip
-                      "Get started by creating a new post to share an update, announcement, or plans."]
+                      "Welcome! Now you’re ready to post new updates and information for your team."]
                     [:div.add-post-tooltip.second-line
-                      "The sample post below can be deleted anytime."]]
+                      "You can delete this sample post anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
                     {:on-click compose-fn}
