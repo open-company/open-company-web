@@ -122,6 +122,8 @@ div.wrt-container {
           }
         }
 
+        $row_right_label_max_width: 110px;
+
         div.wrt-popup-list-row-name {
           float: left;
           margin-left: 8px;
@@ -132,7 +134,7 @@ div.wrt-container {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          max-width: calc(100% - 32px - 8px - 8px - 80px);
+          max-width: calc(100% - 32px - 8px - 8px - $row_right_label_max_width);
         }
 
         &:hover {
@@ -149,7 +151,7 @@ div.wrt-container {
           color: $deep_navy;
           float: right;
           text-align: right;
-          max-width: 80px;
+          max-width: $row_right_label_max_width;
           line-height: 32px;
           overflow: hidden;
           text-overflow: ellipsis;
