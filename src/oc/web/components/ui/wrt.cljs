@@ -110,7 +110,6 @@
                     (utils/name-or-email u)]
                   [:div.wrt-popup-list-row-seen
                     {:class (when (:seen u) "seen")}
-                    (js/console.log "DBG user" u)
                     (if (:seen u)
                       ;; Show time the read happened
                       (utils/time-since (:read-at u))
