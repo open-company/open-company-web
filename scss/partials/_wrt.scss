@@ -57,12 +57,35 @@ div.wrt-container {
       }
     }
 
+    div.wrt-popup-tabs {
+      margin-top: 16px;
+      width: 100%;
+      height: 33px;
+      border-bottom: 1px solid #ECECEC;
+
+      button.wrt-popup-tab {
+        height: 33px;
+        border-bottom: 1px solid transparent;
+        @include avenir_B();
+        font-size: 13px;
+        color: $deep_navy;
+        line-height: 33px;
+        text-transform: uppercase;
+        float: left;
+        margin-right: 24px;
+
+        &.active {
+          border-bottom: 1px solid $carrot_orange;
+          color: $carrot_orange;
+        }
+      }
+    }
+
     div.wrt-popup-list {
       margin: 24px 0px 0px 0px;
       width: calc(100% + 48px);
       margin-left: -24px;
       padding: 0px 24px;
-      border-top: 1px solid #ECECEC;
 
       div.wrt-popup-list-row {
         padding: 16px 0px;
@@ -123,8 +146,51 @@ div.wrt-container {
             color: $light_ui_grey;
           }
         }
+
+        &.empty-list {
+          text-align: center;
+          padding-top: 8px;
+
+          div.empty-copy {
+            height: 32px;
+            text-align: left;
+            padding-left: 32px;
+            @include avenir_R();
+            font-size: 14px;
+            color: $ui_grey;
+            line-height: 32px;
+            position: relative;
+
+            &:before {
+              content: "";
+              position: absolute;
+              top: 0px;
+              left: 0px;
+              width: 23px;
+              height: 29px;
+              background-position: center;
+              background-repeat: no-repeat;
+              background-size: 23px 29px;
+            }
+
+            &.no-viewed {
+              width: 234px;
+              margin-left: 38px;
+              &:before {
+                background-image: cdnUrl("/img/ML/no_viewed.svg");
+              }
+            }
+
+            &.no-unseen{
+              width: 214px;
+              margin-left: 48px;
+              &:before {
+                background-image: cdnUrl("/img/ML/no_unseen.svg");
+              }
+            }
+          }
+        }
       }
     }
-
   }
 }

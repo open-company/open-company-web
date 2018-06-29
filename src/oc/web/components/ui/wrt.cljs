@@ -29,6 +29,8 @@
                  (rum/local false ::showing-popup)
                  (rum/local false ::under-middle-screen)
                  (rum/local 0 ::left-position)
+                 (rum/local :viewed ::list-view)
+
   [s item-id read-data team-users]
   (let [seen-users (into [] (sort-by utils/name-or-email (map #(assoc % :seen true) (:reads read-data))))
         seen-ids (set (map :user-id seen-users))
@@ -39,12 +41,14 @@
         read-count (:count read-data)
         query (::query s)
         lower-query (string/lower @query)
+        list-view (::list-view s)
+        unsorted-list (if (= @list-view :viewed)
+                        seen-users
+                        unseen-users)
         filtered-users (if (seq @query)
-                         (case lower-query
-                           "seen" seen-users
-                           "unseen" (filter #(not (:seen %)) unseen-users)
-                           (filterv #(filter-by-query % (string/lower @query)) all-users))
-                         all-users)
+                         (filterv #(filter-by-query % (string/lower @query)) unsorted-list)
+                         unsorted-list)
+        sorted-filtered-users (sort-by utils/name-or-email filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-container
       {:class (when seen-users "has-read-list")
@@ -71,19 +75,34 @@
           [:input.wrt-popup-query
             {:value @query
              :type "text"
-             :placeholder "Find a person or seen/unseen..."
+             :placeholder "Find a person..."
              :on-change #(reset! query (.. % -target -value))}]
+          [:div.wrt-popup-tabs
+            [:button.mlb-reset.wrt-popup-tab.viewed
+              {:class (when (= @list-view :viewed) "active")
+               :on-click #(reset! list-view :viewed)}
+              "Viewed"]
+            [:button.mlb-reset.wrt-popup-tab.unseen
+              {:class (when (= @list-view :unseen) "active")
+               :on-click #(reset! list-view :unseen)}
+              "Unseen"]]
           [:div.wrt-popup-list
-            (for [u filtered-users]
-              [:div.wrt-popup-list-row
-                {:key (str "wrt-popup-row-" (:user-id u))}
-                [:div.wrt-popup-list-row-avatar
-                  {:class (when (:seen u) "seen")}
-                  (user-avatar-image u)]
-                [:div.wrt-popup-list-row-name
-                  (utils/name-or-email u)]
-                [:div.wrt-popup-list-row-seen
-                  {:class (when (:seen u) "seen")}
-                  (if (:seen u)
-                    "Viewed"
-                    "Not seen")]])]])]))
+            (if (pos? (count sorted-filtered-users))
+              (for [u sorted-filtered-users]
+                [:div.wrt-popup-list-row
+                  {:key (str "wrt-popup-row-" (:user-id u))}
+                  [:div.wrt-popup-list-row-avatar
+                    {:class (when (:seen u) "seen")}
+                    (user-avatar-image u)]
+                  [:div.wrt-popup-list-row-name
+                    (utils/name-or-email u)]
+                  [:div.wrt-popup-list-row-seen
+                    {:class (when (:seen u) "seen")}
+                    (if (:seen u)
+                      "Viewed"
+                      "Not seen")]])
+              [:div.wrt-popup-list-row.empty-list
+                {:class (if (= @list-view :viewed) "viewed" "unseen")}
+                (if (= @list-view :viewed)
+                  [:div.empty-copy.no-viewed "No one has seen this post yet…"]
+                  [:div.empty-copy.no-unseen "Everyone has seen this post!"])])]])]))
