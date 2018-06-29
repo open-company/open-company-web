@@ -23,7 +23,6 @@
                         ;; Derivatives
                         (drv/drv :org-data)
                         (drv/drv :comments-data)
-                        (drv/drv :team-data)
                         ;; Mixins
                         (am/truncate-element-mixin "activity-headline" (* 18 2))
                         {:after-render (fn [s]
@@ -49,7 +48,6 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
-        team-data (drv/react s :team-data)
         activity-time (or (:published-at activity-data) (:created-at activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
@@ -85,7 +83,7 @@
           [:span.board-name (:board-name activity-data)]
           [:div.separator]
           [:div.activity-card-wrt
-            (wrt (:uuid activity-data) read-data (:users team-data))]]
+            (wrt activity-data read-data dom-element-id)]]
         [:div.activity-card-headline.ap-seen-item-headline
           {:ref "activity-headline"
            :data-itemuuid (:uuid activity-data)

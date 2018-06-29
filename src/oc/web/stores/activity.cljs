@@ -144,16 +144,18 @@
     (assoc-in db board-key next-board-data)))
 
 (defmethod dispatcher/action :activity-share-show
-  [db [_ activity-data container-element-id]]
+  [db [_ activity-data container-element-id share-medium]]
   (-> db
     (assoc :activity-share {:share-data activity-data})
     (assoc :activity-share-container container-element-id)
+    (assoc :activity-share-medium share-medium)
     (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_]]
   (-> db
     (dissoc :activity-share)
+    (dissoc :activity-share-medium)
     (dissoc :activity-share-container)))
 
 (defmethod dispatcher/action :activity-share-reset

@@ -470,8 +470,8 @@
   (api/delete-activity activity-data activity-delete-finish)
   (dis/dispatch! [:activity-delete (dis/current-board-key) activity-data]))
 
-(defn activity-share-show [activity-data & [element-id]]
-  (dis/dispatch! [:activity-share-show activity-data element-id]))
+(defn activity-share-show [activity-data & [element-id share-medium]]
+  (dis/dispatch! [:activity-share-show activity-data element-id share-medium]))
 
 (defn activity-share-hide []
   (dis/dispatch! [:activity-share-hide]))

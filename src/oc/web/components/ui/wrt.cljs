@@ -1,9 +1,11 @@
 (ns oc.web.components.ui.wrt
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.section :as su]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn filter-by-query [user query]
@@ -25,14 +27,23 @@
       (- (- win-width 40) (+ el-offset-left 360))
       0)))
 
-(rum/defcs wrt < (rum/local "" ::query)
+(rum/defcs wrt < rum/reactive
+                 ;; Derivatives
+                 (drv/drv :team-roster)
+                 ;; Locals
+                 (rum/local "" ::query)
                  (rum/local false ::showing-popup)
                  (rum/local false ::under-middle-screen)
                  (rum/local 0 ::left-position)
                  (rum/local :seen ::list-view)
 
-  [s item-id read-data team-users]
-  (let [seen-users (into [] (sort-by utils/name-or-email (map #(assoc % :seen true) (:reads read-data))))
+                 {:after-render (fn [s] (.tooltip (js/$ "[data-toggle=\"tooltip\"]")) s)}
+
+  [s activity-data read-data share-container-id]
+  (let [item-id (:uuid activity-data)
+        team-roster (drv/react s :team-roster)
+        team-users (filter #(= (:status %) "active") (:users team-roster))
+        seen-users (into [] (sort-by utils/name-or-email (map #(assoc % :seen true) (:reads read-data))))
         seen-ids (set (map :user-id seen-users))
         all-ids (set (map :user-id team-users))
         unseen-ids (clojure.set/difference all-ids seen-ids)
@@ -88,7 +99,8 @@
               "Unseen"]]
           [:div.wrt-popup-list
             (if (pos? (count sorted-filtered-users))
-              (for [u sorted-filtered-users]
+              (for [u sorted-filtered-users
+                    :let [slack-user? (contains? u :slack-users)]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))}
                   [:div.wrt-popup-list-row-avatar
@@ -98,9 +110,23 @@
                     (utils/name-or-email u)]
                   [:div.wrt-popup-list-row-seen
                     {:class (when (:seen u) "seen")}
+                    (js/console.log "DBG user" u)
                     (if (:seen u)
-                      "Seen"
-                      "Not seen")]])
+                      ;; Show time the read happened
+                      (utils/time-since (:read-at u))
+                      ;; Send reminder button
+                      [:button.mlb-reset.button.send-remainder-bt
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :class (if slack-user? "slack" "email")
+                         :title "Send remainder"
+                         :on-click #(let [share-medium (if slack-user? :slack :email)]
+                                      ;; Hide the WRT popup
+                                      (reset! (::showing-popup s) false)
+                                      ;; Show the share popup
+                                      (activity-actions/activity-share-show activity-data share-container-id share-medium))}])]])
               [:div.wrt-popup-list-row.empty-list
                 {:class (if (= @list-view :seen) "viewed" "unseen")}
                 (if (= @list-view :seen)

@@ -52,7 +52,6 @@
                          (drv/drv :org-data)
                          (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
-                         (drv/drv :team-data)
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
@@ -100,8 +99,7 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
-        dom-node-class (str "stream-item-" (:uuid activity-data))
-        team-data (drv/react s :team-data)]
+        dom-node-class (str "stream-item-" (:uuid activity-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
@@ -142,7 +140,7 @@
                 (utils/time-since t)])]
           [:div.separator]
           [:div.stream-item-wrt
-            (wrt (:uuid activity-data) read-data (:users team-data))]]
+            (wrt activity-data read-data dom-element-id)]]
         (when (and (not is-mobile?)
                    (not is-drafts-board))
           (tile-menu activity-data dom-element-id))

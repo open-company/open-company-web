@@ -215,6 +215,7 @@
                           (fn [base]
                             (:alert-modal base))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
+   :activity-share-medium [[:base] (fn [base] (:activity-share-medium base))]
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share

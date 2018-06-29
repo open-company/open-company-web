@@ -131,7 +131,16 @@ div.wrt-container {
           line-height: 32px;
           overflow: hidden;
           text-overflow: ellipsis;
-          max-width: calc(100% - 32px - 8px - 8px - 58px);
+          white-space: nowrap;
+          max-width: calc(100% - 32px - 8px - 8px - 80px);
+        }
+
+        &:hover {
+          div.wrt-popup-list-row-seen {
+            button.send-remainder-bt {
+              display: block;
+            }
+          }          
         }
 
         div.wrt-popup-list-row-seen {
@@ -139,11 +148,39 @@ div.wrt-container {
           font-size: 14px;
           color: $deep_navy;
           float: right;
-          max-width: 58px;
+          text-align: right;
+          max-width: 80px;
           line-height: 32px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
 
           &.seen {
             color: $light_ui_grey;
+          }
+
+          button.send-remainder-bt {
+            background-position: right 9px;
+            background-repeat: no-repeat;
+            width: 24px;
+            height: 24px;
+            float: right;
+            display: none;
+            opacity: 0.6;
+
+            &:hover {
+              opacity: 1;
+            }
+
+            &.email {
+              background-image: cdnUrl("/img/ML/reminder_email.svg");
+              background-size: 16px 13px;
+            }
+
+            &.slack {
+              background-image: cdnUrl("/img/ML/slack_remainder.svg");
+              background-size: 16px 16px;
+            }
           }
         }
 
