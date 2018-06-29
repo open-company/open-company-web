@@ -133,6 +133,10 @@ div.about-wrap {
               @include image-2x("/img/ML/about_team_sean_johnson");
             }
 
+            &.georgiana-laudi div.user-avatar {
+              @include image-2x("/img/ML/about_team_georgiana_laudi");
+            }
+
             &.stuart-levinson div.user-avatar {
               @include image-2x("/img/ML/about_team_stuart_levinson");
             }
@@ -163,7 +167,7 @@ div.about-wrap {
 
             div.user-position {
               @include avenir_R();
-              font-size: 18px;
+              font-size: 16px;
               color: rgba($carrot_light_gray_3, 0.8);
               line-height: 27px;
             }

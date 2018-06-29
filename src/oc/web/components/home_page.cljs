@@ -47,8 +47,8 @@
             "Thoughtful team communication"]
           [:div.subheadline
             (str
-             "Rise above the noise of real-time chat and overstuffed inboxes "
-             "to keep growing and distributed teams aligned.")]
+             "Rise above the noise of chat and email inboxes to keep "
+             "growing and remote teams aligned.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container
             [:button.mlb-reset.get-started-button
