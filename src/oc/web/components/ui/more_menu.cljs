@@ -11,6 +11,17 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
+(defn show-hide-menu
+  [s will-open will-close]
+  (utils/remove-tooltips)
+  (let [next-showing-menu (not @(::showing-menu s))]
+    (if next-showing-menu
+      (when (fn? will-open)
+        (will-open))
+      (when (fn? will-close)
+        (will-close)))
+    (reset! (::showing-menu s) next-showing-menu)))
+
 ;; Delete handling
 
 (defn delete-clicked [e activity-data]
@@ -61,15 +72,7 @@
         [:button.mlb-reset.more-menu-bt
           {:type "button"
            :ref "more-menu-bt"
-           :on-click (fn [_]
-                       (utils/remove-tooltips)
-                       (let [next-showing-menu (not @(::showing-menu s))]
-                        (if next-showing-menu
-                          (when (fn? will-open)
-                            (will-open))
-                          (when (fn? will-close)
-                            (will-close)))
-                        (reset! (::showing-menu s) next-showing-menu)))
+           :on-click #(show-hide-menu s will-open will-close)
            :class (when @(::showing-menu s) "active")
            :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
            :data-placement "left"
@@ -78,6 +81,7 @@
            :title "More"}]
         (when @(::showing-menu s)
           [:ul.more-menu-list
+             {:on-mouse-leave #(show-hide-menu s will-open will-close)}
             (when edit-link
               [:li.edit
                 {:on-click #(activity-actions/activity-edit activity-data)}
