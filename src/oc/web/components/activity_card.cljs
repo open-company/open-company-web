@@ -114,7 +114,7 @@
                   [:span.attachments-count
                     (count (:attachments activity-data))]
                   [:span.attachments-icon]])
-              (when (:must-read activity-data)
-                [:div.activity-card-must-read
+              (when (:must-see activity-data)
+                [:div.activity-card-must-see
                  {:class (utils/class-set {:must-see-on
-                                           (:must-read activity-data)})}])]])]]))
+                                           (:must-see activity-data)})}])]])]]))

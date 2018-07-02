@@ -92,7 +92,7 @@
       (if (utils/link-for (:links org-data) "activity")
         ;; Load all posts only if not coming from a digest url
         ;; in that case do not load since we already have the results we need
-        (aa/must-read-get org-data)
+        (aa/must-see-get org-data)
         (digest-button-check))
 
       ; If there is a board slug let's load the board data

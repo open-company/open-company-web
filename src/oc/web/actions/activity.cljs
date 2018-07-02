@@ -62,25 +62,25 @@
   (api/load-more-all-posts more-link direction (partial all-posts-more-finish direction))
   (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
 
-;; Must read
-(defn must-read-get-finish
+;; Must see
+(defn must-see-get-finish
   [{:keys [success body]}]
     (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
-          must-read-data (when success (json->cljs body))
-          must-read-posts (au/fix-all-posts (:collection must-read-data))]
+          must-see-data (when success (json->cljs body))
+          must-see-posts (au/fix-all-posts (:collection must-see-data))]
       (when (= (router/current-board-slug) "must-see")
         (save-last-used-section "must-see"))
-      (watch-boards must-read-posts)
-      (dis/dispatch! [:must-read-get/finish org must-read-posts]))))
+      (watch-boards must-see-posts)
+      (dis/dispatch! [:must-see-get/finish org must-see-posts]))))
 
-(defn must-read-get [org-data]
+(defn must-see-get [org-data]
   (when-let [activity-link (utils/link-for (:links org-data) "activity")]
     (let [activity-href (:href activity-link)
-          must-read-filter (str activity-href "?must-read=true")
-          must-read-link (assoc activity-link :href must-read-filter)]
-      (api/get-all-posts must-read-link nil (partial must-read-get-finish)))))
+          must-see-filter (str activity-href "?must-see=true")
+          must-see-link (assoc activity-link :href must-see-filter)]
+      (api/get-all-posts must-see-link nil (partial must-see-get-finish)))))
 
 ;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]
@@ -503,22 +503,22 @@
 (defn secure-activity-get []
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
-(defn toggle-must-read [activity-data]
-  (let [must-read (:must-read activity-data)
-        must-read-toggled (assoc activity-data :must-read (not must-read))
+(defn toggle-must-see [activity-data]
+  (let [must-see (:must-see activity-data)
+        must-see-toggled (assoc activity-data :must-see (not must-see))
         org-data (dis/org-data)
-        must-read-count (:must-read-count dis/org-data)
-        new-must-read-count (if (not must-read)
-                              (+ must-read-count 1)
-                              (- must-read-count 1))]
+        must-see-count (:must-see-count dis/org-data)
+        new-must-see-count (if (not must-see)
+                              (+ must-see-count 1)
+                              (- must-see-count 1))]
     (dis/dispatch! [:org-loaded
-                    (assoc org-data :must-read-count new-must-read-count)
+                    (assoc org-data :must-see-count new-must-see-count)
                     false])
     (dis/dispatch! [:entry
                     (dis/current-board-key)
                     (:uuid activity-data)
-                    must-read-toggled])
-    (api/update-entry must-read-toggled :must-read
+                    must-see-toggled])
+    (api/update-entry must-see-toggled :must-see
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success
                           (api/get-org org-data

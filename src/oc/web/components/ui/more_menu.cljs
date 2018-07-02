@@ -97,12 +97,12 @@
             (when edit-link
               [:li
                {:class (utils/class-set
-                         {:must-see (not (:must-read activity-data))
-                          :must-see-on (:must-read activity-data)})
+                         {:must-see (not (:must-see activity-data))
+                          :must-see-on (:must-see activity-data)})
                 :on-click #(do
                              (utils/event-stop %)
-                             (activity-actions/toggle-must-read activity-data))}
-               (if (:must-read activity-data)
+                             (activity-actions/toggle-must-see activity-data))}
+               (if (:must-see activity-data)
                  "Unmark"
                  "Must see")]
               )])

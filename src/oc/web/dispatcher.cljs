@@ -29,7 +29,7 @@
 (defn all-posts-key [org-slug]
   (vec (concat (boards-key org-slug) [:all-posts :board-data])))
 
-(defn must-read-key [org-slug]
+(defn must-see-key [org-slug]
   (vec (concat (boards-key org-slug) [:must-see :board-data])))
 
 (defn change-data-key [org-slug]
@@ -73,7 +73,7 @@
   []
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
-        ;; if we are coming from all-posts, must-read
+        ;; if we are coming from all-posts, must-see
     (cond
 
      (or (:from-all-posts @router/path) (= board-slug "all-posts"))
@@ -81,7 +81,7 @@
      (all-posts-key org-slug)
 
      (= board-slug "must-see")
-     (must-read-key org-slug)
+     (must-see-key org-slug)
 
      :default
      (board-data-key org-slug board-slug))))
@@ -160,7 +160,7 @@
    :must-see        [[:base :org-slug]
                           (fn [base org-slug]
                             (when (and base org-slug)
-                              (get-in base (must-read-key org-slug))))]
+                              (get-in base (must-see-key org-slug))))]
 
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
@@ -392,14 +392,14 @@
   ([data org-slug]
     (get-in data (all-posts-key org-slug))))
 
-(defn must-read-data
-  "Get org must-read data."
+(defn must-see-data
+  "Get org must-see data."
   ([]
-    (must-read-data @app-state))
+    (must-see-data @app-state))
   ([data]
-    (must-read-data data (router/current-org-slug)))
+    (must-see-data data (router/current-org-slug)))
   ([data org-slug]
-    (get-in data (must-read-key org-slug))))
+    (get-in data (must-see-key org-slug))))
 
 (defn change-data
   "Get change data."

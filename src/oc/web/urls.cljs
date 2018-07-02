@@ -94,10 +94,10 @@
   ([org-slug]
     (str (org org-slug) "/all-posts")))
 
-(defn must-read
-  "Org must read url"
+(defn must-see
+  "Org must see url"
   ([]
-    (must-read (router/current-org-slug)))
+    (must-see (router/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/must-see")))
 

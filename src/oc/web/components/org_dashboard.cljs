@@ -52,7 +52,7 @@
 
         (= (router/current-board-slug) "must-see")
         (do
-          (activity-actions/must-read-get org-data)
+          (activity-actions/must-see-get org-data)
           (utils/after 2000
             #(section-actions/load-other-sections (:boards org-data))))
 

@@ -152,9 +152,9 @@
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
-        is-must-read (utils/in? (:route route) "must-see")
+        is-must-see (utils/in? (:route route) "must-see")
         board-data (cond
-                     is-must-read
+                     is-must-see
                      must-see-data
 
                      :default
@@ -220,7 +220,7 @@
                                                  is-all-posts
                                                  #js {"__html" "All posts"}
 
-                                                 is-must-read
+                                                 is-must-see
                                                  #js {"__html" "Must see"}
 
                                                  :default
@@ -228,7 +228,7 @@
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)
-                             (not is-must-read)
+                             (not is-must-see)
                              (not (:read-only board-data)))
                     [:div.board-settings-container.group
                       [:button.mlb-reset.board-settings-bt

@@ -138,10 +138,10 @@
           [:div.stream-item-headline
             {:ref "activity-headline"
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          (when (:must-read activity-data)
-            [:div.must-read
+          (when (:must-see activity-data)
+            [:div.must-see
              {:class (utils/class-set {:must-see-on
-                                       (:must-read activity-data)})}])
+                                       (:must-see activity-data)})}])
           [:div.stream-item-body-container
             [:div.stream-item-body
               {:class (utils/class-set {:expanded expanded?})}
