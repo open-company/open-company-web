@@ -118,13 +118,6 @@
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
-(defn slack-lander-new-user []
-  (cook/set-cookie!
-   (router/show-nux-cookie
-    (jwt/get-key :user-id))
-   (:new-user router/nux-cookie-values)
-   (* 60 60 24 7)))
-
 (defn slack-lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point
     (fn [success body]
@@ -266,8 +259,8 @@
     (do
       (update-jwt-cookie jwt)
       (cook/set-cookie!
-       (router/show-nux-cookie (jwt/user-id))
-       (:new-user router/nux-cookie-values)
+       (router/new-user-cookie (jwt/user-id))
+       "email"
        (* 60 60 24 7))
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
@@ -304,8 +297,8 @@
             (utils/after 200 #(router/nav! oc-urls/login)))
           (do
             (cook/set-cookie!
-             (router/show-nux-cookie (jwt/user-id))
-             (:new-user router/nux-cookie-values)
+             (router/new-user-cookie (jwt/user-id))
+             "email"
              (* 60 60 24 7))
             (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))

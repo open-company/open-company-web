@@ -710,8 +710,8 @@
                                    (empty? (jwt/get-key :last-name)))
                             (do
                               (cook/set-cookie!
-                               (router/show-nux-cookie (jwt/user-id))
-                               (:new-user router/nux-cookie-values)
+                               (router/new-user-cookie (jwt/user-id))
+                               "email"
                                (* 60 60 24 7))
                               (router/nav! oc-urls/confirm-invitation-profile))
                             (router/nav! (oc-urls/org (:slug org))))

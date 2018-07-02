@@ -150,15 +150,7 @@
   (drv-root home-page target))
 
 (defn check-nux [query-params]
-  (let [nux-setup-time 3000
-        has-at-param (contains? query-params :at)
-        nux-cookie (cook/get-cookie
-                    (router/show-nux-cookie
-                     (jwt/get-key :user-id)))
-        show-nux (and (not (:show-login-overlay @dis/app-state))
-                      (jwt/jwt)
-                      (or (some #(= % nux-cookie) (vals router/nux-cookie-values))
-                          (contains? query-params :show-nux-again-please)))
+  (let [has-at-param (contains? query-params :at)
         loading (or (and ;; if is board page
                          (not (contains? query-params :ap))
                          ;; if the board data are not present
@@ -176,17 +168,12 @@
         bot-access (when (and (contains? query-params :access)
                               (= (:access query-params) "bot"))
                       :slack-bot-success-notification)
-        next-app-state {:nux (when show-nux :1)
-                        :loading loading
+        next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :user-settings user-settings
-                        :nux-loading show-nux
-                        :bot-access bot-access
-                        :nux-end nil}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))
-        (utils/after nux-setup-time
-         #(swap! dis/app-state assoc :nux-end true))))
+                        :bot-access bot-access}]
+        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -283,9 +270,9 @@
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
       (cook/set-cookie!
-       (router/show-nux-cookie
+       (router/new-user-cookie
         (jwt/get-key :user-id))
-       (:new-user router/nux-cookie-values)
+       "slack"
        (* 60 60 24 7)))
     (if new-user
       (utils/after 100 #(router/nav! urls/sign-up-profile))

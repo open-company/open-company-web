@@ -332,7 +332,7 @@
   ;; Add the cookie to show the add post tooltip
   (cook/set-cookie! (router/show-add-post-tooltip-cookie) true (* 60 60 24 365))
   (check-add-post-tooltip)
-  (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
+  (cook/remove-cookie! (router/new-user-cookie (jwt/user-id)))
   (dis/dispatch! [:nux-end]))
 
 (defn add-attachment [dispatch-input-key attachment-data]

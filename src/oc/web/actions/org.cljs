@@ -133,11 +133,6 @@
 ;; Org redirect
 
 (defn org-redirect [org-data]
-  ;; Show NUX for first ever user when the dashboard is loaded
-  (cook/set-cookie!
-   (router/show-nux-cookie (jwt/user-id))
-   (:first-ever-user router/nux-cookie-values)
-   (* 60 60 24 7))
   (when org-data
     (let [org-slug (:slug org-data)]
       (utils/after 100 #(router/redirect! (oc-urls/all-posts org-slug))))))
