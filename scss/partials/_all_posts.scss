@@ -54,7 +54,7 @@ div.all-posts {
         div.top-loading-message {
           top: 300px;
           position: absolute;
-          width: #{$bpard_container_width - 100}px;
+          width: #{$board_container_width - 100}px;
           color: rgba($oc_gray_7, 0.5);
           font-size: 16px;
           @include avenir_M();
