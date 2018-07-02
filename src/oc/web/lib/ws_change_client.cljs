@@ -28,12 +28,16 @@
 (defun container-watch
   ([watch-id :guard string?]
     (timbre/debug "Adding container/watch for:" watch-id)
-    (swap! container-ids conj watch-id)
-    (container-watch))
+    (container-watch [watch-id]))
 
   ([watch-ids :guard sequential?]
     (timbre/debug "Adding container/watch for:" watch-ids)
-    (swap! container-ids concat watch-ids)
+    ;; Remove duplicated sections by moving old and new ids into sets
+    ;; and replacing with the union of the 2.
+    (let [current-set (set @container-ids)
+          new-set (set watch-ids)
+          union-set (clojure.set/union current-set new-set)]
+      (reset! container-ids (into [] union-set)))
     (container-watch))
 
   ([]

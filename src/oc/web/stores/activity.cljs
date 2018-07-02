@@ -220,7 +220,7 @@
   [db [_ org direction all-posts-data]]
   (if all-posts-data
     (let [all-posts-key (dispatcher/all-posts-key org)
-          fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
+          fixed-all-posts (au/fix-all-posts (:collection all-posts-data) (dispatcher/change-data db))
           old-all-posts (get-in db all-posts-key)
           next-links (vec
                       (remove

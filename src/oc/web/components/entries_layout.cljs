@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.activity-card :refer (activity-card)]
@@ -39,6 +40,7 @@
                           ;; Mixins
                           (mixins/load-more-items 400)
                           (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
+                          section-mixins/container-nav-in
 
                           {:init (fn [s]
                             (-> s

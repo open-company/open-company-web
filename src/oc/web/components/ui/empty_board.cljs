@@ -4,6 +4,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.activity :as activity-actions]))
 
 (def mobile-image-size
@@ -13,6 +14,7 @@
 
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :board-data)
+                         section-mixins/container-nav-in
   [s]
   (let [board-data (drv/react s :board-data)
         mobile? (responsive/is-mobile-size?)

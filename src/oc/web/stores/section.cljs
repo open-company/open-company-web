@@ -59,12 +59,15 @@
 
 (defn fix-sections
   [db org-data changes]
-  (let [sections (:boards org-data)
+  (let [current-board-slug (:board (:router-path db))
+        section-slugs (map :slug (:boards org-data))
+        all-slugs (conj section-slugs "all-posts")
+        sections (filterv #(not= % current-board-slug) all-slugs)
         org-slug (:slug org-data)]
-    (reduce #(if (dispatcher/board-data db org-slug (:slug %2))
-               (let [board-key (dispatcher/board-data-key org-slug (:slug %2))
+    (reduce #(if (dispatcher/board-data db org-slug %2)
+               (let [board-key (dispatcher/board-data-key org-slug %2)
                      board-data (au/fix-board
-                                 (dispatcher/board-data db org-slug (:slug %2))
+                                 (dispatcher/board-data db org-slug %2)
                                  changes)]
                  (assoc-in %1 board-key board-data))
                %1)

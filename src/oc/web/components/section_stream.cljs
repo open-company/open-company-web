@@ -8,6 +8,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]
+            [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
@@ -29,6 +30,8 @@
                             mixins/first-render-mixin
                             (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner"
                              wrt-stream-item-mixin-cb)
+                            section-mixins/container-nav-in
+
   [s]
   (let [section-data (drv/react s :section-stream-data)
         items (activity-utils/get-sorted-activities section-data)

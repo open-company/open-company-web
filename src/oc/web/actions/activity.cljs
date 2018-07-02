@@ -26,7 +26,7 @@
           org (router/current-org-slug)
           all-posts-key (dis/all-posts-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
+          fixed-all-posts (au/fix-all-posts (:collection all-posts-data) (dis/change-data))
           should-404? (and from
                            (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
