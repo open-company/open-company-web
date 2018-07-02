@@ -8,6 +8,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]
+            [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
@@ -114,6 +115,7 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
+                        section-mixins/container-nav-in
                         {:will-mount (fn [s]
                           (let [all-posts-data @(drv/get-ref s :all-posts)
                                 sorted-items (activity-utils/get-sorted-activities all-posts-data)
