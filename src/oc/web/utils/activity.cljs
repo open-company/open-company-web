@@ -166,9 +166,6 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images))))
 
-(defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data {}))
-
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
   ([board-data] (fix-board board-data {}))
@@ -185,9 +182,9 @@
 
 (defn fix-all-posts
   "Fix org data coming from the API."
-  [all-posts-data]
+  [all-posts-data change-data]
   (let [fixed-activities-list (map
-                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
+                               #(fix-entry % {:slug (:board-slug %) :name (:board-name %)} change-data)
                                (:items all-posts-data))
         without-items (dissoc all-posts-data :items)
         fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
