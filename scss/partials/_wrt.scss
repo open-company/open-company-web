@@ -139,7 +139,7 @@ div.wrt-container {
 
         &:hover {
           div.wrt-popup-list-row-seen {
-            button.send-remainder-bt {
+            button.send-reminder-bt {
               display: block;
             }
           }          
@@ -161,7 +161,7 @@ div.wrt-container {
             color: $light_ui_grey;
           }
 
-          button.send-remainder-bt {
+          button.send-reminder-bt {
             background-position: right 9px;
             background-repeat: no-repeat;
             width: 24px;
@@ -180,7 +180,7 @@ div.wrt-container {
             }
 
             &.slack {
-              background-image: cdnUrl("/img/ML/slack_remainder.svg");
+              background-image: cdnUrl("/img/ML/slack_reminder.svg");
               background-size: 16px 16px;
             }
           }

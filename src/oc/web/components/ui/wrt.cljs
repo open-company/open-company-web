@@ -136,13 +136,13 @@
                       ;; Show time the read happened
                       (utils/time-since (:read-at u))
                       ;; Send reminder button
-                      [:button.mlb-reset.button.send-remainder-bt
+                      [:button.mlb-reset.button.send-reminder-bt
                         {:data-toggle "tooltip"
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :class (if slack-user? "slack" "email")
-                         :title "Send remainder"
+                         :title "Send reminder"
                          :on-click #(let [share-medium (if slack-user? :slack :email)]
                                       ;; Hide the WRT popup
                                       (reset! (::showing-popup s) false)
