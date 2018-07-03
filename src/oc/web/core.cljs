@@ -25,6 +25,7 @@
             [oc.web.actions.comment :as ca]
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
+            [oc.web.actions.nux :as na]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.api :as api]
@@ -269,11 +270,7 @@
   (pre-routing (:query-params params) true)
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
-      (cook/set-cookie!
-       (router/new-user-cookie
-        (jwt/get-key :user-id))
-       "slack"
-       (* 60 60 24 7)))
+      (na/set-new-user-cookie "slack"))
     (if new-user
       (utils/after 100 #(router/nav! urls/sign-up-profile))
       (user-actions/slack-lander-check-team-redirect))))

@@ -11,8 +11,9 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -113,8 +114,8 @@
                               ;; Mixins
                               (ui-mixins/render-on-resize win-width)
                               {:before-render (fn [s]
-                                ;; Check if it still needs the add post tooltip
-                                (activity-actions/check-add-post-tooltip)
+                                ;; Check if it needs any NUX stuff
+                                (nux-actions/check-nux)
                                 s)
                                :will-mount (fn [s]
                                 (win-width s)
@@ -163,7 +164,7 @@
                     ;; If the add post tooltip is visible
                     (when @(drv/get-ref s :show-add-post-tooltip)
                       ;; Dismiss it and bring up the invite people tooltip
-                      (utils/after 1000 activity-actions/hide-add-post-tooltip)))
+                      (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
@@ -295,7 +296,7 @@
               (when (drv/react s :show-add-post-tooltip)
                 [:div.add-post-tooltip-container.group
                   [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(activity-actions/hide-add-post-tooltip)}]
+                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
                   [:div.add-post-tooltip-icon]
                   [:div.add-post-tooltips
                     [:div.add-post-tooltip

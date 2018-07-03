@@ -10,6 +10,7 @@
             [oc.web.local_settings :as ls]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -179,7 +180,7 @@
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
         (dis/dispatch! [:user-data (json->cljs data)])
-        (utils/after 100 org-actions/maybe-show-add-bot-notification?)))
+        (utils/after 100 nux-actions/check-nux)))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
@@ -258,10 +259,7 @@
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
-      (cook/set-cookie!
-       (router/new-user-cookie (jwt/user-id))
-       "email"
-       (* 60 60 24 7))
+      (nux-actions/set-new-user-cookie "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
@@ -296,10 +294,7 @@
             (cook/remove-cookie! :show-login-overlay)
             (utils/after 200 #(router/nav! oc-urls/login)))
           (do
-            (cook/set-cookie!
-             (router/new-user-cookie (jwt/user-id))
-             "email"
-             (* 60 60 24 7))
+            (nux-actions/set-new-user-cookie "email")
             (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))
   (dis/dispatch! [:pswd-collect password-reset?]))

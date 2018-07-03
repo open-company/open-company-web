@@ -267,15 +267,13 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :notifications-data :jwt]
                             (fn [base orgs org-data board-data all-posts activity-data nux ap-initial-at
                                  show-section-editor show-section-add show-sections-picker entry-editing
                                  mobile-menu-open notifications-data jwt]
-                              {:nux nux
-                               :nux-loading (:nux-loading base)
-                               :nux-end (:nux-end base)
+                              {:show-onboard-overlay (:show-onboard-overlay base)
                                :jwt jwt
                                :orgs orgs
                                :org-data org-data
