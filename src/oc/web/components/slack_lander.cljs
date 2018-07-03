@@ -49,15 +49,7 @@
                 {:src (utils/cdn "/img/ML/slack_screenshot.png")
                  :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
-            [:div.core-values-list.group
-              [:div.core-value.key-announcement
-                "Key announcements"]
-              [:div.core-value.company-updates
-                "Company & team updates"]
-              [:div.core-value.strategic-plans
-                "Strategic plans"]
-              [:div.core-value.ideas-discussions
-                "Ideas & follow-on discussions"]]]
+            shared-misc/core-values-list]
 
           [:section.keep-aligned
             [:div.keep-aligned-title
