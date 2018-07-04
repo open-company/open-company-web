@@ -271,9 +271,7 @@
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
       (na/set-new-user-cookie "slack"))
-    (if new-user
-      (utils/after 100 #(router/nav! urls/sign-up-profile))
-      (user-actions/slack-lander-check-team-redirect))))
+    (user-actions/slack-lander-check-team-redirect)))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests

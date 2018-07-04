@@ -65,8 +65,7 @@
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
-        (or (status-response :name-required)
-            (:new-slack-user @dis/app-state))
+        (status-response :name-required)
         (if has-orgs
           (router/nav! oc-urls/confirm-invitation-profile)
           (router/nav! oc-urls/sign-up-profile))

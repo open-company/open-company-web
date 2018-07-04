@@ -90,9 +90,9 @@
   []
   (when-let [{:keys [user-type step] :as new-user-cookie} (get-new-user-cookie)]
     (when-let* [org-data (dis/org-data)
-                board-data (dis/board-data)
-                team-data (dis/team-data (:team-id org-data))]
-      (let [posts (vals (:fixed-items board-data))
+                board-data (dis/board-data)]
+      (let [team-data (dis/team-data (:team-id org-data))
+            posts (vals (:fixed-items board-data))
             first-post (first posts)
             first-post-author (when first-post
                                 (if (map? (:author first-post))

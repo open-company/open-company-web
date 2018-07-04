@@ -268,10 +268,10 @@
    :search-results        [[:base] (fn [base] (:search-results base))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :notifications-data :jwt]
+                            :mobile-menu-open :jwt]
                             (fn [base orgs org-data board-data all-posts activity-data nux ap-initial-at
                                  show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open notifications-data jwt]
+                                 mobile-menu-open jwt]
                               {:show-onboard-overlay (:show-onboard-overlay base)
                                :jwt jwt
                                :orgs orgs
@@ -294,8 +294,7 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open
-                               :notifications (count notifications-data)})]})
+                               :mobile-menu-open mobile-menu-open})]})
 
 
 ;; Action Loop =================================================================
