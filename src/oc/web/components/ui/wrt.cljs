@@ -92,6 +92,7 @@
                            (utils/after default-disappear-delay
                             #(do
                               (reset! (::show-delay s) nil)
+                              (reset! (::list-view s) :seen)
                               (reset! (::showing-popup s) false))))))}
       [:div.wrt-count
         {:ref :wrt-count}
