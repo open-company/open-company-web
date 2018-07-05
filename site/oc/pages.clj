@@ -101,7 +101,7 @@
     [:div.core-value.strategic-plans
       "Strategic plans"]
     [:div.core-value.ideas-discussions
-      "Ideas & follow-on discussions"]])
+      "Decisions"]])
 
 (def testimonials-section
   [:div.hidden]
@@ -234,7 +234,7 @@
         [:div.balloon.small-purple]
 
         [:h1.headline
-          "Thoughtful team communication"]
+          "The new way to provide meaningful team communication."]
         [:div.subheadline
           (str
            "Rise above the noise of chat and email inboxes to keep "
