@@ -52,6 +52,10 @@ div.stream-item {
       margin-top: -8px;
       margin-right: -10px;
 
+      &.moving-activity {
+        display: block;
+      }
+
       @include mobile() {
         display: none;
       }
