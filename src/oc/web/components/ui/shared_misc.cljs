@@ -42,7 +42,7 @@
     [:div.core-value.strategic-plans
       "Strategic plans"]
     [:div.core-value.ideas-discussions
-      "Ideas & follow-on discussions"]])
+      "Decisions"]])
 
 (def testimonials-section
   [:section.testimonials-section
