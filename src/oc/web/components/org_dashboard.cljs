@@ -81,9 +81,7 @@
                 jwt
                 board-data
                 posts-data
-                nux
-                nux-loading
-                nux-end
+                show-onboard-overlay
                 ap-initial-at
                 user-settings
                 org-settings-data
@@ -102,7 +100,6 @@
                 activity-share-container
                 mobile-menu-open]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (= nux :1)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
@@ -126,10 +123,7 @@
                          (not posts-data))
                      (and (= (router/current-board-slug) "must-see")
                           ;; But no must-see-data data yet
-                         (not posts-data))
-                     ;; First ever user nux, not enough time
-                     (and nux-loading
-                          (not nux-end)))
+                         (not posts-data)))
         org-not-found (and orgs
                            (not (seq (filterv #(= (:slug %) (router/current-org-slug)) orgs))))
         section-not-found (and (not org-not-found)
@@ -173,7 +167,7 @@
           show-activity-not-found
           (activity-not-found)
           ;; Onboard overlay
-          should-show-onboard-overlay?
+          show-onboard-overlay
           (onboard-overlay)
           ;; Org settings
           org-settings-data
@@ -257,7 +251,7 @@
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing
-                           should-show-onboard-overlay?
+                           show-onboard-overlay
                            is-sharing-activity
                            show-section-add
                            show-section-editor))

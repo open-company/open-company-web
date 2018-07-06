@@ -9,7 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.nux :as nux-actions]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -52,6 +52,6 @@
                          :padding-top (str padding-top "px")}))}
             "Your company digest keeps everyone aligned around what matters most."]
           [:button.mlb-reset.continue-btn
-            {:on-click #(activity-actions/nux-end)
+            {:on-click #(nux-actions/dismiss-onboard-overlay)
              :style (when is-mobile? {:bottom (if is-safari-mobile "85px" "78px")})}
             "Start using Carrot"]])]])

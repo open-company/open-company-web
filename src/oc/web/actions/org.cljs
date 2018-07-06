@@ -15,8 +15,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]
-            [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.slack-bot-modal :as slack-bot-modal]))
+            [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
 ;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
@@ -28,35 +27,15 @@
                         redirect)]
     (router/redirect! fixed-auth-url)))
 
-(defn maybe-show-add-bot-notification? []
+(defn maybe-show-bot-added-notification? []
   ;; Do we need to show the add bot banner?
-  (when-let [org-data (dis/org-data)]
-    (if (and (= (jwt/get-key :auth-source) "slack")
-             (not (jwt/team-has-bot? (:team-id org-data))))
-      ;; Do we have the needed data loaded
-      (when-let* [current-user-data (dis/current-user-data)
-                  team-data (dis/team-data (:team-id org-data))]
-        ;; Show the notification
-        (notification-actions/show-notification {:title "Enable Carrot for Slack?"
-                                                 :description "Share post to Slack, sync comments, invite & manage your team."
-                                                 :id :slack-second-step-banner
-                                                 :dismiss true
-                                                 :expire 0
-                                                 :slack-bot true
-                                                 :primary-bt-cb #(bot-auth team-data current-user-data)
-                                                 :primary-bt-title [:span [:span.slack-icon] "Add to Slack"]
-                                                 :primary-bt-style :solid-green
-                                                 :primary-bt-dismiss true
-                                                 :secondary-bt-cb #(slack-bot-modal/show-modal bot-auth)
-                                                 :secondary-bt-title "Learn More"
-                                                 :secondary-bt-style :default-link
-                                                 :secondary-bt-dismiss true}))
-      (let [bot-access (dis/bot-access)]
-        (when (= bot-access :slack-bot-success-notification)
-          (notification-actions/show-notification {:title "Slack integration successful"
-                                                   :slack-icon true
-                                                   :id "slack-bot-integration-succesful"}))
-        (dis/dispatch! [:input [:bot-access] nil])))))
+  (when-let* [org-data (dis/org-data)
+              bot-access (dis/bot-access)]
+    (when (= bot-access :slack-bot-success-notification)
+      (notification-actions/show-notification {:title "Slack integration successful"
+                                               :slack-icon true
+                                               :id "slack-bot-integration-succesful"}))
+    (dis/dispatch! [:input [:bot-access] nil])))
 
 ;; Org get
 (defn digest-button-check []
@@ -131,7 +110,7 @@
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
       (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
   (dis/dispatch! [:org-loaded org-data saved?])
-  (utils/after 100 maybe-show-add-bot-notification?))
+  (utils/after 100 maybe-show-bot-added-notification?))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
@@ -144,11 +123,6 @@
 ;; Org redirect
 
 (defn org-redirect [org-data]
-  ;; Show NUX for first ever user when the dashboard is loaded
-  (cook/set-cookie!
-   (router/show-nux-cookie (jwt/user-id))
-   (:first-ever-user router/nux-cookie-values)
-   (* 60 60 24 7))
   (when org-data
     (let [org-slug (:slug org-data)]
       (utils/after 100 #(router/redirect! (oc-urls/all-posts org-slug))))))

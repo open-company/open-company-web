@@ -136,10 +136,10 @@
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
-(defn show-nux-cookie
+(defn new-user-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
-  (str "show-nux-" user-id))
+  (str "new-user-" user-id))
 
 (defn show-add-post-tooltip-cookie
   "Cookie to check if the add first post tooltip shuold be visible."
@@ -151,11 +151,7 @@
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
 
-;; Values for NUX cookie
-
-(def nux-cookie-values
-  {:new-user "new-user"
-   :first-ever-user "first-ever-user"})
+;; Debug
 
 (defn print-router-path []
   (js/console.log @path))
