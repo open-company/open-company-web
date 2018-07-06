@@ -316,7 +316,7 @@
                     [:div.add-post-tooltip
                       "Welcome! Now you’re ready to post new updates and information for your team."]
                     [:div.add-post-tooltip.second-line
-                      "You can delete this sample post anytime."]]
+                      "You can delete the sample post at anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
                     {:on-click compose-fn}
