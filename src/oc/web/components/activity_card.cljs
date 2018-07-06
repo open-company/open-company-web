@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -16,7 +17,7 @@
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.components.ui.tile-menu :refer (tile-menu)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defcs activity-card < rum/reactive
@@ -42,6 +43,7 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))
+        is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "activity-card-" (:uuid activity-data))
         comments-data (au/get-comments activity-data (drv/react s :comments-data))
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -57,7 +59,7 @@
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                      (when-not (or is-drafts-board
-                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.tile-menu]))
+                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-menu]))
                                    (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.wrt-container])))
                        (activity-actions/activity-modal-fade-in activity-data))))}
       [:div.new-tag "NEW"]
@@ -93,7 +95,7 @@
         [:div.activity-card-footer-hover.group
           (when-not is-drafts-board
             [:div.activity-card-menu-container
-              (tile-menu activity-data dom-element-id)])]
+              (more-menu activity-data dom-element-id)])]
         (if is-drafts-board
           [:div.activity-card-footer.group
             [:button.mlb-reset.edit-draft-bt
@@ -115,8 +117,13 @@
                       (:reaction max-reaction)]
                     [:span.count
                       (:count max-reaction)]]))]
-            (when (pos? (count (:attachments activity-data)))
-              [:div.tile-attachments
-                [:span.attachments-count
-                  (count (:attachments activity-data))]
-                [:span.attachments-icon]])])]]))
+            [:div.activity-card-footer-right
+              (when (pos? (count (:attachments activity-data)))
+                [:div.tile-attachments
+                  [:span.attachments-count
+                    (count (:attachments activity-data))]
+                  [:span.attachments-icon]])
+              (when (:must-see activity-data)
+                [:div.activity-card-must-see
+                 {:class (utils/class-set {:must-see-on
+                                           (:must-see activity-data)})}])]])]]))

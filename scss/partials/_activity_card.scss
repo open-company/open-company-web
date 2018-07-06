@@ -47,6 +47,21 @@ div.activity-card {
         display: block;
       }
     }
+
+    div.activity-card-footer {
+
+      div.comments-count, div.tile-reactions, div.activity-card-footer-right {
+        display: none;
+      }
+
+      div.activity-card-menu-container {
+        display: block;
+
+        div.more-menu {
+          display: block;
+        }
+      }
+    }
   }
 
   &.new-item {
@@ -71,7 +86,7 @@ div.activity-card {
 
   div.activity-share-container {
     div.activity-share-modal-container {
-      margin-top: 16px;
+      margin-top: 42px;
     }
   }
 
@@ -152,11 +167,6 @@ div.activity-card {
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
     height: calc(100% - 121px);
-    // position: absolute;
-    // top: 120px;
-    // bottom: 0px;
-    // left: 0px;
-    // right: 0px;
 
     div.separator {
       width: 4px;
@@ -198,6 +208,7 @@ div.activity-card {
       @include activity-title();
       @include avenir_H();
       font-size: 16px;
+      display: inline;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
@@ -221,13 +232,18 @@ div.activity-card {
       width: calc(100% - 48px);
 
       div.activity-card-menu-container {
-        div.tile-menu {
-          margin-top: -6px;
-          float: left;
-          button.tile-menu-bt {
-            margin-left: 0px;
-            margin-right: 16px;
-          }
+        z-index: 3;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 121px;
+
+        div.more-menu {
+          position: absolute;
+          right: 0px;
+          top: -10px;
+          float: unset;
         }
       }
     }
@@ -315,27 +331,48 @@ div.activity-card {
         }
       }
 
-      div.tile-attachments {
-        height: 16px;
+      div.activity-card-footer-right {
         float: right;
 
-        span.attachments-icon {
-          float: right;
-          display: block;
-          width: 12px;
-          height: 13px;
-          background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
-          background-repeat: no-repeat;
-          background-size: 12px 13px;
-          background-position: center;
+        div.tile-attachments {
+          height: 16px;
+          display: inline;
+          float: left;
+          span.attachments-icon {
+            display: block;
+            width: 12px;
+            height: 13px;
+            background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
+            background-repeat: no-repeat;
+            background-size: 12px 13px;
+            background-position: center;
+          }
+
+          span.attachments-count {
+            @include avenir_M();
+            font-size: 12px;
+            color: $ui_grey;
+            margin-left: 16px;
+            float: left;
+          }
         }
 
-        span.attachments-count {
+        div.activity-card-must-see {
+          background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+          background-size: 12px 16px;
+          background-repeat: no-repeat;
+          background-position: 8px -1px;
+          width: 20px;
+          height: 16px;
+          display: inline-block;
           float: right;
-          @include avenir_M();
-          font-size: 12px;
-          color: $ui_grey;
-          margin-left: 6px;
+          &:hover {
+            background-image: cdnUrl("/img/ML/must_see_bolt.svg");
+          }
+
+          &.must-see-on {
+            background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+          }
         }
       }
     }

@@ -255,3 +255,8 @@
   (let [read-data (into [] (:reads item-data))
         item-id (:item-id item-data)]
     (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads read-data :item-id item-id})))
+
+(defmethod dispatcher/action :must-see-get/finish
+  [db [_ org-slug must-see-posts]]
+  (let [must-see-key (dispatcher/must-see-key org-slug)]
+    (assoc-in db must-see-key must-see-posts)))
