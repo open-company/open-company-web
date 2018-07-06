@@ -4,27 +4,8 @@
             [taoensso.timbre :as timbre]
             [oc.web.components.org-settings :as org-settings]))
 
-(defn current-posts-filter
-  "Find the filter based on the route"
-  [posts-filter]
-  (cond
-   (= posts-filter "all-posts")
-   (fn [p] (not= (:status p) "draft"))
-
-   (= posts-filter "must-see")
-   (fn [p] (and (= (:must-see p) true)
-                (not= (:status p) "draft")))
-
-   (= posts-filter "drafts")
-   (fn [p] (= (:status p) "draft"))
-
-   :default
-   (fn [p] (and (= (:board-slug p) posts-filter)
-                (not= (:status p) "draft")))))
-
 (defn set-posts-filter [posts-filter]
-  (timbre/debug posts-filter)
-  (dis/dispatch! [:posts-filter (current-posts-filter posts-filter)]))
+  (dis/dispatch! [:posts-filter posts-filter]))
 
 (defn close-navigation-sidebar []
   (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))

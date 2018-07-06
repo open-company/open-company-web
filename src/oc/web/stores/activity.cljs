@@ -11,10 +11,27 @@
                             (:fixed-items items))]
     (assoc items :fixed-items merged-items)))
 
+(defn posts-filter-fn
+  "Find the filter based on the route"
+  [posts-filter]
+  (cond
+   (= posts-filter "all-posts")
+   (fn [p] (not= (:status p) "draft"))
+
+   (= posts-filter "must-see")
+   (fn [p] (and (= (:must-see p) true)
+                (not= (:status p) "draft")))
+
+   (= posts-filter "drafts")
+   (fn [p] (= (:status p) "draft"))
+
+   :default
+   (fn [p] (and (= (:board-slug p) posts-filter)
+                (not= (:status p) "draft")))))
+
 (defmethod dispatcher/action :posts-filter
   [db [_ posts-filter]]
-  (timbre/debug posts-filter)
-  (assoc db :posts-filter posts-filter))
+  (assoc db :posts-filter (posts-filter-fn posts-filter)))
 
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ activity-data editing dismiss-on-editing-end]]
