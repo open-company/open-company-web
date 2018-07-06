@@ -42,16 +42,25 @@
      (let [{:keys [org-data
                    board-data
                    ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
-       (if (= (router/current-board-slug) "all-posts")
-         (do
-           (activity-actions/all-posts-get org-data ap-initial-at)
-           (utils/after 2000
-             #(section-actions/load-other-sections (:boards org-data))))
+       (cond
 
-         (let [fixed-board-data (or
-                                 board-data
-                                 (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
-           (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
+        (= (router/current-board-slug) "all-posts")
+        (do
+          (activity-actions/all-posts-get org-data ap-initial-at)
+          (utils/after 2000
+            #(section-actions/load-other-sections (:boards org-data))))
+
+        (= (router/current-board-slug) "must-see")
+        (do
+          (activity-actions/must-see-get org-data)
+          (utils/after 2000
+            #(section-actions/load-other-sections (:boards org-data))))
+
+        :default
+        (let [fixed-board-data (or
+                                board-data
+                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
+          (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
 
 (rum/defcs org-dashboard < ;; Mixins
                            rum/static
@@ -72,6 +81,7 @@
                 jwt
                 board-data
                 all-posts-data
+                must-see-data
                 nux
                 nux-loading
                 nux-end
@@ -106,6 +116,7 @@
                           (pos? (count (:boards org-data))))
                      ;; Board specified
                      (and (not= (router/current-board-slug) "all-posts")
+                          (not= (router/current-board-slug) "must-see")
                           (not ap-initial-at)
                           ;; But no board data yet
                           (not board-data))
@@ -114,6 +125,9 @@
                               ap-initial-at)
                           ;; But no all-posts data yet
                          (not all-posts-data))
+                     (and (= (router/current-board-slug) "must-see")
+                          ;; But no must-see-data data yet
+                         (not must-see-data))
                      ;; First ever user nux, not enough time
                      (and nux-loading
                           (not nux-end)))

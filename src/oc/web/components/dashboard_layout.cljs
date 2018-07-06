@@ -71,8 +71,9 @@
         route @(drv/get-ref s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
+        is-must-see (utils/in? (:route route) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
-    (if (or is-drafts-board is-all-posts)
+    (if (or is-drafts-board is-all-posts is-must-see)
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -97,6 +98,7 @@
                               (drv/drv :org-data)
                               (drv/drv :board-data)
                               (drv/drv :all-posts)
+                              (drv/drv :must-see)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
@@ -144,11 +146,19 @@
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data (drv/react s :board-data)
+        board-data-react (drv/react s :board-data)
         all-posts-data (drv/react s :all-posts)
+        must-see-data (drv/react s :must-see)
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
+        is-must-see (utils/in? (:route route) "must-see")
+        board-data (cond
+                     is-must-see
+                     must-see-data
+
+                     :default
+                     board-data-react)
         nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -206,12 +216,19 @@
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:dangerouslySetInnerHTML (if is-all-posts
-                                                  #js {"__html" "All posts"}
-                                                  (utils/emojify (:name board-data)))}])
+                      {:dangerouslySetInnerHTML (cond
+                                                 is-all-posts
+                                                 #js {"__html" "All posts"}
+
+                                                 is-must-see
+                                                 #js {"__html" "Must see"}
+
+                                                 :default
+                                                 (utils/emojify (:name board-data)))}])
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)
+                             (not is-must-see)
                              (not (:read-only board-data)))
                     [:div.board-settings-container.group
                       [:button.mlb-reset.board-settings-bt

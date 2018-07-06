@@ -1,4 +1,5 @@
 (ns oc.web.components.ui.more-menu
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -9,6 +10,17 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
+
+(defn show-hide-menu
+  [s will-open will-close]
+  (utils/remove-tooltips)
+  (let [next-showing-menu (not @(::showing-menu s))]
+    (if next-showing-menu
+      (when (fn? will-open)
+        (will-open))
+      (when (fn? will-close)
+        (will-close)))
+    (reset! (::showing-menu s) next-showing-menu)))
 
 ;; Delete handling
 
@@ -37,7 +49,8 @@
                          (reset! (::click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(when (not (utils/event-inside? % (rum/ref-node s "more-menu-bt")))
-                               (let [will-close (:will-close (nth (:rum/args s) 2))]
+                               (when-let* [delegate-methods (get (:rum/args s) 2)
+                                           will-close (:will-close delegate-methods)]
                                  (when (fn? will-close)
                                    (will-close)))
                                (reset! (::showing-menu s) false))))
@@ -59,23 +72,16 @@
         [:button.mlb-reset.more-menu-bt
           {:type "button"
            :ref "more-menu-bt"
-           :on-click (fn [_]
-                       (utils/remove-tooltips)
-                       (let [next-showing-menu (not @(::showing-menu s))]
-                        (if next-showing-menu
-                          (when (fn? will-open)
-                            (will-open))
-                          (when (fn? will-close)
-                            (will-close)))
-                        (reset! (::showing-menu s) next-showing-menu)))
+           :on-click #(show-hide-menu s will-open will-close)
            :class (when @(::showing-menu s) "active")
            :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-           :data-placement "left"
+           :data-placement "top"
            :data-container "body"
            :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
            :title "More"}]
         (when @(::showing-menu s)
           [:ul.more-menu-list
+             {:on-mouse-leave #(show-hide-menu s will-open will-close)}
             (when edit-link
               [:li.edit
                 {:on-click #(activity-actions/activity-edit activity-data)}
@@ -84,7 +90,30 @@
               [:li.delete
                 {:on-click #(delete-clicked % activity-data)}
                 "Delete"])
-            (when share-link
+            (when (and share-link (responsive/is-tablet-or-mobile?))
              [:li.share
                {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
-               "Share"])])])))
+              "Share"])
+            (when edit-link
+              [:li
+               {:class (utils/class-set
+                         {:must-see (not (:must-see activity-data))
+                          :must-see-on (:must-see activity-data)})
+                :on-click #(do
+                             (utils/event-stop %)
+                             (activity-actions/toggle-must-see activity-data))}
+               (if (:must-see activity-data)
+                 "Unmark"
+                 "Must see")]
+              )])
+          (when (and share-link (not (responsive/is-tablet-or-mobile?)))
+            [:button.mlb-reset.more-menu-share-bt
+              {:type "button"
+               :ref "tile-menu-share-bt"
+               :on-click #(activity-actions/activity-share-show
+                           activity-data
+                           share-container-id)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Share"}])])))
