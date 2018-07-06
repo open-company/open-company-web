@@ -144,9 +144,9 @@ div.dashboard-layout {
             color: $deep_navy;
 
             &.second-line {
+              padding-top: 10px;
               @include tablet() {
                 margin: 0px auto;
-                padding-top: 10px;
               }
             }
 
