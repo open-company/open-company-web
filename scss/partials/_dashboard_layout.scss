@@ -146,6 +146,7 @@ div.dashboard-layout {
             &.second-line {
               @include tablet() {
                 margin: 0px auto;
+                padding-top: 10px;
               }
             }
 
