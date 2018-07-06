@@ -333,7 +333,7 @@
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
               "SAVE"]
-            (tile-menu activity-data dom-element-id "bottom"))]]
+            (more-menu activity-data dom-element-id))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         (if editing
