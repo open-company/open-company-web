@@ -31,10 +31,17 @@
                                    (:entry-editing db))
                             old-section-data
                             fixed-section-data)
-        next-db (assoc-in db-loading
-                  (dispatcher/board-data-key org-slug (keyword (:slug section-data)))
-                  with-current-edit)]
-    next-db))
+        posts-key (dispatcher/posts-data-key org-slug)
+        merged-items (merge (:fixed-items (get-in db posts-key))
+                            (:fixed-items fixed-section-data))]
+    (-> db-loading
+        (assoc-in
+          (dispatcher/board-data-key
+             org-slug
+             (keyword (:slug section-data)))
+          (dissoc with-current-edit :fixed-items))
+        (assoc-in posts-key
+          {:fixed-items merged-items}))))
 
 (defn new?
   "
@@ -181,9 +188,16 @@
   [db [_ org-slug section-slug]]
   (let [section-key (dispatcher/board-key org-slug section-slug)
         org-sections-key (vec (conj (dispatcher/org-data-key org-slug) :boards))
-        remaining-sections (remove #(= (:slug %) section-slug) (get-in db org-sections-key))]
+        remaining-sections (remove #(= (:slug %) section-slug) (get-in db org-sections-key))
+        posts-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-key)
+        removed-posts (filterv (fn [p] (not= (:board-slug p) section-slug))
+                               (vals (:fixed-items old-posts)))]
     (-> db
       (update-in (butlast section-key) dissoc (last section-key))
+      (assoc posts-key (assoc old-posts
+                              (zipmap (map :uuid removed-posts) removed-posts)
+                              :fixed-items))
       (assoc org-sections-key remaining-sections)
       (dissoc :section-editing))))
 

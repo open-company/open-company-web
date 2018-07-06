@@ -5,6 +5,16 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
+(defn merge-items
+  [old-items items]
+  (let [merged-items (merge (:fixed-items old-items)
+                            (:fixed-items items))]
+    (assoc items :fixed-items merged-items)))
+
+(defmethod dispatcher/action :posts-filter
+  [db [_ posts-filter]]
+  (timbre/debug posts-filter)
+  (assoc db :posts-filter posts-filter))
 
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ activity-data editing dismiss-on-editing-end]]
@@ -69,13 +79,11 @@
         next-attachments (filterv #(not= (:file-url %) (:file-url attachment-data)) old-attachments)]
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
 
-(defmethod dispatcher/action :entry [db [_ board-key entry-uuid body]]
+(defmethod dispatcher/action :entry [db [_ board-key post-uuid body]]
   (let [board-data (get-in db board-key)
-        new-entries (assoc (get board-data :fixed-items)
-                     entry-uuid
-                     (au/fix-entry body board-data (dispatcher/change-data db)))
-        new-board-data (assoc board-data :fixed-items new-entries)]
-    (assoc-in db board-key new-board-data)))
+        posts-key (dispatcher/activity-key (:org-slug board-data) post-uuid)
+        fixed-post (au/fix-entry body board-data (dispatcher/change-data db))]
+    (assoc-in db posts-key fixed-post)))
 
 (defmethod dispatcher/action :entry-clear-local-cache
   [db [_ edit-key]]
@@ -86,14 +94,13 @@
   (assoc-in db [:entry-editing :loading] true))
 
 (defmethod dispatcher/action :entry-save/finish
-  [db [_ activity-data edit-key board-key]]
+  [db [_ activity-data edit-key]]
   (let [org-slug (utils/post-org-slug activity-data)
         board-slug (:board-slug activity-data)
-        board-data (or (get-in db board-key) utils/default-drafts-board)
+        activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
         activity-board-data (get-in db (dispatcher/board-data-key org-slug board-slug))
         fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))
-        next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)
-        next-db (assoc-in db board-key (assoc board-data :fixed-items next-fixed-items))
+        next-db (assoc-in db activity-key fixed-activity-data)
         with-edited-key (if edit-key
                           (update-in next-db [edit-key] dissoc :loading)
                           next-db)
@@ -116,10 +123,14 @@
   [db [_ new-board-data]]
   (let [org-slug (utils/section-org-slug new-board-data)
         board-slug (:slug new-board-data)
+        posts-key (dispatcher/posts-data-key org-slug)
         board-key (dispatcher/board-data-key org-slug board-slug)
-        fixed-board-data (au/fix-board new-board-data (dispatcher/change-data db))]
+        fixed-board-data (au/fix-board new-board-data (dispatcher/change-data db))
+        merged-items (merge (:fixed-items (get-in db posts-key))
+                            (:fixed-items fixed-board-data))]
     (-> db
-      (assoc-in board-key fixed-board-data)
+      (assoc-in board-key (dissoc fixed-board-data :fixed-items))
+      (assoc-in posts-key {:fixed-items merged-items})
       (dissoc :section-editing)
       (update-in [:entry-editing] dissoc :publishing)
       (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
@@ -128,13 +139,13 @@
 
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ edit-key activity-data]]
-  (let [board-slug (:board-slug activity-data)
-        board-key (dispatcher/board-data-key (utils/post-org-slug activity-data) board-slug)
+  (let [org-slug (utils/post-org-slug activity-data)
+        board-slug (:board-slug activity-data)
+        board-key (dispatcher/board-data-key org-slug board-slug)
         board-data (get-in db board-key)
-        fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))
-        next-fixed-items (assoc (:fixed-items board-data) (:uuid fixed-activity-data) fixed-activity-data)]
+        fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))]
     (-> db
-      (assoc-in (vec (conj board-key :fixed-items)) next-fixed-items)
+      (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 
@@ -145,11 +156,12 @@
     (update-in [:entry-editing] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
-  [db [_ board-key activity-data]]
-  (let [board-data (get-in db board-key)
-        next-fixed-items (dissoc (:fixed-items board-data) (:uuid activity-data))
-        next-board-data (assoc board-data :fixed-items next-fixed-items)]
-    (assoc-in db board-key next-board-data)))
+  [db [_ org-slug activity-data]]
+  (let [posts-key (dispatcher/posts-data-key org-slug)
+        posts-data (dispatcher/posts-data org-slug)
+        next-fixed-items (dissoc (:fixed-items posts-data) (:uuid activity-data))
+        next-board-data (assoc posts-data :fixed-items next-fixed-items)]
+    (assoc-in db posts-key next-board-data)))
 
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data container-element-id]]
@@ -189,7 +201,7 @@
         board-slug (:board-slug activity-data)
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
-                       (dispatcher/activity-key org-slug board-slug activity-uuid))
+                       (dispatcher/activity-key org-slug activity-uuid))
         fixed-activity-data (au/fix-entry
                              activity-data
                              {:slug (or (:board-slug activity-data) board-slug)
@@ -201,32 +213,37 @@
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug fixed-board-data]]
-  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data))]
+  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data))
+        posts-key (dispatcher/posts-data-key org-slug)]
   (-> db
-    (assoc-in board-key fixed-board-data)
+    (assoc-in board-key (dissoc fixed-board-data :fixed-items))
+    (assoc-in posts-key (merge-items (get-in db posts-key)
+                                     fixed-board-data))
     (dissoc :section-editing)
     (update-in [:modal-editing-data] dissoc :loading)
     (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
     (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :all-posts-get/finish
-  [db [_ org-slug fixed-all-posts]]
-  (let [all-posts-key (dispatcher/all-posts-key org-slug)]
-    (assoc-in db all-posts-key fixed-all-posts)))
+  [db [_ org-slug fixed-posts]]
+  (let [posts-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-key)
+        merged-items (merge-items old-posts fixed-posts)]
+    (assoc-in db posts-key merged-items)))
 
 (defmethod dispatcher/action :all-posts-more
   [db [_ org-slug]]
-  (let [all-posts-key (dispatcher/all-posts-key org-slug)
-        all-posts-data (get-in db all-posts-key)
-        next-all-posts-data (assoc all-posts-data :loading-more true)]
-    (assoc-in db all-posts-key next-all-posts-data)))
+  (let [posts-data-key (dispatcher/posts-data-key org-slug)
+        posts-data (get-in db posts-data-key)
+        next-posts-data (assoc posts-data :loading-more true)]
+    (assoc-in db posts-data-key next-posts-data)))
 
 (defmethod dispatcher/action :all-posts-more/finish
-  [db [_ org direction all-posts-data]]
-  (if all-posts-data
-    (let [all-posts-key (dispatcher/all-posts-key org)
-          fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
-          old-all-posts (get-in db all-posts-key)
+  [db [_ org direction posts-data]]
+  (if posts-data
+    (let [posts-data-key (dispatcher/posts-data-key org)
+          fixed-all-posts (au/fix-all-posts (:collection posts-data))
+          old-all-posts (get-in db posts-data-key)
           next-links (vec
                       (remove
                        #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
@@ -238,16 +255,17 @@
                               (vec (conj next-links link-to-move))
                               next-links)
           with-links (assoc fixed-all-posts :links fixed-next-links)
-          new-items (merge (:fixed-items old-all-posts) (:fixed-items with-links))
+          new-items (merge-items old-all-posts with-links)
           keeping-items (count (:fixed-items old-all-posts))
-          new-all-posts (-> with-links
-                              (assoc :fixed-items new-items)
-                              (assoc :direction direction)
-                              (assoc :saved-items keeping-items))]
-      (assoc-in db all-posts-key new-all-posts))
+          new-all-posts (-> new-items
+                          (assoc :direction direction)
+                          (assoc :saved-items keeping-items))]
+      (assoc-in db posts-data-key new-all-posts))
     db))
 
 (defmethod dispatcher/action :must-see-get/finish
   [db [_ org-slug must-see-posts]]
-  (let [must-see-key (dispatcher/must-see-key org-slug)]
-    (assoc-in db must-see-key must-see-posts)))
+  (let [posts-data-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-data-key)
+        merged-items (merge-items old-posts must-see-posts)]
+    (assoc-in db posts-data-key merged-items)))

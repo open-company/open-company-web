@@ -2,6 +2,7 @@
   (:require [cuerdas.core :as s]
             [cljs-time.format :as f]
             [cljs-time.core :as time]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -104,8 +105,8 @@
         time-2 (get-activity-date act-2)]
     (compare time-2 time-1)))
 
-(defn get-sorted-activities [all-posts-data]
-  (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))
+(defn get-sorted-activities [posts-data]
+  (vec (sort compare-activities (vals (:fixed-items posts-data)))))
 
 (defn readonly-board? [links]
   (let [new-link (utils/link-for links "create")

@@ -37,7 +37,7 @@
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
-          all-posts-key (dis/all-posts-key org)
+          posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
           fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
           should-404? (and from
@@ -221,16 +221,13 @@
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
-  (let [org-slug (router/current-org-slug)
-        board-key (if (= (:status activity-data) "published")
-                   (dis/current-board-key)
-                   (dis/board-data-key org-slug utils/default-drafts-board-slug))]
+  (let [org-slug (router/current-org-slug)]
     (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
 
-    (dis/dispatch! [:entry-save/finish activity-data edit-key board-key])))
+    (dis/dispatch! [:entry-save/finish activity-data edit-key])))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
@@ -470,7 +467,7 @@
 
 (defn activity-delete [activity-data]
   (api/delete-activity activity-data activity-delete-finish)
-  (dis/dispatch! [:activity-delete (dis/current-board-key) activity-data]))
+  (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data]))
 
 (defn activity-share-show [activity-data & [element-id]]
   (dis/dispatch! [:activity-share-show activity-data element-id]))

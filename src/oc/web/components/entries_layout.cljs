@@ -1,7 +1,6 @@
 (ns oc.web.components.entries-layout
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -27,6 +26,7 @@
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           (drv/drv :board-data)
+                          (drv/drv :filtered-posts)
                           (rum/local nil ::board-uuid)
                           (rum/local false ::loading-more)
                           (rum/local nil ::prev-link)
@@ -40,9 +40,9 @@
                              (assoc :load-more-items-prev-fn (atom nil))))
                            :before-render (fn [s]
                             (when (= (router/current-board-slug) "all-posts")
-                              (let [board-data @(drv/get-ref s :board-data)
-                                    next-link (utils/link-for (:links board-data) "previous")
-                                    prev-link (utils/link-for (:links board-data) "next")]
+                              (let [posts-data @(drv/get-ref s :filtered-posts)
+                                    next-link (utils/link-for (:links posts-data) "previous")
+                                    prev-link (utils/link-for (:links posts-data) "next")]
                                 (when (not= (:href @(::next-link s)) (:href next-link))
                                   (if next-link
                                     (do
@@ -75,13 +75,13 @@
   [s]
   [:div.entries-layout
     (let [board-data (drv/react s :board-data)
+          posts-data (drv/react s :filtered-posts)
           change-data (drv/react s :change-data)
           board-uuid (:uuid board-data)
           changes (get change-data board-uuid)
           is-mobile? (responsive/is-mobile-size?)
-          entries (vals (:fixed-items board-data))
+          entries (vals (:fixed-items posts-data))
           sorted-entries (vec (reverse (sort-by :published-at entries)))]
-      (timbre/debug "Entries Layout: " board-data)
       [:div.entry-cards-container.group
         ; Get the max number of pairs
         (let [top-index (js/Math.ceil (/ (count sorted-entries) tiles-per-row))]

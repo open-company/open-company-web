@@ -26,8 +26,7 @@
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
   (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        comments-key (dis/activity-comments-key org-slug board-slug (:uuid activity-data))]
+        comments-key (dis/activity-comments-key org-slug (:uuid activity-data))]
     ;; Add the comment to the app-state to show it immediately
     (dis/dispatch! [:comment-add
                     activity-data
@@ -47,7 +46,6 @@
 (defn get-comments [activity-data]
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      (router/current-board-slug)
                       (:uuid activity-data))]
     (dis/dispatch! [:comments-get
                     comments-key
@@ -72,7 +70,6 @@
 (defn delete-comment [activity-data comment-data]
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      (router/current-board-slug)
                       (:uuid activity-data))]
     (dis/dispatch! [:comment-delete
                     (:uuid activity-data)
@@ -87,7 +84,6 @@
   [activity-data comment-data reaction-data reacting?]
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      (router/current-board-slug)
                       (:uuid activity-data))]
     (dis/dispatch! [:comment-reaction-toggle
                     comments-key
@@ -104,7 +100,6 @@
   (api/save-comment comment-data new-body)
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      (router/current-board-slug)
                       activity-uuid)]
     (dis/dispatch! [:comment-save
                     comments-key
@@ -116,7 +111,6 @@
   [interaction-data]
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      (router/current-board-slug)
                       (:resource-uuid interaction-data))]
     (dis/dispatch! [:ws-interaction/comment-update
                     comments-key
@@ -125,7 +119,6 @@
 (defn ws-comment-delete [comment-data]
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      (router/current-board-slug)
                       (:resource-uuid comment-data))]
     (dis/dispatch! [:ws-interaction/comment-delete comments-key comment-data])))
 
@@ -134,7 +127,7 @@
         board-slug (router/current-board-slug)
         activity-uuid (:resource-uuid interaction-data)
         entry-data (dis/activity-data org-slug board-slug activity-uuid)
-        comments-key (dis/activity-comments-key org-slug board-slug activity-uuid)]
+        comments-key (dis/activity-comments-key org-slug activity-uuid)]
     (when entry-data
       ;; Refresh the entry data to get the new links to interact with
       (activity-actions/get-entry entry-data))

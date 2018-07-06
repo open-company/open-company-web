@@ -80,8 +80,7 @@
                 org-data
                 jwt
                 board-data
-                all-posts-data
-                must-see-data
+                posts-data
                 nux
                 nux-loading
                 nux-end
@@ -124,10 +123,10 @@
                      (and (or (= (router/current-board-slug) "all-posts")
                               ap-initial-at)
                           ;; But no all-posts data yet
-                         (not all-posts-data))
+                         (not posts-data))
                      (and (= (router/current-board-slug) "must-see")
                           ;; But no must-see-data data yet
-                         (not must-see-data))
+                         (not posts-data))
                      ;; First ever user nux, not enough time
                      (and nux-loading
                           (not nux-end)))
@@ -137,8 +136,8 @@
                                org-data
                                (not (seq (filterv #(= (:slug %) (router/current-board-slug)) (:boards org-data)))))
         entry-not-found (and (not section-not-found)
-                             board-data
-                             (not (seq (filterv #(= % (router/current-activity-id)) (keys (:fixed-items board-data))))))
+                             posts-data
+                             (not (seq (filterv #(= % (router/current-activity-id)) (keys (:fixed-items posts-data))))))
         show-activity-not-found (and (not jwt)
                                      (router/current-activity-id)
                                      (or org-not-found

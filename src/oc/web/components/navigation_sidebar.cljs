@@ -4,29 +4,18 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.org-settings :as org-settings]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
 
-(defn close-navigation-sidebar []
-  (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
-
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
-
-(defn anchor-nav! [e url]
-  (when (and e
-             (.-preventDefault e))
-    (.preventDefault e))
-  (router/nav! url)
-  (close-navigation-sidebar))
 
 (def sidebar-top-margin 84)
 
@@ -77,6 +66,7 @@
                                 {:will-mount (fn [s]
                                   (save-window-size s)
                                   (save-content-height s)
+                                  (nav-actions/set-posts-filter (router/current-posts-filter))
                                   s)
                                  :before-render (fn [s]
                                   (activity-actions/check-invite-people-tooltip)
@@ -128,7 +118,7 @@
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952) 2) "px"))}}
       [:div.mobile-board-name-container
-        {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
+        {:on-click #(nav-actions/mobile-nav-sidebar (not mobile-navigation-sidebar))}
         [:div.board-name
           (cond
             is-all-posts "All posts"
@@ -144,7 +134,7 @@
                                       :showing-must-see show-must-see
                                       :showing-drafts show-drafts})
              :href (oc-urls/all-posts)
-             :on-click #(anchor-nav! % (oc-urls/all-posts))}
+             :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
@@ -154,7 +144,7 @@
             {:class (utils/class-set {:item-selected is-must-see
                                       :showing-drafts show-drafts})
               :href (oc-urls/must-see)
-              :on-click #(anchor-nav! % (oc-urls/must-see))}
+              :on-click #(nav-actions/nav-to-url! % (oc-urls/must-see))}
              [:div.must-see-icon
                {:class (when is-must-see "selected")}]
              [:div.must-see-label
@@ -168,7 +158,7 @@
                :data-board (name (:slug drafts-board))
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
-               :on-click #(anchor-nav! % board-url)}
+               :on-click #(nav-actions/nav-to-url! % board-url)}
               [:div.drafts-icon
                 {:class (when is-drafts-board "selected")}]
               [:div.drafts-label.group
@@ -184,9 +174,7 @@
                 "SECTIONS"]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
-                  {:on-click #(do
-                               (dis/dispatch! [:input [:show-section-add] true])
-                               (close-navigation-sidebar))
+                  {:on-click #(nav-actions/show-section-add)
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
@@ -202,7 +190,7 @@
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
-                 :on-click #(anchor-nav! % board-url)}
+                 :on-click #(nav-actions/nav-to-url! % board-url)}
                 (when (= (:access board) "public")
                   [:div.public
                     {:class (when is-current-board "selected")}])
@@ -234,8 +222,6 @@
             [:div.invite-people-tooltip-arrow]])
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
-            {:on-click #(do
-                          (org-settings/show-modal :invite)
-                          (close-navigation-sidebar))}
+            {:on-click #(nav-actions/show-invite)}
             [:div.invite-people-icon]
             [:span "Invite people"]])]]))

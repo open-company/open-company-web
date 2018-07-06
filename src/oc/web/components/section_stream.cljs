@@ -19,11 +19,11 @@
 (rum/defcs section-stream < rum/static
                             rum/reactive
                             ;; Derivatives
-                            (drv/drv :section-stream-data)
+                            (drv/drv :filtered-posts)
                             ;; Mixins
                             mixins/first-render-mixin
   [s]
-  (let [section-data (drv/react s :section-stream-data)
+  (let [section-data (drv/react s :filtered-posts)
         items (activity-utils/get-sorted-activities section-data)]
     [:div.section-stream.group
       [:div.section-stream-cards

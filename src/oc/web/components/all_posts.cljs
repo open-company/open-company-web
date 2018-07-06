@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.utils :as utils]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -94,8 +95,8 @@
 
 (rum/defcs all-posts  < rum/reactive
                         ;; Derivatives
-                        (drv/drv :all-posts)
                         (drv/drv :ap-initial-at)
+                        (drv/drv :filtered-posts)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -111,18 +112,18 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         {:will-mount (fn [s]
-                          (let [all-posts-data @(drv/get-ref s :all-posts)
-                                sorted-items (activity-utils/get-sorted-activities all-posts-data)
-                                year (:year all-posts-data)
-                                month (:month all-posts-data)
-                                direction (:direction all-posts-data)
-                                next-link (utils/link-for (:links all-posts-data) "previous")
-                                prev-link (utils/link-for (:links all-posts-data) "next")
+                          (let [posts-data @(drv/get-ref s :filtered-posts)
+                                sorted-items (activity-utils/get-sorted-activities posts-data)
+                                year (:year posts-data)
+                                month (:month posts-data)
+                                direction (:direction posts-data)
+                                next-link (utils/link-for (:links posts-data) "previous")
+                                prev-link (utils/link-for (:links posts-data) "next")
                                 first-entry-date (utils/js-date (activity-utils/get-activity-date (first sorted-items)))
                                 ap-initial-at @(drv/get-ref s :ap-initial-at)
                                 first-available-entry (when (and year month)
                                                         (get-first-available-entry
-                                                         (activity-utils/get-sorted-activities all-posts-data)
+                                                         (activity-utils/get-sorted-activities posts-data)
                                                          year
                                                          month))]
                             (if (and year month)
@@ -135,7 +136,7 @@
                               (if (= direction :up)
                                 ;; did scrolled up, we need to scroll to the first of the old items
                                 ;; to not lose the previous position
-                                (let [saved-items (:saved-items all-posts-data)
+                                (let [saved-items (:saved-items posts-data)
                                       last-new-entry-idx (dec (- (count sorted-items) saved-items))
                                       scroll-to-entry (get sorted-items last-new-entry-idx)
                                       created-date (utils/js-date (activity-utils/get-activity-date scroll-to-entry))
@@ -149,7 +150,7 @@
                                 ;; to update the calendar highlighting
                                 (if (= direction :down)
                                   ; Load more :down scroll, needs to set the calendar
-                                  (let [last-old-entry-idx (dec (:saved-items all-posts-data))
+                                  (let [last-old-entry-idx (dec (:saved-items posts-data))
                                         last-old-entry (get sorted-items last-old-entry-idx)
                                         created-date (utils/js-date (activity-utils/get-activity-date last-old-entry))
                                         to-year (.getFullYear created-date)
@@ -189,9 +190,9 @@
                                                (reset! (::last-direction s) nil))))
                           s)
                          :before-render (fn [s]
-                          (let [all-posts-data @(drv/get-ref s :all-posts)
-                                sorted-items (activity-utils/get-sorted-activities all-posts-data)]
-                            (when-not (:loading-more all-posts-data)
+                          (let [posts-data @(drv/get-ref s :filtered-posts)
+                                sorted-items (activity-utils/get-sorted-activities posts-data)]
+                            (when-not (:loading-more posts-data)
                               (when @(::top-loading s)
                                 (reset! (::top-loading s) false)
                                 (reset! (::has-next s) nil))
@@ -208,8 +209,8 @@
                                                            sorted-items
                                                            @(::selected-year s)
                                                            month)
-                                    next-link (utils/link-for (:links all-posts-data) "previous")
-                                    prev-link (utils/link-for (:links all-posts-data) "next")]
+                                    next-link (utils/link-for (:links posts-data) "previous")
+                                    prev-link (utils/link-for (:links posts-data) "next")]
                                 (reset! (::has-next s) next-link)
                                 (if prev-link
                                   (do
@@ -226,8 +227,8 @@
                             (events/unlistenByKey @(::scroll-listener s)))
                           s)}
   [s]
-  (let [all-posts-data (drv/react s :all-posts)
-        items (activity-utils/get-sorted-activities all-posts-data)]
+  (let [posts-data @(drv/get-ref s :filtered-posts)
+        items (activity-utils/get-sorted-activities posts-data)]
     [:div.all-posts.group
       [:div.all-posts-cards
         (when @(::top-loading s)
@@ -236,7 +237,7 @@
         [:div.all-posts-cards-inner.group
           (when (or @(::top-loading s)
                     @(::retrieving-calendar s)
-                    (and (:loading-more all-posts-data)
+                    (and (:loading-more posts-data)
                          (not @(:first-render-done s)))
                     @(::scroll-to-entry s)
                     (= @(::last-direction s) :up))

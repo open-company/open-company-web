@@ -166,7 +166,7 @@
                          ;; if the all-posts data are not preset
                     (and (contains? query-params :ap)
                          ;; this latter is used when displaying modal over AP
-                         (not (:fixed-items (dis/all-posts-data)))))
+                         (not (:fixed-items (dis/posts-data)))))
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))

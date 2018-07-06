@@ -97,8 +97,7 @@
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :board-data)
-                              (drv/drv :all-posts)
-                              (drv/drv :must-see)
+                              (drv/drv :filtered-posts)
                               (drv/drv :nux)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
@@ -146,24 +145,17 @@
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data-react (drv/react s :board-data)
-        all-posts-data (drv/react s :all-posts)
-        must-see-data (drv/react s :must-see)
+        board-data (drv/react s :board-data)
+        posts-data (drv/react s :filtered-posts)
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
         is-must-see (utils/in? (:route route) "must-see")
-        board-data (cond
-                     is-must-see
-                     must-see-data
-
-                     :default
-                     board-data-react)
         nux (drv/react s :nux)
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
         empty-board? (and (not nux)
-                          (zero? (count (:fixed-items board-data))))
+                          (zero? (count (:fixed-items posts-data))))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))

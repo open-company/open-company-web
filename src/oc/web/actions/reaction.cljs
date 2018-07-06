@@ -26,7 +26,7 @@
          [:react-from-picker/finish
           {:status status
            :activity-data activity-data
-           :activity-key (concat (dis/current-board-key) [:fixed-items (:uuid activity-data)])
+           :activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))
            :reaction-data (if success (json->cljs body) {})}])))))
 
 (defn reaction-toggle
@@ -46,20 +46,19 @@
   (let [activity-uuid (router/current-activity-id)
         item-uuid (:resource-uuid interaction-data)
         reaction-data (:interaction interaction-data)
-        comments-key (dis/activity-comments-key org-slug board-slug activity-uuid)
+        comments-key (dis/activity-comments-key org-slug activity-uuid)
         comments-data (get-in @dis/app-state comments-key)
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
     (nil? comment-idx)))
 
 (defn refresh-if-needed [org-slug board-slug interaction-data]
   (let [; Get the current router data
-        is-all-posts (:from-all-posts @router/path)
         activity-uuid (:resource-uuid interaction-data)
         ; Board data
-        board-key (if is-all-posts (dis/all-posts-key org-slug) (dis/board-data-key org-slug board-slug))
+        board-key (dis/board-data-key org-slug board-slug)
         board-data (get-in @dis/app-state board-key)
         ; Entry data
-        entry-key (dis/activity-key org-slug board-slug activity-uuid)
+        entry-key (dis/activity-key org-slug activity-uuid)
         entry-data (get-in @dis/app-state entry-key)
         reaction-data (:interaction interaction-data)
         is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))]
