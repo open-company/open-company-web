@@ -81,7 +81,9 @@
         {:on-click #(do
                       (reset! (::timeout s) nil)
                       (js/clearTimeout @(::timeout s))
-                      (notification-actions/remove-notification notification-data))}])
+                      (notification-actions/remove-notification notification-data)
+                      (when (fn? dismiss)
+                        (dismiss %)))}])
     (when (seq description)
       [:div.notification-description
         (description-wrapper description)])
