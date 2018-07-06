@@ -93,7 +93,6 @@
    :route               [[] route-db]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
-   :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
@@ -282,15 +281,13 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :nux :ap-initial-at :must-see
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :ap-initial-at :must-see
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :notifications-data :jwt]
-                            (fn [base orgs org-data board-data all-posts activity-data nux ap-initial-at must-see
+                            :mobile-menu-open :jwt]
+                            (fn [base orgs org-data board-data all-posts activity-data ap-initial-at must-see
                                  show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open notifications-data jwt]
-                              {:nux nux
-                               :nux-loading (:nux-loading base)
-                               :nux-end (:nux-end base)
+                                 mobile-menu-open jwt]
+                              {:show-onboard-overlay (:show-onboard-overlay base)
                                :jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -313,8 +310,7 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open
-                               :notifications (count notifications-data)})]})
+                               :mobile-menu-open mobile-menu-open})]})
 
 
 ;; Action Loop =================================================================

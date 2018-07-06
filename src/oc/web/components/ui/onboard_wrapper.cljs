@@ -14,6 +14,7 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -709,10 +710,7 @@
                           (if (and (empty? (jwt/get-key :first-name))
                                    (empty? (jwt/get-key :last-name)))
                             (do
-                              (cook/set-cookie!
-                               (router/show-nux-cookie (jwt/user-id))
-                               (:new-user router/nux-cookie-values)
-                               (* 60 60 24 7))
+                              (nux-actions/set-new-user-cookie "email")
                               (router/nav! oc-urls/confirm-invitation-profile))
                             (router/nav! (oc-urls/org (:slug org))))
                           (router/nav! oc-urls/login)))
