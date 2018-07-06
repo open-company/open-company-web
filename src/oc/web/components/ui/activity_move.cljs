@@ -40,6 +40,8 @@
   [s {:keys [boards-list activity-data dismiss-cb]}]
   [:div.activity-move
     {:ref "activity-move"
+     :on-mouse-leave #(when (fn? dismiss-cb)
+                        (dismiss-cb))
      :on-click #(do
                   (utils/event-stop %)
                   (when @(::show-boards-list s)

@@ -12,9 +12,9 @@ div.more-menu {
 
   div.activity-move {
     position: absolute;
-    top: 60px;
+    top: 40px;
     left: unset;
-    right: 14px;
+    right: 22px;
   }
 
   button.more-menu-bt {
@@ -111,13 +111,18 @@ div.more-menu {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_mustsee.svg");
         }
-        border: none;
-        padding-bottom: 0px;
       }
 
       &.must-see-on {
         &:before {
           background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+        }
+      }
+
+      &.move {
+        &:before {
+          background-image: cdnUrl("/img/ML/move_activity.svg");
+          background-size: 14px 14px;
         }
         border: none;
         padding-bottom: 0px;
@@ -133,6 +138,7 @@ div.more-menu {
         background-repeat: no-repeat;
         background-size: 14px 16px;
         background-position: center;
+        background-color: transpant;
       }
 
       &.disabled {

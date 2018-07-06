@@ -3,13 +3,15 @@
   (:require [rum.core :as rum]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.alert-modal :as alert-modal]))
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.activity-move :refer (activity-move)]))
 
 (defn show-hide-menu
   [s will-open will-close]
@@ -41,10 +43,11 @@
                     }]
     (alert-modal/show-alert alert-data)))
 
-(rum/defcs more-menu < rum/static
+(rum/defcs more-menu < rum/reactive
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
                        (rum/local nil ::click-listener)
+                       (drv/drv :editable-boards)
                        {:will-mount (fn [s]
                          (reset! (::click-listener s)
                            (events/listen js/window EventType/CLICK
@@ -61,10 +64,11 @@
                            (reset! (::click-listener s) nil))
                          s)}
   [s activity-data share-container-id
-   {:keys [will-open will-close]}]
+   {:keys [will-open will-close tooltip-position]}]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
-        share-link (utils/link-for (:links activity-data) "share")]
+        share-link (utils/link-for (:links activity-data) "share")
+        editable-boards (drv/react s :editable-boards)]
     (when (or edit-link
               share-link
               delete-link)
@@ -75,11 +79,16 @@
            :on-click #(show-hide-menu s will-open will-close)
            :class (when @(::showing-menu s) "active")
            :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-           :data-placement "top"
+           :data-placement (or tooltip-position "top")
            :data-container "body"
            :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
            :title "More"}]
-        (when @(::showing-menu s)
+        (cond
+          @(::move-activity s)
+          (activity-move {:boards-list (vals editable-boards)
+                          :activity-data activity-data
+                          :dismiss-cb #(reset! (::move-activity s) false)})
+          @(::showing-menu s)
           [:ul.more-menu-list
              {:on-mouse-leave #(show-hide-menu s will-open will-close)}
             (when edit-link
@@ -104,8 +113,14 @@
                              (activity-actions/toggle-must-see activity-data))}
                (if (:must-see activity-data)
                  "Unmark"
-                 "Must see")]
-              )])
+                 "Must see")])
+            (when edit-link
+              [:li.move
+               {:on-click #(do
+                             (utils/event-stop %)
+                             (reset! (::showing-menu s) false)
+                             (reset! (::move-activity s) true))}
+               "Move"])])
           (when (and share-link (not (responsive/is-tablet-or-mobile?)))
             [:button.mlb-reset.more-menu-share-bt
               {:type "button"
