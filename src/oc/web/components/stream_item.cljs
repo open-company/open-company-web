@@ -13,7 +13,6 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.components.ui.tile-menu :refer (tile-menu)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
@@ -127,10 +126,7 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (when (and (not is-mobile?)
-                   (not is-drafts-board))
-          (tile-menu activity-data dom-element-id))
-        (when is-mobile?
+        (when (not is-drafts-board)
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)}))
@@ -142,6 +138,10 @@
           [:div.stream-item-headline
             {:ref "activity-headline"
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          (when (:must-see activity-data)
+            [:div.must-see
+             {:class (utils/class-set {:must-see-on
+                                       (:must-see activity-data)})}])
           [:div.stream-item-body-container
             [:div.stream-item-body
               {:class (utils/class-set {:expanded expanded?})}
