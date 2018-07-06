@@ -282,92 +282,6 @@
     (api/update-entry activity-data :modal-editing-data create-update-entry-cb))
   (dis/dispatch! [:entry-modal-save]))
 
-(defn nux-next-step [next-step]
-  (dis/dispatch! [:nux-next-step next-step]))
-
-(defn show-invite-people-tooltip []
-  (dis/dispatch! [:input [:show-invite-people-tooltip] true]))
-
-(defn hide-invite-people-tooltip []
-  (dis/dispatch! [:input [:show-invite-people-tooltip] false]))
-
-(defn remove-invite-people-tooltip []
-  (cook/remove-cookie! (router/show-invite-people-tooltip-cookie))
-  (hide-invite-people-tooltip))
-
-(defn show-add-post-tooltip []
-  (dis/dispatch! [:input [:show-add-post-tooltip] true]))
-
-(defn should-show-invite-people-tooltip []
-  (let [org-data (dis/org-data)
-        team-data (dis/team-data (:team-id org-data))
-        board-data (dis/board-data)
-        posts (vals (:fixed-items board-data))]
-    (and ;; cookie is set
-         (cook/get-cookie (router/show-invite-people-tooltip-cookie))
-         ;; user is alone in the team
-         (= (count (:users team-data)) 1)
-         ;; has at least 1 user added post
-         (> (count posts) 1))))
-
-(defn check-invite-people-tooltip []
-  (if (should-show-invite-people-tooltip)
-    (show-invite-people-tooltip)
-    (hide-invite-people-tooltip)))
-
-(defn hide-add-post-tooltip []
-  (let [add-post-cookie-name (router/show-add-post-tooltip-cookie)
-        show-add-post-tooltip (cook/get-cookie add-post-cookie-name)
-        team-data (dis/team-data (:team-id (dis/org-data)))]
-    (cook/remove-cookie! (router/show-add-post-tooltip-cookie))
-    (dis/dispatch! [:input [:show-add-post-tooltip] false])
-    ;; Show the invite people tooltip if
-    (when (and ;; was showing the add post tooltip
-               show-add-post-tooltip
-               ;; the team has only the current user
-               (= (count (:users team-data)) 1))
-      (cook/set-cookie! (router/show-invite-people-tooltip-cookie) true (* 60 60 24 365))
-      (when (should-show-invite-people-tooltip)
-        (check-invite-people-tooltip)))))
-
-(defn should-show-add-post-tooltip
-  "Check if we need to show the add post tooltip."
-  []
-  (let [org-data (dis/org-data)]
-    (and ;; The cookie is set
-         (cook/get-cookie (router/show-add-post-tooltip-cookie))
-         ;; user has edit permission
-         (utils/link-for (:links org-data) "create")
-         ;; has only one board
-         (= (count (:boards org-data)) 1)
-         ;; and the board
-         (let [board-data (dis/board-data)
-               first-post (first (vals (:fixed-items board-data)))
-               first-post-author (when first-post
-                                   (if (map? (:author first-post))
-                                      (:author first-post)
-                                      (first (:author first-post))))]
-           ;; or
-           (or (and ;; has only one post
-                    (= (count (:fixed-items board-data)) 1)
-                    first-post
-                    ;; from CarrotHQ
-                    (= (:user-id first-post-author) "1111-1111-1111"))
-                ;; has no posts
-               (zero? (count (:fixed-items board-data))))))))
-
-(defn check-add-post-tooltip []
-  (if (should-show-add-post-tooltip)
-    (show-add-post-tooltip)
-    (hide-add-post-tooltip)))
-
-(defn nux-end []
-  ;; Add the cookie to show the add post tooltip
-  (cook/set-cookie! (router/show-add-post-tooltip-cookie) true (* 60 60 24 365))
-  (check-add-post-tooltip)
-  (cook/remove-cookie! (router/show-nux-cookie (jwt/user-id)))
-  (dis/dispatch! [:nux-end]))
-
 (defn add-attachment [dispatch-input-key attachment-data]
   (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data]))
 
@@ -519,6 +433,7 @@
   (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
 (defn secure-activity-get []
+
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
 ;; Change reaction

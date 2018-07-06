@@ -113,7 +113,7 @@
           {:href "#"
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
-            "Digest Settings"]])
+            "Settings"]])
       ; TODO: need a better experience for these links.
       ; [:a
       ;   {:href oc-urls/what-s-new

@@ -10,6 +10,7 @@
             [oc.web.local_settings :as ls]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -64,8 +65,7 @@
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
-        (or (status-response :name-required)
-            (:new-slack-user @dis/app-state))
+        (status-response :name-required)
         (if has-orgs
           (router/nav! oc-urls/confirm-invitation-profile)
           (router/nav! oc-urls/sign-up-profile))
@@ -117,13 +117,6 @@
                       (utils/in? (:route @router/path) "login")
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
-
-(defn slack-lander-new-user []
-  (cook/set-cookie!
-   (router/show-nux-cookie
-    (jwt/get-key :user-id))
-   (:new-user router/nux-cookie-values)
-   (* 60 60 24 7)))
 
 (defn slack-lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point
@@ -186,7 +179,7 @@
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
         (dis/dispatch! [:user-data (json->cljs data)])
-        (utils/after 100 org-actions/maybe-show-add-bot-notification?)))
+        (utils/after 100 nux-actions/check-nux)))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
@@ -265,10 +258,7 @@
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
-      (cook/set-cookie!
-       (router/show-nux-cookie (jwt/user-id))
-       (:new-user router/nux-cookie-values)
-       (* 60 60 24 7))
+      (nux-actions/set-new-user-cookie "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
@@ -303,10 +293,7 @@
             (cook/remove-cookie! :show-login-overlay)
             (utils/after 200 #(router/nav! oc-urls/login)))
           (do
-            (cook/set-cookie!
-             (router/show-nux-cookie (jwt/user-id))
-             (:new-user router/nux-cookie-values)
-             (* 60 60 24 7))
+            (nux-actions/set-new-user-cookie "email")
             (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))
   (dis/dispatch! [:pswd-collect password-reset?]))

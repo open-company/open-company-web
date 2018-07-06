@@ -9,7 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.components.org-settings :as org-settings]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -79,7 +79,7 @@
                                   (save-content-height s)
                                   s)
                                  :before-render (fn [s]
-                                  (activity-actions/check-invite-people-tooltip)
+                                  (nux-actions/check-nux)
                                   s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
@@ -226,7 +226,7 @@
         (when show-invite-people-tooltip
           [:div.invite-people-tooltip-container.group
             [:button.mlb-reset.invite-people-tooltip-dismiss
-              {:on-click #(activity-actions/remove-invite-people-tooltip)}]
+              {:on-click #(nux-actions/dismiss-invite-people-tooltip)}]
             [:div.invite-people-tooltip-icon]
             [:div.invite-people-tooltip-title
               "Well done on your first post!"]

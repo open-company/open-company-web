@@ -37,7 +37,7 @@
       [:a.org-settings-tab-link
         {:href "#"
          :on-click #(do (utils/event-stop %) (show-modal :main))}
-        "DIGEST SETTINGS"]]
+        "SETTINGS"]]
     [:div.org-settings-tab
       {:class (when (= :team active-tab) "active")}
       [:a.org-settings-tab-link
