@@ -9,8 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.org :as org-actions]
-            [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.actions.activity :as activity-actions]))
+            [oc.web.lib.json :refer (json->cljs)]))
 
 (defn roster-get [roster-link]
   (api/get-team roster-link
@@ -38,7 +37,7 @@
       (let [team-data (when success (json->cljs body))]
         (when success
           (dis/dispatch! [:team-loaded team-data])
-          (utils/after 100 org-actions/maybe-show-add-bot-notification?)
+          (utils/after 100 org-actions/maybe-show-bot-added-notification?)
           (enumerate-channels team-data))))))
 
 (defn force-team-refresh [team-id]
@@ -104,7 +103,6 @@
   (if success
     (do
       (teams-get)
-      (activity-actions/remove-invite-people-tooltip)
       (dis/dispatch! [:invite-user/success user]))
     (dis/dispatch! [:invite-user/failed user])))
 

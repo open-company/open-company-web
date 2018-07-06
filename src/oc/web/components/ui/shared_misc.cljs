@@ -87,6 +87,7 @@
           [:div.keep-aligned-section-list-item
             "Attachments from Google, Dropbox, & others"]]]
 
+
       [:div.keep-aligned-section-row
         [:div.keep-aligned-section-screenshot.screenshot-1]
         [:div.keep-aligned-section-copy
@@ -98,6 +99,7 @@
             "Follow people and topics you can’t miss"]
           [:div.keep-aligned-section-list-item
             "Organized and easy to browse"]]]
+
 
       [:div.keep-aligned-section-row
         [:div.keep-aligned-section-screenshot.screenshot-3]

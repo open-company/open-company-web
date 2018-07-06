@@ -9,7 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.components.org-settings :as org-settings]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -79,7 +79,7 @@
                                   (save-content-height s)
                                   s)
                                  :before-render (fn [s]
-                                  (activity-actions/check-invite-people-tooltip)
+                                  (nux-actions/check-nux)
                                   s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
@@ -102,11 +102,13 @@
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
+        is-must-see (= (router/current-board-slug) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
+        show-must-see (pos? (:must-see-count org-data))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -131,6 +133,7 @@
           (cond
             is-all-posts "All posts"
             is-drafts-board "Drafts"
+            is-must-see "Must see"
             :else (:name board-data))]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -138,6 +141,7 @@
         (when show-all-posts
           [:a.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-all-posts
+                                      :showing-must-see show-must-see
                                       :showing-drafts show-drafts})
              :href (oc-urls/all-posts)
              :on-click #(anchor-nav! % (oc-urls/all-posts))}
@@ -145,6 +149,16 @@
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
               "All posts"]])
+        (when show-must-see
+           [:a.must-see.hover-item.group
+            {:class (utils/class-set {:item-selected is-must-see
+                                      :showing-drafts show-drafts})
+              :href (oc-urls/must-see)
+              :on-click #(anchor-nav! % (oc-urls/must-see))}
+             [:div.must-see-icon
+               {:class (when is-must-see "selected")}]
+             [:div.must-see-label
+               "Must see"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group
@@ -211,7 +225,7 @@
         (when show-invite-people-tooltip
           [:div.invite-people-tooltip-container.group
             [:button.mlb-reset.invite-people-tooltip-dismiss
-              {:on-click #(activity-actions/remove-invite-people-tooltip)}]
+              {:on-click #(nux-actions/dismiss-invite-people-tooltip)}]
             [:div.invite-people-tooltip-icon]
             [:div.invite-people-tooltip-title
               "Well done on your first post!"]

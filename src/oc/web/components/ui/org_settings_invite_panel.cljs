@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.team :as team-actions]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -39,9 +39,14 @@
   (reset! (::inviting-from s) value)
   (doseq [i (range (count invite-users))
           :let [user (get invite-users i)]]
-    (when (and (empty? (:user user))
-               (empty? (:temp-user user)))
-      (dis/dispatch! [:input [:invite-users i :type] value]))))
+    (if (= value "slack")
+      (when (and (empty? (:user user))
+                 (empty? (:temp-user user)))
+        (dis/dispatch! [:input [:invite-users i :type] value]))
+      (when (empty? (:user user))
+        (dis/dispatch! [:update [:invite-users i] #(merge % {:type value
+                                                             :user (:temp-user user)
+                                                             :temp-user ""})])))))
 
 (defn setup-initial-rows [s]
   (let [inviting-users-data @(drv/get-ref s :invite-data)
@@ -52,7 +57,8 @@
                                      (:can-slack-invite team-data))
                               "slack"
                               "email")
-        invite-from (or @(::inviting-from s) invite-from-default)]
+        old-inviting-from @(::inviting-from s)
+        invite-from (or old-inviting-from invite-from-default)]
     ;; Setup the invite from if it's not already
     (when (nil? @(::inviting-from s))
       (reset! (::inviting-from s) invite-from))
@@ -62,7 +68,8 @@
       (let [new-row (new-user-row s)]
         (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))]))
       ;; if there are change those w/o value to the current invite from
-      (user-type-did-change s invite-users invite-from))))
+      (when (not= invite-from old-inviting-from)
+        (user-type-did-change s invite-users invite-from)))))
 
 (rum/defcs org-settings-invite-panel
   < rum/reactive
@@ -73,7 +80,7 @@
     (rum/local 0 ::sending)
     {:will-mount (fn [s]
                    (setup-initial-rows s)
-                   (activity-actions/remove-invite-people-tooltip)
+                   (nux-actions/dismiss-invite-people-tooltip)
                    s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")

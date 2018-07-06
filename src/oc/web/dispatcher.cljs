@@ -29,6 +29,9 @@
 (defn all-posts-key [org-slug]
   (vec (concat (boards-key org-slug) [:all-posts :board-data])))
 
+(defn must-see-key [org-slug]
+  (vec (concat (boards-key org-slug) [:must-see :board-data])))
+
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
@@ -70,11 +73,18 @@
   []
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
-        ;; if we are coming from all-posts
-        (if (or (:from-all-posts @router/path) (= board-slug "all-posts"))
-          ;; We need to update the entry in all-posts data, not in the board data
-          (all-posts-key org-slug)
-          (board-data-key org-slug board-slug))))
+        ;; if we are coming from all-posts, must-see
+    (cond
+
+     (or (:from-all-posts @router/path) (= board-slug "all-posts"))
+     ;; We need to update the entry in all-posts data, not in the board data
+     (all-posts-key org-slug)
+
+     (= board-slug "must-see")
+     (must-see-key org-slug)
+
+     :default
+     (board-data-key org-slug board-slug))))
 
 ;; Derived Data ================================================================
 
@@ -83,7 +93,6 @@
    :route               [[] route-db]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
-   :nux                 [[:base] (fn [base] (:nux base))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
@@ -147,6 +156,11 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (all-posts-key org-slug))))]
+   :must-see        [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (must-see-key org-slug))))]
+
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -267,20 +281,19 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :nux :ap-initial-at
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :ap-initial-at :must-see
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :notifications-data :jwt]
-                            (fn [base orgs org-data board-data all-posts activity-data nux ap-initial-at
+                            :mobile-menu-open :jwt]
+                            (fn [base orgs org-data board-data all-posts activity-data ap-initial-at must-see
                                  show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open notifications-data jwt]
-                              {:nux nux
-                               :nux-loading (:nux-loading base)
-                               :nux-end (:nux-end base)
+                                 mobile-menu-open jwt]
+                              {:show-onboard-overlay (:show-onboard-overlay base)
                                :jwt jwt
                                :orgs orgs
                                :org-data org-data
                                :board-data board-data
                                :all-posts-data all-posts
+                               :must-see-data must-see
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
@@ -297,8 +310,7 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open
-                               :notifications (count notifications-data)})]})
+                               :mobile-menu-open mobile-menu-open})]})
 
 
 ;; Action Loop =================================================================
@@ -375,6 +387,15 @@
     (all-posts-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (all-posts-key org-slug))))
+
+(defn must-see-data
+  "Get org must-see data."
+  ([]
+    (must-see-data @app-state))
+  ([data]
+    (must-see-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (must-see-key org-slug))))
 
 (defn change-data
   "Get change data."
