@@ -148,27 +148,26 @@
     (assoc-in db board-key next-board-data)))
 
 (defmethod dispatcher/action :activity-move
-  [db [_ activity-data org-slug board-data is-all-posts]]
+  [db [_ activity-data org-slug board-data]]
   (let [fixed-activity-data (merge activity-data {:board-slug (:slug board-data)
                                                   :board-name (:name board-data)
-                                                  :board-uuid (:uuid board-data)})]
-    (if is-all-posts
-      (let [next-activity-data-key (dispatcher/activity-key
-                                    org-slug
-                                    :all-posts
-                                    (:uuid activity-data))]
-        (assoc-in db next-activity-data-key fixed-activity-data))
-      (let [activity-data-key (dispatcher/activity-key
-                               org-slug
-                               (:board-slug activity-data)
-                               (:uuid activity-data))
-            next-activity-data-key (dispatcher/activity-key
-                                    org-slug
-                                    (:slug board-data)
-                                    (:uuid activity-data))]
-        (-> db
-          (update-in (butlast activity-data-key) dissoc (last activity-data-key))
-          (assoc-in next-activity-data-key fixed-activity-data))))))
+                                                  :board-uuid (:uuid board-data)})
+        all-posts-activity-key (dispatcher/activity-key
+                                org-slug
+                                :all-posts
+                                (:uuid activity-data))
+        old-board-activity-key (dispatcher/activity-key
+                                org-slug
+                                (:board-slug activity-data)
+                                (:uuid activity-data))
+        new-board-activity-key (dispatcher/activity-key
+                                org-slug
+                                (:slug board-data)
+                                (:uuid activity-data))]
+    (-> db
+      (assoc-in all-posts-activity-key fixed-activity-data)
+      (update-in (butlast old-board-activity-key) dissoc (last old-board-activity-key))
+      (assoc-in new-board-activity-key fixed-activity-data))))
 
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data container-element-id]]
