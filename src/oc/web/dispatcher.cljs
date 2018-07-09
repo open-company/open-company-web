@@ -35,6 +35,9 @@
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
+(defn change-cache-data-key [org-slug]
+  (vec (conj (org-key org-slug) :change-cache-data)))
+
 (defn board-key [org-slug board-slug]
   (vec (conj (boards-key org-slug) (keyword board-slug))))
 
@@ -410,6 +413,15 @@
     (change-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (change-data-key org-slug))))
+
+(defn change-cache-data
+  "Get change data."
+  ([]
+    (change-cache-data @app-state))
+  ([data]
+    (change-cache-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (change-cache-data-key org-slug))))
 
 (defn board-data
   "Get board data."
