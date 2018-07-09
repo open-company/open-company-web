@@ -12,9 +12,7 @@
     db
     (-> db
       (assoc :activity-modal-fade-in (:uuid activity-data))
-      (assoc :dismiss-modal-on-editing-stop (and editing dismiss-on-editing-end))
-      ;; Make sure the seen-at is not reset when navigating to modal view
-      (assoc :no-reset-seen-at true))))
+      (assoc :dismiss-modal-on-editing-stop (and editing dismiss-on-editing-end)))))
 
 (defmethod dispatcher/action :activity-modal-fade-out
   [db [_ board-slug]]
