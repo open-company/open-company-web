@@ -58,13 +58,16 @@
                                    (will-close)))
                                (reset! (::showing-menu s) false))))
                          s)
+                        :did-mount (fn [s]
+                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                         s)
                         :will-unmount (fn [s]
                          (when @(::click-listener s)
                            (events/unlistenByKey @(::click-listener s))
                            (reset! (::click-listener s) nil))
                          s)}
   [s activity-data share-container-id
-   {:keys [will-open will-close tooltip-position]}]
+   {:keys [will-open will-close external-share tooltip-position]}]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
@@ -73,16 +76,20 @@
               share-link
               delete-link)
       [:div.more-menu
-        [:button.mlb-reset.more-menu-bt
-          {:type "button"
-           :ref "more-menu-bt"
-           :on-click #(show-hide-menu s will-open will-close)
-           :class (when @(::showing-menu s) "active")
-           :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-           :data-placement (or tooltip-position "top")
-           :data-container "body"
-           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-           :title "More"}]
+        (when (or edit-link
+                  delete-link
+                  (and (not external-share)
+                       share-link))
+          [:button.mlb-reset.more-menu-bt
+            {:type "button"
+             :ref "more-menu-bt"
+             :on-click #(show-hide-menu s will-open will-close)
+             :class (when @(::showing-menu s) "active")
+             :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+             :data-placement (or tooltip-position "top")
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :title "More"}])
         (cond
           @(::move-activity s)
           (activity-move {:boards-list (vals editable-boards)
@@ -99,10 +106,18 @@
               [:li.delete
                 {:on-click #(delete-clicked % activity-data)}
                 "Delete"])
-            (when (and share-link (responsive/is-tablet-or-mobile?))
-             [:li.share
-               {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
-              "Share"])
+            (when edit-link
+              [:li.move
+               {:on-click #(do
+                             (utils/event-stop %)
+                             (reset! (::showing-menu s) false)
+                             (reset! (::move-activity s) true))}
+               "Move"])
+            (when (and (not external-share)
+                       share-link)
+              [:li.share
+                {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
+                "Share"])
             (when edit-link
               [:li
                {:class (utils/class-set
@@ -113,22 +128,17 @@
                              (activity-actions/toggle-must-see activity-data))}
                (if (:must-see activity-data)
                  "Unmark"
-                 "Must see")])
-            (when edit-link
-              [:li.move
-               {:on-click #(do
-                             (utils/event-stop %)
-                             (reset! (::showing-menu s) false)
-                             (reset! (::move-activity s) true))}
-               "Move"])])
-          (when (and share-link (not (responsive/is-tablet-or-mobile?)))
-            [:button.mlb-reset.more-menu-share-bt
-              {:type "button"
-               :ref "tile-menu-share-bt"
-               :on-click #(activity-actions/activity-share-show
-                           activity-data
-                           share-container-id)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Share"}])])))
+                 "Must see")])])
+        (when (and external-share
+                   share-link
+                   (not (responsive/is-tablet-or-mobile?)))
+          [:button.mlb-reset.more-menu-share-bt
+            {:type "button"
+             :ref "tile-menu-share-bt"
+             :on-click #(activity-actions/activity-share-show
+                         activity-data
+                         share-container-id)
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :title "Share"}])])))

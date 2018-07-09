@@ -1,6 +1,6 @@
 div.more-menu {
   float: right;
-  width: 60px;
+  width: auto;
   height: 30px;
   transform: opacity 180ms ease-in;
   opacity: 1;
@@ -60,30 +60,27 @@ div.more-menu {
   ul.more-menu-list {
     position: absolute;
     top: 26px;
-    left: calc(100% - 136px);
-    width: 146px;
+    left: calc(100% - 118px);
+    width: 128px;
     outline: none;
     z-index: 110;
     background-color: $deep_navy;
     border: 1px solid $deep_tan;
-    box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
-    border-radius: 5px;
+    box-shadow: none;
+    border-radius: 4px;
     margin: 0;
-    padding: 12px 24px 12px 24px;
+    padding: 0px 16px;
     list-style-type: none;
 
     li {
-      height: 18px;
+      height: 48px;
       @include avenir_H();
       font-size: 14px;
       color: white;
       cursor: pointer;
-      padding-left: 32px;
-      padding-bottom: 32px;
+      padding: 16px 0px 16px 32px;
       position: relative;
-      margin-top: 16px;
-      border-bottom: 1px solid $deep_tan;
-      opacity: 0.9;
+      border-bottom: 1px solid rgba(white, 0.1);
 
       &:first-child {
         margin-top: 0px;
@@ -131,12 +128,12 @@ div.more-menu {
       &:before {
         content: "";
         position: absolute;
-        top: 0px;
+        top: 16px;
         left: 0px;
-        width: 14px;
+        width: 16px;
         height: 16px;
         background-repeat: no-repeat;
-        background-size: 14px 16px;
+        background-size: 16px 16px;
         background-position: center;
         background-color: transpant;
       }

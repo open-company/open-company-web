@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-    <title>Combined Shape</title>
+    <title>Rectangle</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Must-see" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="June-20:-Mobile-stream-menu" transform="translate(-249.000000, -283.000000)" fill="#FFFFFF" fill-rule="nonzero">
-            <g id="Group-5" transform="translate(0.000000, 89.000000)">
-                <g id="Group-14" transform="translate(231.000000, 36.000000)">
-                    <path d="M30.4615385,160.626318 L23.3131591,167.774698 C23.0127558,168.075101 22.5257058,168.075101 22.2253025,167.774698 C21.9248992,167.474294 21.9248992,166.987244 22.2253025,166.686841 L29.3736819,159.538462 L27.3846154,159.538462 C26.959781,159.538462 26.6153846,159.194065 26.6153846,158.769231 C26.6153846,158.344396 26.959781,158 27.3846154,158 L31.2307692,158 C31.6556037,158 32,158.344396 32,158.769231 L32,162.615385 C32,163.040219 31.6556037,163.384615 31.2307692,163.384615 C30.8059348,163.384615 30.4615385,163.040219 30.4615385,162.615385 L30.4615385,160.626318 Z M30.4444444,165.777778 C30.4444444,165.348223 30.7926674,165 31.2222222,165 C31.651777,165 32,165.348223 32,165.777778 L32,170.446354 C32,171.305212 31.3049044,172 30.4445583,172 L19.5554417,172 C18.6959926,172 18,171.305307 18,170.444558 L18,159.555442 C18,158.696752 18.694996,158 19.5536458,158 L24.2222222,158 C24.651777,158 25,158.348223 25,158.777778 C25,159.207333 24.651777,159.555556 24.2222222,159.555556 L19.5555556,159.555556 L19.5555556,170.444444 L30.4444444,170.444444 L30.4444444,165.777778 Z" id="Combined-Shape"></path>
-                </g>
+    <g id="Misc-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0">
+        <g id="Grid-data-update" transform="translate(-727.000000, -507.000000)" fill="#FFFFFF">
+            <g id="Group-14" transform="translate(710.000000, 350.000000)">
+                <rect id="Rectangle" x="17" y="157" width="16" height="16"></rect>
             </g>
         </g>
     </g>

@@ -129,7 +129,8 @@
         (when (not is-drafts-board)
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
-            :will-close #(reset! (::more-menu-open s) false)}))
+            :will-close #(reset! (::more-menu-open s) false)
+            :external-share true}))
         (when (:new activity-data)
           [:div.new-tag
             "New"])]
