@@ -8,6 +8,7 @@
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
+            [oc.web.stores.routing]
             [oc.web.stores.org]
             [oc.web.stores.team]
             [oc.web.stores.user]
@@ -29,6 +30,7 @@
             [oc.web.actions.nux :as na]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -56,7 +58,6 @@
 (enable-console-print!)
 
 (defn drv-root [component target]
-  (swap! dis/app-state assoc :router-path @router/path)
   (ru/drv-root {:state dis/app-state
                 :drv-spec (dis/drv-spec dis/app-state router/path)
                 :component component
@@ -122,25 +123,25 @@
   (inject-loading))
 
 (defn post-routing []
-  (utils/after 10 (fn []
-    (let [force-refresh (or (utils/in? (:route @router/path) "org")
-                            (utils/in? (:route @router/path) "login"))
-          latest-entry-point (if (or force-refresh
-                                     (nil? (:latest-entry-point @dis/app-state)))
+  (routing-actions/routing @router/path)
+  (let [force-refresh (or (utils/in? (:route @router/path) "org")
+                          (utils/in? (:route @router/path) "login"))
+        latest-entry-point (if (or force-refresh
+                                   (nil? (:latest-entry-point @dis/app-state)))
+                             0
+                             (:latest-entry-point @dis/app-state))
+        latest-auth-settings (if (or force-refresh
+                                     (nil? (:latest-auth-settings @dis/app-state)))
                                0
-                               (:latest-entry-point @dis/app-state))
-          latest-auth-settings (if (or force-refresh
-                                       (nil? (:latest-auth-settings @dis/app-state)))
-                                 0
-                                 (:latest-auth-settings @dis/app-state))
-          now (.getTime (js/Date.))
-          reload-time (* 1000 60 20)] ; every 20m
-      (when (or (> (- now latest-entry-point) reload-time)
-                (and (router/current-org-slug)
-                     (nil? (dis/org-data))))
-        (user-actions/entry-point-get (router/current-org-slug)))
-      (when (> (- now latest-auth-settings) reload-time)
-        (user-actions/auth-settings-get))))))
+                               (:latest-auth-settings @dis/app-state))
+        now (.getTime (js/Date.))
+        reload-time (* 1000 60 20)] ; every 20m
+    (when (or (> (- now latest-entry-point) reload-time)
+              (and (router/current-org-slug)
+                   (nil? (dis/org-data))))
+      (user-actions/entry-point-get (router/current-org-slug)))
+    (when (> (- now latest-auth-settings) reload-time)
+      (user-actions/auth-settings-get))))
 
 ;; home
 (defn home-handler [target params]
