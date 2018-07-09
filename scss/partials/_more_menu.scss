@@ -86,6 +86,10 @@ div.more-menu {
         margin-top: 0px;
       }
 
+      &:last-child {
+        border-bottom: 0px;
+      }
+
       &.edit {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_edit.svg");
@@ -121,8 +125,6 @@ div.more-menu {
           background-image: cdnUrl("/img/ML/move_activity.svg");
           background-size: 14px 14px;
         }
-        border: none;
-        padding-bottom: 0px;
       }
 
       &:before {
