@@ -55,6 +55,9 @@
                                    (will-close)))
                                (reset! (::showing-menu s) false))))
                          s)
+                        :did-mount (fn [s]
+                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                         s)
                         :will-unmount (fn [s]
                          (when @(::click-listener s)
                            (events/unlistenByKey @(::click-listener s))
@@ -69,16 +72,18 @@
               share-link
               delete-link)
       [:div.more-menu
-        [:button.mlb-reset.more-menu-bt
-          {:type "button"
-           :ref "more-menu-bt"
-           :on-click #(show-hide-menu s will-open will-close)
-           :class (when @(::showing-menu s) "active")
-           :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-           :data-placement "top"
-           :data-container "body"
-           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-           :title "More"}]
+        (when (or edit-link
+                  delete-link)
+          [:button.mlb-reset.more-menu-bt
+            {:type "button"
+             :ref "more-menu-bt"
+             :on-click #(show-hide-menu s will-open will-close)
+             :class (when @(::showing-menu s) "active")
+             :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :title "More"}])
         (when @(::showing-menu s)
           [:ul.more-menu-list
              {:on-mouse-leave #(show-hide-menu s will-open will-close)}
@@ -90,10 +95,6 @@
               [:li.delete
                 {:on-click #(delete-clicked % activity-data)}
                 "Delete"])
-            (when (and share-link (responsive/is-tablet-or-mobile?))
-             [:li.share
-               {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
-              "Share"])
             (when edit-link
               [:li
                {:class (utils/class-set
