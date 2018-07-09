@@ -64,7 +64,7 @@
                            (reset! (::click-listener s) nil))
                          s)}
   [s activity-data share-container-id
-   {:keys [will-open will-close]}]
+   {:keys [will-open will-close external-share]}]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")]
@@ -73,7 +73,9 @@
               delete-link)
       [:div.more-menu
         (when (or edit-link
-                  delete-link)
+                  delete-link
+                  (and (not external-share)
+                       share-link))
           [:button.mlb-reset.more-menu-bt
             {:type "button"
              :ref "more-menu-bt"
@@ -95,6 +97,11 @@
               [:li.delete
                 {:on-click #(delete-clicked % activity-data)}
                 "Delete"])
+            (when (and (not external-share)
+                       share-link)
+              [:li.share
+                {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
+                "Share"])
             (when edit-link
               [:li
                {:class (utils/class-set
@@ -107,7 +114,9 @@
                  "Unmark"
                  "Must see")]
               )])
-          (when (and share-link (not (responsive/is-tablet-or-mobile?)))
+          (when (and external-share
+                     share-link
+                     (not (responsive/is-tablet-or-mobile?)))
             [:button.mlb-reset.more-menu-share-bt
               {:type "button"
                :ref "tile-menu-share-bt"
