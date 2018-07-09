@@ -75,9 +75,6 @@
                                        (not @(::board-uuid s)))
                               (let [board-data @(drv/get-ref s :board-data)]
                                 (reset! (::board-uuid s) (:uuid board-data))))
-                            s)
-                           :will-unmount (fn [s]
-                            (section-actions/section-nav-away @(::board-uuid s))
                             s)}
   [s]
   [:div.entries-layout

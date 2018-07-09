@@ -34,8 +34,7 @@
 (defn section-seen
   [uuid]
   ;; Let the change service know we saw the board
-  (ws-cc/container-seen uuid)
-  (dispatcher/dispatch! [:section-seen uuid]))
+  (ws-cc/container-seen uuid))
 
 (defn section-get-finish
   [section]
@@ -73,9 +72,6 @@
   (api/get-board link
     (fn [status body success]
       (when success (section-get-finish (json->cljs body))))))
-
-(defn section-nav-away [uuid]
-  (dispatcher/dispatch! [:section-nav-away uuid]))
 
 (defn section-delete [section-slug]
   (api/delete-board section-slug (fn [status success body]
