@@ -12,8 +12,7 @@
   "Given an entry body get the first thumbnail available.
   Thumbnail type: image, video or chart."
   [activity-body]
-  (let [is-ap (= (router/current-board-slug) "all-posts")
-        $body (js/$ (str "<div>" activity-body "</div>"))
+  (let [$body (js/$ (str "<div>" activity-body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
     (dotimes [el-num (.-length thumb-els)]
@@ -28,7 +27,7 @@
                              (<= height (* width 2))))
                 (reset! found
                   {:type "image"
-                   :thumbnail (if (and (not is-ap) (.data $el "thumbnail"))
+                   :thumbnail (if (.data $el "thumbnail")
                                 (.data $el "thumbnail")
                                 (.attr $el "src"))})))
             (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))

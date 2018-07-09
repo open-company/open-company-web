@@ -155,7 +155,7 @@
         loading (or (and ;; if is board page
                          (not (contains? query-params :ap))
                          ;; if the board data are not present
-                         (not (:fixed-items (dis/board-data))))
+                         (not (:fixed-items (dis/posts-data))))
                          ;; if the all-posts data are not preset
                     (and (contains? query-params :ap)
                          ;; this latter is used when displaying modal over AP

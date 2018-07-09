@@ -68,13 +68,8 @@
      :board-slug (:slug board-data)}))
 
 (defn get-board-for-edit [s]
-  (let [board-data @(drv/get-ref s :board-data)
-        route @(drv/get-ref s :route)
-        is-all-posts (or (utils/in? (:route route) "all-posts")
-                         (:from-all-posts route))
-        is-must-see (utils/in? (:route route) "must-see")
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
-    (if (or is-drafts-board is-all-posts is-must-see)
+  (let [board-data @(drv/get-ref s :board-data)]
+    (if-not board-data
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -171,12 +166,9 @@
         board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        can-compose (or (and (or is-all-posts
-                                 is-drafts-board)
+        can-compose (or (and (not board-data)
                              (pos? (count all-boards)))
-                        (and (not is-all-posts)
-                             (not is-drafts-board)
-                             board-data
+                        (and board-data
                              (not (:read-only board-data))))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list

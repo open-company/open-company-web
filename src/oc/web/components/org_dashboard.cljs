@@ -110,20 +110,7 @@
                      (and (not (router/current-board-slug))
                           ;; but there are some
                           (pos? (count (:boards org-data))))
-                     ;; Board specified
-                     (and (not= (router/current-board-slug) "all-posts")
-                          (not= (router/current-board-slug) "must-see")
-                          (not ap-initial-at)
-                          ;; But no board data yet
-                          (not board-data))
-                     ;; All posts
-                     (and (or (= (router/current-board-slug) "all-posts")
-                              ap-initial-at)
-                          ;; But no all-posts data yet
-                         (not posts-data))
-                     (and (= (router/current-board-slug) "must-see")
-                          ;; But no must-see-data data yet
-                         (not posts-data)))
+                     (not posts-data))
         org-not-found (and orgs
                            (not (seq (filterv #(= (:slug %) (router/current-org-slug)) orgs))))
         section-not-found (and (not org-not-found)
@@ -223,9 +210,7 @@
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
-          (let [from-ap (:from-all-posts @router/path)
-                board-slug (if from-ap :all-posts (router/current-board-slug))]
-            (fullscreen-post)))
+          (fullscreen-post))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
