@@ -223,9 +223,12 @@
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
   (let [org-slug (router/current-org-slug)
-        board-key (if (= (:status activity-data) "published")
-                   (dis/current-board-key)
-                   (dis/board-data-key org-slug utils/default-drafts-board-slug))]
+        activity-board-slug (if (= (:status activity-data) "published")
+                              (if (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+                                :all-posts
+                                board-slug)
+                              utils/default-drafts-board-slug)
+        board-key (dis/board-data-key org-slug activity-board-slug)]
     (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
