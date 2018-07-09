@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
     <title>Rectangle</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Misc-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0">
-        <g id="Grid-data-update" transform="translate(-727.000000, -507.000000)" fill="#FFFFFF">
+    <g id="Misc-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Grid-data-update" transform="translate(-728.000000, -508.000000)" fill="#FFFFFF">
             <g id="Group-14" transform="translate(710.000000, 350.000000)">
-                <rect id="Rectangle" x="17" y="157" width="16" height="16"></rect>
+                <g id="Rectangle" transform="translate(17.000000, 157.000000)">
+                    <rect fill-rule="evenodd" opacity="0" x="0" y="0" width="16" height="16"></rect>
+                    <path d="M13.4615385,3.62631812 L6.31315906,10.7746975 C6.01275576,11.0751008 5.52570578,11.0751008 5.22530248,10.7746975 C4.92489917,10.4742942 4.92489917,9.98724424 5.22530248,9.68684094 L12.3736819,2.53846154 L10.3846154,2.53846154 C9.95978096,2.53846154 9.61538462,2.19406519 9.61538462,1.76923077 C9.61538462,1.34439635 9.95978096,1 10.3846154,1 L14.2307692,1 C14.6556037,1 15,1.34439635 15,1.76923077 L15,5.61538462 C15,6.04021904 14.6556037,6.38461538 14.2307692,6.38461538 C13.8059348,6.38461538 13.4615385,6.04021904 13.4615385,5.61538462 L13.4615385,3.62631812 Z M13.4444444,8.77777778 C13.4444444,8.34822297 13.7926674,8 14.2222222,8 C14.651777,8 15,8.34822297 15,8.77777778 L15,13.4463542 C15,14.305212 14.3049044,15 13.4445583,15 L2.55544172,15 C1.69599256,15 1,14.3053073 1,13.4445583 L1,2.55544172 C1,1.69675162 1.69499599,1 2.55364584,1 L7.22222222,1 C7.65177703,1 8,1.34822297 8,1.77777778 C8,2.20733258 7.65177703,2.55555556 7.22222222,2.55555556 L2.55555556,2.55555556 L2.55555556,13.4444444 L13.4444444,13.4444444 L13.4444444,8.77777778 Z" id="Combined-Shape" fill-rule="nonzero"></path>
+                </g>
             </g>
         </g>
     </g>
