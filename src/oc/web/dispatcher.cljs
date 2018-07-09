@@ -143,7 +143,6 @@
 
    :filtered-posts      [[:base :org-slug :posts-data :posts-filter]
                          (fn [base org-slug posts-data posts-filter]
-                           (timbre/debug org-slug posts-filter)
                            (when (and base org-slug posts-data posts-filter)
                              (let [filtered-items
                                    (filterv
