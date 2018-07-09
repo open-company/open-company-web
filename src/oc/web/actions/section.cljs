@@ -163,7 +163,12 @@
 (defn ws-change-subscribe []
   (ws-cc/subscribe :container/status
     (fn [data]
-      (dispatcher/dispatch! [:container/status (:data data)])))
+      (let [status-by-uuid (group-by :container-id (:data data))
+            clean-change-data (zipmap (keys status-by-uuid) (->> status-by-uuid
+                                                              vals
+                                                              ; remove the sequence of 1 from group-by
+                                                              (map first)))]
+        (dispatcher/dispatch! [:container/status clean-change-data]))))
 
   (ws-cc/subscribe :container/change
     (fn [data]
