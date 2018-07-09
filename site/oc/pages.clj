@@ -237,8 +237,8 @@
           "The new way to provide meaningful team communication."]
         [:div.subheadline
           (str
-           "Rise above the noise of chat and email inboxes to keep "
-           "growing and remote teams aligned.")]
+           "Rise above the noise of chat and email to keep your "
+           "growing and distributed teams aligned.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
