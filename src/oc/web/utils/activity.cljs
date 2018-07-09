@@ -189,9 +189,8 @@
     (let [fixed-activities-list (map
                                  #(fix-entry % {:slug (:board-slug %) :name (:board-name %)} change-data)
                                  (:items all-posts-data))
-          without-items (dissoc all-posts-data :items)
           fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
-          with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
+          with-fixed-activities (assoc all-posts-data :fixed-items fixed-activities)]
       with-fixed-activities)))
 
 (defn get-comments [activity-data comments-data]

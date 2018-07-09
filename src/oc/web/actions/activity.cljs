@@ -453,8 +453,7 @@
     (fn [data]
       (let [change-data (:data data)
             section-uuid (:item-id change-data)
-            change-type (:change-type change-data)
-            change-at (:change-at change-data)]
+            change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
         (when (= (router/current-board-slug) "all-posts")
           (all-posts-get (dis/org-data) (dis/ap-initial-at))))))

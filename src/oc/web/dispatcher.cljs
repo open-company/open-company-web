@@ -88,6 +88,9 @@
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
+(defn change-cache-data-key [org-slug]
+  (vec (conj (org-key org-slug) :change-cache-data)))
+
 (def activities-read-key
   [:activities-read])
 
@@ -500,6 +503,15 @@
     (change-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (change-data-key org-slug))))
+
+(defn change-cache-data
+  "Get change data."
+  ([]
+    (change-cache-data @app-state))
+  ([data]
+    (change-cache-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (change-cache-data-key org-slug))))
 
 (defn activities-read-data
   "Get the read counts of all the items."
