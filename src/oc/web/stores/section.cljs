@@ -59,45 +59,25 @@
 
 (defn fix-sections
   [db org-data changes]
-  (let [current-board-slug (:board (:router-path db))
-        section-slugs (map :slug (:boards org-data))
-        all-slugs (conj section-slugs "all-posts")
-        sections (filterv #(not= % current-board-slug) all-slugs)
+  (let [section-slugs (map :slug (:boards org-data))
+        all-slugs (into [] (conj section-slugs "all-posts"))
         org-slug (:slug org-data)]
     (reduce #(if (dispatcher/board-data db org-slug %2)
                (let [board-key (dispatcher/board-data-key org-slug %2)
-                     board-data (au/fix-board
-                                 (dispatcher/board-data db org-slug %2)
-                                 changes)]
+                     board-data (if (= %2 "all-posts")
+                                  (au/fix-all-posts
+                                   (dispatcher/board-data db org-slug %2)
+                                   changes)
+                                  (au/fix-board
+                                   (dispatcher/board-data db org-slug %2)
+                                   changes))]
                  (assoc-in %1 board-key board-data))
                %1)
-            db sections)))
-
-(defn- update-change-data [db section-uuid]
-  (let [org-data (dispatcher/org-data db)
-        change-data-key (dispatcher/change-data-key (:slug org-data))
-        change-data (get-in db change-data-key)
-        change-map (or (get change-data section-uuid) {})
-        new-change-data (assoc change-data section-uuid change-map)]
-    (-> db
-      (fix-org-section-data org-data new-change-data)
-      (fix-sections org-data new-change-data)
-      (assoc-in change-data-key new-change-data))))
+            db all-slugs)))
 
 (defmethod dispatcher/action :section-change
   [db [_ section-uuid]]
-  (update-change-data db section-uuid))
-
-(defmethod dispatcher/action :section-seen
-  [db [_ section-uuid]]
-  ;; Update change-data state that we nav'd to the section
-  (update-change-data db section-uuid))
-
-(defmethod dispatcher/action :section-nav-away
-  [db [_ section-uuid]]
-  (timbre/debug "Section nav away:" section-uuid)
-  ;; Update change-data state that we saw the section
-  (update-change-data db section-uuid))
+  db)
 
 (defmethod dispatcher/action :section-edit-save/finish
   [db [_ section-data]]
@@ -152,14 +132,6 @@
     ;; An error occurred while kicking the user out, no-op to let the user retry
     db))
 
-(defmethod dispatcher/action :container/section-change
-  [db [_ {container-id :container-id user-id :user-id}]]
-  (if (not= (jwt/user-id) user-id) ; no need to respond to our own events
-    (if (not= container-id (:uuid (dispatcher/org-data)))
-      (update-change-data db container-id)
-      db)
-    db))
-
 (defmethod dispatcher/action :section-delete
   [db [_ org-slug section-slug]]
   (let [section-key (dispatcher/board-key org-slug section-slug)
@@ -171,21 +143,26 @@
       (dissoc :section-editing))))
 
 (defmethod dispatcher/action :container/status
-  [db [_ status-data]]
-  (timbre/debug "Change status received:" status-data)
+  [db [_ change-data replace-change-data?]]
+  (timbre/debug "Change status received:" change-data)
   (let [org-data (dispatcher/org-data db)
-        old-status-data (dispatcher/change-data db)
-        status-by-uuid (group-by :container-id status-data)
-        clean-status-data (zipmap (keys status-by-uuid) (->> status-by-uuid
-                                                          vals
-                                                          ; remove the sequence of 1 from group-by
-                                                          (map first)))
-        new-status-data (merge old-status-data clean-status-data)]
-    (timbre/debug "Change status data:" new-status-data)
+        old-change-data (dispatcher/change-data db)
+        current-board-slug (:board (:router-path db))
+        current-board-uuid (:uuid (dispatcher/board-data db))
+        filtered-change-data (if (= current-board-slug "all-posts")
+                               {} ;; ignore all changes if we are on AP
+                               (into {} (filter (fn [[buid _]](not= buid current-board-uuid)) change-data)))
+        new-change-data (if replace-change-data?
+                          change-data
+                          (merge old-change-data filtered-change-data))
+        old-change-cache-data (dispatcher/change-cache-data db)
+        new-change-cache-data (merge old-change-cache-data change-data)]
+    (timbre/debug "Change status data:" new-change-data)
     (-> db
-      (fix-org-section-data org-data new-status-data)
-      (fix-sections org-data new-status-data)
-      (assoc-in (dispatcher/change-data-key (:slug org-data)) new-status-data))))
+      (fix-org-section-data org-data new-change-data)
+      (fix-sections org-data new-change-data)
+      (assoc-in (dispatcher/change-cache-data-key (:slug org-data)) new-change-cache-data)
+      (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data))))
 
 
 (defmethod dispatcher/action :item-delete/unseen
