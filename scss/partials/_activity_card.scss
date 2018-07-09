@@ -71,6 +71,11 @@ div.activity-card {
       right: 0px;
       top: -10px;
       float: unset;
+
+      div.activity-move {
+        left: unset;
+        right: -4px;
+      }
     }
   }
 
