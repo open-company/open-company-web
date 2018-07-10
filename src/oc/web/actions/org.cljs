@@ -38,7 +38,7 @@
     (dis/dispatch! [:input [:bot-access] nil])))
 
 ;; Org get
-(defn digest-button-check []
+(defn check-org-404 []
   (let [orgs (dis/orgs-data)]
     ;; avoid infinite loop of the Go to digest button
     ;; by changing the value of the last visited slug
@@ -54,25 +54,21 @@
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
-        boards (:boards org-data)]
+        boards (:boards org-data)
+        activity-link (utils/link-for (:links org-data) "activity")]
     (sa/load-other-sections (:boards org-data))
+    (when activity-link
+      ;; Preload all posts data
+      (aa/all-posts-get org-data ap-initial-at)
+      ;; Preload must see data
+      (aa/must-see-get org-data))
     (cond
-      ;; If it's all posts page, loads all posts for the current org
+      ;; If it's all posts page or must see, loads AP and must see for the current org
       (or (= (router/current-board-slug) "all-posts")
-          ap-initial-at)
-      (if (utils/link-for (:links org-data) "activity")
-        ;; Load all posts only if not coming from a digest url
-        ;; in that case do not load since we already have the results we need
-        (aa/all-posts-get org-data ap-initial-at)
-        (digest-button-check))
-
-      ;; If it's the must see page, loads must sees for the current org
-      (= (router/current-board-slug) "must-see")
-      (if (utils/link-for (:links org-data) "activity")
-        ;; Load all posts only if not coming from a digest url
-        ;; in that case do not load since we already have the results we need
-        (aa/must-see-get org-data)
-        (digest-button-check))
+          ap-initial-at
+          (= (router/current-board-slug) "must-see"))
+      (when-not activity-link
+        (check-org-404))
 
       ; If there is a board slug let's load the board data
       (router/current-board-slug)

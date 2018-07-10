@@ -17,7 +17,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.tile-menu :refer (tile-menu)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.stream-comments :refer (stream-comments)]
@@ -329,7 +329,7 @@
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
               "SAVE"]
-            (tile-menu activity-data dom-element-id "bottom"))]]
+            (more-menu activity-data dom-element-id {:tooltip-position "left" :external-share true}))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         (if editing
@@ -400,6 +400,10 @@
                  :ref "edit-headline"
                  :key (str "fullscreen-post-headline-" (:updated-at activity-data))
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+            (when (and (:must-see activity-data)
+                       (not editing))
+              [:div.must-see
+               {:class (utils/class-set {:must-see-on (:must-see activity-data)})}])
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)

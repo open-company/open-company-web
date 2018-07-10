@@ -224,9 +224,12 @@
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
   (let [org-slug (router/current-org-slug)
-        board-key (if (= (:status activity-data) "published")
-                   (dis/current-board-key)
-                   (dis/board-data-key org-slug utils/default-drafts-board-slug))]
+        activity-board-slug (if (= (:status activity-data) "published")
+                              (if (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
+                                :all-posts
+                                board-slug)
+                              utils/default-drafts-board-slug)
+        board-key (dis/board-data-key org-slug activity-board-slug)]
     (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
@@ -387,6 +390,11 @@
   (api/delete-activity activity-data activity-delete-finish)
   (dis/dispatch! [:activity-delete (dis/current-board-key) activity-data]))
 
+(defn activity-move [activity-data board-data]
+  (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
+    (api/update-entry fixed-activity-data nil create-update-entry-cb)
+    (dis/dispatch! [:activity-move activity-data (router/current-org-slug) board-data])))
+
 (defn activity-share-show [activity-data & [element-id]]
   (dis/dispatch! [:activity-share-show activity-data element-id]))
 
@@ -501,9 +509,9 @@
         must-see-toggled (assoc activity-data :must-see (not must-see))
         org-data (dis/org-data)
         must-see-count (:must-see-count dis/org-data)
-        new-must-see-count (if (not must-see)
-                              (+ must-see-count 1)
-                              (- must-see-count 1))]
+        new-must-see-count (if-not must-see
+                              (inc must-see-count)
+                              (dec must-see-count))]
     (dis/dispatch! [:org-loaded
                     (assoc org-data :must-see-count new-must-see-count)
                     false])
@@ -520,7 +528,8 @@
                           (api/get-org org-data
                             (fn [{:keys [status body success]}]
                               (let [api-org-data (json->cljs body)]
-                                (dis/dispatch! [:org-loaded api-org-data false]))))
+                                (dis/dispatch! [:org-loaded api-org-data false])
+                                (must-see-get api-org-data))))
                           (dis/dispatch! [:activity-get/finish
                                            status
                                            (router/current-org-slug)

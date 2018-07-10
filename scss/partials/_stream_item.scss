@@ -21,22 +21,6 @@ div.stream-item {
     }
   }
 
-  &:hover {
-    div.stream-item-header {
-      div.more-menu {
-        display: block;
-      }
-    }
-
-    div.stream-item-body {
-      div.stream-body-left {
-        div.must-see {
-          display: inline;
-        }
-      }
-    }
-  }
-
   &.show-continue-reading {
     div.stream-item-body {
       div.stream-body-left {
@@ -60,10 +44,8 @@ div.stream-item {
     @include mobile() {
       width: 100%;
     }
-
+    
     div.more-menu {
-      display: none;
-
       @include mobile() {
         display: block;
         float: right;
@@ -143,31 +125,7 @@ div.stream-item {
         }
       }
 
-      div.must-see {
-        display: inline;
-        padding-left: 16px;
-        padding-bottom: 10px;
-        padding-top: 6px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        @include avenir_M();
-        color: $ui_grey;
-        font-size: 12px;
-        white-space: nowrap;
-        background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-        background-size: 12px 16px;
-        background-repeat: no-repeat;
-        background-position: 4px 0px;
-        margin-left: 8px;
-
-        &.must-see-on {
-          background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-        }
-
-        @include mobile() {
-          width: auto;
-        }
-      }
+      @include must-see();
 
       div.stream-item-body-container {
 

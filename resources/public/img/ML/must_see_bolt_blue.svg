@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="13px" height="16px" viewBox="0 0 13 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-    <title>Combined Shape</title>
+    <title>Rectangle Copy</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Fin" transform="translate(-655.000000, -227.000000)" fill="#5789FA" fill-rule="nonzero">
-            <g id="Group-2" transform="translate(90.000000, 141.000000)">
-                <g id="Group-25">
-                    <path d="M573.466987,92.0449131 L576.63315,92.0449131 C577.459272,92.0449131 577.693736,92.5745015 577.153939,93.2313115 L570.440196,101.400412 C569.632347,102.38338 568.977457,102.132649 568.977457,100.832324 L568.977457,95.9550869 L565.811294,95.9550869 C564.985172,95.9550869 564.750709,95.4254985 565.290506,94.7686885 L572.004249,86.5995881 C572.812097,85.6166204 573.466987,85.8673514 573.466987,87.1676759 L573.466987,92.0449131 Z" id="Combined-Shape"></path>
+    <g id="Misc-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Grid-data-update" transform="translate(-730.000000, -555.000000)">
+            <g id="Group-14" transform="translate(710.000000, 350.000000)">
+                <g id="Rectangle-Copy" transform="translate(17.000000, 204.000000)">
+                    <rect fill="#FFFFFF" fill-rule="evenodd" opacity="0" x="0" y="0" width="16" height="16"></rect>
+                    <path d="M9.80382911,6.28929896 L12.3480674,6.28929896 C13.011915,6.28929896 13.2003232,6.75268882 12.766558,7.32739758 L7.37158575,14.4753604 C6.72242205,15.3354572 6.19617089,15.1160675 6.19617089,13.9782836 L6.19617089,9.71070104 L3.65193264,9.71070104 C2.98808503,9.71070104 2.79967677,9.24731118 3.23344201,8.67260242 L8.62841425,1.52463958 C9.27757795,0.664542842 9.80382911,0.883932501 9.80382911,2.02171645 L9.80382911,6.28929896 Z" id="Combined-Shape" fill="#5789FA" fill-rule="nonzero"></path>
                 </g>
             </g>
         </g>
