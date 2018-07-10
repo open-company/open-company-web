@@ -3,13 +3,15 @@
   (:require [rum.core :as rum]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.alert-modal :as alert-modal]))
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.activity-move :refer (activity-move)]))
 
 (defn show-hide-menu
   [s will-open will-close]
@@ -41,16 +43,17 @@
                     }]
     (alert-modal/show-alert alert-data)))
 
-(rum/defcs more-menu < rum/static
+(rum/defcs more-menu < rum/reactive
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
                        (rum/local nil ::click-listener)
+                       (drv/drv :editable-boards)
                        {:will-mount (fn [s]
                          (reset! (::click-listener s)
                            (events/listen js/window EventType/CLICK
-                            #(when-not (utils/event-inside? % (rum/ref-node s "more-menu-bt"))
-                               (when-let* [delegate-methods (get (:rum/args s) 2)
-                                           will-close (:will-close delegate-methods)]
+                            #(when-not (utils/event-inside? % (rum/ref-node s "more-menu"))
+                               (when-let* [opts (nth (:rum/args s) 2)
+                                           will-close (:will-close opts)]
                                  (when (fn? will-close)
                                    (will-close)))
                                (reset! (::showing-menu s) false))))
@@ -64,14 +67,16 @@
                            (reset! (::click-listener s) nil))
                          s)}
   [s activity-data share-container-id
-   {:keys [will-open will-close external-share]}]
+   {:keys [will-open will-close external-share tooltip-position]}]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
-        share-link (utils/link-for (:links activity-data) "share")]
+        share-link (utils/link-for (:links activity-data) "share")
+        editable-boards (drv/react s :editable-boards)]
     (when (or edit-link
               share-link
               delete-link)
       [:div.more-menu
+        {:ref "more-menu"}
         (when (or edit-link
                   delete-link
                   (and (not external-share)
@@ -82,21 +87,37 @@
              :on-click #(show-hide-menu s will-open will-close)
              :class (when @(::showing-menu s) "active")
              :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-             :data-placement "top"
+             :data-placement (or tooltip-position "top")
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "More"}])
-        (when @(::showing-menu s)
+        (cond
+          @(::move-activity s)
+          (activity-move {:boards-list (vals editable-boards)
+                          :activity-data activity-data
+                          :dismiss-cb #(reset! (::move-activity s) false)})
+          @(::showing-menu s)
           [:ul.more-menu-list
-             {:on-mouse-leave #(show-hide-menu s will-open will-close)}
             (when edit-link
               [:li.edit
-                {:on-click #(activity-actions/activity-edit activity-data)}
+                {:on-click #(do
+                              (utils/event-stop %)
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/activity-edit activity-data))}
                 "Edit"])
             (when delete-link
               [:li.delete
                 {:on-click #(delete-clicked % activity-data)}
                 "Delete"])
+            (when edit-link
+              [:li.move
+               {:on-click #(do
+                             (utils/event-stop %)
+                             (reset! (::showing-menu s) false)
+                             (reset! (::move-activity s) true))}
+               "Move"])
             (when (and (not external-share)
                        share-link)
               [:li.share
@@ -112,18 +133,19 @@
                              (activity-actions/toggle-must-see activity-data))}
                (if (:must-see activity-data)
                  "Unmark"
-                 "Must see")]
-              )])
-          (when (and external-share
-                     share-link
-                     (not (responsive/is-tablet-or-mobile?)))
-            [:button.mlb-reset.more-menu-share-bt
-              {:type "button"
-               :ref "tile-menu-share-bt"
-               :on-click #(activity-actions/activity-share-show
-                           activity-data
-                           share-container-id)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Share"}])])))
+                 "Must see")])])
+        (when (and external-share
+                   share-link
+                   (not (responsive/is-tablet-or-mobile?)))
+          [:button.mlb-reset.more-menu-share-bt
+            {:type "button"
+             :ref "tile-menu-share-bt"
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/activity-share-show activity-data share-container-id))
+             :data-toggle "tooltip"
+             :data-placement (or tooltip-position "top")
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :title "Share"}])])))

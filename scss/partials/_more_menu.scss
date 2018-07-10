@@ -10,6 +10,13 @@ div.more-menu {
     width: 30px;
   }
 
+  div.activity-move {
+    position: absolute;
+    top: 40px;
+    left: unset;
+    right: 22px;
+  }
+
   button.more-menu-bt {
     width: 30px;
     height: 30px;
@@ -79,6 +86,10 @@ div.more-menu {
         margin-top: 0px;
       }
 
+      &:last-child {
+        border-bottom: 0px;
+      }
+
       &.edit {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_edit.svg");
@@ -102,8 +113,6 @@ div.more-menu {
           background-image: cdnUrl("/img/ML/more_menu_mustsee.svg");
           background-position: 3px 0px;
         }
-        border: none;
-        padding-bottom: 0px;
       }
 
       &.must-see-on {
@@ -111,8 +120,13 @@ div.more-menu {
           background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
           background-position: 3px 0px;
         }
-        border: none;
-        padding-bottom: 0px;
+      }
+
+      &.move {
+        &:before {
+          background-image: cdnUrl("/img/ML/move_activity.svg");
+          background-size: 14px 14px;
+        }
       }
 
       &:before {
@@ -125,6 +139,7 @@ div.more-menu {
         background-repeat: no-repeat;
         background-size: 16px 16px;
         background-position: center;
+        background-color: transpant;
       }
 
       &.disabled {

@@ -48,6 +48,7 @@
                          (rum/local false ::truncated)
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::more-menu-open)
+                         (rum/local false ::hovering-tile)
                          ;; Mixins
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
@@ -94,6 +95,8 @@
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board})
+       :on-mouse-enter #(reset! (::hovering-tile s) true)
+       :on-mouse-leave #(reset! (::hovering-tile s) false)
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)
                          dom-node-selector (str "div." dom-node-class)]
@@ -126,7 +129,9 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (when-not is-drafts-board
+        (when (and (not is-drafts-board)
+                   (or @(::hovering-tile s)
+                       @(::more-menu-open s)))
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)

@@ -111,8 +111,10 @@ div.fullscreen-post-container {
       top: 16px;
       right: 24px;
 
-      div.tile-menu {
-        margin-top: 0px;
+      div.more-menu {
+        div.activity-move {
+          right: -4px;
+        }
       }
 
       button.post-publish-bt {

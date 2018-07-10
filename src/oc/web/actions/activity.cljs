@@ -384,6 +384,11 @@
   (api/delete-activity activity-data activity-delete-finish)
   (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data]))
 
+(defn activity-move [activity-data board-data]
+  (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
+    (api/update-entry fixed-activity-data nil create-update-entry-cb)
+    (dis/dispatch! [:activity-move activity-data (router/current-org-slug) board-data])))
+
 (defn activity-share-show [activity-data & [element-id]]
   (dis/dispatch! [:activity-share-show activity-data element-id]))
 
