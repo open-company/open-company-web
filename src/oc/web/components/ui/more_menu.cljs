@@ -110,7 +110,12 @@
                 "Edit"])
             (when delete-link
               [:li.delete
-                {:on-click #(delete-clicked % activity-data)}
+                {:on-click #(do
+                              (utils/event-stop %)
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (delete-clicked % activity-data))}
                 "Delete"])
             (when edit-link
               [:li.move
@@ -122,7 +127,12 @@
             (when (and (not external-share)
                        share-link)
               [:li.share
-                {:on-click #(activity-actions/activity-share-show activity-data share-container-id)}
+                {:on-click #(do
+                              (utils/event-stop %)
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/activity-share-show activity-data share-container-id))}
                 "Share"])
             (when edit-link
               [:li
