@@ -55,7 +55,7 @@
   "Read the cookie from the document only if the new-user-cookie-value atom is nil.
   In all the other cases return the read value in the atom."
   []
-  (when (not (map? @new-user-cookie-value))
+  (when-not (map? @new-user-cookie-value)
     (if-let [string-json (cook/get-cookie (router/new-user-cookie (jwt/user-id)))]
       (reset! new-user-cookie-value (json->cljs string-json))
       (reset! new-user-cookie-value {})))

@@ -421,7 +421,7 @@
         must-see-toggled (assoc activity-data :must-see (not must-see))
         org-data (dis/org-data)
         must-see-count (:must-see-count dis/org-data)
-        new-must-see-count (if (not must-see)
+        new-must-see-count (if-not must-see
                               (inc must-see-count)
                               (dec must-see-count))]
     (dis/dispatch! [:org-loaded
