@@ -425,8 +425,8 @@
         org-data (dis/org-data)
         must-see-count (:must-see-count dis/org-data)
         new-must-see-count (if (not must-see)
-                              (+ must-see-count 1)
-                              (- must-see-count 1))]
+                              (inc must-see-count)
+                              (dec must-see-count))]
     (dis/dispatch! [:org-loaded
                     (assoc org-data :must-see-count new-must-see-count)
                     false])
@@ -440,7 +440,8 @@
                           (api/get-org org-data
                             (fn [{:keys [status body success]}]
                               (let [api-org-data (json->cljs body)]
-                                (dis/dispatch! [:org-loaded api-org-data false]))))
+                                (dis/dispatch! [:org-loaded api-org-data false])
+                                (must-see-get org-data))))
                           (dis/dispatch! [:entry
                                           (dis/current-board-key)
                                           (:uuid activity-data)
