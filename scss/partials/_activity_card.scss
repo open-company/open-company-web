@@ -166,6 +166,11 @@ div.activity-card {
       text-overflow: ellipsis;
       white-space: nowrap;
 
+      &.wrt-container {
+        overflow: visible;
+        text-overflow: unset;
+      }
+
       &>span, &>div {
         float: left;
       }
@@ -175,12 +180,12 @@ div.activity-card {
       @include activity-title();
       @include avenir_H();
       font-size: 16px;
-      display: inline;
+      display: inline-;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
-      // white-space: nowrap;
+      white-space: nowrap;
       max-height: 36px;
       line-height: 18px;
       margin-top: 4px;

@@ -82,10 +82,15 @@
           {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
       [:div.activity-card-bottom-container.group
         [:div.activity-card-header
+          {:class (utils/class-set {:hidden (or @(::showing-menu s)
+                                                @(::hovering-card s))})}
           [:span (:name publisher)]
           [:div.separator]
           [:span (utils/time-since activity-time)]]
-        [:div.activity-card-header-hover
+        [:div.activity-card-header
+          {:class (utils/class-set {:hidden (and (not @(::showing-menu s))
+                                                 (not @(::hovering-card s)))
+                                    :wrt-container true})}
           [:span.board-name (:board-name activity-data)]
           [:div.separator]
           [:div.activity-card-wrt
@@ -96,10 +101,6 @@
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-footer-placeholder]
         [:div.activity-share-container]
-        [:div.activity-card-footer-hover.group
-          (when-not is-drafts-board
-            [:div.activity-card-menu-container
-              (more-menu activity-data dom-element-id)])]
         (if is-drafts-board
           [:div.activity-card-footer.group
             [:button.mlb-reset.edit-draft-bt
