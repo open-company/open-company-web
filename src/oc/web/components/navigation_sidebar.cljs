@@ -108,7 +108,8 @@
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
-        show-must-see (pos? (:must-see-count org-data))
+        show-must-see (or is-must-see
+                          (pos? (:must-see-count org-data)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)

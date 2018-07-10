@@ -312,6 +312,7 @@ div.fullscreen-post-container {
           line-height: 28px;
           cursor: text;
           outline: none;
+          display: inline;
 
           &:empty:before {
             content: attr(placeholder);
@@ -321,6 +322,8 @@ div.fullscreen-post-container {
             height: 26px;
           }
         }
+
+        @include must-see();
 
         div.rich-body-editor-container {
           position: relative;

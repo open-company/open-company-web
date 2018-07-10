@@ -404,6 +404,10 @@
                  :ref "edit-headline"
                  :key (str "fullscreen-post-headline-" (:updated-at activity-data))
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+            (when (and (:must-see activity-data)
+                       (not editing))
+              [:div.must-see
+               {:class (utils/class-set {:must-see-on (:must-see activity-data)})}])
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)
