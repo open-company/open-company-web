@@ -148,6 +148,12 @@ div.activity-card {
     border-bottom-right-radius: 6px;
     height: calc(100% - 121px);
 
+    div.activity-share-container {
+      div.activity-share-modal-container {
+        margin-top: 0px;
+      }
+    }
+
     div.separator {
       width: 4px;
       height: 4px;
@@ -180,7 +186,7 @@ div.activity-card {
       @include activity-title();
       @include avenir_H();
       font-size: 16px;
-      display: inline-;
+      display: inline-block;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
