@@ -115,11 +115,11 @@
             [:button.mlb-reset.wrt-popup-tab.viewed
               {:class (when (= @list-view :seen) "active")
                :on-click #(reset! list-view :seen)}
-              "Seen"]
+              "Viewed"]
             [:button.mlb-reset.wrt-popup-tab.unseen
               {:class (when (= @list-view :unseen) "active")
                :on-click #(reset! list-view :unseen)}
-              "Unseen"]]
+              "NOT SEEN"]]
           [:div.wrt-popup-list
             (if (pos? (count sorted-filtered-users))
               (for [u sorted-filtered-users
