@@ -1,7 +1,6 @@
 (ns oc.web.components.entries-layout
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]

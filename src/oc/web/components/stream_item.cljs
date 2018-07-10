@@ -57,6 +57,7 @@
                          (rum/local false ::item-ready)
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::more-menu-open)
+                         (rum/local false ::hovering-tile)
                          ;; Mixins
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
@@ -104,6 +105,8 @@
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board
                                 :new-item (:new activity-data)})
+       :on-mouse-enter #(reset! (::hovering-tile s) true)
+       :on-mouse-leave #(reset! (::hovering-tile s) false)
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)
                          dom-node-selector (str "div." dom-node-class)]
@@ -140,10 +143,16 @@
           [:div.separator]
           [:div.stream-item-wrt
             (wrt activity-data read-data dom-element-id)]]
-        (when (not is-drafts-board)
+        (when (and (not is-drafts-board)
+                   (or @(::hovering-tile s)
+                       @(::more-menu-open s)))
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
-            :will-close #(reset! (::more-menu-open s) false)}))]
+            :will-close #(reset! (::more-menu-open s) false)
+            :external-share true}))
+        (when (:new activity-data)
+          [:div.new-tag
+            "New"])]
       [:div.stream-item-body.group
         [:div.stream-body-left.group.fs-hide
           [:div.stream-item-headline.ap-seen-item-headline
