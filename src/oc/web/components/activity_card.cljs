@@ -60,10 +60,9 @@
        :on-mouse-enter #(reset! (::hovering-card s) true)
        :on-mouse-leave #(reset! (::hovering-card s) false)
        :on-click (fn [e]
-                   (let [ev-in? (partial utils/event-inside? e)]
-                     (when-not (or is-drafts-board
-                                   (ev-in? (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.more-menu])))
-                       (activity-actions/activity-modal-fade-in activity-data))))}
+                   (when (and (not is-drafts-board)
+                              (not @(::showing-menu s)))
+                     (activity-actions/activity-modal-fade-in activity-data)))}
       [:div.new-tag "NEW"]
       [:div.activity-card-preview-container
         [:div.activity-card-preview-header.group
