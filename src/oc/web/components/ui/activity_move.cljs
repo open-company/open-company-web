@@ -29,7 +29,7 @@
                                               dismiss-cb (:dismiss-cb opts)]
                                           (reset! (::window-click s)
                                            (events/listen js/window EventType/CLICK
-                                            #(when (and (not (utils/event-inside? % (rum/ref-node s "activity-move")))
+                                            #(when (and (not (utils/event-inside? % (rum/dom-node s)))
                                                         (fn? dismiss-cb))
                                                 (dismiss-cb)))))
                                         s)
@@ -39,19 +39,14 @@
                                             s)}
   [s {:keys [boards-list activity-data dismiss-cb]}]
   [:div.activity-move
-    {:ref "activity-move"
-     :on-mouse-leave #(when (fn? dismiss-cb)
-                        (dismiss-cb))
-     :on-click #(do
+    {:on-click #(do
                   (utils/event-stop %)
                   (when @(::show-boards-list s)
                     (reset! (::show-boards-list s) false)))}
     [:div.triangle]
     [:div.move-post-inner
       [:div.move-post-title
-        "Move"
-        ; [:i.mdi.mdi-information-outline]
-        ]
+        "Move"]
       [:div.select-new-board
         {:on-click #(do (utils/event-stop %) (reset! (::show-boards-list s) (not @(::show-boards-list s))))
          :class (when (nil? @(::selected-board s)) "placeholder")}

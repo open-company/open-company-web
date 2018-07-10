@@ -20,6 +20,9 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defcs activity-card < rum/reactive
+                        ;; Locals
+                        (rum/local false ::hovering-card)
+                        (rum/local false ::showing-menu)
                         ;; Derivatives
                         (drv/drv :org-data)
                         (drv/drv :comments-data)
@@ -53,6 +56,8 @@
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :draft is-drafts-board})
        :id dom-element-id
+       :on-mouse-enter #(reset! (::hovering-card s) true)
+       :on-mouse-leave #(reset! (::hovering-card s) false)
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)]
                      (when-not (or is-drafts-board
@@ -92,29 +97,38 @@
             [:button.mlb-reset.delete-draft-bt
               {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
               "Delete"]]
-          [:div.activity-card-footer
-            (when-not is-drafts-board
-              [:div.activity-card-menu-container
-                (more-menu activity-data dom-element-id)])
-            [:div.comments-count
-              [:span.comments-icon]
-              [:span.comments-count
-                (count comments-data)]]
-            [:div.tile-reactions
-              (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
-                (when (pos? (:count max-reaction))
-                  [:div.tile-reaction
-                    [:span.reaction
-                      (:reaction max-reaction)]
-                    [:span.count
-                      (:count max-reaction)]]))]
-            [:div.activity-card-footer-right
-              (when (pos? (count (:attachments activity-data)))
-                [:div.tile-attachments
-                  [:span.attachments-count
-                    (count (:attachments activity-data))]
-                  [:span.attachments-icon]])
-              (when (:must-see activity-data)
-                [:div.activity-card-must-see
-                 {:class (utils/class-set {:must-see-on
-                                           (:must-see activity-data)})}])]])]]))
+          [:div.activity-card-footer-container
+            [:div.activity-card-footer
+              {:class (when (and (not @(::hovering-card s))
+                                 (not @(::showing-menu s)))
+                        "hidden")}
+              (when-not is-drafts-board
+                [:div.activity-card-menu-container
+                  (more-menu activity-data dom-element-id {:will-open #(reset! (::showing-menu s) true)
+                                                           :will-close #(reset! (::showing-menu s) false)})])]
+            [:div.activity-card-footer
+              {:class (when (or @(::hovering-card s)
+                                @(::showing-menu s))
+                        "hidden")}
+              [:div.comments-count
+                [:span.comments-icon]
+                [:span.comments-count
+                  (count comments-data)]]
+              [:div.tile-reactions
+                (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
+                  (when (pos? (:count max-reaction))
+                    [:div.tile-reaction
+                      [:span.reaction
+                        (:reaction max-reaction)]
+                      [:span.count
+                        (:count max-reaction)]]))]
+              [:div.activity-card-footer-right
+                (when (pos? (count (:attachments activity-data)))
+                  [:div.tile-attachments
+                    [:span.attachments-count
+                      (count (:attachments activity-data))]
+                    [:span.attachments-icon]])
+                (when (:must-see activity-data)
+                  [:div.activity-card-must-see
+                   {:class (utils/class-set {:must-see-on
+                                             (:must-see activity-data)})}])]]])]]))

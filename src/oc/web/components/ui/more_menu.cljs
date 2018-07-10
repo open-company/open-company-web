@@ -51,9 +51,9 @@
                        {:will-mount (fn [s]
                          (reset! (::click-listener s)
                            (events/listen js/window EventType/CLICK
-                            #(when-not (utils/event-inside? % (rum/ref-node s "more-menu-bt"))
-                               (when-let* [delegate-methods (get (:rum/args s) 2)
-                                           will-close (:will-close delegate-methods)]
+                            #(when-not (utils/event-inside? % (rum/ref-node s "more-menu"))
+                               (when-let* [opts (nth (:rum/args s) 2)
+                                           will-close (:will-close opts)]
                                  (when (fn? will-close)
                                    (will-close)))
                                (reset! (::showing-menu s) false))))
@@ -76,6 +76,7 @@
               share-link
               delete-link)
       [:div.more-menu
+        {:ref "more-menu"}
         (when (or edit-link
                   delete-link
                   (and (not external-share)
@@ -97,10 +98,14 @@
                           :dismiss-cb #(reset! (::move-activity s) false)})
           @(::showing-menu s)
           [:ul.more-menu-list
-             {:on-mouse-leave #(show-hide-menu s will-open will-close)}
             (when edit-link
               [:li.edit
-                {:on-click #(activity-actions/activity-edit activity-data)}
+                {:on-click #(do
+                              (utils/event-stop %)
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/activity-edit activity-data))}
                 "Edit"])
             (when delete-link
               [:li.delete
@@ -135,9 +140,11 @@
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
-             :on-click #(activity-actions/activity-share-show
-                         activity-data
-                         share-container-id)
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/activity-share-show activity-data share-container-id))
              :data-toggle "tooltip"
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"

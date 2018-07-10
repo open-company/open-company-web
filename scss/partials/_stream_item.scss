@@ -11,22 +11,6 @@ div.stream-item {
     padding: 24px 16px;
   }
 
-  &:hover {
-    div.stream-item-header {
-      div.more-menu {
-        display: block;
-      }
-    }
-
-    div.stream-item-body {
-      div.stream-body-left {
-        div.must-see {
-          display: inline;
-        }
-      }
-    }
-  }
-
   &.show-continue-reading {
     div.stream-item-body {
       div.stream-body-left {
@@ -52,8 +36,6 @@ div.stream-item {
     }
     
     div.more-menu {
-      display: none;
-
       @include mobile() {
         display: block;
         float: right;
