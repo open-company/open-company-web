@@ -139,6 +139,6 @@
                          activity-data
                          share-container-id)
              :data-toggle "tooltip"
-             :data-placement "top"
+             :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "Share"}])])))

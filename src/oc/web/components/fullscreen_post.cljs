@@ -333,7 +333,7 @@
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
               "SAVE"]
-            (more-menu activity-data dom-element-id {:tooltip-position "left"}))]]
+            (more-menu activity-data dom-element-id {:tooltip-position "left" :external-share true}))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         (if editing
