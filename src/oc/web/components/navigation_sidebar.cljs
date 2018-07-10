@@ -8,8 +8,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.user :as user-actions]
+            [oc.web.actions.routing :as routing-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -25,7 +27,12 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (router/nav! url)
+  (let [current-path (.. js/window -location -pathname)]
+    (if (= current-path url)
+      (do
+        (routing-actions/routing @router/path)
+        (user-actions/initial-loading true))
+      (router/nav! url)))
   (close-navigation-sidebar))
 
 (def sidebar-top-margin 84)
