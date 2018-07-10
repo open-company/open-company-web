@@ -413,7 +413,7 @@
     (dis/dispatch! [:activity-move activity-data (router/current-org-slug) board-data])))
 
 (defn activity-share-show [activity-data & [element-id share-medium]]
-  (dis/dispatch! [:activity-share-show activity-data element-id share-medium]))
+  (dis/dispatch! [:activity-share-show activity-data element-id (or share-medium :url)]))
 
 (defn activity-share-hide []
   (dis/dispatch! [:activity-share-hide]))
