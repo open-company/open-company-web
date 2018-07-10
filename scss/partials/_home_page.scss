@@ -107,7 +107,7 @@ div.home-wrap {
 
         @include mobile(){
           text-align: left;
-          font-size: 34px;
+          font-size: 31px;
           line-height: 40px;
         }
       }
@@ -117,7 +117,7 @@ div.home-wrap {
         font-size: 24px;
         line-height: 32px;
         @include avenir_R();
-        max-width: 680px;
+        max-width: 650px;
         margin: 4px auto 0px;
         z-index: 2;
         position: relative;
