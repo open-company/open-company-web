@@ -111,12 +111,14 @@ div.more-menu {
       &.must-see {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_mustsee.svg");
+          background-position: 3px 0px;
         }
       }
 
       &.must-see-on {
         &:before {
           background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+          background-position: 3px 0px;
         }
       }
 
