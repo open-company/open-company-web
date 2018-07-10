@@ -52,7 +52,8 @@
                          (reset! (::click-listener s)
                            (events/listen js/window EventType/CLICK
                             #(when-not (utils/event-inside? % (rum/ref-node s "more-menu"))
-                               (when-let* [opts (nth (:rum/args s) 2)
+                               (when-let* [args (into [] (:rum/args s))
+                                           opts (get args 2)
                                            will-close (:will-close opts)]
                                  (when (fn? will-close)
                                    (will-close)))
