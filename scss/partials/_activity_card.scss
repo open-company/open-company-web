@@ -29,23 +29,6 @@ div.activity-card {
     margin: 12px 0px;
   }
 
-  &:hover {
-    div.activity-card-footer {
-
-      div.comments-count, div.tile-reactions, div.activity-card-footer-right {
-        display: none;
-      }
-
-      div.activity-card-menu-container {
-        display: block;
-
-        div.more-menu {
-          display: block;
-        }
-      }
-    }
-  }
-
   &.draft {
     background-color: #FFF6DD;
     border: 1px solid #ECECEC;
@@ -58,7 +41,6 @@ div.activity-card {
   }
 
   div.activity-card-menu-container {
-    display: none;
     z-index: 3;
     position: absolute;
     top: 0px;
@@ -71,6 +53,11 @@ div.activity-card {
       right: 0px;
       top: -10px;
       float: unset;
+
+      div.activity-move {
+        left: unset;
+        right: -4px;
+      }
     }
   }
 
