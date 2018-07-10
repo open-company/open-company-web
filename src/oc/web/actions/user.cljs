@@ -334,6 +334,29 @@
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
 
+;; Initial loading
+
+(defn initial-loading [& [force-refresh]]
+  (let [force-refresh (or force-refresh
+                          (utils/in? (:route @router/path) "org")
+                          (utils/in? (:route @router/path) "login"))
+        latest-entry-point (if (or force-refresh
+                                   (nil? (:latest-entry-point @dis/app-state)))
+                             0
+                             (:latest-entry-point @dis/app-state))
+        latest-auth-settings (if (or force-refresh
+                                     (nil? (:latest-auth-settings @dis/app-state)))
+                               0
+                               (:latest-auth-settings @dis/app-state))
+        now (.getTime (js/Date.))
+        reload-time (* 1000 60 20)] ; every 20m
+    (when (or (> (- now latest-entry-point) reload-time)
+              (and (router/current-org-slug)
+                   (nil? (dis/org-data))))
+      (entry-point-get (router/current-org-slug)))
+    (when (> (- now latest-auth-settings) reload-time)
+      (auth-settings-get))))
+
 ;; User profile tab
 
 (defn change-user-profile-panel [panel]
