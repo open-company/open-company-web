@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="10px" height="14px" viewBox="0 0 10 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-    <title>Combined Shape</title>
+    <title>Rectangle Copy</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Must-see" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="June-20:-Grid-(must-see-hover)" transform="translate(-280.000000, -488.000000)" fill="#FFFFFF" fill-rule="nonzero">
-            <g id="Group-29" transform="translate(260.000000, 312.000000)">
-                <g id="Group-31" transform="translate(0.000000, 17.000000)">
-                    <g id="Group-10" transform="translate(17.000000, 110.000000)">
-                        <g id="Group-33" transform="translate(0.000000, 32.000000)">
-                            <path d="M8.60777628,19.6523547 L5.06998876,24.3421402 L6.79901653,24.3421402 C7.13022562,24.3421402 7.39860418,24.6494581 7.39845805,25.0254119 L7.39716844,28.3432652 L10.9396998,23.6578598 L9.2034785,23.6578598 C8.87089145,23.6578598 8.60177562,23.3502055 8.60238636,22.9738401 L8.60777628,19.6523547 Z M9.80382911,22.289299 L12.3480674,22.289299 C13.011915,22.289299 13.2003232,22.7526888 12.766558,23.3273976 L7.37158575,30.4753604 C6.72242205,31.3354572 6.19617089,31.1160675 6.19617089,29.9782836 L6.19617089,25.710701 L3.65193264,25.710701 C2.98808503,25.710701 2.79967677,25.2473112 3.23344201,24.6726024 L8.62841425,17.5246396 C9.27757795,16.6645428 9.80382911,16.8839325 9.80382911,18.0217164 L9.80382911,22.289299 Z" id="Combined-Shape"></path>
-                        </g>
-                    </g>
+    <g id="Misc-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Grid-data-update" transform="translate(-730.000000, -555.000000)" fill="#FFFFFF">
+            <g id="Group-14" transform="translate(710.000000, 350.000000)">
+                <g id="Rectangle-Copy" transform="translate(17.000000, 204.000000)">
+                    <rect fill-rule="evenodd" opacity="0" x="0" y="0" width="16" height="16"></rect>
+                    <path d="M9.80382911,6.28929896 L12.3480674,6.28929896 C13.011915,6.28929896 13.2003232,6.75268882 12.766558,7.32739758 L7.37158575,14.4753604 C6.72242205,15.3354572 6.19617089,15.1160675 6.19617089,13.9782836 L6.19617089,9.71070104 L3.65193264,9.71070104 C2.98808503,9.71070104 2.79967677,9.24731118 3.23344201,8.67260242 L8.62841425,1.52463958 C9.27757795,0.664542842 9.80382911,0.883932501 9.80382911,2.02171645 L9.80382911,6.28929896 Z" id="Combined-Shape" fill-rule="nonzero"></path>
                 </g>
             </g>
         </g>
