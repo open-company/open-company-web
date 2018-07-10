@@ -63,7 +63,7 @@
            :on-click #(if (or (not (utils/valid-email? @(::email s)))
                               (<= (count @(::pswd s)) 7))
                         (do
-                          (when (not (utils/valid-email? @(::email s)))
+                          (when-not (utils/valid-email? @(::email s))
                             (reset! (::email-error s) true))
                           (when (<= (count @(::pswd s)) 7)
                             (reset! (::password-error s) true)))
@@ -137,7 +137,7 @@
              :on-click #(if (or (not (utils/valid-email? @(::email s)))
                                 (<= (count @(::pswd s)) 7))
                           (do
-                            (when (not (utils/valid-email? @(::email s)))
+                            (when-not (utils/valid-email? @(::email s))
                               (reset! (::email-error s) true))
                             (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))

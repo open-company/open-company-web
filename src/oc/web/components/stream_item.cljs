@@ -126,7 +126,7 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]]
-        (when (not is-drafts-board)
+        (when-not is-drafts-board
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
