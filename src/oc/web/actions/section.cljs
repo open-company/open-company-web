@@ -197,27 +197,9 @@
         ;; the specified container to make sure it's marked as seen
         (when (and (= change-type :add)
                    (not= (:user-id change-data) (jwt/user-id)))
-          (let [old-change-data (dispatcher/change-cache-data)
-                old-container-change-data (get old-change-data section-uuid)
-                old-unseen (or (:unseen old-container-change-data) [])
-                next-unseen (into [] (seq (conj old-unseen item-id)))
-                next-container-change-data (if old-container-change-data
-                                             (assoc old-container-change-data :unseen next-unseen)
-                                             {:container-id section-uuid
-                                              :unseen next-unseen})
-                next-change-data (assoc old-change-data section-uuid next-container-change-data)]
-          (dispatcher/dispatch! [:container/status next-change-data])))
+          (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
         (when (= change-type :delete)
-          (let [old-change-data (dispatcher/change-cache-data)
-                old-container-change-data (get old-change-data section-uuid)
-                old-unseen (or (:unseen old-container-change-data) [])
-                next-unseen (filter #(not= % item-id) old-unseen)
-                next-container-change-data (if old-container-change-data
-                                             (assoc old-container-change-data :unseen next-unseen)
-                                             {:container-id section-uuid
-                                              :unseen next-unseen})
-                next-change-data (assoc old-change-data section-uuid next-container-change-data)]
-            (dispatcher/dispatch! [:container/status next-change-data])))))))
+          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))))))
 
 (defn ws-interaction-subscribe []
   (ws-ic/subscribe :interaction-comment/add
