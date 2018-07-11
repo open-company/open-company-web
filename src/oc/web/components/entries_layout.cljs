@@ -24,7 +24,7 @@
 
 (def tiles-per-row 3)
 
-(defn- item-scrolled-into-view-cb [item-uuid]
+(defn- item-scrolled-into-view-cb [_ item-uuid]
   ;; only in case of AP
   (activity-actions/ap-seen-events-gate item-uuid))
 
