@@ -42,7 +42,7 @@
         @include oc-letter($max_logo_height);
 
         span.org-name {
-          display: block;
+          display: block !important;
         }
       }
     }
