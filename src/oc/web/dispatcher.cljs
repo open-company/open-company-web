@@ -177,6 +177,10 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (change-data-key org-slug))))]
+   :change-cache-data   [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (change-cache-data-key org-slug))))]
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                             (let [boards-key (boards-key org-slug)
@@ -548,6 +552,9 @@
 (defn print-activities-read-data []
   (js/console.log (get-in @app-state activities-read-key)))
 
+(defn print-change-cache-data []
+  (js/console.log (get-in @app-state (change-cache-data-key (router/current-org-slug)))))
+
 (defn print-board-data []
   (js/console.log
    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
@@ -600,6 +607,7 @@
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
 (set! (.-OCWebPrintActivitiesReadData js/window) print-activities-read-data)
+(set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)

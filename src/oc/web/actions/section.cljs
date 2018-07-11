@@ -185,7 +185,9 @@
     (fn [data]
       (let [change-data (:data data)
             section-uuid (:container-id change-data)
-            change-type (:change-type change-data)]
+            change-type (:change-type change-data)
+            org-slug (router/current-org-slug)
+            item-id (:item-id change-data)]
         ;; Refresh the section only in case of items added or removed
         ;; let the activity handle the item update case
         (when (or (= change-type :add)
@@ -195,9 +197,27 @@
         ;; the specified container to make sure it's marked as seen
         (when (and (= change-type :add)
                    (not= (:user-id change-data) (jwt/user-id)))
-          (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
+          (let [old-change-data (dispatcher/change-cache-data)
+                old-container-change-data (get old-change-data section-uuid)
+                old-unseen (or (:unseen old-container-change-data) [])
+                next-unseen (into [] (seq (conj old-unseen item-id)))
+                next-container-change-data (if old-container-change-data
+                                             (assoc old-container-change-data :unseen next-unseen)
+                                             {:container-id section-uuid
+                                              :unseen next-unseen})
+                next-change-data (assoc old-change-data section-uuid next-container-change-data)]
+          (dispatcher/dispatch! [:container/status next-change-data])))
         (when (= change-type :delete)
-          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))))))
+          (let [old-change-data (dispatcher/change-cache-data)
+                old-container-change-data (get old-change-data section-uuid)
+                old-unseen (or (:unseen old-container-change-data) [])
+                next-unseen (filter #(not= % item-id) old-unseen)
+                next-container-change-data (if old-container-change-data
+                                             (assoc old-container-change-data :unseen next-unseen)
+                                             {:container-id section-uuid
+                                              :unseen next-unseen})
+                next-change-data (assoc old-change-data section-uuid next-container-change-data)]
+            (dispatcher/dispatch! [:container/status next-change-data])))))))
 
 (defn ws-interaction-subscribe []
   (ws-ic/subscribe :interaction-comment/add
