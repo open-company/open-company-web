@@ -139,9 +139,8 @@
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
-  (let [fixed-activity-data (merge activity-data {:board-slug (:slug board-data)
-                                                  :board-name (:name board-data)
-                                                  :board-uuid (:uuid board-data)})
+  (let [change-data (dispatcher/change-data db)
+        fixed-activity-data (au/fix-entry activity-data board-data change-data)
         all-posts-activity-key (dispatcher/activity-key
                                 org-slug
                                 :all-posts
