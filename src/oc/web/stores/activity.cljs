@@ -139,7 +139,7 @@
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
-  (let [change-data (dispatcher/change-data db)
+  (let [cached-data (dispatcher/change-cache-data db)
         fixed-activity-data (au/fix-entry activity-data board-data change-data)
         all-posts-activity-key (dispatcher/activity-key
                                 org-slug
