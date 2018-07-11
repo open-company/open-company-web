@@ -246,10 +246,12 @@
                               (vec (conj next-links link-to-move))
                               next-links)
           with-links (assoc fixed-all-posts :links fixed-next-links)
-          new-items (merge (:fixed-items old-all-posts) (:fixed-items with-links))
+          new-items (into [] (concat (:items old-all-posts) (:items with-links)))
+          new-items-map (merge (:fixed-items old-all-posts) (:fixed-items with-links))
           keeping-items (count (:fixed-items old-all-posts))
           new-all-posts (-> with-links
-                              (assoc :fixed-items new-items)
+                              (assoc :fixed-items new-items-map)
+                              (assoc :items new-items)
                               (assoc :direction direction)
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-posts-key new-all-posts))

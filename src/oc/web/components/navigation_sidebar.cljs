@@ -69,7 +69,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                (drv/drv :change-data)
+                                (drv/drv :change-cache-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :show-invite-people-tooltip)
                                 ;; Locals
@@ -103,7 +103,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        change-data (drv/react s :change-data)
+        change-data (drv/react s :change-cache-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
