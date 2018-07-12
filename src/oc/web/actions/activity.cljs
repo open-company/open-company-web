@@ -282,7 +282,7 @@
 (defn get-entry [entry-data]
   (api/get-entry entry-data
     (fn [{:keys [status success body]}]
-      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil (= (router/current-board-slug) "all-posts")]))))
+      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))
 
 (defn entry-clear-local-cache [item-uuid edit-key]
   (remove-cached-item item-uuid)
@@ -418,13 +418,12 @@
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
     (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-  (dis/dispatch! [:activity-get/finish (router/current-org-slug) status activity-data secure-uuid]))
+  (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid]))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
   (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
 (defn secure-activity-get []
-
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
 ;; Change reaction
@@ -517,9 +516,7 @@
                     nil
                     (router/current-org-slug)
                     must-see-toggled
-                    nil
-                    (or (= (router/current-board-slug) "all-posts")
-                        (:from-all-posts @router/path))])
+                    nil])
     (api/update-entry must-see-toggled :must-see
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success
@@ -532,6 +529,4 @@
                                            status
                                            (router/current-org-slug)
                                            (json->cljs body)
-                                           nil
-                                           (or (= (router/current-board-slug) "all-posts")
-                                               (:from-all-posts @router/path))]))))))
+                                           nil]))))))

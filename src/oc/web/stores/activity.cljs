@@ -187,25 +187,25 @@
       {:error true})))
 
 (defmethod dispatcher/action :activity-get/finish
-  [db [_ status org-slug activity-data secure-uuid is-ap?]]
+  [db [_ status org-slug activity-data secure-uuid]]
   (let [next-db (if (= status 404)
                   (dissoc db :latest-entry-point)
                   db)
         activity-uuid (:uuid activity-data)
-        board-slug (:board-slug activity-data)
+        board-data (au/board-by-uuid (:board-uuid activity-data))
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
-                       (dispatcher/activity-key org-slug board-slug activity-uuid))
+                       (dispatcher/activity-key org-slug (:slug board-data) activity-uuid))
         fixed-activity-data (au/fix-entry
                              activity-data
-                             {:slug (or (:board-slug activity-data) board-slug)
-                              :name (:board-name activity-data)}
+                             board-data
                              (dispatcher/change-data db))
         ap-activity-key (dispatcher/activity-key org-slug :all-posts activity-uuid)
-        with-fixed-ap (if is-ap?
-                        (assoc-in next-db ap-activity-key fixed-activity-data)
-                        next-db)]
-    (assoc-in with-fixed-ap activity-key fixed-activity-data)))
+        ms-activity-key (dispatcher/activity-key org-slug :must-see activity-uuid)]
+    (-> db
+      (assoc-in activity-key fixed-activity-data)
+      (assoc-in ap-activity-key fixed-activity-data)
+      (assoc-in ms-activity-key fixed-activity-data))))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug fixed-board-data]]

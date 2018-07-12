@@ -7,6 +7,11 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
+(defn board-by-uuid [board-uuid]
+  (let [org-data (dis/org-data)
+        boards (:boards org-data)]
+    (first (filter #(= (:uuid %) board-uuid) boards))))
+
 (defn get-first-body-thumbnail
   "Given an entry body get the first thumbnail available.
   Thumbnail type: image, video or chart."
