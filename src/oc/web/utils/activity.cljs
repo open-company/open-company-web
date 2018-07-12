@@ -167,30 +167,33 @@
       (assoc :body-has-images has-images))))
 
 (defn fix-board
-  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
+  "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."
   ([board-data] (fix-board board-data {}))
 
   ([board-data changes]
      (let [links (:links board-data)
            read-only (readonly-board? links)
            with-read-only (assoc board-data :read-only read-only)
-           fixed-entries (zipmap
-                          (map :uuid (:entries board-data))
-                          (map #(fix-entry % board-data changes) (:entries board-data)))
-           with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
-       with-fixed-entries)))
+           with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
+                                        (fix-entry %2 board-data changes))
+                               with-read-only (:entries board-data))
+           without-entries (dissoc with-fixed-entries :entries)]
+       without-entries)))
 
 (defn fix-all-posts
   "Fix org data coming from the API."
   ([all-posts-data]
    (fix-all-posts all-posts-data {}))
   ([all-posts-data change-data]
-    (let [fixed-activities-list (map
-                                 #(fix-entry % {:slug (:board-slug %) :name (:board-name %)} change-data)
+    (let [with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
+                                          (fix-entry %2 {:slug (:board-slug %2)
+                                                         :name (:board-name %2)
+                                                         :uuid (:board-uuid %2)}
+                                           change-data))
+                                 all-posts-data
                                  (:items all-posts-data))
-          fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
-          with-fixed-activities (assoc all-posts-data :fixed-items fixed-activities)]
-      with-fixed-activities)))
+          without-items (dissoc with-fixed-activities :items)]
+      without-items)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data
