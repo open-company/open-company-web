@@ -168,14 +168,30 @@
 (defn org-edit-save [org-data]
   (api/patch-org org-data org-edit-save-cb))
 
-(defn org-change [data]
+(defn org-change [data org-data]
   (let [change-data (:data data)
         container-id (:container-id change-data)
         user-id (:user-id change-data)]
     (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
-      (when (= container-id (:uuid (dis/org-data)))
+      (when (= container-id (:uuid org-data))
         (utils/after 1000 get-org)))))
 
 ;; subscribe to websocket events
 (defn subscribe []
-  (ws-cc/subscribe :container/change org-change))
+  (ws-cc/subscribe :org/status
+    (fn [data]
+      (get-org)))
+  (ws-cc/subscribe :container/change
+    (fn [data]
+      (let [change-data (:data data)
+            change-type (:change-type change-data)
+            org-data (dis/org-data)]
+        ;; Handle section changes
+        (org-change data org-data)
+        ;; Nav away of the current section
+        ;; if it's being deleted
+        (when (and (= change-type :delete)
+                   (= (:container-id change-data) (:uuid org-data)))
+          (let [current-board-data (dis/board-data)]
+            (when (= (:item-id change-data) (:uuid current-board-data))
+              (router/nav! (oc-urls/all-posts (:slug org-data))))))))))

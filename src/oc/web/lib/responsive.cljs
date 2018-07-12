@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]))
 
 (def big-web-min-width 768)
+(def navbar-height 56)
 
 (defn ww []
   (when (and js/document

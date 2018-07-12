@@ -54,7 +54,8 @@
                     (:publisher activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
-                                :draft is-drafts-board})
+                                :draft is-drafts-board
+                                :new-item (:new activity-data)})
        :id dom-element-id
        :on-mouse-enter #(reset! (::hovering-card s) true)
        :on-mouse-leave #(reset! (::hovering-card s) false)
@@ -62,7 +63,7 @@
                    (when (and (not is-drafts-board)
                               (not @(::showing-menu s)))
                      (activity-actions/activity-modal-fade-in activity-data)))}
-      [:div.activity-share-container]
+      [:div.new-tag "NEW"]
       [:div.activity-card-preview-container
         [:div.activity-card-preview-header.group
           (user-avatar-image publisher)
@@ -84,10 +85,16 @@
               " in ")
             (when (or is-all-posts is-drafts-board is-must-see)
               (:board-name activity-data)))]
-        [:div.activity-card-headline
+        [:div.activity-card-headline.ap-seen-item-headline
           {:ref "activity-headline"
+           :data-itemuuid (:uuid activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-footer-placeholder]
+        [:div.activity-share-container]
+        [:div.activity-card-footer-hover.group
+          (when-not is-drafts-board
+            [:div.activity-card-menu-container
+              (more-menu activity-data dom-element-id)])]
         (if is-drafts-board
           [:div.activity-card-footer.group
             [:button.mlb-reset.edit-draft-bt

@@ -11,6 +11,16 @@ div.stream-item {
     padding: 24px 16px;
   }
 
+  &.new-item {
+    div.stream-item-header {
+      div.stream-header-head-author {
+        div.new-tag {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
   &.show-continue-reading {
     div.stream-item-body {
       div.stream-body-left {
@@ -69,6 +79,12 @@ div.stream-item {
         @include mobile() {
           width: auto;
         }
+      }
+
+      @include new-tag();
+
+      div.new-tag {
+        display: none;
       }
     }
   }

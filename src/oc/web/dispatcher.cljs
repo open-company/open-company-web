@@ -35,6 +35,9 @@
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
+(defn change-cache-data-key [org-slug]
+  (vec (conj (org-key org-slug) :change-cache-data)))
+
 (defn board-key [org-slug board-slug]
   (vec (conj (boards-key org-slug) (keyword board-slug))))
 
@@ -169,6 +172,10 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (change-data-key org-slug))))]
+   :change-cache-data   [[:base :org-slug]
+                          (fn [base org-slug]
+                            (when (and base org-slug)
+                              (get-in base (change-cache-data-key org-slug))))]
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                             (let [boards-key (boards-key org-slug)
@@ -334,6 +341,11 @@
 
 ;; Data
 
+(defn ap-initial-at
+  "Get ap-initial-at."
+  ([] (ap-initial-at @app-state))
+  ([data] (:ap-initial-at data)))
+
 (defn bot-access
   ""
   ([] (bot-access @app-state))
@@ -405,6 +417,15 @@
     (change-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (change-data-key org-slug))))
+
+(defn change-cache-data
+  "Get change data."
+  ([]
+    (change-cache-data @app-state))
+  ([data]
+    (change-cache-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (change-cache-data-key org-slug))))
 
 (defn board-data
   "Get board data."
@@ -507,6 +528,9 @@
 (defn print-change-data []
   (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
 
+(defn print-change-cache-data []
+  (js/console.log (get-in @app-state (change-cache-data-key (router/current-org-slug)))))
+
 (defn print-board-data []
   (js/console.log
    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
@@ -558,6 +582,7 @@
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
+(set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
