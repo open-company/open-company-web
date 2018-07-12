@@ -153,7 +153,8 @@
           filtered-change-data (if (= current-board-slug "all-posts")
                                  {} ;; ignore all changes if we are on AP
                                  (into {} (filter (fn [[buid _]](not= buid current-board-uuid)) change-data)))
-          new-change-data (if replace-change-data?
+          new-change-data (if (or replace-change-data?
+                                  (empty? old-change-data))
                             change-data
                             (merge old-change-data filtered-change-data))
           old-change-cache-data (dispatcher/change-cache-data db)
