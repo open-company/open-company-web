@@ -446,6 +446,8 @@
             activity-uuid (:item-id change-data)
             section-uuid (:container-id change-data)
             change-type (:change-type change-data)]
+        (when (= change-type :delete)
+          (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid activity-uuid}]))
         ;; Refresh the AP in case of items added or removed
         (when (and (or (= change-type :add)
                        (= change-type :delete))
