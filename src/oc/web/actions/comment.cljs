@@ -126,7 +126,7 @@
   (let [org-slug   (router/current-org-slug)
         board-slug (router/current-board-slug)
         activity-uuid (:resource-uuid interaction-data)
-        entry-data (dis/activity-data org-slug board-slug activity-uuid)
+        entry-data (dis/activity-data org-slug activity-uuid)
         comments-key (dis/activity-comments-key org-slug activity-uuid)]
     (when entry-data
       ;; Refresh the entry data to get the new links to interact with

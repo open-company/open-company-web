@@ -183,8 +183,8 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :activity-data       [[:base :org-slug :board-slug :activity-uuid]
-                          (fn [base org-slug board-slug activity-uuid]
+   :activity-data       [[:base :org-slug :activity-uuid]
+                          (fn [base org-slug activity-uuid]
                             (get-in base (activity-key org-slug activity-uuid)))]
    :secure-activity-data [[:base :org-slug :secure-id]
                           (fn [base org-slug secure-id]

@@ -425,7 +425,7 @@
 (defn activity-change [section-uuid activity-uuid]
   (let [org-data (dis/org-data)
         section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
-        activity-data (dis/activity-data (:slug org-data) (:slug section-data) activity-uuid)]
+        activity-data (dis/activity-data (:slug org-data) activity-uuid)]
     (when activity-data
       (get-entry activity-data))))
 
@@ -459,7 +459,7 @@
   "Actually send the seen at. Needs to get the activity data from the app-state
   to read the published-at and make sure it's still inside the TTL."
   [activity-id]
-  (when-let* [activity-data (dis/activity-data (router/current-org-slug) (router/current-board-slug) activity-id)
+  (when-let* [activity-data (dis/activity-data (router/current-org-slug) activity-id)
               publisher-id (:user-id (:publisher activity-data))
               container-id (:board-uuid activity-data)
               published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
