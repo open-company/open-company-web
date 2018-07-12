@@ -2,6 +2,8 @@
   (:require [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [taoensso.timbre :as timbre]
+            [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.user :as user-actions]
             [oc.web.components.org-settings :as org-settings]))
 
 (defn set-posts-filter [posts-filter]
@@ -15,7 +17,12 @@
              (.-preventDefault e))
     (.preventDefault e))
   (set-posts-filter (second (clojure.string/split url "/")))
-  (router/nav! url)
+  (let [current-path (.. js/window -location -pathname)]
+    (if (= current-path url)
+      (do
+        (routing-actions/routing @router/path)
+        (user-actions/initial-loading true))
+      (router/nav! url)))
   (close-navigation-sidebar))
 
 

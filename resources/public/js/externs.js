@@ -96,6 +96,8 @@ var OCWebHelp = function(){};
 var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
 var OCWebPrintRouterPath = function(){};
+var OCWebPrintChangeData = function(){};
+var OCWebPrintChangeCacheData = function(){};
 var OCWebForceRefreshToken = function(){};
 // Moment
 var moment = {};

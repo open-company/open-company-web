@@ -62,10 +62,6 @@
     (activity-actions/activity-modal-fade-out (:board-slug edited-data))))
 
 (defn close-clicked [s]
-  (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :fullscreen-post-data))]
-    (when-not (:from-all-posts @router/path)
-      ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
-      (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s)))
 

@@ -9,9 +9,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
-            [oc.web.actions.section :as sa]
-            [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.lib.user-cache :as uc]
+            [oc.web.local-settings :as ls]
+            [oc.web.actions.section :as sa]
+            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]))
@@ -40,7 +41,7 @@
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
+          fixed-all-posts (au/fix-all-posts (:collection all-posts-data) (dis/change-data))
           should-404? (and from
                            (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
@@ -243,7 +244,7 @@
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
-      (ws-cc/container-watch [(:uuid fixed-board-data)]))
+      (ws-cc/container-watch (:uuid fixed-board-data)))
     (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
 
 (defn board-name-exists-error [edit-key]
@@ -275,8 +276,7 @@
 (defn get-entry [entry-data]
   (api/get-entry entry-data
     (fn [{:keys [status success body]}]
-      (if success
-        (dis/dispatch! [:entry (dis/current-board-key) (:uuid entry-data) (json->cljs body)])))))
+      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))
 
 (defn entry-clear-local-cache [item-uuid edit-key]
   (remove-cached-item item-uuid)
@@ -332,7 +332,7 @@
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
-      (ws-cc/container-watch [(:uuid new-board-data)]))
+      (ws-cc/container-watch (:uuid new-board-data)))
     (dis/dispatch! [:entry-publish-with-board/finish new-board-data])))
 
 (defn entry-publish-with-board-cb [entry-uuid {:keys [status success body]}]
@@ -412,14 +412,88 @@
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
     (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-  (dis/dispatch! [:activity-get/finish status activity-data secure-uuid]))
+  (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid]))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
   (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
 (defn secure-activity-get []
-
   (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+
+;; Change reaction
+
+(defn activity-change [section-uuid activity-uuid]
+  (let [org-data (dis/org-data)
+        section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
+        activity-data (dis/activity-data (:slug org-data) (:slug section-data) activity-uuid)]
+    (when activity-data
+      (get-entry activity-data))))
+
+;; Change service actions
+
+(defn ws-change-subscribe []
+  (ws-cc/subscribe :container/change
+    (fn [data]
+      (let [change-data (:data data)
+            section-uuid (:item-id change-data)
+            change-type (:change-type change-data)]
+        ;; Refresh AP if user is looking at it
+        (when (= (router/current-board-slug) "all-posts")
+          (all-posts-get (dis/org-data) (dis/ap-initial-at))))))
+  (ws-cc/subscribe :item/change
+    (fn [data]
+      (let [change-data (:data data)
+            activity-uuid (:item-id change-data)
+            section-uuid (:container-id change-data)
+            change-type (:change-type change-data)]
+        ;; Refresh the AP in case of items added or removed
+        (when (and (or (= change-type :add)
+                       (= change-type :delete))
+                   (= (router/current-board-slug) "all-posts"))
+          (all-posts-get (dis/org-data) (dis/ap-initial-at)))
+        ;; Refresh the activity in case of an item update
+        (when (= change-type :update)
+          (activity-change section-uuid activity-uuid))))))
+
+(defn- send-item-seen
+  "Actually send the seen at. Needs to get the activity data from the app-state
+  to read the published-at and make sure it's still inside the TTL."
+  [activity-id]
+  (when-let* [activity-data (dis/activity-data (router/current-org-slug) (router/current-board-slug) activity-id)
+              publisher-id (:user-id (:publisher activity-data))
+              container-id (:board-uuid activity-data)
+              published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
+              today-ts (.getTime (utils/js-date))
+              oc-seen-ttl-ms (* ls/oc-seen-ttl 24 60 60 1000)
+              minimum-ttl (- today-ts oc-seen-ttl-ms)]
+    (when (> published-at-ts minimum-ttl)
+      ;; Send the seen because:
+      ;; 1. item is published
+      ;; 2. item is newer than TTL
+      (ws-cc/item-seen publisher-id container-id activity-id))))
+
+(def ap-seen-timeouts-list (atom {}))
+(def ap-seen-wait-interval 3)
+
+(defn ap-seen-events-gate
+  "Gate to throttle too many seen call for the same UUID.
+  Set a timeout to ap-seen-wait-interval seconds every time it's called with a new UUID,
+  if there was already a timeout for that item remove the old one.
+  Once the timeout finishes it means no other events were fired for it so we can send a seen.
+  It will send seen every 3 seconds or more."
+  [activity-id]
+  ;; Discard everything if we are not on AP
+  (when (= :all-posts (keyword (router/current-board-slug)))
+    (let [wait-interval-ms (* ap-seen-wait-interval 1000)]
+      ;; Remove the old timeout if there is
+      (when-let [uuid-timeout (get @ap-seen-timeouts-list activity-id)]
+        (.clearTimeout js/window uuid-timeout))
+      ;; Set the new timeout
+      (swap! ap-seen-timeouts-list assoc activity-id
+       (utils/after wait-interval-ms
+        (fn []
+         (swap! ap-seen-timeouts-list dissoc activity-id)
+         (send-item-seen activity-id)))))))
 
 (defn toggle-must-see [activity-data]
   (let [must-see (:must-see activity-data)
@@ -432,10 +506,11 @@
     (dis/dispatch! [:org-loaded
                     (assoc org-data :must-see-count new-must-see-count)
                     false])
-    (dis/dispatch! [:entry
-                    (dis/current-board-key)
-                    (:uuid activity-data)
-                    must-see-toggled])
+    (dis/dispatch! [:activity-get/finish
+                    nil
+                    (router/current-org-slug)
+                    must-see-toggled
+                    nil])
     (api/update-entry must-see-toggled :must-see
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success
@@ -443,8 +518,9 @@
                             (fn [{:keys [status body success]}]
                               (let [api-org-data (json->cljs body)]
                                 (dis/dispatch! [:org-loaded api-org-data false])
-                                (must-see-get org-data))))
-                          (dis/dispatch! [:entry
-                                          (dis/current-board-key)
-                                          (:uuid activity-data)
-                                          (json->cljs body)]))))))
+                                (must-see-get api-org-data))))
+                          (dis/dispatch! [:activity-get/finish
+                                           status
+                                           (router/current-org-slug)
+                                           (json->cljs body)
+                                           nil]))))))

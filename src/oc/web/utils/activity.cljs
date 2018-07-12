@@ -8,6 +8,11 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
+(defn board-by-uuid [board-uuid]
+  (let [org-data (dis/org-data)
+        boards (:boards org-data)]
+    (first (filter #(= (:uuid %) board-uuid) boards))))
+
 (defn get-first-body-thumbnail
   "Given an entry body get the first thumbnail available.
   Thumbnail type: image, video or chart."
@@ -121,31 +126,12 @@
     (and (nil? partial-update) (nil? delete))))
 
 (defn post-new?
-  "
-  An entry is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-      -and-
-    user is not the post's author
-      -and-
-    published-at is < 30 days
-      -and-
-    published-at of the entry is newer than seen at
-      -or-
-    no seen at
-  "
+  "An entry is new if its uuid is contained in container's unseen."
   [entry changes]
-  (let [published-at (:published-at entry)
-        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
-        seen-at (:seen-at changes)
-        user-id (jwt/get-key :user-id)
-        author-id (-> entry :author first :user-id)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
-        new? (and in-team?
-                  (not= author-id user-id)
-                  (> published-at too-old)
-                  (or (> published-at seen-at)
-                      (nil? seen-at)))]
-    new?))
+  (let [board-uuid (:board-uuid entry)
+        board-change-data (get changes board-uuid {})
+        board-unseen (:unseen board-change-data)]
+    (utils/in? board-unseen (:uuid entry))))
 
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
@@ -169,13 +155,15 @@
   [entry-data board-data changes]
   (let [comments-link (utils/link-for (:links entry-data) "comments")
         add-comment-link (utils/link-for (:links entry-data) "create" "POST")
+        fixed-board-uuid (or (:board-uuid entry-data) (:uuid board-data))
         fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
-      (assoc :new (post-new? (:body entry-data) changes))
+      (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
+      (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)
       (assoc :board-name fixed-board-name)
       (assoc :has-comments (boolean comments-link))
@@ -183,33 +171,34 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images))))
 
-(defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data {}))
-
 (defn fix-board
-  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
+  "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."
   ([board-data] (fix-board board-data {}))
 
   ([board-data changes]
      (let [links (:links board-data)
            read-only (readonly-board? links)
            with-read-only (assoc board-data :read-only read-only)
-           fixed-entries (zipmap
-                          (map :uuid (:entries board-data))
-                          (map #(fix-entry % board-data changes) (:entries board-data)))
-           with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
-       with-fixed-entries)))
+           with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
+                                        (fix-entry %2 board-data changes))
+                               with-read-only (:entries board-data))
+           without-entries (dissoc with-fixed-entries :entries)]
+       without-entries)))
 
 (defn fix-all-posts
   "Fix org data coming from the API."
-  [all-posts-data]
-  (let [fixed-activities-list (map
-                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
-                               (:items all-posts-data))
-        without-items (dissoc all-posts-data :items)
-        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
-        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
-    with-fixed-activities))
+  ([all-posts-data]
+   (fix-all-posts all-posts-data {}))
+  ([all-posts-data change-data]
+    (let [with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
+                                          (fix-entry %2 {:slug (:board-slug %2)
+                                                         :name (:board-name %2)
+                                                         :uuid (:board-uuid %2)}
+                                           change-data))
+                                 all-posts-data
+                                 (:items all-posts-data))
+          without-items (dissoc with-fixed-activities :items)]
+      without-items)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data

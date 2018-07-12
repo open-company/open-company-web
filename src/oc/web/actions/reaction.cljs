@@ -58,8 +58,7 @@
         board-key (dis/board-data-key org-slug board-slug)
         board-data (get-in @dis/app-state board-key)
         ; Entry data
-        entry-key (dis/activity-key org-slug activity-uuid)
-        entry-data (get-in @dis/app-state entry-key)
+        entry-data (dis/activity-data org-slug activity-uuid)
         reaction-data (:interaction interaction-data)
         is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))]
     (if (and entry-data (seq (:reactions entry-data)))

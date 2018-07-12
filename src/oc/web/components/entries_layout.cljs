@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.activity-card :refer (activity-card)]
@@ -23,6 +24,10 @@
 
 (def tiles-per-row 3)
 
+(defn- item-scrolled-into-view-cb [_ item-uuid]
+  ;; only in case of AP
+  (activity-actions/ap-seen-events-gate item-uuid))
+
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           (drv/drv :board-data)
@@ -33,6 +38,8 @@
                           (rum/local nil ::next-link)
                           ;; Mixins
                           (mixins/load-more-items 400)
+                          (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
+                          section-mixins/container-nav-in
 
                           {:init (fn [s]
                             (-> s
@@ -68,9 +75,6 @@
                                        (not @(::board-uuid s)))
                               (let [board-data @(drv/get-ref s :board-data)]
                                 (reset! (::board-uuid s) (:uuid board-data))))
-                            s)
-                           :will-unmount (fn [s]
-                            (section-actions/section-nav-away @(::board-uuid s))
                             s)}
   [s]
   [:div.entries-layout
@@ -99,7 +103,7 @@
               {:key (str "entries-row-" idx)}
               (for [entry entries]
                 (rum/with-key (activity-card entry has-headline has-body (:new entry) has-attachments)
-                  (str "entry-latest-" (:uuid entry))))
+                  (str "entry-latest-" (:uuid entry) "-" (:updated-at entry))))
               ; If the row contains less than 2, add a placeholder
 
               ; div to avoid having the first cover the full width

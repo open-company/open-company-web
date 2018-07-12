@@ -34,8 +34,7 @@
 (defn section-seen
   [uuid]
   ;; Let the change service know we saw the board
-  (ws-cc/container-seen uuid)
-  (dispatcher/dispatch! [:section-seen uuid]))
+  (ws-cc/container-seen uuid))
 
 (defn section-get-finish
   [section]
@@ -52,9 +51,9 @@
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
 
 (defn section-change
-  [section-uuid change-at]
-  (timbre/debug "Section change:" section-uuid "at:" change-at)
-  (utils/after 1000 (fn []
+  [section-uuid]
+  (timbre/debug "Section change:" section-uuid)
+  (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)]
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
@@ -66,16 +65,13 @@
               filtered-sections (filter #(= (:uuid %) section-uuid) sections)]
           (load-other-sections filtered-sections))))))
   ;; Update change-data state that the board has a change
-  (dispatcher/dispatch! [:section-change section-uuid change-at]))
+  (dispatcher/dispatch! [:section-change section-uuid]))
 
 (defn section-get
   [link]
   (api/get-board link
     (fn [status body success]
       (when success (section-get-finish (json->cljs body))))))
-
-(defn section-nav-away [uuid]
-  (dispatcher/dispatch! [:section-nav-away uuid]))
 
 (defn section-delete [section-slug]
   (api/delete-board section-slug (fn [status success body]
@@ -116,7 +112,7 @@
               (do
                 (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
                 (utils/after 500 refresh-org-data)
-                (ws-cc/container-watch [(:uuid section-data)])
+                (ws-cc/container-watch (:uuid section-data))
                 (dispatcher/dispatch! [:section-edit-save/finish section-data])
                 (when (fn? success-cb)
                   (success-cb)))))))
@@ -164,19 +160,44 @@
       (let [board-data (dispatcher/board-data)]
         (section-get (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))))
 
-
 (defn ws-change-subscribe []
   (ws-cc/subscribe :container/status
     (fn [data]
-      (dispatcher/dispatch! [:container/status (:data data)])))
+      (let [status-by-uuid (group-by :container-id (:data data))
+            clean-change-data (zipmap (keys status-by-uuid) (->> status-by-uuid
+                                                              vals
+                                                              ; remove the sequence of 1 from group-by
+                                                              (map first)))]
+        (dispatcher/dispatch! [:container/status clean-change-data]))))
 
   (ws-cc/subscribe :container/change
     (fn [data]
       (let [change-data (:data data)
-            container-id (:container-id change-data)]
-        ;; not an org data change
-        (when (not= container-id (:uuid (dispatcher/org-data)))
-          (section-change container-id (:change-at change-data)))))))
+            section-uuid (:item-id change-data)
+            change-type (:change-type change-data)]
+        ;; Refresh the section only in case of an update, let the org
+        ;; handle the add and delete cases
+        (when (= change-type :update)
+          (section-change section-uuid)))))
+  (ws-cc/subscribe :item/change
+    (fn [data]
+      (let [change-data (:data data)
+            section-uuid (:container-id change-data)
+            change-type (:change-type change-data)
+            org-slug (router/current-org-slug)
+            item-id (:item-id change-data)]
+        ;; Refresh the section only in case of items added or removed
+        ;; let the activity handle the item update case
+        (when (or (= change-type :add)
+                  (= change-type :delete))
+          (section-change section-uuid))
+        ;; On item/change :add let's add the UUID to the unseen list of
+        ;; the specified container to make sure it's marked as seen
+        (when (and (= change-type :add)
+                   (not= (:user-id change-data) (jwt/user-id)))
+          (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
+        (when (= change-type :delete)
+          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))))))
 
 (defn ws-interaction-subscribe []
   (ws-ic/subscribe :interaction-comment/add

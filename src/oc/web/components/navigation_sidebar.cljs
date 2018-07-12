@@ -51,7 +51,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                (drv/drv :change-data)
+                                (drv/drv :change-cache-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :show-invite-people-tooltip)
                                 ;; Locals
@@ -86,7 +86,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        change-data (drv/react s :change-data)
+        change-data (drv/react s :change-cache-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
@@ -185,7 +185,8 @@
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (= (router/current-board-slug) (:slug board))]]
+                        is-current-board (= (router/current-board-slug) (:slug board))
+                        board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-posts) is-current-board) "item-selected")
                  :data-board (name (:slug board))
@@ -203,7 +204,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (:new board)
+                    {:class (utils/class-set {:new (seq (:unseen board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]

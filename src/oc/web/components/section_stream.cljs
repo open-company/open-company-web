@@ -8,6 +8,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]
+            [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
@@ -22,6 +23,8 @@
                             (drv/drv :filtered-posts)
                             ;; Mixins
                             mixins/first-render-mixin
+                            section-mixins/container-nav-in
+
   [s]
   (let [section-data (drv/react s :filtered-posts)
         items (activity-utils/get-sorted-activities section-data)]
@@ -29,6 +32,6 @@
       [:div.section-stream-cards
         [:div.section-stream-cards-inner.group
           (for [e items]
-            (rum/with-key (stream-item e) (str "section-stream-item-" (:uuid e))))]
+            (rum/with-key (stream-item e) (str "section-stream-item-" (:uuid e) "-" (:updated-at e))))]
         (when (responsive/is-mobile-size?)
           (all-caught-up))]]))

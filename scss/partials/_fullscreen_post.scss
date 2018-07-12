@@ -281,8 +281,6 @@ div.fullscreen-post-container {
       div.fullscreen-post-author-header-right {
         float: right;
         width: 25%;
-
-        @include new-tag();
       }
     }
 

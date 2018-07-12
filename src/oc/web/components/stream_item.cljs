@@ -94,7 +94,8 @@
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
-                                :draft is-drafts-board})
+                                :draft is-drafts-board
+                                :new-item (:new activity-data)})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
        :on-click (fn [e]
@@ -119,7 +120,8 @@
               (when (or is-all-posts is-drafts-board)
                 " in ")
               (when (or is-all-posts is-drafts-board)
-                (:board-name activity-data)))]
+                (:board-name activity-data)))
+            [:div.new-tag "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
@@ -135,14 +137,12 @@
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
-            :external-share true}))
-        (when (:new activity-data)
-          [:div.new-tag
-            "New"])]
+            :external-share true}))]
       [:div.stream-item-body.group
         [:div.stream-body-left.group.fs-hide
-          [:div.stream-item-headline
+          [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"
+             :data-itemuuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           (when (:must-see activity-data)
             [:div.must-see
