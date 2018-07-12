@@ -163,10 +163,10 @@
 (defmethod dispatcher/action :activity-delete
   [db [_ org-slug activity-data]]
   (let [posts-key (dispatcher/posts-data-key org-slug)
-        posts-data (dispatcher/posts-data org-slug)
+        posts-data (dispatcher/posts-data)
         next-fixed-items (dissoc (:fixed-items posts-data) (:uuid activity-data))
-        next-board-data (assoc posts-data :fixed-items next-fixed-items)]
-    (assoc-in db posts-key next-board-data)))
+        next-posts-data (assoc posts-data :fixed-items next-fixed-items)]
+    (assoc-in db posts-key next-posts-data)))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]

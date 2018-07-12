@@ -16,7 +16,7 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (set-posts-filter (second (clojure.string/split url "/")))
+  (set-posts-filter (nth (clojure.string/split url "/") 2))
   (let [current-path (.. js/window -location -pathname)]
     (if (= current-path url)
       (do
