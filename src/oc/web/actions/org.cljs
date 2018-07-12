@@ -187,6 +187,4 @@
             change-type (:change-type change-data)]
         ;; Handle only the section add and delete cases
         ;; Let the section handle the update case
-        (when (or (= change-type :add)
-                  (= change-type :delete))
-          (org-change data))))))
+        (org-change data)))))
