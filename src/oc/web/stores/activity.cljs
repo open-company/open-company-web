@@ -268,10 +268,14 @@
     (update-in db dispatcher/activities-read-key merge new-items-count)))
 
 (defmethod dispatcher/action :activity-reads
-  [db [_ item-data]]
-  (let [read-data (into [] (:reads item-data))
-        item-id (:item-id item-data)]
-    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads read-data :item-id item-id})))
+  [db [_ item-id read-data team-roster]]
+  (let [fixed-read-data (into [] (map #(assoc % :seen true) read-data))
+        team-users (filter #(= (:status %) "active") (:users team-roster))
+        seen-ids (set (map :user-id read-data))
+        all-ids (set (map :user-id team-users))
+        unseen-ids (clojure.set/difference all-ids seen-ids)
+        unseen-users (into [] (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
+    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads fixed-read-data :item-id item-id :unreads unseen-users})))
 
 (defmethod dispatcher/action :must-see-get/finish
   [db [_ org-slug must-see-posts]]

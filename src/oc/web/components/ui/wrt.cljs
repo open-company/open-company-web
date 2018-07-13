@@ -31,8 +31,6 @@
 (def default-disappear-delay 500)
 
 (rum/defcs wrt < rum/reactive
-                 ;; Derivatives
-                 (drv/drv :team-roster)
                  ;; Locals
                  (rum/local "" ::query)
                  (rum/local false ::showing-popup)
@@ -45,13 +43,9 @@
 
   [s activity-data read-data]
   (let [item-id (:uuid activity-data)
-        team-roster (drv/react s :team-roster)
-        team-users (filter #(= (:status %) "active") (:users team-roster))
-        seen-users (into [] (sort-by utils/name-or-email (map #(assoc % :seen true) (:reads read-data))))
+        seen-users (into [] (sort-by utils/name-or-email (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
-        all-ids (set (map :user-id team-users))
-        unseen-ids (clojure.set/difference all-ids seen-ids)
-        unseen-users (into [] (sort-by utils/name-or-email (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids)))
+        unseen-users (into [] (sort-by utils/name-or-email (:unreads read-data)))
         all-users (sort-by utils/name-or-email (concat seen-users unseen-users))
         read-count (:count read-data)
         query (::query s)

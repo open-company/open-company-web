@@ -489,7 +489,7 @@
       (dis/dispatch! [:activities-count (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
-      (dis/dispatch! [:activity-reads (:data data)]))))
+      (dis/dispatch! [:activity-reads (:item-id (:data data)) (:reads (:data data)) (dis/team-roster)]))))
 
 ;; AP Seen
 
