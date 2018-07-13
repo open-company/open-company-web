@@ -4,7 +4,6 @@
             [oc.web.router :as router]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.section :as su]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.ws-interaction-client :as ws-ic]
@@ -40,7 +39,7 @@
 
     ;; Retrieve reads count
     (when (not= (:slug section) utils/default-drafts-board-slug)
-      (su/request-reads-count (map :uuid (:entries section))))
+      (api/request-reads-count (map :uuid (:entries section))))
 
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
 

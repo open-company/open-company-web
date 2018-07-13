@@ -8,7 +8,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.utils.section :as su]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
             [oc.web.local-settings :as ls]
@@ -35,6 +34,14 @@
           (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
           (ws-ic/board-watch (org-board-map board-slug))))))))
 
+;; Reads data
+
+(defn request-reads-data [item-id]
+  (api/request-reads-data item-id))
+
+(defn request-reads-count [item-ids]
+  (api/request-reads-data item-ids))
+
 ;; All Posts
 (defn all-posts-get-finish [from {:keys [body success]}]
   (when body
@@ -52,7 +59,7 @@
                  (= (router/current-board-slug) "all-posts"))
         (save-last-used-section "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
-      (su/request-reads-count (keys (:fixed-items fixed-all-posts)))
+      (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards fixed-all-posts)
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
@@ -62,7 +69,7 @@
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
-    (su/request-reads-count (map :uuid (:items (json->cljs body)))))
+    (request-reads-count (map :uuid (:items (json->cljs body)))))
   (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]

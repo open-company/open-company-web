@@ -3,7 +3,6 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.section :as su]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notifications-actions]
@@ -70,7 +69,7 @@
       {:class (when seen-users "has-read-list")
        :on-mouse-over #(when (and (not is-mobile?)
                                   (not (:reads read-data)))
-                        (su/request-reads-data item-id))
+                        (activity-actions/request-reads-data item-id))
        :on-mouse-enter (fn [_]
                          (when-not is-mobile?
                            (reset! (::under-middle-screen s) (under-middle-screen? (rum/ref-node s :wrt-count)))
@@ -147,14 +146,12 @@
                                                        :note "When you have a moment, please check out this post."
                                                        :subject (str "Just a reminder: " (:headline activity-data))
                                                        :to [(:email u)]}]
-                                      ;; Hide the WRT popup
-                                      (reset! (::showing-popup s) false)
                                       ;; Show the share popup
                                       (activity-actions/activity-share activity-data [email-share]
                                        (fn []
                                         (notifications-actions/show-notification
                                          {:title (str "Reminder sent to " (utils/name-or-email u) ".")
-                                          :id :wrt-remind-default
+                                          :id (str "wrt-share-" (utils/name-or-email u))
                                           :dismiss true
                                           :expire 5}))))}])]])
               (when-not (seq @query)
