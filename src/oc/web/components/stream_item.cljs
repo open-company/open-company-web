@@ -142,7 +142,7 @@
                 (utils/time-since t)])]
           [:div.separator]
           [:div.stream-item-wrt
-            (wrt activity-data read-data dom-element-id)]]
+            (wrt activity-data read-data)]]
         (when (and (not is-drafts-board)
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)))

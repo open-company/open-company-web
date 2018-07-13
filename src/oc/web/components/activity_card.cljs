@@ -94,7 +94,7 @@
           [:span.board-name (:board-name activity-data)]
           [:div.separator]
           [:div.activity-card-wrt
-            (wrt activity-data read-data dom-element-id)]]
+            (wrt activity-data read-data)]]
         [:div.activity-card-headline.ap-seen-item-headline
           {:ref "activity-headline"
            :data-itemuuid (:uuid activity-data)

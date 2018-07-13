@@ -169,19 +169,11 @@ div.wrt-container {
             float: right;
             display: none;
             opacity: 0.6;
+            background-image: cdnUrl("/img/ML/send_reminder.svg");
+            background-size: 14px 14px;
 
             &:hover {
               opacity: 1;
-            }
-
-            &.email {
-              background-image: cdnUrl("/img/ML/reminder_email.svg");
-              background-size: 16px 13px;
-            }
-
-            &.slack {
-              background-image: cdnUrl("/img/ML/slack_reminder.svg");
-              background-size: 16px 16px;
             }
           }
         }

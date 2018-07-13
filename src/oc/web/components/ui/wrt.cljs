@@ -6,6 +6,7 @@
             [oc.web.utils.section :as su]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.notifications :as notifications-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn filter-by-query [user query]
@@ -43,7 +44,7 @@
 
                  {:after-render (fn [s] (.tooltip (js/$ "[data-toggle=\"tooltip\"]")) s)}
 
-  [s activity-data read-data share-container-id]
+  [s activity-data read-data]
   (let [item-id (:uuid activity-data)
         team-roster (drv/react s :team-roster)
         team-users (filter #(= (:status %) "active") (:users team-roster))
@@ -122,8 +123,7 @@
               "NOT SEEN"]]
           [:div.wrt-popup-list
             (if (pos? (count sorted-filtered-users))
-              (for [u sorted-filtered-users
-                    :let [slack-user? (contains? u :slack-users)]]
+              (for [u sorted-filtered-users]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))}
                   [:div.wrt-popup-list-row-avatar
@@ -142,13 +142,21 @@
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :class (if slack-user? "slack" "email")
-                         :title "Send reminder"
-                         :on-click #(let [share-medium (if slack-user? :slack :email)]
+                         :title "Send a reminder"
+                         :on-click #(let [email-share {:medium :email
+                                                       :note "When you have a moment, please check out this post."
+                                                       :subject (str "Just a reminder: " (:headline activity-data))
+                                                       :to [(:email u)]}]
                                       ;; Hide the WRT popup
                                       (reset! (::showing-popup s) false)
                                       ;; Show the share popup
-                                      (activity-actions/activity-share-show activity-data share-container-id share-medium))}])]])
+                                      (activity-actions/activity-share activity-data [email-share]
+                                       (fn []
+                                        (notifications-actions/show-notification
+                                         {:title (str "Reminder sent to " (utils/name-or-email u) ".")
+                                          :id :wrt-remind-default
+                                          :dismiss true
+                                          :expire 5}))))}])]])
               (when-not (seq @query)
                 [:div.wrt-popup-list-row.empty-list
                   {:class (if (= @list-view :seen) "viewed" "unseen")}

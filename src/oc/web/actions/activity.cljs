@@ -424,8 +424,8 @@
 (defn activity-share-cb [{:keys [status success body]}]
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
-(defn activity-share [activity-data share-data]
-  (api/share-activity activity-data share-data activity-share-cb)
+(defn activity-share [activity-data share-data & [share-cb]]
+  (api/share-activity activity-data share-data (or share-cb activity-share-cb))
   (dis/dispatch! [:activity-share share-data]))
 
 (defn activity-get-finish [status activity-data secure-uuid]
