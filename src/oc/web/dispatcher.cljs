@@ -239,12 +239,13 @@
    :activity-share-medium [[:base] (fn [base] (:activity-share-medium base))]
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
+   :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share
                            :add-comment-focus :ap-initial-at :comments-data
-                           :show-sections-picker :section-editing]
+                           :show-sections-picker :section-editing :activities-read]
                           (fn [base org-data activity-data activity-share
                                add-comment-focus ap-initial-at comments-data
-                               show-sections-picker section-editing]
+                               show-sections-picker section-editing activities-read]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
@@ -257,7 +258,8 @@
                              :comments-data comments-data
                              :ap-initial-at ap-initial-at
                              :show-sections-picker show-sections-picker
-                             :section-editing section-editing})]
+                             :section-editing section-editing
+                             :read-data (get activities-read (router/current-activity-id))})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
@@ -323,8 +325,7 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open})]
-   :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]})
+                               :mobile-menu-open mobile-menu-open})]})
 
 
 ;; Action Loop =================================================================

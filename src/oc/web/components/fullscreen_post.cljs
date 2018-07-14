@@ -13,6 +13,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
@@ -325,7 +326,8 @@
                               :comments-data
                               (get (:uuid activity-data))
                               :sorted-comments)
-        comments-data (or activity-comments (:comments activity-data))]
+        comments-data (or activity-comments (:comments activity-data))
+        read-data (:read-data modal-data)]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -387,15 +389,19 @@
                 (str (:name (:publisher activity-data))
                  " in "
                  (:board-name activity-data))]
-              [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/time-since t)])]]
+              [:div.fullscreen-post-author-header-sub
+                [:div.time-since
+                  (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                    [:time
+                      {:date-time t
+                       :data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :data-title (utils/activity-date-tooltip activity-data)}
+                      (utils/time-since t)])]
+                [:div.separator]
+                [:div.fullscreen-post-wrt
+                  (wrt activity-data read-data)]]]
             [:div.fullscreen-post-author-header-right
               (when (:new activity-data)
                 [:div.new-tag
