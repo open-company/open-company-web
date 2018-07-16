@@ -54,9 +54,6 @@
 (defn refresh-if-needed [org-slug board-slug interaction-data]
   (let [; Get the current router data
         activity-uuid (:resource-uuid interaction-data)
-        ; Board data
-        board-key (dis/board-data-key org-slug board-slug)
-        board-data (get-in @dis/app-state board-key)
         ; Entry data
         entry-data (dis/activity-data org-slug activity-uuid)
         reaction-data (:interaction interaction-data)
