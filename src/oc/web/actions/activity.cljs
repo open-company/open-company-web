@@ -34,6 +34,14 @@
           (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
           (ws-ic/board-watch (org-board-map board-slug))))))))
 
+;; Reads data
+
+(defn request-reads-data [item-id]
+  (api/request-reads-data item-id))
+
+(defn request-reads-count [item-ids]
+  (api/request-reads-data item-ids))
+
 ;; All Posts
 (defn all-posts-get-finish [from {:keys [body success]}]
   (when body
@@ -49,7 +57,9 @@
         (router/redirect-404!))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
-        (save-last-used-section "all-posts"))
+        (save-last-used-section "all-posts")
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
+      (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards fixed-all-posts)
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
@@ -58,6 +68,8 @@
     (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (json->cljs body)))))
   (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
@@ -222,14 +234,18 @@
   [enable?]
   (dis/dispatch! [:entry-toggle-save-on-exit enable?]))
 
+(declare send-item-read)
+
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
   (let [org-slug (router/current-org-slug)]
     (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
-
-    (dis/dispatch! [:entry-save/finish activity-data edit-key])))
+    (dis/dispatch! [:entry-save/finish activity-data edit-key])
+    ;; Send item read
+    (when (= (:status activity-data) "published")
+      (send-item-read (:uuid activity-data)))))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
@@ -238,14 +254,17 @@
 
 (defn entry-modal-save-with-board-finish [activity-data response]
   (let [fixed-board-data (au/fix-board response)
-        org-slug (router/current-org-slug)]
+        org-slug (router/current-org-slug)
+        saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
     (save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid fixed-board-data)))
-    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])))
+    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])
+    (when (= (:status saved-activity-data) "published")
+      (send-item-read (:uuid saved-activity-data)))))
 
 (defn board-name-exists-error [edit-key]
   (dis/dispatch!
@@ -318,7 +337,9 @@
   (refresh-org-data)
   ;; Remove entry cached edits
   (remove-cached-item initial-uuid)
-  (dis/dispatch! [:entry-publish/finish edit-key activity-data]))
+  (dis/dispatch! [:entry-publish/finish edit-key activity-data])
+  ;; Send item read
+  (send-item-read (:uuid activity-data)))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug {:keys [status success body]}]
   (if success
@@ -326,14 +347,17 @@
     (dis/dispatch! [:entry-publish/failed  :entry-editing])))
 
 (defn entry-publish-with-board-finish [entry-uuid new-board-data]
-  (let [board-slug (:slug new-board-data)]
+  (let [board-slug (:slug new-board-data)
+        saved-activity-data (first (:entries new-board-data))]
     (save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid new-board-data)))
-    (dis/dispatch! [:entry-publish-with-board/finish new-board-data])))
+    (dis/dispatch! [:entry-publish-with-board/finish new-board-data])
+    ;; Send item read
+    (send-item-read (:uuid saved-activity-data))))
 
 (defn entry-publish-with-board-cb [entry-uuid {:keys [status success body]}]
   (if (= status 409)
@@ -389,8 +413,8 @@
     (api/update-entry fixed-activity-data nil create-update-entry-cb)
     (dis/dispatch! [:activity-move activity-data (router/current-org-slug) board-data])))
 
-(defn activity-share-show [activity-data & [element-id]]
-  (dis/dispatch! [:activity-share-show activity-data element-id]))
+(defn activity-share-show [activity-data & [element-id share-medium]]
+  (dis/dispatch! [:activity-share-show activity-data element-id (or share-medium :url)]))
 
 (defn activity-share-hide []
   (dis/dispatch! [:activity-share-hide]))
@@ -401,8 +425,8 @@
 (defn activity-share-cb [{:keys [status success body]}]
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
-(defn activity-share [activity-data share-data]
-  (api/share-activity activity-data share-data activity-share-cb)
+(defn activity-share [activity-data share-data & [share-cb]]
+  (api/share-activity activity-data share-data (or share-cb activity-share-cb))
   (dis/dispatch! [:activity-share share-data]))
 
 (defn activity-get-finish [status activity-data secure-uuid]
@@ -455,10 +479,18 @@
           (all-posts-get (dis/org-data) (dis/ap-initial-at)))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
-          (activity-change section-uuid activity-uuid))))))
+          (activity-change section-uuid activity-uuid)))))
+  (ws-cc/subscribe :item/counts
+    (fn [data]
+      (dis/dispatch! [:activities-count (:data data)])))
+  (ws-cc/subscribe :item/status
+    (fn [data]
+      (dis/dispatch! [:activity-reads (:item-id (:data data)) (:reads (:data data)) (dis/team-roster)]))))
+
+;; AP Seen
 
 (defn- send-item-seen
-  "Actually send the seen at. Needs to get the activity data from the app-state
+  "Actually send the seen. Needs to get the activity data from the app-state
   to read the published-at and make sure it's still inside the TTL."
   [activity-id]
   (when-let* [activity-data (dis/activity-data (router/current-org-slug) activity-id)
@@ -496,6 +528,41 @@
         (fn []
          (swap! ap-seen-timeouts-list dissoc activity-id)
          (send-item-seen activity-id)))))))
+
+;; WRT read
+
+(defn- send-item-read
+  "Actually send the read. Needs to get the activity data from the app-state
+  to read the published-id and the board uuid."
+  [activity-id]
+  (when-let* [activity-key (dis/activity-key (router/current-org-slug) activity-id)
+              activity-data (get-in @dis/app-state activity-key)
+              org-id (:uuid (dis/org-data))
+              container-id (:board-uuid activity-data)
+              user-name (jwt/get-key :name)
+              avatar-url (jwt/get-key :avatar-url)]
+    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
+
+(def wrt-timeouts-list (atom {}))
+(def wrt-wait-interval 3)
+
+(defn wrt-events-gate
+  "Gate to throttle too many wrt call for the same UUID.
+  Set a timeout to wrt-wait-interval seconds every time it's called with a certain UUID,
+  if there was already a timeout for that item remove it and reset it.
+  Once the timeout finishes it means no other events were fired for it so we can send a seen.
+  It will send seen every 3 seconds or more."
+  [activity-id]
+  (let [wait-interval-ms (* wrt-wait-interval 1000)]
+    ;; Remove the old timeout if there is
+    (when-let [uuid-timeout (get @wrt-timeouts-list activity-id)]
+      (.clearTimeout js/window uuid-timeout))
+    ;; Set the new timeout
+    (swap! wrt-timeouts-list assoc activity-id
+     (utils/after wait-interval-ms
+      (fn []
+       (swap! wrt-timeouts-list dissoc activity-id)
+       (send-item-read activity-id))))))
 
 (defn toggle-must-see [activity-data]
   (let [must-see (:must-see activity-data)

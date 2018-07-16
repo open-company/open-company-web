@@ -29,12 +29,6 @@
 (defn posts-data-key [org-slug]
   (vec (conj (org-key org-slug) :posts)))
 
-(defn change-data-key [org-slug]
-  (vec (conj (org-key org-slug) :change-data)))
-
-(defn change-cache-data-key [org-slug]
-  (vec (conj (org-key org-slug) :change-cache-data)))
-
 (defn board-key [org-slug board-slug]
   (vec (conj (boards-key org-slug) (keyword board-slug))))
 
@@ -71,6 +65,17 @@
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
      (board-data-key org-slug board-slug)))
+
+;; Change related keys
+
+(defn change-data-key [org-slug]
+  (vec (conj (org-key org-slug) :change-data)))
+
+(defn change-cache-data-key [org-slug]
+  (vec (conj (org-key org-slug) :change-cache-data)))
+
+(def activities-read-key
+  [:activities-read])
 
 ;; Derived Data ================================================================
 
@@ -218,14 +223,16 @@
                           (fn [base]
                             (:alert-modal base))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
+   :activity-share-medium [[:base] (fn [base] (:activity-share-medium base))]
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
+   :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share
                            :add-comment-focus :ap-initial-at :comments-data
-                           :show-sections-picker :section-editing]
+                           :show-sections-picker :section-editing :activities-read]
                           (fn [base org-data activity-data activity-share
                                add-comment-focus ap-initial-at comments-data
-                               show-sections-picker section-editing]
+                               show-sections-picker section-editing activities-read]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
@@ -238,7 +245,8 @@
                              :comments-data comments-data
                              :ap-initial-at ap-initial-at
                              :show-sections-picker show-sections-picker
-                             :section-editing section-editing})]
+                             :section-editing section-editing
+                             :read-data (get activities-read (router/current-activity-id))})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
@@ -386,24 +394,6 @@
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
 
-(defn change-data
-  "Get change data."
-  ([]
-    (change-data @app-state))
-  ([data]
-    (change-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (change-data-key org-slug))))
-
-(defn change-cache-data
-  "Get change data."
-  ([]
-    (change-cache-data @app-state))
-  ([data]
-    (change-cache-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (change-cache-data-key org-slug))))
-
 (defn board-data
   "Get board data."
   ([]
@@ -481,6 +471,38 @@
   ([team-id] (team-channels team-id @app-state))
   ([team-id data] (get-in data (team-channels-key team-id))))
 
+;; Change related
+
+(defn change-data
+  "Get change data."
+  ([]
+    (change-data @app-state))
+  ([data]
+    (change-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (change-data-key org-slug))))
+
+(defn change-cache-data
+  "Get change data."
+  ([]
+    (change-cache-data @app-state))
+  ([data]
+    (change-cache-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (change-cache-data-key org-slug))))
+
+(defn activities-read-data
+  "Get the read counts of all the items."
+  ([]
+    (activities-read-data nil @app-state))
+  ([item-ids]
+    (activities-read-data @app-state item-ids))
+  ([item-ids data]
+    (let [all-activities-read (get-in data activities-read-key)]
+      (if item-ids
+        (select-keys all-activities-read item-ids)
+        all-activities-read))))
+
 ;; Debug functions
 
 (defn print-app-state []
@@ -497,6 +519,9 @@
 
 (defn print-change-data []
   (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
+
+(defn print-activities-read-data []
+  (js/console.log (get-in @app-state activities-read-key)))
 
 (defn print-change-cache-data []
   (js/console.log (get-in @app-state (change-cache-data-key (router/current-org-slug)))))
@@ -551,6 +576,7 @@
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
+(set! (.-OCWebPrintActivitiesReadData js/window) print-activities-read-data)
 (set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintActivitiesData js/window) print-activities-data)

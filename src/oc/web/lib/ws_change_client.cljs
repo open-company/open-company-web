@@ -52,8 +52,28 @@
 
 (defn item-seen [publisher-id container-id item-id]
   (when @chsk-send!
-    (timbre/debug "Sending container/seen for container:" container-id "item:" item-id)
+    (timbre/debug "Sending item/seen for container:" container-id "item:" item-id)
     (@chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}] 1000)))
+
+(defn item-read [org-id container-id item-id user-name avatar-url]
+  (when @chsk-send!
+    (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
+    (@chsk-send! [:item/read {:org-id org-id
+                              :container-id container-id
+                              :item-id item-id
+                              :name user-name
+                              :avatar-url avatar-url
+                              :read-at (time/current-timestamp)}] 1000)))
+
+(defn who-read-count [item-ids]
+  (when @chsk-send!
+    (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
+    (@chsk-send! [:item/who-read-count item-ids] 1000)))
+
+(defn who-read [item-ids]
+  (when @chsk-send!
+    (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
+    (@chsk-send! [:item/who-read item-ids] 1000)))
 
 (defn subscribe
   [topic handler-fn]
@@ -98,6 +118,16 @@
   [_ body]
   (timbre/debug "Change event:" body)
   (go (>! ch-pub { :topic :item/change :data body })))
+
+(defmethod event-handler :item/counts
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :item/counts :data body })))
+
+(defmethod event-handler :item/status
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :item/status :data body })))
 
 ;; ----- Sente event handlers -----
 

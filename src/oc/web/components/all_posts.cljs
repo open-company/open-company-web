@@ -94,13 +94,17 @@
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))
 
-(defn- item-scrolled-into-view-cb [_ item-uuid]
+(defn- ap-seen-mixin-cb [_ item-uuid]
   (activity-actions/ap-seen-events-gate item-uuid))
+
+(defn- wrt-stream-item-mixin-cb [_ item-uuid]
+  (activity-actions/wrt-events-gate item-uuid))
 
 (rum/defcs all-posts  < rum/reactive
                         ;; Derivatives
                         (drv/drv :ap-initial-at)
                         (drv/drv :filtered-posts)
+                        (drv/drv :activities-read)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -115,8 +119,11 @@
                         (rum/local nil ::last-direction)
                         ;; Mixins
                         mixins/first-render-mixin
-                        (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
+                        (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
+                        (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner"
+                         wrt-stream-item-mixin-cb)
                         section-mixins/container-nav-in
+
                         {:will-mount (fn [s]
                           (let [posts-data @(drv/get-ref s :filtered-posts)
                                 sorted-items (activity-utils/get-sorted-activities posts-data)
@@ -233,8 +240,9 @@
                             (events/unlistenByKey @(::scroll-listener s)))
                           s)}
   [s]
-  (let [posts-data @(drv/get-ref s :filtered-posts)
-        items (activity-utils/get-sorted-activities posts-data)]
+  (let [posts-data (drv/react s :filtered-posts)
+        items (activity-utils/get-sorted-activities posts-data)
+        activities-read (drv/react s :activities-read)]
     [:div.all-posts.group
       [:div.all-posts-cards
         (when @(::top-loading s)
@@ -252,9 +260,10 @@
               (when (or @(::top-loading s)
                         (= @(::last-direction s) :up))
                 [:div.top-loading-message "Retrieving earlier activity..."])])
-          (for [e items]
+          (for [e items
+                :let [reads-data (get activities-read (:uuid e))]]
             (rum/with-key
-             (stream-item e)
+             (stream-item e reads-data)
              (str "all-posts-entry-" (:uuid e) "-" (:updated-at e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading

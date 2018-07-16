@@ -20,17 +20,6 @@
     (timbre/debug rep "Watching on socket " (:uuid section))
         (ws-ic/board-watch (:uuid section)))))
 
-(defn load-other-sections
-  [sections]
-  (doseq [section sections
-          :when (not (is-currently-shown? section))]
-    (api/get-board (utils/link-for (:links section) ["item" "self"] "GET")
-      (fn [status body success]
-        (let [section-data (json->cljs body)]
-              ;; is-loaded is meant for the currently in view board components
-              (dispatcher/dispatch!
-               [:section (assoc section-data :is-loaded false)]))))))
-
 (defn section-seen
   [uuid]
   ;; Let the change service know we saw the board
@@ -48,7 +37,19 @@
       (when (jwt/jwt) ; only for logged in users
         (watch-single-section section)))
 
+    ;; Retrieve reads count
+    (when (not= (:slug section) utils/default-drafts-board-slug)
+      (api/request-reads-count (map :uuid (:entries section))))
+
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
+
+(defn load-other-sections
+  [sections]
+  (doseq [section sections
+          :when (not (is-currently-shown? section))]
+    (api/get-board (utils/link-for (:links section) ["item" "self"] "GET")
+      (fn [status body success]
+        (section-get-finish (json->cljs body))))))
 
 (defn section-change
   [section-uuid]

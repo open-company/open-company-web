@@ -16,7 +16,14 @@
    (fn [{:keys [success body status]}]
      (let [fixed-body (when success (json->cljs body))]
        (if success
-         (dis/dispatch! [:team-roster-loaded fixed-body]))))))
+         (let [fixed-roster-data {:team-id (:team-id fixed-body)
+                             :links (-> fixed-body :collection :links)
+                             :users (-> fixed-body :collection :items)}]
+           (dis/dispatch! [:team-roster-loaded fixed-roster-data])
+           ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
+           (let [activities-read (dis/activities-read-data)]
+             (doseq [read-data activities-read]
+               (dis/dispatch! [:activity-reads (:item-id read-data) (:reads read-data) fixed-roster-data])))))))))
 
 (defn enumerate-channels-cb [team-id {:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))

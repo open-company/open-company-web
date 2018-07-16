@@ -49,12 +49,6 @@ div.activity-card {
     border: 1px solid #ECECEC;
   }
 
-  div.activity-share-container {
-    div.activity-share-modal-container {
-      margin-top: 42px;
-    }
-  }
-
   div.activity-card-menu-container {
     z-index: 3;
     position: absolute;
@@ -154,6 +148,21 @@ div.activity-card {
     border-bottom-right-radius: 6px;
     height: calc(100% - 121px);
 
+    div.activity-share-container {
+      div.activity-share-modal-container {
+        margin-top: 0px;
+      }
+    }
+
+    div.separator {
+      width: 4px;
+      height: 4px;
+      border-radius: 4px;
+      background-color: $ui_grey;
+      margin: 6px 8px 0px;
+      float: left; 
+    }
+
     div.activity-card-header {
       @include avenir_M();
       font-size: 12px;
@@ -163,18 +172,26 @@ div.activity-card {
       text-overflow: ellipsis;
       white-space: nowrap;
 
+      &.wrt-container {
+        overflow: visible;
+        text-overflow: unset;
+      }
+
+      &>span, &>div {
+        float: left;
+      }
     }
 
     div.activity-card-headline {
       @include activity-title();
       @include avenir_H();
       font-size: 16px;
-      display: inline;
+      display: inline-block;
       color: $deep_navy;
       text-overflow: ellipsis;
       width: 100%;
       overflow: hidden;
-      // white-space: nowrap;
+      white-space: nowrap;
       max-height: 36px;
       line-height: 18px;
       margin-top: 4px;
@@ -184,8 +201,7 @@ div.activity-card {
       height: 32px;
     }
 
-    div.activity-card-footer-hover {
-      display: none;
+    div.activity-card-footer {
       margin-top: 16px;
       height: 16px;
       position: absolute;
@@ -207,14 +223,6 @@ div.activity-card {
           float: unset;
         }
       }
-    }
-
-    div.activity-card-footer {
-      margin-top: 16px;
-      height: 16px;
-      position: absolute;
-      bottom: 16px;
-      width: calc(100% - 48px);
 
       button.delete-draft-bt {
         float: right;

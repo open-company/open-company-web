@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="15px" height="16px" viewBox="0 0 15 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
+    <title>icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Who-saw-this" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Who-saw-this---modal-states-(July2)" transform="translate(-397.000000, -139.000000)">
+            <rect fill="#FBFAF7" x="0" y="0" width="1726" height="1300"></rect>
+            <g id="Group-9" transform="translate(78.000000, 122.000000)">
+                <g id="Group-18">
+                    <g id="Group-11">
+                        <g id="icon" transform="translate(319.000000, 17.000000)">
+                            <rect id="Rectangle-4" fill="#C4C6C7" transform="translate(12.351801, 13.000000) rotate(-45.000000) translate(-12.351801, -13.000000) " x="11.401662" y="10" width="1.90027701" height="6" rx="0.950138504"></rect>
+                            <circle id="Oval" stroke="#C4C6C7" stroke-width="2" cx="7" cy="7" r="6"></circle>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
