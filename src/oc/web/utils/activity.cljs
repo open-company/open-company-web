@@ -182,8 +182,13 @@
            with-read-only (assoc board-data :read-only read-only)
            with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                         (fix-entry %2 board-data changes))
-                               with-read-only (:entries board-data))
-           without-entries (dissoc with-fixed-entries :entries)]
+                                      with-read-only (:entries board-data))
+           with-entry-count (if (:entries board-data)
+                              (assoc with-fixed-entries
+                              :entry-count
+                              (count (:fixed-items with-fixed-entries)))
+                              with-fixed-entries)
+           without-entries (dissoc with-entry-count :entries)]
        without-entries)))
 
 (defn fix-all-posts

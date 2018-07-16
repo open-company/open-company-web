@@ -35,7 +35,7 @@
             [:div.sections-picker-section-name
               (:name b)]
             [:div.sections-picker-section-posts
-              (str (count (:fixed-items b)) " posts")]]))]))
+              (str (:entry-count b) " posts")]]))]))
 
 (rum/defcs sections-picker < rum/reactive
                              (drv/drv :editable-boards)

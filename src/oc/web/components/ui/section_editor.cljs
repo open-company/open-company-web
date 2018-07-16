@@ -376,7 +376,7 @@
                             :action "delete-section"
                             :message [:span
                                        [:span "Are you sure?"]
-                                       (when (-> section-data :fixed-items count pos?)
+                                       (when (-> section-data :entry-count pos?)
                                          [:span
                                            " This will delete the section and "
                                            [:strong "all"]
