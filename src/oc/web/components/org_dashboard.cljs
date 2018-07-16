@@ -2,7 +2,6 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.router :as router]
@@ -14,6 +13,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
@@ -39,6 +39,8 @@
 (defn refresh-board-data [s]
   (when-not (router/current-activity-id)
     (utils/after 100 (fn []
+     (when (responsive/is-tablet-or-mobile?)
+       (nav-actions/set-posts-filter (router/current-posts-filter)))
      (let [{:keys [org-data
                    board-data
                    ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
