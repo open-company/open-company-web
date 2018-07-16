@@ -14,6 +14,7 @@
             [oc.web.mixins.activity :as am]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -39,7 +40,7 @@
                               (.tooltip "fixTitle")
                               (.tooltip "hide")))
                           s)}
-  [s activity-data has-headline has-body is-new has-attachments]
+  [s activity-data read-data has-headline has-body is-new has-attachments]
   (let [share-link (utils/link-for (:links activity-data) "share")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -51,7 +52,8 @@
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         publisher (if is-drafts-board
                     (first (:author activity-data))
-                    (:publisher activity-data))]
+                    (:publisher activity-data))
+        activity-time (or (:published-at activity-data) (:created-at activity-data))]
     [:div.activity-card
       {:class (utils/class-set {(str "activity-card-" (:uuid activity-data)) true
                                 :draft is-drafts-board
@@ -61,7 +63,8 @@
        :on-mouse-leave #(reset! (::hovering-card s) false)
        :on-click (fn [e]
                    (when (and (not is-drafts-board)
-                              (not @(::showing-menu s)))
+                              (not @(::showing-menu s))
+                              (not (utils/event-inside? e (sel1 [(str "div.activity-card-" (:uuid activity-data)) :div.wrt-container]))))
                      (activity-actions/activity-modal-fade-in activity-data)))}
       [:div.new-tag "NEW"]
       [:div.activity-card-preview-container
@@ -70,31 +73,34 @@
           [:div.activity-card-preview-author
             (:name publisher)]
           [:div.time-since
-            (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t}
-                (utils/time-since t)])]]
+            [:time
+              {:date-time activity-time}
+              (utils/time-since activity-time)]]]
         [:div.activity-card-preview-title
           {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-preview-body
           {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
       [:div.activity-card-bottom-container.group
         [:div.activity-card-header
-          (str (:name publisher)
-            (when (or is-all-posts is-drafts-board is-must-see)
-              " in ")
-            (when (or is-all-posts is-drafts-board is-must-see)
-              (:board-name activity-data)))]
+          {:class (utils/class-set {:hidden (or @(::showing-menu s)
+                                                @(::hovering-card s))})}
+          [:span (:name publisher)]
+          [:div.separator]
+          [:span (utils/time-since activity-time)]]
+        [:div.activity-card-header
+          {:class (utils/class-set {:hidden (and (not @(::showing-menu s))
+                                                 (not @(::hovering-card s)))
+                                    :wrt-container true})}
+          [:span.board-name (:board-name activity-data)]
+          [:div.separator]
+          [:div.activity-card-wrt
+            (wrt activity-data read-data)]]
         [:div.activity-card-headline.ap-seen-item-headline
           {:ref "activity-headline"
            :data-itemuuid (:uuid activity-data)
            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         [:div.activity-card-footer-placeholder]
         [:div.activity-share-container]
-        [:div.activity-card-footer-hover.group
-          (when-not is-drafts-board
-            [:div.activity-card-menu-container
-              (more-menu activity-data dom-element-id)])]
         (if is-drafts-board
           [:div.activity-card-footer.group
             [:button.mlb-reset.edit-draft-bt

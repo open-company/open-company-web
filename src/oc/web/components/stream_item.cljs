@@ -10,7 +10,9 @@
             [oc.web.mixins.activity :as am]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.events.expand-event :as expand-event]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -26,7 +28,12 @@
              scroll-to-comments?)
     (reset! (::should-scroll-to-comments s) true))
   (when-not expand?
-    (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0))))
+    (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0)))
+  (when expand?
+    ;; When expanding send an expand event with a bit of delay to let the component re-render first
+    (utils/after 100
+     #(let [e (expand-event/ExpandEvent. expand?)]
+        (.dispatchEvent expand-event/expand-event-target e)))))
 
 (defn should-show-continue-reading? [s]
   (let [activity-data (first (:rum/args s))
@@ -36,7 +43,8 @@
               (> (count (:attachments activity-data)) 3)
               (pos? (count comments-data))
               (:body-has-images activity-data))
-      (reset! (::truncated s) true))))
+      (reset! (::truncated s) true))
+    (reset! (::item-ready s) true)))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -46,6 +54,7 @@
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
+                         (rum/local false ::item-ready)
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::more-menu-open)
                          (rum/local false ::hovering-tile)
@@ -70,7 +79,7 @@
                                     (.focus (.find (js/$ dom-node) "div.add-comment")))))
                                (reset! (::should-scroll-to-comments s) false)))
                            s)}
-  [s activity-data]
+  [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         edit-link (utils/link-for (:links activity-data) "partial-update")
@@ -130,7 +139,10 @@
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
+                (utils/time-since t)])]
+          [:div.separator]
+          [:div.stream-item-wrt
+            (wrt activity-data read-data)]]
         (when (and (not is-drafts-board)
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)))
@@ -150,13 +162,20 @@
                                        (:must-see activity-data)})}])
           [:div.stream-item-body-container
             [:div.stream-item-body
-              {:class (utils/class-set {:expanded expanded?})}
+              {:class (utils/class-set {:expanded expanded?
+                                        :wrt-item-ready @(::item-ready s)})}
               [:div.stream-item-body-inner.to-truncate
                 {:ref "activity-body"
-                 :class (utils/class-set {:hide-images (and truncated? (not expanded?))})
+                 :data-itemuuid (:uuid activity-data)
+                 :class (utils/class-set {:hide-images (and truncated? (not expanded?))
+                                          :wrt-truncated truncated?
+                                          :wrt-expanded expanded?})
                  :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
               [:div.stream-item-body-inner.no-truncate
                 {:ref "full-activity-body"
+                 :data-itemuuid (:uuid activity-data)
+                 :class (utils/class-set {:wrt-truncated truncated?
+                                          :wrt-expanded expanded?})
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]
           (when (or (not is-mobile?) expanded?)
             (stream-attachments activity-attachments

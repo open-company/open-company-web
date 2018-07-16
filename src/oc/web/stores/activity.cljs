@@ -159,16 +159,18 @@
       (assoc-in new-board-activity-key fixed-activity-data))))
 
 (defmethod dispatcher/action :activity-share-show
-  [db [_ activity-data container-element-id]]
+  [db [_ activity-data container-element-id share-medium]]
   (-> db
     (assoc :activity-share {:share-data activity-data})
     (assoc :activity-share-container container-element-id)
+    (assoc :activity-share-medium share-medium)
     (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_]]
   (-> db
     (dissoc :activity-share)
+    (dissoc :activity-share-medium)
     (dissoc :activity-share-container)))
 
 (defmethod dispatcher/action :activity-share-reset
@@ -256,6 +258,24 @@
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-posts-key new-all-posts))
     db))
+
+(defmethod dispatcher/action :activities-count
+  [db [_ items-count]]
+  (let [old-reads-data (get-in db dispatcher/activities-read-key)
+        ks (into [] (map :item-id items-count))
+        vs (map #(zipmap [:count :reads :item-id] [(:count %) (get-in old-reads-data [(:item-id %) :reads]) (:item-id %)]) items-count)
+        new-items-count (zipmap ks vs)]
+    (update-in db dispatcher/activities-read-key merge new-items-count)))
+
+(defmethod dispatcher/action :activity-reads
+  [db [_ item-id read-data team-roster]]
+  (let [fixed-read-data (into [] (map #(assoc % :seen true) read-data))
+        team-users (filter #(= (:status %) "active") (:users team-roster))
+        seen-ids (set (map :user-id read-data))
+        all-ids (set (map :user-id team-users))
+        unseen-ids (clojure.set/difference all-ids seen-ids)
+        unseen-users (into [] (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
+    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads fixed-read-data :item-id item-id :unreads unseen-users})))
 
 (defmethod dispatcher/action :must-see-get/finish
   [db [_ org-slug must-see-posts]]

@@ -60,7 +60,7 @@ div.stream-item {
     div.stream-header-head-author {
       float: left;
       width: 55%;
-      overflow: hidden;
+      // overflow: hidden;
 
       @include activity-author(32);
 
@@ -75,10 +75,23 @@ div.stream-item {
       }
 
       div.time-since {
-        display: inline;
+        float: left;
         @include mobile() {
           width: auto;
         }
+      }
+
+      div.separator {
+        width: 4px;
+        height: 4px;
+        border-radius: 4px;
+        background-color: $ui_grey;
+        margin: 6px 8px 0px;
+        float: left;
+      }
+
+      div.stream-item-wrt {
+        float: left;
       }
 
       @include new-tag();

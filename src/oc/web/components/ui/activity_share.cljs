@@ -48,10 +48,10 @@
                             (drv/drv :org-data)
                             (drv/drv :activity-share)
                             (drv/drv :activity-shared-data)
+                            (drv/drv :activity-share-medium)
                             ;; Locals
                             (rum/local nil ::email-data)
                             (rum/local {:note ""} ::slack-data)
-                            (rum/local :url ::medium)
                             (rum/local false ::dismiss)
                             (rum/local false ::copied)
                             (rum/local false ::sharing)
@@ -71,8 +71,9 @@
                                (reset! (::email-subject s) subject)
                                (reset! (::email-data s) {:subject subject
                                                          :note ""})
-                               (when (has-bot? org-data)
-                                 (reset! (::medium s) :slack)))
+                               (when (and (not @(drv/get-ref s :activity-share-medium))
+                                          (has-bot? org-data))
+                                 (dis/dispatch! [:input [:activity-share-medium] :slack])))
                               (reset! (::window-click-listener s)
                                (events/listen js/window EventType/CLICK
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
@@ -95,16 +96,17 @@
                                    (if (:error shared-data) :error :shared))
                                   ;; If share succeeded reset share fields
                                   (when-not (:error shared-data)
-                                    (cond
-                                      (= @(::medium s) :email)
-                                      (do
-                                        (reset! (::item-input-key s) (rand 1000))
-                                        (reset! (::email-data s) {:subject @(::email-subject s)
-                                                                  :note ""}))
-                                      (= @(::medium s) :slack)
-                                      (do
-                                        (reset! (::slack-channels-dropdown-key s) (rand 1000))
-                                        (reset! (::slack-data s) {:note ""}))))
+                                    (let [medium @(drv/get-ref s :activity-share-medium)]
+                                      (cond
+                                        (= medium :email)
+                                        (do
+                                          (reset! (::item-input-key s) (rand 1000))
+                                          (reset! (::email-data s) {:subject @(::email-subject s)
+                                                                    :note ""}))
+                                        (= medium :slack)
+                                        (do
+                                          (reset! (::slack-channels-dropdown-key s) (rand 1000))
+                                          (reset! (::slack-data s) {:note ""})))))
                                   (utils/after
                                    2000
                                    (fn []
@@ -124,7 +126,8 @@
         secure-uuid (:secure-uuid activity-data)
         ;; Make sure it gets remounted when share request finishes
         _ (drv/react s :activity-shared-data)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        medium (drv/react s :activity-share-medium)]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -136,10 +139,10 @@
           "Share post"]
         [:div.activity-share-medium-selector-container
           [:div.activity-share-medium-selector
-            {:class (when (= @(::medium s) :url) "selected")
+            {:class (when (= medium :url) "selected")
              :on-click (fn [_]
                         (when-not @(::sharing s)
-                          (reset! (::medium s) :url)
+                          (dis/dispatch! [:input [:activity-share-medium] :url])
                           (utils/after
                            500
                            #(highlight-url s))))}
@@ -147,7 +150,7 @@
           (let [slack-disabled (not (has-bot? org-data))
                 show-slack-tooltip? (show-slack-tooltip? org-data)]
             [:div.activity-share-medium-selector
-              {:class (utils/class-set {:selected (= @(::medium s) :slack)
+              {:class (utils/class-set {:selected (= medium :slack)
                                         :medium-selector-disabled slack-disabled})
                :data-placement "top"
                :data-container "body"
@@ -164,15 +167,15 @@
                                    (utils/after
                                     2000
                                     #(.tooltip $this "hide"))))
-                               (reset! (::medium s) :slack))))}
+                               (dis/dispatch! [:input [:activity-share-medium] :slack]))))}
               "Slack"])
           [:div.activity-share-medium-selector
-            {:class (when (= @(::medium s) :email) "selected")
+            {:class (when (= medium :email) "selected")
              :on-click #(when-not @(::sharing s)
-                         (reset! (::medium s) :email))}
+                         (dis/dispatch! [:input [:activity-share-medium] :email]))}
             "Email"]]
         [:div.activity-share-divider-line]
-        (when (= @(::medium s) :email)
+        (when (= medium :email)
           [:div.activity-share-share.fs-hide
             [:div.mediums-box
               [:div.medium
@@ -239,7 +242,7 @@
                     [(when @(::sharing s)
                       (small-loading))
                      "Share"])]]]])
-        (when (= @(::medium s) :url)
+        (when (= medium :url)
           [:div.activity-share-modal-shared.group
             [:form
               {:on-submit #(utils/event-stop %)}
@@ -293,7 +296,7 @@
                   (if @(::copied s)
                     "Copied!"
                     "Copy")]]]])
-        (when (= @(::medium s) :slack)
+        (when (= medium :slack)
           [:div.activity-share-share.fs-hide
             [:div.mediums-box
               [:div.medium

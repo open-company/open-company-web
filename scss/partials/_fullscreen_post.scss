@@ -259,7 +259,6 @@ div.fullscreen-post-container {
       div.fullscreen-post-author-header-author {
         width: 75%;
         padding-right: 20px;
-        overflow: hidden;
         line-height: 18px;
         float: left;
 
@@ -270,11 +269,30 @@ div.fullscreen-post-container {
           color: $deep_navy;
         }
 
-        div.time-since {
-          @include avenir_M();
-          font-size: 12px;
-          line-height: 14px;
-          color: $ui_grey;
+        div.fullscreen-post-author-header-sub {
+
+          div.time-since {
+            @include avenir_M();
+            font-size: 12px;
+            line-height: 14px;
+            color: $ui_grey;
+            float: left;
+          }
+
+          div.separator {
+            width: 4px;
+            height: 4px;
+            border-radius: 4px;
+            background-color: $ui_grey;
+            margin: 6px 8px 0px;
+            float: left;
+          }
+
+          div.fullscreen-post-wrt {
+            &>span, &>div {
+              float: left;
+            }
+          }
         }
       }
 
