@@ -2,7 +2,6 @@
   (:require [cuerdas.core :as s]
             [cljs-time.format :as f]
             [cljs-time.core :as time]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]

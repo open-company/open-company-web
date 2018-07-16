@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.utils :as utils]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]

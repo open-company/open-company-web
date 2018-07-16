@@ -1,7 +1,6 @@
 (ns oc.web.actions.nav-sidebar
   (:require [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [taoensso.timbre :as timbre]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.org-settings :as org-settings]))
