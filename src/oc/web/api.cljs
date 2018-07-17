@@ -701,7 +701,6 @@
                                 :body (when (seq body) (json->cljs body))}))))))
 
 (defn request-reads-data [item-id]
-  (js/console.log "XXX api/request-reads-data" item-id)
   (ws-cc/who-read item-id))
 
 (defn request-reads-count [item-ids]
@@ -709,5 +708,4 @@
         all-items (set (keys activities-read-data))
         request-set (set item-ids)
         needed-ids (into [] (clojure.set/difference request-set all-items))]
-    (js/console.log "XXX api/request-reads-count" item-ids activities-read-data all-items request-set needed-ids)
     (ws-cc/who-read-count needed-ids)))
