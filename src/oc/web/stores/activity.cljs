@@ -12,9 +12,7 @@
     db
     (-> db
       (assoc :activity-modal-fade-in (:uuid activity-data))
-      (assoc :dismiss-modal-on-editing-stop (and editing dismiss-on-editing-end))
-      ;; Make sure the seen-at is not reset when navigating to modal view
-      (assoc :no-reset-seen-at true))))
+      (assoc :dismiss-modal-on-editing-stop (and editing dismiss-on-editing-end)))))
 
 (defmethod dispatcher/action :activity-modal-fade-out
   [db [_ board-slug]]
@@ -53,10 +51,6 @@
   [db [_ next-step]]
   (assoc db :nux next-step))
 
-(defmethod dispatcher/action :nux-end
-  [db [_]]
-  (dissoc db :nux))
-
 (defmethod dispatcher/action :activity-add-attachment
   [db [_ dispatch-input-key attachment-data]]
   (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
@@ -68,14 +62,6 @@
   (let [old-attachments (or (-> db dispatch-input-key :attachments) [])
         next-attachments (filterv #(not= (:file-url %) (:file-url attachment-data)) old-attachments)]
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
-
-(defmethod dispatcher/action :entry [db [_ board-key entry-uuid body]]
-  (let [board-data (get db board-key)
-        new-entries (assoc (get board-data :fixed-items)
-                     entry-uuid
-                     (au/fix-entry body board-data (dispatcher/change-data db)))
-        new-board-data (assoc board-data :fixed-items new-entries)]
-  (assoc db board-key new-board-data)))
 
 (defmethod dispatcher/action :entry-clear-local-cache
   [db [_ edit-key]]
@@ -151,17 +137,40 @@
         next-board-data (assoc board-data :fixed-items next-fixed-items)]
     (assoc-in db board-key next-board-data)))
 
+(defmethod dispatcher/action :activity-move
+  [db [_ activity-data org-slug board-data]]
+  (let [change-data (dispatcher/change-cache-data db)
+        fixed-activity-data (au/fix-entry activity-data board-data change-data)
+        all-posts-activity-key (dispatcher/activity-key
+                                org-slug
+                                :all-posts
+                                (:uuid activity-data))
+        old-board-activity-key (dispatcher/activity-key
+                                org-slug
+                                (:board-slug activity-data)
+                                (:uuid activity-data))
+        new-board-activity-key (dispatcher/activity-key
+                                org-slug
+                                (:slug board-data)
+                                (:uuid activity-data))]
+    (-> db
+      (assoc-in all-posts-activity-key fixed-activity-data)
+      (update-in (butlast old-board-activity-key) dissoc (last old-board-activity-key))
+      (assoc-in new-board-activity-key fixed-activity-data))))
+
 (defmethod dispatcher/action :activity-share-show
-  [db [_ activity-data container-element-id]]
+  [db [_ activity-data container-element-id share-medium]]
   (-> db
     (assoc :activity-share {:share-data activity-data})
     (assoc :activity-share-container container-element-id)
+    (assoc :activity-share-medium share-medium)
     (dissoc :activity-shared-data)))
 
 (defmethod dispatcher/action :activity-share-hide
   [db [_]]
   (-> db
     (dissoc :activity-share)
+    (dissoc :activity-share-medium)
     (dissoc :activity-share-container)))
 
 (defmethod dispatcher/action :activity-share-reset
@@ -180,24 +189,25 @@
       {:error true})))
 
 (defmethod dispatcher/action :activity-get/finish
-  [db [_ status activity-data secure-uuid]]
+  [db [_ status org-slug activity-data secure-uuid]]
   (let [next-db (if (= status 404)
                   (dissoc db :latest-entry-point)
                   db)
         activity-uuid (:uuid activity-data)
-        org-slug (:org-slug activity-data)
-        board-slug (:board-slug activity-data)
+        board-data (au/board-by-uuid (:board-uuid activity-data))
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
-                       (dispatcher/activity-key org-slug board-slug activity-uuid))
+                       (dispatcher/activity-key org-slug (:slug board-data) activity-uuid))
         fixed-activity-data (au/fix-entry
                              activity-data
-                             {:slug (or (:board-slug activity-data) board-slug)
-                              :name (:board-name activity-data)}
-                             (dispatcher/change-data db))]
-    (-> next-db
-      (dissoc :activity-loading)
-      (assoc-in activity-key fixed-activity-data))))
+                             board-data
+                             (dispatcher/change-data db))
+        ap-activity-key (dispatcher/activity-key org-slug :all-posts activity-uuid)
+        ms-activity-key (dispatcher/activity-key org-slug :must-see activity-uuid)]
+    (-> db
+      (assoc-in activity-key fixed-activity-data)
+      (assoc-in ap-activity-key fixed-activity-data)
+      (assoc-in ms-activity-key fixed-activity-data))))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug fixed-board-data]]
@@ -225,7 +235,7 @@
   [db [_ org direction all-posts-data]]
   (if all-posts-data
     (let [all-posts-key (dispatcher/all-posts-key org)
-          fixed-all-posts (au/fix-all-posts (:collection all-posts-data))
+          fixed-all-posts (au/fix-all-posts (:collection all-posts-data) (dispatcher/change-data db))
           old-all-posts (get-in db all-posts-key)
           next-links (vec
                       (remove
@@ -238,11 +248,36 @@
                               (vec (conj next-links link-to-move))
                               next-links)
           with-links (assoc fixed-all-posts :links fixed-next-links)
-          new-items (merge (:fixed-items old-all-posts) (:fixed-items with-links))
+          new-items (into [] (concat (:items old-all-posts) (:items with-links)))
+          new-items-map (merge (:fixed-items old-all-posts) (:fixed-items with-links))
           keeping-items (count (:fixed-items old-all-posts))
           new-all-posts (-> with-links
-                              (assoc :fixed-items new-items)
+                              (assoc :fixed-items new-items-map)
+                              (assoc :items new-items)
                               (assoc :direction direction)
                               (assoc :saved-items keeping-items))]
       (assoc-in db all-posts-key new-all-posts))
     db))
+
+(defmethod dispatcher/action :activities-count
+  [db [_ items-count]]
+  (let [old-reads-data (get-in db dispatcher/activities-read-key)
+        ks (into [] (map :item-id items-count))
+        vs (map #(zipmap [:count :reads :item-id] [(:count %) (get-in old-reads-data [(:item-id %) :reads]) (:item-id %)]) items-count)
+        new-items-count (zipmap ks vs)]
+    (update-in db dispatcher/activities-read-key merge new-items-count)))
+
+(defmethod dispatcher/action :activity-reads
+  [db [_ item-id read-data team-roster]]
+  (let [fixed-read-data (into [] (map #(assoc % :seen true) read-data))
+        team-users (filter #(= (:status %) "active") (:users team-roster))
+        seen-ids (set (map :user-id read-data))
+        all-ids (set (map :user-id team-users))
+        unseen-ids (clojure.set/difference all-ids seen-ids)
+        unseen-users (into [] (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
+    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads fixed-read-data :item-id item-id :unreads unseen-users})))
+
+(defmethod dispatcher/action :must-see-get/finish
+  [db [_ org-slug must-see-posts]]
+  (let [must-see-key (dispatcher/must-see-key org-slug)]
+    (assoc-in db must-see-key must-see-posts)))

@@ -44,11 +44,11 @@
           [:div.balloon.small-purple]
 
           [:h1.headline
-            "Keep your team informed with fewer distractions."]
+            "The new way to provide meaningful team communication."]
           [:div.subheadline
             (str
-             "Carrot rises above the noise of real-time chat so it's simple "
-             "to stay aligned, creating happy and engaged teams.")]
+             "Rise above the noise of chat and email to keep your "
+             "growing and distributed teams aligned.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container
             [:button.mlb-reset.get-started-button
@@ -76,85 +76,11 @@
             [:div.core-value.strategic-plans
               "Strategic plans"]
             [:div.core-value.ideas-discussions
-              "Ideas & follow-on discussions"]]]
+              "Decisions"]]]
 
-        [:section.home-keep-aligned
-          [:h2.home-keep-aligned-title
-            "Carrot keeps leaders and their teams aligned"]
+        shared-misc/keep-aligned-section
 
-          [:div.home-keep-aligned-carouselle.carouselle
-            [:div.carouselle-screenshots
-              [:div.carouselle-screenshot.screenshot-1]
-              [:div.carouselle-screenshot.screenshot-2.disappear]
-              [:div.carouselle-screenshot.screenshot-3.disappear]]
-            [:button.mlb-reset.carouselle-left]
-            [:button.mlb-reset.carouselle-right]]
-
-          [:div.green-values.group
-            [:div.green-value.lamp
-              [:div.green-value-icon]
-              [:div.green-value-title
-                "KNOW WHAT MATTERS MOST"]
-              [:div.green-value-description
-                (str
-                 "See \"must reads\" and focus on the "
-                 "people and topics you can't miss.")]]
-            [:div.green-value.people
-              [:div.green-value-icon]
-              [:div.green-value-title
-                "SPARK FOLLOW-ON DISCUSSIONS"]
-              [:div.green-value-description
-                (str
-                 "React, comment and ask questions, with "
-                 "time and space to be more thoughtful.")]]
-            [:div.green-value.slack
-              [:div.green-value-icon]
-              [:div.green-value-title
-                "SYNC TO SLACK"]
-              [:div.green-value-description
-                (str
-                 "Share posts to the relevant Slack "
-                 "channel, and sync comments from Slack "
-                 "back into Carrot.")]]]]
-
-        [:section.team-transparency
-          [:h2.team-transparency-title
-            "Carrot keeps leaders and their teams aligned"]
-
-          [:div.team-transparency-carouselle.carouselle
-            [:div.carouselle-screenshots
-              [:div.carouselle-screenshot.screenshot-1]
-              [:div.carouselle-screenshot.screenshot-2.disappear]
-              [:div.carouselle-screenshot.screenshot-3.disappear]]
-            [:button.mlb-reset.carouselle-left]
-            [:button.mlb-reset.carouselle-right]]
-
-          [:div.blue-values.group
-            [:div.blue-value.mega
-              [:div.blue-value-icon]
-              [:div.blue-value-title
-                "POST QUICKLY"]
-              [:div.blue-value-description
-                (str
-                 "It's simple and fast to share something "
-                 "new with your team.")]]
-            [:div.blue-value.paperclip
-              [:div.blue-value-icon]
-              [:div.blue-value-title
-                "ADD CONTENT FROM ANYWHERE"]
-              [:div.blue-value-description
-                (str
-                 "Link to external content, or add images, "
-                 "video and attachments from Google "
-                 "Drive, Dropbox, and others.")]]
-            [:div.blue-value.thumbup
-              [:div.blue-value-icon]
-              [:div.blue-value-title
-                "SEE WHO’S ENGAGED"]
-              [:div.blue-value-description
-                (str
-                 "See who’s viewed your post to "
-                 "eliminate communication gaps.")]]]]
+        shared-misc/access-anywhere-section
 
         (shared-misc/slack-comparison-section)
 

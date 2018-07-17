@@ -15,8 +15,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]
-            [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.slack-bot-modal :as slack-bot-modal]))
+            [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
 ;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
@@ -28,37 +27,25 @@
                         redirect)]
     (router/redirect! fixed-auth-url)))
 
-(defn maybe-show-add-bot-notification? []
+(defn maybe-show-bot-added-notification? []
   ;; Do we need to show the add bot banner?
-  (when-let [org-data (dis/org-data)]
-    (if (and (= (jwt/get-key :auth-source) "slack")
-             (not (jwt/team-has-bot? (:team-id org-data))))
-      ;; Do we have the needed data loaded
-      (when-let* [current-user-data (dis/current-user-data)
-                  team-data (dis/team-data (:team-id org-data))]
-        ;; Show the notification
-        (notification-actions/show-notification {:title "Enable Carrot for Slack?"
-                                                 :description "Share post to Slack, sync comments, invite & manage your team."
-                                                 :id :slack-second-step-banner
-                                                 :dismiss true
-                                                 :expire 0
-                                                 :slack-bot true
-                                                 :primary-bt-cb #(bot-auth team-data current-user-data)
-                                                 :primary-bt-title [:span [:span.slack-icon] "Add to Slack"]
-                                                 :primary-bt-style :solid-green
-                                                 :primary-bt-dismiss true
-                                                 :secondary-bt-cb #(slack-bot-modal/show-modal bot-auth)
-                                                 :secondary-bt-title "Learn More"
-                                                 :secondary-bt-style :default-link
-                                                 :secondary-bt-dismiss true}))
-      (let [bot-access (dis/bot-access)]
-        (when (= bot-access :slack-bot-success-notification)
-          (notification-actions/show-notification {:title "Slack integration successful"
-                                                   :slack-icon true
-                                                   :id "slack-bot-integration-succesful"}))
-        (dis/dispatch! [:input [:bot-access] nil])))))
+  (when-let* [org-data (dis/org-data)
+              bot-access (dis/bot-access)]
+    (when (= bot-access :slack-bot-success-notification)
+      (notification-actions/show-notification {:title "Slack integration successful"
+                                               :slack-icon true
+                                               :id "slack-bot-integration-succesful"}))
+    (dis/dispatch! [:input [:bot-access] nil])))
 
 ;; Org get
+(defn check-org-404 []
+  (let [orgs (dis/orgs-data)]
+    ;; avoid infinite loop of the Go to digest button
+    ;; by changing the value of the last visited slug
+    (if (pos? (count orgs))
+      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+      (cook/remove-cookie! (router/last-org-cookie)))
+    (router/redirect-404!)))
 
 (defn org-loaded [org-data saved?]
   ;; Save the last visited org
@@ -67,23 +54,22 @@
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
-        boards (:boards org-data)]
+        boards (:boards org-data)
+        activity-link (utils/link-for (:links org-data) "activity")]
     (sa/load-other-sections (:boards org-data))
+    (when activity-link
+      ;; Preload all posts data
+      (aa/all-posts-get org-data ap-initial-at)
+      ;; Preload must see data
+      (aa/must-see-get org-data))
     (cond
-      ;; If it's all posts page, loads all posts for the current org
+      ;; If it's all posts page or must see, loads AP and must see for the current org
       (or (= (router/current-board-slug) "all-posts")
-          ap-initial-at)
-      (if (utils/link-for (:links org-data) "activity")
-        ;; Load all posts only if not coming from a digest url
-        ;; in that case do not load since we already have the results we need
-        (aa/all-posts-get org-data ap-initial-at)
-        (let [orgs (dis/orgs-data)]
-           ;; avoid infinite loop of the Go to digest button
-           ;; by changing the value of the last visited slug
-          (if (pos? (count orgs))
-            (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
-            (cook/remove-cookie! (router/last-org-cookie)))
-          (router/redirect-404!)))
+          ap-initial-at
+          (= (router/current-board-slug) "must-see"))
+      (when-not activity-link
+        (check-org-404))
+
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
@@ -93,12 +79,7 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
-          (if (router/current-activity-id) ;; user is asking for a specific post
-            (if (jwt/jwt)
-              ;; Show the activity removed
-              (dis/dispatch! [:input [:show-activity-removed] true])
-              ;; Show the activity not found/login screen
-              (dis/dispatch! [:input [:show-activity-not-found] true]))
+          (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (router/redirect-404!))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
@@ -125,7 +106,7 @@
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
       (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
   (dis/dispatch! [:org-loaded org-data saved?])
-  (utils/after 100 maybe-show-add-bot-notification?))
+  (utils/after 100 maybe-show-bot-added-notification?))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
@@ -138,11 +119,6 @@
 ;; Org redirect
 
 (defn org-redirect [org-data]
-  ;; Show NUX for first ever user when the dashboard is loaded
-  (cook/set-cookie!
-   (router/show-nux-cookie (jwt/user-id))
-   (:first-ever-user router/nux-cookie-values)
-   (* 60 60 24 7))
   (when org-data
     (let [org-slug (:slug org-data)]
       (utils/after 100 #(router/redirect! (oc-urls/all-posts org-slug))))))
@@ -192,14 +168,30 @@
 (defn org-edit-save [org-data]
   (api/patch-org org-data org-edit-save-cb))
 
-(defn org-change [data]
+(defn org-change [data org-data]
   (let [change-data (:data data)
         container-id (:container-id change-data)
         user-id (:user-id change-data)]
     (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
-      (when (= container-id (:uuid (dis/org-data)))
+      (when (= container-id (:uuid org-data))
         (utils/after 1000 get-org)))))
 
 ;; subscribe to websocket events
 (defn subscribe []
-  (ws-cc/subscribe :container/change org-change))
+  (ws-cc/subscribe :org/status
+    (fn [data]
+      (get-org)))
+  (ws-cc/subscribe :container/change
+    (fn [data]
+      (let [change-data (:data data)
+            change-type (:change-type change-data)
+            org-data (dis/org-data)]
+        ;; Handle section changes
+        (org-change data org-data)
+        ;; Nav away of the current section
+        ;; if it's being deleted
+        (when (and (= change-type :delete)
+                   (= (:container-id change-data) (:uuid org-data)))
+          (let [current-board-data (dis/board-data)]
+            (when (= (:item-id change-data) (:uuid current-board-data))
+              (router/nav! (oc-urls/all-posts (:slug org-data))))))))))

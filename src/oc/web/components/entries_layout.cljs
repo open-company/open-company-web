@@ -1,7 +1,6 @@
 (ns oc.web.components.entries-layout
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -9,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.activity-card :refer (activity-card)]
@@ -24,15 +24,22 @@
 
 (def tiles-per-row 3)
 
+(defn- item-scrolled-into-view-cb [_ item-uuid]
+  ;; only in case of AP
+  (activity-actions/ap-seen-events-gate item-uuid))
+
 (rum/defcs entries-layout < rum/reactive
                           (drv/drv :change-data)
                           (drv/drv :board-data)
+                          (drv/drv :activities-read)
                           (rum/local nil ::board-uuid)
                           (rum/local false ::loading-more)
                           (rum/local nil ::prev-link)
                           (rum/local nil ::next-link)
                           ;; Mixins
                           (mixins/load-more-items 400)
+                          (mixins/ap-seen-mixin "div.ap-seen-item-headline" item-scrolled-into-view-cb)
+                          section-mixins/container-nav-in
 
                           {:init (fn [s]
                             (-> s
@@ -68,9 +75,6 @@
                                        (not @(::board-uuid s)))
                               (let [board-data @(drv/get-ref s :board-data)]
                                 (reset! (::board-uuid s) (:uuid board-data))))
-                            s)
-                           :will-unmount (fn [s]
-                            (section-actions/section-nav-away @(::board-uuid s))
                             s)}
   [s]
   [:div.entries-layout
@@ -80,7 +84,8 @@
           changes (get change-data board-uuid)
           is-mobile? (responsive/is-mobile-size?)
           entries (vals (:fixed-items board-data))
-          sorted-entries (vec (reverse (sort-by :published-at entries)))]
+          sorted-entries (vec (reverse (sort-by :published-at entries)))
+          activities-read (drv/react s :activities-read)]
       [:div.entry-cards-container.group
         ; Get the max number of pairs
         (let [top-index (js/Math.ceil (/ (count sorted-entries) tiles-per-row))]
@@ -96,9 +101,10 @@
             ; Renteder the entries in thisnrow
             [:div.entries-cards-container-row.group
               {:key (str "entries-row-" idx)}
-              (for [entry entries]
-                (rum/with-key (activity-card entry has-headline has-body (:new entry) has-attachments)
-                  (str "entry-latest-" (:uuid entry))))
+              (for [entry entries
+                    :let [reads-data (get activities-read (:uuid entry))]]
+                (rum/with-key (activity-card entry reads-data has-headline has-body (:new entry) has-attachments)
+                  (str "entry-latest-" (:uuid entry) "-" (:updated-at entry))))
               ; If the row contains less than 2, add a placeholder
 
               ; div to avoid having the first cover the full width

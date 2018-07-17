@@ -8,6 +8,7 @@
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
+            [oc.web.stores.routing]
             [oc.web.stores.org]
             [oc.web.stores.team]
             [oc.web.stores.user]
@@ -21,12 +22,15 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
             [oc.web.actions.team]
+            [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
+            [oc.web.actions.nux :as na]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -55,7 +59,6 @@
 (enable-console-print!)
 
 (defn drv-root [component target]
-  (swap! dis/app-state assoc :router-path @router/path)
   (ru/drv-root {:state dis/app-state
                 :drv-spec (dis/drv-spec dis/app-state router/path)
                 :component component
@@ -121,25 +124,8 @@
   (inject-loading))
 
 (defn post-routing []
-  (utils/after 10 (fn []
-    (let [force-refresh (or (utils/in? (:route @router/path) "org")
-                            (utils/in? (:route @router/path) "login"))
-          latest-entry-point (if (or force-refresh
-                                     (nil? (:latest-entry-point @dis/app-state)))
-                               0
-                               (:latest-entry-point @dis/app-state))
-          latest-auth-settings (if (or force-refresh
-                                       (nil? (:latest-auth-settings @dis/app-state)))
-                                 0
-                                 (:latest-auth-settings @dis/app-state))
-          now (.getTime (js/Date.))
-          reload-time (* 1000 60 20)] ; every 20m
-      (when (or (> (- now latest-entry-point) reload-time)
-                (and (router/current-org-slug)
-                     (nil? (dis/org-data))))
-        (user-actions/entry-point-get (router/current-org-slug)))
-      (when (> (- now latest-auth-settings) reload-time)
-        (user-actions/auth-settings-get))))))
+  (routing-actions/routing @router/path)
+  (user-actions/initial-loading))
 
 ;; home
 (defn home-handler [target params]
@@ -151,15 +137,7 @@
   (drv-root home-page target))
 
 (defn check-nux [query-params]
-  (let [nux-setup-time 3000
-        has-at-param (contains? query-params :at)
-        nux-cookie (cook/get-cookie
-                    (router/show-nux-cookie
-                     (jwt/get-key :user-id)))
-        show-nux (and (not (:show-login-overlay @dis/app-state))
-                      (jwt/jwt)
-                      (or (some #(= % nux-cookie) (vals router/nux-cookie-values))
-                          (contains? query-params :show-nux-again-please)))
+  (let [has-at-param (contains? query-params :at)
         loading (or (and ;; if is board page
                          (not (contains? query-params :ap))
                          ;; if the board data are not present
@@ -177,17 +155,12 @@
         bot-access (when (and (contains? query-params :access)
                               (= (:access query-params) "bot"))
                       :slack-bot-success-notification)
-        next-app-state {:nux (when show-nux :1)
-                        :loading loading
+        next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :user-settings user-settings
-                        :nux-loading show-nux
-                        :bot-access bot-access
-                        :nux-end nil}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))
-        (utils/after nux-setup-time
-         #(swap! dis/app-state assoc :nux-end true))))
+                        :bot-access bot-access}]
+        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -283,14 +256,8 @@
   (pre-routing (:query-params params) true)
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
-      (cook/set-cookie!
-       (router/show-nux-cookie
-        (jwt/get-key :user-id))
-       (:new-user router/nux-cookie-values)
-       (* 60 60 24 7)))
-    (if new-user
-      (utils/after 100 #(router/nav! urls/sign-up-profile))
-      (user-actions/slack-lander-check-team-redirect))))
+      (na/set-new-user-cookie "slack"))
+    (user-actions/slack-lander-check-team-redirect)))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -480,6 +447,14 @@
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
 
+    (defroute must-see-route (urls/must-see ":org") {:as params}
+      (timbre/info "Routing must-see-route" (urls/must-see ":org"))
+      (org-handler "must-see" target org-dashboard (assoc-in params [:params :board] "must-see")))
+
+    (defroute must-see-slash-route (str (urls/must-see ":org") "/") {:as params}
+      (timbre/info "Routing must-see-slash-route" (str (urls/must-see ":org") "/"))
+      (org-handler "must-see" target org-dashboard (assoc-in params [:params :board] "must-see")))
+
     (defroute user-notifications-route urls/user-notifications {:as params}
       (timbre/info "Routing user-notifications-route" urls/user-notifications)
       (pre-routing (:query-params params))
@@ -612,6 +587,7 @@
   (user-actions/dispatch-jwt)
 
   ;; Subscribe to websocket client events
+  (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
   (sa/ws-interaction-subscribe)
   (oa/subscribe)

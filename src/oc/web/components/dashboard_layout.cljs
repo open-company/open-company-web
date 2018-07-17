@@ -11,8 +11,9 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -71,8 +72,9 @@
         route @(drv/get-ref s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
+        is-must-see (utils/in? (:route route) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
-    (if (or is-drafts-board is-all-posts)
+    (if (or is-drafts-board is-all-posts is-must-see)
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -97,7 +99,7 @@
                               (drv/drv :org-data)
                               (drv/drv :board-data)
                               (drv/drv :all-posts)
-                              (drv/drv :nux)
+                              (drv/drv :must-see)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
                               (drv/drv :show-section-add)
@@ -113,8 +115,8 @@
                               ;; Mixins
                               (ui-mixins/render-on-resize win-width)
                               {:before-render (fn [s]
-                                ;; Check if it still needs the add post tooltip
-                                (activity-actions/check-add-post-tooltip)
+                                ;; Check if it needs any NUX stuff
+                                (nux-actions/check-nux)
                                 s)
                                :will-mount (fn [s]
                                 (win-width s)
@@ -144,16 +146,22 @@
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data (drv/react s :board-data)
+        board-data-react (drv/react s :board-data)
         all-posts-data (drv/react s :all-posts)
+        must-see-data (drv/react s :must-see)
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
-        nux (drv/react s :nux)
+        is-must-see (utils/in? (:route route) "must-see")
+        board-data (cond
+                     is-must-see
+                     must-see-data
+
+                     :default
+                     board-data-react)
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        empty-board? (and (not nux)
-                          (zero? (count (:fixed-items board-data))))
+        empty-board? (zero? (count (:fixed-items board-data)))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
@@ -163,7 +171,7 @@
                     ;; If the add post tooltip is visible
                     (when @(drv/get-ref s :show-add-post-tooltip)
                       ;; Dismiss it and bring up the invite people tooltip
-                      (utils/after 1000 activity-actions/hide-add-post-tooltip)))
+                      (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
@@ -206,12 +214,19 @@
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:dangerouslySetInnerHTML (if is-all-posts
-                                                  #js {"__html" "All posts"}
-                                                  (utils/emojify (:name board-data)))}])
+                      {:dangerouslySetInnerHTML (cond
+                                                 is-all-posts
+                                                 #js {"__html" "All posts"}
+
+                                                 is-must-see
+                                                 #js {"__html" "Must see"}
+
+                                                 :default
+                                                 (utils/emojify (:name board-data)))}])
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)
+                             (not is-must-see)
                              (not (:read-only board-data)))
                     [:div.board-settings-container.group
                       [:button.mlb-reset.board-settings-bt
@@ -295,13 +310,13 @@
               (when (drv/react s :show-add-post-tooltip)
                 [:div.add-post-tooltip-container.group
                   [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(activity-actions/hide-add-post-tooltip)}]
+                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
                   [:div.add-post-tooltip-icon]
                   [:div.add-post-tooltips
                     [:div.add-post-tooltip
-                      "Get started by creating a new post to share an update, announcement, or plans."]
+                      "Welcome! Now you’re ready to post new updates and information for your team."]
                     [:div.add-post-tooltip.second-line
-                      "The sample post below can be deleted anytime."]]
+                      "You can delete the sample post at anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
                     {:on-click compose-fn}

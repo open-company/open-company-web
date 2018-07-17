@@ -10,11 +10,11 @@
             [oc.web.mixins.activity :as am]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.utils.activity :as activity-utils]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.events.expand-event :as expand-event]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.components.ui.tile-menu :refer (tile-menu)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
@@ -29,7 +29,12 @@
              scroll-to-comments?)
     (reset! (::should-scroll-to-comments s) true))
   (when-not expand?
-    (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0))))
+    (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0)))
+  (when expand?
+    ;; When expanding send an expand event with a bit of delay to let the component re-render first
+    (utils/after 100
+     #(let [e (expand-event/ExpandEvent. expand?)]
+        (.dispatchEvent expand-event/expand-event-target e)))))
 
 (defn should-show-continue-reading? [s]
   (let [activity-data (first (:rum/args s))
@@ -40,7 +45,8 @@
               (pos? (count comments-data))
               (:body-has-images activity-data)
               (:video-id activity-data))
-      (reset! (::truncated s) true))))
+      (reset! (::truncated s) true))
+    (reset! (::item-ready s) true)))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -50,8 +56,10 @@
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
+                         (rum/local false ::item-ready)
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::more-menu-open)
+                         (rum/local false ::hovering-tile)
                          ;; Mixins
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
@@ -73,7 +81,7 @@
                                     (.focus (.find (js/$ dom-node) "div.add-comment")))))
                                (reset! (::should-scroll-to-comments s) false)))
                            s)}
-  [s activity-data]
+  [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         edit-link (utils/link-for (:links activity-data) "partial-update")
@@ -98,7 +106,10 @@
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
-                                :draft is-drafts-board})
+                                :draft is-drafts-board
+                                :new-item (:new activity-data)})
+       :on-mouse-enter #(reset! (::hovering-tile s) true)
+       :on-mouse-leave #(reset! (::hovering-tile s) false)
        :on-click (fn [e]
                    (let [ev-in? (partial utils/event-inside? e)
                          dom-node-selector (str "div." dom-node-class)]
@@ -121,7 +132,8 @@
               (when (or is-all-posts is-drafts-board)
                 " in ")
               (when (or is-all-posts is-drafts-board)
-                (:board-name activity-data)))]
+                (:board-name activity-data)))
+            [:div.new-tag "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
@@ -130,92 +142,99 @@
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
-        (when (and (not is-mobile?)
-                   (not is-drafts-board))
-          (tile-menu activity-data dom-element-id))
-        (when is-mobile?
+                (utils/time-since t)])]
+          [:div.separator]
+          [:div.stream-item-wrt
+            (wrt activity-data read-data)]]
+        (when (and (not is-drafts-board)
+                   (or @(::hovering-tile s)
+                       @(::more-menu-open s)))
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
-            :will-close #(reset! (::more-menu-open s) false)}))
-        (when (:new activity-data)
-          [:div.new-tag
-            "New"])]
+            :will-close #(reset! (::more-menu-open s) false)
+            :external-share true}))]
       [:div.stream-item-body.group
         [:div.group
           [:div.stream-body-left.group.fs-hide
-            {:class (when (and has-video (not expanded?)) "has-video")}
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            (when (and has-video
-                       expanded?)
-              (ziggeo-player (:video-id activity-data) nil 638 479))
+            (when (:must-see activity-data)
+              [:div.must-see
+               {:class (utils/class-set {:must-see-on
+                                         (:must-see activity-data)})}])
             [:div.stream-item-body-container
               [:div.stream-item-body
-                {:class (utils/class-set {:expanded expanded?})}
+                {:class (utils/class-set {:expanded expanded?
+                                          :wrt-item-ready @(::item-ready s)})}
                 [:div.stream-item-body-inner.to-truncate
                   {:ref "activity-body"
-                   :class (utils/class-set {:hide-images (and truncated? (not expanded?))})
+                   :data-itemuuid (:uuid activity-data)
+                   :class (utils/class-set {:hide-images (and truncated? (not expanded?))
+                                            :wrt-truncated truncated?
+                                            :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
                 [:div.stream-item-body-inner.no-truncate
                   {:ref "full-activity-body"
+                   :data-itemuuid (:uuid activity-data)
+                   :class (utils/class-set {:wrt-truncated truncated?
+                                            :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
-          (when (and has-video
-                     (not expanded?))
-            (ziggeo-player (:video-id activity-data) nil 200 150))]
-        (when (or (not is-mobile?) expanded?)
-          (stream-attachments activity-attachments
-           (when (and truncated? (not expanded?))
-             #(expand s true))))
-        (if is-drafts-board
-          [:div.stream-item-footer.group
-            [:div.stream-body-draft-edit
-              [:button.mlb-reset.edit-draft-bt
-                {:on-click #(activity-actions/activity-edit activity-data)}
-                "Continue writing"]]
-            [:div.stream-body-draft-delete
-              [:button.mlb-reset.delete-draft-bt
-                {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
-                "Delete draft"]]]
-          [:div.stream-item-footer.group
-            {:ref "stream-item-reactions"}
-            [:button.mlb-reset.expand-button
-              {:class (when expanded? "expanded")
-               :ref :expand-button
-               :on-click #(expand s (not expanded?))}
-              (if expanded?
-                "Show less"
-                "Show more")]
-            (when-not is-mobile?
-              (reactions activity-data))
-            (if is-mobile?
-              (if expanded?
-                (reactions activity-data)
-                [:div.group
-                  {:on-click #(expand s true)}
-                  [:div.mobile-summary
-                    [:div.mobile-comments-summary
-                      [:div.mobile-comments-summary-icon]
-                      [:span
-                        (if (zero? (count comments-data))
-                          "Add a comment"
-                          (count comments-data))]]
-                    (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
-                      (when (pos? (:count max-reaction))
-                        [:div.mobile-summary-reaction
-                          [:span.reaction
-                            (:reaction max-reaction)]
-                          [:span.count
-                            (:count max-reaction)]]))]
-                  (when (pos? (count (:attachments activity-data)))
-                    [:div.mobile-summary-attachments
-                      [:span.attachments-icon]
-                      [:span.attachments-count (count (:attachments activity-data))]])])
-              [:div.stream-item-comments-summary
-                {:on-click #(expand s true true)}
-                (comments-summary activity-data true)])])
+            (when (and has-video
+                       (not expanded?))
+              (ziggeo-player (:video-id activity-data) nil 200 150))]
+          (when (or (not is-mobile?) expanded?)
+            (stream-attachments activity-attachments
+             (when (and truncated? (not expanded?))
+               #(expand s true))))
+          (if is-drafts-board
+            [:div.stream-item-footer.group
+              [:div.stream-body-draft-edit
+                [:button.mlb-reset.edit-draft-bt
+                  {:on-click #(activity-actions/activity-edit activity-data)}
+                  "Continue writing"]]
+              [:div.stream-body-draft-delete
+                [:button.mlb-reset.delete-draft-bt
+                  {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
+                  "Delete draft"]]]
+            [:div.stream-item-footer.group
+              {:ref "stream-item-reactions"}
+              [:button.mlb-reset.expand-button
+                {:class (when expanded? "expanded")
+                 :ref :expand-button
+                 :on-click #(expand s (not expanded?))}
+                (if expanded?
+                  "Show less"
+                  "Show more")]
+              (when-not is-mobile?
+                (reactions activity-data))
+              (if is-mobile?
+                (if expanded?
+                  (reactions activity-data)
+                  [:div.group
+                    {:on-click #(expand s true)}
+                    [:div.mobile-summary
+                      [:div.mobile-comments-summary
+                        [:div.mobile-comments-summary-icon]
+                        [:span
+                          (if (zero? (count comments-data))
+                            "Add a comment"
+                            (count comments-data))]]
+                      (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
+                        (when (pos? (:count max-reaction))
+                          [:div.mobile-summary-reaction
+                            [:span.reaction
+                              (:reaction max-reaction)]
+                            [:span.count
+                              (:count max-reaction)]]))]
+                    (when (pos? (count (:attachments activity-data)))
+                      [:div.mobile-summary-attachments
+                        [:span.attachments-icon]
+                        [:span.attachments-count (count (:attachments activity-data))]])])
+                [:div.stream-item-comments-summary
+                  {:on-click #(expand s true true)}
+                  (comments-summary activity-data true)])])]
         (when (and expanded?
                    (:has-comments activity-data))
           [:div.stream-body-right
@@ -226,4 +245,4 @@
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data true)]])]]))
+              (stream-comments activity-data comments-data true)]])]))

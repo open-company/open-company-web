@@ -12,7 +12,7 @@
   ([comments :guard map?]
    (sort-comments (vals comments)))
   ([comments :guard sequential?]
-   (vec (reverse (sort-by :created-at comments)))))
+   (vec (sort-by :created-at comments))))
 
 
 (defn- is-emoji

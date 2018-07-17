@@ -66,9 +66,7 @@
              secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss
              app-update slack-bot] :as notification-data}]
   [:div.notification
-    {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                              :appear (and (not @(::dismiss s)) @(:first-render-done s))
-                              :server-error server-error
+    {:class (utils/class-set {:server-error server-error
                               :app-update app-update
                               :slack-bot slack-bot
                               :opac opac
@@ -83,7 +81,9 @@
         {:on-click #(do
                       (reset! (::timeout s) nil)
                       (js/clearTimeout @(::timeout s))
-                      (notification-actions/remove-notification notification-data))}])
+                      (notification-actions/remove-notification notification-data)
+                      (when (fn? dismiss)
+                        (dismiss %)))}])
     (when (seq description)
       [:div.notification-description
         (description-wrapper description)])

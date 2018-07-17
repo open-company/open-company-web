@@ -39,24 +39,17 @@
               [:button.mlb-reset.get-started-button
                 {:on-click #(user-actions/login-with-slack slack-auth-link)}
                 [:span.slack-white-icon]
-                (if (responsive/is-tablet-or-mobile?)
-                  "Join your team"
-                  "Sign in with Slack and join your team")]]
+                [:span.slack-copy
+                  (if (responsive/is-tablet-or-mobile?)
+                    "Join your team"
+                    "Sign in with Slack and join your team")]]]
 
             [:div.main-animation-container
               [:img.main-animation
-                {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-                 :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
+                {:src (utils/cdn "/img/ML/slack_screenshot.png")
+                 :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
-            [:div.core-values-list.group
-              [:div.core-value.key-announcement
-                "Key announcements"]
-              [:div.core-value.company-updates
-                "Company & team updates"]
-              [:div.core-value.strategic-plans
-                "Strategic plans"]
-              [:div.core-value.ideas-discussions
-                "Ideas & follow-on discussions"]]]
+            shared-misc/core-values-list]
 
           [:section.keep-aligned
             [:div.keep-aligned-title
@@ -64,8 +57,9 @@
             [:button.mlb-reset.get-started-button
               {:on-click #(user-actions/login-with-slack slack-auth-link)}
               [:span.slack-white-icon]
-              (if (responsive/is-tablet-or-mobile?)
-                "Join your team"
-                "Sign in with Slack and join your team")]]]]
+              [:span.slack-copy
+                (if (responsive/is-tablet-or-mobile?)
+                  "Join your team"
+                  "Sign in with Slack and join your team")]]]]]
 
       (site-footer)]))

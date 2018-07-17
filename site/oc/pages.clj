@@ -107,7 +107,7 @@
     [:div.core-value.strategic-plans
       "Strategic plans"]
     [:div.core-value.ideas-discussions
-      "Ideas & follow-on discussions"]])
+      "Decisions"]])
 
 (def testimonials-section
   [:div.hidden]
@@ -142,83 +142,69 @@
 
 (def keep-aligned-section
   [:section.home-keep-aligned
-    [:h2.home-keep-aligned-title
-      "Carrot keeps leaders and their teams aligned"]
+    [:h2.keep-aligned-title
+      "Carrot keeps leaders and teams aligned"]
 
-    [:div.home-keep-aligned-carouselle.carouselle
-      [:div.carouselle-screenshots
-        [:div.carouselle-screenshot.screenshot-1]
-        [:div.carouselle-screenshot.screenshot-2.disappear]
-        [:div.carouselle-screenshot.screenshot-3.disappear]]
-      [:button.mlb-reset.carouselle-left]
-      [:button.mlb-reset.carouselle-right]]
+    [:div.keep-aligned-section
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-2]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Create engaging updates"]
+          [:div.keep-aligned-section-list-item
+            "Room for more than a quick chat"]
+          [:div.keep-aligned-section-list-item
+            "Capture video to add a human touch"]
+          [:div.keep-aligned-section-list-item
+            "Attachments from Google, Dropbox, & others"]]]
 
-    [:div.green-values.group
-      [:div.green-value.lamp
-        [:div.green-value-icon]
-        [:div.green-value-title
-          "KNOW WHAT MATTERS MOST"]
-        [:div.green-value-description
-          (str
-           "See \"must reads\" and focus on the "
-           "people and topics you can't miss.")]]
-      [:div.green-value.people
-        [:div.green-value-icon]
-        [:div.green-value-title
-          "SPARK FOLLOW-ON DISCUSSIONS"]
-        [:div.green-value-description
-          (str
-           "React, comment and ask questions, with "
-           "time and space to be more thoughtful.")]]
-      [:div.green-value.slack
-        [:div.green-value-icon]
-        [:div.green-value-title
-          "SYNC TO SLACK"]
-        [:div.green-value-description
-          (str
-           "Share posts to the relevant Slack "
-           "channel, and sync comments from Slack "
-           "back into Carrot.")]]]])
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-1]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Get up to speed quickly"]
+          [:div.keep-aligned-section-list-item
+            "“Must see” updates rise to the top"]
+          [:div.keep-aligned-section-list-item
+            "Follow people and topics you can’t miss"]
+          [:div.keep-aligned-section-list-item
+            "Organized and easy to browse"]]]
 
-(def team-transparency-section
-  [:section.team-transparency
-    [:h2.team-transparency-title
-      "Carrot keeps leaders and their teams aligned"]
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-3]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Spark better discussions"]
+          [:div.keep-aligned-section-list-item
+            "Encourage more comments and questions"]
+          [:div.keep-aligned-section-list-item
+            "Keep interactions together for greater context"]
+          [:div.keep-aligned-section-list-item
+            "Sync to Slack to discuss anywhere"]]]
 
-    [:div.team-transparency-carouselle.carouselle
-      [:div.carouselle-screenshots
-        [:div.carouselle-screenshot.screenshot-1]
-        [:div.carouselle-screenshot.screenshot-2.disappear]
-        [:div.carouselle-screenshot.screenshot-3.disappear]]
-      [:button.mlb-reset.carouselle-left]
-      [:button.mlb-reset.carouselle-right]]
+      [:div.keep-aligned-section-row
+        [:div.keep-aligned-section-screenshot.screenshot-4]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Know who’s up to date"]
+          [:div.keep-aligned-section-list-item
+            "Eliminate communication gaps"]
+          [:div.keep-aligned-section-list-item
+            "Send reminders with a single click"]
+          [:div.keep-aligned-section-list-item
+            "Ensures alignment on important items"]]]]])
 
-    [:div.blue-values.group
-      [:div.blue-value.mega
-        [:div.blue-value-icon]
-        [:div.blue-value-title
-          "POST QUICKLY"]
-        [:div.blue-value-description
-          (str
-           "It's simple and fast to share something "
-           "new with your team.")]]
-      [:div.blue-value.paperclip
-        [:div.blue-value-icon]
-        [:div.blue-value-title
-          "ADD CONTENT FROM ANYWHERE"]
-        [:div.blue-value-description
-          (str
-           "Link to external content, or add images, "
-           "video and attachments from Google "
-           "Drive, Dropbox, and others.")]]
-      [:div.blue-value.thumbup
-        [:div.blue-value-icon]
-        [:div.blue-value-title
-          "SEE WHO’S ENGAGED"]
-        [:div.blue-value-description
-          (str
-           "See who’s viewed your post to "
-           "eliminate communication gaps.")]]]])
+(def access-anywhere-section
+  [:section.access-anywhere-section
+    [:div.access-anywhere-section-container
+      [:div.access-anywhere-copy
+        [:div.access-anywhere-copy-title
+          "Stay informed on the go."]
+        [:div.access-anywhere-copy-subtitle
+          "Fully responsive mobile web app."]
+        [:div.access-anywhere-copy-subtitle.second-line
+          "No app install required."]]
+      [:div.access-anywhere-screenshot]]])
 
 (defn slack-comparison-section
   [& [slack-version?]]
@@ -230,7 +216,7 @@
         "Slack keeps your team connected in the moment."])
     (if slack-version? 
       [:div.slack-comparison-headline-2
-        "Keep Slackers on the same page with fewer distractions."]
+        "Keep your team informed without distractions."]
       [:div.slack-comparison-headline-2
         "Carrot keeps it aligned over time."])
     [:img.slack-comparison-screenshot.big-web-only
@@ -254,11 +240,11 @@
         [:div.balloon.small-purple]
 
         [:h1.headline
-          "Keep your team informed with fewer distractions."]
+          "The new way to provide meaningful team communication."]
         [:div.subheadline
           (str
-           "Carrot rises above the noise of real-time chat so it's simple "
-           "to stay aligned, creating happy and engaged teams.")]
+           "Rise above the noise of chat and email to keep your "
+           "growing and distributed teams aligned.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -281,7 +267,7 @@
 
       keep-aligned-section
 
-      team-transparency-section
+      access-anywhere-section
 
       (slack-comparison-section)
 
@@ -587,7 +573,7 @@
           [:button.mlb-reset.signin-with-slack
             {:id "get-started-centred-bt"}
             [:span.slack-white-icon]
-            "Add to Slack"]]
+            [:span.slack-copy "Add to Slack"]]]
         no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -605,9 +591,9 @@
 
       (slack-comparison-section true)
 
-      team-transparency-section
-
       keep-aligned-section
+
+      access-anywhere-section
 
       testimonials-section
 
@@ -660,7 +646,7 @@
               [:div.user-position
                 "Software Engineer"]
               [:a.linkedin-link
-                {:href "https://www.linkedin.com/in/iacopocarraro/"
+                {:href "https://linkedin.com/in/iacopocarraro/"
                  :target "_blank"}]]
             [:div.team-card.sean-johnson
               [:div.user-avatar]
@@ -671,6 +657,16 @@
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/snootymonkey/"
                  :target "_blank"}]]
+            [:div.team-card.georgiana-laudi
+              [:div.user-avatar]
+              [:div.user-name
+                "Georgiana Laudi"]
+              [:div.user-position
+                "Marketing and CX Advisor"]
+              [:a.linkedin-link
+                {:href "https://linkedin.com/in/georgianalaudi/"
+                 :target "_blank"}]]]
+          [:div.team-row.group.three-cards
             [:div.team-card.stuart-levinson
               [:div.user-avatar]
               [:div.user-name
@@ -679,8 +675,7 @@
                 "CEO and co-founder"]
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/stuartlevinson/"
-                 :target "_blank"}]]]
-          [:div.team-row.group.two-cards
+                 :target "_blank"}]]
             [:div.team-card.ryan-le-roux
               [:div.user-avatar]
               [:div.user-name
@@ -688,7 +683,7 @@
               [:div.user-position
                 "CDO"]
               [:a.linkedin-link
-                {:href "https://www.linkedin.com/in/ryanleroux/"
+                {:href "https://linkedin.com/in/ryanleroux/"
                  :target "_blank"}]]
             [:div.team-card.nathan-zorn
               [:div.user-avatar]
@@ -697,7 +692,7 @@
               [:div.user-position
                 "Software Engineer"]
               [:a.linkedin-link
-                {:href "https://www.linkedin.com/in/nathanzorn/"
+                {:href "https://linkedin.com/in/nathanzorn/"
                  :target "_blank"}]]]]
 
         [:div.other-cards.group

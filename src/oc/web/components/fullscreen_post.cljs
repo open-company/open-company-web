@@ -13,11 +13,12 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.tile-menu :refer (tile-menu)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.stream-comments :refer (stream-comments)]
@@ -63,10 +64,6 @@
     (activity-actions/activity-modal-fade-out (:board-slug edited-data))))
 
 (defn close-clicked [s]
-  (let [ap-initial-at (:ap-initial-at @(drv/get-ref s :fullscreen-post-data))]
-    (when-not (:from-all-posts @router/path)
-      ;; Make sure the seen-at is not reset when navigating back to the board so NEW is still visible
-      (dis/dispatch! [:input [:no-reset-seen-at] true])))
   (reset! (::dismiss s) true)
   (utils/after 180 #(dismiss-modal s)))
 
@@ -237,6 +234,18 @@
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data)))
 
+(defn send-item-read-if-needed [s]
+  (let [post-data @(drv/get-ref s :fullscreen-post-data)
+        editing (:modal-editing post-data)
+        activity-data (:activity-data post-data)]
+    (when (and (= (:status activity-data) "published")
+               (not editing))
+      ;; Check if the page is at the bottom of the scroll
+      (let [body-el (rum/ref-node s :fullscreen-post-box-content-body)]
+        (when (au/is-element-bottom-visible? body-el)
+          (activity-actions/wrt-events-gate (:uuid activity-data)))))))
+
+
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
                              (drv/drv :fullscreen-post-data)
@@ -246,6 +255,7 @@
                              (rum/local false ::showing-dropdown)
                              (rum/local false ::move-activity)
                              (rum/local nil ::window-click)
+                             (rum/local nil ::window-scroll)
                              ;; Editing locals
                              (rum/local "" ::initial-headline)
                              (rum/local "" ::initial-body)
@@ -324,6 +334,12 @@
                                    (when (and @(::show-legend s)
                                               (not (utils/event-inside? e (rum/ref-node s "legend-container"))))
                                       (reset! (::show-legend s) false)))))
+                               (reset! (::window-scroll s)
+                                (events/listen
+                                 (rum/ref-node s :fullscreen-post-container)
+                                 EventType/SCROLL
+                                 #(send-item-read-if-needed s)))
+                               (send-item-read-if-needed s)
                                s)
                               :will-unmount (fn [s]
                                (when @(::window-click s)
@@ -332,6 +348,9 @@
                                (when @(::headline-input-listener s)
                                  (events/unlistenByKey @(::headline-input-listener s))
                                  (reset! (::headline-input-listener s) nil))
+                               (when @(::window-scroll s)
+                                 (events/unlistenByKey @(::window-scroll s))
+                                 (reset! (::window-scroll s) nil))
                                (set! (.-onbeforeunload js/window) nil)
                                s)}
   [s]
@@ -351,7 +370,8 @@
                               :comments-data
                               (get (:uuid activity-data))
                               :sorted-comments)
-        comments-data (or activity-comments (:comments activity-data))]
+        comments-data (or activity-comments (:comments activity-data))
+        read-data (:read-data modal-data)]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -359,6 +379,7 @@
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))
                                 :editing editing
                                 :no-comments (not (:has-comments activity-data))})
+       :ref :fullscreen-post-container
        :id dom-element-id}
       [:div.fullscreen-post-header
         [:button.mlb-reset.mobile-modal-close-bt
@@ -376,7 +397,7 @@
                :disabled (zero? (count (:headline activity-editing)))
                :class (when @(::entry-saving s) "loading")}
               "SAVE"]
-            (tile-menu activity-data dom-element-id "bottom"))]]
+            (more-menu activity-data dom-element-id {:tooltip-position "left" :external-share true}))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
         (if editing
@@ -412,15 +433,19 @@
                 (str (:name (:publisher activity-data))
                  " in "
                  (:board-name activity-data))]
-              [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/time-since t)])]]
+              [:div.fullscreen-post-author-header-sub
+                [:div.time-since
+                  (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                    [:time
+                      {:date-time t
+                       :data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :data-title (utils/activity-date-tooltip activity-data)}
+                      (utils/time-since t)])]
+                [:div.separator]
+                [:div.fullscreen-post-wrt
+                  (wrt activity-data read-data)]]]
             [:div.fullscreen-post-author-header-right
               (when (:new activity-data)
                 [:div.new-tag
@@ -447,6 +472,10 @@
                  :ref "edit-headline"
                  :key (str "fullscreen-post-headline-" (:updated-at activity-data))
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+            (when (and (:must-see activity-data)
+                       (not editing))
+              [:div.must-see
+               {:class (utils/class-set {:must-see-on (:must-see activity-data)})}])
             ;; Video element
             (when (and video-id
                        (not @(::record-video s)))
@@ -466,6 +495,7 @@
                                  :multi-picker-container-selector "div#fullscreen-post-box-footer-multi-picker"})
               [:div.fullscreen-post-box-content-body.fs-hide
                 {:key (str "fullscreen-post-body-" (:updated-at activity-data))
+                 :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))

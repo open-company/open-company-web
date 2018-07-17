@@ -9,15 +9,21 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.org :as org-actions]
-            [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.actions.activity :as activity-actions]))
+            [oc.web.lib.json :refer (json->cljs)]))
 
 (defn roster-get [roster-link]
   (api/get-team roster-link
    (fn [{:keys [success body status]}]
      (let [fixed-body (when success (json->cljs body))]
        (if success
-         (dis/dispatch! [:team-roster-loaded fixed-body]))))))
+         (let [fixed-roster-data {:team-id (:team-id fixed-body)
+                             :links (-> fixed-body :collection :links)
+                             :users (-> fixed-body :collection :items)}]
+           (dis/dispatch! [:team-roster-loaded fixed-roster-data])
+           ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
+           (let [activities-read (dis/activities-read-data)]
+             (doseq [read-data activities-read]
+               (dis/dispatch! [:activity-reads (:item-id read-data) (:reads read-data) fixed-roster-data])))))))))
 
 (defn enumerate-channels-cb [team-id {:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))
@@ -38,7 +44,7 @@
       (let [team-data (when success (json->cljs body))]
         (when success
           (dis/dispatch! [:team-loaded team-data])
-          (utils/after 100 org-actions/maybe-show-add-bot-notification?)
+          (utils/after 100 org-actions/maybe-show-bot-added-notification?)
           (enumerate-channels team-data))))))
 
 (defn force-team-refresh [team-id]
@@ -104,7 +110,6 @@
   (if success
     (do
       (teams-get)
-      (activity-actions/remove-invite-people-tooltip)
       (dis/dispatch! [:invite-user/success user]))
     (dis/dispatch! [:invite-user/failed user])))
 

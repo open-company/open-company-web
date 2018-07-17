@@ -12,6 +12,7 @@
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.lib.raven :as sentry]
             [goog.Uri :as guri]))
@@ -188,7 +189,7 @@
 
 ;; Allowed keys
 
-(def entry-allowed-keys [:headline :body :attachments :video-id :board-slug :status])
+(def entry-allowed-keys [:headline :body :attachments :video-id :board-slug :status :must-see])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
@@ -698,3 +699,15 @@
                                 :success success
                                 :error (when-not success body)
                                 :body (when (seq body) (json->cljs body))}))))))
+
+(defn request-reads-data [item-id]
+  (js/console.log "XXX api/request-reads-data" item-id)
+  (ws-cc/who-read item-id))
+
+(defn request-reads-count [item-ids]
+  (let [activities-read-data (dispatcher/activities-read-data)
+        all-items (set (keys activities-read-data))
+        request-set (set item-ids)
+        needed-ids (into [] (clojure.set/difference request-set all-items))]
+    (js/console.log "XXX api/request-reads-count" item-ids activities-read-data all-items request-set needed-ids)
+    (ws-cc/who-read-count needed-ids)))

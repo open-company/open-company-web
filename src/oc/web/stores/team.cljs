@@ -15,10 +15,7 @@
 (defmethod dispatcher/action :team-roster-loaded
   [db [_ roster-data]]
   (if roster-data
-    (let [fixed-roster-data {:team-id (:team-id roster-data)
-                             :links (-> roster-data :collection :links)
-                             :users (-> roster-data :collection :items)}]
-      (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) fixed-roster-data))
+    (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
     db))
 
 (defn parse-team-data [team-data]

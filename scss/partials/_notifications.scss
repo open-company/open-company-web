@@ -26,14 +26,6 @@ div.notifications {
       border-radius: 0px;
     }
 
-    &.will-appear {
-      opacity: 0;
-    }
-
-    &.appear {
-      opacity: 1;
-    }
-
     &.server-error {
       background-color: #FDAB1D;
 

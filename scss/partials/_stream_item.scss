@@ -8,15 +8,14 @@ div.stream-item {
 
   @include mobile() {
     width: 100%;
+    padding: 24px 16px;
   }
 
-  &:hover {
+  &.new-item {
     div.stream-item-header {
-      div.tile-menu {
-        display: block;
-
-        @include mobile() {
-          display: none;
+      div.stream-header-head-author {
+        div.new-tag {
+          display: inline-block;
         }
       }
     }
@@ -43,26 +42,13 @@ div.stream-item {
     @include mobile() {
       width: 100%;
     }
-
-    div.tile-menu {
-      display: none;
-      margin-top: -8px;
-      margin-right: -10px;
-
-      @include mobile() {
-        display: none;
-      }
-    }
-
+    
     div.more-menu {
-      display: none;
-
       @include mobile() {
         display: block;
         float: right;
 
         ul.more-menu-list {
-          top: -4px;
           left: unset;
           right: 16px;
         }
@@ -72,7 +58,7 @@ div.stream-item {
     div.stream-header-head-author {
       float: left;
       width: 55%;
-      overflow: hidden;
+      // overflow: hidden;
 
       @include activity-author(32);
 
@@ -87,9 +73,29 @@ div.stream-item {
       }
 
       div.time-since {
+        float: left;
         @include mobile() {
           width: auto;
         }
+      }
+
+      div.separator {
+        width: 4px;
+        height: 4px;
+        border-radius: 4px;
+        background-color: $ui_grey;
+        margin: 6px 8px 0px;
+        float: left;
+      }
+
+      div.stream-item-wrt {
+        float: left;
+      }
+
+      @include new-tag();
+
+      div.new-tag {
+        display: none;
       }
     }
   }
@@ -137,11 +143,13 @@ div.stream-item {
         font-size: 22px;
         color: $deep_navy;
         line-height: 28px;
-        
+        display: inline;
         @include mobile() {
           margin-top: 16px;
         }
       }
+
+      @include must-see();
 
       div.stream-item-body-container {
 
@@ -197,24 +205,22 @@ div.stream-item {
       height: 32px;
       margin-top: 32px;
 
+      @include mobile() {
+        margin-top: 16px;
+      }
+      
       div.mobile-summary {
         float: left;
-        margin-top: 10px;
 
-        div.mobile-comments-summary {
-          height: 16px;
+        div.mobile-comments-summary-icon {
+          background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 14px;
+          height: 14px;
           float: left;
-
-          div.mobile-comments-summary-icon {
-            background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
-            background-size: 14px 14px;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 14px;
-            height: 14px;
-            float: left;
-            display: block;
-          }
+          display: block;
 
           span {
             margin-left: 6px;
@@ -348,7 +354,7 @@ div.stream-item {
 
         @include mobile() {
           width: auto;
-          margin-right: 6px;
+          margin-right: 24px;
         }
 
         &:before {

@@ -10,6 +10,7 @@
             [oc.web.local_settings :as ls]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -64,8 +65,7 @@
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
-        (or (status-response :name-required)
-            (:new-slack-user @dis/app-state))
+        (status-response :name-required)
         (if has-orgs
           (router/nav! oc-urls/confirm-invitation-profile)
           (router/nav! oc-urls/sign-up-profile))
@@ -102,10 +102,8 @@
              (org-actions/get-org org-data)
              (let [ap-initial-at (:ap-initial-at @dis/app-state)
                    currently-logged-in (jwt/jwt)]
-               (if (and (or (router/current-activity-id)
-                            ap-initial-at)
-                        (not currently-logged-in))
-                 (dis/dispatch! [:input [:show-activity-not-found] true])
+               (when-not (or (router/current-activity-id)
+                             ap-initial-at)
                  ;; 404 only if the user is not looking at a secure post page
                  ;; if so the entry point response can not include the specified org
                  (when-not (router/current-secure-activity-id)
@@ -119,13 +117,6 @@
                       (utils/in? (:route @router/path) "login")
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
-
-(defn slack-lander-new-user []
-  (cook/set-cookie!
-   (router/show-nux-cookie
-    (jwt/get-key :user-id))
-   (:new-user router/nux-cookie-values)
-   (* 60 60 24 7)))
 
 (defn slack-lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point
@@ -188,7 +179,7 @@
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
         (dis/dispatch! [:user-data (json->cljs data)])
-        (utils/after 100 org-actions/maybe-show-add-bot-notification?)))
+        (utils/after 100 nux-actions/check-nux)))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
@@ -267,10 +258,7 @@
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
-      (cook/set-cookie!
-       (router/show-nux-cookie (jwt/user-id))
-       (:new-user router/nux-cookie-values)
-       (* 60 60 24 7))
+      (nux-actions/set-new-user-cookie "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
@@ -305,10 +293,7 @@
             (cook/remove-cookie! :show-login-overlay)
             (utils/after 200 #(router/nav! oc-urls/login)))
           (do
-            (cook/set-cookie!
-             (router/show-nux-cookie (jwt/user-id))
-             (:new-user router/nux-cookie-values)
-             (* 60 60 24 7))
+            (nux-actions/set-new-user-cookie "email")
             (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))
   (dis/dispatch! [:pswd-collect password-reset?]))
@@ -348,6 +333,29 @@
 
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
+
+;; Initial loading
+
+(defn initial-loading [& [force-refresh]]
+  (let [force-refresh (or force-refresh
+                          (utils/in? (:route @router/path) "org")
+                          (utils/in? (:route @router/path) "login"))
+        latest-entry-point (if (or force-refresh
+                                   (nil? (:latest-entry-point @dis/app-state)))
+                             0
+                             (:latest-entry-point @dis/app-state))
+        latest-auth-settings (if (or force-refresh
+                                     (nil? (:latest-auth-settings @dis/app-state)))
+                               0
+                               (:latest-auth-settings @dis/app-state))
+        now (.getTime (js/Date.))
+        reload-time (* 1000 60 20)] ; every 20m
+    (when (or (> (- now latest-entry-point) reload-time)
+              (and (router/current-org-slug)
+                   (nil? (dis/org-data))))
+      (entry-point-get (router/current-org-slug)))
+    (when (> (- now latest-auth-settings) reload-time)
+      (auth-settings-get))))
 
 ;; User profile tab
 

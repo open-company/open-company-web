@@ -249,7 +249,7 @@
                             ;; Entry is saving
                             (when @(::saving s)
                               ;: Save request finished
-                              (when (not (:loading entry-editing))
+                              (when-not (:loading entry-editing)
                                 (reset! (::saving s) false)
                                 (when-not (:error entry-editing)
                                   (real-close s)
@@ -261,7 +261,7 @@
                                          (oc-urls/drafts (router/current-org-slug))
                                          (oc-urls/board (:board-slug entry-editing)))))))))
                             (when @(::publishing s)
-                              (when (not (:publishing entry-editing))
+                              (when-not (:publishing entry-editing)
                                 (reset! (::publishing s) false)
                                 (when-not (:error entry-editing)
                                   (let [redirect? (seq (:board-slug entry-editing))]

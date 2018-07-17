@@ -8,8 +8,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.user :as user-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.org-settings :as org-settings]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -25,7 +27,12 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (router/nav! url)
+  (let [current-path (.. js/window -location -pathname)]
+    (if (= current-path url)
+      (do
+        (routing-actions/routing @router/path)
+        (user-actions/initial-loading true))
+      (router/nav! url)))
   (close-navigation-sidebar))
 
 (def sidebar-top-margin 84)
@@ -62,7 +69,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                (drv/drv :change-data)
+                                (drv/drv :change-cache-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :show-invite-people-tooltip)
                                 ;; Locals
@@ -79,7 +86,7 @@
                                   (save-content-height s)
                                   s)
                                  :before-render (fn [s]
-                                  (activity-actions/check-invite-people-tooltip)
+                                  (nux-actions/check-nux)
                                   s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
@@ -96,17 +103,20 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        change-data (drv/react s :change-data)
+        change-data (drv/react s :change-cache-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
+        is-must-see (= (router/current-board-slug) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
+        show-must-see (or is-must-see
+                          (pos? (:must-see-count org-data)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -131,6 +141,7 @@
           (cond
             is-all-posts "All posts"
             is-drafts-board "Drafts"
+            is-must-see "Must see"
             :else (:name board-data))]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -138,6 +149,7 @@
         (when show-all-posts
           [:a.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-all-posts
+                                      :showing-must-see show-must-see
                                       :showing-drafts show-drafts})
              :href (oc-urls/all-posts)
              :on-click #(anchor-nav! % (oc-urls/all-posts))}
@@ -145,6 +157,16 @@
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
               "All posts"]])
+        (when show-must-see
+           [:a.must-see.hover-item.group
+            {:class (utils/class-set {:item-selected is-must-see
+                                      :showing-drafts show-drafts})
+              :href (oc-urls/must-see)
+              :on-click #(anchor-nav! % (oc-urls/must-see))}
+             [:div.must-see-icon
+               {:class (when is-must-see "selected")}]
+             [:div.must-see-label
+               "Must see"]])
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group
@@ -182,7 +204,8 @@
           [:div.left-navigation-sidebar-items.group
             (for [board (sort-boards boards)
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (= (router/current-board-slug) (:slug board))]]
+                        is-current-board (= (router/current-board-slug) (:slug board))
+                        board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (when (and (not is-all-posts) is-current-board) "item-selected")
                  :data-board (name (:slug board))
@@ -200,7 +223,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (:new board)
+                    {:class (utils/class-set {:new (seq (:unseen board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
@@ -211,7 +234,7 @@
         (when show-invite-people-tooltip
           [:div.invite-people-tooltip-container.group
             [:button.mlb-reset.invite-people-tooltip-dismiss
-              {:on-click #(activity-actions/remove-invite-people-tooltip)}]
+              {:on-click #(nux-actions/dismiss-invite-people-tooltip)}]
             [:div.invite-people-tooltip-icon]
             [:div.invite-people-tooltip-title
               "Well done on your first post!"]
