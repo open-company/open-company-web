@@ -72,7 +72,7 @@
 
 (defn who-read [item-ids]
   (when @chsk-send!
-    (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
+    (timbre/debug "Sending item/who-read for item-ids:" item-ids)
     (@chsk-send! [:item/who-read item-ids] 1000)))
 
 (defn subscribe

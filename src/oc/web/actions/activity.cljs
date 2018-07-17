@@ -36,11 +36,17 @@
 
 ;; Reads data
 
-(defn request-reads-data [item-id]
+(defn request-reads-data
+  "Request the list of readers of the given item."
+  [item-id]
   (api/request-reads-data item-id))
 
-(defn request-reads-count [item-ids]
-  (api/request-reads-data item-ids))
+(defn request-reads-count
+  "Request the reads count data only for the items we don't have already."
+  [item-ids]
+  (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activities-read-data))]
+    (when (seq cleaned-ids)
+      (api/request-reads-data cleaned-ids))))
 
 ;; All Posts
 (defn all-posts-get-finish [from {:keys [body success]}]

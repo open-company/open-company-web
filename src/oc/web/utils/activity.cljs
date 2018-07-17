@@ -247,3 +247,12 @@
               (> (.-bottom rect) responsive/navbar-height))
          ;; Item right is less than the screen width
          (<= (.-right rect) win-width))))
+
+(defn clean-who-reads-count-ids
+  "Given a list of items we want to request the who reads count
+   and the current read data, filter out the ids we already have data."
+  [item-ids activities-read-data]
+  (let [all-items (set (keys activities-read-data))
+        request-set (set item-ids)
+        diff-ids (clojure.set/difference request-set all-items)]
+    (into [] diff-ids)))
