@@ -29,6 +29,12 @@
     (dissoc :entry-editing)
     (assoc :entry-edit-dissmissing true)))
 
+(defmethod dispatcher/action :capture-video/dismiss
+  [db [_]]
+  (-> db
+    (dissoc :capture-video)
+    (assoc :capture-video-dissmissing true)))
+
 (defmethod dispatcher/action :modal-editing-deactivate
   [db [_]]
   (dissoc db :modal-editing))

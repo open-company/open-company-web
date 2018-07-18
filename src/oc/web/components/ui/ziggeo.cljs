@@ -43,8 +43,8 @@
                                  (let [config {:element recorder-el
                                                :attrs #js {:width width
                                                            :height height
-                                                           :theme "modern"
-                                                           :themecolor "red"}}
+                                                           :theme "carrot"
+                                                           :themecolor "green"}}
                                        Recorder (.. js/ZiggeoApi -V2 -Recorder)
                                        recorder-instance (Recorder. (clj->js config))]
                                    (.activate recorder-instance)
@@ -87,4 +87,6 @@
                                s)} 
   [s submit-cb start-cb cancel-cb width height]
   [:div.ziggeo-recorder
-    {:ref :ziggeo-recorder}])
+    {:ref :ziggeo-recorder
+     :style {:width (str (or width 640) "px")
+             :height (str (+ (or height 480) 96) "px")}}])

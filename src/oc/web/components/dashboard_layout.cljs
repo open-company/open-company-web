@@ -93,6 +93,17 @@
      (.tooltip "hide")
      (.tooltip "fixTitle"))))
 
+(defn compose-fn [s type]
+  (utils/remove-tooltips)
+  (reset! (::showing-compose-picker s) false)
+  (case type
+    :video (activity-actions/capture-video (get-board-for-edit s))
+    (activity-actions/entry-edit (get-board-for-edit s)))
+  ;; If the add post tooltip is visible
+  (when @(drv/get-ref s :show-add-post-tooltip)
+    ;; Dismiss it and bring up the invite people tooltip
+    (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
+
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
@@ -112,6 +123,7 @@
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
                               (rum/local nil ::board-switch)
+                              (rum/local false ::showing-compose-picker)
                               ;; Mixins
                               (ui-mixins/render-on-resize win-width)
                               {:before-render (fn [s]
@@ -165,13 +177,6 @@
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
-        compose-fn (fn [_]
-                    (utils/remove-tooltips)
-                    (activity-actions/entry-edit (get-board-for-edit s))
-                    ;; If the add post tooltip is visible
-                    (when @(drv/get-ref s :show-add-post-tooltip)
-                      ;; Dismiss it and bring up the invite people tooltip
-                      (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
@@ -268,7 +273,7 @@
                     (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
                       [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                         {:ref :top-compose-button
-                         :on-click #(when can-compose (compose-fn %))
+                         :on-click #(when can-compose (reset! (::showing-compose-picker s) true))
                          :class (when-not can-compose "disabled")
                          :title (when show-tooltip? "You are a view-only user.")
                          :data-viewer (if show-tooltip? "enable" "disable")
@@ -279,6 +284,16 @@
                         [:div.add-to-board-plus]
                         [:label.add-to-board-label
                           "New"]])
+                    (when @(::showing-compose-picker s)
+                      [:div.compose-type-dropdown
+                        {:on-mouse-leave #(reset! (::showing-compose-picker s) false)}
+                        [:div.compose-type.compose-type-post
+                          {:on-click #(compose-fn s :post)}
+                          "Text"]
+                        [:div.compose-type-separator]
+                        [:div.compose-type.compose-type-video
+                          {:on-click #(compose-fn s :video)}
+                          "Video"]])
                     (when @(::show-top-boards-dropdown s)
                       (dropdown-list
                        {:items (map
@@ -319,7 +334,7 @@
                       "You can delete the sample post at anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
-                    {:on-click compose-fn}
+                    {:on-click #(compose-fn s :post)}
                     "Create new post"]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
@@ -357,5 +372,5 @@
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :on-click compose-fn}
+                       :on-click #(compose-fn s :post)}
                       [:div.add-to-board-plus]]]))])]]))

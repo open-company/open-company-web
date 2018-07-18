@@ -21,6 +21,7 @@
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
+            [oc.web.components.capture-video :refer (capture-video)]
             [oc.web.components.fullscreen-post :refer (fullscreen-post)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -89,6 +90,7 @@
                 slack-bot-modal-data
                 made-with-carrot-modal-data
                 is-entry-editing
+                is-capturing-video
                 is-sharing-activity
                 entry-edit-dissmissing
                 is-showing-alert
@@ -210,6 +212,9 @@
           ;; Entry editing
           is-entry-editing
           (entry-edit)
+          ;; Video capture
+          is-capturing-video
+          (capture-video)
           ;; Activity share for mobile
           (and is-mobile?
                is-sharing-activity)

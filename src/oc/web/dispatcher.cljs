@@ -314,9 +314,11 @@
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :slack-bot-modal-data (:slack-bot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
+                               :is-capturing-video (boolean (:capture-video base))
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
+                               :capture-video-dissmissing (:capture-video-dissmissing base)
                                :media-input (:media-input base)
                                :ap-initial-at ap-initial-at
                                :show-section-editor show-section-editor

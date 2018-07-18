@@ -190,6 +190,10 @@
   [initial-entry-data]
   (load-cached-item initial-entry-data :entry-editing))
 
+(defn capture-video
+  [initial-entry-data]
+  (load-cached-item initial-entry-data :capture-video))
+
 (defn activity-edit
   [activity-data]
   (if (or (responsive/is-tablet-or-mobile?)
@@ -212,6 +216,12 @@
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
   (dis/dispatch! [:entry-edit/dismiss]))
+
+(defn capture-video-dismiss
+  []
+  ;; Add :capture-video-dismissing for 1 second to avoid reopening the activity modal after edit is dismissed.
+  (utils/after 1000 #(dis/dispatch! [:input [:capture-video-dissmissing] false]))
+  (dis/dispatch! [:capture-video/dismiss]))
 
 (defn activity-modal-edit
   [activity-data activate]
