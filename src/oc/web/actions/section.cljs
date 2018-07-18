@@ -1,14 +1,15 @@
 (ns oc.web.actions.section
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.router :as router]
+            [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.lib.utils :as utils]
-            [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.urls :as oc-urls]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.api :as api]))
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn is-currently-shown? [section]
   (= (router/current-board-slug)
@@ -37,9 +38,13 @@
       (when (jwt/jwt) ; only for logged in users
         (watch-single-section section)))
 
-    ;; Retrieve reads count
-    (when (not= (:slug section) utils/default-drafts-board-slug)
-      (api/request-reads-count (map :uuid (:entries section))))
+    ;; Retrieve reads count if there are items in the loaded section
+    (when (and (not= (:slug section) utils/default-drafts-board-slug)
+               (seq (:entries section)))
+      (let [item-ids (map :uuid (:entries section))
+            cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activities-read-data))]
+        (when (seq cleaned-ids)
+          (api/request-reads-count cleaned-ids))))
 
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
 
