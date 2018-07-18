@@ -1,0 +1,75 @@
+div.capture-video {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background-color: #222931;
+  z-index: #{$navbar_zindex + 105};
+  transition: opacity 180ms ease-in;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  div.capture-video-header {
+    background-color: #2F3944;
+    width: 100%;
+    height: 56px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+
+    button.modal-close-bt {
+      background-image: cdnUrl("/img/ML/white_close.svg");
+      width: 16px;
+      height: 24px;
+      background-repeat: no-repeat;
+      background-size: 14px 14px;
+      background-position: center;
+      position: absolute;
+      padding: 0px;
+      top: 16px;
+      left: 24px;
+    }
+
+    div.capture-video-title {
+      width: 500px;
+      height: 24px;
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      margin-left: -250px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @include avenir_H();
+      font-size: 16px;
+      line-height: 24px;
+      color: $light_ui_grey;
+
+      div.rec {
+
+        span.recording {
+          width: 8px;
+          height: 8px;
+          border-radius: 8px;
+          background-color: #FA6654;
+          display: block;
+          margin-top: 8px;
+          margin-right: 8px;
+          float: left;
+        }
+      }
+    }
+
+  }
+
+  div.capture-video-body {
+    margin: 0px auto;
+    padding: 165px 0px 40px;
+    border-radius: 6px;
+    width: 640px;
+    min-height: calc(100vh - 56px);
+  }
+
+}
