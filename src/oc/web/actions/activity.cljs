@@ -46,7 +46,7 @@
   [item-ids]
   (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activities-read-data))]
     (when (seq cleaned-ids)
-      (api/request-reads-data cleaned-ids))))
+      (api/request-reads-count cleaned-ids))))
 
 ;; All Posts
 (defn all-posts-get-finish [from {:keys [body success]}]
