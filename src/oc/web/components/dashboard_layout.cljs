@@ -286,12 +286,12 @@
                           "New"]])
                     (when @(::showing-compose-picker s)
                       [:div.compose-type-dropdown
-                        {:on-mouse-leave #(reset! (::showing-compose-picker s) false)}
-                        [:div.compose-type.compose-type-post
+                        ; {:on-mouse-leave #(reset! (::showing-compose-picker s) false)}
+                        [:button.mlb-reset.compose-type.compose-type-post
                           {:on-click #(compose-fn s :post)}
                           "Text"]
                         [:div.compose-type-separator]
-                        [:div.compose-type.compose-type-video
+                        [:button.mlb-reset.compose-type.compose-type-video
                           {:on-click #(compose-fn s :video)}
                           "Video"]])
                     (when @(::show-top-boards-dropdown s)

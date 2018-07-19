@@ -17,6 +17,7 @@ div.capture-video {
     position: fixed;
     top: 0px;
     left: 0px;
+    z-index: 1;
 
     button.modal-close-bt {
       background-image: cdnUrl("/img/ML/white_close.svg");
@@ -61,7 +62,6 @@ div.capture-video {
         }
       }
     }
-
   }
 
   div.capture-video-body {
@@ -71,5 +71,4 @@ div.capture-video {
     width: 640px;
     min-height: calc(100vh - 56px);
   }
-
 }

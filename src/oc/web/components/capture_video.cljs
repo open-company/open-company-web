@@ -12,7 +12,6 @@
   (real-close s))
 
 (defn video-record-started [s]
-  (js/console.log "XXX video-record-started")
   (reset! (::title s) [:div.rec [:span.recording] "Recording"]))
 
 (defn video-uploaded-cb [s video-token]

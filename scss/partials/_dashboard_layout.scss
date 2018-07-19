@@ -495,12 +495,14 @@ div.dashboard-layout {
               margin: 12px 0px;
             }
 
-            div.compose-type {
+            button.compose-type {
               @include avenir_H();
               font-size: 14px;
               color: $carrot_green;
               cursor: pointer;
               height: 20px;
+              margin: 0;
+              padding: 0;
 
               &:before {
                 content: "";
