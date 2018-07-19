@@ -58,11 +58,12 @@
         activity-uuid (:uuid activity-data)
         comments-data (get all-comments-data activity-uuid)
         should-load-comments? (and ;; there are comments to load,
-                                   (pos? (:count comments-link))
-                                   ;; they are not already loading,
-                                   (not (:loading comments-data))
-                                   ;; and they are not loaded already
-                                   (not (contains? comments-data :sorted-comments)))]
+                               (pos? (:count comments-link))
+                               (some? comments-data)
+                               ;; they are not already loading,
+                               (not (:loading comments-data))
+                               ;; and they are not loaded already
+                               (not (contains? comments-data :sorted-comments)))]
     ;; Load the whole list of comments if..
     (when should-load-comments?
       (get-comments activity-data))))

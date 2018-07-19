@@ -240,41 +240,48 @@
   [db [_ org-slug fixed-posts]]
   (let [posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge-items old-posts fixed-posts)]
-    (assoc-in db posts-key merged-items)))
+        merged-items (merge-items old-posts fixed-posts)
+        container-key (dispatcher/container-key org-slug :all-posts)]
+    (-> db
+      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in posts-key merged-items))))
 
 (defmethod dispatcher/action :all-posts-more
   [db [_ org-slug]]
-  (let [posts-data-key (dispatcher/posts-data-key org-slug)
-        posts-data (get-in db posts-data-key)
-        next-posts-data (assoc posts-data :loading-more true)]
-    (assoc-in db posts-data-key next-posts-data)))
+  (let [container-key (dispatcher/container-key org-slug :all-posts)
+        container-data (get-in db container-key)
+        next-posts-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-posts-data)))
 
 (defmethod dispatcher/action :all-posts-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
     (let [posts-data-key (dispatcher/posts-data-key org)
+          container-key (dispatcher/container-key org :all-posts)
           fixed-all-posts (au/fix-all-posts (:collection posts-data) (dispatcher/change-data db))
           old-all-posts (get-in db posts-data-key)
+          container-data (get-in db container-key)
           next-links (vec
                       (remove
                        #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
                        (:links fixed-all-posts)))
           link-to-move (if (= direction :up)
-                          (utils/link-for (:links old-all-posts) "next")
-                          (utils/link-for (:links old-all-posts) "previous"))
+                          (utils/link-for (:links container-data) "next")
+                          (utils/link-for (:links container-data) "previous"))
           fixed-next-links (if link-to-move
                               (vec (conj next-links link-to-move))
                               next-links)
-          with-links (assoc fixed-all-posts :links fixed-next-links)
-          new-items (into [] (concat (:items old-all-posts) (:items with-links)))
-          new-items-map (merge (:fixed-items old-all-posts) (:fixed-items with-links))
+          with-links (assoc container-data :links fixed-next-links)
+          new-items (into [] (concat (:items old-all-posts) (:items fixed-all-posts)))
+          new-items-map (merge (:fixed-items old-all-posts) (:fixed-items fixed-all-posts))
           keeping-items (count (:fixed-items old-all-posts))
+          new-container (-> with-links
+                          (assoc :saved-items keeping-items)
+                          (assoc :direction direction))
           new-all-posts (-> with-links
                               (assoc :fixed-items new-items-map)
-                              (assoc :items new-items)
-                              (assoc :direction direction)
-                              (assoc :saved-items keeping-items))]
+                              (assoc :items new-items))]
+      (assoc-in db container-key new-container)
       (assoc-in db posts-data-key new-all-posts))
     db))
 

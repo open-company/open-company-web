@@ -35,6 +35,9 @@
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
 
+(defn container-key [org-slug posts-filter]
+  (vec (conj [:container-data (keyword org-slug)] (keyword posts-filter))))
+
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
 
@@ -144,6 +147,11 @@
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
                              :query-params query-params})]
+   :container-data      [[:base :org-slug :board-slug]
+                         (fn [base org-slug board-slug]
+                           (timbre/debug (container-key org-slug board-slug))
+                           (when (and org-slug board-slug)
+                             (get-in base (container-key org-slug board-slug))))]
    :posts-data          [[:base :org-slug]
                          (fn [base org-slug]
                            (when (and base org-slug)
@@ -283,10 +291,10 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :posts-data :activity-data :ap-initial-at
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :jwt]
-                            (fn [base orgs org-data board-data posts-data activity-data ap-initial-at
+                            (fn [base orgs org-data board-data filtered-posts activity-data ap-initial-at
                                  show-section-editor show-section-add show-sections-picker entry-editing
                                  mobile-menu-open jwt]
                               {:show-onboard-overlay (:show-onboard-overlay base)
@@ -294,7 +302,7 @@
                                :orgs orgs
                                :org-data org-data
                                :board-data board-data
-                               :posts-data posts-data
+                               :posts-data filtered-posts
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)

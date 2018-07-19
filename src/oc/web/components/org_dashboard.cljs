@@ -39,8 +39,7 @@
 (defn refresh-board-data [s]
   (when-not (router/current-activity-id)
     (utils/after 100 (fn []
-     (when (responsive/is-tablet-or-mobile?)
-       (nav-actions/set-posts-filter (router/current-posts-filter)))
+     (nav-actions/set-posts-filter (router/current-posts-filter))
      (let [{:keys [org-data
                    board-data
                    ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
@@ -108,10 +107,7 @@
                           (:results (drv/react s search/search-key))))
         loading? (or ;; the org data are not loaded yet
                      (not org-data)
-                     ;; No board specified
-                     (and (not (router/current-board-slug))
-                          ;; but there are some
-                          (pos? (count (:boards org-data))))
+                     (not (pos? (count (:boards org-data))))
                      (not posts-data))
         org-not-found (and orgs
                            (not (seq (filterv #(= (:slug %) (router/current-org-slug)) orgs))))
