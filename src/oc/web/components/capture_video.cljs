@@ -14,6 +14,9 @@
 (defn video-record-started [s]
   (reset! (::title s) [:div.rec [:span.recording] "Recording"]))
 
+(defn video-record-stopped [s]
+  (reset! (::title s) [:span "Pick a cover shot..."]))
+
 (defn video-uploaded-cb [s video-token]
   (dis/dispatch! [:update [:capture-video] #(merge % {:video-id video-token
                                                       :has-changes true})]))
@@ -28,4 +31,7 @@
       [:div.capture-video-title
         @(::title s)]]
     [:div.capture-video-body
-      (ziggeo-recorder video-uploaded-cb (partial video-record-started s))]])
+      (ziggeo-recorder {:submit-cb video-uploaded-cb
+                        :start-cb (partial video-record-started s)
+                        :pick-cover-start-cb (partial video-record-stopped s)
+                        :pick-cover-stop-cb nil})]])
