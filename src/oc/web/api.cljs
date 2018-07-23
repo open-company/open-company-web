@@ -701,11 +701,9 @@
                                 :body (when (seq body) (json->cljs body))}))))))
 
 (defn request-reads-data [item-id]
-  (ws-cc/who-read item-id))
+  (when (seq item-id)
+    (ws-cc/who-read item-id)))
 
 (defn request-reads-count [item-ids]
-  (let [activities-read-data (dispatcher/activities-read-data)
-        all-items (set (keys activities-read-data))
-        request-set (set item-ids)
-        needed-ids (into [] (clojure.set/difference request-set all-items))]
-    (ws-cc/who-read-count needed-ids)))
+  (when (seq item-ids)
+    (ws-cc/who-read-count item-ids)))
