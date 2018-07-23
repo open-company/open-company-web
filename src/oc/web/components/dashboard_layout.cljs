@@ -270,10 +270,11 @@
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
+                    {:on-mouse-leave #(reset! (::showing-compose-picker s) false)}
                     (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
                       [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                         {:ref :top-compose-button
-                         :on-click #(when can-compose (reset! (::showing-compose-picker s) true))
+                         :on-click #(when can-compose (swap! (::showing-compose-picker s) not))
                          :class (when-not can-compose "disabled")
                          :title (when show-tooltip? "You are a view-only user.")
                          :data-viewer (if show-tooltip? "enable" "disable")
@@ -285,15 +286,15 @@
                         [:label.add-to-board-label
                           "New"]])
                     (when @(::showing-compose-picker s)
-                      [:div.compose-type-dropdown
-                        ; {:on-mouse-leave #(reset! (::showing-compose-picker s) false)}
-                        [:button.mlb-reset.compose-type.compose-type-post
-                          {:on-click #(compose-fn s :post)}
-                          "Text"]
-                        [:div.compose-type-separator]
-                        [:button.mlb-reset.compose-type.compose-type-video
-                          {:on-click #(compose-fn s :video)}
-                          "Video"]])
+                      [:div.compose-type-dropdown-wrapper
+                        [:div.compose-type-dropdown
+                          [:button.mlb-reset.compose-type.compose-type-post
+                            {:on-click #(compose-fn s :post)}
+                            "Text"]
+                          [:div.compose-type-separator]
+                          [:button.mlb-reset.compose-type.compose-type-video
+                            {:on-click #(compose-fn s :video)}
+                            "Video"]]])
                     (when @(::show-top-boards-dropdown s)
                       (dropdown-list
                        {:items (map
