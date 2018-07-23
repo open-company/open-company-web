@@ -21,11 +21,12 @@
 
 (defmethod dispatcher/action :section
   [db [_ section-data]]
-  (let [org-slug (utils/section-org-slug section-data)
-        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
-        db-loading (if (:is-loaded section-data)
+  (let [db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
+        with-entries (:entries section-data)
+        org-slug (utils/section-org-slug section-data)
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
         old-section-data (get-in db (dispatcher/board-data-key org-slug (keyword (:slug section-data))))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
@@ -33,15 +34,15 @@
                             fixed-section-data)
         posts-key (dispatcher/posts-data-key org-slug)
         merged-items (merge (:fixed-items (get-in db posts-key))
-                            (:fixed-items fixed-section-data))]
-    (-> db-loading
-        (assoc-in
-          (dispatcher/board-data-key
-             org-slug
-             (keyword (:slug section-data)))
-          (dissoc with-current-edit :fixed-items))
-        (assoc-in posts-key
-          {:fixed-items merged-items}))))
+                            (:fixed-items fixed-section-data))
+        with-merged-items (if with-entries
+                            (assoc-in db-loading posts-key {:fixed-items merged-items})
+                            db-loading)]
+    (assoc-in with-merged-items
+              (dispatcher/board-data-key
+               org-slug
+               (keyword (:slug section-data)))
+              (dissoc with-current-edit :fixed-items))))
 
 (defn new?
   "
