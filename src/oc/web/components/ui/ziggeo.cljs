@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.ziggeo
   (:require [rum.core :as rum]
+            [taoensso.timbre :as timbre]
             [oc.web.actions.notifications :as na]
             [clojure.contrib.humanize :refer (filesize)]))
 
@@ -50,12 +51,12 @@
                                    (.activate recorder-instance)
                                    (.on recorder-instance "upload_selected"
                                     (fn []
-                                     (js/console.log "XXX upload_selected")
+                                     (timbre/debug "upload_selected")
                                      (when (fn? start-cb)
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "upload_progress"
                                     (fn [a b]
-                                     (js/console.log "XXX upload_progress" a b (fn? upload-started-cb))
+                                     (timbre/debug "upload_progress" a b (fn? upload-started-cb))
                                      (when (and (fn? upload-started-cb)
                                                 (not @(::upload-started-called s)))
                                        (reset! (::upload-started-called s) true)
@@ -66,12 +67,12 @@
                                                             :expire (if (< (- b a) 10000) 5 0)})))
                                    (.on recorder-instance "recording"
                                     (fn []
-                                     (js/console.log "XXX recording")
+                                     (timbre/debug "recording")
                                      (when (fn? start-cb)
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processing"
                                     (fn [a]
-                                     (js/console.log "XXX processing")
+                                     (timbre/debug "processing")
                                      (na/remove-notification-by-id :ziggeo-video-upload)
                                      (na/show-notification {:title "Video is processing."
                                                             :description (str "Progress: " (int a) "%.")
@@ -79,7 +80,7 @@
                                                             :expire (if (> a 99) 5 0)})))
                                    (.on recorder-instance "error"
                                     (fn []
-                                     (js/console.log "XXX error")
+                                     (timbre/debug "error")
                                      (na/remove-notification-by-id :ziggeo-video-upload)
                                      (na/remove-notification-by-id :ziggeo-video-processing)
                                      (na/show-notification {:title "Error processing your video."
@@ -90,17 +91,17 @@
                                        (cancel-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "pick_cover_start"
                                     (fn []
-                                      (js/console.log "XXX picking_cover")
+                                      (timbre/debug "picking_cover")
                                       (when (fn? pick-cover-start-cb)
                                         (pick-cover-start-cb))))
                                    (.on recorder-instance "pick_cover_end"
                                     (fn [a]
-                                      (js/console.log "XXX picking_cover_end" a)
+                                      (timbre/debug "picking_cover_end" a)
                                       (when (fn? pick-cover-end-cb)
                                         (pick-cover-end-cb a))))
                                    (.on recorder-instance "processed"
                                     (fn []
-                                     (js/console.log "XXX processed" (.get recorder-instance "video"))
+                                     (timbre/debug "processed" (.get recorder-instance "video"))
                                      (na/remove-notification-by-id :ziggeo-video-upload)
                                      (na/remove-notification-by-id :ziggeo-video-processing)
                                      (submit-cb (.get recorder-instance "video"))))))
