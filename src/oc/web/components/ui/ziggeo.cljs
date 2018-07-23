@@ -32,10 +32,11 @@
     [:div.ziggeo-player-embed
       {:ref :ziggeo-player}]])
 
-(rum/defcs ziggeo-recorder < {:did-mount (fn [s]
+(rum/defcs ziggeo-recorder <  (rum/local false ::upload-started-called)
+                              {:did-mount (fn [s]
                                (let [args (into [] (:rum/args s))
                                      {:keys [submit-cb start-cb cancel-cb width height
-                                             pick-cover-start-cb pick-cover-end-cb]
+                                             pick-cover-start-cb pick-cover-end-cb upload-started-cb]
                                       :or {width 640
                                            height 480}} (first (:rum/args s))
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
@@ -54,11 +55,15 @@
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "upload_progress"
                                     (fn [a b]
-                                     (js/console.log "XXX upload_progress" a b)
+                                     (js/console.log "XXX upload_progress" a b (fn? upload-started-cb))
+                                     (when (and (fn? upload-started-cb)
+                                                (not @(::upload-started-called s)))
+                                       (reset! (::upload-started-called s) true)
+                                       (upload-started-cb))
                                      (na/show-notification {:title "Video is uploading."
                                                             :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")
                                                             :id :ziggeo-video-upload
-                                                            :expire (if (< (- b a) 1000) 5 0)})))
+                                                            :expire (if (< (- b a) 10000) 5 0)})))
                                    (.on recorder-instance "recording"
                                     (fn []
                                      (js/console.log "XXX recording")
@@ -95,12 +100,12 @@
                                         (pick-cover-end-cb a))))
                                    (.on recorder-instance "processed"
                                     (fn []
-                                     (js/console.log "XXX processed")
+                                     (js/console.log "XXX processed" (.get recorder-instance "video"))
                                      (na/remove-notification-by-id :ziggeo-video-upload)
                                      (na/remove-notification-by-id :ziggeo-video-processing)
                                      (submit-cb (.get recorder-instance "video"))))))
                                s)} 
-  [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb pick-cover-end-cb]
+  [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb pick-cover-end-cb upload-started-cb]
       :or {width 640
            height 480}}]
   [:div.ziggeo-recorder

@@ -1,7 +1,6 @@
 (ns oc.web.components.entry-edit
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
@@ -135,11 +134,6 @@
 (defn- is-publishable? [entry-editing]
   (seq (:board-slug entry-editing)))
 
-(defn trim [value]
-  (if (string? value)
-    (string/trim value)
-    value))
-
 (defn video-record-clicked [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
         start-recording-fn #(reset! (::record-video s) true)]
@@ -232,8 +226,6 @@
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
-                          (when (and (responsive/is-tablet-or-mobile?) (js/isSafari))
-                            (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
                           s)
                          :before-render (fn [s]
                           ;; Set or remove the onBeforeUnload prompt
@@ -322,7 +314,7 @@
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
-            (let [fixed-headline (trim (:headline entry-editing))
+            (let [fixed-headline (utils/trim (:headline entry-editing))
                   disabled? (or @(::publishing s)
                                 (not (is-publishable? entry-editing))
                                 (zero? (count fixed-headline)))
