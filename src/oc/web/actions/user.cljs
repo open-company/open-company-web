@@ -160,6 +160,10 @@
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
+(defn login-with-google [auth-url]
+  (router/redirect! auth-url)
+  (dis/dispatch! [:login-with-google]))
+
 (defn refresh-slack-user []
   (api/refresh-slack-user (fn [status body success]
     (if success

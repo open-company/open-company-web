@@ -82,6 +82,17 @@
             "Sign Up with "
             [:div.slack-blue-icon
               {:aria-label "slack"}]]]
+       [:button.mlb-reset.signup-with-google
+         {:on-touch-start identity
+          :on-click #(do
+                       (.preventDefault %)
+                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                            {:auth-source "google"})]
+                         (user-actions/login-with-google auth-link)))}
+          [:div.signup-with-google-content
+            "Sign Up with "
+            [:div.google-blue-icon
+              {:aria-label "google"}]]]
         [:div.or-with-email
           [:div.or-with-email-line]
           [:div.or-with-email-copy

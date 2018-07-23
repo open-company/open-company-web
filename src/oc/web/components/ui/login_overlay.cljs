@@ -101,7 +101,19 @@
           [:div.signin-with-slack-content
             "Sign In with "
             [:div.slack-blue-icon
-              {:aria-label "slack"}]]]
+             {:aria-label "slack"}]]]
+        ;; Google button
+        [:button.mlb-reset.signin-with-google
+          {:on-click #(do
+                       (.preventDefault %)
+                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                             {:auth-source "slack"})]
+                         (user-actions/login-with-google google-auth-link)))
+           :on-touch-start identity}
+          [:div.signin-with-google-content
+            "Sign In with "
+            [:div.google-blue-icon
+              {:aria-label "google"}]]]
         ;; Or with email
         [:div.or-with-email
           [:div.or-with-email-line]
