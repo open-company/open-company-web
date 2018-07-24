@@ -17,6 +17,8 @@
 
 (def orgs-key :orgs)
 
+(def posts-filter-key :posts-filter)
+
 (defn org-key [org-slug]
   [(keyword org-slug)])
 
@@ -43,7 +45,7 @@
 
 (defn activity-key [org-slug activity-uuid]
   (let [posts-key (posts-data-key org-slug)]
-    (vec (concat posts-key [:fixed-items activity-uuid]))))
+    (vec (concat posts-key [activity-uuid]))))
 
 (defn comments-key [org-slug]
   (vec (conj (posts-data-key org-slug) :comments)))
@@ -90,7 +92,7 @@
    :board-slug          [[:route] (fn [route] (:board route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
-   :posts-filter        [[:base] (fn [base] (:posts-filter base))]
+   :posts-filter        [[:base] (fn [base] (get base posts-filter-key))]
    :loading             [[:base] (fn [base] (:loading base))]
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
    :query-params        [[:route] (fn [route] (:query-params route))]
@@ -157,17 +159,16 @@
                            (when (and base org-slug)
                              (get-in base (posts-data-key org-slug))))]
 
-   :filtered-posts      [[:base :org-slug :posts-data :posts-filter]
-                         (fn [base org-slug posts-data posts-filter]
-                           (when (and base org-slug posts-data posts-filter)
-                             (let [filtered-items
-                                   (filterv
-                                      posts-filter
-                                      (vals (:fixed-items posts-data)))
-                                   mapped-items (zipmap
-                                                 (map :uuid filtered-items)
-                                                 filtered-items)]
-                               (assoc posts-data :fixed-items mapped-items))))]
+   :filtered-posts      [[:base :org-slug :posts-data :route]
+                         (fn [base org-slug posts-data route]
+                           (when (and base org-slug posts-data route)
+                             (let [container-slug (:board route)
+                                   container-key (container-key org-slug container-slug)
+                                   is-container? (seq (get-in base container-key))
+                                   items-list (if is-container?
+                                                (:posts-list (get-in base container-key))
+                                                (:posts-list (get-in base (board-data-key org-slug container-slug))))]
+                              (zipmap items-list (map #(get posts-data %) items-list)))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -291,16 +292,17 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :filtered-posts :activity-data :ap-initial-at
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :jwt]
-                            (fn [base orgs org-data board-data filtered-posts activity-data ap-initial-at
-                                 show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open jwt]
+                            (fn [base orgs org-data board-data container-data filtered-posts activity-data
+                                 ap-initial-at show-section-editor show-section-add show-sections-picker
+                                 entry-editing mobile-menu-open jwt]
                               {:show-onboard-overlay (:show-onboard-overlay base)
                                :jwt jwt
                                :orgs orgs
                                :org-data org-data
+                               :container-data container-data
                                :board-data board-data
                                :posts-data filtered-posts
                                :org-settings-data (:org-settings base)
@@ -412,6 +414,33 @@
     (board-data data org-slug (router/current-board-slug)))
   ([data org-slug board-slug]
     (get-in data (board-data-key org-slug board-slug))))
+
+(defn container-data
+  "Get container data."
+  ([]
+    (container-data @app-state))
+  ([data]
+    (container-data data (router/current-org-slug) (router/current-posts-filter)))
+  ([data org-slug]
+    (container-data data org-slug (router/current-posts-filter)))
+  ([data org-slug posts-filter]
+    (get-in data (container-key org-slug posts-filter))))
+
+(defn filtered-posts-data
+  ([]
+    (filtered-posts-data @app-state))
+  ([data]
+    (filtered-posts-data data (router/current-org-slug) (router/current-posts-filter)))
+  ([data org-slug]
+    (filtered-posts-data data org-slug (router/current-posts-filter)))
+  ([data org-slug posts-filter]
+    (let [container-key (container-key org-slug posts-filter)
+          is-container? (seq (get-in data container-key))
+          posts-data (get-in data (posts-data-key org-slug))
+          items-list (if is-container?
+                       (:posts-list (get-in data container-key))
+                       (:posts-list (get-in data (board-data-key org-slug posts-filter))))]
+     (zipmap items-list (map #(get posts-data %) items-list)))))
 
 (defn activity-data
   "Get activity data."
@@ -538,12 +567,6 @@
   (js/console.log
    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
-(defn print-activities-data []
-  (js/console.log
-   (get-in
-    @app-state
-    (conj (board-data-key (router/current-org-slug) (router/current-board-slug)) :fixed-items))))
-
 (defn print-activity-data []
   (js/console.log
    (get-in
@@ -582,17 +605,8 @@
 (defn print-posts-data []
   (js/console.log (get-in @app-state (posts-data-key (router/current-org-slug)))))
 
-(defn print-current-posts []
-  (let [posts-filter (get @app-state :posts-filter)
-        posts-data (get-in @app-state (posts-data-key (router/current-org-slug)))
-        filtered-items
-         (filterv
-            posts-filter
-            (vals (:fixed-items posts-data)))
-         mapped-items (zipmap
-                       (map :uuid filtered-items)
-                       filtered-items)]
-     (assoc posts-data :fixed-items mapped-items)))
+(defn print-filtered-posts []
+  (js/console.log (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter))))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
@@ -602,12 +616,11 @@
 (set! (.-OCWebPrintActivitiesReadData js/window) print-activities-read-data)
 (set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
-(set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
 (set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
-(set! (.-OCWebPrintCurrentPostsData js/window) print-current-posts)
+(set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
