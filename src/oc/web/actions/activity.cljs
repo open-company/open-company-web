@@ -479,10 +479,12 @@
         (when (= change-type :delete)
           (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid activity-uuid}]))
         ;; Refresh the AP in case of items added or removed
-        (when (and (or (= change-type :add)
-                       (= change-type :delete))
-                   (= (router/current-board-slug) "all-posts"))
-          (all-posts-get (dis/org-data) (dis/ap-initial-at)))
+        (when (or (= change-type :add)
+                  (= change-type :delete))
+          (when (= (router/current-board-slug) "all-posts")
+            (all-posts-get (dis/org-data) (dis/ap-initial-at)))
+          (when (= (router/current-board-slug) "must-see")
+            (must-see-get (dis/org-data))))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
           (activity-change section-uuid activity-uuid)))))
@@ -572,20 +574,16 @@
 
 (defn toggle-must-see [activity-data]
   (let [must-see (:must-see activity-data)
-        must-see-toggled (assoc activity-data :must-see (not must-see))
+        must-see-toggled (update-in activity-data [:must-see] not)
         org-data (dis/org-data)
         must-see-count (:must-see-count dis/org-data)
         new-must-see-count (if-not must-see
-                              (inc must-see-count)
-                              (dec must-see-count))]
+                             (inc must-see-count)
+                             (dec must-see-count))]
     (dis/dispatch! [:org-loaded
                     (assoc org-data :must-see-count new-must-see-count)
                     false])
-    (dis/dispatch! [:activity-get/finish
-                    nil
-                    (router/current-org-slug)
-                    must-see-toggled
-                    nil])
+    (dis/dispatch! [:must-see-toggle (router/current-org-slug) must-see-toggled])
     (api/update-entry must-see-toggled :must-see
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success

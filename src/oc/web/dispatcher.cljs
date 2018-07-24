@@ -80,6 +80,11 @@
 (def activities-read-key
   [:activities-read])
 
+(defn get-posts-for-board [posts-data board-slug]
+  (let [posts-list (vals posts-data)
+        board-posts (map :uuid (filter #(= (:board-slug %) board-slug) posts-list))]
+    (select-keys posts-data board-posts)))
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -156,16 +161,18 @@
                            (when (and base org-slug)
                              (get-in base (posts-data-key org-slug))))]
 
-   :filtered-posts      [[:base :org-slug :posts-data :route]
-                         (fn [base org-slug posts-data route]
-                           (when (and base org-slug posts-data route)
-                             (let [container-slug (:board route)
-                                   container-key (container-key org-slug container-slug)
-                                   is-container? (seq (get-in base container-key))
-                                   items-list (if is-container?
-                                                (:posts-list (get-in base container-key))
-                                                (:posts-list (get-in base (board-data-key org-slug container-slug))))]
-                              (zipmap items-list (map #(get posts-data %) items-list)))))]
+   :filtered-posts      [[:base :org-data :posts-data :route]
+                         (fn [base org-data posts-data route]
+                           (when (and base org-data posts-data route)
+                             (let [org-slug (:slug org-data)
+                                   all-boards-slug (map :slug (:boards org-data))
+                                   container-slug (:board route)
+                                   is-board? ((set all-boards-slug) container-slug)]
+                              (if is-board?
+                                (get-posts-for-board posts-data container-slug)
+                                (let [container-key (container-key org-slug container-slug)
+                                      items-list (:posts-list (get-in base container-key))]
+                                  (zipmap items-list (map #(get posts-data %) items-list)))))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -431,13 +438,15 @@
   ([data org-slug]
     (filtered-posts-data data org-slug (router/current-posts-filter)))
   ([data org-slug posts-filter]
-    (let [container-key (container-key org-slug posts-filter)
-          is-container? (seq (get-in data container-key))
-          posts-data (get-in data (posts-data-key org-slug))
-          items-list (if is-container?
-                       (:posts-list (get-in data container-key))
-                       (:posts-list (get-in data (board-data-key org-slug posts-filter))))]
-     (zipmap items-list (map #(get posts-data %) items-list)))))
+    (let [org-data (org-data data org-slug)
+          all-boards-slug (map :slug (:boards org-data))
+          is-board? ((set all-boards-slug) posts-filter)
+          posts-data (get-in data (posts-data-key org-slug))]
+     (if is-board?
+       (get-posts-for-board posts-data posts-filter)
+       (let [container-key (container-key org-slug posts-filter)
+             items-list (:posts-list (get-in data container-key))]
+        (zipmap items-list (map #(get posts-data %) items-list)))))))
 
 (defn activity-data
   "Get activity data."

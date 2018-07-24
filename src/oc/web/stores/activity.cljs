@@ -146,18 +146,8 @@
                                    (fn []
                                     (filter #(not= (:uuid %) (:uuid activity-data)))))))
                                db
-                               (keys (get-in db containers-key)))
-        ;; Remove the post from all the sections posts list
-        sections-key (butlast (dispatcher/board-data-key org-slug :board))
-        with-fixed-sections (reduce
-                               (fn [ndb skey]
-                                 (let [section-posts-key (concat sections-key [skey :posts-list])]
-                                  (update-in ndb section-posts-key
-                                   (fn []
-                                    (filter #(not= (:uuid %) (:uuid activity-data)))))))
-                               with-fixed-containers
-                               (keys (get-in db sections-key)))]
-    (assoc-in with-fixed-sections posts-key next-posts)))
+                               (keys (get-in db containers-key)))]
+    (assoc-in with-fixed-containers posts-key next-posts)))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
@@ -198,6 +188,34 @@
       (au/fix-entry shared-data (:board-slug shared-data) (dispatcher/change-data db))
       {:error true})))
 
+(defn add-remove-item-from-all-posts [db org-slug activity-data]
+  (let [;; Add/remove item from AP
+        is-ap? (= (:status activity-data) "published")
+        ap-key (dispatcher/container-key org-slug :all-posts)
+        old-ap-data (get-in db ap-key)
+        old-ap-data-posts (get old-ap-data :posts-list)
+        ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
+        new-ap-data-posts (into []
+                            (if is-ap?
+                              (conj ap-without-uuid (:uuid activity-data))
+                              ap-without-uuid))
+        next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)]
+    (assoc-in db ap-key next-ap-data)))
+
+(defn add-remove-item-from-must-see [db org-slug activity-data]
+  (let [;; Add/remove item from MS
+        is-ms? (:must-see activity-data)
+        ms-key (dispatcher/container-key org-slug :must-see)
+        old-ms-data (get-in db ms-key)
+        old-ms-data-posts (get old-ms-data :posts-list)
+        ms-without-uuid (utils/vec-dissoc old-ms-data-posts (:uuid activity-data))
+        new-ms-data-posts (into []
+                            (if is-ms?
+                              (conj ms-without-uuid (:uuid activity-data))
+                              ms-without-uuid))
+        next-ms-data (assoc old-ms-data :posts-list new-ms-data-posts)]
+    (assoc-in db ms-key next-ms-data)))
+
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status org-slug activity-data secure-uuid]]
   (let [next-db (if (= status 404)
@@ -212,7 +230,17 @@
                              activity-data
                              board-data
                              (dispatcher/change-data db))]
-    (assoc-in db activity-key fixed-activity-data)))
+    (-> db
+     (assoc-in activity-key fixed-activity-data)
+     (add-remove-item-from-all-posts org-slug activity-data)
+     (add-remove-item-from-must-see org-slug activity-data))))
+
+(defmethod dispatcher/action :must-see-toggle
+  [db [_ org-slug activity-data]]
+  (let [activity-key (dispatcher/activity-key org-slug (:uuid activity-data))]
+    (-> db
+      (assoc-in activity-key activity-data)
+      (add-remove-item-from-must-see org-slug activity-data))))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug fixed-board-data]]

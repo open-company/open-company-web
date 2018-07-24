@@ -187,10 +187,8 @@
                               :entry-count
                               (count (:fixed-items with-fixed-entries)))
                               with-fixed-entries)
-           without-entries (dissoc with-entry-count :entries)
-           new-items (map :uuid (:entries board-data))
-           with-posts-list (assoc without-entries :posts-list (into [] new-items))]
-       with-posts-list)))
+           without-entries (dissoc with-entry-count :entries)]
+       without-entries)))
 
 (defn fix-container
   "Fix container data coming from the API."
