@@ -63,9 +63,8 @@
 (defn- wrt-stream-item-mixin-cb [_ item-uuid]
   (activity-actions/wrt-events-gate item-uuid))
 
-(defn- sorted-posts [s]
-  (let [posts-data @(drv/get-ref s :filtered-posts)]
-    (activity-utils/get-sorted-activities posts-data)))
+(defn- sorted-posts [posts]
+  (activity-utils/get-sorted-activities posts))
 
 (rum/defcs all-posts  < rum/reactive
                         ;; Derivatives
@@ -91,7 +90,7 @@
 
                         {:did-remount (fn [s]
                          (let [container-data @(drv/get-ref s :container-data)
-                               sorted-items (sorted-posts s)
+                               sorted-items (sorted-posts @(drv/get-ref s :filtered-posts))
                                direction (:direction container-data)
                                next-link (utils/link-for (:links container-data) "previous")
                                prev-link (utils/link-for (:links container-data) "next")
@@ -148,8 +147,8 @@
                             (events/unlistenByKey @(::scroll-listener s)))
                           s)}
   [s]
-  (let [container-data @(drv/get-ref s :container-data)
-        items (sorted-posts s)
+  (let [container-data (drv/react s :container-data)
+        items (sorted-posts (drv/react s :filtered-posts))
         activities-read (drv/react s :activities-read)]
     [:div.all-posts.group
       [:div.all-posts-cards
