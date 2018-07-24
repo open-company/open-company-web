@@ -33,10 +33,10 @@
                             old-section-data
                             fixed-section-data)
         posts-key (dispatcher/posts-data-key org-slug)
-        merged-items (merge (:fixed-items (get-in db posts-key))
+        merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-section-data))
         with-merged-items (if with-entries
-                            (assoc-in db-loading posts-key {:fixed-items merged-items})
+                            (assoc-in db-loading posts-key merged-items)
                             db-loading)]
     (assoc-in with-merged-items
               (dispatcher/board-data-key
@@ -65,23 +65,16 @@
             (dispatcher/org-data-key (:slug org-data))
             org-data))
 
-(defn fix-sections
-  [db org-data changes]
-  (let [section-slugs (map :slug (:boards org-data))
-        all-slugs (into [] (conj section-slugs "all-posts"))
-        org-slug (:slug org-data)]
-    (reduce #(if (dispatcher/board-data db org-slug %2)
-               (let [board-key (dispatcher/board-data-key org-slug %2)
-                     board-data (if (= %2 "all-posts")
-                                  (au/fix-all-posts
-                                   (dispatcher/board-data db org-slug %2)
-                                   changes)
-                                  (au/fix-board
-                                   (dispatcher/board-data db org-slug %2)
-                                   changes))]
-                 (assoc-in %1 board-key board-data))
-               %1)
-            db all-slugs)))
+(defn fix-posts-new-label
+  [db changes]
+  (let [posts-data (dispatcher/posts-data db)
+        org-slug (:org (:router-path db))]
+    (reduce
+      #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))
+             new-key (into [] (conj posts-key :new))]
+          (assoc %1 new-key (au/post-new? %2 changes)))
+      db
+      (vals posts-data))))
 
 (defmethod dispatcher/action :section-change
   [db [_ section-uuid]]
@@ -148,12 +141,10 @@
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         removed-posts (filterv (fn [p] (not= (:board-slug p) section-slug))
-                               (vals (:fixed-items old-posts)))]
+                               (vals old-posts))]
     (-> db
       (update-in (butlast section-key) dissoc (last section-key))
-      (assoc posts-key (assoc old-posts
-                              (zipmap (map :uuid removed-posts) removed-posts)
-                              :fixed-items))
+      (assoc posts-key (zipmap (map :uuid removed-posts) removed-posts))
       (assoc org-sections-key remaining-sections)
       (dissoc :section-editing))))
 
@@ -173,11 +164,11 @@
                             change-data
                             (merge old-change-data filtered-change-data))
           old-change-cache-data (dispatcher/change-cache-data db)
-          new-change-cache-data (merge old-change-cache-data change-data)]
+          new-change-cache-data (merge old-change-cache-data change-data)
+          next-db (fix-org-section-data db org-data new-change-data)]
       (timbre/debug "Change status data:" new-change-data)
-      (-> db
-        (fix-org-section-data org-data new-change-data)
-        (fix-sections org-data new-change-data)
+      (-> next-db
+        (fix-posts-new-label new-change-data)
         (assoc-in (dispatcher/change-cache-data-key (:slug org-data)) new-change-cache-data)
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
