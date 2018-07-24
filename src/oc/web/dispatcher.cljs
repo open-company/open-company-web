@@ -579,6 +579,21 @@
 (defn print-entry-editing-data []
   (js/console.log (get @app-state :entry-editing)))
 
+(defn print-posts-data []
+  (js/console.log (get-in @app-state (posts-data-key (router/current-org-slug)))))
+
+(defn print-current-posts []
+  (let [posts-filter (get @app-state :posts-filter)
+        posts-data (get-in @app-state (posts-data-key (router/current-org-slug)))
+        filtered-items
+         (filterv
+            posts-filter
+            (vals (:fixed-items posts-data)))
+         mapped-items (zipmap
+                       (map :uuid filtered-items)
+                       filtered-items)]
+     (assoc posts-data :fixed-items mapped-items)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -594,3 +609,5 @@
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
+(set! (.-OCWebPrintCurrentPostsData js/window) print-current-posts)
+(set! (.-OCWebPrintPostsData js/window) print-posts-data)

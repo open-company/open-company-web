@@ -101,6 +101,8 @@ var OCWebPrintRouterPath = function(){};
 var OCWebPrintChangeData = function(){};
 var OCWebPrintChangeCacheData = function(){};
 var OCWebForceRefreshToken = function(){};
+var OCWebPrintCurrentPostsData = function(){};
+var OCWebPrintPostsData = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
