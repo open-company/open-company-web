@@ -54,7 +54,7 @@
           :when (not (is-currently-shown? section))]
     (api/get-board (utils/link-for (:links section) ["item" "self"] "GET")
       (fn [status body success]
-        (section-get-finish (dissoc (json->cljs body) :entries))))))
+        (section-get-finish (json->cljs body))))))
 
 (defn section-change
   [section-uuid]
