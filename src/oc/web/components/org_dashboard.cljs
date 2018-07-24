@@ -39,7 +39,6 @@
 (defn refresh-board-data [s]
   (when-not (router/current-activity-id)
     (utils/after 100 (fn []
-     (nav-actions/set-posts-filter (router/current-posts-filter))
      (let [{:keys [org-data
                    board-data
                    ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]

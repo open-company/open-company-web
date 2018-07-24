@@ -66,7 +66,6 @@
                                 {:will-mount (fn [s]
                                   (save-window-size s)
                                   (save-content-height s)
-                                  (nav-actions/set-posts-filter (router/current-posts-filter))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)

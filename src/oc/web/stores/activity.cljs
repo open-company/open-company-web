@@ -5,28 +5,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-(defn posts-filter-fn
-  "Find the filter based on the route"
-  [posts-filter]
-  (cond
-   (= posts-filter "all-posts")
-   (fn [p] (not= (:status p) "draft"))
-
-   (= posts-filter "must-see")
-   (fn [p] (and (= (:must-see p) true)
-                (not= (:status p) "draft")))
-
-   (= posts-filter "drafts")
-   (fn [p] (= (:status p) "draft"))
-
-   :default
-   (fn [p] (and (= (:board-slug p) posts-filter)
-                (not= (:status p) "draft")))))
-
-(defmethod dispatcher/action :posts-filter
-  [db [_ posts-filter]]
-  (assoc db :posts-filter (posts-filter-fn posts-filter)))
-
 (defmethod dispatcher/action :activity-modal-fade-in
   [db [_ activity-data editing dismiss-on-editing-end]]
   (if (get-in db [:search-active])
@@ -163,7 +141,7 @@
         containers-key (butlast (dispatcher/container-key org-slug :all-posts))
         with-fixed-containers (reduce
                                (fn [ndb ckey]
-                                 (let [container-posts-key (concat containers-key [ckey :posts-filter])]
+                                 (let [container-posts-key (concat containers-key [ckey :posts-list])]
                                   (update-in ndb container-posts-key
                                    (fn []
                                     (filter #(not= (:uuid %) (:uuid activity-data)))))))
@@ -173,7 +151,7 @@
         sections-key (butlast (dispatcher/board-data-key org-slug :board))
         with-fixed-sections (reduce
                                (fn [ndb skey]
-                                 (let [section-posts-key (concat sections-key [skey :posts-filter])]
+                                 (let [section-posts-key (concat sections-key [skey :posts-list])]
                                   (update-in ndb section-posts-key
                                    (fn []
                                     (filter #(not= (:uuid %) (:uuid activity-data)))))))

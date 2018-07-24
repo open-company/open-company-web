@@ -17,8 +17,6 @@
 
 (def orgs-key :orgs)
 
-(def posts-filter-key :posts-filter)
-
 (defn org-key [org-slug]
   [(keyword org-slug)])
 
@@ -92,7 +90,6 @@
    :board-slug          [[:route] (fn [route] (:board route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
-   :posts-filter        [[:base] (fn [base] (get base posts-filter-key))]
    :loading             [[:base] (fn [base] (:loading base))]
    :signup-with-email   [[:base] (fn [base] (:signup-with-email base))]
    :query-params        [[:route] (fn [route] (:query-params route))]

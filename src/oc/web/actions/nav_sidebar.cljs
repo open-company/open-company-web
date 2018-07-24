@@ -5,9 +5,6 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.components.org-settings :as org-settings]))
 
-(defn set-posts-filter [posts-filter]
-  (dis/dispatch! [:posts-filter posts-filter]))
-
 (defn close-navigation-sidebar []
   (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
 
@@ -15,7 +12,6 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (set-posts-filter (nth (clojure.string/split url "/") 2))
   (let [current-path (.. js/window -location -pathname)]
     (if (= current-path url)
       (do
