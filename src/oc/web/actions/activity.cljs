@@ -25,7 +25,7 @@
 (defn watch-boards [posts-data]
   (when (jwt/jwt) ; only for logged in users
     (let [board-slugs (distinct (map :board-slug
-                                     (map second (:fixed-items posts-data))))
+                                     (map second posts-data)))
           org-data (dis/org-data)
           org-boards (:boards org-data)
           org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
@@ -55,7 +55,7 @@
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-all-posts (:collection all-posts-data) (dis/change-data))
+          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))
           should-404? (and from
                            (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
@@ -89,7 +89,7 @@
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           must-see-data (when success (json->cljs body))
-          must-see-posts (au/fix-all-posts (:collection must-see-data))]
+          must-see-posts (au/fix-container (:collection must-see-data))]
       (when (= (router/current-board-slug) "must-see")
         (save-last-used-section "must-see"))
       (watch-boards must-see-posts)
@@ -397,10 +397,10 @@
     (refresh-org-data)
     (let [org-slug (router/current-org-slug)
           org-data (dis/org-data)
-          boards-no-draft (sort-by :name (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
-          board-key (dis/board-data-key org-slug (router/current-board-slug))
-          board-data (get-in @dis/app-state board-key)]
-      (when (zero? (count (:fixed-items board-data)))
+          boards-no-draft (sort-by :name
+                           (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
+          filtered-posts-data (dis/filtered-posts-data)]
+      (when (zero? (count filtered-posts-data))
         (utils/after
          100
          #(router/nav!
