@@ -82,7 +82,6 @@ var OCWebPrintAllPostsData = function(){};
 var OCWebPrintTeamData = function(){};
 var OCWebPrintTeamRoster = function(){};
 var OCWebPrintBoardData = function(){};
-var OCWebPrintActivitiesData = function(){};
 var OCWebPrintActivityData = function(){};
 var OCWebPrintSecureActivityData = function(){};
 var OCWebPrintCommentsData = function(){};
@@ -101,7 +100,7 @@ var OCWebPrintRouterPath = function(){};
 var OCWebPrintChangeData = function(){};
 var OCWebPrintChangeCacheData = function(){};
 var OCWebForceRefreshToken = function(){};
-var OCWebPrintCurrentPostsData = function(){};
+var OCWebPrintFilteredPostsData = function(){};
 var OCWebPrintPostsData = function(){};
 // Moment
 var moment = {};
