@@ -110,7 +110,7 @@
     (compare time-2 time-1)))
 
 (defn get-sorted-activities [posts-data]
-  (vec (sort compare-activities (vals (:fixed-items posts-data)))))
+  (vec (sort compare-activities (vals posts-data))))
 
 (defn readonly-board? [links]
   (let [new-link (utils/link-for links "create")
@@ -187,23 +187,31 @@
                               :entry-count
                               (count (:fixed-items with-fixed-entries)))
                               with-fixed-entries)
-           without-entries (dissoc with-entry-count :entries)]
-       without-entries)))
+           without-entries (dissoc with-entry-count :entries)
+           new-items (map :uuid (:entries board-data))
+           with-posts-list (assoc without-entries :posts-list (into [] new-items))]
+       with-posts-list)))
 
-(defn fix-all-posts
-  "Fix org data coming from the API."
-  ([all-posts-data]
-   (fix-all-posts all-posts-data {}))
-  ([all-posts-data change-data]
+(defn fix-container
+  "Fix container data coming from the API."
+  ([container-data]
+   (fix-container container-data {}))
+  ([container-data change-data & [direction]]
     (let [with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
                                                          :uuid (:board-uuid %2)}
                                            change-data))
-                                 all-posts-data
-                                 (:items all-posts-data))
-          without-items (dissoc with-fixed-activities :items)]
-      without-items)))
+                                 container-data
+                                 (:items container-data))
+          new-items (map :uuid (:items container-data))
+          without-items (dissoc with-fixed-activities :items)
+          with-posts-list (assoc without-items :posts-list (into []
+                                                             (case direction
+                                                              :up (concat new-items (:posts-list container-data))
+                                                              :down (concat (:posts-list container-data) new-items)
+                                                              new-items)))]
+      with-posts-list)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data
