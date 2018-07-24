@@ -81,6 +81,7 @@
                 org-data
                 jwt
                 board-data
+                container-data
                 posts-data
                 show-onboard-overlay
                 ap-initial-at
@@ -107,8 +108,22 @@
                           (:results (drv/react s search/search-key))))
         loading? (or ;; the org data are not loaded yet
                      (not org-data)
-                     (not (pos? (count (:boards org-data))))
-                     (not posts-data))
+                     ;; No board specified
+                     (and (not (router/current-board-slug))
+                          ;; but there are some
+                          (pos? (count (:boards org-data))))
+                     ;; Board specified
+                     (and (not= (router/current-board-slug) "all-posts")
+                          (not= (router/current-board-slug) "must-see")
+                          (not ap-initial-at)
+                          ;; But no board data yet
+                          (not board-data))
+                     ;; Another container
+                     (and (or (= (router/current-board-slug) "all-posts")
+                              (= (router/current-board-slug) "must-see")
+                              ap-initial-at)
+                          ;; But no all-posts data yet
+                         (not container-data)))
         org-not-found (and orgs
                            (not (seq (filterv #(= (:slug %) (router/current-org-slug)) orgs))))
         section-not-found (and (not org-not-found)
@@ -116,7 +131,7 @@
                                (not (seq (filterv #(= (:slug %) (router/current-board-slug)) (:boards org-data)))))
         entry-not-found (and (not section-not-found)
                              posts-data
-                             (not (seq (filterv #(= % (router/current-activity-id)) (keys (:fixed-items posts-data))))))
+                             (not (seq (filterv #(= % (router/current-activity-id)) (keys posts-data)))))
         show-activity-not-found (and (not jwt)
                                      (router/current-activity-id)
                                      (or org-not-found
