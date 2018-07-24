@@ -31,8 +31,8 @@
 
 (defn reaction-toggle
   [activity-data reaction-data reacting?]
-  (let [section-key (concat (dis/current-board-key) [:fixed-items (:uuid activity-data)])]
-    (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data section-key])
+  (let [activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))]
+    (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data activity-key])
     (api/toggle-reaction reaction-data reacting?
       (fn [{:keys [status success body]}]
         (dis/dispatch!
@@ -40,7 +40,7 @@
           activity-data
           (:reaction reaction-data)
           (when success (json->cljs body))
-          section-key])))))
+          activity-key])))))
 
 (defn is-activity-reaction? [org-slug board-slug interaction-data]
   (let [activity-uuid (router/current-activity-id)

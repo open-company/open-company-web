@@ -49,16 +49,15 @@
                                    (assoc :reactions next-reactions-data))]
         (assoc-in db activity-key updated-activity-data)))))
 
-(defn handle-reaction-to-entry [db activity-data reaction-data board-key]
+(defn handle-reaction-to-entry [db activity-data reaction-data activity-key]
   (let [old-reactions-loading (or (:reactions-loading activity-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
-        updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)
-        activity-key (concat board-key [:fixed-items (:uuid activity-data)])]
+        updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)]
     (assoc-in db activity-key updated-activity-data)))
 
 (defmethod dispatcher/action :handle-reaction-to-entry
-  [db [_ activity-data reaction-data board-key]]
-  (handle-reaction-to-entry db activity-data reaction-data board-key))
+  [db [_ activity-data reaction-data activity-key]]
+  (handle-reaction-to-entry db activity-data reaction-data activity-key))
 
 (defmethod dispatcher/action :react-from-picker/finish
   [db [_ {:keys [status activity-data reaction reaction-data activity-key]}]]
