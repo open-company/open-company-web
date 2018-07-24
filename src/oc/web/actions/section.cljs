@@ -164,7 +164,7 @@
         entry-data (dispatcher/activity-data org-slug activity-uuid)]
     (when-not entry-data
       (let [board-data (dispatcher/board-data)]
-        (section-get (utils/link-for (:links (dispatcher/board-data)) ["item" "self"] "GET"))))))
+        (section-get (utils/link-for (:links board-data) ["item" "self"] "GET"))))))
 
 (defn ws-change-subscribe []
   (ws-cc/subscribe :container/status
