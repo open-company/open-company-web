@@ -5,12 +5,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-(defn merge-items
-  [old-items items]
-  (let [merged-items (merge (:fixed-items old-items)
-                            (:fixed-items items))]
-    (assoc items :fixed-items merged-items)))
-
 (defn posts-filter-fn
   "Find the filter based on the route"
   [posts-filter]
@@ -131,11 +125,11 @@
         posts-key (dispatcher/posts-data-key org-slug)
         board-key (dispatcher/board-data-key org-slug board-slug)
         fixed-board-data (au/fix-board new-board-data (dispatcher/change-data db))
-        merged-items (merge (:fixed-items (get-in db posts-key))
+        merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-board-data))]
     (-> db
       (assoc-in board-key (dissoc fixed-board-data :fixed-items))
-      (assoc-in posts-key {:fixed-items merged-items})
+      (assoc-in posts-key merged-items)
       (dissoc :section-editing)
       (update-in [:entry-editing] dissoc :publishing)
       (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
@@ -164,9 +158,28 @@
   [db [_ org-slug activity-data]]
   (let [posts-key (dispatcher/posts-data-key org-slug)
         posts-data (dispatcher/posts-data)
-        next-fixed-items (dissoc (:fixed-items posts-data) (:uuid activity-data))
-        next-posts-data (assoc posts-data :fixed-items next-fixed-items)]
-    (assoc-in db posts-key next-posts-data)))
+        next-posts (dissoc posts-data (:uuid activity-data))
+        ;; Remove the post from all the containers posts list
+        containers-key (butlast (dispatcher/container-key org-slug :all-posts))
+        with-fixed-containers (reduce
+                               (fn [ndb ckey]
+                                 (let [container-posts-key (concat containers-key [ckey :posts-filter])]
+                                  (update-in ndb container-posts-key
+                                   (fn []
+                                    (filter #(not= (:uuid %) (:uuid activity-data)))))))
+                               db
+                               (keys (get-in db containers-key)))
+        ;; Remove the post from all the sections posts list
+        sections-key (butlast (dispatcher/board-data-key org-slug :board))
+        with-fixed-sections (reduce
+                               (fn [ndb skey]
+                                 (let [section-posts-key (concat sections-key [skey :posts-filter])]
+                                  (update-in ndb section-posts-key
+                                   (fn []
+                                    (filter #(not= (:uuid %) (:uuid activity-data)))))))
+                               with-fixed-containers
+                               (keys (get-in db sections-key)))]
+    (assoc-in with-fixed-sections posts-key next-posts)))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
@@ -229,8 +242,7 @@
         posts-key (dispatcher/posts-data-key org-slug)]
   (-> db
     (assoc-in board-key (dissoc fixed-board-data :fixed-items))
-    (assoc-in posts-key (merge-items (get-in db posts-key)
-                                     fixed-board-data))
+    (assoc-in posts-key (merge (get-in db posts-key) (get fixed-board-data :fixed-items)))
     (dissoc :section-editing)
     (update-in [:modal-editing-data] dissoc :loading)
     (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
@@ -240,8 +252,9 @@
   [db [_ org-slug fixed-posts]]
   (let [posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge-items old-posts fixed-posts)
-        container-key (dispatcher/container-key org-slug :all-posts)]
+        merged-items (merge old-posts (:fixed-items fixed-posts))
+        container-key (dispatcher/container-key org-slug :all-posts)
+        with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))]
     (-> db
       (assoc-in container-key (dissoc fixed-posts :fixed-items))
       (assoc-in posts-key merged-items))))
@@ -256,15 +269,15 @@
 (defmethod dispatcher/action :all-posts-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
-    (let [posts-data-key (dispatcher/posts-data-key org)
+    (let [fixed-posts-data (au/fix-container (:collection posts-data) (dispatcher/change-data db) direction)
+          posts-data-key (dispatcher/posts-data-key org)
           container-key (dispatcher/container-key org :all-posts)
-          fixed-all-posts (au/fix-all-posts (:collection posts-data) (dispatcher/change-data db))
-          old-all-posts (get-in db posts-data-key)
-          container-data (dissoc (get-in db container-key) :loading-more)
+          old-posts (get-in db posts-data-key)
+          container-data (get-in db container-key)
           next-links (vec
                       (remove
                        #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
-                       (:links fixed-all-posts)))
+                       (:links fixed-posts-data)))
           link-to-move (if (= direction :up)
                           (utils/link-for (:links container-data) "next")
                           (utils/link-for (:links container-data) "previous"))
@@ -272,18 +285,17 @@
                               (vec (conj next-links link-to-move))
                               next-links)
           with-links (assoc container-data :links fixed-next-links)
-          new-items (into [] (concat (:items old-all-posts) (:items fixed-all-posts)))
-          new-items-map (merge (:fixed-items old-all-posts) (:fixed-items fixed-all-posts))
-          keeping-items (count (:fixed-items old-all-posts))
+          new-items (into [] (concat (:posts-list container-data) (:posts-list fixed-posts-data)))
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          keeping-items (count old-posts)
           new-container (-> with-links
                           (assoc :saved-items keeping-items)
-                          (assoc :direction direction))
-          new-all-posts (-> with-links
-                              (assoc :fixed-items new-items-map)
-                              (assoc :items new-items))]
+                          (assoc :posts-list new-items)
+                          (assoc :direction direction))]
       (-> db
         (assoc-in container-key new-container)
-        (assoc-in posts-data-key new-all-posts)))
+        (dissoc container-key :loading-more)
+        (assoc-in posts-data-key new-items-map)))
     db))
 
 (defmethod dispatcher/action :activities-count
@@ -308,5 +320,5 @@
   [db [_ org-slug must-see-posts]]
   (let [posts-data-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-data-key)
-        merged-items (merge-items old-posts must-see-posts)]
+        merged-items (merge old-posts (:fixed-items must-see-posts))]
     (assoc-in db posts-data-key merged-items)))
