@@ -147,7 +147,7 @@
         is-must-see (utils/in? (:route route) "must-see")
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        empty-board? (zero? (count (:fixed-items posts-data)))
+        empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))

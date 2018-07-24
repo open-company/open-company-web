@@ -85,7 +85,7 @@
           board-uuid (:uuid board-data)
           changes (get change-data board-uuid)
           is-mobile? (responsive/is-mobile-size?)
-          entries (vals (:fixed-items posts-data))
+          entries (vals posts-data)
           sorted-entries (vec (reverse (sort-by :published-at entries)))
           activities-read (drv/react s :activities-read)]
       [:div.entry-cards-container.group
