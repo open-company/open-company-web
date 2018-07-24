@@ -294,13 +294,13 @@
           new-items (into [] (concat (:posts-list container-data) (:posts-list fixed-posts-data)))
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           keeping-items (count old-posts)
-          new-container (-> with-links
-                          (assoc :saved-items keeping-items)
-                          (assoc :posts-list new-items)
-                          (assoc :direction direction))]
+          new-container-data (-> with-links
+                              (assoc :saved-items keeping-items)
+                              (assoc :posts-list new-items)
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
       (-> db
-        (assoc-in container-key new-container)
-        (dissoc container-key :loading-more)
+        (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)))
     db))
 

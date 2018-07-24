@@ -66,6 +66,36 @@
 (defn- sorted-posts [posts]
   (activity-utils/get-sorted-activities posts))
 
+(defn check-pagination [s]
+  (let [container-data @(drv/get-ref s :container-data)
+        sorted-items (sorted-posts @(drv/get-ref s :filtered-posts))
+        direction (:direction container-data)
+        next-link (utils/link-for (:links container-data) "previous")
+        prev-link (utils/link-for (:links container-data) "next")
+        ap-initial-at @(drv/get-ref s :ap-initial-at)]
+    ;; First load or subsequent load more with
+    ;; different set of items
+    (if (= direction :up)
+      ;; did scrolled up, we need to scroll to the first of the old items
+      ;; to not lose the previous position
+      (let [saved-items (:saved-items container-data)
+            last-new-entry-idx (dec (- (count sorted-items) saved-items))
+            scroll-to-entry (get sorted-items last-new-entry-idx)]
+        (reset! (::last-direction s) :up)
+        (reset! (::scroll-to-entry s) scroll-to-entry))
+      (do
+        (when ap-initial-at
+          (reset!
+           (::scroll-to-entry s)
+           (first (filter #(= (:published-at %) ap-initial-at) sorted-items))))))
+    (when next-link
+      (reset! (::has-next s) next-link))
+    (if prev-link
+      (do
+        (reset! (::has-prev s) prev-link)
+        (reset! (::show-all-caught-up-message s) false))
+      (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))))
+
 (rum/defcs all-posts  < rum/reactive
                         ;; Derivatives
                         (drv/drv :ap-initial-at)
@@ -89,39 +119,13 @@
                         section-mixins/container-nav-in
 
                         {:did-remount (fn [s]
-                         (let [container-data @(drv/get-ref s :container-data)
-                               sorted-items (sorted-posts @(drv/get-ref s :filtered-posts))
-                               direction (:direction container-data)
-                               next-link (utils/link-for (:links container-data) "previous")
-                               prev-link (utils/link-for (:links container-data) "next")
-                               ap-initial-at @(drv/get-ref s :ap-initial-at)]
-                           ;; First load or subsequent load more with
-                           ;; different set of items
-                           (if (= direction :up)
-                             ;; did scrolled up, we need to scroll to the first of the old items
-                             ;; to not lose the previous position
-                             (let [saved-items (:saved-items container-data)
-                                   last-new-entry-idx (dec (- (count sorted-items) saved-items))
-                                   scroll-to-entry (get sorted-items last-new-entry-idx)]
-                               (reset! (::last-direction s) :up)
-                               (reset! (::scroll-to-entry s) scroll-to-entry))
-                             (do
-                               (when ap-initial-at
-                                 (reset!
-                                  (::scroll-to-entry s)
-                                  (first (filter #(= (:published-at %) ap-initial-at) sorted-items))))))
-                           (when next-link
-                             (reset! (::has-next s) next-link))
-                           (if prev-link
-                             (do
-                               (reset! (::has-prev s) prev-link)
-                               (reset! (::show-all-caught-up-message s) false))
-                             (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10))))
+                         (check-pagination s)
                          s)
                          :did-mount (fn [s]
                           (reset! last-scroll (.-scrollTop (.-body js/document)))
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL #(did-scroll s %)))
+                          (check-pagination s)
                           s)
                          :after-render (fn [s]
                           (when-let [scroll-to @(::scroll-to-entry s)]
