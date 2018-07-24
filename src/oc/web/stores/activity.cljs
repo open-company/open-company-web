@@ -260,7 +260,7 @@
           container-key (dispatcher/container-key org :all-posts)
           fixed-all-posts (au/fix-all-posts (:collection posts-data) (dispatcher/change-data db))
           old-all-posts (get-in db posts-data-key)
-          container-data (get-in db container-key)
+          container-data (dissoc (get-in db container-key) :loading-more)
           next-links (vec
                       (remove
                        #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
@@ -281,8 +281,9 @@
           new-all-posts (-> with-links
                               (assoc :fixed-items new-items-map)
                               (assoc :items new-items))]
-      (assoc-in db container-key new-container)
-      (assoc-in db posts-data-key new-all-posts))
+      (-> db
+        (assoc-in container-key new-container)
+        (assoc-in posts-data-key new-all-posts)))
     db))
 
 (defmethod dispatcher/action :activities-count
