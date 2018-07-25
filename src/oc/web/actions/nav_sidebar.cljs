@@ -12,14 +12,14 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (let [current-path (.. js/window -location -pathname)]
+  (dis/dispatch! [:reset-ap-initial-at (router/current-org-slug)])
+  (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
     (if (= current-path url)
       (do
         (routing-actions/routing @router/path)
         (user-actions/initial-loading true))
       (router/nav! url)))
   (close-navigation-sidebar))
-
 
 (defn mobile-nav-sidebar [mobile-navigation-sidebar]
   (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))
