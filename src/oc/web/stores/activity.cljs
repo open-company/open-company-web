@@ -138,10 +138,10 @@
         posts-data (dispatcher/posts-data)
         next-posts (dissoc posts-data (:uuid activity-data))
         ;; Remove the post from all the containers posts list
-        containers-key (butlast (dispatcher/container-key org-slug :all-posts))
+        containers-key (dispatcher/containers-key org-slug)
         with-fixed-containers (reduce
                                (fn [ndb ckey]
-                                 (let [container-posts-key (concat containers-key [ckey :posts-list])]
+                                 (let [container-posts-key (conj (dispatcher/container-key org-slug ckey) :posts-list)]
                                   (update-in ndb container-posts-key
                                    (fn [posts-list]
                                     (filter #(not= % (:uuid activity-data)) posts-list)))))
@@ -368,4 +368,13 @@
       (-> db
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)))
+    db))
+
+(defmethod dispatcher/action :reset-ap-initial-at
+  [db [_ org-slug]]
+  (if (:ap-initial-at db)
+    (let [containers-key (dispatcher/containers-key org-slug)]
+      (-> db
+        (update-in containers-key dissoc :all-posts)
+        (dissoc :ap-initial-at)))
     db))
