@@ -234,7 +234,7 @@
             [:div.stream-body-comments
               {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
               (when (pos? (count comments-data))
-                [:div.stream-comments-title
+                [:div.stream-comments-title.mobile-only
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))

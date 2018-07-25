@@ -181,13 +181,13 @@ div.stream-comments {
 
               &.edit {
                 &:before {
-                  background-image: cdnUrl("/img/ML/more_menu_edit.svg");
+                  background-image: cdnUrl("/img/ML/more_menu_edit_black.svg");
                 }
               }
 
               &.delete {
                 &:before {
-                  background-image: cdnUrl("/img/ML/more_menu_delete.svg");
+                  background-image: cdnUrl("/img/ML/more_menu_delete_black.svg");
                 }
               }
             }
