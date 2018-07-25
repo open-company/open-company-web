@@ -47,7 +47,7 @@
     (vec (concat posts-key [activity-uuid]))))
 
 (defn comments-key [org-slug]
-  (vec (conj (posts-data-key org-slug) :comments)))
+  (vec (conj (org-key org-slug) :comments)))
 
 (defn activity-comments-key [org-slug activity-uuid]
   (vec (conj (comments-key org-slug) activity-uuid :sorted-comments)))
