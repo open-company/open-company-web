@@ -35,7 +35,7 @@
       (do
         (stop-editing s)
         (set! (.-innerHTML new-comment) comment-text)
-        (comment-actions/save-comment activity-data c comment-text))
+        (comment-actions/save-comment (:uuid activity-data) c comment-text))
       (cancel-edit e s c))))
 
 (defn start-editing [s comment-data]
@@ -115,7 +115,7 @@
                     is-editing? (= @(::editing? s) (:uuid comment-data))
                     reaction-data (first (:reactions comment-data))]]
           [:div.stream-comment
-            {:key (str "stream-comment-" (:created-at comment-data))}
+            {:key (str "stream-comment-" (:created-at comment-data) "-" (:updated-at comment-data))}
             [:div.stream-comment-author-avatar
               (user-avatar-image (:author comment-data))]
 
@@ -150,7 +150,7 @@
                              (not (:is-emoji comment-data))
                              (or (:can-react comment-data)
                                  (pos? (:count reaction-data))))
-                    [:div.stream-comment-reaction
+                    [:button.mlb-reset.stream-comment-reaction
                       {:class (utils/class-set {:reacted (:reacted reaction-data)
                                                 :can-react (:can-react comment-data)})
                        :title "Agree with this comment"
@@ -195,9 +195,11 @@
                   (when is-editing?
                     [:div.save-cancel-edit-buttons
                       [:button.mlb-reset.mlb-link-green
-                        {:on-click #(edit-finished % s comment-data)}
+                        {:on-click #(edit-finished % s comment-data)
+                         :title "Save edit"}
                         "Save"]
                       [:button.mlb-reset.mlb-link-black
-                        {:on-click #(cancel-edit % s comment-data)}
+                        {:on-click #(cancel-edit % s comment-data)
+                         :title "Cancel edit"}
                         "Cancel"]])])]])]
       [:div.stream-comments-empty])])
