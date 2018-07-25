@@ -121,6 +121,7 @@
                            (drv/drv :show-sections-picker)
                            (drv/drv :capture-video)
                            (drv/drv :entry-save-on-exit)
+                           (drv/drv :section-editing)
                            (rum/local "" ::initial-body)
                            (rum/local "" ::initial-headline)
                            (rum/local [:span "New video post"] ::title)
@@ -207,9 +208,6 @@
                                                  (:board-slug entry-editing))))))))))))
                             s)
                            :will-unmount (fn [s]
-                            (when @(::body-editor s)
-                              (.destroy @(::body-editor s))
-                              (reset! (::body-editor s) nil))
                             (when @(::headline-input-listener s)
                               (events/unlistenByKey @(::headline-input-listener s))
                               (reset! (::headline-input-listener s) nil))
@@ -239,7 +237,7 @@
         (when @(::blue-header s)
           (let [should-show-save-button? (and (not @(::publishing s))
                                               (not published?))]
-            [:div.capture-video-modal-header-right
+            [:div.capture-video-header-right
               (let [fixed-headline (utils/trim (:headline entry-editing))
                     disabled? (or @(::publishing s)
                                   (not (is-publishable? entry-editing))
@@ -254,17 +252,17 @@
                                (clean-body)
                                (if (and (is-publishable? entry-editing)
                                         (not (zero? (count fixed-headline))))
-                                  (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                        updated-entry-editing @(drv/get-ref s :entry-editing)
+                                  (let [_ (dis/dispatch! [:input [:capture-video :headline] fixed-headline])
+                                        updated-entry-editing @(drv/get-ref s :capture-video)
                                         section-editing @(drv/get-ref s :section-editing)]
                                     (remove-autosave s)
                                     (if published?
                                       (do
                                         (reset! (::saving s) true)
-                                        (activity-actions/entry-save updated-entry-editing section-editing))
+                                        (activity-actions/entry-save updated-entry-editing section-editing :capture-video))
                                       (do
                                         (reset! (::publishing s) true)
-                                        (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
+                                        (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing :capture-video))))
                                   (when (zero? (count fixed-headline))
                                     (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
                                       (when-not (.data $post-btn "bs.tooltip")
@@ -300,7 +298,7 @@
                                   (remove-autosave s)
                                   (clean-body)
                                   (reset! (::saving s) true)
-                                  (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
+                                  (activity-actions/entry-save (assoc @(drv/get-ref s :capture-video) :status "draft") @(drv/get-ref s :section-editing))))}
                     (when working?
                       (small-loading))
                     "Save to draft"]))]))]
@@ -313,7 +311,7 @@
                                                 (reset! (::show-post-editor s) true)
                                                 (reset! (::blue-header s) true)
                                                 (reset! (::title s) (if (seq @(::initial-body s))
-                                                                      @(::initial-headline s)
+                                                                      (gobj/get @(::initial-headline s) "__html")
                                                                       headline-placeholder)))})
         (when @(::show-purple-banner s)
           [:div.purple-banner.group

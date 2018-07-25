@@ -4,7 +4,12 @@
             [oc.web.actions.notifications :as na]
             [clojure.contrib.humanize :refer (filesize)]))
 
-(rum/defcs ziggeo-player < {:did-mount (fn [s]
+(rum/defcs ziggeo-player < (rum/local nil ::player-instance)
+                           {:will-unmount (fn [s]
+                             (when-let [player-instance @(::player-instance s)]
+                               (.destroy player-instance))
+                             s)
+                            :did-mount (fn [s]
                             (let [args (into [] (:rum/args s))
                                   video-id (get args 0)
                                   width (get args 2 640)
@@ -18,6 +23,7 @@
                                                         :video video-id}}
                                     Player (.. js/ZiggeoApi -V2 -Player)
                                     player-instance (Player. (clj->js config))]
+                                (reset! (::player-instance s) player-instance)
                                 (.activate player-instance)))
                             s)} 
   [s video-id remove-video-cb width height]
@@ -34,7 +40,12 @@
       {:ref :ziggeo-player}]])
 
 (rum/defcs ziggeo-recorder <  (rum/local false ::upload-started-called)
-                              {:did-mount (fn [s]
+                              (rum/local nil ::recorder-instance)
+                              {:will-unmount (fn [s]
+                                (when-let [recorder-instance @(::recorder-instance s)]
+                                  (.destroy recorder-instance))
+                                s)
+                               :did-mount (fn [s]
                                (let [args (into [] (:rum/args s))
                                      {:keys [submit-cb start-cb cancel-cb width height
                                              pick-cover-start-cb pick-cover-end-cb upload-started-cb]
@@ -48,6 +59,7 @@
                                                            :themecolor "green"}}
                                        Recorder (.. js/ZiggeoApi -V2 -Recorder)
                                        recorder-instance (Recorder. (clj->js config))]
+                                   (reset! (::recorder-instance s) recorder-instance)
                                    (.activate recorder-instance)
                                    (.on recorder-instance "upload_selected"
                                     (fn []
@@ -64,7 +76,7 @@
                                      (na/show-notification {:title "Video is uploading."
                                                             :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")
                                                             :id :ziggeo-video-upload
-                                                            :expire (if (< (- b a) 10000) 5 0)})))
+                                                            :expire 5})))
                                    (.on recorder-instance "recording"
                                     (fn []
                                      (timbre/debug "recording")
@@ -72,12 +84,12 @@
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processing"
                                     (fn [a]
-                                     (timbre/debug "processing")
+                                     (timbre/debug "processing" a)
                                      (na/remove-notification-by-id :ziggeo-video-upload)
                                      (na/show-notification {:title "Video is processing."
                                                             :description (str "Progress: " (int a) "%.")
                                                             :id :ziggeo-video-processing
-                                                            :expire (if (> a 99) 5 0)})))
+                                                            :expire 5})))
                                    (.on recorder-instance "error"
                                     (fn []
                                      (timbre/debug "error")

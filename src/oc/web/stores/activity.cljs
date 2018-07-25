@@ -74,8 +74,8 @@
   (dissoc db :entry-save-on-exit))
 
 (defmethod dispatcher/action :entry-save
-  [db [_]]
-  (assoc-in db [:entry-editing :loading] true))
+  [db [_ edit-key]]
+  (assoc-in db [edit-key :loading] true))
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ activity-data edit-key board-key]]
@@ -98,8 +98,8 @@
     (update-in [edit-key] dissoc :loading)
     (update-in [edit-key] assoc :error true)))
 
-(defmethod dispatcher/action :entry-publish [db [_]]
-  (assoc-in db [:entry-editing :publishing] true))
+(defmethod dispatcher/action :entry-publish [db [_ edit-key]]
+  (assoc-in db [edit-key :publishing] true))
 
 (defmethod dispatcher/action :section-edit/error [db [_ error]]
   (assoc-in db [:section-editing :section-name-error] error))

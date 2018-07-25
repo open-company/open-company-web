@@ -185,7 +185,6 @@
                         (drv/drv :show-sections-picker)
                         ;; Locals
                         (rum/local false ::dismiss)
-                        (rum/local nil ::body-editor)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
                         (rum/local 330 ::entry-edit-modal-height)
@@ -274,9 +273,6 @@
                                                (:board-slug entry-editing))))))))))))
                           s)
                          :will-unmount (fn [s]
-                          (when @(::body-editor s)
-                            (.destroy @(::body-editor s))
-                            (reset! (::body-editor s) nil))
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))

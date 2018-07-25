@@ -153,9 +153,11 @@
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
             :external-share true}))]
-      [:div.stream-item-body.group
+      [:div.stream-item-body-ext.group
+        {:class (when expanded? "expanded")}
         [:div.group
           [:div.stream-body-left.group.fs-hide
+            {:class (when (and has-video (not expanded?)) "has-video")}
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
@@ -181,9 +183,10 @@
                    :class (utils/class-set {:wrt-truncated truncated?
                                             :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
-            (when (and has-video
-                       (not expanded?))
-              (ziggeo-player (:video-id activity-data) nil 200 150))]
+            (when has-video
+              (rum/with-key
+               (ziggeo-player (:video-id activity-data) nil (if expanded? 640 200) (if expanded? 480 150))
+                (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))]
           (when (or (not is-mobile?) expanded?)
             (stream-attachments activity-attachments
              (when (and truncated? (not expanded?))

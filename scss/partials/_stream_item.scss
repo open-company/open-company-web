@@ -22,7 +22,7 @@ div.stream-item {
   }
 
   &.show-continue-reading {
-    div.stream-item-body {
+    div.stream-item-body-ext {
       div.stream-item-footer {
         button.expand-button {
           display: block;
@@ -100,7 +100,7 @@ div.stream-item {
     }
   }
 
-  div.stream-item-body {
+  div.stream-item-body-ext {
     padding: 0px;
     border-radius: 6px;
 
@@ -115,6 +115,22 @@ div.stream-item {
       }
     }
 
+    &.expanded {
+      div.ziggeo-player {
+        margin-top: 16px;
+        float: unset;
+        width: 638px;
+        height: 479px;
+      }
+    }
+
+    div.ziggeo-player {
+      margin-top: 0px;
+      width: 200px;
+      height: 150px;
+      float: right;
+    }
+
     div.stream-body-left {
       position: relative;
       margin-top: 8px;
@@ -123,13 +139,6 @@ div.stream-item {
         float: left;
         width: 400px;
         min-height: 112px;
-      }
-
-      div.ziggeo-player {
-        width: 638px;
-        height: 479px;
-        margin-top: 16px;
-        float: unset;
       }
 
       @include mobile() {
@@ -378,12 +387,6 @@ div.stream-item {
           }
         }
       }
-    }
-
-    div.ziggeo-player {
-      width: 200px;
-      height: 150px;
-      float: right;
     }
 
     div.stream-body-right {
