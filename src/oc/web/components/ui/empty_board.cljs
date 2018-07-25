@@ -22,7 +22,9 @@
     [:div.empty-board.group
       (when-not mobile?
         [:div.empty-board-headline
-          (str "There aren’t any posts in " (:name board-data) " yet. ")
+          (if (= (:slug board-data) utils/default-drafts-board-slug)
+            "You have no drafts."
+            (str "There aren’t any posts in " (:name board-data) " yet. "))
           (when-not (:read-only board-data)
             [:button.mlb-reset
               {:on-click #(activity-actions/entry-edit {:board-slug (:slug board-data)
