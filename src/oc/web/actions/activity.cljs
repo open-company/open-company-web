@@ -89,7 +89,7 @@
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           must-see-data (when success (json->cljs body))
-          must-see-posts (au/fix-container (:collection must-see-data))]
+          must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data))]
       (when (= (router/current-board-slug) "must-see")
         (save-last-used-section "must-see"))
       (watch-boards must-see-posts)
@@ -101,6 +101,18 @@
           must-see-filter (str activity-href "?must-see=true")
           must-see-link (assoc activity-link :href must-see-filter)]
       (api/get-all-posts must-see-link nil (partial must-see-get-finish)))))
+
+(defn must-see-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (json->cljs body)))))
+  (dis/dispatch! [:must-see-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+
+(defn must-see-more [more-link direction]
+  (let [more-href (:href more-link)
+        more-must-see-filter (str more-href "&must-see=true")
+        more-must-see-link (assoc more-link :href more-must-see-filter)]
+    (api/load-more-all-posts more-must-see-link direction (partial must-see-more-finish direction))
+    (dis/dispatch! [:must-see-more (router/current-org-slug)])))
 
 ;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]

@@ -43,7 +43,9 @@
       ;; Show a spinner at the top
       (reset! (::top-loading s) true)
       ;; if the user is close to the top margin, load more results if there is a link
-      (activity-actions/all-posts-more @(::has-next s) :up)
+      (if (= (router/current-board-slug) "all-posts")
+        (activity-actions/all-posts-more @(::has-next s) :up)
+        (activity-actions/must-see-more @(::has-next s) :up))
       (reset! (::has-next s) false))
     ;; scrolling down
     (when (and @(::has-prev s)
@@ -52,7 +54,9 @@
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
-      (activity-actions/all-posts-more @(::has-prev s) :down)
+      (if (= (router/current-board-slug) "all-posts")
+        (activity-actions/all-posts-more @(::has-prev s) :down)
+        (activity-actions/must-see-more @(::has-prev s) :down))
       (reset! (::has-prev s) false)))
   ;; Save the last scrollTop value
   (reset! last-scroll (.-scrollTop (.-body js/document))))

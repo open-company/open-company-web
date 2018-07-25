@@ -72,7 +72,7 @@
     (reduce
       #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))
              new-key (into [] (conj posts-key :new))]
-          (assoc %1 new-key (au/post-new? %2 changes)))
+          (assoc-in %1 new-key (au/post-new? %2 changes)))
       db
       (vals posts-data))))
 

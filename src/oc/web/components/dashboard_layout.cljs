@@ -310,7 +310,8 @@
                 (zero? (count (:boards org-data)))
                 (empty-org)
                 ;; All Posts
-                (and is-all-posts
+                (and (or is-all-posts
+                         is-must-see)
                      (= @board-switch :stream))
                 (all-posts)
                 ;; Empty board
