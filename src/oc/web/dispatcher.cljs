@@ -2,7 +2,8 @@
   (:require [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [taoensso.timbre :as timbre]
-            [oc.web.router :as router]))
+            [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]))
 
 (defonce app-state (atom {:loading false
                           :show-login-overlay false}))
@@ -82,7 +83,11 @@
 
 (defn get-posts-for-board [posts-data board-slug]
   (let [posts-list (vals posts-data)
-        board-posts (map :uuid (filter #(= (:board-slug %) board-slug) posts-list))]
+        filter-fn (if (= board-slug utils/default-drafts-board-slug)
+                    #(not= (:status %) "published")
+                    #(and (= (:board-slug %) board-slug)
+                                                 (= (:status %) "published")))
+        board-posts (map :uuid (filter filter-fn posts-list))]
     (select-keys posts-data board-posts)))
 
 ;; Derived Data ================================================================

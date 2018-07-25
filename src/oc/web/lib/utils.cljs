@@ -5,7 +5,6 @@
             [goog.object :as gobj]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dispatcher]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
