@@ -152,7 +152,11 @@
                                  (pos? (:count reaction-data))))
                     [:div.stream-comment-reaction
                       {:class (utils/class-set {:reacted (:reacted reaction-data)
-                                                :can-react (:can-react comment-data)})}
+                                                :can-react (:can-react comment-data)})
+                       :title "Agree with this comment"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-contaner "body"}
                         (when (or (pos? (:count reaction-data))
                                   (:can-react comment-data))
                           [:div.stream-comment-reaction-icon
