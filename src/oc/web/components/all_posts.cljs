@@ -29,22 +29,24 @@
   [s e]
   (let [scroll-top (.-scrollTop (.-scrollingElement js/document))
         direction (if (> @last-scroll scroll-top)
-                    :up
+                    :down
                     (if (< @last-scroll scroll-top)
-                      :down
+                      :up
                       :stale))
-        min-scroll 0
+        min-scroll 60
         max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))]
     ;; scrolling up
     (when (and @(::has-next s)
                (not @(::scroll-to-entry s))
                (= direction :up)
-               (= scroll-top min-scroll))
+               (<= scroll-top min-scroll))
       ;; Show a spinner at the top
       (reset! (::top-loading s) true)
       ;; if the user is close to the top margin, load more results if there is a link
-      (if (= (router/current-board-slug) "all-posts")
+      (cond
+        (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :up)
+        (= (router/current-board-slug) "must-see")
         (activity-actions/must-see-more @(::has-next s) :up))
       (reset! (::has-next s) false))
     ;; scrolling down
@@ -54,8 +56,10 @@
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
-      (if (= (router/current-board-slug) "all-posts")
+      (cond
+        (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-more @(::has-prev s) :down)
+        (= (router/current-board-slug) "must-see")
         (activity-actions/must-see-more @(::has-prev s) :down))
       (reset! (::has-prev s) false)))
   ;; Save the last scrollTop value
@@ -122,14 +126,22 @@
                          wrt-stream-item-mixin-cb)
                         section-mixins/container-nav-in
 
-                        {:did-remount (fn [s]
-                         (check-pagination s)
+                        {:will-mount (fn [s]
+                          (check-pagination s)
+                          s)
+                         :did-remount (fn [s]
+                          (when (or (= (router/current-board-slug) "all-posts")
+                                    (= (router/current-board-slug) "must-see"))
+                            (check-pagination s))
                          s)
                          :did-mount (fn [s]
-                          (reset! last-scroll (.-scrollTop (.-body js/document)))
-                          (reset! (::scroll-listener s)
-                           (events/listen js/window EventType/SCROLL #(did-scroll s %)))
-                          (check-pagination s)
+                          (when (or (= (router/current-board-slug) "all-posts")
+                                    (= (router/current-board-slug) "must-see"))
+                            (reset! last-scroll (.-scrollTop (.-body js/document)))
+                            (reset! (::scroll-listener s)
+                             (events/listen js/window EventType/SCROLL #(did-scroll s %)))
+                            (check-pagination s))
+
                           s)
                          :after-render (fn [s]
                           (when-let [scroll-to @(::scroll-to-entry s)]
@@ -141,7 +153,7 @@
                           s)
                          :before-render (fn [s]
                           (let [container-data @(drv/get-ref s :container-data)]
-                           (when-not (:loading-more container-data)
+                            (when-not (:loading-more container-data)
                               (when @(::top-loading s)
                                 (reset! (::top-loading s) false)
                                 (reset! (::has-next s) nil))
