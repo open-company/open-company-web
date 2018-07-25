@@ -92,6 +92,7 @@
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :board-data)
+                              (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
@@ -116,7 +117,8 @@
                                 (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
                                       cookie-value (cook/get-cookie board-view-cookie)
                                       board-view (or (keyword cookie-value) :stream)
-                                      fixed-board-view (if (responsive/is-tablet-or-mobile?)
+                                      fixed-board-view (if (or (responsive/is-tablet-or-mobile?)
+                                                               (not (nil? @(drv/get-ref s :ap-initial-at))))
                                                         :stream
                                                         board-view)]
                                   (reset! (::board-switch s) fixed-board-view))
@@ -313,7 +315,8 @@
                 (and (or is-all-posts
                          is-must-see)
                      (= @board-switch :stream))
-                (all-posts)
+                (rum/with-key (all-posts)
+                 (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
                 ;; Empty board
                 empty-board?
                 (empty-board)
