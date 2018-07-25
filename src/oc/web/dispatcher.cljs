@@ -36,8 +36,11 @@
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
 
+(defn containers-key [org-slug]
+  (vec (conj (org-key org-slug) :container-data)))
+
 (defn container-key [org-slug posts-filter]
-  (vec (conj [:container-data (keyword org-slug)] (keyword posts-filter))))
+  (vec (conj (containers-key org-slug) (keyword posts-filter))))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -578,6 +581,10 @@
   (js/console.log
    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
+(defn print-container-data []
+  (js/console.log
+   (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug)))))
+
 (defn print-activity-data []
   (js/console.log
    (get-in
@@ -627,6 +634,7 @@
 (set! (.-OCWebPrintActivitiesReadData js/window) print-activities-read-data)
 (set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
+(set! (.-OCWebPrintContainerData js/window) print-container-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
 (set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)

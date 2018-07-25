@@ -82,6 +82,7 @@ var OCWebPrintAllPostsData = function(){};
 var OCWebPrintTeamData = function(){};
 var OCWebPrintTeamRoster = function(){};
 var OCWebPrintBoardData = function(){};
+var OCWebPrintContainerData = function(){};
 var OCWebPrintActivityData = function(){};
 var OCWebPrintSecureActivityData = function(){};
 var OCWebPrintCommentsData = function(){};
