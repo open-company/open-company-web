@@ -45,16 +45,10 @@
        (cond
 
         (= (router/current-board-slug) "all-posts")
-        (do
-          (activity-actions/all-posts-get org-data ap-initial-at)
-          (utils/after 2000
-            #(section-actions/load-other-sections (:boards org-data))))
+        (activity-actions/all-posts-get org-data ap-initial-at)
 
         (= (router/current-board-slug) "must-see")
-        (do
-          (activity-actions/must-see-get org-data)
-          (utils/after 2000
-            #(section-actions/load-other-sections (:boards org-data))))
+        (activity-actions/must-see-get org-data)
 
         :default
         (let [fixed-board-data (or
