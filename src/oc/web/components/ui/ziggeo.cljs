@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.ziggeo
   (:require [rum.core :as rum]
             [taoensso.timbre :as timbre]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.notifications :as na]
             [clojure.contrib.humanize :refer (filesize)]))
 
@@ -56,7 +57,8 @@
                                                :attrs #js {:width width
                                                            :height height
                                                            :theme "carrot"
-                                                           :themecolor "green"}}
+                                                           :themecolor "green"
+                                                           :meta_profile ls/oc-ziggeo-profiles}}
                                        Recorder (.. js/ZiggeoApi -V2 -Recorder)
                                        recorder-instance (Recorder. (clj->js config))]
                                    (reset! (::recorder-instance s) recorder-instance)

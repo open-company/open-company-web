@@ -1,7 +1,8 @@
-(ns oc.web.lib.ziggeo)
+(ns oc.web.lib.ziggeo
+  (:require [oc.web.local-settings :as ls]))
 
 (defn init-ziggeo [& [debug]]
-  (let [config {:token "c9b611b2b996ee5a1f318d3bacc36b27"
+  (let [config {:token ls/oc-ziggeo-app
                 :debug debug
                 :webrtc_streaming true
                 :webrtc_streaming_if_necessary true

@@ -57,3 +57,7 @@
 
 ;; AP seen TTL in days
 (def oc-seen-ttl 30)
+
+;; Ziggeo
+(def oc-ziggeo-app "c9b611b2b996ee5a1f318d3bacc36b27")
+(def oc-ziggeo-profiles "transcript,nsfw")
