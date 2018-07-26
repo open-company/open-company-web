@@ -58,7 +58,7 @@
                                                            :height height
                                                            :theme "carrot"
                                                            :themecolor "green"
-                                                           :meta_profile ls/oc-ziggeo-profiles}}
+                                                           :meta-profile ls/oc-ziggeo-profiles}}
                                        Recorder (.. js/ZiggeoApi -V2 -Recorder)
                                        recorder-instance (Recorder. (clj->js config))]
                                    (reset! (::recorder-instance s) recorder-instance)
