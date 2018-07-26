@@ -89,7 +89,7 @@
                                      (timbre/debug "processing" a)
                                      (na/remove-notification-by-id :ziggeo-video-upload)
                                      (na/show-notification {:title "Video is processing."
-                                                            :description (str "Progress: " (int a) "%.")
+                                                            :description (str "Progress: " (int (* a 100)) "%.")
                                                             :id :ziggeo-video-processing
                                                             :expire 5})))
                                    (.on recorder-instance "error"
