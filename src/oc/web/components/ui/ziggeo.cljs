@@ -53,15 +53,17 @@
                                       :or {width 640
                                            height 480}} (first (:rum/args s))
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
-                                 (let [config {:element recorder-el
-                                               :attrs #js {:width width
-                                                           :height height
-                                                           :theme "carrot"
-                                                           :themecolor "green"
-                                                           :meta-profile ls/oc-ziggeo-profiles}
+                                 (let [attrs {:width width
+                                              :height height
+                                              :theme "carrot"
+                                              :themecolor "green"
+                                              :meta-profile ls/oc-ziggeo-profiles}
+                                       config {:element recorder-el
+                                               :attrs attrs
                                                :meta-profile ls/oc-ziggeo-profiles}
                                        Recorder (.. js/ZiggeoApi -V2 -Recorder)
                                        recorder-instance (Recorder. (clj->js config))]
+                                   (js/console.log "XXX config" (clj->js config) "attrs" (clj->js attrs) "profiles:" ls/oc-ziggeo-profiles)
                                    (reset! (::recorder-instance s) recorder-instance)
                                    (.activate recorder-instance)
                                    (.on recorder-instance "upload_selected"
