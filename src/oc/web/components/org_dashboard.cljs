@@ -118,14 +118,16 @@
                           ;; But no all-posts data yet
                          (not container-data)))
         org-not-found (and orgs
-                           (not (seq (filterv #(= (:slug %) (router/current-org-slug)) orgs))))
+                           (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
-                               (not (seq (filterv #(= (:slug %) (router/current-board-slug)) (:boards org-data)))))
+
+                               (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
-                             board-data
+                             (or board-data
+                                 container-data)
                              posts-data
-                             (not (seq (filterv #(= % (router/current-activity-id)) (keys posts-data)))))
+                             (not ((set (keys posts-data)) (router/current-activity-id))))
         show-activity-not-found (and (not jwt)
                                      (router/current-activity-id)
                                      (or org-not-found
