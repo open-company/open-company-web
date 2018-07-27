@@ -136,14 +136,18 @@
     (events/unlistenByKey @(::headline-input-listener state))
     (reset! (::headline-input-listener state) nil)))
 
-(defn- clean-body []
+(defn- clean-body [state]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
     (let [raw-html (.-innerHTML body-el)]
       (dis/dispatch! [:update [:modal-editing-data] #(merge % {:body (utils/clean-body-html raw-html)
-                                                               :has-changes true})]))))
+                                                               :has-changes true})])))
+  (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
+    (when (:video-id editing-data)
+      (when-let [transcription-el (rum/ref-node state "transcript-edit")]
+        (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
 (defn- save-editing? [state]
-  (clean-body)
+  (clean-body state)
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
         section-editing (:section-editing modal-data)
         edited-data (:modal-editing-data modal-data)]
@@ -498,11 +502,16 @@
             (when @(::record-video s)
               (ziggeo-recorder video-uploaded-cb))
             (when (:video-transcript activity-data)
-              [:div.fullscreen-post-transcript
-                [:div.fullscreen-post-transcript-header
-                  "This transcript was automatically generated and may not be accurate"]
-                [:div.fullscreen-post-transcript-content
-                  {:dangerouslySetInnerHTML (utils/emojify (:video-transcript activity-data))}]])
+              (if editing
+                [:div.fullscreen-post-transcript
+                  [:textarea.fullscreen-post-transcript-edit
+                    {:ref "transcript-edit"}
+                    (:video-transcript activity-data)]]
+                [:div.fullscreen-post-transcript
+                  [:div.fullscreen-post-transcript-header
+                    "This transcript was automatically generated and may not be accurate"]
+                  [:div.fullscreen-post-transcript-content
+                    {:dangerouslySetInnerHTML (utils/emojify (:video-transcript activity-data))}]]))
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             (if editing
