@@ -44,7 +44,6 @@
                           (drv/drv :filtered-posts)
                           (drv/drv :container-data)
                           (drv/drv :activities-read)
-                          (rum/local nil ::board-uuid)
                           (rum/local false ::loading-more)
                           (rum/local nil ::prev-link)
                           (rum/local nil ::next-link)
@@ -82,13 +81,6 @@
                                     (do
                                      (reset! (::prev-link s) nil)
                                      (reset! (:load-more-items-prev-fn s) nil))))))
-                            s)
-                           :after-render (fn [s]
-                            (when (and (not (= (router/current-board-slug) "all-posts"))
-                                       (not (= (router/current-board-slug) "must-see"))
-                                       (not @(::board-uuid s)))
-                              (let [board-data @(drv/get-ref s :board-data)]
-                                (reset! (::board-uuid s) (:uuid board-data))))
                             s)}
   [s]
   [:div.entries-layout
