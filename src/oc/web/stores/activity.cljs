@@ -75,7 +75,7 @@
   (let [org-slug (utils/post-org-slug activity-data)
         board-slug (:board-slug activity-data)
         activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
-        activity-board-data (get-in db (dispatcher/board-data-key org-slug board-slug))
+        activity-board-data (dispatcher/board-data db org-slug board-slug)
         fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))
         next-db (assoc-in db activity-key fixed-activity-data)
         with-edited-key (if edit-key

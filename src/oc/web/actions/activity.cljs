@@ -260,7 +260,7 @@
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
-    (dis/dispatch! [:entry-save/finish activity-data edit-key])
+    (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
     (when (= (:status activity-data) "published")
       (send-item-read (:uuid activity-data)))))
