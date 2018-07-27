@@ -76,11 +76,7 @@
                                      (when (and (fn? upload-started-cb)
                                                 (not @(::upload-started-called s)))
                                        (reset! (::upload-started-called s) true)
-                                       (upload-started-cb))
-                                     (na/show-notification {:title "Video is uploading."
-                                                            :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")
-                                                            :id :ziggeo-video-upload
-                                                            :expire 5})))
+                                       (upload-started-cb))))
                                    (.on recorder-instance "recording"
                                     (fn []
                                      (timbre/debug "recording")
@@ -88,17 +84,10 @@
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processing"
                                     (fn [a]
-                                     (timbre/debug "processing" a)
-                                     (na/remove-notification-by-id :ziggeo-video-upload)
-                                     (na/show-notification {:title "Video is processing."
-                                                            :description (str "Progress: " (int (* a 100)) "%.")
-                                                            :id :ziggeo-video-processing
-                                                            :expire 5})))
+                                     (timbre/debug "processing" a)))
                                    (.on recorder-instance "error"
                                     (fn []
                                      (timbre/debug "error")
-                                     (na/remove-notification-by-id :ziggeo-video-upload)
-                                     (na/remove-notification-by-id :ziggeo-video-processing)
                                      (na/show-notification {:title "Error processing your video."
                                                             :description "An error occurred while processing your video, please try again."
                                                             :id :ziggeo-video-error
@@ -118,8 +107,9 @@
                                    (.on recorder-instance "processed"
                                     (fn []
                                      (timbre/debug "processed" (.get recorder-instance "video"))
-                                     (na/remove-notification-by-id :ziggeo-video-upload)
-                                     (na/remove-notification-by-id :ziggeo-video-processing)
+                                     (na/show-notification {:title "Video uploaded and processed!"
+                                                            :id :ziggeo-video-processed
+                                                            :expire 5})
                                      (submit-cb (.get recorder-instance "video"))))))
                                s)} 
   [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb pick-cover-end-cb upload-started-cb]
