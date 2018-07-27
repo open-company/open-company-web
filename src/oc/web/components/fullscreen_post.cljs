@@ -476,12 +476,6 @@
                        (not editing))
               [:div.must-see
                {:class (utils/class-set {:must-see-on (:must-see activity-data)})}])
-            ;; Video element
-            (when (and video-id
-                       (not @(::record-video s)))
-              (ziggeo-player video-id (when editing remove-video-cb)))
-            (when @(::record-video s)
-              (ziggeo-recorder video-uploaded-cb))
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)
@@ -497,6 +491,12 @@
                 {:key (str "fullscreen-post-body-" (:updated-at activity-data))
                  :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
+            ;; Video element
+            (when (and video-id
+                       (not @(::record-video s)))
+              (ziggeo-player video-id (when editing remove-video-cb)))
+            (when @(::record-video s)
+              (ziggeo-recorder video-uploaded-cb))
             (when (:video-transcript activity-data)
               [:div.fullscreen-post-transcript
                 [:div.fullscreen-post-transcript-header
