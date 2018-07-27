@@ -123,6 +123,7 @@
                                org-data
                                (not (seq (filterv #(= (:slug %) (router/current-board-slug)) (:boards org-data)))))
         entry-not-found (and (not section-not-found)
+                             board-data
                              posts-data
                              (not (seq (filterv #(= % (router/current-activity-id)) (keys posts-data)))))
         show-activity-not-found (and (not jwt)
