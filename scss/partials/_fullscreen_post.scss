@@ -414,6 +414,13 @@ div.fullscreen-post-container {
           white-space: pre-wrap;
           word-wrap: break-word;
 
+          textarea.fullscreen-post-transcript-edit {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            outline: none;
+          }
+
           div.fullscreen-post-transcript-header {
             @include avenir_M();
             font-size: 12px;

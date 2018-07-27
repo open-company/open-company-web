@@ -339,6 +339,27 @@ div.entry-edit-modal-container {
         }
       }
 
+      div.entry-edit-transcript {
+        max-height: 330px;
+        margin-top: 16px;
+        width: 100%;
+        background-color: rgba(#ECECEC, 0.2);
+        border-top: 1px solid #ECECEC;
+        padding: 24px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+
+        textarea.video-transcript {
+          width: 100%;
+          background-color: transparent;
+          border: none;
+          outline: none;
+        }
+      }
+              
+
       div.entry-edit-controls {
         margin-bottom: 16px;
 
