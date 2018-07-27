@@ -317,7 +317,7 @@
           [:div.purple-banner.group
             [:div.purple-banner-title
               [:span.smile-emo]
-              "Be a good human and provide a summary for your video k?"]
+              "Be a good person and provide a summary for your video k?"]
             [:button.remove-button.mlb-reset
               {:on-click #(reset! (::show-purple-banner s) false)}]])
         (when @(::show-post-editor s)
