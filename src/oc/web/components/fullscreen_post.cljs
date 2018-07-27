@@ -497,6 +497,12 @@
                 {:key (str "fullscreen-post-body-" (:updated-at activity-data))
                  :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
+            (when (:video-transcript activity-data)
+              [:div.fullscreen-post-transcript
+                [:div.fullscreen-post-transcript-header
+                  "This transcript was automatically generated and may not be accurate"]
+                [:div.fullscreen-post-transcript-content
+                  {:dangerouslySetInnerHTML (utils/emojify (:video-transcript activity-data))}]])
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             (if editing
