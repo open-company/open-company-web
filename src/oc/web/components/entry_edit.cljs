@@ -127,9 +127,13 @@
   (headline-on-change s)
   (body-on-change s))
 
-(defn- clean-body []
+(defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))])))
+    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))]))
+  (let [editing-data @(drv/get-ref s :entry-editing)]
+    (when (:video-id editing-data)
+      (when-let [transcription-el (rum/ref-node s "transcript-edit")]
+        (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
 (defn- is-publishable? [entry-editing]
   (seq (:board-slug entry-editing)))
@@ -321,7 +325,7 @@
               [:button.mlb-reset.header-buttons.post-button
                 {:ref "mobile-post-btn"
                  :on-click (fn [_]
-                             (clean-body)
+                             (clean-body s)
                              (if (and (is-publishable? entry-editing)
                                       (not (zero? (count fixed-headline))))
                                 (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
@@ -368,7 +372,7 @@
                    :on-click (fn [_]
                               (when-not disabled?
                                 (remove-autosave s)
-                                (clean-body)
+                                (clean-body s)
                                 (reset! (::saving s) true)
                                 (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
@@ -430,6 +434,11 @@
                                                    (reset! (::uploading-media s) is-uploading?))
                              :media-config ["photo" "video"]
                              :classes "emoji-autocomplete emojiable fs-hide"})
+          (when (:video-id entry-editing)
+            [:div.entry-edit-transcript
+              [:textarea.video-transcript
+                {:ref "transcript-edit"}
+                (:video-transcript entry-editing)]])
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
            #(activity-actions/remove-attachment :entry-editing %))]
