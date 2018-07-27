@@ -131,10 +131,10 @@
       (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/failed
-  [db [_]]
+  [db [_ edit-key]]
   (-> db
-    (update-in [:entry-editing] dissoc :publishing)
-    (update-in [:entry-editing] assoc :error true)))
+    (update-in [edit-key] dissoc :publishing)
+    (update-in [edit-key] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ board-key activity-data]]
