@@ -49,16 +49,15 @@
                                    (assoc :reactions next-reactions-data))]
         (assoc-in db activity-key updated-activity-data)))))
 
-(defn handle-reaction-to-entry [db activity-data reaction-data board-key]
+(defn handle-reaction-to-entry [db activity-data reaction-data activity-key]
   (let [old-reactions-loading (or (:reactions-loading activity-data) [])
         next-reactions-loading (conj old-reactions-loading (:reaction reaction-data))
-        updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)
-        activity-key (concat board-key [:fixed-items (:uuid activity-data)])]
+        updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)]
     (assoc-in db activity-key updated-activity-data)))
 
 (defmethod dispatcher/action :handle-reaction-to-entry
-  [db [_ activity-data reaction-data board-key]]
-  (handle-reaction-to-entry db activity-data reaction-data board-key))
+  [db [_ activity-data reaction-data activity-key]]
+  (handle-reaction-to-entry db activity-data reaction-data activity-key))
 
 (defmethod dispatcher/action :react-from-picker/finish
   [db [_ {:keys [status activity-data reaction reaction-data activity-key]}]]
@@ -105,9 +104,8 @@
   [db interaction-data add-event?]
   (let [item-uuid (:resource-uuid interaction-data)
         entries-key (get @reactions-atom (make-activity-index item-uuid))
-        all-posts-key (assoc entries-key 2 :all-posts)
-        ;; look for data in the board and in AP key
-        keys (remove nil? [all-posts-key entries-key])
+        ;; look for data in the board
+        keys (remove nil? [entries-key])
         new-data (->> (mapcat #(vector %
                                 (update-entry-reaction-data add-event? interaction-data
                                  (get-in db %)))
@@ -156,9 +154,8 @@
   [db interaction-data add-event?]
   (let [item-uuid (:resource-uuid interaction-data)
         comments-key (get @reactions-atom (make-comment-index item-uuid))
-        all-posts-key (assoc comments-key 2 :all-posts)
-        ;; look for data in the board and in AP key
-        keys (remove nil? [comments-key all-posts-key])
+        ;; look for data in the board
+        keys (remove nil? [comments-key])
         new-data (->> (mapcat #(vector %
                                        (update-comments-data
                                         add-event?
@@ -199,7 +196,6 @@
             (let [idx (make-comment-index (:uuid comment))
                   comment-key (dispatcher/activity-comments-key
                                org
-                               board-slug
                                activity-uuid)]
               (assoc acc idx comment-key)))
           ra comments))
@@ -216,7 +212,6 @@
                   idx (make-activity-index activity-uuid)
                   activity-key (dispatcher/activity-key
                                 org
-                                board-slug
                                 activity-uuid)
                   next-acc (index-comments acc org board-slug activity-uuid (:comments post))]
               (assoc next-acc idx activity-key)))

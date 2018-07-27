@@ -104,6 +104,9 @@
 (defn current-board-slug []
   (:board @path))
 
+(defn current-posts-filter []
+  (:board @path))
+
 (defn current-activity-id []
   (:activity @path))
 

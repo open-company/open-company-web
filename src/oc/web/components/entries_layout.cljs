@@ -16,11 +16,23 @@
 
 (defn load-more-items-next-fn [s scroll]
   (when (compare-and-set! (::loading-more s) false true)
-    (activity-actions/all-posts-more @(::next-link s) :up)))
+    (cond
+      ;; A;; Posts
+      (= (router/current-board-slug) "all-posts")
+      (activity-actions/all-posts-more @(::next-link s) :up)
+      ;; Must See
+      (= (router/current-board-slug) "must-see")
+      (activity-actions/must-see-more @(::next-link s) :up))))
 
 (defn load-more-items-prev-fn [s scroll]
   (when (compare-and-set! (::loading-more s) false true)
-    (activity-actions/all-posts-more @(::prev-link s) :down)))
+    (cond
+      ;; All Posts
+      (= (router/current-board-slug) "all-posts")
+      (activity-actions/all-posts-more @(::prev-link s) :down)
+      ;; Must see
+      (= (router/current-board-slug) "must-see")
+      (activity-actions/must-see-more @(::prev-link s) :down))))
 
 (def tiles-per-row 3)
 
@@ -29,10 +41,9 @@
   (activity-actions/ap-seen-events-gate item-uuid))
 
 (rum/defcs entries-layout < rum/reactive
-                          (drv/drv :change-data)
-                          (drv/drv :board-data)
+                          (drv/drv :filtered-posts)
+                          (drv/drv :container-data)
                           (drv/drv :activities-read)
-                          (rum/local nil ::board-uuid)
                           (rum/local false ::loading-more)
                           (rum/local nil ::prev-link)
                           (rum/local nil ::next-link)
@@ -46,10 +57,11 @@
                              (assoc :load-more-items-next-fn (atom nil))
                              (assoc :load-more-items-prev-fn (atom nil))))
                            :before-render (fn [s]
-                            (when (= (router/current-board-slug) "all-posts")
-                              (let [board-data @(drv/get-ref s :board-data)
-                                    next-link (utils/link-for (:links board-data) "previous")
-                                    prev-link (utils/link-for (:links board-data) "next")]
+                            (when (or (= (router/current-board-slug) "all-posts")
+                                      (= (router/current-board-slug) "must-see"))
+                              (let [container-data @(drv/get-ref s :container-data)
+                                    next-link (utils/link-for (:links container-data) "previous")
+                                    prev-link (utils/link-for (:links container-data) "next")]
                                 (when (not= (:href @(::next-link s)) (:href next-link))
                                   (if next-link
                                     (do
@@ -69,21 +81,12 @@
                                     (do
                                      (reset! (::prev-link s) nil)
                                      (reset! (:load-more-items-prev-fn s) nil))))))
-                            s)
-                           :after-render (fn [s]
-                            (when (and (not (= (router/current-board-slug) "all-posts"))
-                                       (not @(::board-uuid s)))
-                              (let [board-data @(drv/get-ref s :board-data)]
-                                (reset! (::board-uuid s) (:uuid board-data))))
                             s)}
   [s]
   [:div.entries-layout
-    (let [board-data (drv/react s :board-data)
-          change-data (drv/react s :change-data)
-          board-uuid (:uuid board-data)
-          changes (get change-data board-uuid)
+    (let [posts-data (drv/react s :filtered-posts)
           is-mobile? (responsive/is-mobile-size?)
-          entries (vals (:fixed-items board-data))
+          entries (vals posts-data)
           sorted-entries (vec (reverse (sort-by :published-at entries)))
           activities-read (drv/react s :activities-read)]
       [:div.entry-cards-container.group

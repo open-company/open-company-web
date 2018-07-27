@@ -1,8 +1,8 @@
 div.empty-board {
-  margin: 4px 130px;
+  margin: 4px auto;
   float: left;
   text-align: center;
-  width: 600px;
+  width: 100%;
 
   @include mobile() {
     float: unset;

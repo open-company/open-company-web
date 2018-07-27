@@ -24,7 +24,7 @@
 (rum/defcs section-stream < rum/static
                             rum/reactive
                             ;; Derivatives
-                            (drv/drv :section-stream-data)
+                            (drv/drv :filtered-posts)
                             (drv/drv :activities-read)
                             ;; Mixins
                             mixins/first-render-mixin
@@ -33,7 +33,7 @@
                             section-mixins/container-nav-in
 
   [s]
-  (let [section-data (drv/react s :section-stream-data)
+  (let [section-data (drv/react s :filtered-posts)
         items (activity-utils/get-sorted-activities section-data)
         activities-read (drv/react s :activities-read)]
     [:div.section-stream.group

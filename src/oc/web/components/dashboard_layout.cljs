@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -68,13 +67,8 @@
      :board-slug (:slug board-data)}))
 
 (defn get-board-for-edit [s]
-  (let [board-data @(drv/get-ref s :board-data)
-        route @(drv/get-ref s :route)
-        is-all-posts (or (utils/in? (:route route) "all-posts")
-                         (:from-all-posts route))
-        is-must-see (utils/in? (:route route) "must-see")
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
-    (if (or is-drafts-board is-all-posts is-must-see)
+  (let [board-data @(drv/get-ref s :board-data)]
+    (if-not board-data
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -98,8 +92,8 @@
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :board-data)
-                              (drv/drv :all-posts)
-                              (drv/drv :must-see)
+                              (drv/drv :ap-initial-at)
+                              (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
                               (drv/drv :show-section-add)
@@ -123,7 +117,8 @@
                                 (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
                                       cookie-value (cook/get-cookie board-view-cookie)
                                       board-view (or (keyword cookie-value) :stream)
-                                      fixed-board-view (if (responsive/is-tablet-or-mobile?)
+                                      fixed-board-view (if (or (responsive/is-tablet-or-mobile?)
+                                                               (not (nil? @(drv/get-ref s :ap-initial-at))))
                                                         :stream
                                                         board-view)]
                                   (reset! (::board-switch s) fixed-board-view))
@@ -146,22 +141,15 @@
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data-react (drv/react s :board-data)
-        all-posts-data (drv/react s :all-posts)
-        must-see-data (drv/react s :must-see)
+        board-data (drv/react s :board-data)
+        posts-data (drv/react s :filtered-posts)
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
         is-must-see (utils/in? (:route route) "must-see")
-        board-data (cond
-                     is-must-see
-                     must-see-data
-
-                     :default
-                     board-data-react)
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        empty-board? (zero? (count (:fixed-items board-data)))
+        empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
@@ -179,12 +167,9 @@
         board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        can-compose (or (and (or is-all-posts
-                                 is-drafts-board)
+        can-compose (or (and (not board-data)
                              (pos? (count all-boards)))
-                        (and (not is-all-posts)
-                             (not is-drafts-board)
-                             board-data
+                        (and board-data
                              (not (:read-only board-data))))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
@@ -327,9 +312,11 @@
                 (zero? (count (:boards org-data)))
                 (empty-org)
                 ;; All Posts
-                (and is-all-posts
+                (and (or is-all-posts
+                         is-must-see)
                      (= @board-switch :stream))
-                (all-posts)
+                (rum/with-key (all-posts)
+                 (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
                 ;; Empty board
                 empty-board?
                 (empty-board)

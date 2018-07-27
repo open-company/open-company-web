@@ -17,8 +17,7 @@
   "Given an entry body get the first thumbnail available.
   Thumbnail type: image, video or chart."
   [activity-body]
-  (let [is-ap (= (router/current-board-slug) "all-posts")
-        $body (js/$ (str "<div>" activity-body "</div>"))
+  (let [$body (js/$ (str "<div>" activity-body "</div>"))
         thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
         found (atom nil)]
     (dotimes [el-num (.-length thumb-els)]
@@ -33,7 +32,7 @@
                              (<= height (* width 2))))
                 (reset! found
                   {:type "image"
-                   :thumbnail (if (and (not is-ap) (.data $el "thumbnail"))
+                   :thumbnail (if (.data $el "thumbnail")
                                 (.data $el "thumbnail")
                                 (.attr $el "src"))})))
             (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
@@ -110,8 +109,8 @@
         time-2 (get-activity-date act-2)]
     (compare time-2 time-1)))
 
-(defn get-sorted-activities [all-posts-data]
-  (vec (sort compare-activities (vals (:fixed-items all-posts-data)))))
+(defn get-sorted-activities [posts-data]
+  (vec (sort compare-activities (vals posts-data))))
 
 (defn readonly-board? [links]
   (let [new-link (utils/link-for links "create")
@@ -182,24 +181,35 @@
            with-read-only (assoc board-data :read-only read-only)
            with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                         (fix-entry %2 board-data changes))
-                               with-read-only (:entries board-data))
-           without-entries (dissoc with-fixed-entries :entries)]
+                                      with-read-only (:entries board-data))
+           with-entry-count (if (:entries board-data)
+                              (assoc with-fixed-entries
+                              :entry-count
+                              (count (:fixed-items with-fixed-entries)))
+                              with-fixed-entries)
+           without-entries (dissoc with-entry-count :entries)]
        without-entries)))
 
-(defn fix-all-posts
-  "Fix org data coming from the API."
-  ([all-posts-data]
-   (fix-all-posts all-posts-data {}))
-  ([all-posts-data change-data]
+(defn fix-container
+  "Fix container data coming from the API."
+  ([container-data]
+   (fix-container container-data {}))
+  ([container-data change-data & [direction]]
     (let [with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
                                                          :uuid (:board-uuid %2)}
                                            change-data))
-                                 all-posts-data
-                                 (:items all-posts-data))
-          without-items (dissoc with-fixed-activities :items)]
-      without-items)))
+                                 container-data
+                                 (:items container-data))
+          new-items (map :uuid (:items container-data))
+          without-items (dissoc with-fixed-activities :items)
+          with-posts-list (assoc without-items :posts-list (into []
+                                                             (case direction
+                                                              :up (concat new-items (:posts-list container-data))
+                                                              :down (concat (:posts-list container-data) new-items)
+                                                              new-items)))]
+      with-posts-list)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data

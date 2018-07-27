@@ -2,7 +2,6 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.router :as router]
@@ -14,6 +13,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.entry-edit :refer (entry-edit)]
@@ -45,16 +45,10 @@
        (cond
 
         (= (router/current-board-slug) "all-posts")
-        (do
-          (activity-actions/all-posts-get org-data ap-initial-at)
-          (utils/after 2000
-            #(section-actions/load-other-sections (:boards org-data))))
+        (activity-actions/all-posts-get org-data ap-initial-at)
 
         (= (router/current-board-slug) "must-see")
-        (do
-          (activity-actions/must-see-get org-data)
-          (utils/after 2000
-            #(section-actions/load-other-sections (:boards org-data))))
+        (activity-actions/must-see-get org-data)
 
         :default
         (let [fixed-board-data (or
@@ -80,9 +74,9 @@
                 org-data
                 jwt
                 board-data
-                all-posts-data
+                container-data
+                posts-data
                 show-onboard-overlay
-                must-see-data
                 ap-initial-at
                 user-settings
                 org-settings-data
@@ -117,22 +111,23 @@
                           (not ap-initial-at)
                           ;; But no board data yet
                           (not board-data))
-                     ;; All posts
+                     ;; Another container
                      (and (or (= (router/current-board-slug) "all-posts")
+                              (= (router/current-board-slug) "must-see")
                               ap-initial-at)
                           ;; But no all-posts data yet
-                         (not all-posts-data))
-                     (and (= (router/current-board-slug) "must-see")
-                          ;; But no must-see-data data yet
-                         (not must-see-data)))
+                         (not container-data)))
         org-not-found (and orgs
-                           (not (seq (filterv #(= (:slug %) (router/current-org-slug)) orgs))))
+                           (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
-                               (not (seq (filterv #(= (:slug %) (router/current-board-slug)) (:boards org-data)))))
+
+                               (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
-                             board-data
-                             (not (seq (filterv #(= % (router/current-activity-id)) (keys (:fixed-items board-data))))))
+                             (or board-data
+                                 container-data)
+                             posts-data
+                             (not ((set (keys posts-data)) (router/current-activity-id))))
         show-activity-not-found (and (not jwt)
                                      (router/current-activity-id)
                                      (or org-not-found
@@ -224,9 +219,7 @@
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
-          (let [from-ap (:from-all-posts @router/path)
-                board-slug (if from-ap :all-posts (router/current-board-slug))]
-            (fullscreen-post)))
+          (fullscreen-post))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

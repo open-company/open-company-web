@@ -16,11 +16,10 @@
 
 (defmethod dispatcher/action :org-loaded
   [db [_ org-data saved?]]
-  ;; We need to remove the boards that are no longer in the org except all-posts and drafts
+  ;; We need to remove the boards that are no longer in the org
   (let [boards-key (dispatcher/boards-key (:slug org-data))
         old-boards (get-in db boards-key)
-        keep-boards [:all-posts :must-see]
-        board-slugs (set (concat (map (comp keyword :slug) (:boards org-data)) keep-boards))
+        board-slugs (set (map (comp keyword :slug) (:boards org-data)))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))]
