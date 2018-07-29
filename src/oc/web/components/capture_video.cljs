@@ -125,7 +125,7 @@
                            (rum/local "" ::initial-body)
                            (rum/local "" ::initial-headline)
                            (rum/local [:span "New video post"] ::title)
-                           (rum/local false ::show-purple-banner)
+                           (rum/local false ::show-good-human-banner)
                            (rum/local false ::show-post-editor)
                            (rum/local false ::show-legend)
                            (rum/local nil ::autosave-timer)
@@ -307,21 +307,25 @@
                           :start-cb (partial video-record-started s)
                           :pick-cover-start-cb (partial video-record-stopped s)
                           :upload-started-cb #(do
-                                                (reset! (::show-purple-banner s) true)
+                                                (when (activity-actions/should-show-good-human-banner?)
+                                                  (reset! (::show-good-human-banner s) true))
                                                 (reset! (::show-post-editor s) true)
                                                 (reset! (::blue-header s) true)
                                                 (reset! (::title s) (if (seq @(::initial-body s))
                                                                       (gobj/get @(::initial-headline s) "__html")
                                                                       headline-placeholder)))})
-        (when @(::show-purple-banner s)
-          [:div.purple-banner.group
-            [:div.purple-banner-title
+        (when @(::show-good-human-banner s)
+          [:div.good-human-banner.group
+            [:div.good-human-banner-title
               [:span.smile-emo]
               "Be a good person and provide a summary for your video k?"]
             [:button.remove-button.mlb-reset
-              {:on-click #(reset! (::show-purple-banner s) false)}]])
+              {:on-click #(do
+                            (activity-actions/hide-good-human-banner!)
+                            (reset! (::show-good-human-banner s) false))}]])
         (when @(::show-post-editor s)
           [:div.post-editor.group
+            {:class (utils/class-set {:move-up (not @(::show-good-human-banner s))})}
             [:div.post-editor-header.group
               (user-avatar-image current-user-data)
               [:div.posting-in

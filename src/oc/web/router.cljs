@@ -148,6 +148,9 @@
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
 
+(defn good-human-banner []
+  (str "good-human-banner-hide-" (jwt/user-id)))
+
 ;; Debug
 
 (defn print-router-path []

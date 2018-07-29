@@ -172,8 +172,25 @@ div.capture-video {
     border-radius: 6px;
     width: 640px;
     min-height: calc(100vh - 56px);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
 
-    div.purple-banner {
+    div.ziggeo-recorder {
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+
+      &>div {
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+
+        video {
+          border-top-left-radius: 6px;
+          border-top-right-radius: 6px;          
+        }
+      }
+    }
+
+    div.good-human-banner {
       width: 100%;
       height: 48px;
       background-color: #B167FB;
@@ -183,7 +200,7 @@ div.capture-video {
       padding: 11px 0px;
       z-index: 14;
 
-      div.purple-banner-title {
+      div.good-human-banner-title {
         text-align: center;
         display: flex;
         justify-content: center;
@@ -223,6 +240,12 @@ div.capture-video {
       padding: 24px;
       z-index: 13;
       position: relative;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+
+      &.move-up {
+        margin-top: -96px;
+      }
 
       div.post-editor-header {
         width: 100%;
