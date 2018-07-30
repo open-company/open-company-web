@@ -146,7 +146,6 @@
   (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
     (when (:video-id editing-data)
       (when-let [transcription-el (rum/ref-node state "transcript-edit")]
-        (js/console.log "XXX new transcription" (.-value transcription-el))
         (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
 (defn- save-editing? [state]

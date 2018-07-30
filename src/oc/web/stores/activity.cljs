@@ -103,7 +103,7 @@
   (assoc-in db [:section-editing :section-name-error] error))
 
 (defmethod dispatcher/action :entry-publish-with-board/finish
-  [db [_ new-board-data]]
+  [db [_ new-board-data edit-key]]
   (let [org-slug (utils/section-org-slug new-board-data)
         board-slug (:slug new-board-data)
         posts-key (dispatcher/posts-data-key org-slug)
@@ -115,9 +115,9 @@
       (assoc-in board-key (dissoc fixed-board-data :fixed-items))
       (assoc-in posts-key merged-items)
       (dissoc :section-editing)
-      (update-in [:entry-editing] dissoc :publishing)
-      (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
-      (assoc-in [:entry-editing :new-section] true)
+      (update-in [edit-key] dissoc :publishing)
+      (assoc-in [edit-key :board-slug] (:slug fixed-board-data))
+      (assoc-in [edit-key :new-section] true)
       (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/finish

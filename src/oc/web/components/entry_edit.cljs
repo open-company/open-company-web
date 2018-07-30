@@ -422,12 +422,6 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          ;; Video elements
-          (when (and (:video-id entry-editing)
-                     (not @(::record-video s)))
-            (ziggeo-player (:video-id entry-editing) remove-video-cb))
-          (when @(::record-video s)
-            (ziggeo-recorder video-uploaded-cb))
           (rich-body-editor {:on-change (partial body-on-change s)
                              :use-inline-media-picker false
                              :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
@@ -439,6 +433,12 @@
                                                    (reset! (::uploading-media s) is-uploading?))
                              :media-config ["photo" "video"]
                              :classes "emoji-autocomplete emojiable fs-hide"})
+          ;; Video elements
+          (when (and (:video-id entry-editing)
+                     (not @(::record-video s)))
+            (ziggeo-player (:video-id entry-editing) remove-video-cb))
+          (when @(::record-video s)
+            (ziggeo-recorder video-uploaded-cb))
           (when (:video-id entry-editing)
             [:div.entry-edit-transcript
               [:textarea.video-transcript

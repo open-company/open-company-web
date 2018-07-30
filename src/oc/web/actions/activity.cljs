@@ -375,7 +375,7 @@
     (entry-publish-finish entry-uuid edit-key posted-to-board-slug (when success (json->cljs body)))
     (dis/dispatch! [:entry-publish/failed edit-key])))
 
-(defn entry-publish-with-board-finish [entry-uuid new-board-data]
+(defn entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
   (let [board-slug (:slug new-board-data)
         saved-activity-data (first (:entries new-board-data))]
     (save-last-used-section (:slug new-board-data))
@@ -384,15 +384,15 @@
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid new-board-data)))
-    (dis/dispatch! [:entry-publish-with-board/finish new-board-data])
+    (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
     ;; Send item read
     (send-item-read (:uuid saved-activity-data))))
 
-(defn entry-publish-with-board-cb [entry-uuid {:keys [status success body]}]
+(defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
     ; Board name already exists
     (dis/dispatch! [:section-edit/error "Board name already exists or isn't allowed"])
-    (entry-publish-with-board-finish entry-uuid (when success (json->cljs body)))))
+    (entry-publish-with-board-finish entry-uuid edit-key (when success (json->cljs body)))))
 
 (defn entry-publish [entry-editing section-editing & [edit-key]]
   (let [fixed-entry-editing (assoc entry-editing :status "published")
@@ -402,7 +402,7 @@
       (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
             final-board-data (assoc section-editing :entries [fixed-entry-data])]
         (api/create-board final-board-data (:invite-note section-editing)
-         (partial entry-publish-with-board-cb (:uuid fixed-entry-editing))))
+         (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
       (let [entry-exists? (seq (:links fixed-entry-editing))
             org-slug (router/current-org-slug)
             board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-entry-editing))
