@@ -522,6 +522,7 @@ div.dashboard-layout {
 
                 &.compose-type-video:before {
                   background-image: cdnUrl("/img/ML/video_green.svg");
+                  background-size: 16px 10px;
                 }
 
                 &.compose-type-post:before {
