@@ -22,21 +22,20 @@
 (def scroll-card-threshold 5)
 (def card-avg-height 372)
 
-(def last-scroll (atom 0))
-
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
   [s e]
   (let [scroll-top (.-scrollTop (.-scrollingElement js/document))
-        direction (if (> @last-scroll scroll-top)
-                    :down
-                    (if (< @last-scroll scroll-top)
-                      :up
+        direction (if (> @(::last-scroll s) scroll-top)
+                    :up
+                    (if (< @(::last-scroll s) scroll-top)
+                      :down
                       :stale))
         min-scroll 60
         max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))]
     ;; scrolling up
-    (when (and @(::has-next s)
+    (when (and (not @(::top-loading s))
+               @(::has-prev s)
                (not @(::scroll-to-entry s))
                (= direction :up)
                (<= scroll-top min-scroll))
@@ -45,12 +44,12 @@
       ;; if the user is close to the top margin, load more results if there is a link
       (cond
         (= (router/current-board-slug) "all-posts")
-        (activity-actions/all-posts-more @(::has-next s) :up)
+        (activity-actions/all-posts-more @(::has-prev s) :up)
         (= (router/current-board-slug) "must-see")
-        (activity-actions/must-see-more @(::has-next s) :up))
-      (reset! (::has-next s) false))
+        (activity-actions/must-see-more @(::has-prev s) :up)))
     ;; scrolling down
-    (when (and @(::has-prev s)
+    (when (and (not @(::bottom-loading s))
+               @(::has-next s)
                (= direction :down)
                (>= scroll-top (- max-scroll (* scroll-card-threshold card-avg-height))))
       ;; Show a spinner at the bottom
@@ -58,12 +57,11 @@
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
         (= (router/current-board-slug) "all-posts")
-        (activity-actions/all-posts-more @(::has-prev s) :down)
+        (activity-actions/all-posts-more @(::has-next s) :down)
         (= (router/current-board-slug) "must-see")
-        (activity-actions/must-see-more @(::has-prev s) :down))
-      (reset! (::has-prev s) false)))
-  ;; Save the last scrollTop value
-  (reset! last-scroll (.-scrollTop (.-body js/document))))
+        (activity-actions/must-see-more @(::has-next s) :down)))
+    ;; Save the last scrollTop value
+    (reset! (::last-scroll s) scroll-top)))
 
 (defn- ap-seen-mixin-cb [_ item-uuid]
   (activity-actions/ap-seen-events-gate item-uuid))
@@ -78,8 +76,8 @@
   (let [container-data @(drv/get-ref s :container-data)
         sorted-items (sorted-posts @(drv/get-ref s :filtered-posts))
         direction (:direction container-data)
-        next-link (utils/link-for (:links container-data) "previous")
-        prev-link (utils/link-for (:links container-data) "next")
+        next-link (utils/link-for (:links container-data) "next")
+        prev-link (utils/link-for (:links container-data) "previous")
         ap-initial-at @(drv/get-ref s :ap-initial-at)]
     ;; First load or subsequent load more with
     ;; different set of items
@@ -91,17 +89,14 @@
             scroll-to-entry (get sorted-items last-new-entry-idx)]
         (reset! (::last-direction s) :up)
         (reset! (::scroll-to-entry s) scroll-to-entry))
-      (do
-        (when ap-initial-at
-          (reset!
-           (::scroll-to-entry s)
-           (first (filter #(= (:published-at %) ap-initial-at) sorted-items))))))
-    (when next-link
-      (reset! (::has-next s) next-link))
-    (if prev-link
-      (do
-        (reset! (::has-prev s) prev-link)
-        (reset! (::show-all-caught-up-message s) false))
+      (when ap-initial-at
+        (reset!
+         (::scroll-to-entry s)
+         (first (filter #(= (:published-at %) ap-initial-at) sorted-items)))))
+    (reset! (::has-prev s) prev-link)
+    (reset! (::has-next s) next-link)
+    (if next-link
+      (reset! (::show-all-caught-up-message s) false)
       (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))))
 
 (rum/defcs all-posts  < rum/reactive
@@ -112,6 +107,7 @@
                         (drv/drv :activities-read)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
+                        (rum/local 0 ::last-scroll)
                         (rum/local false ::has-next)
                         (rum/local false ::has-prev)
                         (rum/local nil ::scroll-to-entry)
@@ -137,7 +133,7 @@
                          :did-mount (fn [s]
                           (when (or (= (router/current-board-slug) "all-posts")
                                     (= (router/current-board-slug) "must-see"))
-                            (reset! last-scroll (.-scrollTop (.-body js/document)))
+                            (reset! (::last-scroll s) (.-scrollTop (.-body js/document)))
                             (reset! (::scroll-listener s)
                              (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                             (check-pagination s))
@@ -155,11 +151,9 @@
                           (let [container-data @(drv/get-ref s :container-data)]
                             (when-not (:loading-more container-data)
                               (when @(::top-loading s)
-                                (reset! (::top-loading s) false)
-                                (reset! (::has-next s) nil))
+                                (reset! (::top-loading s) false))
                               (when @(::bottom-loading s)
                                 (reset! (::bottom-loading s) false)
-                                (reset! (::has-prev s) nil)
                                 (reset! (::show-all-caught-up-message s) true))))
                           s)
                          :will-unmount (fn [s]
