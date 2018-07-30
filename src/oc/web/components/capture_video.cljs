@@ -306,6 +306,11 @@
         (ziggeo-recorder {:submit-cb update-video-token
                           :start-cb (partial video-record-started s)
                           :pick-cover-start-cb (partial video-record-stopped s)
+                          :rerecord-cb #(do
+                                         (reset! (::show-good-human-banner s) false)
+                                         (reset! (::show-post-editor s) false)
+                                         (reset! (::blue-header s) false)
+                                         (reset! (::title s) [:span "Rerecord video post"]))
                           :upload-started-cb #(do
                                                 (when (activity-actions/should-show-good-human-banner?)
                                                   (reset! (::show-good-human-banner s) true))

@@ -40,16 +40,18 @@
     [:div.ziggeo-player-embed
       {:ref :ziggeo-player}]])
 
-(rum/defcs ziggeo-recorder <  (rum/local false ::upload-started-called)
-                              (rum/local nil ::recorder-instance)
+(rum/defcs ziggeo-recorder <  (rum/local nil ::recorder-instance)
+                              (rum/local false ::uploading)
                               {:will-unmount (fn [s]
                                 (when-let [recorder-instance @(::recorder-instance s)]
-                                  (.destroy recorder-instance))
+                                  (when-not @(::uploading s)
+                                    (.destroy recorder-instance)))
                                 s)
                                :did-mount (fn [s]
                                (let [args (into [] (:rum/args s))
                                      {:keys [submit-cb start-cb cancel-cb width height
-                                             pick-cover-start-cb pick-cover-end-cb upload-started-cb]
+                                             pick-cover-start-cb pick-cover-end-cb upload-started-cb
+                                             rerecord-cb]
                                       :or {width 640
                                            height 480}} (first (:rum/args s))
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
@@ -62,7 +64,6 @@
                                                :attrs attrs}
                                        Recorder (.. js/ZiggeoApi -V2 -Recorder)
                                        recorder-instance (Recorder. (clj->js config))]
-                                   (js/console.log "XXX config" (clj->js config) "attrs" (clj->js attrs) "profiles:" ls/oc-ziggeo-profiles)
                                    (reset! (::recorder-instance s) recorder-instance)
                                    (.activate recorder-instance)
                                    (.on recorder-instance "upload_selected"
@@ -74,8 +75,8 @@
                                     (fn [a b]
                                      (timbre/debug "upload_progress" a b (fn? upload-started-cb))
                                      (when (and (fn? upload-started-cb)
-                                                (not @(::upload-started-called s)))
-                                       (reset! (::upload-started-called s) true)
+                                                (not @(::uploading s)))
+                                       (reset! (::uploading s) true)
                                        (upload-started-cb))))
                                    (.on recorder-instance "recording"
                                     (fn []
@@ -88,6 +89,7 @@
                                    (.on recorder-instance "error"
                                     (fn []
                                      (timbre/debug "error")
+                                     (reset! (::uploading s) false)
                                      (na/show-notification {:title "Error processing your video."
                                                             :description "An error occurred while processing your video, please try again."
                                                             :id :ziggeo-video-error
@@ -99,20 +101,27 @@
                                       (timbre/debug "picking_cover")
                                       (when (fn? pick-cover-start-cb)
                                         (pick-cover-start-cb))))
-                                   (.on recorder-instance "pick_cover_end"
+                                   (.on recorder-instance "upload_start"
                                     (fn [a]
                                       (timbre/debug "picking_cover_end" a)
                                       (when (fn? pick-cover-end-cb)
                                         (pick-cover-end-cb a))))
+                                   (.on recorder-instance "rerecord"
+                                    (fn []
+                                     (reset! (::uploading s) false)
+                                     (when (fn? rerecord-cb)
+                                      (rerecord-cb))))
                                    (.on recorder-instance "processed"
                                     (fn []
                                      (timbre/debug "processed" (.get recorder-instance "video"))
+                                     (reset! (::uploading s) false)
                                      (na/show-notification {:title "Video uploaded and processed!"
                                                             :id :ziggeo-video-processed
                                                             :expire 5})
                                      (submit-cb (.get recorder-instance "video"))))))
                                s)} 
-  [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb pick-cover-end-cb upload-started-cb]
+  [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb
+             pick-cover-end-cb upload-started-cb rerecord-cb]
       :or {width 640
            height 480}}]
   [:div.ziggeo-recorder
