@@ -185,7 +185,12 @@ div.capture-video {
 
         video {
           border-top-left-radius: 6px;
-          border-top-right-radius: 6px;          
+          border-top-right-radius: 6px;
+        }
+
+        video + img {
+          border-top-left-radius: 6px;
+          border-top-right-radius: 6px;
         }
       }
     }
@@ -323,7 +328,7 @@ div.capture-video {
         min-height: 28px;
         line-height: 28px;
         margin-top: 24px;
-        opacity: 0.5;
+        color: white;
 
         @include tablet() {
           width: 100%;
@@ -338,6 +343,7 @@ div.capture-video {
           color: white !important;
           font-style: none;
           height: 28px;
+          color: rgba(white, 0.5);
         }
       }
 
@@ -362,7 +368,6 @@ div.capture-video {
           @include avenir_R();
           font-size: 16px;
           line-height: 22px;
-          opacity: 0.5;
 
           @media screen and (min-height: 556px) {
             min-height: 240px;
@@ -387,7 +392,7 @@ div.capture-video {
           }
 
           &.medium-editor-placeholder:after {
-            color: white !important;
+            color: rgba(white, 0.5) !important;
           }
 
           &:after {
