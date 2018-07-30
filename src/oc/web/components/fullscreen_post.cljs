@@ -518,7 +518,7 @@
                   [:div.fullscreen-post-transcript-header
                     "This transcript was automatically generated and may not be accurate"]
                   [:div.fullscreen-post-transcript-content
-                    {:dangerouslySetInnerHTML (utils/emojify (:video-transcript activity-data))}]]))
+                    (:video-transcript activity-data)]]))
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             (if editing
