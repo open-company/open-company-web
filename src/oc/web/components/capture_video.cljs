@@ -303,8 +303,7 @@
                       (small-loading))
                     "Save to draft"]))]))]
       [:div.capture-video-body
-        (ziggeo-recorder {:submit-cb update-video-token
-                          :start-cb (partial video-record-started s)
+        (ziggeo-recorder {:start-cb (partial video-record-started s)
                           :pick-cover-start-cb (partial video-record-stopped s)
                           :rerecord-cb #(do
                                          (reset! (::show-good-human-banner s) false)

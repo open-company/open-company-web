@@ -42,10 +42,15 @@
 
 (rum/defcs ziggeo-recorder <  (rum/local nil ::recorder-instance)
                               (rum/local false ::uploading)
+                              (rum/local false ::mounted)
                               {:will-unmount (fn [s]
+                                (reset! (::mounted s) false)
                                 (when-let [recorder-instance @(::recorder-instance s)]
                                   (when-not @(::uploading s)
                                     (.destroy recorder-instance)))
+                                s)
+                               :will-mount (fn[s]
+                                (reset! (::mounted s) true)
                                 s)
                                :did-mount (fn [s]
                                (let [args (into [] (:rum/args s))
@@ -77,7 +82,12 @@
                                      (when (and (fn? upload-started-cb)
                                                 (not @(::uploading s)))
                                        (reset! (::uploading s) true)
-                                       (upload-started-cb))))
+                                       (upload-started-cb))
+                                     (when-not @(::mounted s)
+                                       (na/show-notification {:title "Video is uploading."
+                                                              :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")
+                                                              :id :ziggeo-video-upload
+                                                              :expire 5}))))
                                    (.on recorder-instance "recording"
                                     (fn []
                                      (timbre/debug "recording")
@@ -85,11 +95,19 @@
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processing"
                                     (fn [a]
-                                     (timbre/debug "processing" a)))
+                                     (timbre/debug "processing" a)
+                                     (when-not @(::mounted s)
+                                       (na/remove-notification-by-id :ziggeo-video-upload)
+                                       (na/show-notification {:title "Video is processing."
+                                                              :description (str "Progress: " (int (* a 100)) "%.")
+                                                              :id :ziggeo-video-processing
+                                                              :expire 5}))))
                                    (.on recorder-instance "error"
                                     (fn []
                                      (timbre/debug "error")
                                      (reset! (::uploading s) false)
+                                     (na/remove-notification-by-id :ziggeo-video-upload)
+                                     (na/remove-notification-by-id :ziggeo-video-processing)
                                      (na/show-notification {:title "Error processing your video."
                                                             :description "An error occurred while processing your video, please try again."
                                                             :id :ziggeo-video-error
@@ -115,10 +133,12 @@
                                     (fn []
                                      (timbre/debug "processed" (.get recorder-instance "video"))
                                      (reset! (::uploading s) false)
-                                     (na/show-notification {:title "Video uploaded and processed!"
-                                                            :id :ziggeo-video-processed
-                                                            :expire 5})
-                                     (submit-cb (.get recorder-instance "video"))))))
+                                     (when @(::mounted s)
+                                       (na/show-notification {:title "Video uploaded and processed!"
+                                                              :id :ziggeo-video-processed
+                                                              :expire 5}))
+                                     (when (fn? submit-cb)
+                                      (submit-cb (.get recorder-instance "video")))))))
                                s)} 
   [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb
              pick-cover-end-cb upload-started-cb rerecord-cb]

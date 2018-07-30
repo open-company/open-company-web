@@ -340,10 +340,9 @@ div.capture-video {
         &:empty:before {
           content: attr(placeholder);
           display: inline-block;
-          color: white !important;
           font-style: none;
           height: 28px;
-          color: rgba(white, 0.5);
+          color: rgba(white, 0.5) !important;
         }
       }
 

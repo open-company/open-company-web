@@ -419,6 +419,12 @@ div.fullscreen-post-container {
             background-color: transparent;
             border: none;
             outline: none;
+            resize: none;
+            min-height: 80px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
           }
 
           div.fullscreen-post-transcript-header {

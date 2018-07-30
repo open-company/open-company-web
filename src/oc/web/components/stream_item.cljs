@@ -183,18 +183,18 @@
                    :data-itemuuid (:uuid activity-data)
                    :class (utils/class-set {:wrt-truncated truncated?
                                             :wrt-expanded expanded?})
-                   :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]
-              (when (and expanded?
-                         (:video-transcript activity-data))
-                [:div.stream-item-transcript
-                  [:div.stream-item-transcript-header
-                    "This transcript was automatically generated and may not be accurate"]
-                  [:div.stream-item-transcript-content
-                    {:dangerouslySetInnerHTML (utils/emojify (:video-transcript activity-data))}]])]]
+                   :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
             (when has-video
               (rum/with-key
                (ziggeo-player (:video-id activity-data) nil (if expanded? 640 200) (if expanded? 480 150))
-                (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))]
+                (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))
+            (when (and expanded?
+                       (:video-transcript activity-data))
+              [:div.stream-item-transcript
+                [:div.stream-item-transcript-header
+                  "This transcript was automatically generated and may not be accurate"]
+                [:div.stream-item-transcript-content
+                  (:video-transcript activity-data)]])]
           (when (or (not is-mobile?) expanded?)
             (stream-attachments activity-attachments
              (when (and truncated? (not expanded?))

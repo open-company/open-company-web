@@ -12,6 +12,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.actions.comment :as comment-actions]
@@ -113,6 +114,7 @@
   (remove-autosave state)
   (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
   (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
+  (ui-utils/resize-textarea (rum/ref-node state "transcript-edit"))
   (when (and focus
              (= (.-activeElement js/document) (.-body js/document)))
     (utils/after 1000
@@ -144,6 +146,7 @@
   (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
     (when (:video-id editing-data)
       (when-let [transcription-el (rum/ref-node state "transcript-edit")]
+        (js/console.log "XXX new transcription" (.-value transcription-el))
         (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
 (defn- save-editing? [state]
@@ -249,7 +252,6 @@
         (when (au/is-element-bottom-visible? body-el)
           (activity-actions/wrt-events-gate (:uuid activity-data)))))))
 
-
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
                              (drv/drv :fullscreen-post-data)
@@ -344,6 +346,10 @@
                                  EventType/SCROLL
                                  #(send-item-read-if-needed s)))
                                (send-item-read-if-needed s)
+                               (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                               s)
+                              :did-remount (fn [_ s]
+                               (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                                s)
                               :will-unmount (fn [s]
                                (when @(::window-click s)
@@ -480,12 +486,6 @@
                        (not editing))
               [:div.must-see
                {:class (utils/class-set {:must-see-on (:must-see activity-data)})}])
-            ;; Video element
-            (when (and video-id
-                       (not @(::record-video s)))
-              (ziggeo-player video-id (when editing remove-video-cb)))
-            (when @(::record-video s)
-              (ziggeo-recorder video-uploaded-cb))
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)
@@ -501,12 +501,19 @@
                 {:key (str "fullscreen-post-body-" (:updated-at activity-data))
                  :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
+            ;; Video element
+            (when (and video-id
+                       (not @(::record-video s)))
+              (ziggeo-player video-id (when editing remove-video-cb)))
+            (when @(::record-video s)
+              (ziggeo-recorder video-uploaded-cb))
             (when (:video-transcript activity-data)
               (if editing
                 [:div.fullscreen-post-transcript
                   [:textarea.fullscreen-post-transcript-edit
-                    {:ref "transcript-edit"}
-                    (:video-transcript activity-data)]]
+                    {:ref "transcript-edit"
+                     :on-input #(ui-utils/resize-textarea (.-target %))
+                     :default-value (:video-transcript activity-data)}]]
                 [:div.fullscreen-post-transcript
                   [:div.fullscreen-post-transcript-header
                     "This transcript was automatically generated and may not be accurate"]

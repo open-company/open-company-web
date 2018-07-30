@@ -10,6 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
@@ -229,6 +230,10 @@
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
+                          (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                          s)
+                         :did-remount (fn [_ s]
+                          (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                           s)
                          :before-render (fn [s]
                           ;; Set or remove the onBeforeUnload prompt
@@ -437,8 +442,9 @@
           (when (:video-id entry-editing)
             [:div.entry-edit-transcript
               [:textarea.video-transcript
-                {:ref "transcript-edit"}
-                (:video-transcript entry-editing)]])
+                {:ref "transcript-edit"
+                 :on-input #(ui-utils/resize-textarea (.-target %))
+                 :default-value (:video-transcript entry-editing)}]])
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
            #(activity-actions/remove-attachment :entry-editing %))]
