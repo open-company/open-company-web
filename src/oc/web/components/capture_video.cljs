@@ -298,7 +298,7 @@
                                   (remove-autosave s)
                                   (clean-body)
                                   (reset! (::saving s) true)
-                                  (activity-actions/entry-save (assoc @(drv/get-ref s :capture-video) :status "draft") @(drv/get-ref s :section-editing))))}
+                                  (activity-actions/entry-save (assoc @(drv/get-ref s :capture-video) :status "draft") @(drv/get-ref s :section-editing) :capture-video)))}
                     (when working?
                       (small-loading))
                     "Save to draft"]))]))]

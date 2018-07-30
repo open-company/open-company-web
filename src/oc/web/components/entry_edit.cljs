@@ -134,7 +134,7 @@
   (let [editing-data @(drv/get-ref s :entry-editing)]
     (when (:video-id editing-data)
       (when-let [transcription-el (rum/ref-node s "transcript-edit")]
-        (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})])))))
+        (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
 (defn- is-publishable? [entry-editing]
   (seq (:board-slug entry-editing)))
