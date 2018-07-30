@@ -167,10 +167,7 @@
         board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        can-compose (or (and (not board-data)
-                             (pos? (count all-boards)))
-                        (and board-data
-                             (not (:read-only board-data))))
+        can-compose (pos? (count all-boards))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
       [:div.dashboard-layout.group
