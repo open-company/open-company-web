@@ -32,8 +32,8 @@
 
 (defn setup-timeout [s]
   (when @(::timeout s)
-    (reset! (::timeout s) nil)
-    (js/clearTimeout @(::timeout s)))
+    (js/clearTimeout @(::timeout s))
+    (reset! (::timeout s) nil))
   (let [n-data (first (:rum/args s))]
     (reset! (::old-expire s) (:expire n-data))
     (when (pos? (:expire n-data))
