@@ -68,7 +68,8 @@
 
 (defn get-board-for-edit [s]
   (let [board-data @(drv/get-ref s :board-data)]
-    (if-not board-data
+    (if (or (not board-data)
+            (= (:slug board-data) utils/default-drafts-board-slug))
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -167,10 +168,7 @@
         board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        can-compose (or (and (not board-data)
-                             (pos? (count all-boards)))
-                        (and board-data
-                             (not (:read-only board-data))))
+        can-compose (pos? (count all-boards))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
       [:div.dashboard-layout.group
