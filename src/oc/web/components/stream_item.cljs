@@ -204,7 +204,7 @@
               [:div.stream-body-draft-edit
                 [:button.mlb-reset.edit-draft-bt
                   {:on-click #(activity-actions/activity-edit activity-data)}
-                  "Continue writing"]]
+                  "Continue editing"]]
               [:div.stream-body-draft-delete
                 [:button.mlb-reset.delete-draft-bt
                   {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
