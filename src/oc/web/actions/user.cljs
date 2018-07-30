@@ -161,7 +161,7 @@
     (dis/dispatch! [:login-with-slack])))
 
 (defn login-with-google [auth-url]
-  (router/redirect! auth-url)
+  (router/redirect! (:href auth-url))
   (dis/dispatch! [:login-with-google]))
 
 (defn refresh-slack-user []

@@ -107,8 +107,9 @@
           {:on-click #(do
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                             {:auth-source "slack"})]
-                         (user-actions/login-with-google google-auth-link)))
+                                                            {:auth-source "google"})]
+                         (timbre/debug auth-settings auth-link)
+                         (user-actions/login-with-google auth-link)))
            :on-touch-start identity}
           [:div.signin-with-google-content
             "Sign In with "

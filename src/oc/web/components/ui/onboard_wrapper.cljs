@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -88,6 +89,7 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                             {:auth-source "google"})]
+                         (timbre/debug auth-settings auth-link)
                          (user-actions/login-with-google auth-link)))}
           [:div.signup-with-google-content
             "Sign Up with "
