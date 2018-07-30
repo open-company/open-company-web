@@ -68,7 +68,8 @@
 
 (defn get-board-for-edit [s]
   (let [board-data @(drv/get-ref s :board-data)]
-    (if-not board-data
+    (if (or (not board-data)
+            (= (:slug board-data) utils/default-drafts-board-slug))
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
