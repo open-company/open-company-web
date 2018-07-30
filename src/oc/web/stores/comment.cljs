@@ -49,10 +49,10 @@
   [db [_ activity-data comment-body comments-key]]
   (let [comments-data (get-in db comments-key)
         new-comment-data (parse-comment {:body comment-body
-                                                          :created-at (utils/as-of-now)
-                                                          :author {:name (jwt/get-key :name)
-                                                                   :avatar-url (jwt/get-key :avatar-url)
-                                                                   :user-id (jwt/get-key :user-id)}})
+                                         :created-at (utils/as-of-now)
+                                         :author {:name (jwt/get-key :name)
+                                                  :avatar-url (jwt/get-key :avatar-url)
+                                                  :user-id (jwt/get-key :user-id)}})
         new-comments-data (sort-comments (conj comments-data new-comment-data))]
     (assoc-in db comments-key new-comments-data)))
 
@@ -109,6 +109,9 @@
         (assoc-in db comments-key new-comments-data))
       db)))
 
+(defn inc-time [t]
+  (.getTime (js/Date. (inc (.getTime (js/Date. t))))))
+
 (defmethod dispatcher/action :comment-save
   [db [_ comments-key activity-uuid comment-data new-body]]
   (let [item-uuid (:uuid comment-data)
@@ -116,7 +119,8 @@
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
     (if comment-idx
       (let [comment-data (nth comments-data comment-idx)
-            with-new-comment (assoc comment-data :body new-body)
+            with-new-comment (merge comment-data {:body new-body
+                                                  :updated-at (inc-time (:updated-at comment-data))})
             new-comments-data (assoc comments-data comment-idx with-new-comment)]
         (assoc-in db comments-key new-comments-data))
       db)))
@@ -177,5 +181,5 @@
           with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
       (-> db
         (assoc-in comments-key sorted-comments-data)
-        (assoc-in (vec (concat board-key [:fixed-items activity-uuid])) with-authors)))
+        (assoc-in (dispatcher/activity-key (second board-key) activity-uuid) with-authors)))
     db))

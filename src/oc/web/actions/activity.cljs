@@ -25,7 +25,7 @@
 (defn watch-boards [posts-data]
   (when (jwt/jwt) ; only for logged in users
     (let [board-slugs (distinct (map :board-slug
-                                     (map second (:fixed-items posts-data))))
+                                     (map second posts-data)))
           org-data (dis/org-data)
           org-boards (:boards org-data)
           org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
@@ -53,9 +53,9 @@
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
-          all-posts-key (dis/all-posts-key org)
+          posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-all-posts (:collection all-posts-data) (dis/change-data))
+          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))
           should-404? (and from
                            (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
@@ -89,7 +89,7 @@
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           must-see-data (when success (json->cljs body))
-          must-see-posts (au/fix-all-posts (:collection must-see-data))]
+          must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data))]
       (when (= (router/current-board-slug) "must-see")
         (save-last-used-section "must-see"))
       (watch-boards must-see-posts)
@@ -101,6 +101,18 @@
           must-see-filter (str activity-href "?must-see=true")
           must-see-link (assoc activity-link :href must-see-filter)]
       (api/get-all-posts must-see-link nil (partial must-see-get-finish)))))
+
+(defn must-see-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (json->cljs body)))))
+  (dis/dispatch! [:must-see-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+
+(defn must-see-more [more-link direction]
+  (let [more-href (:href more-link)
+        more-must-see-filter (str more-href "&must-see=true")
+        more-must-see-link (assoc more-link :href more-must-see-filter)]
+    (api/load-more-all-posts more-must-see-link direction (partial must-see-more-finish direction))
+    (dis/dispatch! [:must-see-more (router/current-org-slug)])))
 
 ;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]
@@ -253,18 +265,12 @@
 (declare send-item-read)
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
-  (let [org-slug (router/current-org-slug)
-        activity-board-slug (if (= (:status activity-data) "published")
-                              (if (or (:from-all-posts @router/path) (= (router/current-board-slug) "all-posts"))
-                                :all-posts
-                                board-slug)
-                              utils/default-drafts-board-slug)
-        board-key (dis/board-data-key org-slug activity-board-slug)]
+  (let [org-slug (router/current-org-slug)]
     (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
-    (dis/dispatch! [:entry-save/finish activity-data edit-key board-key])
+    (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
     (when (= (:status activity-data) "published")
       (send-item-read (:uuid activity-data)))))
@@ -415,10 +421,10 @@
     (refresh-org-data)
     (let [org-slug (router/current-org-slug)
           org-data (dis/org-data)
-          boards-no-draft (sort-by :name (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
-          board-key (dis/board-data-key org-slug (router/current-board-slug))
-          board-data (get-in @dis/app-state board-key)]
-      (when (zero? (count (:fixed-items board-data)))
+          boards-no-draft (sort-by :name
+                           (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
+          filtered-posts-data (dis/filtered-posts-data)]
+      (when (zero? (count filtered-posts-data))
         (utils/after
          100
          #(router/nav!
@@ -430,7 +436,7 @@
 
 (defn activity-delete [activity-data]
   (api/delete-activity activity-data activity-delete-finish)
-  (dis/dispatch! [:activity-delete (dis/current-board-key) activity-data]))
+  (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data]))
 
 (defn activity-move [activity-data board-data]
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
@@ -473,7 +479,7 @@
 (defn activity-change [section-uuid activity-uuid]
   (let [org-data (dis/org-data)
         section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
-        activity-data (dis/activity-data (:slug org-data) (:slug section-data) activity-uuid)]
+        activity-data (dis/activity-data (:slug org-data) activity-uuid)]
     (when activity-data
       (get-entry activity-data))))
 
@@ -494,11 +500,15 @@
             activity-uuid (:item-id change-data)
             section-uuid (:container-id change-data)
             change-type (:change-type change-data)]
+        (when (= change-type :delete)
+          (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid activity-uuid}]))
         ;; Refresh the AP in case of items added or removed
-        (when (and (or (= change-type :add)
-                       (= change-type :delete))
-                   (= (router/current-board-slug) "all-posts"))
-          (all-posts-get (dis/org-data) (dis/ap-initial-at)))
+        (when (or (= change-type :add)
+                  (= change-type :delete))
+          (when (= (router/current-board-slug) "all-posts")
+            (all-posts-get (dis/org-data) (dis/ap-initial-at)))
+          (when (= (router/current-board-slug) "must-see")
+            (must-see-get (dis/org-data))))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
           (activity-change section-uuid activity-uuid)))))
@@ -515,7 +525,7 @@
   "Actually send the seen. Needs to get the activity data from the app-state
   to read the published-at and make sure it's still inside the TTL."
   [activity-id]
-  (when-let* [activity-data (dis/activity-data (router/current-org-slug) (router/current-board-slug) activity-id)
+  (when-let* [activity-data (dis/activity-data (router/current-org-slug) activity-id)
               publisher-id (:user-id (:publisher activity-data))
               container-id (:board-uuid activity-data)
               published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
@@ -557,7 +567,7 @@
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
   [activity-id]
-  (when-let* [activity-key (dis/activity-key (router/current-org-slug) (router/current-board-slug) activity-id)
+  (when-let* [activity-key (dis/activity-key (router/current-org-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               org-id (:uuid (dis/org-data))
               container-id (:board-uuid activity-data)
@@ -588,20 +598,16 @@
 
 (defn toggle-must-see [activity-data]
   (let [must-see (:must-see activity-data)
-        must-see-toggled (assoc activity-data :must-see (not must-see))
+        must-see-toggled (update-in activity-data [:must-see] not)
         org-data (dis/org-data)
         must-see-count (:must-see-count dis/org-data)
         new-must-see-count (if-not must-see
-                              (inc must-see-count)
-                              (dec must-see-count))]
+                             (inc must-see-count)
+                             (dec must-see-count))]
     (dis/dispatch! [:org-loaded
                     (assoc org-data :must-see-count new-must-see-count)
                     false])
-    (dis/dispatch! [:activity-get/finish
-                    nil
-                    (router/current-org-slug)
-                    must-see-toggled
-                    nil])
+    (dis/dispatch! [:must-see-toggle (router/current-org-slug) must-see-toggled])
     (api/update-entry must-see-toggled :must-see
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success

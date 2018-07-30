@@ -141,11 +141,11 @@
         loading (or (and ;; if is board page
                          (not (contains? query-params :ap))
                          ;; if the board data are not present
-                         (not (:fixed-items (dis/board-data))))
+                         (not (dis/posts-data)))
                          ;; if the all-posts data are not preset
                     (and (contains? query-params :ap)
                          ;; this latter is used when displaying modal over AP
-                         (not (:fixed-items (dis/all-posts-data)))))
+                         (not (dis/posts-data))))
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
@@ -233,7 +233,7 @@
     (when (or ;; if the company data are not present
               (not (dis/board-data))
               ;; or the entries key is missing that means we have only
-              (not (:fixed-items (dis/board-data)))
+              (not (:posts-list (dis/board-data)))
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))

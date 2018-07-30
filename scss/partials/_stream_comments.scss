@@ -194,7 +194,7 @@ div.stream-comments {
           }
         }
 
-        div.stream-comment-reaction {
+        button.stream-comment-reaction {
           padding-top: 4px;
           height: 24px;
           @include avenir_M();

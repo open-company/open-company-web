@@ -97,6 +97,7 @@
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-all-posts (or (:from-all-posts @router/path)
                          (= (router/current-board-slug) "all-posts"))
+        is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         publisher (if is-drafts-board
                     (first (:author activity-data))
@@ -129,9 +130,9 @@
           (user-avatar-image publisher)
           [:div.name.fs-hide
             (str (:name publisher)
-              (when (or is-all-posts is-drafts-board)
+              (when (or is-all-posts is-must-see is-drafts-board)
                 " in ")
-              (when (or is-all-posts is-drafts-board)
+              (when (or is-all-posts is-must-see is-drafts-board)
                 (:board-name activity-data)))
             [:div.new-tag "NEW"]]
           [:div.time-since

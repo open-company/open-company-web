@@ -2,7 +2,8 @@
   (:require [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [taoensso.timbre :as timbre]
-            [oc.web.router :as router]))
+            [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]))
 
 (defonce app-state (atom {:loading false
                           :show-login-overlay false}))
@@ -26,11 +27,8 @@
 (defn boards-key [org-slug]
   (vec (conj (org-key org-slug) :boards)))
 
-(defn all-posts-key [org-slug]
-  (vec (concat (boards-key org-slug) [:all-posts :board-data])))
-
-(defn must-see-key [org-slug]
-  (vec (concat (boards-key org-slug) [:must-see :board-data])))
+(defn posts-data-key [org-slug]
+  (vec (conj (org-key org-slug) :posts)))
 
 (defn board-key [org-slug board-slug]
   (vec (conj (boards-key org-slug) (keyword board-slug))))
@@ -38,21 +36,24 @@
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
 
+(defn containers-key [org-slug]
+  (vec (conj (org-key org-slug) :container-data)))
+
+(defn container-key [org-slug posts-filter]
+  (vec (conj (containers-key org-slug) (keyword posts-filter))))
+
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
 
-(defn activity-key [org-slug board-slug activity-uuid]
-  (let [from-all-posts (or (= board-slug :all-posts) (:from-all-posts @router/path))
-        board-key (if from-all-posts
-                    (all-posts-key org-slug)
-                    (board-data-key org-slug board-slug))]
-    (vec (concat board-key [:fixed-items activity-uuid]))))
+(defn activity-key [org-slug activity-uuid]
+  (let [posts-key (posts-data-key org-slug)]
+    (vec (concat posts-key [activity-uuid]))))
 
-(defn comments-key [org-slug board-slug]
-  (vec (conj (board-key org-slug board-slug) :comments)))
+(defn comments-key [org-slug]
+  (vec (conj (org-key org-slug) :comments)))
 
-(defn activity-comments-key [org-slug board-slug activity-uuid]
-  (vec (conj (comments-key org-slug board-slug) activity-uuid :sorted-comments)))
+(defn activity-comments-key [org-slug activity-uuid]
+  (vec (conj (comments-key org-slug) activity-uuid :sorted-comments)))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -70,18 +71,7 @@
   []
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
-        ;; if we are coming from all-posts, must-see
-    (cond
-
-     (or (:from-all-posts @router/path) (= board-slug "all-posts"))
-     ;; We need to update the entry in all-posts data, not in the board data
-     (all-posts-key org-slug)
-
-     (= board-slug "must-see")
-     (must-see-key org-slug)
-
-     :default
-     (board-data-key org-slug board-slug))))
+     (board-data-key org-slug board-slug)))
 
 ;; Change related keys
 
@@ -93,6 +83,15 @@
 
 (def activities-read-key
   [:activities-read])
+
+(defn get-posts-for-board [posts-data board-slug]
+  (let [posts-list (vals posts-data)
+        filter-fn (if (= board-slug utils/default-drafts-board-slug)
+                    #(not= (:status %) "published")
+                    #(and (= (:board-slug %) board-slug)
+                                                 (= (:status %) "published")))
+        board-posts (map :uuid (filter filter-fn posts-list))]
+    (select-keys posts-data board-posts)))
 
 ;; Derived Data ================================================================
 
@@ -160,15 +159,28 @@
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
                              :query-params query-params})]
-   :all-posts        [[:base :org-slug]
-                          (fn [base org-slug]
-                            (when (and base org-slug)
-                              (get-in base (all-posts-key org-slug))))]
-   :must-see        [[:base :org-slug]
-                          (fn [base org-slug]
-                            (when (and base org-slug)
-                              (get-in base (must-see-key org-slug))))]
+   :container-data      [[:base :org-slug :board-slug]
+                         (fn [base org-slug board-slug]
+                           (timbre/debug (container-key org-slug board-slug))
+                           (when (and org-slug board-slug)
+                             (get-in base (container-key org-slug board-slug))))]
+   :posts-data          [[:base :org-slug]
+                         (fn [base org-slug]
+                           (when (and base org-slug)
+                             (get-in base (posts-data-key org-slug))))]
 
+   :filtered-posts      [[:base :org-data :posts-data :route]
+                         (fn [base org-data posts-data route]
+                           (when (and base org-data posts-data route)
+                             (let [org-slug (:slug org-data)
+                                   all-boards-slug (map :slug (:boards org-data))
+                                   container-slug (:board route)
+                                   is-board? ((set all-boards-slug) container-slug)]
+                              (if is-board?
+                                (get-posts-for-board posts-data container-slug)
+                                (let [container-key (container-key org-slug container-slug)
+                                      items-list (:posts-list (get-in base container-key))]
+                                  (zipmap items-list (map #(get posts-data %) items-list)))))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -197,19 +209,15 @@
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
                               (get-in base (board-data-key org-slug board-slug))))]
-   :section-stream-data [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (get-in base (board-data-key org-slug board-slug))))]
-   :activity-data       [[:base :org-slug :board-slug :activity-uuid]
-                          (fn [base org-slug board-slug activity-uuid]
-                            (get-in base (activity-key org-slug board-slug activity-uuid)))]
+   :activity-data       [[:base :org-slug :activity-uuid]
+                          (fn [base org-slug activity-uuid]
+                            (get-in base (activity-key org-slug activity-uuid)))]
    :secure-activity-data [[:base :org-slug :secure-id]
                           (fn [base org-slug secure-id]
                             (get-in base (secure-activity-key org-slug secure-id)))]
-   :comments-data       [[:base :org-slug :board-slug]
-                         (fn [base org-slug board-slug]
-                           (get-in base (comments-key org-slug board-slug)))]
+   :comments-data       [[:base :org-slug]
+                         (fn [base org-slug]
+                           (get-in base (comments-key org-slug)))]
    :edit-user-profile   [[:base]
                           (fn [base]
                             {:user-data (:edit-user-profile base)
@@ -299,19 +307,19 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :all-posts :activity-data :ap-initial-at :must-see
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :jwt]
-                            (fn [base orgs org-data board-data all-posts activity-data ap-initial-at must-see
-                                 show-section-editor show-section-add show-sections-picker entry-editing
-                                 mobile-menu-open jwt]
+                            (fn [base orgs org-data board-data container-data filtered-posts activity-data
+                                 ap-initial-at show-section-editor show-section-add show-sections-picker
+                                 entry-editing mobile-menu-open jwt]
                               {:show-onboard-overlay (:show-onboard-overlay base)
                                :jwt jwt
                                :orgs orgs
                                :org-data org-data
+                               :container-data container-data
                                :board-data board-data
-                               :all-posts-data all-posts
-                               :must-see-data must-see
+                               :posts-data filtered-posts
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
@@ -336,7 +344,9 @@
 ;; Action Loop =================================================================
 
 (defmulti action (fn [db [action-type & _]]
-                   (when (not= action-type :input)
+                   (when (and (not= action-type :input)
+                              (not= action-type :update)
+                              (not= action-type :entry-toggle-save-on-exit))
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 
@@ -404,23 +414,14 @@
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
 
-(defn all-posts-data
+(defn posts-data
   "Get org all posts data."
   ([]
-    (all-posts-data @app-state))
+    (posts-data @app-state))
   ([data]
-    (all-posts-data data (router/current-org-slug)))
+    (posts-data data (router/current-org-slug)))
   ([data org-slug]
-    (get-in data (all-posts-key org-slug))))
-
-(defn must-see-data
-  "Get org must-see data."
-  ([]
-    (must-see-data @app-state))
-  ([data]
-    (must-see-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (must-see-key org-slug))))
+    (get-in data (posts-data-key org-slug))))
 
 (defn board-data
   "Get board data."
@@ -433,18 +434,45 @@
   ([data org-slug board-slug]
     (get-in data (board-data-key org-slug board-slug))))
 
+(defn container-data
+  "Get container data."
+  ([]
+    (container-data @app-state))
+  ([data]
+    (container-data data (router/current-org-slug) (router/current-posts-filter)))
+  ([data org-slug]
+    (container-data data org-slug (router/current-posts-filter)))
+  ([data org-slug posts-filter]
+    (get-in data (container-key org-slug posts-filter))))
+
+(defn filtered-posts-data
+  ([]
+    (filtered-posts-data @app-state))
+  ([data]
+    (filtered-posts-data data (router/current-org-slug) (router/current-posts-filter)))
+  ([data org-slug]
+    (filtered-posts-data data org-slug (router/current-posts-filter)))
+  ([data org-slug posts-filter]
+    (let [org-data (org-data data org-slug)
+          all-boards-slug (map :slug (:boards org-data))
+          is-board? ((set all-boards-slug) posts-filter)
+          posts-data (get-in data (posts-data-key org-slug))]
+     (if is-board?
+       (get-posts-for-board posts-data posts-filter)
+       (let [container-key (container-key org-slug posts-filter)
+             items-list (:posts-list (get-in data container-key))]
+        (zipmap items-list (map #(get posts-data %) items-list)))))))
+
 (defn activity-data
   "Get activity data."
   ([]
-    (activity-data (router/current-org-slug) (router/current-board-slug) (router/current-activity-id) @app-state))
+    (activity-data (router/current-org-slug) (router/current-activity-id) @app-state))
   ([activity-id]
-    (activity-data (router/current-org-slug) (router/current-board-slug) activity-id @app-state))
-  ([board-slug activity-id]
-    (activity-data (router/current-org-slug) board-slug activity-id @app-state))
-  ([org-slug board-slug activity-id]
-    (activity-data org-slug board-slug activity-id @app-state))
-  ([org-slug board-slug activity-id data]
-    (let [activity-key (activity-key org-slug board-slug activity-id)]
+    (activity-data (router/current-org-slug) activity-id @app-state))
+  ([org-slug activity-id]
+    (activity-data org-slug activity-id @app-state))
+  ([org-slug activity-id data]
+    (let [activity-key (activity-key org-slug activity-id)]
       (get-in data activity-key))))
 
 (defn secure-activity-data
@@ -461,28 +489,26 @@
 
 (defn comments-data
   ([]
-    (comments-data (router/current-org-slug) (router/current-board-slug) @app-state))
-  ([org-slug board-slug]
-    (comments-data org-slug board-slug @app-state))
-  ([org-slug board-slug data]
-    (get-in data (comments-key org-slug board-slug))))
+    (comments-data (router/current-org-slug) @app-state))
+  ([org-slug]
+    (comments-data org-slug @app-state))
+  ([org-slug data]
+    (get-in data (comments-key org-slug))))
 
 (defn activity-comments-data
   ([]
     (activity-comments-data
      (router/current-org-slug)
-     (router/current-board-slug)
      (router/current-activity-id)
      @app-state))
   ([activity-uuid]
     (activity-comments-data
      (router/current-org-slug)
-     (router/current-board-slug)
      activity-uuid @app-state))
-  ([org-slug board-slug activity-uuid]
-    (activity-comments-data org-slug board-slug activity-uuid @app-state))
-  ([org-slug board-slug activity-uuid data]
-    (get-in data (activity-comments-key org-slug board-slug activity-uuid))))
+  ([org-slug activity-uuid]
+    (activity-comments-data org-slug activity-uuid @app-state))
+  ([org-slug activity-uuid data]
+    (get-in data (activity-comments-key org-slug activity-uuid))))
 
 (defn teams-data
   ([] (teams-data @app-state))
@@ -543,9 +569,6 @@
 (defn print-org-data []
   (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
 
-(defn print-all-posts-data []
-  (js/console.log (get-in @app-state (all-posts-key (router/current-org-slug)))))
-
 (defn print-team-data []
   (js/console.log (get-in @app-state (team-data-key (:team-id (org-data))))))
 
@@ -565,17 +588,15 @@
   (js/console.log
    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
-(defn print-activities-data []
+(defn print-container-data []
   (js/console.log
-   (get-in
-    @app-state
-    (conj (board-data-key (router/current-org-slug) (router/current-board-slug)) :fixed-items))))
+   (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activity-data []
   (js/console.log
    (get-in
     @app-state
-    (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
+    (activity-key (router/current-org-slug) (router/current-activity-id)))))
 
 (defn print-secure-activity-data []
   (js/console.log
@@ -588,37 +609,44 @@
    (get-in
     @app-state
     (conj
-     (activity-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id))
+     (activity-key (router/current-org-slug) (router/current-activity-id))
      :reactions))))
 
 (defn print-comments-data []
   (js/console.log
    (get-in
     @app-state
-    (comments-key (router/current-org-slug) (router/current-board-slug)))))
+    (comments-key (router/current-org-slug)))))
 
 (defn print-activity-comments-data []
   (js/console.log
    (get-in
     @app-state
-    (activity-comments-key (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))))
+    (activity-comments-key (router/current-org-slug) (router/current-activity-id)))))
 
 (defn print-entry-editing-data []
   (js/console.log (get @app-state :entry-editing)))
 
+(defn print-posts-data []
+  (js/console.log (get-in @app-state (posts-data-key (router/current-org-slug)))))
+
+(defn print-filtered-posts []
+  (js/console.log (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter))))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
-(set! (.-OCWebPrintAllPostsData js/window) print-all-posts-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
 (set! (.-OCWebPrintActivitiesReadData js/window) print-activities-read-data)
 (set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
-(set! (.-OCWebPrintActivitiesData js/window) print-activities-data)
+(set! (.-OCWebPrintContainerData js/window) print-container-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
 (set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
 (set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
 (set! (.-OCWebPrintCommentsData js/window) print-comments-data)
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
+(set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
+(set! (.-OCWebPrintPostsData js/window) print-posts-data)

@@ -90,9 +90,9 @@
   []
   (when-let [{:keys [user-type step] :as new-user-cookie} (get-new-user-cookie)]
     (when-let* [org-data (dis/org-data)
-                board-data (dis/board-data)]
+                posts-data (dis/posts-data)]
       (let [team-data (dis/team-data (:team-id org-data))
-            posts (vals (:fixed-items board-data))
+            posts (vals posts-data)
             first-post (first posts)
             first-post-author (when first-post
                                 (if (map? (:author first-post))
@@ -110,7 +110,7 @@
                                                 ;; from CarrotHQ
                                                 (= (:user-id first-post-author) default-first-post-user-id))
                                             ;; has no posts
-                                           (zero? (count (:fixed-items board-data)))))
+                                           (zero? (count posts))))
             can-proceed-to-second-step? (or ;; the user added a post
                                             (> (count posts) 1)
                                             ;; The user added a post but deleted our first
