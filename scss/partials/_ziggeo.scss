@@ -2,7 +2,7 @@ div.ziggeo-player {
   position: relative;
   border-radius: 6px;
 
-  div.ziggeo-player-embed, div.ziggeo-recorder-embed {
+  div.ziggeo-player-embed {
     border-radius: 6px;
     &>div {
       border-radius: 6px;
@@ -31,4 +31,31 @@ div.ziggeo-player {
     right: 16px;
     z-index: 1;
   }
+}
+
+div.ziggeo-recorder {
+  position: relative;
+  border-radius: 6px;
+
+  div.ziggeo-recorder-embed {
+    border-radius: 6px;
+    &>div {
+      border-radius: 6px;
+    }
+  }
+
+ button.remove-recorder-bt {
+    width: 40px;
+    height: 40px;
+    background-image: cdnUrl("/img/ML/modal_close_x.svg");
+    background-size: 40px;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    opacity: 0.7;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+  } 
+
 }

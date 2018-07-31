@@ -185,8 +185,9 @@ div.entry-edit-modal-container {
       margin: 56px auto 32px;
     }
 
-    div.entry-edit-modal-headline {
+    div.entry-edit-modal-section {
       width: 100%;
+      margin-top: 16px;
 
       @include mobile() {
         padding: 24px 24px 0px;
@@ -269,6 +270,7 @@ div.entry-edit-modal-container {
         word-wrap: break-word;
         min-height: 28px;
         line-height: 28px;
+        margin-top: 16px;
 
         @include tablet() {
           width: 100%;
@@ -337,10 +339,6 @@ div.entry-edit-modal-container {
             margin: 0;
           }
         }
-      }
-
-      div.ziggeo-player, div.ziggeo-recorder {
-        margin-top: 16px;
       }
 
       div.entry-edit-transcript {

@@ -147,10 +147,19 @@
                                       (submit-cb (.get recorder-instance "video")))))))
                                s)} 
   [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb
-             pick-cover-end-cb upload-started-cb rerecord-cb]
+             pick-cover-end-cb upload-started-cb rerecord-cb remove-recorder-cb]
       :or {width 640
            height 480}}]
   [:div.ziggeo-recorder
-    {:ref :ziggeo-recorder
-     :style {:width (str (or width 640) "px")
-             :height (str (+ (or height 480) 96) "px")}}])
+    {:style {:width (str (or width 640) "px")
+             :height (str (+ (or height 480) 96) "px")}}
+    (when (fn? remove-recorder-cb)
+      [:button.mlb-reset.remove-recorder-bt
+        {:on-click (fn [] (when (fn? remove-recorder-cb)
+                            (remove-recorder-cb)))
+         :data-toggle "tooltip"
+         :data-placement "top"
+         :data-container "body"
+         :title "Remove video"}])
+    [:div.ziggeo-recorder-embed
+      {:ref :ziggeo-recorder}]])

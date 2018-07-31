@@ -385,7 +385,7 @@
                   "Save to draft"]))])]
       [:div.entry-edit-modal.group
         {:ref "entry-edit-modal"}
-        [:div.entry-edit-modal-headline.group
+        [:div.entry-edit-modal-section.group
           (user-avatar-image current-user-data)
           [:div.posting-in
             {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
@@ -409,6 +409,19 @@
                                            :invite-note note})]))))])]]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          ;; Video elements
+          (when (and (:video-id entry-editing)
+                     (not @(::record-video s)))
+            (ziggeo-player {:video-id (:video-id entry-editing)
+                            :remove-video-cb remove-video-cb
+                            :video-processed (:video-processed entry-editing)}))
+          (when @(::record-video s)
+            (ziggeo-recorder {:start-cb video-uploaded-cb
+                              :remove-recorder-cb (fn []
+                                (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id nil
+                                                                                    :video-transcript nil
+                                                                                    :video-processed false})])
+                                (reset! (::record-video s) false))}))
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable.group.fs-hide
             {:content-editable true
@@ -433,14 +446,6 @@
                                                    (reset! (::uploading-media s) is-uploading?))
                              :media-config ["photo" "video"]
                              :classes "emoji-autocomplete emojiable fs-hide"})
-          ;; Video elements
-          (when (and (:video-id entry-editing)
-                     (not @(::record-video s)))
-            (ziggeo-player {:video-id (:video-id entry-editing)
-                            :remove-video-cb remove-video-cb
-                            :video-processed (:video-processed entry-editing)}))
-          (when @(::record-video s)
-            (ziggeo-recorder video-uploaded-cb))
           (when (:video-id entry-editing)
             [:div.entry-edit-transcript
               [:textarea.video-transcript

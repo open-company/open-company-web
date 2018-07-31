@@ -462,6 +462,19 @@
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
+            ;; Video element
+            (when (and video-id
+                       (not @(::record-video s)))
+              (ziggeo-player {:video-id video-id
+                              :remove-video-cb (when editing remove-video-cb)
+                              :video-processed (:video-processed (if editing activity-editing activity-data))}))
+            (when @(::record-video s)
+              (ziggeo-recorder {:start-cb video-uploaded-cb
+                                :remove-recorder-cb (fn []
+                                  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id nil
+                                                                                           :video-transcript nil
+                                                                                           :video-processed false})])
+                                  (reset! (::record-video s) false))}))
             (if editing
               [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable.fs-hide
                 {:content-editable true
@@ -500,14 +513,6 @@
                 {:key (str "fullscreen-post-body-" (:updated-at activity-data))
                  :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
-            ;; Video element
-            (when (and video-id
-                       (not @(::record-video s)))
-              (ziggeo-player {:video-id video-id
-                              :remove-video-cb (when editing remove-video-cb)
-                              :video-processed (:video-processed (if editing activity-editing activity-data))}))
-            (when @(::record-video s)
-              (ziggeo-recorder video-uploaded-cb))
             (when (:video-transcript activity-data)
               (if editing
                 [:div.fullscreen-post-transcript
