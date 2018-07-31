@@ -436,7 +436,9 @@
           ;; Video elements
           (when (and (:video-id entry-editing)
                      (not @(::record-video s)))
-            (ziggeo-player (:video-id entry-editing) remove-video-cb))
+            (ziggeo-player {:video-id (:video-id entry-editing)
+                            :remove-video-cb remove-video-cb
+                            :video-processed (:video-processed entry-editing)}))
           (when @(::record-video s)
             (ziggeo-recorder video-uploaded-cb))
           (when (:video-id entry-editing)

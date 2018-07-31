@@ -11,23 +11,25 @@
                                (.destroy player-instance))
                              s)
                             :did-mount (fn [s]
-                            (let [args (into [] (:rum/args s))
-                                  video-id (get args 0)
-                                  width (get args 2 640)
-                                  height (get args 3 480)
-                                  player-el (rum/ref-node s :ziggeo-player)]
-                              (let [config {:element player-el
-                                            :attrs #js {:width width
-                                                        :height height
-                                                        :theme "modern"
-                                                        :themecolor "red"
-                                                        :video video-id}}
-                                    Player (.. js/ZiggeoApi -V2 -Player)
-                                    player-instance (Player. (clj->js config))]
-                                (reset! (::player-instance s) player-instance)
-                                (.activate player-instance)))
+                            (let [{:keys [video-id width height video-processed]
+                                       :or {width 640
+                                            height 480}} (first (:rum/args s))]
+                              (when video-processed
+                                (let [player-el (rum/ref-node s :ziggeo-player)
+                                      config {:element player-el
+                                              :attrs #js {:width width
+                                                          :height height
+                                                          :theme "carrot"
+                                                          :themecolor "green"
+                                                          :video video-id}}
+                                      Player (.. js/ZiggeoApi -V2 -Player)
+                                      player-instance (Player. (clj->js config))]
+                                  (reset! (::player-instance s) player-instance)
+                                  (.activate player-instance))))
                             s)} 
-  [s video-id remove-video-cb width height]
+  [s {:keys [video-id remove-video-cb width height video-processed]
+      :or {width 640
+           height 480}}]
   [:div.ziggeo-player
     (when (fn? remove-video-cb)
       [:button.mlb-reset.remove-video-bt
@@ -37,8 +39,12 @@
          :data-placement "top"
          :data-container "body"
          :title "Remove video"}])
-    [:div.ziggeo-player-embed
-      {:ref :ziggeo-player}]])
+    (if-not video-processed
+      [:div.ziggeo-player-not-processed
+        {:style {:width (str (or width 640) "px")
+                 :height (str (or height 480) "px")}}]
+      [:div.ziggeo-player-embed
+        {:ref :ziggeo-player}])])
 
 (rum/defcs ziggeo-recorder <  (rum/local nil ::recorder-instance)
                               (rum/local false ::uploading)

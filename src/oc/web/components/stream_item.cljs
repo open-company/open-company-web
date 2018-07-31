@@ -186,7 +186,10 @@
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
             (when has-video
               (rum/with-key
-               (ziggeo-player (:video-id activity-data) nil (if expanded? 640 200) (if expanded? 480 150))
+               (ziggeo-player {:video-id (:video-id activity-data)
+                               :width (if expanded? 640 200)
+                               :height (if expanded? 480 150)
+                               :video-processed (:video-processed activity-data)})
                 (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))
             (when (and expanded?
                        (:video-transcript activity-data))

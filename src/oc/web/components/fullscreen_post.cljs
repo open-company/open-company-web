@@ -503,7 +503,9 @@
             ;; Video element
             (when (and video-id
                        (not @(::record-video s)))
-              (ziggeo-player video-id (when editing remove-video-cb)))
+              (ziggeo-player {:video-id video-id
+                              :remove-video-cb (when editing remove-video-cb)
+                              :video-processed (:video-processed (if editing activity-editing activity-data))}))
             (when @(::record-video s)
               (ziggeo-recorder video-uploaded-cb))
             (when (:video-transcript activity-data)

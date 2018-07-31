@@ -1,5 +1,22 @@
 div.ziggeo-player {
   position: relative;
+  border-radius: 6px;
+
+  div.ziggeo-player-embed, div.ziggeo-recorder-embed {
+    border-radius: 6px;
+    &>div {
+      border-radius: 6px;
+    }
+  }
+
+  div.ziggeo-player-not-processed {
+    @include image-2x("/img/ML/video_loading");
+    background-size: 100%;
+    background-color: #ECECEC;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 6px;
+  }
 
   button.remove-video-bt {
     width: 40px;
