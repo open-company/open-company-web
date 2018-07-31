@@ -253,6 +253,14 @@
         (when (au/is-element-bottom-visible? body-el)
           (activity-actions/wrt-events-gate (:uuid activity-data)))))))
 
+(defn win-width []
+  (or (.-innerWidth js/window)
+      (.-clientWidth (.-documentElement js/document))))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
+
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
                              (drv/drv :fullscreen-post-data)
@@ -274,10 +282,11 @@
                              (rum/local nil ::autosave-timer)
                              (rum/local false ::show-legend)
                              (rum/local false ::record-video)
+                             (rum/local 0 ::mobile-video-height)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
-                             (mixins/render-on-resize nil)
+                             (mixins/render-on-resize calc-video-height)
                              mixins/first-render-mixin
 
                              {:before-render (fn [s]
@@ -382,7 +391,14 @@
                               (get (:uuid activity-data))
                               :sorted-comments)
         comments-data (or activity-comments (:comments activity-data))
-        read-data (:read-data modal-data)]
+        read-data (:read-data modal-data)
+        video-size (when (or (and (not editing) (:video-id activity-data))
+                             (and editing (:video-id activity-editing)))
+                    (if is-mobile?
+                      {:width (win-width)
+                       :height @(::mobile-video-height s)}
+                      {:width 640
+                       :height 480}))]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -469,9 +485,13 @@
                        (not @(::record-video s)))
               (ziggeo-player {:video-id video-id
                               :remove-video-cb (when editing remove-video-cb)
+                              :width (:width video-size)
+                              :height (:height video-size)
                               :video-processed (:video-processed (if editing activity-editing activity-data))}))
             (when @(::record-video s)
               (ziggeo-recorder {:start-cb video-uploaded-cb
+                                :width (:width video-size)
+                                :height (:height video-size)
                                 :remove-recorder-cb (fn []
                                   (remove-video)
                                   (reset! (::record-video s) false))}))

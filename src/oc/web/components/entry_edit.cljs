@@ -180,6 +180,14 @@
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data)))
 
+(defn win-width []
+  (or (.-innerWidth js/window)
+      (.-clientWidth (.-documentElement js/document))))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
@@ -203,9 +211,11 @@
                         (rum/local nil ::autosave-timer)
                         (rum/local false ::show-legend)
                         (rum/local false ::record-video)
+                        (rum/local 0 ::mobile-video-height)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
+                        (mixins/render-on-resize calc-video-height)
 
                         {:will-mount (fn [s]
                           (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -308,7 +318,13 @@
                         (if (= (:status entry-editing) "published")
                           "Posted to: "
                           "Draft for: ")
-                        "Posting to: ")]
+                        "Posting to: ")
+        video-size (when (:video-id entry-editing)
+                    (if is-mobile?
+                      {:width (win-width)
+                       :height @(::mobile-video-height s)}
+                      {:width 640
+                       :height 480}))]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -416,9 +432,13 @@
                      (not @(::record-video s)))
             (ziggeo-player {:video-id (:video-id entry-editing)
                             :remove-video-cb remove-video-cb
+                            :width (:width video-size)
+                            :height (:height video-size)
                             :video-processed (:video-processed entry-editing)}))
           (when @(::record-video s)
             (ziggeo-recorder {:start-cb video-uploaded-cb
+                              :width (:width video-size)
+                              :height (:height video-size)
                               :remove-recorder-cb (fn []
                                 (remove-video)
                                 (reset! (::record-video s) false))}))

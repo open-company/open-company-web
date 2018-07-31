@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
@@ -48,6 +49,14 @@
       (reset! (::truncated s) true))
     (reset! (::item-ready s) true)))
 
+(defn win-width []
+  (or (.-innerWidth js/window)
+      (.-clientWidth (.-documentElement js/document))))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
+
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
@@ -60,10 +69,15 @@
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::more-menu-open)
                          (rum/local false ::hovering-tile)
+                         (rum/local 0 ::mobile-video-height)
                          ;; Mixins
+                         (ui-mixins/render-on-resize calc-video-height)
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
-                         {:did-mount (fn [s]
+                         {:will-mount (fn [s]
+                           (calc-video-height s)
+                           s)
+                          :did-mount (fn [s]
                            (should-show-continue-reading? s)
                            s)
                           :after-render (fn [s]
@@ -103,7 +117,13 @@
                     (first (:author activity-data))
                     (:publisher activity-data))
         dom-node-class (str "stream-item-" (:uuid activity-data))
-        has-video (seq (:video-id activity-data))]
+        has-video (seq (:video-id activity-data))
+        video-size (when has-video
+                     (if is-mobile?
+                       {:width (win-width)
+                        :height @(::mobile-video-height s)}
+                       {:width (if expanded? 640 200)
+                        :height (if expanded? 480 150)}))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
@@ -160,8 +180,8 @@
           (when has-video
             (rum/with-key
              (ziggeo-player {:video-id (:video-id activity-data)
-                             :width (if expanded? 640 200)
-                             :height (if expanded? 480 150)
+                             :width (:width video-size)
+                             :height (:height video-size)
                              :video-processed (:video-processed activity-data)})
               (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))
           [:div.stream-body-left.group.fs-hide
@@ -226,10 +246,10 @@
               (if is-mobile?
                 (if expanded?
                   (reactions activity-data)
-                  [:div.group
+                  [:div.mobile-summary.group
                     {:on-click #(expand s true)}
-                    [:div.mobile-summary
-                      [:div.mobile-comments-summary
+                    [:div.group
+                      [:div.mobile-comments-summary.group
                         [:div.mobile-comments-summary-icon]
                         [:span
                           (if (zero? (count comments-data))

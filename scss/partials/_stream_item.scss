@@ -121,6 +121,11 @@ div.stream-item {
         float: unset;
         width: 638px;
         height: 479px;
+
+        @include tablet(){
+          width: auto;
+          height: auto;
+        }
       }
     }
 
@@ -129,6 +134,14 @@ div.stream-item {
       width: 200px;
       height: 150px;
       float: right;
+
+      @include tablet(){
+        margin-top: 16px;
+        float: unset;
+        width: auto;
+        height: auto;
+        margin-left: -16px;
+      }
     }
 
     div.stream-body-left {
@@ -242,17 +255,24 @@ div.stream-item {
       }
       
       div.mobile-summary {
-        float: left;
+        float: right;
+        margin-top: 10px;
 
-        div.mobile-comments-summary-icon {
-          background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
-          background-size: 14px 14px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 14px;
-          height: 14px;
+        div.mobile-comments-summary {
           float: left;
-          display: block;
+          height: 16px;
+          margin-left: 6px;
+
+          div.mobile-comments-summary-icon {
+            background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
+            background-size: 14px 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 14px;
+            height: 14px;
+            float: left;
+            display: block;
+          }
 
           span {
             margin-left: 6px;
@@ -266,7 +286,6 @@ div.stream-item {
         }
 
         div.mobile-summary-reaction {
-          margin-left: 6px;
           height: 16px;
           margin-left: 6px;
           float: left;
@@ -287,32 +306,32 @@ div.stream-item {
             margin-left: 4px;
           }
         }
-      }
 
-      div.mobile-summary-attachments {
-        float: right;
-        text-align: right;
-        height: 16px;
-        margin-top: 10px;
-        
-        span.attachments-icon {
-          float: left;
-          display: block;
-          width: 14px;
-          height: 15px;
-          background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
-          background-repeat: no-repeat;
-          background-size: 14px 15px;
-          background-position: center;
-        }
+        div.mobile-summary-attachments {
+          float: right;
+          text-align: right;
+          height: 16px;
+          margin-top: 10px;
+          
+          span.attachments-icon {
+            float: left;
+            display: block;
+            width: 14px;
+            height: 15px;
+            background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
+            background-repeat: no-repeat;
+            background-size: 14px 15px;
+            background-position: center;
+          }
 
-        span.attachments-count {
-          float: left;
-          display: block;
-          @include avenir_H();
-          font-size: 12px;
-          color: $ui_grey;
-          margin-left: 6px;
+          span.attachments-count {
+            float: left;
+            display: block;
+            @include avenir_H();
+            font-size: 12px;
+            color: $ui_grey;
+            margin-left: 6px;
+          }
         }
       }
 

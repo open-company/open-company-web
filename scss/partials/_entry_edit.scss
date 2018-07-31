@@ -256,6 +256,10 @@ div.entry-edit-modal-container {
 
       @include tablet() {
         padding: 24px 24px 0px;
+
+        div.ziggeo-player, div.ziggeo-recorder {
+          margin-left: -24px;
+        }
       }
 
       div.entry-edit-headline {
