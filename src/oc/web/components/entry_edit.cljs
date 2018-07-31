@@ -139,6 +139,12 @@
 (defn- is-publishable? [entry-editing]
   (seq (:board-slug entry-editing)))
 
+(defn remove-video []
+  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id nil
+                                                      :video-transcript nil
+                                                      :video-processed false
+                                                      :has-changes true})]))
+
 (defn video-record-clicked [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
         start-recording-fn #(reset! (::record-video s) true)]
@@ -151,9 +157,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (dis/dispatch! [:update [:entry-editing]
-                                           #(merge % {:video-id nil
-                                                      :has-changes true})])
+                                          (remove-video)
                                           (start-recording-fn)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data))
@@ -172,9 +176,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (dis/dispatch! [:update [:entry-editing]
-                                           #(merge % {:video-id nil
-                                                      :has-changes true})])
+                                          (remove-video)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data)))
 
@@ -418,9 +420,7 @@
           (when @(::record-video s)
             (ziggeo-recorder {:start-cb video-uploaded-cb
                               :remove-recorder-cb (fn []
-                                (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id nil
-                                                                                    :video-transcript nil
-                                                                                    :video-processed false})])
+                                (remove-video)
                                 (reset! (::record-video s) false))}))
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable.group.fs-hide

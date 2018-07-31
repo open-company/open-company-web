@@ -200,6 +200,12 @@
         (reset! (::initial-headline s) initial-headline)
         (reset! (::edited-data-loaded s) true)))))
 
+(defn remove-video []
+  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id nil
+                                                           :video-transcript nil
+                                                           :video-processed false
+                                                           :has-changes true})]))
+
 (defn video-record-clicked [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)
         activity-editing (:modal-editing-data modal-data)
@@ -213,9 +219,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (dis/dispatch! [:update [:modal-editing-data]
-                                           #(merge % {:video-id nil
-                                                      :has-changes true})])
+                                          (remove-video)
                                           (start-recording-fn)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data))
@@ -234,9 +238,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (dis/dispatch! [:update [:modal-editing-data]
-                                           #(merge % {:video-id nil
-                                                      :has-changes true})])
+                                          (remove-video)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data)))
 
@@ -471,9 +473,7 @@
             (when @(::record-video s)
               (ziggeo-recorder {:start-cb video-uploaded-cb
                                 :remove-recorder-cb (fn []
-                                  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id nil
-                                                                                           :video-transcript nil
-                                                                                           :video-processed false})])
+                                  (remove-video)
                                   (reset! (::record-video s) false))}))
             (if editing
               [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable.fs-hide

@@ -157,6 +157,13 @@
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.group
+          (when has-video
+            (rum/with-key
+             (ziggeo-player {:video-id (:video-id activity-data)
+                             :width (if expanded? 640 200)
+                             :height (if expanded? 480 150)
+                             :video-processed (:video-processed activity-data)})
+              (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))
           [:div.stream-body-left.group.fs-hide
             {:class (when (and has-video (not expanded?)) "has-video")}
             [:div.stream-item-headline.ap-seen-item-headline
@@ -184,20 +191,13 @@
                    :class (utils/class-set {:wrt-truncated truncated?
                                             :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
-            (when has-video
-              (rum/with-key
-               (ziggeo-player {:video-id (:video-id activity-data)
-                               :width (if expanded? 640 200)
-                               :height (if expanded? 480 150)
-                               :video-processed (:video-processed activity-data)})
-                (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))
-            (when (and expanded?
-                       (:video-transcript activity-data))
-              [:div.stream-item-transcript
-                [:div.stream-item-transcript-header
-                  "This transcript was automatically generated and may not be accurate"]
-                [:div.stream-item-transcript-content
-                  (:video-transcript activity-data)]])]
+          (when (and expanded?
+                     (:video-transcript activity-data))
+            [:div.stream-item-transcript
+              [:div.stream-item-transcript-header
+                "This transcript was automatically generated and may not be accurate"]
+              [:div.stream-item-transcript-content
+                (:video-transcript activity-data)]])]
           (when (or (not is-mobile?) expanded?)
             (stream-attachments activity-attachments
              (when (and truncated? (not expanded?))
