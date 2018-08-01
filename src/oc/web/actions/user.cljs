@@ -118,7 +118,7 @@
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
-(defn slack-lander-check-team-redirect []
+(defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point
     (fn [success body]
       (entry-point-get-finished success body

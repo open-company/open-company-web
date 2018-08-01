@@ -256,7 +256,14 @@
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
       (na/set-new-user-cookie "slack"))
-    (user-actions/slack-lander-check-team-redirect)))
+    (user-actions/lander-check-team-redirect)))
+
+(defn google-lander-check [params]
+  (pre-routing (:query-params params) true)
+  (let [new-user (= (:new (:query-params params)) "true")]
+    (when new-user
+      (na/set-new-user-cookie "google"))
+    (user-actions/lander-check-team-redirect)))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -353,6 +360,16 @@
       (timbre/info "Routing slack-lander-check-slash-route" (str urls/slack-lander-check "/"))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
+
+    (defroute google-lander-check-route urls/google-lander-check {:as params}
+      (timbre/info "Routing google-lander-check-route" urls/google-lander-check)
+      ;; Check if the user already have filled the needed data or if it needs to
+      (google-lander-check params))
+
+    (defroute google-lander-check-slash-route (str urls/google-lander-check "/") {:as params}
+      (timbre/info "Routing google-lander-check-slash-route" (str urls/google-lander-check "/"))
+      ;; Check if the user already have filled the needed data or if it needs to
+      (google-lander-check params))
 
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
@@ -517,6 +534,9 @@
                                  ;; Signup slack
                                  slack-lander-check-route
                                  slack-lander-check-slash-route
+                                 ;; Signup google
+                                 google-lander-check-route
+                                 google-lander-check-slash-route
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route
