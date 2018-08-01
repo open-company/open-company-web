@@ -24,8 +24,7 @@
 
 (defn watch-boards [posts-data]
   (when (jwt/jwt) ; only for logged in users
-    (let [board-slugs (distinct (map :board-slug
-                                     (map second posts-data)))
+    (let [board-slugs (distinct (map :board-slug (vals posts-data)))
           org-data (dis/org-data)
           org-boards (:boards org-data)
           org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
@@ -66,7 +65,7 @@
         (save-last-used-section "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
-      (watch-boards fixed-all-posts)
+      (watch-boards (:fixed-items fixed-all-posts))
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
 (defn all-posts-get [org-data ap-initial-at]
@@ -92,7 +91,7 @@
           must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data))]
       (when (= (router/current-board-slug) "must-see")
         (save-last-used-section "must-see"))
-      (watch-boards must-see-posts)
+      (watch-boards (:fixed-items must-see-posts))
       (dis/dispatch! [:must-see-get/finish org must-see-posts]))))
 
 (defn must-see-get [org-data]
