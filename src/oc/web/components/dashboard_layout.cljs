@@ -88,12 +88,10 @@
      (.tooltip "hide")
      (.tooltip "fixTitle"))))
 
-(defn compose-fn [s type]
+(defn compose [s]
   (utils/remove-tooltips)
   (reset! (::showing-compose-picker s) false)
-  (case type
-    :video (activity-actions/capture-video (get-board-for-edit s))
-    (activity-actions/entry-edit (get-board-for-edit s)))
+  (activity-actions/entry-edit (get-board-for-edit s))
   ;; If the add post tooltip is visible
   (when @(drv/get-ref s :show-add-post-tooltip)
     ;; Dismiss it and bring up the invite people tooltip
@@ -272,11 +270,11 @@
                       [:div.compose-type-dropdown-wrapper
                         [:div.compose-type-dropdown
                           [:button.mlb-reset.compose-type.compose-type-post
-                            {:on-click #(compose-fn s :post)}
+                            {:on-click #(compose s)}
                             "Text"]
                           [:div.compose-type-separator]
                           [:button.mlb-reset.compose-type.compose-type-video
-                            {:on-click #(compose-fn s :video)}
+                            {:on-click #(compose s)}
                             "Video"]]])
                     (when @(::show-top-boards-dropdown s)
                       (dropdown-list
@@ -318,7 +316,7 @@
                       "You can delete the sample post at anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
-                    {:on-click #(compose-fn s :post)}
+                    {:on-click #(compose s)}
                     "Create new post"]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
@@ -358,5 +356,5 @@
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :on-click #(compose-fn s :post)}
+                       :on-click #(compose s)}
                       [:div.add-to-board-plus]]]))])]]))
