@@ -202,14 +202,34 @@
                                            change-data))
                                  container-data
                                  (:items container-data))
+          next-links (when direction
+                      (vec
+                       (remove
+                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
+                        (:links container-data))))
+          link-to-move (when direction
+                         (if (= direction :down)
+                           (utils/link-for (:old-links container-data) "previous")
+                           (utils/link-for (:old-links container-data) "next")))
+          fixed-next-links (if direction
+                             (if link-to-move
+                               (vec (conj next-links link-to-move))
+                               next-links)
+                             (:links container-data))
+          with-links (-> with-fixed-activities
+                       (dissoc :old-links)
+                       (assoc :links fixed-next-links))
           new-items (map :uuid (:items container-data))
-          without-items (dissoc with-fixed-activities :items)
+          without-items (dissoc with-links :items)
           with-posts-list (assoc without-items :posts-list (into []
                                                              (case direction
                                                               :up (concat new-items (:posts-list container-data))
                                                               :down (concat (:posts-list container-data) new-items)
-                                                              new-items)))]
-      with-posts-list)))
+                                                              new-items)))
+          with-saved-items (if direction
+                             (assoc with-posts-list :saved-items (count (:posts-list container-data)))
+                             with-posts-list)]
+      with-saved-items)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data
