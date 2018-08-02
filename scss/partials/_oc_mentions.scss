@@ -16,13 +16,6 @@ div.oc-mention-panel {
   border: none;
 
   div.oc-mention-options {
-    label.oc-mention-options-title {
-      opacity: 0.5;
-      @include avenir_R();
-      font-size: 12px;
-      margin: 16px 0px 8px 16px;
-    }
-
     div.oc-mention-option {
       height: 56px;
       width: 100%;

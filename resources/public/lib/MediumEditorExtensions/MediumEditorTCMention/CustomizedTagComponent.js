@@ -58,23 +58,15 @@ function CustomizedTagComponent(props) {
     return !!user["selectedKey"];
   });
 
-  console.log("XXX selectedUsers", selectedUsers);
-
   return React.createElement(
     "div",
     { "className": "oc-mention-options" },
-    React.createElement(
-      "label",
-      { "className": "oc-mention-options-title" },
-      "@mention to tag someone"
-    ),
     React.createElement(
       "div",
       { "className": "oc-mention-options-list" },
       selectedUsers.map(function (user, i) {
         var avatarStyle = { "backgroundImage": "url(" + user["avatar-url"] + ")" };
         var displayName = (user["name"] && user["name"].length > 0) ? user["name"] : (user["first-name"] + " " + user["last-name"]);
-        console.log("XXX    user", user);
         return React.createElement(
           "div",
           { "key": "user-" + (user["user-id"] + "-" + user["email"]),
