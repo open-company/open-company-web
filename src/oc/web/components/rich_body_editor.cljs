@@ -452,7 +452,7 @@
            :add-video-cb #(add-video s)
            :add-attachment-cb #(add-attachment s nil)})
          multi-picker-container)))
-    [:div.rich-body-editor
+    [:div.rich-body-editor.oc-mentions
       {:ref "body"
        :content-editable (not nux)
        :class (str classes
