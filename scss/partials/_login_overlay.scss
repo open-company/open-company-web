@@ -139,77 +139,59 @@ div.login-overlay-container {
       }
     }
 
-    button.signin-with-slack {
+    button.signin-with-slack, button.signin-with-google {
       width: 340px;
       height: 48px;
       margin-top: 52px;
-      border: 2px solid $chalk_blue;
-      color: $sea_blue;
+      border: 1px solid $light_ui_grey;
+      color: $light_ui_grey;
       background-color: white;
-      border-radius: 100px;
+      border-radius: 5px;
       text-align: center;
 
       div.signin-with-slack-content {
-        div.slack-blue-icon {
+        div.slack-icon {
           @include image-2x("/img/ML/slack_blue_icon");
         }
       }
 
-      div.signin-with-slack-content {
+      div.signin-with-google-content {
+        div.google-icon {
+          background-image: cdnUrl("/img/ML/google_signin.svg");
+        }
+      }
+
+      div.signin-with-slack-content, div.signin-with-google-content {
         @include avenir_H();
-        font-size: 18px;
-        color: $carrot_text_blue;
-        width: 184px;
+        font-size: 14px;
+        color: black;
+        width: 224px;
         margin: 0px auto;
 
-        div.slack-blue-icon {
-          width: 70px;
-          height: 21px;
-          @include image-2x("/img/ML/slack_blue_icon");
+        div.slack-icon {
+          width: 17px;
+          height: 17px;
+          background-image: cdnUrl('/img/slack.png');
           background-repeat: no-repeat;
-          background-size: 70px 21px;
-          float: right;
-          margin-left: 4px;
+          background-size: 17px 17px;
+          float: left;
+          margin-top: 2px;
+          margin-left: 26px;
+        }
+
+        div.google-icon {
+          width: 50px;
+          height: 21px;
+          background-image: cdnUrl("/img/ML/google_signin.svg");
+          background-repeat: no-repeat;
+          background-size: 50px 21px;
+          float: left;
+          margin-left: 8px;
         }
       }
 
       @include mobile() {
         width: 100%;
-      }
-    }
-
-    button.signin-with-google {
-      width: 340px;
-      height: 48px;
-      margin-top: 52px;
-      border: 2px solid $chalk_blue;
-      color: $sea_blue;
-      background-color: white;
-      border-radius: 100px;
-      text-align: center;
-
-      div.signin-with-google-content {
-        div.google-blue-icon {
-          background-image: cdnUrl("/img/ML/google_signin.svg");
-        }
-      }
-
-      div.signin-with-google-content {
-        @include avenir_H();
-        font-size: 18px;
-        color: $carrot_text_blue;
-        width: 184px;
-        margin: 0px auto;
-
-        div.google-blue-icon {
-          width: 70px;
-          height: 21px;
-          background-image: cdnUrl("/img/ML/google_signin.svg");
-          background-repeat: no-repeat;
-          background-size: 70px 21px;
-          float: right;
-          margin-left: 4px;
-        }
       }
     }
 
