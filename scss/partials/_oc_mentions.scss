@@ -46,9 +46,9 @@ div.oc-mention-panel {
 
       div.oc-mention-option-title {
         width: calc(100% - 38px);
-        height: 12px;
+        height: 16px;
         line-height: 16px;
-        // margin-left: 16px;
+        margin-top: -4px;
         @include avenir_H();
         color: white;
         font-size: 14px;
@@ -61,8 +61,8 @@ div.oc-mention-panel {
 
       div.oc-mention-option-subline {
         width: calc(100% - 38px);
-        height: 12px;
-        line-height: 16px;
+        height: 18px;
+        line-height: 18px;
         // margin-left: 16px;
         @include avenir_R();
         color: white;
