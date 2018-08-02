@@ -281,28 +281,15 @@
 (defmethod dispatcher/action :all-posts-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
-    (let [fixed-posts-data (au/fix-container (:collection posts-data) (dispatcher/change-data db) direction)
-          posts-data-key (dispatcher/posts-data-key org)
-          container-key (dispatcher/container-key org :all-posts)
-          old-posts (get-in db posts-data-key)
+    (let [container-key (dispatcher/container-key org :all-posts)
           container-data (get-in db container-key)
-          next-links (vec
-                      (remove
-                       #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
-                       (:links fixed-posts-data)))
-          link-to-move (if (= direction :up)
-                          (utils/link-for (:links container-data) "next")
-                          (utils/link-for (:links container-data) "previous"))
-          fixed-next-links (if link-to-move
-                              (vec (conj next-links link-to-move))
-                              next-links)
-          with-links (assoc container-data :links fixed-next-links)
-          new-items (into [] (concat (:posts-list container-data) (:posts-list fixed-posts-data)))
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :old-links (:links container-data)})
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
-          keeping-items (count old-posts)
-          new-container-data (-> with-links
-                              (assoc :saved-items keeping-items)
-                              (assoc :posts-list new-items)
+          new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
                               (dissoc :loading-more))]
       (-> db
@@ -347,28 +334,16 @@
 (defmethod dispatcher/action :must-see-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
-    (let [fixed-posts-data (au/fix-container (:collection posts-data) (dispatcher/change-data db) direction)
-          posts-data-key (dispatcher/posts-data-key org)
-          container-key (dispatcher/container-key org :must-see)
-          old-posts (get-in db posts-data-key)
+    (let [container-key (dispatcher/container-key org :must-see)
           container-data (get-in db container-key)
-          next-links (vec
-                      (remove
-                       #(if (= direction :up) (= (:rel %) "next") (= (:rel %) "previous"))
-                       (:links fixed-posts-data)))
-          link-to-move (if (= direction :up)
-                          (utils/link-for (:links container-data) "next")
-                          (utils/link-for (:links container-data) "previous"))
-          fixed-next-links (if link-to-move
-                              (vec (conj next-links link-to-move))
-                              next-links)
-          with-links (assoc container-data :links fixed-next-links)
-          new-items (into [] (concat (:posts-list container-data) (:posts-list fixed-posts-data)))
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :old-links (:links container-data)})
+
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
-          keeping-items (count old-posts)
-          new-container-data (-> with-links
-                              (assoc :saved-items keeping-items)
-                              (assoc :posts-list new-items)
+          new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
                               (dissoc :loading-more))]
       (-> db
