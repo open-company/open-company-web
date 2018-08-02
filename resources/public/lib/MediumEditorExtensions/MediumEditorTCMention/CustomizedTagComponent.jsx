@@ -5,15 +5,15 @@ export function CustomizedTagComponent(props) {
   const currentText = props.currentMentionText.substring(1, props.currentMentionText.length).toLowerCase();
 
   var mappedUsers = props.users.map(function(user, i) {
-    if (user["name"] && user["name"].toLowerCase().indexOf(currentText) !== -1)
+    if (user["name"] && user["name"].toLowerCase().indexOf(currentText) === 0)
       return Object.assign(user, {"selectedKey": "name"});
-    else if (user["first-name"] && user["first-name"].toLowerCase().indexOf(currentText) !== -1)
+    else if (user["first-name"] && user["first-name"].toLowerCase().indexOf(currentText) === 0)
       return Object.assign(user, {"selectedKey": "first-name"});
-    else if (user["last-name"] && user["last-name"].toLowerCase().indexOf(currentText) !== -1)
+    else if (user["last-name"] && user["last-name"].toLowerCase().indexOf(currentText) === 0)
       return Object.assign(user, {"selectedKey": "last-name"});
-    else if (user["slack-username"] && user["slack-username"].toLowerCase().indexOf(currentText) !== -1)
+    else if (user["slack-username"] && user["slack-username"].toLowerCase().indexOf(currentText) === 0)
       return Object.assign(user, {"selectedKey": "slack-username"});
-    else if (user["email"] && user["email"].toLowerCase().indexOf(currentText) !== -1)
+    else if (user["email"] && user["email"].toLowerCase().indexOf(currentText) === 0)
       return Object.assign(user, {"selectedKey": "email"});
     else 
       return user;
