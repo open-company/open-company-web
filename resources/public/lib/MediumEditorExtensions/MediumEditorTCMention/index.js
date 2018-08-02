@@ -357,8 +357,7 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
   positionPanel: function positionPanel() {
     var _activeMentionAt$getB = this.activeMentionAt.getBoundingClientRect(),
         bottom = _activeMentionAt$getB.bottom,
-        left = _activeMentionAt$getB.left,
-        width = _activeMentionAt$getB.width;
+        left = _activeMentionAt$getB.left;
 
     var _window = this.window,
         pageXOffset = _window.pageXOffset,
@@ -366,7 +365,7 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
 
 
     this.mentionPanel.style.top = pageYOffset + bottom + "px";
-    this.mentionPanel.style.left = pageXOffset + left + width + "px";
+    this.mentionPanel.style.left = pageXOffset + left + "px";
   },
   updatePanelContent: function updatePanelContent() {
     this.renderPanelContent(this.mentionPanel, this.word, this.handleSelectMention.bind(this));
@@ -390,6 +389,7 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
       if (details["user-id"] && details["user-id"].length > 0) {
         this.activeMentionAt.setAttribute("data-user-id", details["user-id"]);
       }
+      this.activeMentionAt.setAttribute("data-found", "true");
       textNode.textContent = selectedText;
       _mediumEditor2.default.selection.select(this.document, textNode, selectedText.length);
       //
