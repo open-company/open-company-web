@@ -88,7 +88,7 @@
                                      (when-not @(::uploading s)
                                        (reset! (::uploading s) true)
                                        (when (fn? upload-started-cb)
-                                          (upload-started-cb)))
+                                          (upload-started-cb (.get recorder-instance "video"))))
                                      (when-not @(::mounted s)
                                        (na/show-notification {:title "Video is uploading."
                                                               :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")

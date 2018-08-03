@@ -66,6 +66,9 @@
 (defn team-channels-key [team-id]
   [:teams-data team-id :channels])
 
+(defn uploading-video-key [org-slug video-id]
+  (vec (concat (org-key org-slug) [:uploading-videos video-id])))
+
 (defn current-board-key
   "Find the board key for db based on the current path."
   []
@@ -523,6 +526,13 @@
   ([] (team-channels (:team-id (org-data))))
   ([team-id] (team-channels team-id @app-state))
   ([team-id data] (get-in data (team-channels-key team-id))))
+
+(defn uploading-video-data
+  ([video-id] (uploading-video-data (router/current-org-slug) video-id @app-state))
+  ([org-slug video-id] (uploading-video-data org-slug video-id @app-state))
+  ([org-slug video-id data]
+    (let [uv-key (uploading-video-key org-slug video-id)]
+      (get-in data uv-key))))
 
 ;; Change related
 

@@ -610,3 +610,6 @@
                                            (router/current-org-slug)
                                            (json->cljs body)
                                            nil]))))))
+
+(defn uploading-video [video-id]
+  (dis/dispatch! [:uploading-video (router/current-org-slug) video-id]))

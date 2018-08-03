@@ -470,7 +470,9 @@
                             :video-processed (:video-processed entry-editing)}))
           (when @(::record-video s)
             (ziggeo-recorder {:start-cb video-started-recording-cb
-                              :upload-started-cb #(reset! (::video-uploading s) true)
+                              :upload-started-cb #(do
+                                                    (activity-actions/uploading-video %)
+                                                    (reset! (::video-uploading s) true))
                               :submit-cb video-processed-cb
                               :width (:width video-size)
                               :height (:height video-size)

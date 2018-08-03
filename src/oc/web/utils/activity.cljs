@@ -159,7 +159,10 @@
         fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
-        fixed-video-id (when-not (:video-error entry-data) (:video-id entry-data))]
+        is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
+        fixed-video-id (when (or (not (:video-error entry-data))
+                                 is-uploading-video?)
+                         (:video-id entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
       (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))

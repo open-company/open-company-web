@@ -502,6 +502,7 @@
                               :video-processed (:video-processed current-activity-data)}))
             (when @(::record-video s)
               (ziggeo-recorder {:start-cb video-started-recording-cb
+                                :upload-started-cb #(activity-actions/uploading-video %)
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :submit-cb video-processed-cb

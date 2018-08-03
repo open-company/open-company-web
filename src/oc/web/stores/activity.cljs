@@ -359,3 +359,8 @@
         (update-in containers-key dissoc :all-posts)
         (dissoc :ap-initial-at)))
     db))
+
+(defmethod dispatcher/action :uploading-video
+  [db [_ org-slug video-id]]
+  (let [uploading-video-key (dispatcher/uploading-video-key org-slug video-id)]
+    (assoc-in db uploading-video-key true)))
