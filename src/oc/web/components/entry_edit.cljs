@@ -132,24 +132,31 @@
   (when-let [body-el (sel1 [:div.rich-body-editor])]
     (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))]))
   (let [editing-data @(drv/get-ref s :entry-editing)]
-    (when (:video-id editing-data)
+    (when (:fixed-video-id editing-data)
       (when-let [transcription-el (rum/ref-node s "transcript-edit")]
         (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
-(defn- is-publishable? [entry-editing]
-  (seq (:board-slug entry-editing)))
+(defn- is-publishable? [s entry-editing]
+  (and (seq (:board-slug entry-editing))
+       (or (and @(::record-video s)
+                @(::video-uploading s))
+           (not @(::record-video s)))))
 
 (defn remove-video []
-  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id nil
+  (dis/dispatch! [:update [:entry-editing] #(merge % {:fixed-video-id nil
+                                                      :video-id nil
                                                       :video-transcript nil
                                                       :video-processed false
+                                                      :video-error false
                                                       :has-changes true})]))
 
 (defn video-record-clicked [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
-        start-recording-fn #(reset! (::record-video s) true)]
+        start-recording-fn #(do
+                              (reset! (::record-video s) true)
+                              (reset! (::video-uploading s) false))]
     (cond
-      (:video-id entry-editing)
+      (:fixed-video-id entry-editing)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "rerecord-video"
                         :message "You sure you want to replace the current video?"
@@ -168,7 +175,9 @@
       (start-recording-fn))))
 
 (defn video-uploaded-cb [video-token]
-  (dis/dispatch! [:update [:entry-editing] #(merge % {:video-id video-token
+  (dis/dispatch! [:update [:entry-editing] #(merge % {:fixed-video-id video-token
+                                                      :video-id video-token
+                                                      :video-error false
                                                       :has-changes true})]))
 
 (defn- remove-video-cb []
@@ -216,6 +225,7 @@
                         (rum/local false ::show-legend)
                         (rum/local false ::record-video)
                         (rum/local 0 ::mobile-video-height)
+                        (rum/local false ::video-uploading)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -342,7 +352,7 @@
           [:div.entry-edit-modal-header-right
             (let [fixed-headline (utils/trim (:headline entry-editing))
                   disabled? (or @(::publishing s)
-                                (not (is-publishable? entry-editing))
+                                (not (is-publishable? s entry-editing))
                                 (zero? (count fixed-headline)))
                   working? (or (and published?
                                     @(::saving s))
@@ -352,7 +362,7 @@
                 {:ref "mobile-post-btn"
                  :on-click (fn [_]
                              (clean-body s)
-                             (if (and (is-publishable? entry-editing)
+                             (if (and (is-publishable? s entry-editing)
                                       (not (zero? (count fixed-headline))))
                                 (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
                                       updated-entry-editing @(drv/get-ref s :entry-editing)
@@ -390,7 +400,9 @@
               [:div.mobile-buttons-divider-line])
             (when should-show-save-button?
               (let [disabled? (or @(::saving s)
-                                  (not (:has-changes entry-editing)))
+                                  (not (:has-changes entry-editing))
+                                  (and @(::record-video s)
+                                       (not @(::video-uploading s))))
                     working? @(::saving s)]
                 [:button.mlb-reset.header-buttons.save-button
                   {:class (utils/class-set {:disabled disabled?
@@ -431,25 +443,26 @@
           [:div.entry-edit-modal-video-bt-container
             [:button.mlb-reset.video-record-bt
               {:on-click #(video-record-clicked s)
-               :class (when (or (:video-id entry-editing)
+               :class (when (or (:fixed-video-id entry-editing)
                                 @(::record-video s))
                         "remove-video-bt")}
-              (if (or (:video-id entry-editing)
+              (if (or (:fixed-video-id entry-editing)
                       @(::record-video s))
                 "Remove video"
                 "Record video")]]]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ;; Video elements
-          (when (and (:video-id entry-editing)
+          (when (and (:fixed-video-id entry-editing)
                      (not @(::record-video s)))
-            (ziggeo-player {:video-id (:video-id entry-editing)
+            (ziggeo-player {:video-id (:fixed-video-id entry-editing)
                             :remove-video-cb remove-video-cb
                             :width (:width video-size)
                             :height (:height video-size)
                             :video-processed (:video-processed entry-editing)}))
           (when @(::record-video s)
             (ziggeo-recorder {:start-cb video-uploaded-cb
+                              :upload-started-cb #(reset! (::video-uploading s) true)
                               :width (:width video-size)
                               :height (:height video-size)
                               :remove-recorder-cb (fn []
@@ -480,7 +493,7 @@
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})]
-          (when (:video-id entry-editing)
+          (when (:fixed-video-id entry-editing)
             [:div.entry-edit-transcript
               [:textarea.video-transcript
                 {:ref "transcript-edit"
