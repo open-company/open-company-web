@@ -1,11 +1,11 @@
 div.ziggeo-player {
   position: relative;
-  border-radius: 6px;
+  border-radius: 8px;
 
   div.ziggeo-player-embed {
-    border-radius: 6px;
+    border-radius: 8px;
     &>div {
-      border-radius: 6px;
+      border-radius: 8px;
     }
   }
 
@@ -15,46 +15,44 @@ div.ziggeo-player {
     background-color: #ECECEC;
     background-repeat: no-repeat;
     background-position: center;
-    border-radius: 6px;
+    border-radius: 8px;
   }
 
   button.remove-video-bt {
-    width: 40px;
-    height: 40px;
-    background-image: cdnUrl("/img/ML/modal_close_x.svg");
-    background-size: 40px;
-    background-position: 50%;
+    width: 24px;
+    height: 24px;
+    background-image: cdnUrl("/img/ML/remove_video_x.svg");
+    background-size: 12px;
+    background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.7;
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    left: 12px;
     z-index: 1;
   }
 }
 
 div.ziggeo-recorder {
   position: relative;
-  border-radius: 6px;
+  border-radius: 8px;
 
   div.ziggeo-recorder-embed {
-    border-radius: 6px;
+    border-radius: 8px;
     &>div {
-      border-radius: 6px;
+      border-radius: 8px;
     }
   }
 
  button.remove-recorder-bt {
-    width: 40px;
-    height: 40px;
-    background-image: cdnUrl("/img/ML/modal_close_x.svg");
-    background-size: 40px;
-    background-position: 50%;
+    width: 24px;
+    height: 24px;
+    background-image: cdnUrl("/img/ML/remove_video_x.svg");
+    background-size: 12px;
+    background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.7;
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    left: 12px;
     z-index: 1;
   } 
 

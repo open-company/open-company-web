@@ -6,7 +6,7 @@ div.entry-edit-modal-container {
   position: fixed;
   top: 0px;
   left: 0px;
-  background-color: $oc_gray_8;
+  background-color: white;
   z-index: #{$navbar_zindex + 105};
   transition: opacity 180ms ease-in;
   overflow-y: auto;
@@ -167,13 +167,11 @@ div.entry-edit-modal-container {
   }
 
   div.entry-edit-modal {
-    width: 720px;
-    margin: 112px auto 0px;
+    width: 640px;
+    margin: 56px auto 0px;
     position: relative;
     background-color: white;
-    border-radius: 6px;
-    box-shadow: 0px 2px 4px 0px rgba(#E4E3DE, 0.5);
-    padding: 32px 40px;
+    padding: 24px 0px;
 
     @include mobile() {
       width: 100%;
@@ -188,6 +186,8 @@ div.entry-edit-modal-container {
     div.entry-edit-modal-section {
       width: 100%;
       margin-top: 16px;
+      border-bottom: 1px solid rgba($ui_grey, 0.2);
+      padding-bottom: 24px;
 
       @include mobile() {
         padding: 24px 24px 0px;
@@ -205,7 +205,6 @@ div.entry-edit-modal-container {
         font-size: 14px;
         color: $deep_navy;
         float: left;
-        margin-left: 16px;
         margin-top: 6px;
         position: relative;
 
@@ -247,6 +246,50 @@ div.entry-edit-modal-container {
           z-index: 1000;
         }
       }
+
+      div.entry-edit-modal-video-bt-container {
+        float: right;
+        button.video-record-bt {
+          @include avenir_M();
+          color: $light_ui_grey;
+          font-size: 14px;
+          height: 20px;
+          position: relative;
+          padding-left: 26px;
+
+          &.remove-video-bt {
+            &:before {
+              background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+            }
+            &:hover {
+              &:before {
+                background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+              }
+            }
+          }
+
+          &:hover {
+            color: $ui_grey;
+
+            &:before {
+              background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+            }
+          }
+
+          &:before {
+            content: "";
+            left: 0px;
+            top: 4px;
+            position: absolute;
+            height: 12px;
+            width: 20px;
+            background-image: cdnUrl("/img/ML/capture_video_icon.svg");
+            background-size: 20px 12px;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+        }
+      }
     }
 
     div.entry-edit-modal-body {
@@ -259,6 +302,14 @@ div.entry-edit-modal-container {
 
         div.ziggeo-player, div.ziggeo-recorder {
           margin-left: -24px;
+        }
+      }
+
+      div.ziggeo-player, div.ziggeo-recorder {
+        margin: 0px auto;
+
+        div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
+          margin: 0px auto;
         }
       }
 
@@ -308,55 +359,64 @@ div.entry-edit-modal-container {
         }
       }
 
-      div.rich-body-editor-container {
-        position: relative;
-        overflow: visible;
+      div.rich-body-editor-wrapper {
+        overflow-x: hidden;
+        overflow-y: auto;
 
-        div.medium-editor-media-picker {
-          margin-top: 0px;
-          margin-left: -42px;
-          top: 0px;
-        }
+        div.rich-body-editor-container {
+          position: relative;
+          overflow: visible;
+          height: auto;
 
-        div.rich-body-editor {
-          border: none;
-          outline: none;
-          margin: 8px 0px 0px;
-          cursor: text;
-          @include activity-body(16, 22, 22, $deep_navy);
-          color: $deep_navy;
-          @include avenir_R();
-          font-size: 16px;
-          line-height: 22px;
+          div.medium-editor-media-picker {
+            margin-top: 0px;
+            margin-left: -42px;
+            top: 0px;
+          }
 
-          @media screen and (min-height: 556px) {
-            min-height: 240px;
-            max-height: calc(100vh - 315px);
+          div.rich-body-editor {
+            border: none;
+            outline: none;
+            margin: 8px 0px 0px;
+            cursor: text;
+            @include activity-body(16, 22, 22, $deep_navy);
+            color: $deep_navy;
+            @include avenir_R();
+            font-size: 16px;
+            line-height: 22px;
+            height: auto;
             overflow-y: auto;
             overflow-x: hidden;
-          }
 
-          @include mobile() {
-            min-height: initial;
-            max-height: initial;
-            overflow-x: auto;
-            overflow-y: auto;
-          }
+            // @media screen and (min-height: 556px) {
+            //   // min-height: 240px;
+            //   // max-height: calc(100vh - 315px);
+            //   overflow-y: auto;
+            //   overflow-x: hidden;
+            // }
 
-          & > *:first-child {
-            margin-top: 0px;
-          }
+            @include mobile() {
+              min-height: initial;
+              max-height: initial;
+              overflow-x: auto;
+              overflow-y: auto;
+            }
 
-          p:not(:last-child):not(:first-child) {
-            margin: 16px 0px;
-          }
+            & > *:first-child {
+              margin-top: 0px;
+            }
 
-          &.medium-editor-placeholder:after {
-            color: $light_ui_grey !important;
-          }
+            p:not(:last-child):not(:first-child) {
+              margin: 16px 0px;
+            }
 
-          &:after {
-            margin: 0;
+            &.medium-editor-placeholder:after {
+              color: $light_ui_grey !important;
+            }
+
+            &:after {
+              margin: 0;
+            }
           }
         }
       }
@@ -466,20 +526,6 @@ div.entry-edit-modal-container {
         background-color: $light_ui_grey;
         margin: 0px 16px;
         float: left;
-      }
-
-      button.video-record-bt {
-        @include avenir_M();
-        color: $light_ui_grey;
-        font-size: 14px;
-        float: left;
-        padding: 2px 0px;
-        height: 20px;
-        width: 20px;
-        background-image: cdnUrl("/img/ML/video_recorder_icon.svg");
-        background-size: 18px 12px;
-        background-repeat: no-repeat;
-        background-position: center;
       }
     }
   }

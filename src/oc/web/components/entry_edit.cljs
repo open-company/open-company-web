@@ -316,15 +316,19 @@
         show-sections-picker (drv/react s :show-sections-picker)
         posting-title (if (:uuid entry-editing)
                         (if (= (:status entry-editing) "published")
-                          "Posted to: "
-                          "Draft for: ")
-                        "Posting to: ")
-        video-size (when (:video-id entry-editing)
-                    (if is-mobile?
-                      {:width (win-width)
-                       :height @(::mobile-video-height s)}
-                      {:width 640
-                       :height 480}))]
+                          "Posted to "
+                          "Draft for ")
+                        "Posting to ")
+        video-size (if is-mobile?
+                     {:width (win-width)
+                      :height @(::mobile-video-height s)}
+                     {:width 360
+                      :height 202})
+        body-min-height-delta (if (or (:video-id entry-editing)
+                                            @(::record-video s))
+                                      (+ 264 (:height video-size))
+                                      264)
+        body-min-height (str "calc(100vh - " body-min-height-delta "px)")]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -404,7 +408,6 @@
       [:div.entry-edit-modal.group
         {:ref "entry-edit-modal"}
         [:div.entry-edit-modal-section.group
-          (user-avatar-image current-user-data)
           [:div.posting-in
             {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                           (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
@@ -424,7 +427,18 @@
                      (merge entry-editing {:board-slug (:slug board-data)
                                            :board-name (:name board-data)
                                            :has-changes true
-                                           :invite-note note})]))))])]]
+                                           :invite-note note})]))))])]
+          ;; Add video button
+          [:div.entry-edit-modal-video-bt-container
+            [:button.mlb-reset.video-record-bt
+              {:on-click #(video-record-clicked s)
+               :class (when (or (:video-id entry-editing)
+                                @(::record-video s))
+                        "remove-video-bt")}
+              (if (or (:video-id entry-editing)
+                      @(::record-video s))
+                "Remove video"
+                "Capture video")]]]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ;; Video elements
@@ -455,17 +469,19 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          (rich-body-editor {:on-change (partial body-on-change s)
-                             :use-inline-media-picker false
-                             :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
-                             :initial-body @(::initial-body s)
-                             :show-placeholder (not (contains? entry-editing :links))
-                             :show-h2 true
-                             :dispatch-input-key :entry-editing
-                             :upload-progress-cb (fn [is-uploading?]
-                                                   (reset! (::uploading-media s) is-uploading?))
-                             :media-config ["photo" "video"]
-                             :classes "emoji-autocomplete emojiable fs-hide"})
+          [:div.rich-body-editor-wrapper
+            {:style {:height body-min-height}}
+            (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker false
+                               :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
+                               :initial-body @(::initial-body s)
+                               :show-placeholder (not (contains? entry-editing :links))
+                               :show-h2 true
+                               :dispatch-input-key :entry-editing
+                               :upload-progress-cb (fn [is-uploading?]
+                                                     (reset! (::uploading-media s) is-uploading?))
+                               :media-config ["photo" "video"]
+                               :classes "emoji-autocomplete emojiable fs-hide"})]
           (when (:video-id entry-editing)
             [:div.entry-edit-transcript
               [:textarea.video-transcript
@@ -494,11 +510,4 @@
                :data-placement "top"
                :data-container "body"}]
             (when @(::show-legend s)
-              [:div.entry-edit-legend-image])]
-          [:div.entry-edit-footer-separator]
-          [:button.mlb-reset.video-record-bt
-            {:data-toggle "tooltip"
-             :data-placement "top"
-             :data-container "body"
-             :title (if (:video-id entry-editing) "Replace video" "Record video")
-             :on-click #(video-record-clicked s)}]]]]))
+              [:div.entry-edit-legend-image])]]]]))

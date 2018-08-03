@@ -610,10 +610,3 @@
                                            (router/current-org-slug)
                                            (json->cljs body)
                                            nil]))))))
-
-(defn should-show-good-human-banner? []
-  (not (cook/get-cookie (router/good-human-banner))))
-
-
-(defn hide-good-human-banner! []
-  (cook/set-cookie! (router/good-human-banner) true (* 60 60 24 365)))

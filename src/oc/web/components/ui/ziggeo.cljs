@@ -66,6 +66,7 @@
                                       :or {width 640
                                            height 480}} (first (:rum/args s))
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
+                                 (js/console.log "XXX ziggeo-recorder/did-mount width" width "height" height)
                                  (let [attrs {:width width
                                               :height height
                                               :theme "carrot"
@@ -150,9 +151,10 @@
              pick-cover-end-cb upload-started-cb rerecord-cb remove-recorder-cb]
       :or {width 640
            height 480}}]
+  (js/console.log "XXX ziggeo-recorder/render width" width "height" height)
   [:div.ziggeo-recorder
     {:style {:width (str (or width 640) "px")
-             :height (str (+ (or height 480) 96) "px")}}
+             :height (str (or height 480) "px")}}
     (when (fn? remove-recorder-cb)
       [:button.mlb-reset.remove-recorder-bt
         {:on-click (fn [] (when (fn? remove-recorder-cb)

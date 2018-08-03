@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="12px" viewBox="0 0 16 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 51.1 (57501) - http://www.bohemiancoding.com/sketch -->
-    <title>Combined Shape</title>
+<svg width="8px" height="13px" viewBox="0 0 8 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>Path 82</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Video" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="June-29:-Covershot-selected" transform="translate(-292.000000, -405.000000)" fill="#2F3944" fill-rule="nonzero">
-            <g id="Group-7" transform="translate(260.000000, 165.000000)">
-                <g id="Group-6" transform="translate(16.000000, 222.000000)">
-                    <g id="Group-4">
-                        <path d="M25.2,19.5406659 L25.2,31.0207195 C25.2,31.5615612 24.6673622,32 24,32 C23.3372583,32 22.8,31.564209 22.8,31.0207195 L22.8,19.5406659 L20.0485281,21.9184811 C19.579899,22.3234693 18.820101,22.3234693 18.3514719,21.9184811 C17.8828427,21.513493 17.8828427,20.8568774 18.3514719,20.4518893 L23.1514719,16.3037411 C23.620101,15.898753 24.379899,15.898753 24.8485281,16.3037411 L29.6485281,20.4518893 C30.1171573,20.8568774 30.1171573,21.513493 29.6485281,21.9184811 C29.179899,22.3234693 28.420101,22.3234693 27.9514719,21.9184811 L25.2,19.5406659 Z" id="Combined-Shape" transform="translate(24.000000, 24.000000) scale(-1, 1) rotate(90.000000) translate(-24.000000, -24.000000) "></path>
-                    </g>
+    <g id="Video" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.800000012">
+        <g id="Video-2.0-(states,-July-30)" transform="translate(-165.000000, -239.000000)" fill="#FFFFFF" fill-rule="nonzero" stroke="#FFFFFF">
+            <g id="Group-4" transform="translate(130.000000, 80.000000)">
+                <g id="Group">
+                    <path d="M43.3263641,162.695262 C43.5948495,162.434913 44.0301505,162.434913 44.2986359,162.695262 C44.5671214,162.955612 44.5671214,163.377722 44.2986359,163.638071 L39.4861359,168.304738 C39.2176505,168.565087 38.7823495,168.565087 38.5138641,168.304738 L33.7013641,163.638071 C33.4328786,163.377722 33.4328786,162.955612 33.7013641,162.695262 C33.9698495,162.434913 34.4051505,162.434913 34.6736359,162.695262 L39,166.890524 L43.3263641,162.695262 Z" id="Path-82" transform="translate(39.000000, 165.500000) rotate(90.000000) translate(-39.000000, -165.500000) "></path>
                 </g>
             </g>
         </g>
