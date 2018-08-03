@@ -66,7 +66,6 @@
                                       :or {width 640
                                            height 480}} (first (:rum/args s))
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
-                                 (js/console.log "XXX ziggeo-recorder/did-mount width" width "height" height)
                                  (let [attrs {:width width
                                               :height height
                                               :theme "carrot"
@@ -86,9 +85,10 @@
                                    (.on recorder-instance "upload_progress"
                                     (fn [a b]
                                      (timbre/debug "upload_progress" a b (fn? upload-started-cb))
+                                     (when-not @(::uploading s)
+                                       (reset! (::uploading s) true))
                                      (when (and (fn? upload-started-cb)
                                                 (not @(::uploading s)))
-                                       (reset! (::uploading s) true)
                                        (upload-started-cb))
                                      (when-not @(::mounted s)
                                        (na/show-notification {:title "Video is uploading."
@@ -151,7 +151,6 @@
              pick-cover-end-cb upload-started-cb rerecord-cb remove-recorder-cb]
       :or {width 640
            height 480}}]
-  (js/console.log "XXX ziggeo-recorder/render width" width "height" height)
   [:div.ziggeo-recorder
     {:style {:width (str (or width 640) "px")
              :height (str (or height 480) "px")}}
