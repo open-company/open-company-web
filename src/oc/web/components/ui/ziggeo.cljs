@@ -86,10 +86,9 @@
                                     (fn [a b]
                                      (timbre/debug "upload_progress" a b (fn? upload-started-cb))
                                      (when-not @(::uploading s)
-                                       (reset! (::uploading s) true))
-                                     (when (and (fn? upload-started-cb)
-                                                (not @(::uploading s)))
-                                       (upload-started-cb))
+                                       (reset! (::uploading s) true)
+                                       (when (fn? upload-started-cb)
+                                          (upload-started-cb)))
                                      (when-not @(::mounted s)
                                        (na/show-notification {:title "Video is uploading."
                                                               :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")
