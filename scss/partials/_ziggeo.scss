@@ -10,7 +10,7 @@ div.ziggeo-player {
   }
 
   div.ziggeo-player-not-processed {
-    @include image-2x("/img/ML/video_loading");
+    background-image: cdnUrl("/img/ML/video_loading.svg");
     background-size: 100%;
     background-color: #ECECEC;
     background-repeat: no-repeat;
