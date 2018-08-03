@@ -144,7 +144,7 @@
       (dis/dispatch! [:update [:modal-editing-data] #(merge % {:body (utils/clean-body-html raw-html)
                                                                :has-changes true})])))
   (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
-    (when (:video-id editing-data)
+    (when (:fixed-video-id editing-data)
       (when-let [transcription-el (rum/ref-node state "transcript-edit")]
         (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
@@ -201,7 +201,9 @@
         (reset! (::edited-data-loaded s) true)))))
 
 (defn remove-video []
-  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id nil
+  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id nil
+                                                           :video-id nil
+                                                           :video-error false
                                                            :video-transcript nil
                                                            :video-processed false
                                                            :has-changes true})]))
@@ -210,7 +212,7 @@
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)
         activity-editing (:modal-editing-data modal-data)
         start-recording-fn #(reset! (::record-video s) true)]
-    (if (:video-id activity-editing)
+    (if (:fixed-video-id activity-editing)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "rerecord-video"
                         :message "You sure you want to replace the current video?"
@@ -226,7 +228,9 @@
       (start-recording-fn))))
 
 (defn video-uploaded-cb [video-token]
-  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-id video-token
+  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id video-token
+                                                           :video-id video-token
+                                                           :video-error false
                                                            :has-changes true})]))
 
 (defn- remove-video-cb []
@@ -383,7 +387,7 @@
         editing (:modal-editing modal-data)
         activity-editing (:modal-editing-data modal-data)
         activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
-        video-id (if editing (:video-id activity-editing) (:video-id activity-data))
+        video-id (if editing (:fixed-video-id activity-editing) (:fixed-video-id activity-data))
         show-sections-picker (and editing (:show-sections-picker modal-data))
         dom-element-id (str "fullscreen-post-" (:uuid activity-data))
         activity-comments (-> modal-data
@@ -392,8 +396,8 @@
                               :sorted-comments)
         comments-data (or activity-comments (:comments activity-data))
         read-data (:read-data modal-data)
-        video-size (when (or (and (not editing) (:video-id activity-data))
-                             (and editing (:video-id activity-editing)))
+        video-size (when (or (and (not editing) (:fixed-video-id activity-data))
+                             (and editing (:fixed-video-id activity-editing)))
                     (if is-mobile?
                       {:width (win-width)
                        :height @(::mobile-video-height s)}
@@ -574,7 +578,7 @@
                     {:data-toggle "tooltip"
                      :data-placement "top"
                      :data-container "body"
-                     :title (if (:video-id activity-data) "Replace video" "Record video")
+                     :title (if (:fixed-video-id activity-data) "Replace video" "Record video")
                      :on-click #(video-record-clicked s)}]]]
                 [:div.fullscreen-post-box-footer.group
                   {:class (when (and (pos? (count comments-data))

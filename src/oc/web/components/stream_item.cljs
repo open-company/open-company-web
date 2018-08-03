@@ -45,7 +45,7 @@
               (> (count (:attachments activity-data)) 3)
               (pos? (count comments-data))
               (:body-has-images activity-data)
-              (:video-id activity-data))
+              (:fixed-video-id activity-data))
       (reset! (::truncated s) true))
     (reset! (::item-ready s) true)))
 
@@ -117,7 +117,7 @@
                     (first (:author activity-data))
                     (:publisher activity-data))
         dom-node-class (str "stream-item-" (:uuid activity-data))
-        has-video (seq (:video-id activity-data))
+        has-video (seq (:fixed-video-id activity-data))
         video-size (when has-video
                      (if is-mobile?
                        {:width (win-width)
@@ -179,11 +179,11 @@
         [:div.group
           (when has-video
             (rum/with-key
-             (ziggeo-player {:video-id (:video-id activity-data)
+             (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
                              :height (:height video-size)
                              :video-processed (:video-processed activity-data)})
-              (str "ziggeo-player-" (:video-id activity-data) "-" (if expanded? "exp" ""))))
+              (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))))
           [:div.stream-body-left.group.fs-hide
             {:class (when (and has-video (not expanded?)) "has-video")}
             [:div.stream-item-headline.ap-seen-item-headline
