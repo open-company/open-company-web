@@ -6,7 +6,7 @@ div.entry-edit-modal-container {
   position: fixed;
   top: 0px;
   left: 0px;
-  background-color: white;
+  background-color: $oc_gray_8;
   z-index: #{$navbar_zindex + 105};
   transition: opacity 180ms ease-in;
   overflow-y: auto;
@@ -167,11 +167,13 @@ div.entry-edit-modal-container {
   }
 
   div.entry-edit-modal {
-    width: 640px;
-    margin: 56px auto 0px;
+    width: 720px;
+    margin: 112px auto 0px;
     position: relative;
     background-color: white;
-    padding: 24px 0px;
+    border-radius: 6px;
+    box-shadow: 0px 2px 4px 0px rgba(#E4E3DE, 0.5);
+    padding: 32px 40px;
 
     @include mobile() {
       width: 100%;
@@ -192,12 +194,6 @@ div.entry-edit-modal-container {
       @include mobile() {
         padding: 24px 24px 0px;
         height: 56px;
-      }
-
-      @include user-profile(32);
-
-      & > div.user-avatar-img-container {
-        float: left;
       }
 
       div.posting-in {
@@ -389,13 +385,6 @@ div.entry-edit-modal-container {
             height: auto;
             overflow-y: auto;
             overflow-x: hidden;
-
-            // @media screen and (min-height: 556px) {
-            //   // min-height: 240px;
-            //   // max-height: calc(100vh - 315px);
-            //   overflow-y: auto;
-            //   overflow-x: hidden;
-            // }
 
             @include mobile() {
               min-height: initial;

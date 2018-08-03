@@ -327,12 +327,7 @@
                      {:width (win-width)
                       :height @(::mobile-video-height s)}
                      {:width 360
-                      :height 202})
-        body-min-height-delta (if (or (:video-id entry-editing)
-                                            @(::record-video s))
-                                      (+ 264 (:height video-size))
-                                      264)
-        body-min-height (str "calc(100vh - " body-min-height-delta "px)")]
+                      :height 202})]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -474,7 +469,6 @@
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
           [:div.rich-body-editor-wrapper
-            {:style {:height body-min-height}}
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker false
                                :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
