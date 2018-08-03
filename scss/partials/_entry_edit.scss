@@ -249,6 +249,8 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-video-bt-container {
         float: right;
+        margin-top: 4px;
+
         button.video-record-bt {
           @include avenir_M();
           color: $light_ui_grey;
@@ -279,7 +281,7 @@ div.entry-edit-modal-container {
           &:before {
             content: "";
             left: 0px;
-            top: 4px;
+            top: 3px;
             position: absolute;
             height: 12px;
             width: 20px;

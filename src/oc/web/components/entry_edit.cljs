@@ -148,7 +148,8 @@
 (defn video-record-clicked [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
         start-recording-fn #(reset! (::record-video s) true)]
-    (if (:video-id entry-editing)
+    (cond
+      (:video-id entry-editing)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "rerecord-video"
                         :message "You sure you want to replace the current video?"
@@ -158,9 +159,12 @@
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
                                           (remove-video)
-                                          (start-recording-fn)
+                                          (reset! (::record-video s) false)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data))
+      @(::record-video s)
+      (reset! (::record-video s) false)
+      :else
       (start-recording-fn))))
 
 (defn video-uploaded-cb [video-token]
@@ -438,7 +442,7 @@
               (if (or (:video-id entry-editing)
                       @(::record-video s))
                 "Remove video"
-                "Capture video")]]]
+                "Record video")]]]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ;; Video elements
