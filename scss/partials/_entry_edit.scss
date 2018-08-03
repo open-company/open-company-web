@@ -484,8 +484,7 @@ div.entry-edit-modal-container {
       }
 
       div.entry-edit-legend-container {
-        float: left;
-        margin-left: 16px;
+        float: right;
         position: relative;
         width: 20px;
         height: 20px;
@@ -501,6 +500,11 @@ div.entry-edit-modal-container {
           position: absolute;
           top: 0px;
           left: 0px;
+          opacity: 0.4;
+
+          &:hover {
+            opacity: 1;
+          }
         }
 
         div.entry-edit-legend-image {

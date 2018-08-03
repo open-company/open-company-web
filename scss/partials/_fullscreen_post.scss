@@ -484,7 +484,6 @@ div.fullscreen-post-container {
           div.fullscreen-post-box-footer-editing {
             div.fullscreen-post-box-footer-multi-picker {
               float: left;
-              width: 20px;
               height: 20px;
             }
 
@@ -513,7 +512,7 @@ div.fullscreen-post-container {
             }
 
             div.fullscreen-post-box-footer-legend-container {
-              float: left;
+              float: right;
               margin-left: 16px;
               position: relative;
               width: 20px;
@@ -530,6 +529,11 @@ div.fullscreen-post-container {
                 position: absolute;
                 top: 0px;
                 left: 0px;
+                opacity: 0.4;
+
+                &:hover {
+                  opacity: 1;
+                }
               }
 
               div.fullscreen-post-box-footer-legend-image {
@@ -565,6 +569,11 @@ div.fullscreen-post-container {
               background-size: 18px 12px;
               background-repeat: no-repeat;
               background-position: center;
+              opacity: 0.4;
+
+              &:hover {
+                opacity: 1;
+              }
             }
           }
         }
