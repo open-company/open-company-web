@@ -227,9 +227,17 @@
         (alert-modal/show-alert alert-data))
       (start-recording-fn))))
 
-(defn video-uploaded-cb [video-token]
+(defn video-started-recording-cb [video-token]
   (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id video-token
                                                            :video-id video-token
+                                                           ;; Default video error to true
+                                                           :video-error true
+                                                           :has-changes true})]))
+
+(defn video-processed-cb [video-token]
+  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id video-token
+                                                           :video-id video-token
+                                                           ;; turn off video error since upload finished
                                                            :video-error false
                                                            :has-changes true})]))
 
@@ -493,9 +501,10 @@
                               :height (:height video-size)
                               :video-processed (:video-processed current-activity-data)}))
             (when @(::record-video s)
-              (ziggeo-recorder {:start-cb video-uploaded-cb
+              (ziggeo-recorder {:start-cb video-started-recording-cb
                                 :width (:width video-size)
                                 :height (:height video-size)
+                                :submit-cb video-processed-cb
                                 :remove-recorder-cb (fn []
                                   (remove-video)
                                   (reset! (::record-video s) false))}))
