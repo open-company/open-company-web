@@ -386,8 +386,6 @@
         share-link (utils/link-for (:links activity-data) "share")
         editing (:modal-editing modal-data)
         activity-editing (:modal-editing-data modal-data)
-        activity-attachments (if editing (:attachments activity-editing) (:attachments activity-data))
-        video-id (if editing (:fixed-video-id activity-editing) (:fixed-video-id activity-data))
         show-sections-picker (and editing (:show-sections-picker modal-data))
         dom-element-id (str "fullscreen-post-" (:uuid activity-data))
         activity-comments (-> modal-data
@@ -396,8 +394,10 @@
                               :sorted-comments)
         comments-data (or activity-comments (:comments activity-data))
         read-data (:read-data modal-data)
-        video-size (when (or (and (not editing) (:fixed-video-id activity-data))
-                             (and editing (:fixed-video-id activity-editing)))
+        current-activity-data (if editing activity-editing activity-data)
+        video-id (:fixed-video-id current-activity-data)
+        activity-attachments (:attachments current-activity-data)
+        video-size (when (:fixed-video-id current-activity-data)
                     (if is-mobile?
                       {:width (win-width)
                        :height @(::mobile-video-height s)}
@@ -419,7 +419,7 @@
                         (close-clicked s))}]
         [:div.header-title-container.group.fs-hide
           {:key (:updated-at activity-data)
-           :dangerouslySetInnerHTML (utils/emojify (:headline (if editing activity-editing activity-data)))}]
+           :dangerouslySetInnerHTML (utils/emojify (:headline current-activity-data))}]
         [:div.fullscreen-post-header-right
           [:div.activity-share-container]
           (if editing
@@ -436,7 +436,7 @@
             [:div.fullscreen-post-author-header-author
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
-              (user-avatar-image (:publisher activity-data))
+              (user-avatar-image (:publisher current-activity-data))
               [:div.fullscreen-post-box-content-board.group
                 [:span.posting-in-span
                   "Posting in "]
@@ -459,26 +459,26 @@
                                                   :invite-note note})]))))])]]]
           [:div.fullscreen-post-author-header.group
             [:div.fullscreen-post-author-header-author
-              (user-avatar-image (:publisher activity-data))
+              (user-avatar-image (:publisher current-activity-data))
               [:div.name.fs-hide
-                (str (:name (:publisher activity-data))
+                (str (:name (:publisher current-activity-data))
                  " in "
-                 (:board-name activity-data))]
+                 (:board-name current-activity-data))]
               [:div.fullscreen-post-author-header-sub
                 [:div.time-since
-                  (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                  (let [t (or (:published-at current-activity-data) (:created-at current-activity-data))]
                     [:time
                       {:date-time t
                        :data-toggle (when-not is-mobile? "tooltip")
                        :data-placement "top"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :data-title (utils/activity-date-tooltip activity-data)}
+                       :data-title (utils/activity-date-tooltip current-activity-data)}
                       (utils/time-since t)])]
                 [:div.separator]
                 [:div.fullscreen-post-wrt
-                  (wrt activity-data read-data)]]]
+                  (wrt current-activity-data read-data)]]]
             [:div.fullscreen-post-author-header-right
-              (when (:new activity-data)
+              (when (:new current-activity-data)
                 [:div.new-tag
                   "New"])]])
         ;; Left column
@@ -491,7 +491,7 @@
                               :remove-video-cb (when editing remove-video-cb)
                               :width (:width video-size)
                               :height (:height video-size)
-                              :video-processed (:video-processed (if editing activity-editing activity-data))}))
+                              :video-processed (:video-processed current-activity-data)}))
             (when @(::record-video s)
               (ziggeo-recorder {:start-cb video-uploaded-cb
                                 :width (:width video-size)
@@ -503,7 +503,7 @@
               [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable.fs-hide
                 {:content-editable true
                  :ref "edit-headline"
-                 :key (str "fullscreen-post-headline-edit-" (:updated-at activity-data))
+                 :key (str "fullscreen-post-headline-edit-" (:updated-at current-activity-data))
                  :placeholder utils/default-headline
                  :on-paste    #(headline-on-paste s %)
                  :on-key-down #(headline-on-change s)
@@ -518,10 +518,10 @@
                  :ref "edit-headline"
                  :key (str "fullscreen-post-headline-" (:updated-at activity-data))
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
-            (when (and (:must-see activity-data)
+            (when (and (:must-see current-activity-data)
                        (not editing))
               [:div.must-see
-               {:class (utils/class-set {:must-see-on (:must-see activity-data)})}])
+               {:class (utils/class-set {:must-see-on (:must-see current-activity-data)})}])
             (if editing
               (rich-body-editor {:on-change #(body-on-change s)
                                  :initial-body @(::initial-body s)
@@ -534,21 +534,22 @@
                                  :use-inline-media-picker false
                                  :multi-picker-container-selector "div#fullscreen-post-box-footer-multi-picker"})
               [:div.fullscreen-post-box-content-body.fs-hide
-                {:key (str "fullscreen-post-body-" (:updated-at activity-data))
+                {:key (str "fullscreen-post-body-" (:updated-at current-activity-data))
                  :ref :fullscreen-post-box-content-body
-                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
-            (when (:video-transcript activity-data)
+                 :dangerouslySetInnerHTML (utils/emojify (:body current-activity-data))}])
+            (when (and (:video-transcript current-activity-data)
+                       (:video-processed current-activity-data))
               (if editing
                 [:div.fullscreen-post-transcript
                   [:textarea.fullscreen-post-transcript-edit
                     {:ref "transcript-edit"
                      :on-input #(ui-utils/resize-textarea (.-target %))
-                     :default-value (:video-transcript activity-data)}]]
+                     :default-value (:video-transcript current-activity-data)}]]
                 [:div.fullscreen-post-transcript
                   [:div.fullscreen-post-transcript-header
                     "This transcript was automatically generated and may not be accurate"]
                   [:div.fullscreen-post-transcript-content
-                    (:video-transcript activity-data)]]))
+                    (:video-transcript current-activity-data)]]))
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             (if editing
@@ -578,14 +579,14 @@
                     {:data-toggle "tooltip"
                      :data-placement "top"
                      :data-container "body"
-                     :title (if (:fixed-video-id activity-data) "Replace video" "Record video")
+                     :title (if (:fixed-video-id current-activity-data) "Replace video" "Record video")
                      :on-click #(video-record-clicked s)}]]]
                 [:div.fullscreen-post-box-footer.group
                   {:class (when (and (pos? (count comments-data))
-                                     (> (count (:reactions activity-data)) 2))
+                                     (> (count (:reactions current-activity-data)) 2))
                             "wrap-reactions")}
-                  (comments-summary activity-data)
-                  (reactions activity-data)])]]
+                  (comments-summary current-activity-data)
+                  (reactions current-activity-data)])]]
         ;; Right column
         (when (:has-comments activity-data)
           [:div.fullscreen-post-right-column.group

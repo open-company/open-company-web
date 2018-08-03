@@ -493,7 +493,8 @@
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})]
-          (when (:fixed-video-id entry-editing)
+          (when (and (:fixed-video-id entry-editing)
+                     (:video-processed entry-editing))
             [:div.entry-edit-transcript
               [:textarea.video-transcript
                 {:ref "transcript-edit"
