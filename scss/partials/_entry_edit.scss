@@ -386,6 +386,11 @@ div.entry-edit-modal-container {
             overflow-y: auto;
             overflow-x: hidden;
 
+            @media screen and (min-height: 556px) {
+              min-height: 240px;
+              max-height: calc(100vh - 315px);
+            }
+
             @include mobile() {
               min-height: initial;
               max-height: initial;
