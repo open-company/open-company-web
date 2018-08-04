@@ -38,7 +38,7 @@
               [:div.price-column-price
                 "0"]
               [:div.price-column-description
-                "Free for small teams for an unlimited period of time"]
+                "Free for small teams"]
               [:button.mlb-reset.price-button
                 {:on-click #(track-event "Free")}
                 "Create a digest"]]
