@@ -298,9 +298,9 @@
             [:div.price-column-price
               "8"]
             [:div.price-column-description
-              "Per user per month billed annually"]
+              "Per user, per month, billed annually"]
             [:div.price-column-description.second-line
-              "Or $10 billed monthly"]
+              "Or $10 monthly"]
             [:button.mlb-reset.price-button
               {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Standard'});"}
               "Buy standard"]]
@@ -311,9 +311,9 @@
             [:div.price-column-price
               "12"]
             [:div.price-column-description
-              "Per user per month billed annually"]
+              "Per user, per month, billed annually"]
             [:div.price-column-description.second-line
-              "Or $14 billed monthly"]
+              "Or $14 monthly"]
             [:button.mlb-reset.price-button
               {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Plus'});"}
               "Buy plus"]]]
