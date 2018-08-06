@@ -124,7 +124,8 @@
         (when (= step 1)
           (if should-show-first-tip
             (dis/dispatch! [:input [:show-add-post-tooltip] true])
-            (dis/dispatch! [:input [:show-onboard-overlay] true])))
+            (when-not (:show-add-post-tooltip @dis/app-state)
+              (dis/dispatch! [:input [:show-onboard-overlay] true]))))
         (when (and (= step 2)
                    ;; Wait for the user to add at least a post
                    can-proceed-to-second-step?)
