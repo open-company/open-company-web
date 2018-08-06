@@ -136,11 +136,15 @@
       (when-let [transcription-el (rum/ref-node s "transcript-edit")]
         (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})])))))
 
+(defn- fix-headline [entry-editing]
+  (utils/trim (:headline entry-editing)))
+
 (defn- is-publishable? [s entry-editing]
   (and (seq (:board-slug entry-editing))
        (or (and @(::record-video s)
                 @(::video-uploading s))
-           (not @(::record-video s)))))
+           (not @(::record-video s)))
+       (not (zero? (count (fix-headline entry-editing))))))
 
 (defn remove-video []
   (dis/dispatch! [:update [:entry-editing] #(merge % {:fixed-video-id nil
@@ -154,6 +158,7 @@
   (let [entry-editing @(drv/get-ref s :entry-editing)
         start-recording-fn #(do
                               (reset! (::record-video s) true)
+                              (reset! (::video-picking-cover s) false)
                               (reset! (::video-uploading s) false))]
     (cond
       (:fixed-video-id entry-editing)
@@ -209,6 +214,55 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
 
+(defn show-post-error [s message]
+  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+    (if-not (.data $post-btn "bs.tooltip")
+      (.tooltip $post-btn
+       (clj->js {:container "body"
+                 :placement "bottom"
+                 :trigger "manual"
+                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                  "<div class=\"tooltip-arrow\"></div>"
+                                  "<div class=\"tooltip-inner\"></div>"
+                                "</div>")
+                 :title message}))
+      (doto $post-btn
+        (.attr "data-original-title" message)
+        (.tooltip "fixTitle")))
+    (utils/after 10 #(.tooltip $post-btn "show"))
+    (utils/after 5000 #(.tooltip $post-btn "hide"))))
+
+(defn post-clicked [s]
+  (clean-body s)
+  (let [entry-editing @(drv/get-ref s :entry-editing)
+        fixed-headline (fix-headline entry-editing)
+        published? (= (:status entry-editing) "published")]
+    (if (is-publishable? s entry-editing)
+      (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
+            updated-entry-editing @(drv/get-ref s :entry-editing)
+            section-editing @(drv/get-ref s :section-editing)]
+        (remove-autosave s)
+        (if published?
+          (do
+            (reset! (::saving s) true)
+            (activity-actions/entry-save updated-entry-editing section-editing))
+          (do
+            (reset! (::publishing s) true)
+            (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
+      (cond
+        ;; Missing headline error
+        (zero? (count fixed-headline))
+        (show-post-error s "A title is required in order to save or share this post.")
+        ;; User needs to pick a cover shot
+        (and @(::record-video s)
+             (not @(::video-uploading s))
+             @(::video-picking-cover s))
+        (show-post-error s "Please pick a cover image for your video.")
+        ;; Video still recording
+        (and @(::record-video s)
+             (not @(::video-uploading s)))
+        (show-post-error s "Please finish video recording.")))))
+
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
@@ -234,6 +288,7 @@
                         (rum/local false ::record-video)
                         (rum/local 0 ::mobile-video-height)
                         (rum/local false ::video-uploading)
+                        (rum/local false ::video-picking-cover)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
@@ -358,45 +413,15 @@
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
-            (let [fixed-headline (utils/trim (:headline entry-editing))
-                  disabled? (or @(::publishing s)
-                                (not (is-publishable? s entry-editing))
-                                (zero? (count fixed-headline)))
+            (let [disabled? (or @(::publishing s)
+                                (not (is-publishable? s entry-editing)))
                   working? (or (and published?
                                     @(::saving s))
                                (and (not published?)
                                     @(::publishing s)))]
               [:button.mlb-reset.header-buttons.post-button
                 {:ref "mobile-post-btn"
-                 :on-click (fn [_]
-                             (clean-body s)
-                             (if (and (is-publishable? s entry-editing)
-                                      (not (zero? (count fixed-headline))))
-                                (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                      updated-entry-editing @(drv/get-ref s :entry-editing)
-                                      section-editing @(drv/get-ref s :section-editing)]
-                                  (remove-autosave s)
-                                  (if published?
-                                    (do
-                                      (reset! (::saving s) true)
-                                      (activity-actions/entry-save updated-entry-editing section-editing))
-                                    (do
-                                      (reset! (::publishing s) true)
-                                      (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
-                                (when (zero? (count fixed-headline))
-                                  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
-                                    (when-not (.data $post-btn "bs.tooltip")
-                                      (.tooltip $post-btn
-                                       (clj->js {:container "body"
-                                                 :placement "bottom"
-                                                 :trigger "manual"
-                                                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                                  "<div class=\"tooltip-arrow\"></div>"
-                                                                  "<div class=\"tooltip-inner\"></div>"
-                                                                "</div>")
-                                                 :title "A title is required in order to save or share this post."})))
-                                    (utils/after 10 #(.tooltip $post-btn "show"))
-                                    (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+                 :on-click #(post-clicked s)
                  :class (utils/class-set {:disabled disabled?
                                           :loading working?})}
                 (when working?
@@ -472,7 +497,10 @@
             (ziggeo-recorder {:start-cb video-started-recording-cb
                               :upload-started-cb #(do
                                                     (activity-actions/uploading-video %)
+                                                    (reset! (::video-picking-cover s) false)
                                                     (reset! (::video-uploading s) true))
+                              :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
+                              :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
                               :submit-cb video-processed-cb
                               :width (:width video-size)
                               :height (:height video-size)
