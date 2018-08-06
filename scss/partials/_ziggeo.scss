@@ -41,6 +41,15 @@ div.ziggeo-recorder {
     &>div {
       border-radius: 8px;
     }
+
+    .ba-videoplayer-carrot-theme-container, video, video+img, video+ba-recorderfaceoutline {
+      border-radius: 8px;
+    }
+
+    .ba-videoplayer-carrot-theme-overlay {
+      background: linear-gradient(to bottom, black, transparent 60px);
+      border-radius: 8px;
+    }
   }
 
  button.remove-recorder-bt {

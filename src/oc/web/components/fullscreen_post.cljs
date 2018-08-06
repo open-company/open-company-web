@@ -156,7 +156,7 @@
     (when (and (:has-changes edited-data)
                (pos? (count (:headline edited-data))))
       (reset! (::entry-saving state) true)
-      (activity-actions/entry-modal-save edited-data (router/current-board-slug) section-editing))))
+      (activity-actions/entry-modal-save edited-data section-editing))))
 
 (defn- dismiss-editing? [state dismiss-modal?]
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
@@ -215,7 +215,7 @@
     (if (:fixed-video-id activity-editing)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "rerecord-video"
-                        :message "You sure you want to replace the current video?"
+                        :message "Are you sure you want to delete the current video? This can’t be undone."
                         :link-button-title "Keep"
                         :link-button-cb #(alert-modal/hide-alert)
                         :solid-button-style :red

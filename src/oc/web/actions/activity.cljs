@@ -255,6 +255,9 @@
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
   (let [org-slug (router/current-org-slug)]
+    (when (and (router/current-activity-id)
+               (not= board-slug (router/current-board-slug)))
+      (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
     (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
@@ -289,7 +292,7 @@
     [edit-key :section-name-error]
     "Board name already exists or isn't allowed"]))
 
-(defn entry-modal-save [activity-data board-slug section-editing]
+(defn entry-modal-save [activity-data section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
            section-editing)
     (let [fixed-entry-data (dissoc activity-data :board-slug :board-name :invite-note)
@@ -299,7 +302,10 @@
           (if (= status 409)
             ;; Board name exists
             (board-name-exists-error :modal-editing-data)
-            (entry-modal-save-with-board-finish activity-data (when success (json->cljs body)))))))
+            (let [board-data (when success (json->cljs body))]
+              (when (router/current-activity-id)
+                (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data) (:uuid activity-data))))
+              (entry-modal-save-with-board-finish activity-data board-data))))))
     (api/update-entry activity-data :modal-editing-data create-update-entry-cb))
   (dis/dispatch! [:entry-modal-save]))
 
