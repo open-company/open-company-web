@@ -155,7 +155,7 @@
 
 (defn org-create [org-data]
   (when (seq (:name org-data))
-    (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data) org-create-cb)))
+    (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data) (:email-domains org-data) org-create-cb)))
 
 ;; Org edit
 

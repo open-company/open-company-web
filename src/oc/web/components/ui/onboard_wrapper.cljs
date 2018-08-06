@@ -366,7 +366,54 @@
              :class (when (:error org-editing) "error")
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing]
-                          (merge org-editing {:error nil :name (.. % -target -value)})])}]
+               (merge org-editing {:error nil :name (.. % -target -value)})])}]
+                 ;; Email domains row
+          [:div.org-email-domains-row.group
+            [:div.field-label
+              [:label
+                "Accepted email domains for registration"
+                [:i.mdi.mdi-information-outline
+                  {:title "Anyone who signs up with this email domain can view team boards."
+                   :data-toggle "tooltip"
+                   :data-placement "top"}]]
+              (when (:error org-editing)
+                [:label.error
+                   "Only company email domains are allowed."])]
+            [:div.org-email-domain-field
+              {:class (when (:domain-error org-editing) "error")}
+              [:input.um-invite-field.email
+                {:name "um-domain-invite"
+                 :type "text"
+                 :auto-capitalize "none"
+                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :on-change #(do
+                               (timbre/debug (.. % -target -value))
+                               (dis/dispatch! [:input [:org-editing :email-domain] (.. % -target -value)]))
+                 :placeholder "Domain, e.g. @acme.com"}]
+              [:button.mlb-reset.add-email-domain-bt
+                {:on-click #(let [domain (:email-domain org-editing)]
+                              (if (utils/valid-domain? domain)
+                                (dis/dispatch! [:input [:org-editing :email-domains] (conj (set (:email-domains org-editing)) domain)])
+                                (dis/dispatch! [:input [:org-editing :domain-error] true])))
+                 :disabled (not (utils/valid-domain?
+                                (:email-domain org-editing)))}
+                "Add domain"]]
+            (when-not (zero? (count (:email-domains org-editing)))
+              [:div.org-email-domains-list
+                (for [domain (:email-domains org-editing)]
+                  [:div.org-list-item.group
+                    {:key (str "email-domain-team-" domain)}
+                    [:span.org-list-item-name
+                      (str "@" domain)]
+                    [:button.remove-team-btn.btn-reset
+                     {:on-click #(do
+                                   (timbre/debug domain)
+                                   (timbre/debug (:email-domains org-editing))
+                                   (dis/dispatch! [:input [:org-editing :email-domains] (disj (:email-domains org-editing) domain)]))
+                       :title "Remove"
+                       :data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"}]])])]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
