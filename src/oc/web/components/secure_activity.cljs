@@ -124,6 +124,13 @@
             (when (:body activity-data)
               [:div.activity-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
+            (when (and (:video-transcript activity-data)
+                       (:video-processed activity-data))
+              [:div.activity-video-transcript
+                [:div.activity-video-transcript-header
+                  "This transcript was automatically generated and may not be accurate"]
+                [:div.activity-video-transcript-content
+                  (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))]])
       (when-not activity-data
         [:div.secure-activity-container
