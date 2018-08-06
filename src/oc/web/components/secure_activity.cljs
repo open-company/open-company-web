@@ -10,6 +10,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
@@ -17,8 +18,14 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn win-width []
+  (or (.-innerWidth js/window)
+      (.-clientWidth (.-documentElement js/document))))
+
 (defn save-win-height [s]
-  (reset! (::win-height s) (.-innerHeight js/window)))
+  (reset! (::win-height s) (.-innerHeight js/window))
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
 
 (def default-activity-header-height 56)
 
@@ -30,6 +37,7 @@
                              (rum/local 0 ::win-height)
                              (rum/local nil ::win-resize-listener)
                              (rum/local true ::show-login-header)
+                             (rum/local 0 ::mobile-video-height)
                              ;; Mixins
                              (ui-mixins/render-on-resize save-win-height)
 
@@ -42,7 +50,14 @@
   (let [activity-data (drv/react s :secure-activity-data)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        win-height @(::win-height s)]
+        win-height @(::win-height s)
+        video-size (when (:fixed-video-id activity-data)
+                    (if is-mobile?
+                      {:width (win-width)
+                       :height @(::mobile-video-height s)}
+                      {:width 640
+                       :height 480}))
+        video-id (:fixed-video-id activity-data)]
     [:div.secure-activity-container
       {:style {:min-height (when is-mobile?
                              (str (- win-height default-activity-header-height) "px"))}}
@@ -93,16 +108,19 @@
                      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
                     (utils/time-since t)])]]
-            [:div.activity-content-header-right
-              [:div.section-tag
-                {:class (when (:new activity-data) "has-new")
-                 :dangerouslySetInnerHTML (utils/emojify (:board-name activity-data))}]]]
+            [:div.activity-content-header-right]]
           [:div.activity-content
             {:style {:min-height (when is-mobile?
                                   (str (- win-height default-activity-header-height) "px"))}}
             (when (:headline activity-data)
               [:div.activity-title.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+            (when (and video-id
+                       (not @(::record-video s)))
+              (ziggeo-player {:video-id video-id
+                              :width (:width video-size)
+                              :height (:height video-size)
+                              :video-processed (:video-processed activity-data)}))
             (when (:body activity-data)
               [:div.activity-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
