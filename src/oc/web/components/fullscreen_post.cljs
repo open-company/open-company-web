@@ -234,12 +234,13 @@
                                                            :video-error true
                                                            :has-changes true})]))
 
-(defn video-processed-cb [video-token]
-  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id video-token
-                                                           :video-id video-token
-                                                           ;; turn off video error since upload finished
-                                                           :video-error false
-                                                           :has-changes true})]))
+(defn video-processed-cb [video-token unmounted?]
+  (when-not unmounted?
+    (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id video-token
+                                                             :video-id video-token
+                                                             ;; turn off video error since upload finished
+                                                             :video-error false
+                                                             :has-changes true})])))
 
 (defn- remove-video-cb []
   (let [alert-data {:icon "/img/ML/trash.svg"

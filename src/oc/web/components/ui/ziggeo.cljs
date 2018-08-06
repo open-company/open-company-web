@@ -144,7 +144,7 @@
                                                               :id :ziggeo-video-processed
                                                               :expire 5}))
                                      (when (fn? submit-cb)
-                                      (submit-cb (.get recorder-instance "video")))))))
+                                      (submit-cb (.get recorder-instance "video") (not @(::mounted s))))))))
                                s)} 
   [s {:keys [submit-cb start-cb cancel-cb width height pick-cover-start-cb
              pick-cover-end-cb upload-started-cb rerecord-cb remove-recorder-cb]
