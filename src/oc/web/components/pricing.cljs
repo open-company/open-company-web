@@ -47,11 +47,11 @@
               [:div.price-column-title
                 "Standard"]
               [:div.price-column-price
-                "8"]
+                "5"]
               [:div.price-column-description
                 "Per user, per month, billed annually"]
               [:div.price-column-description.second-line
-                "Or $10 monthly"]
+                "Or $6 monthly"]
               [:button.mlb-reset.price-button
                 {:on-click #(track-event "Standard")}
                 "Buy standard"]]
@@ -60,11 +60,11 @@
               [:div.price-column-title
                 "Plus"]
               [:div.price-column-price
-                "12"]
+                "8"]
               [:div.price-column-description
                 "Per user, per month, billed annually"]
               [:div.price-column-description.second-line
-                "Or $14 monthly"]
+                "Or $10 monthly"]
               [:button.mlb-reset.price-button
                 {:on-click #(track-event "Plus")}
                 "Buy plus"]]]
