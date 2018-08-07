@@ -117,10 +117,11 @@ div.stream-item {
 
     &.expanded {
       div.ziggeo-player {
-        margin-top: 16px;
+        margin-top: 24px;
+        margin-bottom: 24px;
         float: unset;
         width: 638px;
-        height: 479px;
+        height: 377px;
 
         @include tablet(){
           width: auto;

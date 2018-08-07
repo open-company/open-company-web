@@ -390,7 +390,7 @@ div.fullscreen-post-container {
         }
 
         div.ziggeo-player, div.ziggeo-recorder {
-          margin-top: 16px;
+          margin: 8px auto 24px;
           @include tablet(){
             margin-left: -24px;
           }

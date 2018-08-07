@@ -25,7 +25,7 @@
 (defn save-win-height [s]
   (reset! (::win-height s) (.-innerHeight js/window))
   (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
+    (reset! (::mobile-video-height s) (* (win-width) (/ 377 640)))))
 
 (def default-activity-header-height 56)
 
@@ -56,7 +56,7 @@
                       {:width (win-width)
                        :height @(::mobile-video-height s)}
                       {:width 640
-                       :height 480}))
+                       :height 377}))
         video-id (:fixed-video-id activity-data)]
     [:div.secure-activity-container
       {:style {:min-height (when is-mobile?
