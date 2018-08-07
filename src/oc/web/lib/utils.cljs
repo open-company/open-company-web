@@ -117,7 +117,7 @@
       (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
 
       :else
-      "just now")))
+      "Just now")))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
@@ -439,7 +439,7 @@
       (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
 
       :else
-      "just now")))
+      "Just now")))
 
 (defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
