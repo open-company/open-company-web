@@ -431,20 +431,20 @@ div.stream-item {
         }
       }
     }
+  }
 
-    div.stream-body-right {
-      position: relative;
-      margin-top: 24px;
+  div.stream-body-right {
+    position: relative;
+    margin-top: 24px;
 
-      div.stream-body-comments {
-        height: 100%;
+    div.stream-body-comments {
+      height: 100%;
 
-        div.stream-comments-title {
-          @include avenir_H();
-          font-size: 14px;
-          color: $carrot_dark_gray;
-          margin-bottom: 8px;
-        }
+      div.stream-comments-title {
+        @include avenir_H();
+        font-size: 14px;
+        color: $carrot_dark_gray;
+        margin-bottom: 8px;
       }
     }
   }
