@@ -38,7 +38,7 @@
               [:div.price-column-price
                 "0"]
               [:div.price-column-description
-                "Free for small teams for an unlimited period of time"]
+                "Free for small teams"]
               [:button.mlb-reset.price-button
                 {:on-click #(track-event "Free")}
                 "Create a digest"]]
@@ -47,13 +47,11 @@
               [:div.price-column-title
                 "Standard"]
               [:div.price-column-price
-                "8"]
+                "5"]
               [:div.price-column-description
-                "Per contributor per month billed annually"]
+                "Per user, per month, billed annually"]
               [:div.price-column-description.second-line
-                "Or $10 billed monthly"]
-              [:div.price-column-description.more-info
-                "Viewers are always free"]
+                "Or $6 monthly"]
               [:button.mlb-reset.price-button
                 {:on-click #(track-event "Standard")}
                 "Buy standard"]]
@@ -62,13 +60,11 @@
               [:div.price-column-title
                 "Plus"]
               [:div.price-column-price
-                "12"]
+                "8"]
               [:div.price-column-description
-                "Per contributor per month billed annually"]
+                "Per user, per month, billed annually"]
               [:div.price-column-description.second-line
-                "Or $14 billed monthly"]
-              [:div.price-column-description.more-info
-                "Viewers are always free"]
+                "Or $10 monthly"]
               [:button.mlb-reset.price-button
                 {:on-click #(track-event "Plus")}
                 "Buy plus"]]]
