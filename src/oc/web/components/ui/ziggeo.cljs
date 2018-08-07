@@ -80,11 +80,13 @@
                                    (.activate recorder-instance)
                                    (.on recorder-instance "upload_selected"
                                     (fn []
+                                     (js/console.log "DBG upload_selected")
                                      (timbre/debug "upload_selected")
                                      (when (fn? start-cb)
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "upload_progress"
                                     (fn [a b]
+                                     (js/console.log "DBG upload_progress" a b)
                                      (timbre/debug "upload_progress" a b (fn? upload-started-cb))
                                      (when-not @(::uploading s)
                                        (reset! (::uploading s) true)
@@ -97,11 +99,13 @@
                                                               :expire 5}))))
                                    (.on recorder-instance "recording"
                                     (fn []
+                                     (js/console.log "DBG recording")
                                      (timbre/debug "recording")
                                      (when (fn? start-cb)
                                        (start-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "processing"
                                     (fn [a]
+                                     (js/console.log "DBG processing" a)
                                      (timbre/debug "processing" a)
                                      (when-not @(::mounted s)
                                        (na/remove-notification-by-id :ziggeo-video-upload)
@@ -111,6 +115,7 @@
                                                               :expire 5}))))
                                    (.on recorder-instance "error"
                                     (fn []
+                                     (js/console.log "DBG error")
                                      (timbre/debug "error")
                                      (reset! (::uploading s) false)
                                      (na/remove-notification-by-id :ziggeo-video-upload)
@@ -123,21 +128,25 @@
                                        (cancel-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "pick_cover_start"
                                     (fn []
+                                      (js/console.log "DBG pick_cover_start")
                                       (timbre/debug "picking_cover")
                                       (when (fn? pick-cover-start-cb)
                                         (pick-cover-start-cb))))
                                    (.on recorder-instance "upload_start"
                                     (fn [a]
+                                      (js/console.log "DBG upload_start" a)
                                       (timbre/debug "picking_cover_end" a)
                                       (when (fn? pick-cover-end-cb)
                                         (pick-cover-end-cb a))))
                                    (.on recorder-instance "rerecord"
                                     (fn []
+                                     (js/console.log "DBG rerecord")
                                      (reset! (::uploading s) false)
                                      (when (fn? rerecord-cb)
                                       (rerecord-cb))))
                                    (.on recorder-instance "processed"
                                     (fn []
+                                     (js/console.log "DBG processed")
                                      (timbre/debug "processed" (.get recorder-instance "video"))
                                      (reset! (::uploading s) false)
                                      (when @(::mounted s)
