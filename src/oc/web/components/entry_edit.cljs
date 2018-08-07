@@ -410,7 +410,7 @@
           {:on-click #(cancel-clicked s)}
           ""]
         [:div.entry-edit-modal-header-title
-          {:dangerouslySetInnerHTML (utils/emojify (:headline entry-editing))}]
+          {:dangerouslySetInnerHTML (utils/emojify (if (seq (:headline entry-editing)) (:headline entry-editing) "Untitled post"))}]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
