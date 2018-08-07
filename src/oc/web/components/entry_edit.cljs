@@ -449,7 +449,7 @@
                                 (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
                     (small-loading))
-                  "Save to draft"]))])]
+                  "Save draft"]))])]
       [:div.entry-edit-modal.group
         {:ref "entry-edit-modal"}
         [:div.entry-edit-modal-section.group
