@@ -40,7 +40,7 @@
 
 (defn start-editing [s comment-data]
   (let [comment-node (rum/ref-node s (str "comment-body-" (:uuid comment-data)))
-        medium-editor (cu/setup-medium-editor comment-node)]
+        medium-editor (cu/setup-medium-editor comment-node (:users @(drv/get-ref s :team-roster)))]
     (reset! (::esc-key-listener s)
      (events/listen
       js/window
@@ -76,6 +76,7 @@
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
+                             (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local false ::showing-menu)
                              (rum/local nil ::click-listener)
@@ -127,7 +128,7 @@
                   [:div.stream-comment-author-timestamp
                     (utils/time-since (:created-at comment-data))]]]
               [:div.stream-comment-content
-                [:div.stream-comment-body.fs-hide
+                [:div.stream-comment-body.oc-mentions.fs-hide
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                    :ref (str "comment-body-" (:uuid comment-data))
                    :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]

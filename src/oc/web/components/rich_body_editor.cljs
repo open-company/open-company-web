@@ -302,22 +302,9 @@
                   ["bold" "italic" "h2" "unorderedlist" "anchor"]
                   ["bold" "italic" "unorderedlist" "anchor"])
         users-list (:users @(drv/get-ref s :team-roster))
-        tc-mention-props {:tagName "span"
-                          :extraPanelClassName "oc-mention-panel"
-                          :extraTriggerClassNameMap {"@" "oc-mention"}
-                          :renderPanelContent (fn [panel-el current-mention-text select-mention-callback]
-                                               (.render js/ReactDOM
-                                                (.createElement js/React
-                                                 js/CustomizedTagComponent
-                                                 (clj->js {:currentMentionText current-mention-text
-                                                           :users (clj->js users-list)
-                                                           :selectMentionCallback select-mention-callback}))
-                                                panel-el))
-                          :activeTriggerList ["@"]}
-        tc-mention (js/TCMention. (clj->js tc-mention-props))
         extensions (if mobile-editor
                       #js {"autolist" (js/AutoList.)
-                           "mention" tc-mention}
+                           "mention" (mention-utils/mention-ext users-list)}
                       #js {"autolist" (js/AutoList.)
                            "mention" tc-mention
                            "media-picker" media-picker-ext

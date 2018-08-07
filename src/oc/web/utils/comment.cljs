@@ -3,13 +3,14 @@
             [goog.object :as gobj]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.mention :as mention-utils]))
 
-(defn setup-medium-editor [comment-node]
+(defn setup-medium-editor [comment-node users-list]
   (let [config {:toolbar false
                 :anchorPreview false
                 :imageDragging false
-                :extensions #js []
+                :extensions #js {"mention" (mention-utils/mention-ext users-list)}
                 :autoLink true
                 :anchor false
                 :targetBlank true
