@@ -70,6 +70,7 @@
                                               :height height
                                               :theme "carrot"
                                               :themecolor "green"
+                                              :localplayback true
                                               :meta-profile ls/oc-ziggeo-profiles}
                                        config {:element recorder-el
                                                :attrs attrs}
