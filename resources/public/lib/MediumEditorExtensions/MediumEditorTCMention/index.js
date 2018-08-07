@@ -371,11 +371,10 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
     this.renderPanelContent(this.mentionPanel, this.word, this.handleSelectMention.bind(this));
   },
   handleSelectMention: function handleSelectMention(selectedText, details) {
-    console.log("XXX handleSelectMention", selectedText, details);
     if (selectedText) {
       var textNode = this.activeMentionAt.firstChild;
-      if (details.name && details.name.length > 0) {
-        this.activeMentionAt.setAttribute("data-name", details.name);
+      if (details["name"] && details["name"].length > 0) {
+        this.activeMentionAt.setAttribute("data-name", details["name"]);
       }
       if (details["first-name"] && details["first-name"].length > 0) {
         this.activeMentionAt.setAttribute("data-first-name", details["first-name"]);
@@ -388,6 +387,9 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
       }
       if (details["user-id"] && details["user-id"].length > 0) {
         this.activeMentionAt.setAttribute("data-user-id", details["user-id"]);
+      }
+      if (details["email"] && details["email"].length > 0) {
+        this.activeMentionAt.setAttribute("data-email", details["email"]);
       }
       this.activeMentionAt.setAttribute("data-found", "true");
       textNode.textContent = selectedText;

@@ -1,20 +1,27 @@
-// function CustomizedTagComponent(props) {
-//   const trigger = props.currentMentionText.substring(0, 1);
-//   const currentText = props.currentMentionText.substring(1, props.currentMentionText.length).toLowerCase();
-
 function CustomizedTagComponent(props) {
   const trigger = props.currentMentionText.substring(0, 1);
   const currentText = props.currentMentionText.substring(1, props.currentMentionText.length).toLowerCase();
 
   var mappedUsers = props.users.map(function (user, i) {
+    var activeUser = user["status"] === "active",
+        filteredSlackUsernames = [];
+    if (activeUser) {
+      Object.values(user["slack-users"]).map(function(slackUser){
+        if (slackUser["display-name"].toLowerCase().indexOf(currentText) !== -1)
+          filteredSlackUsernames.push(slackUser);
+      });
+    }
     if (user["name"] && user["name"].toLowerCase().indexOf(currentText) !== -1)
       return Object.assign(user, { "selectedKey": "name" });
     else if (user["first-name"] && user["first-name"].toLowerCase().indexOf(currentText) !== -1)
       return Object.assign(user, { "selectedKey": "first-name" });
     else if (user["last-name"] && user["last-name"].toLowerCase().indexOf(currentText) !== -1)
       return Object.assign(user, { "selectedKey": "last-name" });
-    else if (user["slack-username"] && user["slack-username"].toLowerCase().indexOf(currentText) !== -1)
-      return Object.assign(user, { "selectedKey": "slack-username" });
+    else if (activeUser && filteredSlackUsernames.length > 0)
+      return Object.assign(user, { "selectedKey": "slack-username",
+                                   "slack-username": filteredSlackUsernames[0]["display-name"] });
+    else if (!activeUser && user["slack-display-name"] && user["slack-display-name"].toLowerCase().indexOf(currentText) !== -1)
+      return Object.assign(user, { "selectedKey": "slack-display-name" });  
     else if (user["email"] && user["email"].toLowerCase().indexOf(currentText) !== -1)
       return Object.assign(user, { "selectedKey": "email" });
     else return user;
@@ -41,7 +48,7 @@ function CustomizedTagComponent(props) {
             "data-user-id": user["user-id"],
             "data-slack-username": user["slack-username"],
             onClick: function(){
-              props.selectMentionCallback("@" + selectedValue);
+              props.selectMentionCallback("@" + selectedValue, user);
             }},
           React.createElement("div", { "className": "oc-mention-option-avatar", style: avatarStyle }),
           React.createElement(
