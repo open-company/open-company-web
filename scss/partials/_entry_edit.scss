@@ -168,7 +168,7 @@ div.entry-edit-modal-container {
 
   div.entry-edit-modal {
     width: 720px;
-    margin: 112px auto 40px;
+    margin: 112px auto 32px;
     position: relative;
     background-color: white;
     border-radius: 6px;
@@ -206,7 +206,6 @@ div.entry-edit-modal-container {
         font-size: 14px;
         color: $deep_navy;
         float: left;
-        margin-top: 6px;
         position: relative;
 
         @include user-profile(24);
@@ -259,7 +258,6 @@ div.entry-edit-modal-container {
 
       div.entry-edit-modal-video-bt-container {
         float: right;
-        margin-top: 4px;
 
         button.video-record-bt {
           @include avenir_M();
@@ -307,7 +305,7 @@ div.entry-edit-modal-container {
     div.entry-edit-modal-body {
       margin: 0px;
       width: 100%;
-      padding: 16px 16px 0px;
+      padding: 32px 16px 0px;
 
       @include tablet() {
         padding: 24px 24px 0px;
@@ -318,7 +316,7 @@ div.entry-edit-modal-container {
       }
 
       div.ziggeo-player, div.ziggeo-recorder {
-        margin: 8px auto 24px;
+        margin: 0px auto 24px;
 
         div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
           margin: 0px auto;
@@ -337,7 +335,6 @@ div.entry-edit-modal-container {
         word-wrap: break-word;
         min-height: 28px;
         line-height: 28px;
-        margin-top: 16px;
 
         @include tablet() {
           width: 100%;
