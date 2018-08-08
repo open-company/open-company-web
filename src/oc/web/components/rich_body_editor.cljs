@@ -9,6 +9,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.mention :as mention-utils]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]
@@ -306,7 +307,7 @@
                       #js {"autolist" (js/AutoList.)
                            "mention" (mention-utils/mention-ext users-list)}
                       #js {"autolist" (js/AutoList.)
-                           "mention" tc-mention
+                           "mention" (mention-utils/mention-ext users-list)
                            "media-picker" media-picker-ext
                            "fileDragging" false
                            "carrotFileDragging" file-dragging-ext})
