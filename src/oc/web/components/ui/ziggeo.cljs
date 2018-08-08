@@ -149,10 +149,14 @@
                                    (.on recorder-instance "processed"
                                     (fn []
                                      (js/console.log "DBG processed")
-                                     (timbre/debug "processed" (.get recorder-instance "video"))
+                                     (timbre/debug "processed" (.get recorder-instance "video"))))
+                                   (.on recorder-instance "verified"
+                                    (fn []
+                                     (js/console.log "DBG verified")
+                                     (timbre/debug "verified" (.get recorder-instance "video"))
                                      (reset! (::uploading s) false)
                                      (when @(::mounted s)
-                                       (na/show-notification {:title "Video uploaded and processed!"
+                                       (na/show-notification {:title "Video succesfully uploaded!"
                                                               :id :ziggeo-video-processed
                                                               :expire 5}))
                                      (when (fn? submit-cb)
