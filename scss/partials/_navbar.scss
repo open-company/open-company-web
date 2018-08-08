@@ -141,9 +141,20 @@ nav.oc-navbar {
         float: right;
         margin-right: 0px;
 
+        div.user-notifications {
+          float: left;
+          margin-right: 16px;
+          margin-top: 4px;
+        }
+
         div.user-menu {
           width: 48px;
           height: 32px;
+          float: right;
+
+          @inlcude mobile() {
+            float: unset;
+          }
         }
 
         button.mobile-menu {
