@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -264,6 +265,10 @@
          [:input
           [:org-editing]
           first-team])
+        (when (jwt/get-key :google-domain)
+          (dis/dispatch!
+           [:input [:org-editing :email-domains]
+            (conj #{} (jwt/get-key :google-domain))]))
         (when (and (not (zero? (count (:logo-url first-team))))
                    (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]

@@ -135,11 +135,14 @@
   (when success
     (org-created org-data)))
 
-(defn org-create-cb [{:keys [success status body]}]
+(defn org-create-cb [{:keys [success status body]} email-domains]
   (if success
     (when-let [org-data (when success (json->cljs body))]
       (org-loaded org-data false)
       (let [team-data (dis/team-data (:team-id org-data))]
+        (when (pos? (count email-domains))
+          (doseq [domain email-domains]
+            (api/add-email-domain domain #() team-data)))
         (if (and (empty? (:name team-data))
                  (utils/link-for (:links team-data) "partial-update"))
           ; if the current team has no name and
