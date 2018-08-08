@@ -20,7 +20,7 @@
                                               :attrs #js {:width width
                                                           :height height
                                                           :theme "carrot"
-                                                          :themecolor "green"
+                                                          :themecolor "white"
                                                           :video video-id}}
                                       Player (.. js/ZiggeoApi -V2 -Player)
                                       player-instance (Player. (clj->js config))]
@@ -69,7 +69,7 @@
                                  (let [attrs {:width width
                                               :height height
                                               :theme "carrot"
-                                              :themecolor "green"
+                                              :themecolor "white"
                                               :localplayback true
                                               :meta-profile ls/oc-ziggeo-profiles}
                                        config {:element recorder-el

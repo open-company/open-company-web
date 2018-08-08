@@ -185,10 +185,16 @@ div.entry-edit-modal-container {
       margin: 56px auto 32px;
     }
 
+    div.entry-edit-modal-separator {
+      width: calc(100% + 80px);
+      height: 1px;
+      margin-left: -40px;
+      background-color: rgba($ui_grey, 0.2);
+    }
+
     div.entry-edit-modal-section {
       width: 100%;
       margin-top: 16px;
-      border-bottom: 1px solid rgba($ui_grey, 0.2);
       padding-bottom: 24px;
 
       @include mobile() {
@@ -204,11 +210,20 @@ div.entry-edit-modal-container {
         margin-top: 6px;
         position: relative;
 
-        span {
+        @include user-profile(32);
+
+        div.user-avatar-img-container {
           float: left;
         }
 
+        span {
+          float: left;
+          margin-left: 16px;
+          margin-top: 6px;
+        }
+
         div.board-name {
+          margin-top: 6px;
           margin-left: 6px;
           cursor: pointer;
           position: relative;

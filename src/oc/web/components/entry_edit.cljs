@@ -457,6 +457,7 @@
           [:div.posting-in
             {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                           (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
+            (user-avatar-image current-user-data)
             [:span.posting-in-span
               posting-title]
             [:div.board-name
@@ -485,6 +486,7 @@
                       @(::record-video s))
                 "Remove video"
                 "Record video")]]]
+        [:div.entry-edit-modal-separator]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ;; Video elements

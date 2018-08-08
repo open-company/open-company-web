@@ -47,22 +47,27 @@ div.ziggeo-recorder {
     }
 
     .ba-videoplayer-carrot-theme-overlay {
-      background: linear-gradient(to bottom, black, transparent 60px);
       border-radius: 8px;
     }
   }
 
  button.remove-recorder-bt {
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
     background-image: cdnUrl("/img/ML/remove_video_x.svg");
+    background-color: rgba(0, 0, 0, 0.2);
     background-size: 12px;
     background-position: center;
     background-repeat: no-repeat;
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 16px;
+    left: 16px;
     z-index: 1;
+    border-radius: 50%;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
   } 
 
 }
