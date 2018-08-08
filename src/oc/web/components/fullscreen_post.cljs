@@ -114,7 +114,7 @@
   (remove-autosave state)
   (reset! (::autosave-timer state) (utils/every 5000 #(autosave state)))
   (.click (js/$ "div.rich-body-editor a") #(.stopPropagation %))
-  (ui-utils/resize-textarea (rum/ref-node state "transcript-edit"))
+  ; (ui-utils/resize-textarea (rum/ref-node state "transcript-edit"))
   (when (and focus
              (= (.-activeElement js/document) (.-body js/document)))
     (utils/after 1000
@@ -143,10 +143,11 @@
     (let [raw-html (.-innerHTML body-el)]
       (dis/dispatch! [:update [:modal-editing-data] #(merge % {:body (utils/clean-body-html raw-html)
                                                                :has-changes true})])))
-  (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
-    (when (:fixed-video-id editing-data)
-      (when-let [transcription-el (rum/ref-node state "transcript-edit")]
-        (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})])))))
+  ; (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
+  ;   (when (:fixed-video-id editing-data)
+  ;     (when-let [transcription-el (rum/ref-node state "transcript-edit")]
+  ;       (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})]))))
+  )
 
 (defn- save-editing? [state]
   (clean-body state)
@@ -369,10 +370,10 @@
                                  EventType/SCROLL
                                  #(send-item-read-if-needed s)))
                                (send-item-read-if-needed s)
-                               (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                               ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                                s)
                               :did-remount (fn [_ s]
-                               (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                               ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                                s)
                               :will-unmount (fn [s]
                                (when @(::window-click s)
@@ -548,19 +549,19 @@
                 {:key (str "fullscreen-post-body-" (:updated-at current-activity-data))
                  :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body current-activity-data))}])
-            (when (and (:video-transcript current-activity-data)
-                       (:video-processed current-activity-data))
-              (if editing
-                [:div.fullscreen-post-transcript
-                  [:textarea.fullscreen-post-transcript-edit
-                    {:ref "transcript-edit"
-                     :on-input #(ui-utils/resize-textarea (.-target %))
-                     :default-value (:video-transcript current-activity-data)}]]
-                [:div.fullscreen-post-transcript
-                  [:div.fullscreen-post-transcript-header
-                    "This transcript was automatically generated and may not be accurate"]
-                  [:div.fullscreen-post-transcript-content
-                    (:video-transcript current-activity-data)]]))
+            ; (when (and (:video-transcript current-activity-data)
+            ;            (:video-processed current-activity-data))
+            ;   (if editing
+            ;     [:div.fullscreen-post-transcript
+            ;       [:textarea.fullscreen-post-transcript-edit
+            ;         {:ref "transcript-edit"
+            ;          :on-input #(ui-utils/resize-textarea (.-target %))
+            ;          :default-value (:video-transcript current-activity-data)}]]
+            ;     [:div.fullscreen-post-transcript
+            ;       [:div.fullscreen-post-transcript-header
+            ;         "This transcript was automatically generated and may not be accurate"]
+            ;       [:div.fullscreen-post-transcript-content
+            ;         (:video-transcript current-activity-data)]]))
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             (if editing

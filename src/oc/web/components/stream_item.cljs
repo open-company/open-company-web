@@ -211,13 +211,14 @@
                    :class (utils/class-set {:wrt-truncated truncated?
                                             :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
-          (when (and expanded?
-                     (:video-transcript activity-data))
-            [:div.stream-item-transcript
-              [:div.stream-item-transcript-header
-                "This transcript was automatically generated and may not be accurate"]
-              [:div.stream-item-transcript-content
-                (:video-transcript activity-data)]])]
+          ; (when (and expanded?
+          ;            (:video-transcript activity-data))
+          ;   [:div.stream-item-transcript
+          ;     [:div.stream-item-transcript-header
+          ;       "This transcript was automatically generated and may not be accurate"]
+          ;     [:div.stream-item-transcript-content
+          ;       (:video-transcript activity-data)]])
+          ]
           (when (or (not is-mobile?) expanded?)
             (stream-attachments activity-attachments
              (when (and truncated? (not expanded?))

@@ -131,10 +131,11 @@
 (defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
     (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))]))
-  (let [editing-data @(drv/get-ref s :entry-editing)]
-    (when (:fixed-video-id editing-data)
-      (when-let [transcription-el (rum/ref-node s "transcript-edit")]
-        (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})])))))
+  ; (let [editing-data @(drv/get-ref s :entry-editing)]
+  ;   (when (:fixed-video-id editing-data)
+  ;     (when-let [transcription-el (rum/ref-node s "transcript-edit")]
+  ;       (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})]))))
+  )
 
 (defn- fix-headline [entry-editing]
   (utils/trim (:headline entry-editing)))
@@ -320,10 +321,10 @@
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
-                          (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                          ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                           s)
                          :did-remount (fn [_ s]
-                          (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                          ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                           s)
                          :before-render (fn [s]
                           ;; Set or remove the onBeforeUnload prompt
@@ -533,13 +534,13 @@
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})]
-          (when (and (:fixed-video-id entry-editing)
-                     (:video-processed entry-editing))
-            [:div.entry-edit-transcript
-              [:textarea.video-transcript
-                {:ref "transcript-edit"
-                 :on-input #(ui-utils/resize-textarea (.-target %))
-                 :default-value (:video-transcript entry-editing)}]])
+          ; (when (and (:fixed-video-id entry-editing)
+          ;            (:video-processed entry-editing))
+          ;   [:div.entry-edit-transcript
+          ;     [:textarea.video-transcript
+          ;       {:ref "transcript-edit"
+          ;        :on-input #(ui-utils/resize-textarea (.-target %))
+          ;        :default-value (:video-transcript entry-editing)}]])
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
            #(activity-actions/remove-attachment :entry-editing %))]
