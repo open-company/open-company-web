@@ -73,6 +73,11 @@
         board-slug (router/current-board-slug)]
      (board-data-key org-slug board-slug)))
 
+;; User notifications
+
+(defn user-notifications-key [org-slug]
+  (vec (conj (org-key org-slug) :user-notifications)))
+
 ;; Change related keys
 
 (defn change-data-key [org-slug]
@@ -304,6 +309,10 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
+   :user-notifications    [[:base :org-slug]
+                            (fn [base org-slug]
+                              (when (and base org-slug)
+                                (get-in base (user-notifications-key org-slug))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :jwt]
@@ -523,6 +532,17 @@
   ([] (team-channels (:team-id (org-data))))
   ([team-id] (team-channels team-id @app-state))
   ([team-id data] (get-in data (team-channels-key team-id))))
+
+;; User notifications
+
+(defn user-notifications-data
+  "Get user notifications data"
+  ([]
+    (user-notifications-key (router/current-org-slug) @app-state))
+  ([org-slug]
+    (user-notifications-key org-slug @app-state))
+  ([org-slug data]
+    (get-in data (user-notifications-key org-slug))))
 
 ;; Change related
 
