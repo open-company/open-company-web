@@ -168,12 +168,12 @@ div.entry-edit-modal-container {
 
   div.entry-edit-modal {
     width: 720px;
-    margin: 112px auto 0px;
+    margin: 112px auto 40px;
     position: relative;
     background-color: white;
     border-radius: 6px;
     box-shadow: 0px 2px 4px 0px rgba(#E4E3DE, 0.5);
-    padding: 32px 40px;
+    padding: 16px 24px 32px;
 
     @include mobile() {
       width: 100%;
@@ -186,16 +186,15 @@ div.entry-edit-modal-container {
     }
 
     div.entry-edit-modal-separator {
-      width: calc(100% + 80px);
+      width: calc(100% + 48px);
       height: 1px;
-      margin-left: -40px;
+      margin-left: -24px;
       background-color: rgba($ui_grey, 0.2);
     }
 
     div.entry-edit-modal-section {
       width: 100%;
-      margin-top: 16px;
-      padding-bottom: 24px;
+      padding-bottom: 16px;
 
       @include mobile() {
         padding: 24px 24px 0px;
@@ -210,7 +209,7 @@ div.entry-edit-modal-container {
         margin-top: 6px;
         position: relative;
 
-        @include user-profile(32);
+        @include user-profile(24);
 
         div.user-avatar-img-container {
           float: left;
@@ -219,11 +218,11 @@ div.entry-edit-modal-container {
         span {
           float: left;
           margin-left: 16px;
-          margin-top: 6px;
+          margin-top: 2px;
         }
 
         div.board-name {
-          margin-top: 6px;
+          margin-top: 2px;
           margin-left: 6px;
           cursor: pointer;
           position: relative;
@@ -308,7 +307,7 @@ div.entry-edit-modal-container {
     div.entry-edit-modal-body {
       margin: 0px;
       width: 100%;
-      padding: 16px 0px 0px;
+      padding: 16px 16px 0px;
 
       @include tablet() {
         padding: 24px 24px 0px;
@@ -448,6 +447,7 @@ div.entry-edit-modal-container {
 
     div.entry-edit-modal-footer {
       margin-top: 32px;
+      padding: 0px 16px;
       position: relative;
 
       @include mobile() {

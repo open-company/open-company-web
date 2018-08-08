@@ -14,7 +14,7 @@
                             (let [{:keys [video-id width height video-processed]
                                        :or {width 640
                                             height 480}} (first (:rum/args s))]
-                              (when video-processed
+                              (when-not video-processed
                                 (let [player-el (rum/ref-node s :ziggeo-player)
                                       config {:element player-el
                                               :attrs #js {:width width
@@ -39,10 +39,12 @@
          :data-placement "top"
          :data-container "body"
          :title "Remove video"}])
-    (if-not video-processed
+    (if video-processed
       [:div.ziggeo-player-not-processed
         {:style {:width (str (or width 640) "px")
-                 :height (str (or height 480) "px")}}]
+                 :height (str (or height 480) "px")}}
+        [:div.refresh-icon]
+        [:span "Uploading video"]]
       [:div.ziggeo-player-embed
         {:ref :ziggeo-player}])])
 

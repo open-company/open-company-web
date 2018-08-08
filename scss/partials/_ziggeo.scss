@@ -1,21 +1,31 @@
 div.ziggeo-player {
   position: relative;
-  border-radius: 8px;
-
-  div.ziggeo-player-embed {
-    border-radius: 8px;
-    &>div {
-      border-radius: 8px;
-    }
-  }
 
   div.ziggeo-player-not-processed {
-    background-image: cdnUrl("/img/ML/video_loading.svg");
-    background-size: 100%;
+    width: 100%;
+    height: 100%;
     background-color: $deep_navy;
-    background-repeat: no-repeat;
-    background-position: center;
-    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    span {
+      @include avenir_H();
+      font-size: 16px;
+      color: white;
+      margin-left: 8px;
+    }
+
+    div.refresh-icon {
+      width: 14px;
+      height: 14px;
+      float: left;
+      background-image: cdnUrl("/img/ML/uploading_video_icon.svg");
+      background-size: 14px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
   }
 
   button.remove-video-bt {
@@ -34,22 +44,6 @@ div.ziggeo-player {
 
 div.ziggeo-recorder {
   position: relative;
-  border-radius: 8px;
-
-  div.ziggeo-recorder-embed {
-    border-radius: 8px;
-    &>div {
-      border-radius: 8px;
-    }
-
-    .ba-videoplayer-carrot-theme-container, video, video+img, video+ba-recorderfaceoutline {
-      border-radius: 8px;
-    }
-
-    .ba-videoplayer-carrot-theme-overlay {
-      border-radius: 8px;
-    }
-  }
 
  button.remove-recorder-bt {
     width: 40px;
