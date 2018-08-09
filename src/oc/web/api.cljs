@@ -150,7 +150,7 @@
 
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
-        (timbre/debug "Resp:" (method-name method) (str endpoint path) status)
+        (timbre/debug "Resp:" (method-name method) (str endpoint path) status response)
         ; when a request get a 401 logout the user since his using an old token, need to repeat auth process
         ; no token refresh
         (when (and (j/jwt)
