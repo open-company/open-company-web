@@ -44,7 +44,7 @@
         {:style {:width (str (or width 640) "px")
                  :height (str (or height 480) "px")}}
         [:div.refresh-icon]
-        [:span "Uploading video"]]
+        [:span "Video is still processing"]]
       [:div.ziggeo-player-embed
         {:ref :ziggeo-player}])])
 
@@ -145,7 +145,7 @@
                                     (fn []
                                      (timbre/debug "verified" (.get recorder-instance "video"))
                                      (reset! (::uploading s) false)
-                                     (na/show-notification {:title "Video succesfully uploaded!"
+                                     (na/show-notification {:title "Video is processing and will be available soon"
                                                             :id :ziggeo-video-processed
                                                             :expire 5})
                                      (when (fn? submit-cb)
