@@ -588,6 +588,100 @@ div.onboard-lander {
       }
     }
 
+    div.org-email-domains-row {
+      div.field-label {
+        i.mdi.mdi-information-outline {
+          margin-left: 8px;
+          color: $light_ui_grey;
+        }
+
+        &:before {
+          font-size: 16px;
+        }
+
+        div.tooltip {
+          width: 160px;
+        }
+
+        label.error {
+          margin-left: 0px !important;
+        }
+      }
+
+      div.org-email-domains-list {
+        margin-top: 16px;
+        margin-bottom: 0px;
+
+        div.org-list-item {
+          display: inline-block;
+          padding-left: 6px;
+          background-color: $feint_emerald;
+          height: 32px;
+          border-radius: 100px;
+          margin-right: 8px;
+          color: $carrot_green;
+          border: none;
+          outline: none;
+          box-shadow: none;
+
+          button.remove-domain-btn {
+            width: 20px;
+            height: 28px;
+            margin-left: 4px;
+            margin-top: -5px;
+            background-image: cdnUrl("/img/ML/remove_email_domain.svg");
+            background-size: 8px 8px;
+            background-position: 4px 18px;
+            background-repeat: no-repeat;
+          }
+
+          span.org-list-item-name {
+            color: $carrot_green;
+            @include avenir_H();
+            font-size: 14px;
+            margin-top: -10px;
+          }
+        }
+      }
+
+      div.org-email-domain-field {
+         width: 100%;
+         height: 40px;
+         border: 1px solid rgba($carrot_light_gray_1, 0.5);
+         box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+         border-radius: 4px;
+
+         @include mobile() {
+            width: 70% !important;
+         }
+
+         input {
+           float: left;
+           width: 70%;
+           height: 100%;
+           border: none;
+           @include placeholder(){
+             @include avenir_R();
+             margin-top: 10px;
+             margin-left: 4px;
+             color: $ui_grey;
+             font-size: 16px;
+           }
+         }
+
+         button.add-email-domain-bt {
+           height: 20px;
+           padding: 8px 8px;
+           color: $carrot_green;
+           @include avenir_H();
+           font-size: 14px;
+           border-top-right-radius: 6px;
+           border-bottom-right-radius: 6px;
+           float: right;
+         }
+      }
+    }
+
     button.continue {
       margin-top: 35px;
       outline: none;

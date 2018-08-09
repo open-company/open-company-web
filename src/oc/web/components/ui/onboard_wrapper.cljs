@@ -264,11 +264,7 @@
         (dis/dispatch!
          [:input
           [:org-editing]
-          first-team])
-        (when (jwt/get-key :google-domain)
-          (dis/dispatch!
-           [:input [:org-editing :email-domains]
-            (conj #{} (jwt/get-key :google-domain))]))
+          (assoc first-team :email-domains (:email-domains org-editing))])
         (when (and (not (zero? (count (:logo-url first-team))))
                    (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
@@ -293,6 +289,11 @@
                            s)
                           :did-mount (fn [s]
                            (setup-team-data s)
+                           (when (and (jwt/get-key :google-domain)
+                                      (nil? (:email-domains @(drv/get-ref s :org-editing))))
+                             (dis/dispatch!
+                              [:input [:org-editing :email-domains]
+                               (conj #{} (jwt/get-key :google-domain))]))
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
@@ -311,6 +312,7 @@
                            ;; Create org and show setup screen
                            (org-actions/org-create @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
+    (timbre/debug (:email-domains org-editing))
     [:div.onboard-lander.lander-team
       [:div.main-cta
         [:div.title.company-setup
@@ -390,9 +392,8 @@
                  :auto-capitalize "none"
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                  :on-change #(do
-                               (timbre/debug (.. % -target -value))
                                (dis/dispatch! [:input [:org-editing :email-domain] (.. % -target -value)]))
-                 :placeholder "Domain, e.g. @acme.com"}]
+                 :placeholder "  Domain, e.g. acme.com"}]
               [:button.mlb-reset.add-email-domain-bt
                 {:on-click #(let [domain (:email-domain org-editing)]
                               (if (utils/valid-domain? domain)
@@ -408,10 +409,11 @@
                     {:key (str "email-domain-team-" domain)}
                     [:span.org-list-item-name
                       (str "@" domain)]
-                    [:button.remove-team-btn.btn-reset
+                    [:button.remove-domain-btn.btn-reset
                      {:on-click #(do
                                    (timbre/debug domain)
                                    (timbre/debug (:email-domains org-editing))
+                                   (timbre/debug (disj (:email-domains org-editing) domain))
                                    (dis/dispatch! [:input [:org-editing :email-domains] (disj (:email-domains org-editing) domain)]))
                        :title "Remove"
                        :data-toggle "tooltip"
