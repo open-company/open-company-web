@@ -538,9 +538,9 @@
 (defn user-notifications-data
   "Get user notifications data"
   ([]
-    (user-notifications-key (router/current-org-slug) @app-state))
+    (user-notifications-data (router/current-org-slug) @app-state))
   ([org-slug]
-    (user-notifications-key org-slug @app-state))
+    (user-notifications-data org-slug @app-state))
   ([org-slug data]
     (get-in data (user-notifications-key org-slug))))
 
