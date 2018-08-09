@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -312,7 +311,6 @@
                            ;; Create org and show setup screen
                            (org-actions/org-create @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
-    (timbre/debug (:email-domains org-editing))
     [:div.onboard-lander.lander-team
       [:div.main-cta
         [:div.title.company-setup
