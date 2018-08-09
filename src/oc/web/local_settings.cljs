@@ -60,4 +60,4 @@
 
 ;; Ziggeo
 (def oc-ziggeo-app "c9b611b2b996ee5a1f318d3bacc36b27")
-(def oc-ziggeo-profiles [])
+(def oc-ziggeo-profiles ["13f1a7409fed80efac0006f91613aaf5", "7895efcb260089af22d490376cdcf584"])
