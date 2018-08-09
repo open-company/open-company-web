@@ -603,6 +603,13 @@ div.onboard-lander {
           width: 160px;
         }
 
+        label {
+           @include avenir_H();
+           font-size: 15px;
+           color: $deep_navy;
+           margin-top: 32px;
+        }
+
         label.error {
           margin-left: 0px !important;
         }
@@ -657,9 +664,12 @@ div.onboard-lander {
 
          input {
            float: left;
-           width: 70%;
+           width: 65%;
            height: 100%;
            border: none;
+           margin-left: 4px;
+           outline: none;
+
            @include placeholder(){
              @include avenir_R();
              margin-top: 10px;
@@ -671,7 +681,7 @@ div.onboard-lander {
 
          button.add-email-domain-bt {
            height: 20px;
-           padding: 8px 8px;
+           padding: 10px 10px;
            color: $carrot_green;
            @include avenir_H();
            font-size: 14px;
