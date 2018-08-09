@@ -297,35 +297,59 @@ div.onboard-lander {
     }
 
     button.signup-with-slack {
-      width: 340px;
-      height: 48px;
       margin-top: 52px;
-      border: 2px solid $chalk_blue;
-      color: $sea_blue;
-      border-radius: 100px;
+    }
+
+    button.signup-with-google {
+      margin-top: 16px;
+    }
+
+    button.signup-with-slack, button.signup-with-google {
+      width: 340px;
+      height: 40px;
+      border: 1px solid $light_ui_grey;;
+      color: $light_ui_grey;
+      border-radius: 4px;
       text-align: center;
 
       div.signup-with-slack-content {
-        div.slack-blue-icon {
-          @include image-2x("/img/ML/slack_blue_icon");
+        div.slack-icon {
+            background-image: cdnUrl('/img/slack.png');
         }
       }
 
-      div.signup-with-slack-content {
-        @include avenir_H();
-        font-size: 18px;
-        color: $carrot_text_blue;
-        width: 184px;
-        margin: 4px auto 0px;
+      div.signup-with-google-content {
+        div.google-icon {
+          background-image: cdnUrl("/img/ML/google_signin.svg");
+        }
+      }
 
-        div.slack-blue-icon {
-          width: 70px;
-          height: 21px;
-          @include image-2x("/img/ML/slack_blue_icon");
+      div.signup-with-slack-content, div.signup-with-google-content {
+        @include avenir_H();
+        font-size: 14px;
+        color: black;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        div.slack-icon {
+          width: 17px;
+          height: 17px;
+          background-image: cdnUrl('/img/slack.png');
           background-repeat: no-repeat;
-          background-size: 70px 21px;
-          float: right;
-          margin-left: 4px;
+          background-size: 17px 17px;
+          float: left;
+          margin-right: 16px;
+        }
+
+        div.google-icon {
+          width: 21px;
+          height: 21px;
+          background-image: cdnUrl("/img/ML/google_signin.svg");
+          background-repeat: no-repeat;
+          float: left;
+          margin-right: 16px;
         }
       }
 

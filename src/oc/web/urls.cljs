@@ -42,6 +42,8 @@
 
 (def slack-lander-check "/slack-lander/check")
 
+(def google-lander-check "/google/lander")
+
 (def logout "/logout")
 
 (def pricing "/pricing")
