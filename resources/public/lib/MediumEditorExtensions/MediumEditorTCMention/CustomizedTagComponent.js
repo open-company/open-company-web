@@ -3,9 +3,10 @@ function CustomizedTagComponent(props) {
   const currentText = props.currentMentionText.substring(1, props.currentMentionText.length).toLowerCase();
 
   var mappedUsers = props.users.map(function (user, i) {
+    console.log("XXX checking", user);
     var activeUser = user["status"] === "active",
         filteredSlackUsernames = [];
-    if (activeUser) {
+    if (activeUser && user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
       Object.values(user["slack-users"]).map(function(slackUser){
         if (slackUser["display-name"] && slackUser["display-name"].toLowerCase().indexOf(currentText) !== -1)
           filteredSlackUsernames.push(slackUser);
