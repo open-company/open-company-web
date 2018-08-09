@@ -44,7 +44,7 @@
         {:style {:width (str (or width 640) "px")
                  :height (str (or height 480) "px")}}
         [:div.refresh-icon]
-        [:span "Video is still processing"]]
+        [:span "Preparing video…"]]
       [:div.ziggeo-player-embed
         {:ref :ziggeo-player}])])
 
