@@ -312,18 +312,6 @@ div.onboard-lander {
       border-radius: 4px;
       text-align: center;
 
-      div.signup-with-slack-content {
-        div.slack-icon {
-            background-image: cdnUrl('/img/slack.png');
-        }
-      }
-
-      div.signup-with-google-content {
-        div.google-icon {
-          background-image: cdnUrl("/img/ML/google_signin.svg");
-        }
-      }
-
       div.signup-with-slack-content, div.signup-with-google-content {
         @include avenir_H();
         font-size: 14px;
@@ -334,11 +322,11 @@ div.onboard-lander {
         align-items: center;
 
         div.slack-icon {
-          width: 17px;
-          height: 17px;
-          background-image: cdnUrl('/img/slack.png');
+          width: 21px;
+          height: 21px;
+          background-image: cdnUrl("/img/ML/slack_normal.svg");
           background-repeat: no-repeat;
-          background-size: 17px 17px;
+          background-size: 21px 21px;
           float: left;
           margin-right: 16px;
         }
