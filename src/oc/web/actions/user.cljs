@@ -118,7 +118,7 @@
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
-(defn slack-lander-check-team-redirect []
+(defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point
     (fn [success body]
       (entry-point-get-finished success body
@@ -159,6 +159,10 @@
                                  "open-company-auth" oc-urls/slack-lander-check)]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
+
+(defn login-with-google [auth-url]
+  (router/redirect! (:href auth-url))
+  (dis/dispatch! [:login-with-google]))
 
 (defn refresh-slack-user []
   (api/refresh-slack-user (fn [status body success]

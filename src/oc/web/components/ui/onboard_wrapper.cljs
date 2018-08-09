@@ -79,9 +79,20 @@
                                              {:auth-source "slack"})]
                          (user-actions/login-with-slack auth-link)))}
           [:div.signup-with-slack-content
-            "Sign Up with "
-            [:div.slack-blue-icon
-              {:aria-label "slack"}]]]
+            [:div.slack-icon
+              {:aria-label "slack"}]
+            "Continue with Slack"]]
+       [:button.mlb-reset.signup-with-google
+         {:on-touch-start identity
+          :on-click #(do
+                       (.preventDefault %)
+                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                            {:auth-source "google"})]
+                         (user-actions/login-with-google auth-link)))}
+          [:div.signup-with-google-content
+            [:div.google-icon
+              {:aria-label "google"}]
+            "Continue with Google "]]
         [:div.or-with-email
           [:div.or-with-email-line]
           [:div.or-with-email-copy
