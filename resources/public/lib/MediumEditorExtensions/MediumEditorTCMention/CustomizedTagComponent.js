@@ -7,7 +7,7 @@ function CustomizedTagComponent(props) {
         filteredSlackUsernames = [];
     if (activeUser) {
       Object.values(user["slack-users"]).map(function(slackUser){
-        if (slackUser["display-name"].toLowerCase().indexOf(currentText) !== -1)
+        if (slackUser["display-name"] && slackUser["display-name"].toLowerCase().indexOf(currentText) !== -1)
           filteredSlackUsernames.push(slackUser);
       });
     }
