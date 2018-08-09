@@ -360,9 +360,9 @@
                   "+ Upload your company logo"
                   "+ Change your company logo")]
               [:div.add-picture-link-subtitle
-                "A transparent background PNG works best"]])
+                "A 160x160 transparent Gif or PNG works best."]])
           [:div.field-label
-            "Team name"
+            "Company name"
             (when (:error org-editing)
               [:span.error "Must be at least 3 characters"])]
           [:input.field.fs-hide
@@ -376,11 +376,7 @@
           [:div.org-email-domains-row.group
             [:div.field-label
               [:label
-                "Accepted email domains for registration"
-                [:i.mdi.mdi-information-outline
-                  {:title "Anyone who signs up with this email domain can view team boards."
-                   :data-toggle "tooltip"
-                   :data-placement "top"}]]
+                "Allowed email domains (optional)"]
               (when (:error org-editing)
                 [:label.error
                    "Only company email domains are allowed."])]
@@ -411,19 +407,17 @@
                       (str "@" domain)]
                     [:button.remove-domain-btn.btn-reset
                      {:on-click #(do
-                                   (timbre/debug domain)
-                                   (timbre/debug (:email-domains org-editing))
-                                   (timbre/debug (disj (:email-domains org-editing) domain))
                                    (dis/dispatch! [:input [:org-editing :email-domains] (disj (:email-domains org-editing) domain)]))
                        :title "Remove"
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :data-container "body"}]])])]
+                      :data-container "body"}]])])
+            [:div.field-label.info "Anyone with email addresses at these domains can automatically join your team."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
-            "All set!"]]]]))
+            "Create team"]]]]))
 
 (def default-invite-row
   {:user ""
