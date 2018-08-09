@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -26,6 +27,7 @@
                          rum/static
                          ;; Mixins
                          first-render-mixin
+                         (mention-mixins/oc-mentions-hover)
                          ;; Derivatives
                          (drv/drv :add-comment-focus)
                          (drv/drv :team-roster)

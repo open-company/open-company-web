@@ -10,6 +10,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.mention :as mention-utils]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]
@@ -384,6 +385,7 @@
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
                                (drv/drv :team-roster)
+                               (mention-mixins/oc-mentions-hover)
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)

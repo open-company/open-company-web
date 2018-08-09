@@ -1,6 +1,7 @@
 .oc-mentions {
   span.oc-mention[data-found="true"] {
     color: $carrot_green !important;
+    position: relative;
   }
 }
 
@@ -68,5 +69,54 @@ div.oc-mention-panel {
         overflow: hidden;
       }
     }
+  }
+}
+
+div.oc-mention-popup {
+  position: absolute;
+  top: 24px;
+  left: 0px;
+  width: auto;
+  max-width: 280px;
+  background-color: $deep_navy;
+  border-radius: 6px;
+  padding: 16px;
+  height: 56px;
+  overflow: hidden;
+
+  div.oc-mention-popup-avatar {
+    width: 24px;
+    height: 24px;
+    background-size: 24px auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    float: left;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  div.oc-mention-popup-name {
+    margin-left: 40px;
+    @include avenir_H();
+    font-size: 14px !important;
+    color: white !important;
+    line-height: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: -2px;
+  }
+
+  div.oc-mention-popup-subline {
+    margin-left: 40px;
+    @include avenir_R();
+    font-size: 12px !important;
+    color: rgba(white, 0.8) !important;
+    text-align: left;
+    line-height: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 4px;
   }
 }

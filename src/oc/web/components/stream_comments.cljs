@@ -6,6 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -84,6 +85,8 @@
                              (rum/local false ::medium-editor)
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
+                             ;; Mixins
+                             (mention-mixins/oc-mentions-hover)
                              {:will-mount (fn [s]
                                (reset! (::click-listener s)
                                  (events/listen js/window EventType/CLICK
