@@ -375,7 +375,7 @@
           [:div.org-email-domains-row.group
             [:div.field-label
               [:label
-                "Allowed email domain (optional)"]
+                "Allowed email domain " [:span.info "(optional)"]]
               (when (:error org-editing)
                 [:label.error
                    "Only company email domains are allowed."])]

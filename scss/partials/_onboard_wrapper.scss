@@ -604,6 +604,11 @@ div.onboard-lander {
            font-size: 15px;
            color: $deep_navy;
            margin-top: 4px;
+
+           span.info {
+             @include avenir_R();
+             color: rgba($oc_gray_7, 0.5);
+           }
         }
 
         label.error {
@@ -653,13 +658,9 @@ div.onboard-lander {
          border: 1px solid rgba($carrot_light_gray_1, 0.5);
          border-radius: 4px;
 
-         @include mobile() {
-            width: 70% !important;
-         }
-
          input {
            float: left;
-           width: 65%;
+           width: 95%;
            height: 100%;
            border: none;
            margin-left: 4px;
