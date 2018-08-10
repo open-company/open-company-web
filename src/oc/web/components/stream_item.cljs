@@ -122,8 +122,8 @@
                      (if is-mobile?
                        {:width (win-width)
                         :height @(::mobile-video-height s)}
-                       {:width (if expanded? 640 200)
-                        :height (if expanded? 377 117)}))]
+                       {:width (if expanded? 640 180)
+                        :height (if expanded? 377 106)}))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
