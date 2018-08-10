@@ -630,13 +630,12 @@ div.onboard-lander {
            width: 95%;
            height: 100%;
            border: none;
-           margin-left: 4px;
+           padding: 10px 16px;
            outline: none;
 
            @include placeholder(){
              @include avenir_R();
              margin-top: 10px;
-             margin-left: 4px;
              color: $ui_grey;
              font-size: 16px;
            }

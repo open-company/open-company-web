@@ -135,30 +135,42 @@
   (when success
     (org-created org-data)))
 
+(defn- handle-org-redirect [team-data org-data]
+  (if (and (empty? (:name team-data))
+           (utils/link-for (:links team-data) "partial-update"))
+    ;; if the current team has no name and
+    ;; the user has write permission on it
+    ;; use the org name
+    ;; for it and patch it back
+    (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
+    ;; if not redirect the user to the invite page
+    (org-created org-data)))
+
 (defn org-create-cb [{:keys [success status body]} email-domains]
+  (timbre/debug "DOMAIN: " email-domains)
   (if success
     (when-let [org-data (when success (json->cljs body))]
       (org-loaded org-data false)
       (let [team-data (dis/team-data (:team-id org-data))]
-        (when (pos? (count email-domains))
+        (if (pos? (count email-domains))
           (doseq [domain email-domains]
-            (api/add-email-domain domain #() team-data)))
-        (if (and (empty? (:name team-data))
-                 (utils/link-for (:links team-data) "partial-update"))
-          ; if the current team has no name and
-          ; the user has write permission on it
-          ; use the org name
-          ; for it and patch it back
-          (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
-          ; if not redirect the user to the invite page
-          (org-created org-data))))
+            (api/add-email-domain domain
+                                  #(handle-org-redirect team-data org-data)
+                                  team-data))
+          (handle-org-redirect team-data org-data))))
     (when (= status 409)
       ;; Redirect to the already available org
       (router/nav! (oc-urls/org (:slug (first (dis/orgs-data))))))))
 
 (defn org-create [org-data]
   (when (seq (:name org-data))
-    (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data) [(:email-domain org-data)] org-create-cb)))
+    (let [email-domains (remove nil? [(:email-domain org-data)])]
+      (api/create-org (:name org-data)
+                      (:logo-url org-data)
+                      (:logo-width org-data)
+                      (:logo-height org-data)
+                      email-domains
+                      org-create-cb))))
 
 ;; Org edit
 

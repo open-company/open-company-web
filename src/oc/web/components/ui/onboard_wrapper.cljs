@@ -303,7 +303,9 @@
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        continue-disabled (< (count (clean-org-name (:name org-editing))) 3)
+        continue-disabled (or
+                           (< (count (clean-org-name (:name org-editing))) 3)
+                           (:domain-error org-editing))
         continue-fn #(when-not continue-disabled
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])
@@ -388,18 +390,24 @@
                  :value (:email-domain org-editing)
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                  :on-change #(let [domain (.. % -target -value)]
-                               (timbre/debug domain)
-                               (timbre/debug (utils/valid-domain? domain))
                                (if (utils/valid-domain? domain)
                                  (do
-                                   (timbre/debug "adding domain: " domain)
                                    (dis/dispatch!
                                     [:input [:org-editing :email-domain]
                                      domain])
                                    (dis/dispatch!
                                     [:input [:org-editing :domain-error]
                                      false]))
-                                 (dis/dispatch! [:input [:org-editing :domain-error] true])))
+                                 (do
+                                   (if (zero? (count domain))
+                                     (dis/dispatch!
+                                      [:input [:org-editing :domain-error]
+                                       false])
+                                     (dis/dispatch!
+                                      [:input [:org-editing :domain-error]
+                                       true]))
+                                   (dis/dispatch!
+                                    [:input [:org-editing :email-domain] nil]))))
                  :placeholder "  Domain, e.g. acme.com"}]]
             [:div.field-label.info "Anyone with email addresses at this domain can automatically join your team."]]
           [:button.continue
