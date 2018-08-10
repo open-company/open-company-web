@@ -370,6 +370,7 @@
                                  EventType/SCROLL
                                  #(send-item-read-if-needed s)))
                                (send-item-read-if-needed s)
+                               (calc-video-height s)
                                ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                                s)
                               :did-remount (fn [_ s]

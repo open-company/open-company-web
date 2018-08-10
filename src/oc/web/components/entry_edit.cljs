@@ -321,6 +321,7 @@
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
+                          (calc-video-height s)
                           ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
                           s)
                          :did-remount (fn [_ s]
@@ -476,28 +477,31 @@
                                            :has-changes true
                                            :invite-note note})]))))])]
           ;; Add video button
-          [:div.entry-edit-modal-video-bt-container
-            [:button.mlb-reset.video-record-bt
-              {:on-click #(video-record-clicked s)
-               :class (when (or (:fixed-video-id entry-editing)
-                                @(::record-video s))
-                        "remove-video-bt")}
-              (if (or (:fixed-video-id entry-editing)
-                      @(::record-video s))
-                "Remove video"
-                "Record video")]]]
+          (when-not is-mobile?
+            [:div.entry-edit-modal-video-bt-container
+              [:button.mlb-reset.video-record-bt
+                {:on-click #(video-record-clicked s)
+                 :class (when (or (:fixed-video-id entry-editing)
+                                  @(::record-video s))
+                          "remove-video-bt")}
+                (if (or (:fixed-video-id entry-editing)
+                        @(::record-video s))
+                  "Remove video"
+                  "Record video")]])]
         [:div.entry-edit-modal-separator]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
           ;; Video elements
-          (when (and (:fixed-video-id entry-editing)
+          (when (and (not is-mobile?)
+                     (:fixed-video-id entry-editing)
                      (not @(::record-video s)))
             (ziggeo-player {:video-id (:fixed-video-id entry-editing)
                             :remove-video-cb remove-video-cb
                             :width (:width video-size)
                             :height (:height video-size)
                             :video-processed (:video-processed entry-editing)}))
-          (when @(::record-video s)
+          (when (and (not is-mobile?)
+                     @(::record-video s))
             (ziggeo-recorder {:start-cb video-started-recording-cb
                               :upload-started-cb #(do
                                                     (activity-actions/uploading-video %)
