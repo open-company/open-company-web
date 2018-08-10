@@ -674,6 +674,10 @@ div.onboard-lander {
            }
          }
 
+         &.error {
+           border: 1px solid rgba($carrot_orange, 0.5);
+         }
+
          button.add-email-domain-bt {
            height: 20px;
            padding: 10px 10px;

@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -263,7 +264,7 @@
         (dis/dispatch!
          [:input
           [:org-editing]
-          (assoc first-team :email-domains (:email-domains org-editing))])
+          (assoc first-team :email-domain (:email-domain org-editing))])
         (when (and (not (zero? (count (:logo-url first-team))))
                    (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
@@ -289,10 +290,10 @@
                           :did-mount (fn [s]
                            (setup-team-data s)
                            (when (and (jwt/get-key :google-domain)
-                                      (nil? (:email-domains @(drv/get-ref s :org-editing))))
+                                      (nil? (:email-domain @(drv/get-ref s :org-editing))))
                              (dis/dispatch!
-                              [:input [:org-editing :email-domains]
-                               (conj #{} (jwt/get-key :google-domain))]))
+                              [:input [:org-editing :email-domain]
+                               (jwt/get-key :google-domain)]))
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
@@ -374,7 +375,7 @@
           [:div.org-email-domains-row.group
             [:div.field-label
               [:label
-                "Allowed email domains (optional)"]
+                "Allowed email domain (optional)"]
               (when (:error org-editing)
                 [:label.error
                    "Only company email domains are allowed."])]
@@ -384,33 +385,23 @@
                 {:name "um-domain-invite"
                  :type "text"
                  :auto-capitalize "none"
+                 :value (:email-domain org-editing)
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
-                 :on-change #(do
-                               (dis/dispatch! [:input [:org-editing :email-domain] (.. % -target -value)]))
-                 :placeholder "  Domain, e.g. acme.com"}]
-              [:button.mlb-reset.add-email-domain-bt
-                {:on-click #(let [domain (:email-domain org-editing)]
-                              (if (utils/valid-domain? domain)
-                                (dis/dispatch! [:input [:org-editing :email-domains] (conj (set (:email-domains org-editing)) domain)])
-                                (dis/dispatch! [:input [:org-editing :domain-error] true])))
-                 :disabled (not (utils/valid-domain?
-                                (:email-domain org-editing)))}
-                "Add domain"]]
-            (when-not (zero? (count (:email-domains org-editing)))
-              [:div.org-email-domains-list
-                (for [domain (:email-domains org-editing)]
-                  [:div.org-list-item.group
-                    {:key (str "email-domain-team-" domain)}
-                    [:span.org-list-item-name
-                      (str "@" domain)]
-                    [:button.remove-domain-btn.btn-reset
-                     {:on-click #(do
-                                   (dis/dispatch! [:input [:org-editing :email-domains] (disj (:email-domains org-editing) domain)]))
-                       :title "Remove"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                      :data-container "body"}]])])
-            [:div.field-label.info "Anyone with email addresses at these domains can automatically join your team."]]
+                 :on-change #(let [domain (.. % -target -value)]
+                               (timbre/debug domain)
+                               (timbre/debug (utils/valid-domain? domain))
+                               (if (utils/valid-domain? domain)
+                                 (do
+                                   (timbre/debug "adding domain: " domain)
+                                   (dis/dispatch!
+                                    [:input [:org-editing :email-domain]
+                                     domain])
+                                   (dis/dispatch!
+                                    [:input [:org-editing :domain-error]
+                                     false]))
+                                 (dis/dispatch! [:input [:org-editing :domain-error] true])))
+                 :placeholder "  Domain, e.g. acme.com"}]]
+            [:div.field-label.info "Anyone with email addresses at this domain can automatically join your team."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
