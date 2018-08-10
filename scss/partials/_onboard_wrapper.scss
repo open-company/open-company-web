@@ -507,12 +507,12 @@ div.onboard-lander {
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
-      margin-top: 16px;
+      margin-top: 35px;
 
       &.info {
-         @include avenir_R();
-         color: $ui_grey;
-         font-size: 14px;
+        @include avenir_R();
+        font-size: 14px;
+        margin-top: 12px;
       }
 
       span.error {
@@ -591,6 +591,8 @@ div.onboard-lander {
 
     div.org-email-domains-row {
       div.field-label {
+        margin-top: 21px;
+
         &:before {
           font-size: 16px;
         }
@@ -607,48 +609,13 @@ div.onboard-lander {
 
            span.info {
              @include avenir_R();
+             font-size: 14px;
              color: rgba($oc_gray_7, 0.5);
            }
         }
 
         label.error {
           margin-left: 0px !important;
-        }
-      }
-
-      div.org-email-domains-list {
-        margin-top: 16px;
-        margin-bottom: 0px;
-
-        div.org-list-item {
-          display: inline-block;
-          padding-left: 6px;
-          background-color: $feint_emerald;
-          height: 32px;
-          border-radius: 100px;
-          margin-right: 8px;
-          color: $carrot_green;
-          border: none;
-          outline: none;
-          box-shadow: none;
-
-          button.remove-domain-btn {
-            width: 20px;
-            height: 28px;
-            margin-left: 4px;
-            margin-top: -5px;
-            background-image: cdnUrl("/img/ML/remove_email_domain.svg");
-            background-size: 8px 8px;
-            background-position: 4px 18px;
-            background-repeat: no-repeat;
-          }
-
-          span.org-list-item-name {
-            color: $carrot_green;
-            @include avenir_H();
-            font-size: 14px;
-            margin-top: -10px;
-          }
         }
       }
 
@@ -693,7 +660,7 @@ div.onboard-lander {
     }
 
     button.continue {
-      margin-top: 10px;
+      margin-top: 24px;
       outline: none;
       border: none;
       width: 100%;
