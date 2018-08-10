@@ -147,7 +147,6 @@
     (org-created org-data)))
 
 (defn org-create-cb [{:keys [success status body]} email-domains]
-  (timbre/debug "DOMAIN: " email-domains)
   (if success
     (when-let [org-data (when success (json->cljs body))]
       (org-loaded org-data false)
