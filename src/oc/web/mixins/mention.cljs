@@ -14,7 +14,7 @@
         format-str (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"
                         "<div class=\"oc-mention-popup-name\">" user-name "</div>"
                         "<div class=\"oc-mention-popup-subline\">" user-subline "</div>")
-        popup-node (.html (js/$ "<div class=\"oc-mention-popup\">") format-str)]
+        popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\">") format-str)]
     (.append $mention-el popup-node)))
 
 (defn- remove-hover-events [s events-list]

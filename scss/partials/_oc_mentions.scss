@@ -24,7 +24,7 @@ div.oc-mention-panel {
       cursor: pointer;
       background-color: transparent;
 
-      &:hover {
+      &.active {
         background-color: rgba(#32C97B, 0.5);
       }
 
@@ -83,6 +83,7 @@ div.oc-mention-popup {
   padding: 16px;
   height: 56px;
   overflow: hidden;
+  z-index: 1000;
 
   div.oc-mention-popup-avatar {
     width: 24px;
