@@ -61,3 +61,4 @@
 ;; Ziggeo
 (def oc-ziggeo-app "c9b611b2b996ee5a1f318d3bacc36b27")
 (def oc-ziggeo-profiles [])
+(def oc-enable-transcriptions false)

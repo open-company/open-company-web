@@ -11,6 +11,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.responsive :as responsive]
@@ -143,11 +144,11 @@
     (let [raw-html (.-innerHTML body-el)]
       (dis/dispatch! [:update [:modal-editing-data] #(merge % {:body (utils/clean-body-html raw-html)
                                                                :has-changes true})])))
-  ; (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
-  ;   (when (:fixed-video-id editing-data)
-  ;     (when-let [transcription-el (rum/ref-node state "transcript-edit")]
-  ;       (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})]))))
-  )
+  (when ls/oc-enable-transcriptions
+    (let [editing-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
+      (when (:fixed-video-id editing-data)
+        (when-let [transcription-el (rum/ref-node state "transcript-edit")]
+          (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})]))))))
 
 (defn- save-editing? [state]
   (clean-body state)
@@ -201,14 +202,6 @@
         (reset! (::initial-headline s) initial-headline)
         (reset! (::edited-data-loaded s) true)))))
 
-(defn remove-video []
-  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id nil
-                                                           :video-id nil
-                                                           :video-error false
-                                                           :video-transcript nil
-                                                           :video-processed false
-                                                           :has-changes true})]))
-
 (defn video-record-clicked [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)
         activity-editing (:modal-editing-data modal-data)
@@ -222,7 +215,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (remove-video)
+                                          (activity-actions/remove-video :modal-editing-data)
                                           (start-recording-fn)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data))
@@ -252,7 +245,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (remove-video)
+                                          (activity-actions/remove-video :modal-editing-data)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data)))
 
@@ -371,10 +364,12 @@
                                  #(send-item-read-if-needed s)))
                                (send-item-read-if-needed s)
                                (calc-video-height s)
-                               ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                               (when ls/oc-enable-transcriptions
+                                 (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                                s)
                               :did-remount (fn [_ s]
-                               ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                               (when ls/oc-enable-transcriptions
+                                 (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                                s)
                               :will-unmount (fn [s]
                                (when @(::window-click s)
@@ -510,7 +505,7 @@
                                 :height (:height video-size)
                                 :submit-cb video-processed-cb
                                 :remove-recorder-cb (fn []
-                                  (remove-video)
+                                  (activity-actions/remove-video :modal-editing-data)
                                   (reset! (::record-video s) false))}))
             (if editing
               [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable.fs-hide
@@ -550,19 +545,20 @@
                 {:key (str "fullscreen-post-body-" (:updated-at current-activity-data))
                  :ref :fullscreen-post-box-content-body
                  :dangerouslySetInnerHTML (utils/emojify (:body current-activity-data))}])
-            ; (when (and (:video-transcript current-activity-data)
-            ;            (:video-processed current-activity-data))
-            ;   (if editing
-            ;     [:div.fullscreen-post-transcript
-            ;       [:textarea.fullscreen-post-transcript-edit
-            ;         {:ref "transcript-edit"
-            ;          :on-input #(ui-utils/resize-textarea (.-target %))
-            ;          :default-value (:video-transcript current-activity-data)}]]
-            ;     [:div.fullscreen-post-transcript
-            ;       [:div.fullscreen-post-transcript-header
-            ;         "This transcript was automatically generated and may not be accurate"]
-            ;       [:div.fullscreen-post-transcript-content
-            ;         (:video-transcript current-activity-data)]]))
+            (when (and ls/oc-enable-transcriptions
+                       (:video-transcript current-activity-data)
+                       (:video-processed current-activity-data))
+              (if editing
+                [:div.fullscreen-post-transcript
+                  [:textarea.fullscreen-post-transcript-edit
+                    {:ref "transcript-edit"
+                     :on-input #(ui-utils/resize-textarea (.-target %))
+                     :default-value (:video-transcript current-activity-data)}]]
+                [:div.fullscreen-post-transcript
+                  [:div.fullscreen-post-transcript-header
+                    "This transcript was automatically generated and may not be accurate"]
+                  [:div.fullscreen-post-transcript-content
+                    (:video-transcript current-activity-data)]]))
             (stream-attachments activity-attachments nil
              (when editing #(activity-actions/remove-attachment :modal-editing-data %)))
             (if editing

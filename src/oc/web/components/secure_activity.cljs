@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
@@ -124,13 +125,14 @@
             (when (:body activity-data)
               [:div.activity-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
-            ; (when (and (:video-transcript activity-data)
-            ;            (:video-processed activity-data))
-            ;   [:div.activity-video-transcript
-            ;     [:div.activity-video-transcript-header
-            ;       "This transcript was automatically generated and may not be accurate"]
-            ;     [:div.activity-video-transcript-content
-            ;       (:video-transcript activity-data)]])
+            (when (and ls/oc-enable-transcriptions
+                       (:video-transcript activity-data)
+                       (:video-processed activity-data))
+              [:div.activity-video-transcript
+                [:div.activity-video-transcript-header
+                  "This transcript was automatically generated and may not be accurate"]
+                [:div.activity-video-transcript-content
+                  (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))]])
       (when-not activity-data
         [:div.secure-activity-container

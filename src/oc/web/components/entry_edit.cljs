@@ -11,6 +11,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
@@ -131,11 +132,11 @@
 (defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
     (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))]))
-  ; (let [editing-data @(drv/get-ref s :entry-editing)]
-  ;   (when (:fixed-video-id editing-data)
-  ;     (when-let [transcription-el (rum/ref-node s "transcript-edit")]
-  ;       (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})]))))
-  )
+  (when ls/oc-enable-transcriptions
+    (let [editing-data @(drv/get-ref s :entry-editing)]
+      (when (:fixed-video-id editing-data)
+        (when-let [transcription-el (rum/ref-node s "transcript-edit")]
+          (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})]))))))
 
 (defn- fix-headline [entry-editing]
   (utils/trim (:headline entry-editing)))
@@ -146,14 +147,6 @@
                 @(::video-uploading s))
            (not @(::record-video s)))
        (not (zero? (count (fix-headline entry-editing))))))
-
-(defn remove-video []
-  (dis/dispatch! [:update [:entry-editing] #(merge % {:fixed-video-id nil
-                                                      :video-id nil
-                                                      :video-transcript nil
-                                                      :video-processed false
-                                                      :video-error false
-                                                      :has-changes true})]))
 
 (defn video-record-clicked [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -171,7 +164,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (remove-video)
+                                          (activity-actions/remove-video :entry-editing)
                                           (reset! (::record-video s) false)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data))
@@ -204,7 +197,7 @@
                         :solid-button-style :red
                         :solid-button-title "Yes"
                         :solid-button-cb (fn []
-                                          (remove-video)
+                                          (activity-actions/remove-video :entry-editing)
                                           (alert-modal/hide-alert))}]
         (alert-modal/show-alert alert-data)))
 
@@ -322,10 +315,12 @@
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
                           (calc-video-height s)
-                          ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                          (when ls/oc-enable-transcriptions
+                            (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                           s)
                          :did-remount (fn [_ s]
-                          ; (ui-utils/resize-textarea (rum/ref-node s "transcript-edit"))
+                          (when ls/oc-enable-transcriptions
+                            (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                           s)
                          :before-render (fn [s]
                           ;; Set or remove the onBeforeUnload prompt
@@ -513,7 +508,7 @@
                               :width (:width video-size)
                               :height (:height video-size)
                               :remove-recorder-cb (fn []
-                                (remove-video)
+                                (activity-actions/remove-video :entry-editing)
                                 (reset! (::record-video s) false))}))
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable.group.fs-hide
@@ -540,13 +535,14 @@
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]
                                :classes "emoji-autocomplete emojiable fs-hide"})]
-          ; (when (and (:fixed-video-id entry-editing)
-          ;            (:video-processed entry-editing))
-          ;   [:div.entry-edit-transcript
-          ;     [:textarea.video-transcript
-          ;       {:ref "transcript-edit"
-          ;        :on-input #(ui-utils/resize-textarea (.-target %))
-          ;        :default-value (:video-transcript entry-editing)}]])
+          (when (and ls/oc-enable-transcriptions
+                     (:fixed-video-id entry-editing)
+                     (:video-processed entry-editing))
+            [:div.entry-edit-transcript
+              [:textarea.video-transcript
+                {:ref "transcript-edit"
+                 :on-input #(ui-utils/resize-textarea (.-target %))
+                 :default-value (:video-transcript entry-editing)}]])
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
            #(activity-actions/remove-attachment :entry-editing %))]

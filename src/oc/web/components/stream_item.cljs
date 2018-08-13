@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
@@ -211,14 +212,14 @@
                    :class (utils/class-set {:wrt-truncated truncated?
                                             :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
-          ; (when (and expanded?
-          ;            (:video-transcript activity-data))
-          ;   [:div.stream-item-transcript
-          ;     [:div.stream-item-transcript-header
-          ;       "This transcript was automatically generated and may not be accurate"]
-          ;     [:div.stream-item-transcript-content
-          ;       (:video-transcript activity-data)]])
-          ]
+          (when (and ls/oc-enable-transcriptions
+                     expanded?
+                     (:video-transcript activity-data))
+            [:div.stream-item-transcript
+              [:div.stream-item-transcript-header
+                "This transcript was automatically generated and may not be accurate"]
+              [:div.stream-item-transcript-content
+                (:video-transcript activity-data)]])]
           (when (or (not is-mobile?) expanded?)
             (stream-attachments activity-attachments
              (when (and truncated? (not expanded?))
