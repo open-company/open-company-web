@@ -35,3 +35,9 @@
   (let [current-notifications (get-in db dispatcher/notifications-key)
         next-notifications (filter #(not= (:created-at %) (:created-at notification-data)) current-notifications)]
     (assoc-in db dispatcher/notifications-key next-notifications)))
+
+(defmethod dispatcher/action :notification-remove-by-id
+  [db [_ notification-id]]
+  (let [current-notifications (get-in db dispatcher/notifications-key)
+        next-notifications (filter #(not= (:id %) notification-id) current-notifications)]
+    (assoc-in db dispatcher/notifications-key next-notifications)))

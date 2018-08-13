@@ -1,7 +1,6 @@
 (ns oc.web.components.entry-edit
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
@@ -10,6 +9,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.utils.activity :as au]
+            [oc.web.utils.ui :as ui-utils]
+            [oc.web.local-settings :as ls]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -18,6 +21,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [goog.object :as gobj]
             [goog.events :as events]
@@ -125,17 +129,95 @@
   (headline-on-change s)
   (body-on-change s))
 
-(defn- clean-body []
+(defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))])))
+    (dis/dispatch! [:input [:entry-editing :body] (utils/clean-body-html (.-innerHTML body-el))]))
+  (when ls/oc-enable-transcriptions
+    (let [editing-data @(drv/get-ref s :entry-editing)]
+      (when (:fixed-video-id editing-data)
+        (when-let [transcription-el (rum/ref-node s "transcript-edit")]
+          (dis/dispatch! [:update [:entry-editing] #(merge % {:video-transcript (.-value transcription-el)})]))))))
 
-(defn- is-publishable? [entry-editing]
-  (seq (:board-slug entry-editing)))
+(defn- fix-headline [entry-editing]
+  (utils/trim (:headline entry-editing)))
 
-(defn trim [value]
-  (if (string? value)
-    (string/trim value)
-    value))
+(defn- is-publishable? [s entry-editing]
+  (and (seq (:board-slug entry-editing))
+       (or (and @(::record-video s)
+                @(::video-uploading s))
+           (not @(::record-video s)))
+       (not (zero? (count (fix-headline entry-editing))))))
+
+(defn video-record-clicked [s]
+  (let [entry-editing @(drv/get-ref s :entry-editing)
+        start-recording-fn #(do
+                              (reset! (::record-video s) true)
+                              (reset! (::video-picking-cover s) false)
+                              (reset! (::video-uploading s) false))]
+    (cond
+      (:fixed-video-id entry-editing)
+      (activity-actions/prompt-remove-video :entry-editing)
+      @(::record-video s)
+      (reset! (::record-video s) false)
+      :else
+      (start-recording-fn))))
+
+(defn win-width []
+  (or (.-innerWidth js/window)
+      (.-clientWidth (.-documentElement js/document))))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (* (win-width) (/ 377 640)))))
+
+(defn show-post-error [s message]
+  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+    (if-not (.data $post-btn "bs.tooltip")
+      (.tooltip $post-btn
+       (clj->js {:container "body"
+                 :placement "bottom"
+                 :trigger "manual"
+                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                  "<div class=\"tooltip-arrow\"></div>"
+                                  "<div class=\"tooltip-inner\"></div>"
+                                "</div>")
+                 :title message}))
+      (doto $post-btn
+        (.attr "data-original-title" message)
+        (.tooltip "fixTitle")))
+    (utils/after 10 #(.tooltip $post-btn "show"))
+    (utils/after 5000 #(.tooltip $post-btn "hide"))))
+
+(defn post-clicked [s]
+  (clean-body s)
+  (let [entry-editing @(drv/get-ref s :entry-editing)
+        fixed-headline (fix-headline entry-editing)
+        published? (= (:status entry-editing) "published")]
+    (if (is-publishable? s entry-editing)
+      (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
+            updated-entry-editing @(drv/get-ref s :entry-editing)
+            section-editing @(drv/get-ref s :section-editing)]
+        (remove-autosave s)
+        (if published?
+          (do
+            (reset! (::saving s) true)
+            (activity-actions/entry-save updated-entry-editing section-editing))
+          (do
+            (reset! (::publishing s) true)
+            (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
+      (cond
+        ;; Missing headline error
+        (zero? (count fixed-headline))
+        (show-post-error s "A title is required in order to save or share this post.")
+        ;; User needs to pick a cover shot
+        (and @(::record-video s)
+             (not @(::video-uploading s))
+             @(::video-picking-cover s))
+        (show-post-error s "Please pick a cover image for your video.")
+        ;; Video still recording
+        (and @(::record-video s)
+             (not @(::video-uploading s)))
+        (show-post-error s "Please finish video recording.")))))
 
 (rum/defcs entry-edit < rum/reactive
                         ;; Derivatives
@@ -149,7 +231,6 @@
                         (drv/drv :show-sections-picker)
                         ;; Locals
                         (rum/local false ::dismiss)
-                        (rum/local nil ::body-editor)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
                         (rum/local 330 ::entry-edit-modal-height)
@@ -160,9 +241,14 @@
                         (rum/local false ::window-click-listener)
                         (rum/local nil ::autosave-timer)
                         (rum/local false ::show-legend)
+                        (rum/local false ::record-video)
+                        (rum/local 0 ::mobile-video-height)
+                        (rum/local false ::video-uploading)
+                        (rum/local false ::video-picking-cover)
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
+                        (mixins/render-on-resize calc-video-height)
 
                         {:will-mount (fn [s]
                           (let [entry-editing @(drv/get-ref s :entry-editing)
@@ -189,8 +275,13 @@
                           (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                           (when (responsive/is-tablet-or-mobile?)
                             (set! (.-scrollTop (.-body js/document)) 0))
-                          (when (and (responsive/is-tablet-or-mobile?) (js/isSafari))
-                            (js/OCStaticStartFixFixedPositioning "div.entry-edit-modal-header-mobile"))
+                          (calc-video-height s)
+                          (when ls/oc-enable-transcriptions
+                            (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
+                          s)
+                         :did-remount (fn [_ s]
+                          (when ls/oc-enable-transcriptions
+                            (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                           s)
                          :before-render (fn [s]
                           ;; Set or remove the onBeforeUnload prompt
@@ -239,9 +330,6 @@
                                                (:board-slug entry-editing))))))))))))
                           s)
                          :will-unmount (fn [s]
-                          (when @(::body-editor s)
-                            (.destroy @(::body-editor s))
-                            (reset! (::body-editor s) nil))
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
@@ -264,9 +352,14 @@
         show-sections-picker (drv/react s :show-sections-picker)
         posting-title (if (:uuid entry-editing)
                         (if (= (:status entry-editing) "published")
-                          "Posted to: "
-                          "Draft for: ")
-                        "Posting to: ")]
+                          "Posted to "
+                          "Draft for ")
+                        "Posting to ")
+        video-size (if is-mobile?
+                     {:width (win-width)
+                      :height @(::mobile-video-height s)}
+                     {:width 640
+                      :height 377})]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -275,49 +368,19 @@
           {:on-click #(cancel-clicked s)}
           ""]
         [:div.entry-edit-modal-header-title
-          {:dangerouslySetInnerHTML (utils/emojify (:headline entry-editing))}]
+          {:dangerouslySetInnerHTML (utils/emojify (if (seq (:headline entry-editing)) (:headline entry-editing) utils/default-headline))}]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
-            (let [fixed-headline (trim (:headline entry-editing))
-                  disabled? (or @(::publishing s)
-                                (not (is-publishable? entry-editing))
-                                (zero? (count fixed-headline)))
+            (let [disabled? (or @(::publishing s)
+                                (not (is-publishable? s entry-editing)))
                   working? (or (and published?
                                     @(::saving s))
                                (and (not published?)
                                     @(::publishing s)))]
               [:button.mlb-reset.header-buttons.post-button
                 {:ref "mobile-post-btn"
-                 :on-click (fn [_]
-                             (clean-body)
-                             (if (and (is-publishable? entry-editing)
-                                      (not (zero? (count fixed-headline))))
-                                (let [_ (dis/dispatch! [:input [:entry-editing :headline] fixed-headline])
-                                      updated-entry-editing @(drv/get-ref s :entry-editing)
-                                      section-editing @(drv/get-ref s :section-editing)]
-                                  (remove-autosave s)
-                                  (if published?
-                                    (do
-                                      (reset! (::saving s) true)
-                                      (activity-actions/entry-save updated-entry-editing section-editing))
-                                    (do
-                                      (reset! (::publishing s) true)
-                                      (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
-                                (when (zero? (count fixed-headline))
-                                  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
-                                    (when-not (.data $post-btn "bs.tooltip")
-                                      (.tooltip $post-btn
-                                       (clj->js {:container "body"
-                                                 :placement "bottom"
-                                                 :trigger "manual"
-                                                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                                  "<div class=\"tooltip-arrow\"></div>"
-                                                                  "<div class=\"tooltip-inner\"></div>"
-                                                                "</div>")
-                                                 :title "A title is required in order to save or share this post."})))
-                                    (utils/after 10 #(.tooltip $post-btn "show"))
-                                    (utils/after 5000 #(.tooltip $post-btn "hide"))))))
+                 :on-click #(post-clicked s)
                  :class (utils/class-set {:disabled disabled?
                                           :loading working?})}
                 (when working?
@@ -329,7 +392,9 @@
               [:div.mobile-buttons-divider-line])
             (when should-show-save-button?
               (let [disabled? (or @(::saving s)
-                                  (not (:has-changes entry-editing)))
+                                  (not (:has-changes entry-editing))
+                                  (and @(::record-video s)
+                                       (not @(::video-uploading s))))
                     working? @(::saving s)]
                 [:button.mlb-reset.header-buttons.save-button
                   {:class (utils/class-set {:disabled disabled?
@@ -337,19 +402,19 @@
                    :on-click (fn [_]
                               (when-not disabled?
                                 (remove-autosave s)
-                                (clean-body)
+                                (clean-body s)
                                 (reset! (::saving s) true)
                                 (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
                     (small-loading))
-                  "Save to draft"]))])]
+                  "Save draft"]))])]
       [:div.entry-edit-modal.group
         {:ref "entry-edit-modal"}
-        [:div.entry-edit-modal-headline.group
-          (user-avatar-image current-user-data)
+        [:div.entry-edit-modal-section.group
           [:div.posting-in
             {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                           (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
+            (user-avatar-image current-user-data)
             [:span.posting-in-span
               posting-title]
             [:div.board-name
@@ -366,9 +431,46 @@
                      (merge entry-editing {:board-slug (:slug board-data)
                                            :board-name (:name board-data)
                                            :has-changes true
-                                           :invite-note note})]))))])]]
+                                           :invite-note note})]))))])]
+          ;; Add video button
+          (when-not is-mobile?
+            [:div.entry-edit-modal-video-bt-container
+              [:button.mlb-reset.video-record-bt
+                {:on-click #(video-record-clicked s)
+                 :class (when (or (:fixed-video-id entry-editing)
+                                  @(::record-video s))
+                          "remove-video-bt")}
+                (if (or (:fixed-video-id entry-editing)
+                        @(::record-video s))
+                  "Remove video"
+                  "Record video")]])]
+        [:div.entry-edit-modal-separator]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          ;; Video elements
+          (when (and (not is-mobile?)
+                     (:fixed-video-id entry-editing)
+                     (not @(::record-video s)))
+            (ziggeo-player {:video-id (:fixed-video-id entry-editing)
+                            :remove-video-cb #(activity-actions/prompt-remove-video :entry-editing)
+                            :width (:width video-size)
+                            :height (:height video-size)
+                            :video-processed (:video-processed entry-editing)}))
+          (when (and (not is-mobile?)
+                     @(::record-video s))
+            (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :entry-editing)
+                              :upload-started-cb #(do
+                                                    (activity-actions/uploading-video %)
+                                                    (reset! (::video-picking-cover s) false)
+                                                    (reset! (::video-uploading s) true))
+                              :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
+                              :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
+                              :submit-cb (partial activity-actions/video-processed-cb :entry-editing)
+                              :width (:width video-size)
+                              :height (:height video-size)
+                              :remove-recorder-cb (fn []
+                                (activity-actions/remove-video :entry-editing)
+                                (reset! (::record-video s) false))}))
           ; Headline element
           [:div.entry-edit-headline.emoji-autocomplete.emojiable.group.fs-hide
             {:content-editable true
@@ -382,17 +484,26 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          (rich-body-editor {:on-change (partial body-on-change s)
-                             :use-inline-media-picker false
-                             :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
-                             :initial-body @(::initial-body s)
-                             :show-placeholder (not (contains? entry-editing :links))
-                             :show-h2 true
-                             :dispatch-input-key :entry-editing
-                             :upload-progress-cb (fn [is-uploading?]
-                                                   (reset! (::uploading-media s) is-uploading?))
-                             :media-config ["photo" "video"]
-                             :classes "emoji-autocomplete emojiable fs-hide"})
+          [:div.rich-body-editor-wrapper
+            (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker false
+                               :multi-picker-container-selector "div#entry-edit-footer-multi-picker"
+                               :initial-body @(::initial-body s)
+                               :show-placeholder (not (contains? entry-editing :links))
+                               :show-h2 true
+                               :dispatch-input-key :entry-editing
+                               :upload-progress-cb (fn [is-uploading?]
+                                                     (reset! (::uploading-media s) is-uploading?))
+                               :media-config ["photo" "video"]
+                               :classes "emoji-autocomplete emojiable fs-hide"})]
+          (when (and ls/oc-enable-transcriptions
+                     (:fixed-video-id entry-editing)
+                     (:video-processed entry-editing))
+            [:div.entry-edit-transcript
+              [:textarea.video-transcript
+                {:ref "transcript-edit"
+                 :on-input #(ui-utils/resize-textarea (.-target %))
+                 :default-value (:video-transcript entry-editing)}]])
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
            #(activity-actions/remove-attachment :entry-editing %))]

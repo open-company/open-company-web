@@ -135,8 +135,6 @@ div.secure-activity-container {
       div.activity-content-header-right {
         float: right;
         width: 45%;
-
-        @include section-tag();
       }
     }
 
@@ -157,6 +155,13 @@ div.secure-activity-container {
 
       @include mobile() {
         padding: 32px;
+      }
+
+      div.ziggeo-player {
+        margin-top: 16px;
+        @include tablet(){
+          margin-left: -24px;
+        }
       }
 
       div.activity-title {
@@ -200,6 +205,32 @@ div.secure-activity-container {
 
         &:after {
           margin: 0;
+        }
+      }
+
+      div.activity-video-transcript {
+        max-height: 330px;
+        margin-top: 16px;
+        width: 100%;
+        background-color: rgba(#ECECEC, 0.2);
+        border-top: 1px solid #ECECEC;
+        padding: 24px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+
+        div.activity-video-transcript-header {
+          @include avenir_M();
+          font-size: 12px;
+          color: $light_ui_grey;
+        }
+
+        div.activity-video-transcript-content {
+          margin-top: 24px;
+          @include avenir_BOOK();
+          font-size: 16px;
+          color: $deep_navy;
         }
       }
     }

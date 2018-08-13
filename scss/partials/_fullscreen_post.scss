@@ -131,6 +131,10 @@ div.fullscreen-post-container {
           opacity: 1;
         }
 
+        &.disabled {
+          opacity: 0.6
+        }
+
         &.loading {
           &:before {
             content: "";
@@ -256,6 +260,52 @@ div.fullscreen-post-container {
         }
       }
 
+      div.fullscreen-post-author-header-video-bt-container {
+        float: right;
+
+        button.video-record-bt {
+          @include avenir_M();
+          color: $light_ui_grey;
+          font-size: 14px;
+          height: 20px;
+          position: relative;
+          padding-left: 26px;
+          margin-top: 4px;
+
+          &.remove-video-bt {
+            &:before {
+              background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+            }
+            &:hover {
+              &:before {
+                background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+              }
+            }
+          }
+
+          &:hover {
+            color: $ui_grey;
+
+            &:before {
+              background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+            }
+          }
+
+          &:before {
+            content: "";
+            left: 0px;
+            top: 3px;
+            position: absolute;
+            height: 12px;
+            width: 20px;
+            background-image: cdnUrl("/img/ML/capture_video_icon.svg");
+            background-size: 20px 12px;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+        }
+      }
+
       div.fullscreen-post-author-header-author {
         width: 75%;
         padding-right: 20px;
@@ -332,6 +382,10 @@ div.fullscreen-post-container {
           outline: none;
           display: inline;
 
+          &.headline-edit {
+            display: block;
+          }
+
           &:empty:before {
             content: attr(placeholder);
             display: inline-block;
@@ -389,6 +443,13 @@ div.fullscreen-post-container {
           }
         }
 
+        div.ziggeo-player, div.ziggeo-recorder {
+          margin: 8px auto 24px;
+          @include tablet(){
+            margin-left: -24px;
+          }
+        }
+
         div.fullscreen-post-box-content-body {
           border: none;
           outline: none;
@@ -398,10 +459,48 @@ div.fullscreen-post-container {
           @include avenir_R();
           font-size: 16px;
           line-height: 22px;
-          min-height: 160px;
 
           @include mobile() {
             min-height: initial;
+          }
+        }
+
+        div.fullscreen-post-transcript {
+          max-height: 330px;
+          margin-top: 16px;
+          width: 100%;
+          background-color: rgba(#ECECEC, 0.2);
+          border-top: 1px solid #ECECEC;
+          padding: 24px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+
+          textarea.fullscreen-post-transcript-edit {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            min-height: 80px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+          }
+
+          div.fullscreen-post-transcript-header {
+            @include avenir_M();
+            font-size: 12px;
+            color: $light_ui_grey;
+          }
+
+          div.fullscreen-post-transcript-content {
+            margin-top: 24px;
+            @include avenir_BOOK();
+            font-size: 16px;
+            color: $deep_navy;
           }
         }
 
@@ -439,7 +538,6 @@ div.fullscreen-post-container {
           div.fullscreen-post-box-footer-editing {
             div.fullscreen-post-box-footer-multi-picker {
               float: left;
-              width: 20px;
               height: 20px;
             }
 
@@ -468,14 +566,16 @@ div.fullscreen-post-container {
             }
 
             div.fullscreen-post-box-footer-legend-container {
-              float: left;
+              float: right;
               margin-left: 16px;
               position: relative;
+              width: 20px;
+              height: 20px;
 
               button.fullscreen-post-box-footer-legend-trigger {
                 width: 20px;
                 height: 20px;
-                @include image-2x("/img/ML/new_post_legend_button");
+                background-image: cdnUrl("/img/ML/new_post_legend_button.svg");
                 background-repeat: no-repeat;
                 background-size: 20px 20px;
                 background-position: 0px 0px;
@@ -483,6 +583,11 @@ div.fullscreen-post-container {
                 position: absolute;
                 top: 0px;
                 left: 0px;
+                opacity: 0.4;
+
+                &:hover {
+                  opacity: 1;
+                }
               }
 
               div.fullscreen-post-box-footer-legend-image {
@@ -491,7 +596,7 @@ div.fullscreen-post-container {
                 left: -8px;
                 width: 212px;
                 height: 281px;
-                @include image-2x("/img/ML/new_post_legend");
+                background-image: cdnUrl("/img/ML/new_post_legend.svg");
                 background-size: 212px 281px;
                 background-position: center;
                 background-repeat: no-repeat;

@@ -36,6 +36,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.ziggeo :as ziggeo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -618,7 +619,8 @@
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
-    (router/setup-navigation! handle-url-change route-dispatch!)))
+    (router/setup-navigation! handle-url-change route-dispatch!))
+  (ziggeo/init-ziggeo true))
 
 (defn on-js-reload []
   (.clear js/console)

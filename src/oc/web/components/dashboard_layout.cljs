@@ -88,6 +88,14 @@
      (.tooltip "hide")
      (.tooltip "fixTitle"))))
 
+(defn compose [s]
+  (utils/remove-tooltips)
+  (activity-actions/entry-edit (get-board-for-edit s))
+  ;; If the add post tooltip is visible
+  (when @(drv/get-ref s :show-add-post-tooltip)
+    ;; Dismiss it and bring up the invite people tooltip
+    (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
+
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
@@ -154,13 +162,6 @@
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
-        compose-fn (fn [_]
-                    (utils/remove-tooltips)
-                    (activity-actions/entry-edit (get-board-for-edit s))
-                    ;; If the add post tooltip is visible
-                    (when @(drv/get-ref s :show-add-post-tooltip)
-                      ;; Dismiss it and bring up the invite people tooltip
-                      (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
@@ -251,7 +252,7 @@
                     (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
                       [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                         {:ref :top-compose-button
-                         :on-click #(when can-compose (compose-fn %))
+                         :on-click #(when can-compose (compose s))
                          :class (when-not can-compose "disabled")
                          :title (when show-tooltip? "You are a view-only user.")
                          :data-viewer (if show-tooltip? "enable" "disable")
@@ -302,7 +303,7 @@
                       "You can delete the sample post at anytime."]]
                   [:div.add-post-tooltip-arrow]
                   [:button.mlb-reset.add-post-tooltip-compose-bt
-                    {:on-click compose-fn}
+                    {:on-click #(compose s)}
                     "Create new post"]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
@@ -342,5 +343,5 @@
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :on-click compose-fn}
+                       :on-click #(compose s)}
                       [:div.add-to-board-plus]]]))])]]))

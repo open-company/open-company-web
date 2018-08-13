@@ -115,6 +115,12 @@ script/compile_assets.sh <compiler version> ~/path/to/open-company-web localhost
 cp ~/path/to/open-company-web/target/public/oc_assets.js* ~/path/to/open-company-way/resources/public/
 ```
 
+#### Ziggeo media player and recorder development
+
+To change the Ziggeo video player and recorder you need to change [our fork](https://github.com/open-company/betajs-media-components) of [betajs/betajs-media-components](https://github.com/betajs/betajs-media-components).
+Once you changed everything you need you only need to run this `source script/local_ziggeo_dev.sh` to compile the ziggeo sdk and copy it here.
+Do not forget to commit the changes made to betajs-media-compoentns and the changed files here in oc-web.
+
 ### Project REPL
 
 To have a ClojureScript REPL connected to the browser, first start the dev task:

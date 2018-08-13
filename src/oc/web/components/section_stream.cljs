@@ -41,6 +41,7 @@
         [:div.section-stream-cards-inner.group
           (for [e items
                 :let [reads-data (get activities-read (:uuid e))]]
-            (rum/with-key (stream-item e reads-data) (str "section-stream-item-" (:uuid e) "-" (:updated-at e))))]
+            (rum/with-key (stream-item e reads-data)
+             (str "section-stream-item-" (:uuid e) "-" (:updated-at e))))]
         (when (responsive/is-mobile-size?)
           (all-caught-up))]]))
