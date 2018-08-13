@@ -163,7 +163,7 @@
 
 (defn org-create [org-data]
   (when (seq (:name org-data))
-    (let [email-domains (remove nil? [(:email-domain org-data)])]
+    (let [email-domains (remove clojure.string/blank? [(:email-domain org-data)])]
       (api/create-org (:name org-data)
                       (:logo-url org-data)
                       (:logo-width org-data)

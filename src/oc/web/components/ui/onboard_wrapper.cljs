@@ -386,7 +386,7 @@
                 {:name "um-domain-invite"
                  :type "text"
                  :auto-capitalize "none"
-                 :value (:email-domain org-editing)
+                 :value (or (:email-domain org-editing) "")
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                  :on-change #(let [domain (.. % -target -value)]
                                (if (utils/valid-domain? domain)
