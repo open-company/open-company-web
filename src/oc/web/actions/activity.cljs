@@ -619,3 +619,11 @@
 
 (defn uploading-video [video-id]
   (dis/dispatch! [:uploading-video (router/current-org-slug) video-id]))
+
+(defn remove-video [edit-key]
+  (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
+                                                :video-id nil
+                                                :video-transcript nil
+                                                :video-processed false
+                                                :video-error false
+                                                :has-changes true})]))
