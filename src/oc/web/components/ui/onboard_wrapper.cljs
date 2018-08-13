@@ -263,7 +263,7 @@
         (dis/dispatch!
          [:update
           [:org-editing]
-          (assoc first-team :email-domain (:email-domain org-editing))])
+          first-team])
         (when (and (not (zero? (count (:logo-url first-team))))
                    (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
@@ -289,10 +289,17 @@
                           :did-mount (fn [s]
                            (setup-team-data s)
                            (when (and (jwt/get-key :google-domain)
-                                      (nil? (:email-domain @(drv/get-ref s :org-editing))))
+                                      (clojure.string/blank?
+                                       (:email-domain @(drv/get-ref s :org-editing))))
                              (dis/dispatch!
                               [:input [:org-editing :email-domain]
-                               (jwt/get-key :google-domain)]))
+                               (jwt/get-key :google-domain)])
+
+                             (when-let [field (rum/ref-node
+                                                s
+                                                "um-domain-invite")]
+                               (set! (.-value field)
+                                     (jwt/get-key :google-domain))))
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
@@ -384,9 +391,9 @@
               {:class (when (:domain-error org-editing) "error")}
               [:input.um-invite-field.email
                 {:name "um-domain-invite"
+                 :ref "um-domain-invite"
                  :type "text"
                  :auto-capitalize "none"
-                 :value (or (:email-domain org-editing) "")
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
                  :on-change #(let [domain (.. % -target -value)]
                                (if (utils/valid-domain? domain)
