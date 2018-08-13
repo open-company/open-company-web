@@ -73,7 +73,8 @@ function ListItem(props) {
 
 
 
-// function CustomizedTagComponent(props) {
+// Using PureComponent as suggested here:
+// https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization
 class CustomizedTagComponent extends React.PureComponent {
   constructor(props) {
     super(props);
