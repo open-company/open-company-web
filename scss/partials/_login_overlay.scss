@@ -152,18 +152,6 @@ div.login-overlay-container {
       border-radius: 4px;
       text-align: center;
 
-      div.signin-with-slack-content {
-        div.slack-icon {
-          @include image-2x("/img/ML/slack_blue_icon");
-        }
-      }
-
-      div.signin-with-google-content {
-        div.google-icon {
-          background-image: cdnUrl("/img/ML/google_signin.svg");
-        }
-      }
-
       div.signin-with-slack-content, div.signin-with-google-content {
         @include avenir_H();
         font-size: 14px;
@@ -174,11 +162,11 @@ div.login-overlay-container {
         align-items: center;
 
         div.slack-icon {
-          width: 17px;
-          height: 17px;
-          background-image: cdnUrl('/img/slack.png');
+          width: 21px;
+          height: 21px;
+          background-image: cdnUrl("/img/ML/slack_normal.svg");
           background-repeat: no-repeat;
-          background-size: 17px 17px;
+          background-size: 21px 21px;
           float: left;
           margin-right: 16px;
         }
