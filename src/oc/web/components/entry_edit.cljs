@@ -156,50 +156,11 @@
                               (reset! (::video-uploading s) false))]
     (cond
       (:fixed-video-id entry-editing)
-      (let [alert-data {:icon "/img/ML/trash.svg"
-                        :action "rerecord-video"
-                        :message "Are you sure you want to delete the current video? This can’t be undone."
-                        :link-button-title "Keep"
-                        :link-button-cb #(alert-modal/hide-alert)
-                        :solid-button-style :red
-                        :solid-button-title "Yes"
-                        :solid-button-cb (fn []
-                                          (activity-actions/remove-video :entry-editing)
-                                          (reset! (::record-video s) false)
-                                          (alert-modal/hide-alert))}]
-        (alert-modal/show-alert alert-data))
+      (activity-actions/prompt-remove-video :entry-editing)
       @(::record-video s)
       (reset! (::record-video s) false)
       :else
       (start-recording-fn))))
-
-(defn video-started-recording-cb [video-token]
-  (dis/dispatch! [:update [:entry-editing] #(merge % {:fixed-video-id video-token
-                                                      :video-id video-token
-                                                      ;; default video error to true
-                                                      :video-error true
-                                                      :has-changes true})]))
-
-(defn video-processed-cb [video-token unmounted?]
-  (when-not unmounted?
-    (dis/dispatch! [:update [:entry-editing] #(merge % {:fixed-video-id video-token
-                                                        :video-id video-token
-                                                        ;; turn off video error since upload finished
-                                                        :video-error false
-                                                        :has-changes true})])))
-
-(defn- remove-video-cb []
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                        :action "rerecord-video"
-                        :message "You sure you want to remove the current video?"
-                        :link-button-title "Keep"
-                        :link-button-cb #(alert-modal/hide-alert)
-                        :solid-button-style :red
-                        :solid-button-title "Yes"
-                        :solid-button-cb (fn []
-                                          (activity-actions/remove-video :entry-editing)
-                                          (alert-modal/hide-alert))}]
-        (alert-modal/show-alert alert-data)))
 
 (defn win-width []
   (or (.-innerWidth js/window)
@@ -407,7 +368,7 @@
           {:on-click #(cancel-clicked s)}
           ""]
         [:div.entry-edit-modal-header-title
-          {:dangerouslySetInnerHTML (utils/emojify (if (seq (:headline entry-editing)) (:headline entry-editing) "Untitled post"))}]
+          {:dangerouslySetInnerHTML (utils/emojify (if (seq (:headline entry-editing)) (:headline entry-editing) utils/default-headline))}]
         (let [should-show-save-button? (and (not @(::publishing s))
                                             (not published?))]
           [:div.entry-edit-modal-header-right
@@ -491,20 +452,20 @@
                      (:fixed-video-id entry-editing)
                      (not @(::record-video s)))
             (ziggeo-player {:video-id (:fixed-video-id entry-editing)
-                            :remove-video-cb remove-video-cb
+                            :remove-video-cb #(activity-actions/prompt-remove-video :entry-editing)
                             :width (:width video-size)
                             :height (:height video-size)
                             :video-processed (:video-processed entry-editing)}))
           (when (and (not is-mobile?)
                      @(::record-video s))
-            (ziggeo-recorder {:start-cb video-started-recording-cb
+            (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :entry-editing)
                               :upload-started-cb #(do
                                                     (activity-actions/uploading-video %)
                                                     (reset! (::video-picking-cover s) false)
                                                     (reset! (::video-uploading s) true))
                               :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
                               :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
-                              :submit-cb video-processed-cb
+                              :submit-cb (partial activity-actions/video-processed-cb :entry-editing)
                               :width (:width video-size)
                               :height (:height video-size)
                               :remove-recorder-cb (fn []

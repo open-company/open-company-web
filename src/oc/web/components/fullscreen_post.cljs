@@ -150,15 +150,58 @@
         (when-let [transcription-el (rum/ref-node state "transcript-edit")]
           (dis/dispatch! [:update [:modal-editing-data] #(merge % {:video-transcript (.-value transcription-el)})]))))))
 
-(defn- save-editing? [state]
+(defn show-post-error [s message]
+  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+    (if-not (.data $post-btn "bs.tooltip")
+      (.tooltip $post-btn
+       (clj->js {:container "body"
+                 :placement "bottom"
+                 :trigger "manual"
+                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                  "<div class=\"tooltip-arrow\"></div>"
+                                  "<div class=\"tooltip-inner\"></div>"
+                                "</div>")
+                 :title message}))
+      (doto $post-btn
+        (.attr "data-original-title" message)
+        (.tooltip "fixTitle")))
+    (utils/after 10 #(.tooltip $post-btn "show"))
+    (utils/after 5000 #(.tooltip $post-btn "hide"))))
+
+(defn- fix-headline [entry-editing]
+  (utils/trim (:headline entry-editing)))
+
+(defn- can-save? [s modal-editing-data]
+  (and (seq (:board-slug modal-editing-data))
+       (or (and @(::record-video s)
+                @(::video-uploading s))
+           (not @(::record-video s)))
+       (not (zero? (count (fix-headline modal-editing-data))))))
+
+(defn save-editing? [state]
   (clean-body state)
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
         section-editing (:section-editing modal-data)
-        edited-data (:modal-editing-data modal-data)]
-    (when (and (:has-changes edited-data)
-               (pos? (count (:headline edited-data))))
-      (reset! (::entry-saving state) true)
-      (activity-actions/entry-modal-save edited-data section-editing))))
+        edited-data (:modal-editing-data modal-data)
+        fixed-headline (fix-headline edited-data)]
+    (if (can-save? state edited-data)
+      (let [_ (dis/dispatch! [:input [:modal-editing-data :headline] fixed-headline])
+            updated-edited-data (:modal-editing-data @(drv/get-ref state :fullscreen-post-data))]
+        (reset! (::entry-saving state) true)
+        (activity-actions/entry-modal-save edited-data section-editing))
+      (cond
+        ;; Missing headline error
+        (zero? (count fixed-headline))
+        (show-post-error state "A title is required in order to save or share this post.")
+        ;; User needs to pick a cover shot
+        (and @(::record-video state)
+             (not @(::video-uploading state))
+             @(::video-picking-cover state))
+        (show-post-error state "Please pick a cover image for your video.")
+        ;; Video still recording
+        (and @(::record-video state)
+             (not @(::video-uploading state)))
+        (show-post-error state "Please finish video recording.")))))
 
 (defn- dismiss-editing? [state dismiss-modal?]
   (let [modal-data @(drv/get-ref state :fullscreen-post-data)
@@ -205,49 +248,17 @@
 (defn video-record-clicked [s]
   (let [modal-data @(drv/get-ref s :fullscreen-post-data)
         activity-editing (:modal-editing-data modal-data)
-        start-recording-fn #(reset! (::record-video s) true)]
-    (if (:fixed-video-id activity-editing)
-      (let [alert-data {:icon "/img/ML/trash.svg"
-                        :action "rerecord-video"
-                        :message "Are you sure you want to delete the current video? This can’t be undone."
-                        :link-button-title "Keep"
-                        :link-button-cb #(alert-modal/hide-alert)
-                        :solid-button-style :red
-                        :solid-button-title "Yes"
-                        :solid-button-cb (fn []
-                                          (activity-actions/remove-video :modal-editing-data)
-                                          (start-recording-fn)
-                                          (alert-modal/hide-alert))}]
-        (alert-modal/show-alert alert-data))
+        start-recording-fn #(do
+                             (reset! (::record-video s) true)
+                             (reset! (::video-picking-cover s) false)
+                             (reset! (::video-uploading s) false))]
+    (cond
+      (:fixed-video-id activity-editing)
+      (activity-actions/prompt-remove-video :modal-editing-data)
+      @(::record-video s)
+      (reset! (::record-video s) false)
+      :else
       (start-recording-fn))))
-
-(defn video-started-recording-cb [video-token]
-  (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id video-token
-                                                           :video-id video-token
-                                                           ;; Default video error to true
-                                                           :video-error true
-                                                           :has-changes true})]))
-
-(defn video-processed-cb [video-token unmounted?]
-  (when-not unmounted?
-    (dis/dispatch! [:update [:modal-editing-data] #(merge % {:fixed-video-id video-token
-                                                             :video-id video-token
-                                                             ;; turn off video error since upload finished
-                                                             :video-error false
-                                                             :has-changes true})])))
-
-(defn- remove-video-cb []
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                        :action "rerecord-video"
-                        :message "You sure you want to remove the current video?"
-                        :link-button-title "Keep"
-                        :link-button-cb #(alert-modal/hide-alert)
-                        :solid-button-style :red
-                        :solid-button-title "Yes"
-                        :solid-button-cb (fn []
-                                          (activity-actions/remove-video :modal-editing-data)
-                                          (alert-modal/hide-alert))}]
-        (alert-modal/show-alert alert-data)))
 
 (defn send-item-read-if-needed [s]
   (let [post-data @(drv/get-ref s :fullscreen-post-data)
@@ -290,6 +301,8 @@
                              (rum/local false ::show-legend)
                              (rum/local false ::record-video)
                              (rum/local 0 ::mobile-video-height)
+                             (rum/local false ::video-uploading)
+                             (rum/local false ::video-picking-cover)
                              ;; Mixins
                              (when-not (responsive/is-mobile-size?)
                                mixins/no-scroll-mixin)
@@ -403,12 +416,11 @@
         current-activity-data (if editing activity-editing activity-data)
         video-id (:fixed-video-id current-activity-data)
         activity-attachments (:attachments current-activity-data)
-        video-size (when (:fixed-video-id current-activity-data)
-                    (if is-mobile?
-                      {:width (win-width)
-                       :height @(::mobile-video-height s)}
-                      {:width 640
-                       :height 377}))]
+        video-size (if is-mobile?
+                     {:width (win-width)
+                      :height @(::mobile-video-height s)}
+                     {:width 640
+                      :height 377})]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
@@ -424,16 +436,24 @@
                         (dismiss-editing? s (:dismiss-modal-on-editing-stop modal-data))
                         (close-clicked s))}]
         [:div.header-title-container.group.fs-hide
-          {:key (:updated-at activity-data)
-           :dangerouslySetInnerHTML (utils/emojify (:headline current-activity-data))}]
+          {:key (:updated-at activity-data)}
+          (if (seq (:headline current-activity-data))
+            (:headline current-activity-data)
+            utils/default-headline)]
         [:div.fullscreen-post-header-right
           [:div.activity-share-container]
           (if editing
-            [:button.mlb-reset.post-publish-bt
-              {:on-click (fn [] (utils/after 1000 #(save-editing? s)))
-               :disabled (zero? (count (:headline activity-editing)))
-               :class (when @(::entry-saving s) "loading")}
-              "SAVE"]
+            (let [disabled? (or @(::entry-saving s)
+                                (not (:has-changes activity-editing))
+                                (and @(::record-video s)
+                                     (not @(::video-uploading s))))
+                  working? @(::entry-saving s)]
+              [:button.mlb-reset.post-publish-bt
+                {:ref "mobile-post-btn"
+                 :on-click (fn [] (utils/after 1000 #(save-editing? s)))
+                 :class (utils/class-set {:loading working?
+                                          :disabled disabled?})}
+                "SAVE"])
             (more-menu activity-data dom-element-id {:tooltip-position "left" :external-share true}))]]
       [:div.fullscreen-post.group
         {:ref "fullscreen-post"}
@@ -462,7 +482,19 @@
                          (merge activity-editing {:board-slug (:slug section-data)
                                                   :board-name (:name section-data)
                                                   :has-changes true
-                                                  :invite-note note})]))))])]]]
+                                                  :invite-note note})]))))])]]
+            ;; Add video button
+            (when-not is-mobile?
+              [:div.fullscreen-post-author-header-video-bt-container
+                [:button.mlb-reset.video-record-bt
+                  {:on-click #(video-record-clicked s)
+                   :class (when (or (:fixed-video-id activity-editing)
+                                    @(::record-video s))
+                            "remove-video-bt")}
+                  (if (or (:fixed-video-id activity-editing)
+                          @(::record-video s))
+                    "Remove video"
+                    "Record video")]])]
           [:div.fullscreen-post-author-header.group
             [:div.fullscreen-post-author-header-author
               (user-avatar-image (:publisher current-activity-data))
@@ -494,21 +526,26 @@
             (when (and video-id
                        (not @(::record-video s)))
               (ziggeo-player {:video-id video-id
-                              :remove-video-cb (when editing remove-video-cb)
+                              :remove-video-cb (when editing #(activity-actions/prompt-remove-video :modal-editing-data))
                               :width (:width video-size)
                               :height (:height video-size)
                               :video-processed (:video-processed current-activity-data)}))
             (when @(::record-video s)
-              (ziggeo-recorder {:start-cb video-started-recording-cb
-                                :upload-started-cb #(activity-actions/uploading-video %)
+              (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :modal-editing-data)
+                                :upload-started-cb #(do
+                                                      (activity-actions/uploading-video %)
+                                                      (reset! (::video-picking-cover s) false)
+                                                      (reset! (::video-uploading s) true))
+                                :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
+                                :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
                                 :width (:width video-size)
                                 :height (:height video-size)
-                                :submit-cb video-processed-cb
+                                :submit-cb (partial activity-actions/video-processed-cb :modal-editing-data)
                                 :remove-recorder-cb (fn []
                                   (activity-actions/remove-video :modal-editing-data)
                                   (reset! (::record-video s) false))}))
             (if editing
-              [:div.fullscreen-post-box-content-headline.emoji-autocomplete.emojiable.fs-hide
+              [:div.fullscreen-post-box-content-headline.headline-edit.emoji-autocomplete.emojiable.fs-hide
                 {:content-editable true
                  :ref "edit-headline"
                  :key (str "fullscreen-post-headline-edit-" (:updated-at current-activity-data))
@@ -582,14 +619,7 @@
                        :data-placement "top"
                        :data-container "body"}]
                     (when @(::show-legend s)
-                      [:div.fullscreen-post-box-footer-legend-image])]
-                  [:div.fullscreen-post-box-footer-separator]
-                  [:button.mlb-reset.video-record-bt
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title (if (:fixed-video-id current-activity-data) "Replace video" "Record video")
-                     :on-click #(video-record-clicked s)}]]]
+                      [:div.fullscreen-post-box-footer-legend-image])]]]
                 [:div.fullscreen-post-box-footer.group
                   {:class (when (and (pos? (count comments-data))
                                      (> (count (:reactions current-activity-data)) 2))

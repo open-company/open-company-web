@@ -15,7 +15,8 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]))
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (defn save-last-used-section [section-slug]
   (let [org-slug (router/current-org-slug)
@@ -617,6 +618,8 @@
                                            (json->cljs body)
                                            nil]))))))
 
+;; Video handling
+
 (defn uploading-video [video-id]
   (dis/dispatch! [:uploading-video (router/current-org-slug) video-id]))
 
@@ -627,3 +630,31 @@
                                                 :video-processed false
                                                 :video-error false
                                                 :has-changes true})]))
+
+(defn prompt-remove-video [edit-key]
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "rerecord-video"
+                    :message "Are you sure you want to delete the current video? This can’t be undone."
+                    :link-button-title "Keep"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
+                    :solid-button-title "Yes"
+                    :solid-button-cb (fn []
+                                      (remove-video edit-key)
+                                      (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
+
+(defn video-started-recording-cb [edit-key video-token]
+  (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
+                                                :video-id video-token
+                                                ;; default video error to true
+                                                :video-error true
+                                                :has-changes true})]))
+
+(defn video-processed-cb [edit-key video-token unmounted?]
+  (when-not unmounted?
+    (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
+                                                  :video-id video-token
+                                                  ;; turn off video error since upload finished
+                                                  :video-error false
+                                                  :has-changes true})])))

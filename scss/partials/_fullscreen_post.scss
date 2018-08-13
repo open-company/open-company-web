@@ -131,6 +131,10 @@ div.fullscreen-post-container {
           opacity: 1;
         }
 
+        &.disabled {
+          opacity: 0.6
+        }
+
         &.loading {
           &:before {
             content: "";
@@ -256,6 +260,52 @@ div.fullscreen-post-container {
         }
       }
 
+      div.fullscreen-post-author-header-video-bt-container {
+        float: right;
+
+        button.video-record-bt {
+          @include avenir_M();
+          color: $light_ui_grey;
+          font-size: 14px;
+          height: 20px;
+          position: relative;
+          padding-left: 26px;
+          margin-top: 4px;
+
+          &.remove-video-bt {
+            &:before {
+              background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+            }
+            &:hover {
+              &:before {
+                background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+              }
+            }
+          }
+
+          &:hover {
+            color: $ui_grey;
+
+            &:before {
+              background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+            }
+          }
+
+          &:before {
+            content: "";
+            left: 0px;
+            top: 3px;
+            position: absolute;
+            height: 12px;
+            width: 20px;
+            background-image: cdnUrl("/img/ML/capture_video_icon.svg");
+            background-size: 20px 12px;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+        }
+      }
+
       div.fullscreen-post-author-header-author {
         width: 75%;
         padding-right: 20px;
@@ -331,6 +381,10 @@ div.fullscreen-post-container {
           cursor: text;
           outline: none;
           display: inline;
+
+          &.headline-edit {
+            display: block;
+          }
 
           &:empty:before {
             content: attr(placeholder);
@@ -546,33 +600,6 @@ div.fullscreen-post-container {
                 background-size: 212px 281px;
                 background-position: center;
                 background-repeat: no-repeat;
-              }
-            }
-
-            div.fullscreen-post-box-footer-separator {
-              width: 1px;
-              height: 20px;
-              background-color: $light_ui_grey;
-              margin: 0px 16px;
-              float: left;
-            }
-
-            button.video-record-bt {
-              @include avenir_M();
-              color: $light_ui_grey;
-              font-size: 14px;
-              float: left;
-              padding: 2px 0px;
-              height: 20px;
-              width: 20px;
-              background-image: cdnUrl("/img/ML/video_recorder_icon.svg");
-              background-size: 18px 12px;
-              background-repeat: no-repeat;
-              background-position: center;
-              opacity: 0.4;
-
-              &:hover {
-                opacity: 1;
               }
             }
           }
