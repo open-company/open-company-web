@@ -261,7 +261,7 @@
                         (first teams-data)
                         [:name :logo-url :logo-width :logo-height])]
         (dis/dispatch!
-         [:input
+         [:update
           [:org-editing]
           (assoc first-team :email-domain (:email-domain org-editing))])
         (when (and (not (zero? (count (:logo-url first-team))))
