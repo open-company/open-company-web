@@ -3,7 +3,7 @@ function mod(num, tot) {
 }
 
 function isHidden(el) {
-  var style = window.getComputedStyle(el);
+  let style = window.getComputedStyle(el);
   return (style.display === 'none' || style.visibility === 'hidden' || el.offsetParent === null);
 }
 
@@ -36,10 +36,10 @@ function getUserSelectedDisplayValue(user) {
 }
 
 function ListItem(props) {
-  var user = props.user;
-  var avatarStyle = { "backgroundImage": "url(" + user["avatar-url"] + ")" };
-  var displayName = getUserDisplayName(user);
-  var selectedValue = getUserSelectedDisplayValue(user);
+  let user = props.user;
+  let avatarStyle = { "backgroundImage": "url(" + user["avatar-url"] + ")" };
+  let displayName = getUserDisplayName(user);
+  let selectedValue = getUserSelectedDisplayValue(user);
 
   return React.createElement(
     "div",
@@ -74,16 +74,17 @@ function ListItem(props) {
 
 
 // function CustomizedTagComponent(props) {
-class CustomizedTagComponent extends React.Component {
+class CustomizedTagComponent extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = {selectedIndex: null};
+    this.state = {selectedIndex: null,
+                  filteredUsers: []};
   }
 
   keyPress(e) {
     e = e || window.event;
-    var node = ReactDOM.findDOMNode(this);
-    var options = $(node).find(".oc-mention-option");
+    let node = ReactDOM.findDOMNode(this);
+    let options = $(node).find(".oc-mention-option");
     if (!isHidden(node) && options.length) {
       switch(e.keyCode){
         // Right and Down arrows
@@ -111,7 +112,7 @@ class CustomizedTagComponent extends React.Component {
         // Enter
         case 13:
           if (this.state.selectedIndex !== null) {
-            var user = this.filteredUsers()[this.state.selectedIndex];
+            let user = this.state.filteredUsers[this.state.selectedIndex];
             this.selectItem(user);
           }
           e.preventDefault();
@@ -140,35 +141,48 @@ class CustomizedTagComponent extends React.Component {
   }
 
   selectItem(user){
-    var selectedValue = getUserSelectedDisplayValue(user);
+    let selectedValue = getUserSelectedDisplayValue(user);
     this.props.selectMentionCallback("@" + selectedValue, user);
   }
 
-  filteredUsers(){
-    const trigger = this.props.currentMentionText.substring(0, 1);
-    const currentText = this.props.currentMentionText.substring(1, this.props.currentMentionText.length).toLowerCase();
+  checkStringValue(value, searchValue){
+    if (value && value.length) {
+      let values = value.toLowerCase().split(/\s/g);
+      for (let i = 0; i < values.length; i++) {
+        if (values[i] && values[i].indexOf(searchValue.toLowerCase()) === 0){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-    var mappedUsers = this.props.users.map(function (user, i) {
-      var activeUser = user["status"] === "active",
+  filterUsers(props){
+    const trigger = props.currentMentionText.substring(0, 1);
+    const currentText = props.currentMentionText.substring(1, props.currentMentionText.length).toLowerCase();
+    const that = this;
+
+    let mappedUsers = props.users.map(function (user, i) {
+      let activeUser = user["status"] === "active",
           filteredSlackUsernames = [];
-      if (activeUser && user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
+      if (activeUser && Object.values(user["slack-users"]).length > 0) {
         Object.values(user["slack-users"]).map(function(slackUser){
-          if (slackUser["display-name"] && slackUser["display-name"].toLowerCase().indexOf(currentText) !== -1)
+          if (that.checkStringValue(slackUser["display-name"], currentText))
             filteredSlackUsernames.push(slackUser);
         });
       }
-      if (user["name"] && user["name"].toLowerCase().indexOf(currentText) !== -1)
+      if (that.checkStringValue(user["name"], currentText))
         return Object.assign(user, { "selectedKey": "name" });
-      else if (user["first-name"] && user["first-name"].toLowerCase().indexOf(currentText) !== -1)
+      else if (that.checkStringValue(user["first-name"], currentText))
         return Object.assign(user, { "selectedKey": "first-name" });
-      else if (user["last-name"] && user["last-name"].toLowerCase().indexOf(currentText) !== -1)
+      else if (that.checkStringValue(user["last-name"], currentText))
         return Object.assign(user, { "selectedKey": "last-name" });
       else if (activeUser && filteredSlackUsernames.length > 0)
         return Object.assign(user, { "selectedKey": "slack-username",
                                      "slack-username": filteredSlackUsernames[0]["display-name"] });
-      else if (!activeUser && user["slack-display-name"] && user["slack-display-name"].toLowerCase().indexOf(currentText) !== -1)
+      else if (!activeUser && that.checkStringValue(user["slack-display-name"], currentText))
         return Object.assign(user, { "selectedKey": "slack-display-name" });
-      else if (user["email"] && user["email"].toLowerCase().indexOf(currentText) !== -1)
+      else if (that.checkStringValue(user["email"], currentText))
         return Object.assign(user, { "selectedKey": "email" });
       else return user;
     });
@@ -178,7 +192,8 @@ class CustomizedTagComponent extends React.Component {
   }
 
   render() {
-    var that = this;
+    let that = this;
+    let filteredUsers = this.filterUsers(this.props);
     return React.createElement(
       "div",
       { "className": "oc-mention-options",
@@ -186,7 +201,7 @@ class CustomizedTagComponent extends React.Component {
       React.createElement(
         "div",
         { "className": "oc-mention-options-list" },
-        this.filteredUsers().map(function (user, i) {
+        filteredUsers.map(function (user, i) {
           return ListItem({user: user,
                            index: i,
                            selectedIndex: that.state.selectedIndex,
