@@ -93,7 +93,7 @@
                  :on-click #(when (and (:uuid n)
                                        (:board-slug n)
                                        (not (utils/event-inside? % (rum/ref-node s :read-bt))))
-                              (router/nav! (oc-urls/entry (:uuid n) (:board-slug n))))
+                              (router/nav! (oc-urls/entry (:board-slug n) (:uuid n))))
                  :key (str "user-notification-" (:created-at n))}
                 (user-avatar-image (:author n))
                 [:div.user-notification-body
