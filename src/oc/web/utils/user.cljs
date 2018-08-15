@@ -14,12 +14,13 @@
         created-at (:notify-at notification)]
     {:uuid (:entry-id notification)
      :board-slug (:slug board-data)
+     :interaction-id (:interaction-id notification)
      :is-interaction is-interaction
      :unread unread
+     :mention (:mention notification)
      :created-at (:notify-at notification)
      :body (:content notification)
      :author (:author notification)}))
 
 (defn fix-notifications [notifications]
-  (doseq [n notifications]
-    (fix-notification n)))
+  (map fix-notification notifications))
