@@ -1,4 +1,5 @@
-(ns oc.web.utils.user)
+(ns oc.web.utils.user
+  (:require [oc.web.utils.activity :as activity-utils]))
 
 (def user-avatar-filestack-config
   {:accept "image/*"
@@ -8,9 +9,16 @@
        :aspectRatio 1}}})
 
 (defn fix-notification [notification & [unread]]
-  (if unread
-    (assoc notification :unread true)
-    notification))
+  (let [board-data (activity-utils/board-by-uuid (:board-id notification))
+        is-interaction (seq (:interaction-id notification))
+        created-at (:notify-at notification)]
+    {:uuid (:entry-id notification)
+     :board-slug (:slug board-data)
+     :is-interaction is-interaction
+     :unread unread
+     :created-at (:notify-at notification)
+     :body (:content notification)
+     :author (:author notification)}))
 
 (defn fix-notifications [notifications]
   (doseq [n notifications]

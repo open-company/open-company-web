@@ -258,16 +258,14 @@
 ;; User notifications
 (defmethod dispatcher/action :user-notifications
   [db [_ org-slug notifications]]
-  (let [fixed-notifications (user-utils/fix-notifications notifications)]
-    (assoc-in db (dispatcher/user-notifications-key org-slug) fixed-notifications)))
+  (assoc-in db (dispatcher/user-notifications-key org-slug) notifications))
 
 ;; User notifications
 (defmethod dispatcher/action :user-notification
   [db [_ org-slug notification]]
   (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
         old-notifications (get-in db user-notifications-key)
-        fixed-notification (user-utils/fix-notification notification true)
-        new-notifications (concat [fixed-notification] old-notifications)]
+        new-notifications (concat [notification] old-notifications)]
     (assoc-in db user-notifications-key new-notifications)))
 
 (defmethod dispatcher/action :user-notifications/read

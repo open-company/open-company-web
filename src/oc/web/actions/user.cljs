@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local_settings :as ls]
+            [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
@@ -378,11 +379,17 @@
   (ws-nc/subscribe :user/notifications
     (fn [{:keys [_ data]}]
       (js/console.log "XXX user/notifications for" (:user-id data) "notif:" (:notifications data))
-      (dis/dispatch! [:user-notifications (router/current-org-slug) (:notifications data)])))
+      (let [fixed-notifications (user-utils/fix-notifications (:notifications data))]
+        (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [_ data]}]
       (js/console.log "XXX user/notification for" (:user-id data) "notif:" (:notification data))
-      (dis/dispatch! [:user-notification (router/current-org-slug) (:notification data)]))))
+      (let [fixed-notification (user-utils/fix-notification (:notification data))]
+        (dis/dispatch! [:user-notification (router/current-org-slug) (:notification data)])
+        (notification-actions/show-notification
+         {:description (:body fixed-notification)
+          :id (str "notif-" (:created-at fixed-notification))
+          :expire 5})))))
 
 ;; Debug
 
