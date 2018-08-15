@@ -658,6 +658,9 @@
 (defn print-filtered-posts []
   (js/console.log (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter))))
 
+(defn print-user-notifications []
+  (js/console.log (user-notifications-data (router/current-org-slug) @app-state)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -675,3 +678,4 @@
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
+(set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
