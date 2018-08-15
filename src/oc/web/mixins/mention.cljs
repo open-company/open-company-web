@@ -14,19 +14,22 @@
         $win (js/$ js/window)
         mention-offset (.offset $mention-el)
         win-width (.width $win)
+        win-height (.height $win)
         left-pos (- (.-left mention-offset) (.scrollLeft $win))
+        top-pos (- (+ (.-top mention-offset) 24) (.scrollTop $win))
                        ;; If left positoin plus the maximum width of the screen less 20px padding
         fixed-left-pos (if (> (+ left-pos 280) (- win-width 20))
                           (- left-pos (- (+ left-pos 280) (- win-width 20)))
                           left-pos)
-        mention-position {:left fixed-left-pos
-                          :top (- (+ (.-top mention-offset) 24) (.scrollTop $win))}
+        fixed-top-pos (if (> (+ top-pos 56) (- win-height 20))
+                        (- (.-top mention-offset) (.scrollTop $win) 56 8)
+                        top-pos)
         format-str (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"
                         "<div class=\"oc-mention-popup-name\">" user-name "</div>"
                         "<div class=\"oc-mention-popup-subline\">" user-subline "</div>")
         popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\">") format-str)]
-    (.append $mention-el (.css popup-node #js {:left (str (:left mention-position) "px")
-                                               :top (str (:top mention-position) "px")}))))
+    (.append $mention-el (.css popup-node #js {:left (str fixed-left-pos "px")
+                                               :top (str fixed-top-pos "px")}))))
 
 (defn- remove-hover-events [s events-list]
   (doseq [hover-ev @events-list]
