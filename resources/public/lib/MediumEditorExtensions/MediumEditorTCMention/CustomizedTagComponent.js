@@ -79,8 +79,7 @@ function ListItem(props) {
 class CustomizedTagComponent extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = {selectedIndex: null,
-                  filteredUsers: []};
+    this.state = {selectedIndex: null};
   }
 
   keyPress(e) {
@@ -111,10 +110,11 @@ class CustomizedTagComponent extends React.PureComponent {
           e.preventDefault();
           e.stopPropagation();
           break;
-        // Enter
+        // Enter or tab
         case 13:
+        case 9:
           if (this.state.selectedIndex !== null) {
-            let user = this.state.filteredUsers[this.state.selectedIndex];
+            let user = this.filterUsers(this.props)[this.state.selectedIndex];
             this.selectItem(user);
           }
           e.preventDefault();
@@ -167,7 +167,7 @@ class CustomizedTagComponent extends React.PureComponent {
     let mappedUsers = props.users.map(function (user, i) {
       let activeUser = user["status"] === "active",
           filteredSlackUsernames = [];
-      if (activeUser && Object.values(user["slack-users"]).length > 0) {
+      if (activeUser && user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
         Object.values(user["slack-users"]).map(function(slackUser){
           if (that.checkStringValue(slackUser["display-name"], currentText))
             filteredSlackUsernames.push(slackUser);
