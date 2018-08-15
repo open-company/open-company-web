@@ -83,7 +83,7 @@
             [:button.mlb-reset.all-read-bt
               {:on-click #(user-actions/read-notifications)}
               "Mark all as read"])]
-        [:div.user-notifications-tray-list
+        [:div.user-notifications-tray-list.oc-mentions
           (if (empty? user-notifications-data)
             [:div.user-notifications-tray-empty
               (all-caught-up)]
