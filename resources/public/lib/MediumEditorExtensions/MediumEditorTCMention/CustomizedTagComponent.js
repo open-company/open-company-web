@@ -41,13 +41,17 @@ function ListItem(props) {
   let displayName = getUserDisplayName(user);
   let selectedValue = getUserSelectedDisplayValue(user);
 
+  console.log("XXX ListItem", user);
+
+  var slackUsername = user["slack-username"] || user["slack-display-name"];
+
   return React.createElement(
     "div",
     { "key": "user-" + (user["user-id"] + "-" + user["email"]),
       "className": "oc-mention-option " + (props.selectedIndex === props.index? "active" : ""),
       "data-name": displayName,
       "data-user-id": user["user-id"],
-      "data-slack-username": user["slack-username"],
+      "data-slack-username": slackUsername,
       onMouseEnter: function(e){
         props.hoverItem(e, props.index);
       },
@@ -65,8 +69,8 @@ function ListItem(props) {
     ),
     React.createElement(
       "div",
-      { "className": "oc-mention-option-subline" },
-      user["email"] || user["slack-username"]
+      { "className": "oc-mention-option-subline" + (slackUsername.length? " slack-icon" : "") },
+      slackUsername || user["email"]
     )
   );
 };

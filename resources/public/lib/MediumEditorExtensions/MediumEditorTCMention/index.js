@@ -385,6 +385,9 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
       if (details["slack-username"] && details["slack-username"].length > 0) {
         this.activeMentionAt.setAttribute("data-slack-username", details["slack-username"]);
       }
+      if (details["slack-display-name"] && details["slack-display-name"].length > 0) {
+        this.activeMentionAt.setAttribute("data-slack-display-name", details["slack-display-name"]);
+      }
       if (details["user-id"] && details["user-id"].length > 0) {
         this.activeMentionAt.setAttribute("data-user-id", details["user-id"]);
       }
