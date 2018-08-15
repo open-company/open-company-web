@@ -41,7 +41,7 @@
 
 (defn start-editing [s comment-data]
   (let [comment-node (rum/ref-node s (str "comment-body-" (:uuid comment-data)))
-        users-list (filter :user-id (:users @(drv/get-ref s :team-roster)))
+        users-list (:mention-users @(drv/get-ref s :team-roster))
         medium-editor (cu/setup-medium-editor comment-node users-list)]
     (reset! (::esc-key-listener s)
      (events/listen
