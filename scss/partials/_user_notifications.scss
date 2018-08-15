@@ -73,6 +73,17 @@ div.user-notifications {
         border-top: 1px solid #ECECEC;
         padding: 16px;
         cursor: pointer;
+        text-align: left;
+        opacity: 0.9;
+        position: relative;
+
+        &:hover {
+          opacity: 1;
+
+          button.read-bt {
+            display: block;
+          }
+        }
 
         &:last-child {
           border-bottom-left-radius: 6px;
@@ -80,7 +91,7 @@ div.user-notifications {
         }
 
         &.unread {
-          background-color: #FFF9EF;
+          background-color: #FBFAF7;
         }
 
         @include user-profile(24);
@@ -92,8 +103,10 @@ div.user-notifications {
         div.user-notification-body {
           margin-left: 16px;
           width: calc(100% - 40px);
+          padding-right: 8px;
           @include avenir_R();
           font-size: 14px;
+          line-height: 16px;
           color: $deep_navy;
           float: right;
         }
@@ -101,9 +114,24 @@ div.user-notifications {
         div.user-notification-time-since {
           float: right;
           width: calc(100% - 40px);
+          padding-right: 8px;
           @include avenir_R();
           font-size: 12px;
           color: $ui_grey;
+        }
+
+        button.read-bt {
+          position: absolute;
+          right: 4px;
+          top: 50%;
+          margin-top: -12px;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/notification_read_bt.svg");
+          background-size: 8px 8px;
+          background-position: center;
+          background-repeat: no-repeat;
+          display: none;
         }
       }
     }

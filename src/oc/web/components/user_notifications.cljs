@@ -3,11 +3,13 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (def notifications
-  [{:body "Kim Walker mentioned you in a comment: <span class=\"oc-mention\" data-found=\"true\">@Ryan Le Roux</span> Ah ok, I understand now. Thank you…"
+  [{:body "Kim Walker mentioned you in a comment: <span class=\"oc-mention\" data-name=\"Ryan Le Roux\" data-found=\"true\">@Ryan Le Roux</span> Ah ok, I understand now. Thank you…"
     :created-at "2018-08-08T10:21:51.899Z"
     :author {:avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_yellow.svg"
              :name "Kim Walker"}
@@ -22,7 +24,7 @@
     :author {:avatar-url "https://avatars.slack-edge.com/2017-02-02/136114833346_3758034af26a3b4998f4_512.jpg"
              :name "Iacopo Carraro"}
     :unread true}
-   {:body "Kim Walker mentioned you in a comment: <span class=\"oc-mention\" data-found=\"true\">@Ryan Le Roux</span> Ah ok, I understand now. Thank you…"
+   {:body "Kim Walker mentioned you in a comment: <span class=\"oc-mention\" data-name=\"Ryan Le Roux\" data-found=\"true\">@Ryan Le Roux</span> Ah ok, I understand now. Thank you…"
     :created-at "2018-08-08T10:21:51.834Z"
     :author {:avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_yellow.svg"
              :name "Kim Walker"}
@@ -73,9 +75,13 @@
           (for [n notifications]
             [:div.user-notification.group
               {:class (utils/class-set {:unread (:unread n)})
+               :on-click #(when (and (:uuid n)
+                                     (:board-slug n)
+                                     (not (utils/event-inside? % (rum/ref-node s :read-bt))))
+                            (router/nav! (oc-urls/entry (:uuid n) (:board-slug n))))
                :key (str "user-notification-" (:created-at n))}
               (user-avatar-image (:author n))
-              [:div.user-notification-body.oc-mentions
+              [:div.user-notification-body
                 {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
               [:div.user-notification-time-since
                 [:time
@@ -83,5 +89,13 @@
                    :data-toggle "tooltip"
                    :data-placement "top"
                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                   :data-title (utils/entry-date-tooltip n)}
-                  (utils/time-since (:created-at n))]]])]]]))
+                   :data-title (utils/activity-date-string (utils/js-date (:created-at n)))}
+                  (utils/time-since (:created-at n))]]
+              (when (:unread n)
+                [:button.mlb-reset.read-bt
+                  {:title "Mark as read"
+                   :ref :read-bt
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"}])])]]]))
