@@ -40,10 +40,7 @@ function ListItem(props) {
   let avatarStyle = { "backgroundImage": "url(" + user["avatar-url"] + ")" };
   let displayName = getUserDisplayName(user);
   let selectedValue = getUserSelectedDisplayValue(user);
-
-  console.log("XXX ListItem", user);
-
-  var slackUsername = user["slack-username"] || user["slack-display-name"];
+  let slackUsername = user["slack-username"] || user["slack-display-name"];
 
   return React.createElement(
     "div",
@@ -69,7 +66,7 @@ function ListItem(props) {
     ),
     React.createElement(
       "div",
-      { "className": "oc-mention-option-subline" + (slackUsername.length? " slack-icon" : "") },
+      { "className": "oc-mention-option-subline" + (slackUsername && slackUsername.length? " slack-icon" : "") },
       slackUsername || user["email"]
     )
   );
