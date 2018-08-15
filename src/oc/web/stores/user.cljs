@@ -274,3 +274,10 @@
         old-notifications (get-in db user-notifications-key)
         read-notifications (map #(assoc % :unread false) old-notifications)]
     (assoc-in db user-notifications-key read-notifications)))
+
+(defmethod dispatcher/action :user-notification/read
+  [db [_ org-slug notification]]
+  (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
+        old-notifications (get-in db user-notifications-key)
+        read-notifications (map #(if (= (:created-at %) (:created-at notification)) (assoc % :unread false) %) old-notifications)]
+    (assoc-in db user-notifications-key read-notifications)))
