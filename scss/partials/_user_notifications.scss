@@ -69,6 +69,10 @@ div.user-notifications {
       overflow-y: auto;
       overflow-x: hidden;
 
+      div.user-notifications-tray-empty {
+
+      }
+
       div.user-notification {
         border-top: 1px solid #ECECEC;
         padding: 16px;

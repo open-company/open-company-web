@@ -3,7 +3,8 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as user-utils]))
 
 (def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images
@@ -253,3 +254,18 @@
 
 (defn has-slack-bot? [org-data]
   (j/team-has-bot? (:team-id org-data)))
+
+;; User notifications
+(defmethod dispatcher/action :user-notifications
+  [db [_ org-slug notifications]]
+  (let [fixed-notifications (user-utils/fix-notifications notifications)]
+    (assoc db (dispatcher/user-notifications-key org-slug) fixed-notifications)))
+
+;; User notifications
+(defmethod dispatcher/action :user-notification
+  [db [_ org-slug notification]]
+  (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
+        old-notifications (get-in db user-notifications-key)
+        fixed-notification (user-utils/fix-notification notification)
+        new-notifications (concat [fixed-notification] old-notifications)]
+    (assoc db user-notifications-key new-notifications)))

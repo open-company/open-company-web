@@ -6,3 +6,10 @@
    :transformations {
      :crop {
        :aspectRatio 1}}})
+
+(defn fix-notification [notification]
+  notification)
+
+(defn fix-notifications [notifications]
+  (doseq [n notifications]
+    (fix-notification n)))

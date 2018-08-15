@@ -13,6 +13,7 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
+            [oc.web.lib.ws-notify-client :as ws-nc]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; Logout
@@ -365,6 +366,20 @@
 
 (defn change-user-profile-panel [panel]
   (dis/dispatch! [:input [:user-settings] panel]))
+
+;; User notifications
+
+;; subscribe to websocket events
+(defn subscribe []
+  (js/console.log "XXX oc.web.actions.user/subscribe")
+  (ws-nc/subscribe :user/notifications
+    (fn [{:keys [_ data]}]
+      (js/console.log "XXX user/notifications for" (:user-id data) "notif:" (:notifications data))
+      (dis/dispatch! [:user-notifications (router/current-org-slug) (:notifications data)])))
+  (ws-nc/subscribe :user/notification
+    (fn [{:keys [_ data]}]
+      (js/console.log "XXX user/notification for" (:user-id data) "notif:" (:notification data))
+      (dis/dispatch! [:user-notification (router/current-org-slug) (:notification data)]))))
 
 ;; Debug
 
