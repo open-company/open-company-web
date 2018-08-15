@@ -11,11 +11,22 @@
         user-subline (if has-slack-username
                       (.data $mention-el "slack-username")
                       (.data $mention-el "email"))
+        $win (js/$ js/window)
+        mention-offset (.offset $mention-el)
+        win-width (.width $win)
+        left-pos (- (.-left mention-offset) (.scrollLeft $win))
+                       ;; If left positoin plus the maximum width of the screen less 20px padding
+        fixed-left-pos (if (> (+ left-pos 280) (- win-width 20))
+                          (- left-pos (- (+ left-pos 280) (- win-width 20)))
+                          left-pos)
+        mention-position {:left fixed-left-pos
+                          :top (- (+ (.-top mention-offset) 24) (.scrollTop $win))}
         format-str (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"
                         "<div class=\"oc-mention-popup-name\">" user-name "</div>"
                         "<div class=\"oc-mention-popup-subline\">" user-subline "</div>")
         popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\">") format-str)]
-    (.append $mention-el popup-node)))
+    (.append $mention-el (.css popup-node #js {:left (str (:left mention-position) "px")
+                                               :top (str (:top mention-position) "px")}))))
 
 (defn- remove-hover-events [s events-list]
   (doseq [hover-ev @events-list]

@@ -48,6 +48,8 @@ $.closest = function(){};
 $.restore = function(){};
 $.after = function(){};
 $.closest = function(){};
+$.scrollLeft = function(){};
+$.scrollTop = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -103,6 +105,7 @@ var OCWebPrintChangeCacheData = function(){};
 var OCWebForceRefreshToken = function(){};
 var OCWebPrintFilteredPostsData = function(){};
 var OCWebPrintPostsData = function(){};
+var OCWebPrintUserNotifications = function(){};
 // Moment
 var moment = {};
 moment.tz = {};

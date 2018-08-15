@@ -91,9 +91,9 @@ div.oc-mention-panel {
 }
 
 div.oc-mention-popup {
-  position: absolute;
+  position: fixed;
   top: 24px;
-  left: 0px;
+  left: -500px;
   width: auto;
   max-width: 280px;
   background-color: $deep_navy;
