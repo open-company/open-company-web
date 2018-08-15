@@ -369,6 +369,9 @@
 
 ;; User notifications
 
+(defn read-notifications []
+  (dis/dispatch! [:user-notifications/read (router/current-org-slug)]))
+
 ;; subscribe to websocket events
 (defn subscribe []
   (js/console.log "XXX oc.web.actions.user/subscribe")

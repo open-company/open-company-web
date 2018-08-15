@@ -6,6 +6,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -44,6 +45,10 @@
 (defn- has-new-content? [notifications-data]
   (some :unread notifications-data))
 
+(defn- close-tray [s]
+  (reset! (::tray-open s) false)
+  (user-actions/read-notifications))
+
 (rum/defcs user-notifications < rum/reactive
                                 (drv/drv :user-notifications)
                                 (rum/local false ::tray-open)
@@ -53,7 +58,7 @@
                                   (reset! (::click-out-listener s)
                                    (events/listen js/window EventType/CLICK
                                     #(when-not (utils/event-inside? % (rum/dom-node s))
-                                       (reset! (::tray-open s) false))))
+                                       (close-tray s))))
                                   s)
                                  :will-unmount (fn [s]
                                   (when @(::click-out-listener s)
@@ -67,7 +72,9 @@
       [:button.mlb-reset.notification-bell-bt
         {:class (utils/class-set {:new has-new-content
                                   :active @(::tray-open s)})
-         :on-click #(swap! (::tray-open s) not)}]
+         :on-click #(if @(::tray-open s)
+                      (close-tray s)
+                      (reset! (::tray-open s) true))}]
       [:div.user-notifications-tray
         {:class (utils/class-set {:hidden (not @(::tray-open s))})}
         [:div.user-notifications-tray-header.group

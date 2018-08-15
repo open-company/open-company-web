@@ -7,8 +7,10 @@
      :crop {
        :aspectRatio 1}}})
 
-(defn fix-notification [notification]
-  notification)
+(defn fix-notification [notification & [unread]]
+  (if unread
+    (assoc notification :unread true)
+    notification))
 
 (defn fix-notifications [notifications]
   (doseq [n notifications]
