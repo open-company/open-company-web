@@ -292,6 +292,7 @@
         mobile-editor (responsive/is-tablet-or-mobile?)
         show-subtitle (:show-h2 options)
         media-config (:media-config options)
+        placeholder (or (:placeholder options) "What would you like to share?")
         body-el (rum/ref-node s "body")
         media-picker-opts {:buttons (clj->js media-config)
                            :useInlinePlusButton (:use-inline-media-picker options)
@@ -333,7 +334,7 @@
                                                    (when-not show-subtitle "h2") "h3" "h4" "h5"
                                                    "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                                    "details" "summary" "nav" "abbr"]))}
-                 :placeholder #js {:text "What would you like to share?"
+                 :placeholder #js {:text placeholder
                                    :hideOnClick true}
                  :keyboardCommands #js {:commands #js [
                                     #js {

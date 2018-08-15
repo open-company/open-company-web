@@ -236,7 +236,7 @@ div.onboard-lander {
     }
 
     button.continue {
-      margin-top: 16px;
+      margin-top: 20px;
       width: 170px;
       height: 42px;
       background-color: $sea_blue;
@@ -312,18 +312,6 @@ div.onboard-lander {
       border-radius: 4px;
       text-align: center;
 
-      div.signup-with-slack-content {
-        div.slack-icon {
-            background-image: cdnUrl('/img/slack.png');
-        }
-      }
-
-      div.signup-with-google-content {
-        div.google-icon {
-          background-image: cdnUrl("/img/ML/google_signin.svg");
-        }
-      }
-
       div.signup-with-slack-content, div.signup-with-google-content {
         @include avenir_H();
         font-size: 14px;
@@ -334,11 +322,11 @@ div.onboard-lander {
         align-items: center;
 
         div.slack-icon {
-          width: 17px;
-          height: 17px;
-          background-image: cdnUrl('/img/slack.png');
+          width: 21px;
+          height: 21px;
+          background-image: cdnUrl("/img/ML/slack_normal.svg");
           background-repeat: no-repeat;
-          background-size: 17px 17px;
+          background-size: 21px 21px;
           float: left;
           margin-right: 16px;
         }
@@ -398,9 +386,9 @@ div.onboard-lander {
     }
 
     div.logo-upload-container {
-      margin-top: 112px;
+      margin-top: 60px;
       width: 340px;
-      min-height: 80px;
+      min-height: 40px;
       cursor: pointer;
 
       @include mobile() {
@@ -519,7 +507,13 @@ div.onboard-lander {
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
-      margin-top: 32px;
+      margin-top: 35px;
+
+      &.info {
+        @include avenir_R();
+        font-size: 14px;
+        margin-top: 12px;
+      }
 
       span.error {
         margin-left: 16px;
@@ -570,7 +564,6 @@ div.onboard-lander {
       color: $oc_gray_7;
       line-height: 24px;
       letter-spacing: 0.2px;
-      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
       margin-top: 4px;
 
       @include placeholder() {
@@ -596,8 +589,77 @@ div.onboard-lander {
       }
     }
 
+    div.org-email-domains-row {
+      div.field-label {
+        margin-top: 21px;
+
+        &:before {
+          font-size: 16px;
+        }
+
+        div.tooltip {
+          width: 160px;
+        }
+
+        label {
+           @include avenir_H();
+           font-size: 15px;
+           color: $deep_navy;
+           margin-top: 4px;
+
+           span.info {
+             @include avenir_R();
+             font-size: 14px;
+             color: rgba($oc_gray_7, 0.5);
+           }
+        }
+
+        label.error {
+          margin-left: 0px !important;
+        }
+      }
+
+      div.org-email-domain-field {
+         width: 100%;
+         height: 40px;
+         border: 1px solid rgba($carrot_light_gray_1, 0.5);
+         border-radius: 4px;
+
+         input {
+           float: left;
+           width: 95%;
+           height: 100%;
+           border: none;
+           padding: 10px 16px;
+           outline: none;
+
+           @include placeholder(){
+             @include avenir_R();
+             margin-top: 10px;
+             color: $ui_grey;
+             font-size: 16px;
+           }
+         }
+
+         &.error {
+           border: 1px solid rgba($carrot_orange, 0.5);
+         }
+
+         button.add-email-domain-bt {
+           height: 20px;
+           padding: 10px 10px;
+           color: $carrot_green;
+           @include avenir_H();
+           font-size: 14px;
+           border-top-right-radius: 6px;
+           border-bottom-right-radius: 6px;
+           float: right;
+         }
+      }
+    }
+
     button.continue {
-      margin-top: 35px;
+      margin-top: 24px;
       outline: none;
       border: none;
       width: 100%;
@@ -622,7 +684,7 @@ div.onboard-lander {
   &.lander-team {
     div.onboard-form {
       button.continue {
-        margin-top: 108px;
+        margin-top: 18px;
 
         @include mobile() {
           margin-top: 32px;

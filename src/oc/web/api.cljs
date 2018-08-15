@@ -189,7 +189,7 @@
 
 ;; Allowed keys
 
-(def entry-allowed-keys [:headline :body :attachments :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
@@ -391,18 +391,22 @@
          (fn [{:keys [status body success]}]
            (cb status body success))))))
 
-(defn add-email-domain [domain callback]
-  (when domain
-    (let [team-data (dispatcher/team-data)
-          add-domain-team-link (utils/link-for
-                                (:links team-data)
-                                "add"
-                                "POST"
-                                {:content-type "application/vnd.open-company.team.email-domain.v1"})]
+(defn add-email-domain
+  ([domain callback]
+     (let [team-data (dispatcher/team-data)]
+       (add-email-domain domain callback team-data)))
+
+  ([domain callback team-data]
+     (when domain
+       (let [add-domain-team-link (utils/link-for
+                                   (:links team-data)
+                                   "add"
+                                   "POST"
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1"})]
       (auth-http (method-for-link add-domain-team-link) (relative-href add-domain-team-link)
         {:headers (headers-for-link add-domain-team-link)
          :body domain}
-        callback))))
+        callback)))))
 
 (defn refresh-slack-user [cb]
   (let [refresh-url (utils/link-for (:links (:auth-settings @dispatcher/app-state)) "refresh")]
@@ -419,7 +423,7 @@
        :json-params (cljs->json new-team-data)}
       callback)))
 
-(defn create-org [org-name logo-url logo-width logo-height callback]
+(defn create-org [org-name logo-url logo-width logo-height email-domains callback]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
         org-data {:name org-name :team-id team-id}
@@ -432,7 +436,8 @@
       (storage-http (method-for-link create-org-link) (relative-href create-org-link)
         {:headers (headers-for-link create-org-link)
          :json-params (cljs->json with-logo)}
-        callback))))
+        (fn [response]
+          (callback response email-domains))))))
 
 (defn create-board [board-data note callback]
   (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")

@@ -15,7 +15,8 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]))
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (defn save-last-used-section [section-slug]
   (let [org-slug (router/current-org-slug)
@@ -255,6 +256,9 @@
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
   (let [org-slug (router/current-org-slug)]
+    (when (and (router/current-activity-id)
+               (not= board-slug (router/current-board-slug)))
+      (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
     (save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
@@ -289,7 +293,7 @@
     [edit-key :section-name-error]
     "Board name already exists or isn't allowed"]))
 
-(defn entry-modal-save [activity-data board-slug section-editing]
+(defn entry-modal-save [activity-data section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
            section-editing)
     (let [fixed-entry-data (dissoc activity-data :board-slug :board-name :invite-note)
@@ -299,7 +303,10 @@
           (if (= status 409)
             ;; Board name exists
             (board-name-exists-error :modal-editing-data)
-            (entry-modal-save-with-board-finish activity-data (when success (json->cljs body)))))))
+            (let [board-data (when success (json->cljs body))]
+              (when (router/current-activity-id)
+                (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data) (:uuid activity-data))))
+              (entry-modal-save-with-board-finish activity-data board-data))))))
     (api/update-entry activity-data :modal-editing-data create-update-entry-cb))
   (dis/dispatch! [:entry-modal-save]))
 
@@ -318,8 +325,9 @@
   (remove-cached-item item-uuid)
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
-(defn entry-save [edited-data & [section-editing]]
-  (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))]
+(defn entry-save [edited-data & [section-editing edit-key]]
+  (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
+        fixed-edit-key (or edit-key :entry-editing)]
     (if (:links fixed-edited-data)
       (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                section-editing)
@@ -329,9 +337,9 @@
             (fn [{:keys [success status body] :as response}]
               (if (= status 409)
                 ;; Board name exists
-                (board-name-exists-error :entry-editing)
-                (create-update-entry-cb fixed-edited-data :entry-editing response)))))
-        (api/update-entry fixed-edited-data :entry-editing create-update-entry-cb))
+                (board-name-exists-error fixed-edit-key)
+                (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
+        (api/update-entry fixed-edited-data fixed-edit-key create-update-entry-cb))
       (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                section-editing)
         (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
@@ -340,13 +348,13 @@
             (fn [{:keys [success status body] :as response}]
               (if (= status 409)
                 ;; Board name exists
-                (board-name-exists-error :entry-editing)
-                (create-update-entry-cb fixed-edited-data :entry-editing response)))))
+                (board-name-exists-error fixed-edit-key)
+                (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
         (let [org-slug (router/current-org-slug)
               entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
               entry-create-link (utils/link-for (:links entry-board-data) "create")]
-          (api/create-entry fixed-edited-data :entry-editing entry-create-link create-update-entry-cb))))
-    (dis/dispatch! [:entry-save])))
+          (api/create-entry fixed-edited-data fixed-edit-key entry-create-link create-update-entry-cb))))
+    (dis/dispatch! [:entry-save fixed-edit-key])))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
@@ -358,12 +366,12 @@
   ;; Send item read
   (send-item-read (:uuid activity-data)))
 
-(defn entry-publish-cb [entry-uuid posted-to-board-slug {:keys [status success body]}]
+(defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
-    (entry-publish-finish entry-uuid :entry-editing posted-to-board-slug (when success (json->cljs body)))
-    (dis/dispatch! [:entry-publish/failed  :entry-editing])))
+    (entry-publish-finish entry-uuid edit-key posted-to-board-slug (when success (json->cljs body)))
+    (dis/dispatch! [:entry-publish/failed edit-key])))
 
-(defn entry-publish-with-board-finish [entry-uuid new-board-data]
+(defn entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
   (let [board-slug (:slug new-board-data)
         saved-activity-data (first (:entries new-board-data))]
     (save-last-used-section (:slug new-board-data))
@@ -372,24 +380,25 @@
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid new-board-data)))
-    (dis/dispatch! [:entry-publish-with-board/finish new-board-data])
+    (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
     ;; Send item read
     (send-item-read (:uuid saved-activity-data))))
 
-(defn entry-publish-with-board-cb [entry-uuid {:keys [status success body]}]
+(defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
     ; Board name already exists
     (dis/dispatch! [:section-edit/error "Board name already exists or isn't allowed"])
-    (entry-publish-with-board-finish entry-uuid (when success (json->cljs body)))))
+    (entry-publish-with-board-finish entry-uuid edit-key (when success (json->cljs body)))))
 
-(defn entry-publish [entry-editing section-editing]
-  (let [fixed-entry-editing (assoc entry-editing :status "published")]
+(defn entry-publish [entry-editing section-editing & [edit-key]]
+  (let [fixed-entry-editing (assoc entry-editing :status "published")
+        fixed-edit-key (or edit-key :entry-editing)]
     (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
              section-editing)
       (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
             final-board-data (assoc section-editing :entries [fixed-entry-data])]
         (api/create-board final-board-data (:invite-note section-editing)
-         (partial entry-publish-with-board-cb (:uuid fixed-entry-editing))))
+         (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
       (let [entry-exists? (seq (:links fixed-entry-editing))
             org-slug (router/current-org-slug)
             board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-entry-editing))
@@ -399,8 +408,8 @@
                                 ;; If the entry is new, use
                                 (utils/link-for (:links board-data) "create"))]
         (api/publish-entry fixed-entry-editing publish-entry-link
-         (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing)))))
-    (dis/dispatch! [:entry-publish])))
+         (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key))))
+    (dis/dispatch! [:entry-publish fixed-edit-key])))
 
 (defn activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation
@@ -608,3 +617,44 @@
                                            (router/current-org-slug)
                                            (json->cljs body)
                                            nil]))))))
+
+;; Video handling
+
+(defn uploading-video [video-id]
+  (dis/dispatch! [:uploading-video (router/current-org-slug) video-id]))
+
+(defn remove-video [edit-key]
+  (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
+                                                :video-id nil
+                                                :video-transcript nil
+                                                :video-processed false
+                                                :video-error false
+                                                :has-changes true})]))
+
+(defn prompt-remove-video [edit-key]
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "rerecord-video"
+                    :message "Are you sure you want to delete the current video? This can’t be undone."
+                    :link-button-title "Keep"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
+                    :solid-button-title "Yes"
+                    :solid-button-cb (fn []
+                                      (remove-video edit-key)
+                                      (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
+
+(defn video-started-recording-cb [edit-key video-token]
+  (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
+                                                :video-id video-token
+                                                ;; default video error to true
+                                                :video-error true
+                                                :has-changes true})]))
+
+(defn video-processed-cb [edit-key video-token unmounted?]
+  (when-not unmounted?
+    (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
+                                                  :video-id video-token
+                                                  ;; turn off video error since upload finished
+                                                  :video-error false
+                                                  :has-changes true})])))

@@ -123,6 +123,14 @@ Commit the changes back to our fork to make sure we have the latest.
 
 If you need to change the mentions popup panels you can write the JSX code in resources/public/lib/MediumEditorExtensions/MediumEditorTCMention/CustomizedTagComponent.jsx or the JS code in CustomizedTagComponent.js. Better if keep them in sync so we can use both.
 
+
+#### Ziggeo media player and recorder development
+
+To change the Ziggeo video player and recorder you need to change [our fork](https://github.com/open-company/betajs-media-components) of [betajs/betajs-media-components](https://github.com/betajs/betajs-media-components).
+Once you changed everything you need you only need to run this `source script/local_ziggeo_dev.sh` to compile the ziggeo sdk and copy it here.
+Do not forget to commit the changes made to betajs-media-compoentns and the changed files here in oc-web.
+
+
 ### Project REPL
 
 To have a ClojureScript REPL connected to the browser, first start the dev task:

@@ -28,6 +28,12 @@
     (dissoc :entry-editing)
     (assoc :entry-edit-dissmissing true)))
 
+(defmethod dispatcher/action :capture-video/dismiss
+  [db [_]]
+  (-> db
+    (dissoc :capture-video)
+    (assoc :capture-video-dissmissing true)))
+
 (defmethod dispatcher/action :modal-editing-deactivate
   [db [_]]
   (dissoc db :modal-editing))
@@ -67,8 +73,8 @@
   (dissoc db :entry-save-on-exit))
 
 (defmethod dispatcher/action :entry-save
-  [db [_]]
-  (assoc-in db [:entry-editing :loading] true))
+  [db [_ edit-key]]
+  (assoc-in db [edit-key :loading] true))
 
 (defmethod dispatcher/action :entry-save/finish
   [db [_ activity-data edit-key]]
@@ -90,14 +96,14 @@
     (update-in [edit-key] dissoc :loading)
     (update-in [edit-key] assoc :error true)))
 
-(defmethod dispatcher/action :entry-publish [db [_]]
-  (assoc-in db [:entry-editing :publishing] true))
+(defmethod dispatcher/action :entry-publish [db [_ edit-key]]
+  (assoc-in db [edit-key :publishing] true))
 
 (defmethod dispatcher/action :section-edit/error [db [_ error]]
   (assoc-in db [:section-editing :section-name-error] error))
 
 (defmethod dispatcher/action :entry-publish-with-board/finish
-  [db [_ new-board-data]]
+  [db [_ new-board-data edit-key]]
   (let [org-slug (utils/section-org-slug new-board-data)
         board-slug (:slug new-board-data)
         posts-key (dispatcher/posts-data-key org-slug)
@@ -109,9 +115,9 @@
       (assoc-in board-key (dissoc fixed-board-data :fixed-items))
       (assoc-in posts-key merged-items)
       (dissoc :section-editing)
-      (update-in [:entry-editing] dissoc :publishing)
-      (assoc-in [:entry-editing :board-slug] (:slug fixed-board-data))
-      (assoc-in [:entry-editing :new-section] true)
+      (update-in [edit-key] dissoc :publishing)
+      (assoc-in [edit-key :board-slug] (:slug fixed-board-data))
+      (assoc-in [edit-key :new-section] true)
       (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/finish
@@ -127,10 +133,10 @@
       (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/failed
-  [db [_]]
+  [db [_ edit-key]]
   (-> db
-    (update-in [:entry-editing] dissoc :publishing)
-    (update-in [:entry-editing] assoc :error true)))
+    (update-in [edit-key] dissoc :publishing)
+    (update-in [edit-key] assoc :error true)))
 
 (defmethod dispatcher/action :activity-delete
   [db [_ org-slug activity-data]]
@@ -353,3 +359,8 @@
         (update-in containers-key dissoc :all-posts)
         (dissoc :ap-initial-at)))
     db))
+
+(defmethod dispatcher/action :uploading-video
+  [db [_ org-slug video-id]]
+  (let [uploading-video-key (dispatcher/uploading-video-key org-slug video-id)]
+    (assoc-in db uploading-video-key true)))

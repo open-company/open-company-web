@@ -1,0 +1,67 @@
+div.ziggeo-player {
+  position: relative;
+
+  div.ziggeo-player-not-processed {
+    width: 100%;
+    height: 100%;
+    background-color: #EAECED;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    span {
+      @include avenir_H();
+      font-size: 16px;
+      color: #AFB3B6;
+      margin-left: 8px;
+    }
+
+    div.refresh-icon {
+      width: 14px;
+      height: 14px;
+      float: left;
+      background-image: cdnUrl("/img/ML/uploading_video_icon.svg");
+      background-size: 14px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+  }
+
+  button.remove-video-bt {
+    width: 24px;
+    height: 24px;
+    background-image: cdnUrl("/img/ML/remove_video_x.svg");
+    background-size: 12px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+  }
+}
+
+div.ziggeo-recorder {
+  position: relative;
+
+ button.remove-recorder-bt {
+    width: 40px;
+    height: 40px;
+    background-image: cdnUrl("/img/ML/remove_video_x.svg");
+    background-color: rgba(0, 0, 0, 0.2);
+    background-size: 12px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 1;
+    border-radius: 50%;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  } 
+
+}

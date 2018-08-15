@@ -14,3 +14,6 @@
 
 (defn remove-notification [notification-data]
   (dis/dispatch! [:notification-remove notification-data]))
+
+(defn remove-notification-by-id [notification-id]
+  (dis/dispatch! [:notification-remove-by-id notification-id]))

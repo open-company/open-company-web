@@ -596,3 +596,8 @@
 (defn retina-src [url]
   {:src (cdn (str url ".png"))
    :src-set (str (cdn (str url "@2x.png")) " 2x")})
+
+(defn trim [value]
+  (if (string? value)
+    (s/trim value)
+    value))

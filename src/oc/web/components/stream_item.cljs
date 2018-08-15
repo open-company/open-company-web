@@ -6,8 +6,10 @@
             [goog.events.EventType :as EventType]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
@@ -21,7 +23,8 @@
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]))
 
 (defn expand [s expand? & [scroll-to-comments?]]
   (reset! (::expanded s) expand?)
@@ -43,9 +46,18 @@
     (when (or (.hasClass $item-body "ddd-truncated")
               (> (count (:attachments activity-data)) 3)
               (pos? (count comments-data))
-              (:body-has-images activity-data))
+              (:body-has-images activity-data)
+              (:fixed-video-id activity-data))
       (reset! (::truncated s) true))
     (reset! (::item-ready s) true)))
+
+(defn win-width []
+  (or (.-innerWidth js/window)
+      (.-clientWidth (.-documentElement js/document))))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -59,11 +71,16 @@
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::more-menu-open)
                          (rum/local false ::hovering-tile)
+                         (rum/local 0 ::mobile-video-height)
                          ;; Mixins
+                         (ui-mixins/render-on-resize calc-video-height)
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
                          (mention-mixins/oc-mentions-hover)
-                         {:did-mount (fn [s]
+                         {:will-mount (fn [s]
+                           (calc-video-height s)
+                           s)
+                          :did-mount (fn [s]
                            (should-show-continue-reading? s)
                            s)
                           :after-render (fn [s]
@@ -102,7 +119,14 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
-        dom-node-class (str "stream-item-" (:uuid activity-data))]
+        dom-node-class (str "stream-item-" (:uuid activity-data))
+        has-video (seq (:fixed-video-id activity-data))
+        video-size (when has-video
+                     (if is-mobile?
+                       {:width (win-width)
+                        :height @(::mobile-video-height s)}
+                       {:width (if expanded? 640 180)
+                        :height (if expanded? 377 106)}))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
@@ -153,33 +177,51 @@
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
             :external-share true}))]
-      [:div.stream-item-body.group
-        [:div.stream-body-left.group.fs-hide
-          [:div.stream-item-headline.ap-seen-item-headline
-            {:ref "activity-headline"
-             :data-itemuuid (:uuid activity-data)
-             :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          (when (:must-see activity-data)
-            [:div.must-see
-             {:class (utils/class-set {:must-see-on
-                                       (:must-see activity-data)})}])
-          [:div.stream-item-body-container
-            [:div.stream-item-body
-              {:class (utils/class-set {:expanded expanded?
-                                        :wrt-item-ready @(::item-ready s)})}
-              [:div.stream-item-body-inner.to-truncate.oc-mentions
-                {:ref "activity-body"
-                 :data-itemuuid (:uuid activity-data)
-                 :class (utils/class-set {:hide-images (and truncated? (not expanded?))
-                                          :wrt-truncated truncated?
-                                          :wrt-expanded expanded?})
-                 :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
-              [:div.stream-item-body-inner.no-truncate.oc-mentions
-                {:ref "full-activity-body"
-                 :data-itemuuid (:uuid activity-data)
-                 :class (utils/class-set {:wrt-truncated truncated?
-                                          :wrt-expanded expanded?})
-                 :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]
+      [:div.stream-item-body-ext.group
+        {:class (when expanded? "expanded")}
+        [:div.group
+          (when has-video
+            (rum/with-key
+             (ziggeo-player {:video-id (:fixed-video-id activity-data)
+                             :width (:width video-size)
+                             :height (:height video-size)
+                             :video-processed (:video-processed activity-data)})
+              (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))))
+          [:div.stream-body-left.group.fs-hide
+            {:class (when (and has-video (not expanded?)) "has-video")}
+            [:div.stream-item-headline.ap-seen-item-headline
+              {:ref "activity-headline"
+               :data-itemuuid (:uuid activity-data)
+               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+            (when (:must-see activity-data)
+              [:div.must-see
+               {:class (utils/class-set {:must-see-on
+                                         (:must-see activity-data)})}])
+            [:div.stream-item-body-container
+              [:div.stream-item-body
+                {:class (utils/class-set {:expanded expanded?
+                                          :wrt-item-ready @(::item-ready s)})}
+                [:div.stream-item-body-inner.to-truncate.oc-mentions
+                  {:ref "activity-body"
+                   :data-itemuuid (:uuid activity-data)
+                   :class (utils/class-set {:hide-images (and truncated? (not expanded?))
+                                            :wrt-truncated truncated?
+                                            :wrt-expanded expanded?})
+                   :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
+                [:div.stream-item-body-inner.no-truncate.oc-mentions
+                  {:ref "full-activity-body"
+                   :data-itemuuid (:uuid activity-data)
+                   :class (utils/class-set {:wrt-truncated truncated?
+                                            :wrt-expanded expanded?})
+                   :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
+          (when (and ls/oc-enable-transcriptions
+                     expanded?
+                     (:video-transcript activity-data))
+            [:div.stream-item-transcript
+              [:div.stream-item-transcript-header
+                "This transcript was automatically generated and may not be accurate"]
+              [:div.stream-item-transcript-content
+                (:video-transcript activity-data)]])]
           (when (or (not is-mobile?) expanded?)
             (stream-attachments activity-attachments
              (when (and truncated? (not expanded?))
@@ -189,7 +231,7 @@
               [:div.stream-body-draft-edit
                 [:button.mlb-reset.edit-draft-bt
                   {:on-click #(activity-actions/activity-edit activity-data)}
-                  "Continue writing"]]
+                  "Continue editing"]]
               [:div.stream-body-draft-delete
                 [:button.mlb-reset.delete-draft-bt
                   {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
@@ -208,10 +250,10 @@
               (if is-mobile?
                 (if expanded?
                   (reactions activity-data)
-                  [:div.group
+                  [:div.mobile-summary.group
                     {:on-click #(expand s true)}
-                    [:div.mobile-summary
-                      [:div.mobile-comments-summary
+                    [:div.group
+                      [:div.mobile-comments-summary.group
                         [:div.mobile-comments-summary-icon]
                         [:span
                           (if (zero? (count comments-data))
@@ -241,4 +283,4 @@
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data true)]])]]))
+              (stream-comments activity-data comments-data true)]])]))
