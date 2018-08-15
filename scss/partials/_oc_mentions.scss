@@ -67,6 +67,21 @@ div.oc-mention-panel {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+
+        &.slack-icon {
+          &:before {
+            display: block;
+            content: "";
+            float: left;
+            width: 14px;
+            height: 14px;
+            background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
+            background-size: 14px 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-right: 6px;
+          }
+        }
       }
     }
   }
