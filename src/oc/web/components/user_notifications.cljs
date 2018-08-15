@@ -79,9 +79,10 @@
         {:class (utils/class-set {:hidden (not @(::tray-open s))})}
         [:div.user-notifications-tray-header.group
           [:div.title "Notifications"]
-          [:button.mlb-reset.all-read-bt
-            {:on-click #()}
-            "Mark all as read"]]
+          (when has-new-content
+            [:button.mlb-reset.all-read-bt
+              {:on-click #(user-actions/read-notifications)}
+              "Mark all as read"])]
         [:div.user-notifications-tray-list
           (if (empty? user-notifications-data)
             [:div.user-notifications-tray-empty
