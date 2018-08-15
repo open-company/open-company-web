@@ -304,7 +304,7 @@
         buttons (if show-subtitle
                   ["bold" "italic" "h2" "unorderedlist" "anchor"]
                   ["bold" "italic" "unorderedlist" "anchor"])
-        users-list (:users @(drv/get-ref s :team-roster))
+        users-list (filter :user-id (:users @(drv/get-ref s :team-roster)))
         extensions (if mobile-editor
                       #js {"autolist" (js/AutoList.)
                            "mention" (mention-utils/mention-ext users-list)}

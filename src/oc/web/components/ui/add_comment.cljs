@@ -40,7 +40,8 @@
                          {:did-mount (fn [s]
                            (utils/after 2500 #(js/emojiAutocomplete))
                            (let [add-comment-node (rum/ref-node s "add-comment")
-                                 medium-editor (cu/setup-medium-editor add-comment-node (:users @(drv/get-ref s :team-roster)))]
+                                 users-list (filter :user-id (:users @(drv/get-ref s :team-roster)))
+                                 medium-editor (cu/setup-medium-editor add-comment-node users-list)]
                              (reset! (::medium-editor s) medium-editor)
                              (.subscribe medium-editor
                               "editableInput"
