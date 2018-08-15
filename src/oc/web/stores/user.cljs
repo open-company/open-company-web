@@ -273,6 +273,6 @@
 (defmethod dispatcher/action :user-notifications/read
   [db [_ org-slug]]
   (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
-        old-notifications (get-in db notifications-key)
+        old-notifications (get-in db user-notifications-key)
         read-notifications (map #(assoc % :unread false) old-notifications)]
     (assoc-in db user-notifications-key read-notifications)))
