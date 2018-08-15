@@ -375,15 +375,12 @@
 
 ;; subscribe to websocket events
 (defn subscribe []
-  (js/console.log "XXX oc.web.actions.user/subscribe")
   (ws-nc/subscribe :user/notifications
     (fn [{:keys [_ data]}]
-      (js/console.log "XXX user/notifications for" (:user-id data) "notif:" (:notifications data))
       (let [fixed-notifications (user-utils/fix-notifications (:notifications data))]
         (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [_ data]}]
-      (js/console.log "XXX user/notification for" (:user-id data) "notif:" (:notification data))
       (let [fixed-notification (user-utils/fix-notification (:notification data))]
         (dis/dispatch! [:user-notification (router/current-org-slug) (:notification data)])
         (notification-actions/show-notification
