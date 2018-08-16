@@ -328,9 +328,9 @@
                               :targetCheckboxText "Open in new window"}
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
-                             :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
+                             :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
                              :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input" "textarea"]
-                             :unwrapTags (clj->js (remove nil? ["div" "span" "label" "font" "h1"
+                             :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
                                                    (when-not show-subtitle "h2") "h3" "h4" "h5"
                                                    "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                                    "details" "summary" "nav" "abbr"]))}
