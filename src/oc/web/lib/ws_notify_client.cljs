@@ -50,6 +50,11 @@
   (timbre/debug "Notifications list event" body)
   (go (>! ch-pub { :topic :user/notifications :data body })))
 
+(defmethod event-handler :user/notification
+  [_ body]
+  (timbre/debug "Live notification event" body)
+  (go (>! ch-pub { :topic :user/notification :data body })))
+
 ;; Sente events handlers
 
 (defmulti -event-msg-handler
