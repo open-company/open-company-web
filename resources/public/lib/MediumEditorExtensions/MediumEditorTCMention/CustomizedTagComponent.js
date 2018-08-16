@@ -52,9 +52,6 @@ function ListItem(props) {
       onMouseEnter: function(e){
         props.hoverItem(e, props.index);
       },
-      onMouseLeave: function(e){
-        props.blurItem(e, props.index);
-      },
       onClick: function() {
         props.clickCb(user);
       }},
@@ -79,7 +76,7 @@ function ListItem(props) {
 class CustomizedTagComponent extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = {selectedIndex: null};
+    this.state = {selectedIndex: 0};
   }
 
   keyPress(e) {
@@ -139,7 +136,7 @@ class CustomizedTagComponent extends React.PureComponent {
   }
 
   blurItem(e, idx) {
-    this.setState({selectedIndex: null});
+    this.setState({selectedIndex: 0});
   }
 
   selectItem(user){
@@ -208,8 +205,7 @@ class CustomizedTagComponent extends React.PureComponent {
                            index: i,
                            selectedIndex: that.state.selectedIndex,
                            clickCb: that.selectItem.bind(that),
-                           hoverItem: that.hoverItem.bind(that),
-                           blurItem: that.blurItem.bind(that)})
+                           hoverItem: that.hoverItem.bind(that)})
         })));
   }
 }
