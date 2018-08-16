@@ -3,15 +3,8 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.notifications :as notification-actions]))
-
-(defn description-wrapper [desc]
-  (cond
-   (string? desc)
-   {:dangerouslySetInnerHTML #js {"__html" desc}}
-
-   (sequential? desc)
-   desc))
 
 (defn button-wrapper [s bt-cb bt-title bt-style bt-dismiss]
   (let [has-html (string? bt-title)
@@ -64,18 +57,15 @@
   [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss
-             app-update slack-bot] :as notification-data}]
-  [:div.notification
+             app-update slack-bot mention mention-author] :as notification-data}]
+  [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update app-update
                               :slack-bot slack-bot
                               :opac opac
+                              :mention-notification (and mention mention-author)
                               :dismiss-button dismiss-bt})
      :data-notificationid id}
-    [:div.notification-title.group
-      (when slack-icon
-        [:span.slack-icon])
-      title]
     (when dismiss
       [:button.mlb-reset.notification-dismiss-bt
         {:on-click #(do
@@ -84,9 +74,17 @@
                       (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
                         (dismiss %)))}])
+    (when mention-author
+      [:div.mention-author
+        (user-avatar-image mention-author)])
+    [:div.notification-title.group
+      (when slack-icon
+        [:span.slack-icon])
+      title]
     (when (seq description)
       [:div.notification-description
-        (description-wrapper description)])
+        {:dangerouslySetInnerHTML #js {"__html" description}
+         :class (when mention "oc-mentions")}])
     (when (seq secondary-bt-title)
       (button-wrapper s secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
     (when (seq primary-bt-title)

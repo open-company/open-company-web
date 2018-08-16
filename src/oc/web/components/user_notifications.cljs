@@ -83,7 +83,7 @@
             [:button.mlb-reset.all-read-bt
               {:on-click #(user-actions/read-notifications)}
               "Mark all as read"])]
-        [:div.user-notifications-tray-list.oc-mentions
+        [:div.user-notifications-tray-list
           (if (empty? user-notifications-data)
             [:div.user-notifications-tray-empty
               (all-caught-up)]
@@ -96,8 +96,8 @@
                               (router/nav! (oc-urls/entry (:board-slug n) (:uuid n))))
                  :key (str "user-notification-" (:created-at n))}
                 (user-avatar-image (:author n))
-                [:div.user-notification-body
-                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
+                [:div.user-notification-title
+                  (:title n)]
                 [:div.user-notification-time-since
                   [:time
                     {:date-time (:created-at n)
@@ -106,6 +106,8 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-string (utils/js-date (:created-at n)))}
                     (utils/time-since (:created-at n))]]
+                [:div.user-notification-body.oc-mentions
+                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
                 (when (:unread n)
                   [:button.mlb-reset.read-bt
                     {:title "Mark as read"

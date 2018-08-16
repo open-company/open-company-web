@@ -8,6 +8,14 @@
      :crop {
        :aspectRatio 1}}})
 
+(defn notification-title [notification]
+  (cond
+    (:mention notification)
+    (str (:name (:author notification)) " mentioned you")
+    (:interaction-id notification)
+    (str (:name (:author notification)) " replied")))
+
+
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
         is-interaction (seq (:interaction-id notification))
@@ -20,6 +28,7 @@
      :mention (:mention notification)
      :created-at (:notify-at notification)
      :body (:content notification)
+     :title (notification-title notification)
      :author (:author notification)}))
 
 (defn fix-notifications [notifications]

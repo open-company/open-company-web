@@ -384,7 +384,11 @@
       (let [fixed-notification (user-utils/fix-notification (:notification data) true)]
         (dis/dispatch! [:user-notification (router/current-org-slug) fixed-notification])
         (notification-actions/show-notification
-         {:description (:body fixed-notification)
+         {:title (:title fixed-notification)
+          :mention true
+          :dismiss true
+          :mention-author (:author fixed-notification)
+          :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
           :expire 5})))))
 
