@@ -10,10 +10,12 @@
 
 (defn notification-title [notification]
   (cond
+    (and (:mention notification) (:interaction-id notification))
+    (str (:name (:author notification)) " mentioned you in a comment")
     (:mention notification)
     (str (:name (:author notification)) " mentioned you")
     (:interaction-id notification)
-    (str (:name (:author notification)) " replied")))
+    (str (:name (:author notification)) " commented on your post")))
 
 
 (defn fix-notification [notification & [unread]]
