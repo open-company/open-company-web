@@ -105,7 +105,7 @@
                         (pos? (:count drafts-link)))
         org-slug (router/current-org-slug)
         show-invite-people (and org-slug
-                                (jwt/is-admin? (:team-id org-data)))
+                                (utils/is-admin-or-author? org-data))
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
                             (< @(::content-height s)
