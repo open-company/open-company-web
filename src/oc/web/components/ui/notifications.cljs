@@ -23,10 +23,13 @@
       (when-not has-html
         bt-title)]))
 
-(defn setup-timeout [s]
+(defn clear-timeout [s]
   (when @(::timeout s)
     (js/clearTimeout @(::timeout s))
-    (reset! (::timeout s) nil))
+    (reset! (::timeout s) nil)))
+
+(defn setup-timeout [s]
+  (clear-timeout s)
   (let [n-data (first (:rum/args s))]
     (reset! (::old-expire s) (:expire n-data))
     (when (pos? (:expire n-data))
@@ -65,6 +68,8 @@
                               :opac opac
                               :mention-notification (and mention mention-author)
                               :dismiss-button dismiss-bt})
+     :on-mouse-enter #(clear-timeout s)
+     :on-mouse-leave #(setup-timeout s)
      :data-notificationid id}
     (when dismiss
       [:button.mlb-reset.notification-dismiss-bt

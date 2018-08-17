@@ -86,7 +86,8 @@ div.notifications {
 
       div.notification-description {
         float: right;
-        max-width: calc(100% - 32px);
+        width: calc(100% - 32px);
+        text-align: left;
 
         p {
           margin: 0;
