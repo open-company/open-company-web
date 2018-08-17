@@ -29,27 +29,30 @@
   (dis/dispatch! [:input [:org-settings] nil]))
 
 (rum/defc org-settings-tabs
-  [org-slug active-tab]
+  [org-data active-tab]
   [:div.org-settings-tabs.group
     [:div.org-settings-bottom-line]
-    [:div.org-settings-tab
-      {:class (when (= :main active-tab) "active")}
-      [:a.org-settings-tab-link
-        {:href "#"
-         :on-click #(do (utils/event-stop %) (show-modal :main))}
-        "SETTINGS"]]
-    [:div.org-settings-tab
-      {:class (when (= :team active-tab) "active")}
-      [:a.org-settings-tab-link
-        {:href "#"
-         :on-click #(do (utils/event-stop %) (show-modal :team))}
-        "MANAGE MEMBERS"]]
-    [:div.org-settings-tab
-      {:class (when (= :invite active-tab) "active")}
-      [:a.org-settings-tab-link
-        {:href "#"
-         :on-click #(do (utils/event-stop %) (show-modal :invite))}
-        "INVITE PEOPLE"]]])
+    (when (utils/is-admin? org-data)
+      [:div.org-settings-tab
+        {:class (when (= :main active-tab) "active")}
+        [:a.org-settings-tab-link
+          {:href "#"
+           :on-click #(do (utils/event-stop %) (show-modal :main))}
+          "SETTINGS"]])
+    (when (utils/is-admin? org-data)
+      [:div.org-settings-tab
+        {:class (when (= :team active-tab) "active")}
+        [:a.org-settings-tab-link
+          {:href "#"
+           :on-click #(do (utils/event-stop %) (show-modal :team))}
+          "MANAGE MEMBERS"]])
+    (when (utils/is-admin-or-author? org-data)
+      [:div.org-settings-tab
+        {:class (when (= :invite active-tab) "active")}
+        [:a.org-settings-tab-link
+          {:href "#"
+           :on-click #(do (utils/event-stop %) (show-modal :invite))}
+          "INVITE PEOPLE"]])])
 
 (defn close-clicked [s]
   (let [org-data @(drv/get-ref s :org-data)
@@ -171,7 +174,7 @@
                 (org-avatar (if main-tab? org-editing org-data) false false true))]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
-          (org-settings-tabs (:slug org-data) settings-tab)
+          (org-settings-tabs org-data settings-tab)
           (case settings-tab
             :team
             (org-settings-team-panel org-data)

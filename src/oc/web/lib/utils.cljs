@@ -308,6 +308,19 @@
     :else
     :viewer))
 
+(defn is-admin?
+  [org-data]
+  (let [user-data (jwt/get-contents)
+        user-type (get-user-type user-data org-data)]
+    (= :admin user-type)))
+
+(defn is-admin-or-author?
+  [org-data]
+  (let [user-data (jwt/get-contents)
+        user-type (get-user-type user-data org-data)]
+    (or (= :admin user-type)
+        (= :author user-type))))
+
 (defn index-of
   "Given a collection and a function return the index that make the function truely."
   [s f]

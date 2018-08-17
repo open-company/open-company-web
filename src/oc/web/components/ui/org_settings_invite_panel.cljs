@@ -141,7 +141,7 @@
                         "Invalid user"))]]
                 [:th.role "Role "
                   [:i.mdi.mdi-information-outline
-                    {:title "Contributors and admins can view and edit. Admins manage the team, invites and billing."
+                    {:title "Contributors and admins can edit posts and invite users. Admins manage the team, invites and billing."
                      :data-placement "top"
                      :data-toggle "tooltip"}]]
                 [:th ""]]]
