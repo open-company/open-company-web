@@ -81,7 +81,7 @@
               [:label
                 "Accepted email domains for registration"
                 [:i.mdi.mdi-information-outline
-                  {:title "Anyone who signs up with this email domain can view team boards."
+                  {:title "Anyone who signs up with this email domain can contribute to team boards."
                    :data-toggle "tooltip"
                    :data-placement "top"}]]
               (when add-email-domain-team-error
@@ -124,7 +124,7 @@
             [:label
               "Slack integration"
               [:i.mdi.mdi-information-outline
-                {:title "Anyone who signs up with your Slack team can view team boards."
+                {:title "Anyone who signs up with your Slack team can contribute to team boards."
                  :data-toggle "tooltip"
                  :data-placement "top"}]]
             (when (seq (:access query-params))
