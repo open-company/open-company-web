@@ -479,7 +479,9 @@
   [complete-user-data invited-user invite-from user-type first-name last-name note callback]
   (when (and invited-user invite-from user-type)
     (let [org-data (dispatcher/org-data)
-          team-data (dispatcher/team-data)
+          team-data (or (dispatcher/team-data)
+                        (first (filter #(= (:team-id org-data) (:team-id %))
+                                       (dispatcher/teams-data))))
           invitation-link (utils/link-for
                            (:links team-data)
                            "add"

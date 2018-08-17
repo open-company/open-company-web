@@ -100,7 +100,8 @@
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
       (when (and (not is-mobile?)
                  (router/current-org-slug)
-                 (= user-role :admin))
+                 (or (= user-role :admin)
+                     (= user-role :author)))
         [:a
           {:href "#"
            :on-click invite-click}

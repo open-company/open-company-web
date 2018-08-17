@@ -665,7 +665,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.fs-hide
+          [:div.logo-upload-container.group.fs-hide
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
