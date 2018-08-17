@@ -17,7 +17,6 @@
     (:interaction-id notification)
     (str (:name (:author notification)) " commented on your post")))
 
-
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
         is-interaction (seq (:interaction-id notification))
@@ -33,5 +32,8 @@
      :title (notification-title notification)
      :author (:author notification)}))
 
+(defn sorted-notifications [notifications]
+  (vec (reverse (sort-by :created-at notifications))))
+
 (defn fix-notifications [notifications]
-  (map fix-notification notifications))
+  (sorted-notifications (map fix-notification notifications)))
