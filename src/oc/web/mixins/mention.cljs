@@ -37,7 +37,7 @@
   (reset! events-list []))
 
 (defn- add-hover-events [s events-list]
-  (let [searching-node (js/$ ".oc-mentions")
+  (let [searching-node (js/$ ".oc-mentions.oc-mentions-hover")
         all-mentions (.find searching-node ".oc-mention[data-found]")]
     (.each all-mentions
      #(this-as this

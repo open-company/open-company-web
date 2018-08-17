@@ -201,14 +201,14 @@
               [:div.stream-item-body
                 {:class (utils/class-set {:expanded expanded?
                                           :wrt-item-ready @(::item-ready s)})}
-                [:div.stream-item-body-inner.to-truncate.oc-mentions
+                [:div.stream-item-body-inner.to-truncate.oc-mentions.oc-mentions-hover
                   {:ref "activity-body"
                    :data-itemuuid (:uuid activity-data)
                    :class (utils/class-set {:hide-images (and truncated? (not expanded?))
                                             :wrt-truncated truncated?
                                             :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
-                [:div.stream-item-body-inner.no-truncate.oc-mentions
+                [:div.stream-item-body-inner.no-truncate.oc-mentions.oc-mentions-hover
                   {:ref "full-activity-body"
                    :data-itemuuid (:uuid activity-data)
                    :class (utils/class-set {:wrt-truncated truncated?

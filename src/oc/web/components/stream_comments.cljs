@@ -132,7 +132,7 @@
                   [:div.stream-comment-author-timestamp
                     (utils/time-since (:created-at comment-data))]]]
               [:div.stream-comment-content
-                [:div.stream-comment-body.oc-mentions.fs-hide
+                [:div.stream-comment-body.oc-mentions.oc-mentions-hover.fs-hide
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                    :ref (str "comment-body-" (:uuid comment-data))
                    :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]

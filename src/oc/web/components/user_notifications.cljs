@@ -106,7 +106,7 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-string (utils/js-date (:created-at n)))}
                     (utils/time-since (:created-at n))]]
-                [:div.user-notification-body.oc-mentions
+                [:div.user-notification-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
                 (when (:unread n)
                   [:button.mlb-reset.read-bt
