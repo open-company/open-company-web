@@ -32,7 +32,7 @@ function getUserDisplayName(user) {
 }
 
 function getUserSelectedDisplayValue(user) {
-  return (user["selectedKey"] === "slack-username")? user["slack-username"] : user["name"] || (user["first-name"] " " user["last-name"]);
+  return (user["selectedKey"] === "slack-username")? user["slack-username"] : user["name"] || (user["first-name"] + " " + user["last-name"]);
 }
 
 function getSlackUsername(user) {
