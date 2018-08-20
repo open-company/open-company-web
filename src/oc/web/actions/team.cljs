@@ -20,11 +20,11 @@
   (map #(assoc % :slack-usernames (get-slack-usernames %)) users))
 
 (defn- users-for-mentions [users]
-  (filter #(and (seq (:user-id %))
+  (filter #(and ;; is a carrot user
+                (seq (:user-id %))
+                ;; is active
                 (or (= (:status %) "active")
-                    (= (:status %) "unverified")
-                    (seq (:name %))
-                    (seq (:fist-name %))))
+                    (= (:status %) "unverified")))
    (compact-slack-usernames users)))
 
 (defn roster-get [roster-link]
