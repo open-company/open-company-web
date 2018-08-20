@@ -239,13 +239,27 @@
       (dis/dispatch! [:modal-editing-activate]))
     (dis/dispatch! [:modal-editing-deactivate])))
 
+(declare entry-save)
+
 (defn entry-save-on-exit
-  [edit-key activity-data entry-body]
+  [edit-key activity-data entry-body section-editing]
   (let [entry-map (assoc activity-data :body entry-body)
         cache-key (get-entry-cache-key (:uuid activity-data))]
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
+         ;; dispatch that you are auto saving
+         (dis/dispatch! [:update [:entry-editing]
+                         #(merge % activity-data {:auto-saving true})])
+         (when (and (:has-changes activity-data)
+                    (not (:auto-saving activity-data)))
+           (entry-save activity-data section-editing
+             (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
+               (when success
+                 (let [entry-saved (assoc (json->cljs body) :auto-saving false)]
+                   ;; merge with entry editing and only save once we have a uuid
+                   (dis/dispatch! [:update [:entry-editing]
+                                   #(merge % entry-saved)]))))))
          (dis/dispatch! [:entry-toggle-save-on-exit false]))))))
 
 (defn entry-toggle-save-on-exit
@@ -325,36 +339,40 @@
   (remove-cached-item item-uuid)
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
-(defn entry-save [edited-data & [section-editing edit-key]]
-  (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
-        fixed-edit-key (or edit-key :entry-editing)]
-    (if (:links fixed-edited-data)
-      (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
-               section-editing)
-        (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-              final-board-data (assoc section-editing :entries [fixed-entry-data])]
-          (api/create-board final-board-data (:invite-note fixed-edited-data)
-            (fn [{:keys [success status body] :as response}]
-              (if (= status 409)
-                ;; Board name exists
-                (board-name-exists-error fixed-edit-key)
-                (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
-        (api/update-entry fixed-edited-data fixed-edit-key create-update-entry-cb))
-      (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
-               section-editing)
-        (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-              final-board-data (assoc section-editing :entries [fixed-entry-data])]
-          (api/create-board final-board-data (:invite-note fixed-edited-data)
-            (fn [{:keys [success status body] :as response}]
-              (if (= status 409)
-                ;; Board name exists
-                (board-name-exists-error fixed-edit-key)
-                (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
-        (let [org-slug (router/current-org-slug)
-              entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
-              entry-create-link (utils/link-for (:links entry-board-data) "create")]
-          (api/create-entry fixed-edited-data fixed-edit-key entry-create-link create-update-entry-cb))))
-    (dis/dispatch! [:entry-save fixed-edit-key])))
+(defn entry-save
+  ([edited-data section-editing]
+     (entry-save edited-data section-editing create-update-entry-cb))
+
+  ([edited-data section-editing entry-save-cb]
+     (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
+           fixed-edit-key :entry-editing]
+       (if (:links fixed-edited-data)
+         (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+                  section-editing)
+           (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
+                 final-board-data (assoc section-editing :entries [fixed-entry-data])]
+             (api/create-board final-board-data (:invite-note fixed-edited-data)
+               (fn [{:keys [success status body] :as response}]
+                 (if (= status 409)
+                   ;; Board name exists
+                   (board-name-exists-error fixed-edit-key)
+                   (entry-save-cb fixed-edited-data fixed-edit-key response)))))
+           (api/update-entry fixed-edited-data fixed-edit-key entry-save-cb))
+         (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+                  section-editing)
+           (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
+                 final-board-data (assoc section-editing :entries [fixed-entry-data])]
+             (api/create-board final-board-data (:invite-note fixed-edited-data)
+               (fn [{:keys [success status body] :as response}]
+                 (if (= status 409)
+                   ;; Board name exists
+                   (board-name-exists-error fixed-edit-key)
+                   (entry-save-cb fixed-edited-data fixed-edit-key response)))))
+           (let [org-slug (router/current-org-slug)
+                 entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
+                 entry-create-link (utils/link-for (:links entry-board-data) "create")]
+             (api/create-entry fixed-edited-data fixed-edit-key entry-create-link entry-save-cb))))
+       (dis/dispatch! [:entry-save fixed-edit-key]))))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
