@@ -150,14 +150,10 @@ class CustomizedTagComponent extends React.PureComponent {
   }
 
   checkStringValue(value, searchValue){
-    console.log("XXX         value", value, "searchValue", searchValue);
     if (value && value.length) {
       let values = value.toLowerCase().split(/\s/g);
-      console.log("XXX            splittedValues", values);
       for (let i = 0; i < values.length; i++) {
-        console.log("XXX              checking", values[i]);
         if (values[i] && values[i].indexOf(searchValue.toLowerCase()) === 0){
-          console.log("XXX              found!");
           return true;
         }
       }
@@ -169,14 +165,10 @@ class CustomizedTagComponent extends React.PureComponent {
     const trigger = props.currentMentionText.substring(0, 1);
     const currentText = props.currentMentionText.substring(1, props.currentMentionText.length).toLowerCase();
     const that = this;
-    console.log("XXX filterUsers currentText:", currentText);
 
     function checkSlackUsernames(user) {
-      console.log("XXX       checking all", user["slack-usernames"]);
       for(var i = 0; i < user["slack-usernames"].length; i++) {
-        console.log("XXX       checking: ", user["slack-usernames"][i]);
         if (that.checkStringValue(user["slack-usernames"][i], currentText)) {
-          console.log("XXX     found slack-username!", i);
           return Object.assign(user, { "selectedKey": "slack-username",
                                        "slack-username": user["slack-usernames"][i] });
         }
@@ -186,37 +178,27 @@ class CustomizedTagComponent extends React.PureComponent {
 
     let mappedUsers = props.users.map(function (user, i) {
       let filteredSlackUsernames = [];
-      console.log("XXX     checking user", user);
-      console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-usernames"]));
-      console.log("XXX     filteredSlackUsernames", filteredSlackUsernames);
       if (that.checkStringValue(user["name"], currentText)){
-        console.log("XXX     found name!");
         return Object.assign(user, { "selectedKey": "name" });
       }
       else if (that.checkStringValue(user["first-name"], currentText)){
-        console.log("XXX     found first-name!");
         return Object.assign(user, { "selectedKey": "first-name" });
       }
       else if (that.checkStringValue(user["last-name"], currentText)){
-        console.log("XXX     found last-name!");
         return Object.assign(user, { "selectedKey": "last-name" });
       }
       else if (user["slack-usernames"].length > 0 && checkSlackUsernames(user)){
-        console.log("XXX     found slack-username!");
         return checkSlackUsernames(user);
       }
       else if (that.checkStringValue(user["email"], currentText)){
-        console.log("XXX     found email!");
         return Object.assign(user, { "selectedKey": "email" });
       }
       else{
-        console.log("XXX     not found!");
         return user;
       }
     });
-    console.log("XXX   mappedUsers", mappedUsers);
+
     return mappedUsers.filter(function (user) {
-      console.log("XXX      checking", user);
       return !!user["selectedKey"];
     });
   }
@@ -224,8 +206,7 @@ class CustomizedTagComponent extends React.PureComponent {
   render() {
     let that = this;
     let filteredUsers = this.filterUsers(this.props);
-    console.log("XXX props", this.props);
-    console.log("XXX filteredUsers", filteredUsers);
+
     return React.createElement(
       "div",
       { "className": "oc-mention-options",
