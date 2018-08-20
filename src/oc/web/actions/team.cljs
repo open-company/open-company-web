@@ -14,7 +14,7 @@
 (defn- get-slack-usernames [user]
   (let [slack-display-name [(:slack-display-name user)]
         slack-users-usernames (vec (map :display-name (vals (:slack-users user))))]
-    (remove nil? (concat slack-users-usernames slack-display-name))))
+    (remove #(or (nil? %) (= % "-")) (concat slack-users-usernames slack-display-name))))
 
 (defn- compact-slack-usernames [users]
   (doall (map #(assoc % :slack-usernames (get-slack-usernames %)) users)))
