@@ -44,7 +44,9 @@ function ListItem(props) {
   return React.createElement(
     "div",
     { "key": "user-" + (user["user-id"] + "-" + user["email"]),
-      "className": "oc-mention-option " + (props.selectedIndex === props.index? "active" : ""),
+      "className": "oc-mention-option" +
+                   (props.selectedIndex === props.index? " active" : "") +
+                   (user["avatar-url"] && user["avatar-url"].length > 0? " has-avatar " : ""),
       "data-name": displayName,
       "data-user-id": user["user-id"],
       "data-slack-username": slackUsername,
@@ -54,7 +56,8 @@ function ListItem(props) {
       onClick: function() {
         props.clickCb(user);
       }},
-    React.createElement("div", { "className": "oc-mention-option-avatar", style: avatarStyle }),
+    React.createElement("div", { "className": "oc-mention-option-avatar",
+                                 style: avatarStyle }),
     React.createElement(
       "div",
       { "className": "oc-mention-option-title" },
