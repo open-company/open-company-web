@@ -13,19 +13,20 @@
 
 (defn- get-slack-usernames [user]
   (let [slack-display-name [(:slack-display-name user)]
-        slack-users-usernames (vec (map :display-name (:slack-users user)))]
+        slack-users-usernames (vec (map :display-name (vals (:slack-users user))))]
     (remove nil? (concat slack-users-usernames slack-display-name))))
 
 (defn- compact-slack-usernames [users]
-  (map #(assoc % :slack-usernames (get-slack-usernames %)) users))
+  (doall (map #(assoc % :slack-usernames (get-slack-usernames %)) users)))
 
 (defn- users-for-mentions [users]
-  (filter #(and ;; is a carrot user
+  (compact-slack-usernames
+    (filterv #(and ;; is a carrot user
                 (seq (:user-id %))
                 ;; is active
                 (or (= (:status %) "active")
                     (= (:status %) "unverified")))
-   (compact-slack-usernames users)))
+     users)))
 
 (defn roster-get [roster-link]
   (api/get-team roster-link
