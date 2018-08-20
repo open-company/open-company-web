@@ -153,5 +153,21 @@ div.oc-mention-popup {
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-top: 4px;
+
+    &.slack-icon {
+      &:before {
+        display: block;
+        content: "";
+        float: left;
+        width: 12px;
+        height: 12px;
+        background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-right: 4px;
+        margin-top: 0px;
+      }
+    }
   }
 }

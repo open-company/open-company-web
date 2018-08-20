@@ -26,7 +26,10 @@
                         top-pos)
         format-str (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"
                         "<div class=\"oc-mention-popup-name\">" user-name "</div>"
-                        "<div class=\"oc-mention-popup-subline\">" user-subline "</div>")
+                        "<div class=\"oc-mention-popup-subline"
+                         (when has-slack-username
+                           " slack-icon")
+                         "\">" user-subline "</div>")
         popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\">") format-str)]
     (.append $mention-el (.css popup-node #js {:left (str fixed-left-pos "px")
                                                :top (str fixed-top-pos "px")}))))
