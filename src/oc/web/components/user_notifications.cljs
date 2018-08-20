@@ -10,38 +10,6 @@
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-; (def notifications
-;   [{:body "Kim Walker mentioned you in a comment: <span class=\"oc-mention\" data-name=\"Ryan Le Roux\" data-found=\"true\">@Ryan Le Roux</span> Ah ok, I understand now. Thank you…"
-;     :created-at "2018-08-08T10:21:51.899Z"
-;     :author {:avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_yellow.svg"
-;              :name "Kim Walker"}
-;     :unread true}
-;    {:body "Miriam Thomas commented on your post: I’m not  totally clear on how this is going to help…"
-;     :created-at "2018-08-08T10:21:51.812Z"
-;     :author {:avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_red.svg"
-;              :name "Miriam Thomas"}
-;     :unread false}
-;    {:body "Iacopo, Stuart, and 6 others commented on your post Design standup for Tuesday May…"
-;     :created-at "2018-08-08T10:21:51.823Z"
-;     :author {:avatar-url "https://avatars.slack-edge.com/2017-02-02/136114833346_3758034af26a3b4998f4_512.jpg"
-;              :name "Iacopo Carraro"}
-;     :unread true}
-;    {:body "Kim Walker mentioned you in a comment: <span class=\"oc-mention\" data-name=\"Ryan Le Roux\" data-found=\"true\">@Ryan Le Roux</span> Ah ok, I understand now. Thank you…"
-;     :created-at "2018-08-08T10:21:51.834Z"
-;     :author {:avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_yellow.svg"
-;              :name "Kim Walker"}
-;     :unread true}
-;    {:body "Miriam Thomas commented on your post: I’m not  totally clear on how this is going to help…"
-;     :created-at "2018-08-08T10:21:51.845Z"
-;     :author {:avatar-url "https://d1wc0stj82keig.cloudfront.net/img/ML/happy_face_red.svg"
-;              :name "Miriam Thomas"}
-;     :unread false}
-;    {:body "Iacopo, Stuart, and 6 others commented on your post Design standup for Tuesday May…"
-;     :created-at "2018-08-08T10:21:51.856Z"
-;     :author {:avatar-url "https://avatars.slack-edge.com/2017-02-02/136114833346_3758034af26a3b4998f4_512.jpg"
-;              :name "Iacopo Carraro"}
-;     :unread false}])
-
 (defn- has-new-content? [notifications-data]
   (some :unread notifications-data))
 
