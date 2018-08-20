@@ -32,7 +32,7 @@ function getUserDisplayName(user) {
 }
 
 function getUserSelectedDisplayValue(user) {
-  return (user["selectedKey"] === "slack-username")? user["slack-username"] : user["slack-display-name"] || user["slack-usernames"][0];
+  return (user["selectedKey"] === "slack-username")? user["slack-username"] : user["slack-usernames"][0];
 }
 
 function ListItem(props) {
@@ -166,6 +166,9 @@ class CustomizedTagComponent extends React.PureComponent {
 
     function getSlackUsernames(user){
       let slackUsernames = [];
+      if (user["slack-display-name"] && user["slack-display-name"].length > 0) {
+        slackUsernames = [user["slack-display-name"]];
+      }
       if (user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
         Object.values(user["slack-users"]).map(function(slackUser){
           slackUsernames.push(slackUser);
@@ -191,11 +194,6 @@ class CustomizedTagComponent extends React.PureComponent {
       else if (that.checkStringValue(user["last-name"], currentText)){
         console.log("XXX     found last-name!");
         return Object.assign(user, { "selectedKey": "last-name" });
-      }
-      else if (that.checkStringValue(user["slack-display-name"], currentText)){
-        console.log("XXX     found slack-display-name!");
-        return Object.assign(user, { "selectedKey": "slack-username",
-                                     "slack-username": user["slack-usernames"] });
       }
       else if (user["slack-usernames"].length > 0){
         console.log("XXX       checking all", user["slack-usernames"]);
