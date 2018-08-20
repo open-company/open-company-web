@@ -164,23 +164,22 @@ class CustomizedTagComponent extends React.PureComponent {
     const that = this;
     console.log("XXX filterUsers currentText:", currentText);
 
-    function getSlackUsernames(user){
-      let slackUsernames = [];
-      if (user["slack-display-name"] && user["slack-display-name"].length > 0) {
-        slackUsernames = [user["slack-display-name"]];
+    function checkSlackUsernames(user) {
+      console.log("XXX       checking all", user["slack-usernames"]);
+      for(var i = 0; i < user["slack-usernames"].length; i++) {
+        console.log("XXX       checking: ", user["slack-usernames"][i]);
+        if (that.checkStringValue(user["slack-usernames"][i], currentText)) {
+          console.log("XXX     found slack-username!", i);
+          return Object.assign(user, { "selectedKey": "slack-username",
+                                       "slack-username": user["slack-usernames"][i] });
+        }
       }
-      if (user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
-        Object.values(user["slack-users"]).map(function(slackUser){
-          slackUsernames.push(slackUser);
-        });
-      }
-      return slackUsernames;
+      return null;
     }
 
     let mappedUsers = props.users.map(function (user, i) {
-      let activeUser = user["status"] === "active" || user["status"] === "unverified",
-          filteredSlackUsernames = [];
-      user = Object.assign(user, { "slack-usernames": getSlackUsernames(user)});
+      let filteredSlackUsernames = [];
+      console.log("XXX     checking user", user);
       console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-usernames"]));
       console.log("XXX     filteredSlackUsernames", filteredSlackUsernames);
       if (that.checkStringValue(user["name"], currentText)){
@@ -195,16 +194,9 @@ class CustomizedTagComponent extends React.PureComponent {
         console.log("XXX     found last-name!");
         return Object.assign(user, { "selectedKey": "last-name" });
       }
-      else if (user["slack-usernames"].length > 0){
-        console.log("XXX       checking all", user["slack-usernames"]);
-        for(var i = 0; i < user["slack-usernames"].length; i++) {
-          console.log("XXX       checking: ", user["slack-usernames"][i]);
-          if (that.checkStringValue(user["slack-usernames"][i], currentText)) {
-            console.log("XXX     found slack-username!", i);
-            return Object.assign(user, { "selectedKey": "slack-username",
-                                         "slack-username": user["slack-usernames"][i] });
-          }
-        }
+      else if (user["slack-usernames"].length > 0 && checkSlackUsernames(user)){
+        console.log("XXX     found slack-username!");
+        return checkSlackUsernames(user);
       }
       else if (that.checkStringValue(user["email"], currentText)){
         console.log("XXX     found email!");
@@ -215,7 +207,9 @@ class CustomizedTagComponent extends React.PureComponent {
         return user;
       }
     });
+    console.log("XXX   mappedUsers", mappedUsers);
     return mappedUsers.filter(function (user) {
+      console.log("XXX      checking", user);
       return !!user["selectedKey"];
     });
   }
