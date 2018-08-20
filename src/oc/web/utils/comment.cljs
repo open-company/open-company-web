@@ -14,7 +14,14 @@
                 :autoLink true
                 :anchor false
                 :targetBlank true
-                :paste #js {:forcePlainText true}
+                :paste #js {:forcePlainText false
+                            :cleanPastedHTML true
+                            :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
+                            :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas"
+                                            "figure" "input" "textarea"]
+                            :unwrapTags #js ["div" "label" "font" "h1" "h2" "h3" "h4" "h5" "div" "p" "ul" "ol" "li"
+                                             "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
+                                             "details" "summary" "nav" "abbr" "a"]}
                 :placeholder #js {:text "Add a comment..."
                                   :hideOnClick true}
                :keyboardCommands #js {:commands #js [
