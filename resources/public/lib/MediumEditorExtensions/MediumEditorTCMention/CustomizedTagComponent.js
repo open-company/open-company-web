@@ -32,15 +32,14 @@ function getUserDisplayName(user) {
 }
 
 function getUserSelectedDisplayValue(user) {
-  return (user["selectedKey"] === "slack-username")? user["slack-username"] : getUserDisplayName(user);
+  return (user["selectedKey"] === "slack-username")? user["slack-username"] : user["slack-display-name"] || user["slack-usernames"][0];
 }
 
 function ListItem(props) {
   let user = props.user;
   let avatarStyle = { "backgroundImage": "url(" + user["avatar-url"] + ")" };
   let displayName = getUserDisplayName(user);
-  let selectedValue = getUserSelectedDisplayValue(user);
-  let slackUsername = user["slack-display-name"] || user["slack-usernames"][0];
+  let slackUsername = getUserSelectedDisplayValue(user);
 
   return React.createElement(
     "div",
@@ -178,7 +177,7 @@ class CustomizedTagComponent extends React.PureComponent {
     let mappedUsers = props.users.map(function (user, i) {
       let activeUser = user["status"] === "active" || user["status"] === "unverified",
           filteredSlackUsernames = [];
-      user["slack-usernames"] = getSlackUsernames(user);
+      user = Object.assign(user, { "slack-usernames": getSlackUsernames(user)});
       console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-usernames"]));
       console.log("XXX     filteredSlackUsernames", filteredSlackUsernames);
       if (that.checkStringValue(user["name"], currentText)){
