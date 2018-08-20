@@ -160,9 +160,10 @@ class CustomizedTagComponent extends React.PureComponent {
     const trigger = props.currentMentionText.substring(0, 1);
     const currentText = props.currentMentionText.substring(1, props.currentMentionText.length).toLowerCase();
     const that = this;
+    console.log("XXX filterUsers currentText:", currentText);
 
     let mappedUsers = props.users.map(function (user, i) {
-      let activeUser = user["status"] === "active",
+      let activeUser = user["status"] === "active" || user["status"] === "unverified",
           filteredSlackUsernames = [];
       if (activeUser && user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
         Object.values(user["slack-users"]).map(function(slackUser){
@@ -193,6 +194,8 @@ class CustomizedTagComponent extends React.PureComponent {
   render() {
     let that = this;
     let filteredUsers = this.filterUsers(this.props);
+    console.log("XXX props", this.props);
+    console.log("XXX filteredUsers", filteredUsers);
     return React.createElement(
       "div",
       { "className": "oc-mention-options",
