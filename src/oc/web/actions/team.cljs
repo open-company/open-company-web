@@ -11,11 +11,21 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
+(defn- get-slack-usernames [user]
+  (let [slack-display-name [(:slack-display-name user)]
+        slack-users-usernames (vec (map :display-name (:slack-users user)))]
+    (remove nil? (concat slack-users-usernames slack-display-name))))
+
+(defn- compact-slack-usernames [users]
+  (map #(assoc % :slack-usernames (get-slack-usernames %)) users))
+
 (defn- users-for-mentions [users]
   (filter #(and (seq (:user-id %))
                 (or (= (:status %) "active")
-                    (= (:status %) "unverified")))
-   users))
+                    (= (:status %) "unverified")
+                    (seq (:name %))
+                    (seq (:fist-name %))))
+   (compact-slack-usernames users)))
 
 (defn roster-get [roster-link]
   (api/get-team roster-link
