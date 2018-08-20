@@ -178,24 +178,37 @@ class CustomizedTagComponent extends React.PureComponent {
       }
       console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-users"]));
       console.log("XXX     filteredSlackUsernames", filteredSlackUsernames);
-      if (that.checkStringValue(user["name"], currentText))
+      if (that.checkStringValue(user["name"], currentText)){
+        console.log("XXX     found name!");
         return Object.assign(user, { "selectedKey": "name" });
-      else if (that.checkStringValue(user["first-name"], currentText))
+      }
+      else if (that.checkStringValue(user["first-name"], currentText)){
+        console.log("XXX     found first-name!");
         return Object.assign(user, { "selectedKey": "first-name" });
-      else if (that.checkStringValue(user["last-name"], currentText))
+      }
+      else if (that.checkStringValue(user["last-name"], currentText)){
+        console.log("XXX     found last-name!");
         return Object.assign(user, { "selectedKey": "last-name" });
+      }
       else if (activeUser && filteredSlackUsernames.length > 0){
-        console.log("XXX   activeUser filteredSlackUsernames", filteredSlackUsernames);
+        console.log("XXX     activeUser filteredSlackUsernames", filteredSlackUsernames);
+        console.log("XXX     found filteredSlackUsernames!");
         return Object.assign(user, { "selectedKey": "slack-username",
                                      "slack-username": filteredSlackUsernames[0]["display-name"] });
       }
       else if (!activeUser && that.checkStringValue(user["slack-display-name"], currentText)){
-        console.log("XXX   !activeUser checkStringValue", that.checkStringValue(user["slack-display-name"], currentText));
+        console.log("XXX     !activeUser checkStringValue", that.checkStringValue(user["slack-display-name"], currentText));
+        console.log("XXX     found slack-display-name!");
         return Object.assign(user, { "selectedKey": "slack-display-name" });
       }
-      else if (that.checkStringValue(user["email"], currentText))
+      else if (that.checkStringValue(user["email"], currentText)){
+        console.log("XXX     found email!");
         return Object.assign(user, { "selectedKey": "email" });
-      else return user;
+      }
+      else{
+        console.log("XXX     not found!");
+        return user;
+      }
     });
     return mappedUsers.filter(function (user) {
       return !!user["selectedKey"];
