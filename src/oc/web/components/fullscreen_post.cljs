@@ -501,10 +501,14 @@
           [:div.fullscreen-post-author-header.group
             [:div.fullscreen-post-author-header-author
               (user-avatar-image (:publisher current-activity-data))
-              [:div.name.fs-hide
-                (str (:name (:publisher current-activity-data))
-                 " in "
-                 (:board-name current-activity-data))]
+              [:div.name-container.group
+                [:div.name.fs-hide
+                  (str (:name (:publisher current-activity-data))
+                   " in "
+                   (:board-name current-activity-data))]
+                (when (:new current-activity-data)
+                  [:div.new-tag
+                    "New"])]
               [:div.fullscreen-post-author-header-sub
                 [:div.time-since
                   (let [t (or (:published-at current-activity-data) (:created-at current-activity-data))]
@@ -517,11 +521,7 @@
                       (utils/time-since t)])]
                 [:div.separator]
                 [:div.fullscreen-post-wrt
-                  (wrt current-activity-data read-data)]]]
-            [:div.fullscreen-post-author-header-right
-              (when (:new current-activity-data)
-                [:div.new-tag
-                  "New"])]])
+                  (wrt current-activity-data read-data)]]]])
         ;; Left column
         [:div.fullscreen-post-left-column
           [:div.fullscreen-post-left-column-content.group
