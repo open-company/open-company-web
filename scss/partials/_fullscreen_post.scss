@@ -314,9 +314,22 @@ div.fullscreen-post-container {
 
         @include activity-author(32);
 
-        div.name {
-          line-height: 18px;
-          color: $deep_navy;
+        div.name-container {
+          height: 18px;
+
+          div.name {
+            line-height: 18px;
+            color: $deep_navy;
+            float: left;
+          }
+
+          @include new-tag();
+
+          div.new-tag {
+            display: inline-block;
+            position: relative;
+            top: -1px;
+          }
         }
 
         div.fullscreen-post-author-header-sub {
@@ -344,13 +357,6 @@ div.fullscreen-post-container {
             }
           }
         }
-      }
-
-      div.fullscreen-post-author-header-right {
-        float: right;
-        width: 25%;
-
-        @include new-tag();
       }
     }
 
