@@ -40,10 +40,11 @@
 
 (defn autosave [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
+        section-editing @(drv/get-ref s :section-editing)
         body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
                       (utils/clean-body-html (.-innerHTML body-el)))]
-    (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body)))
+    (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body section-editing)))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
