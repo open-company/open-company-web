@@ -6,13 +6,14 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.notifications :as notification-actions]))
 
-(defn button-wrapper [s bt-cb bt-title bt-style bt-dismiss]
+(defn button-wrapper [s bt-ref bt-cb bt-title bt-style bt-dismiss]
   (let [has-html (string? bt-title)
         button-base-map {:on-click (fn [e]
                                      (when bt-dismiss
                                        (notification-actions/remove-notification (first (:rum/args s))))
                                      (when (fn? bt-cb)
                                        (bt-cb e)))
+                         :ref bt-ref
                          :class (utils/class-set {:solid-green (= bt-style :solid-green)
                                                   :default-link (= bt-style :default-link)})}
         button-map (if has-html
@@ -60,7 +61,7 @@
   [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss
-             app-update slack-bot mention mention-author] :as notification-data}]
+             app-update slack-bot mention mention-author click] :as notification-data}]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update app-update
@@ -70,6 +71,11 @@
                               :dismiss-button dismiss-bt})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)
+     :on-click #(when (and (fn? click)
+                           (not (utils/event-inside? % (rum/ref-node s :dismiss-bt)))
+                           (not (utils/event-inside? % (rum/ref-node s :first-bt)))
+                           (not (utils/event-inside? % (rum/ref-node s :second-bt))))
+                  (click %))
      :data-notificationid id}
     (when dismiss
       [:button.mlb-reset.notification-dismiss-bt
@@ -78,7 +84,8 @@
                       (js/clearTimeout @(::timeout s))
                       (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
-                        (dismiss %)))}])
+                        (dismiss %)))
+         :ref :dismiss-bt}])
     (when mention-author
       [:div.mention-author
         (user-avatar-image mention-author)])
@@ -91,9 +98,9 @@
         {:dangerouslySetInnerHTML #js {"__html" description}
          :class (when mention "oc-mentions")}])
     (when (seq secondary-bt-title)
-      (button-wrapper s secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
+      (button-wrapper s :second-bt secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
     (when (seq primary-bt-title)
-      (button-wrapper s primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss))])
+      (button-wrapper s :first-bt primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss))])
 
 (rum/defcs notifications < rum/static
                            rum/reactive
