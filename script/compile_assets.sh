@@ -20,6 +20,8 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
 --js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
 --js lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js \
+--js lib/MediumEditorExtensions/MediumEditorTCMention/index.min.js \
+--js lib/MediumEditorExtensions/MediumEditorTCMention/CustomizedTagComponent.js \
 --output_wrapper "%output%
 //# sourceMappingURL=$3/oc_assets.js.map"
 

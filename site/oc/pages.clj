@@ -886,8 +886,6 @@
           [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
-          ;; MediumEditorTCMention css
-          [:link {:type "text/css" :rel "stylesheet" :href "/lib/MediumEditorExtensions/MediumEditorTCMention/mention-panel.min.css"}]
           ;; jQuery needed by Bootstrap JavaScript
           jquery
           ;; Automatically load the needed polyfill depending on
@@ -923,10 +921,6 @@
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]
-          ;; MediumEditorTCMention
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/index.min.js"}]
-          ;; MediumEditorTCMention Panel
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/CustomizedTagComponent.js"}]
           (when (= (env :fullstory) "true")
             (fullstory-init))
           (google-analytics-init)]})
