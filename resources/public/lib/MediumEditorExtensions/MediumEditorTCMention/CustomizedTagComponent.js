@@ -179,7 +179,7 @@ class CustomizedTagComponent extends React.PureComponent {
       let activeUser = user["status"] === "active" || user["status"] === "unverified",
           filteredSlackUsernames = [];
       user["slack-usernames"] = getSlackUsernames(user);
-      console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-users"]));
+      console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-usernames"]));
       console.log("XXX     filteredSlackUsernames", filteredSlackUsernames);
       if (that.checkStringValue(user["name"], currentText)){
         console.log("XXX     found name!");
