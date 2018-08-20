@@ -195,12 +195,12 @@ div.stream-comments {
         }
 
         button.stream-comment-reaction {
-          padding-top: 4px;
           height: 24px;
           @include avenir_M();
           font-size: 12px;
           color: $ui_grey;
           float: left;
+          padding: 4px 14px 2px 0px;
 
           div.stream-comment-reaction-icon {
             float: left;
