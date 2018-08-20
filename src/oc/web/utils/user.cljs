@@ -9,13 +9,15 @@
        :aspectRatio 1}}})
 
 (defn notification-title [notification]
-  (cond
-    (and (:mention notification) (:interaction-id notification))
-    (str (:name (:author notification)) " mentioned you in a comment")
-    (:mention notification)
-    (str (:name (:author notification)) " mentioned you")
-    (:interaction-id notification)
-    (str (:name (:author notification)) " commented on your post")))
+  (let [author (:author notification)
+        first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))]
+    (cond
+      (and (:mention notification) (:interaction-id notification))
+      (str first-name " mentioned you in a comment")
+      (:mention notification)
+      (str first-name " mentioned you")
+      (:interaction-id notification)
+      (str first-name " commented on your post"))))
 
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
