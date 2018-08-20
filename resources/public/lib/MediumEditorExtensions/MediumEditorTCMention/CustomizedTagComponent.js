@@ -40,7 +40,7 @@ function ListItem(props) {
   let avatarStyle = { "backgroundImage": "url(" + user["avatar-url"] + ")" };
   let displayName = getUserDisplayName(user);
   let selectedValue = getUserSelectedDisplayValue(user);
-  let slackUsername = user["slack-username"] || user["slack-display-name"];
+  let slackUsername = user["slack-display-name"] || user["slack-usernames"][0];
 
   return React.createElement(
     "div",
@@ -68,7 +68,6 @@ function ListItem(props) {
     )
   );
 };
-
 
 
 // Using PureComponent as suggested here:
@@ -166,16 +165,20 @@ class CustomizedTagComponent extends React.PureComponent {
     const that = this;
     console.log("XXX filterUsers currentText:", currentText);
 
+    function getSlackUsernames(user){
+      let slackUsernames = [];
+      if (user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
+        Object.values(user["slack-users"]).map(function(slackUser){
+          slackUsernames.push(slackUser);
+        });
+      }
+      return slackUsernames;
+    }
+
     let mappedUsers = props.users.map(function (user, i) {
       let activeUser = user["status"] === "active" || user["status"] === "unverified",
           filteredSlackUsernames = [];
-      if (activeUser && user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
-        Object.values(user["slack-users"]).map(function(slackUser){
-          console.log("XXX        checking:", slackUser["display-name"], "=>", that.checkStringValue(slackUser["display-name"], currentText));
-          if (that.checkStringValue(slackUser["display-name"], currentText))
-            filteredSlackUsernames.push(slackUser);
-        });
-      }
+      user["slack-usernames"] = getSlackUsernames(user);
       console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-users"]));
       console.log("XXX     filteredSlackUsernames", filteredSlackUsernames);
       if (that.checkStringValue(user["name"], currentText)){
@@ -190,16 +193,21 @@ class CustomizedTagComponent extends React.PureComponent {
         console.log("XXX     found last-name!");
         return Object.assign(user, { "selectedKey": "last-name" });
       }
-      else if (activeUser && filteredSlackUsernames.length > 0){
-        console.log("XXX     activeUser filteredSlackUsernames", filteredSlackUsernames);
-        console.log("XXX     found filteredSlackUsernames!");
-        return Object.assign(user, { "selectedKey": "slack-username",
-                                     "slack-username": filteredSlackUsernames[0]["display-name"] });
-      }
-      else if (!activeUser && that.checkStringValue(user["slack-display-name"], currentText)){
-        console.log("XXX     !activeUser checkStringValue", that.checkStringValue(user["slack-display-name"], currentText));
+      else if (that.checkStringValue(user["slack-display-name"], currentText)){
         console.log("XXX     found slack-display-name!");
-        return Object.assign(user, { "selectedKey": "slack-display-name" });
+        return Object.assign(user, { "selectedKey": "slack-username",
+                                     "slack-username": user["slack-usernames"] });
+      }
+      else if (user["slack-usernames"].length > 0){
+        console.log("XXX       checking all", user["slack-usernames"]);
+        for(var i = 0; i < user["slack-usernames"].length; i++) {
+          console.log("XXX       checking: ", user["slack-usernames"][i]);
+          if (that.checkStringValue(user["slack-usernames"][i], currentText)) {
+            console.log("XXX     found slack-username!", i);
+            return Object.assign(user, { "selectedKey": "slack-username",
+                                         "slack-username": user["slack-usernames"][i] });
+          }
+        }
       }
       else if (that.checkStringValue(user["email"], currentText)){
         console.log("XXX     found email!");
