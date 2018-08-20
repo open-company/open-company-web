@@ -249,13 +249,14 @@
 
 (defn- setup-team-data
   ""
-  [s]
+  [s & [setup-email-domain]]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
         teams-data @(drv/get-ref s :teams-data)
         google-domain (jwt/get-key :google-domain)
-        with-email-domain (if (and google-domain
+        with-email-domain (if (and setup-email-domain
+                                   google-domain
                                    (clojure.string/blank? (:email-domain org-editing)))
                             {:email-domain google-domain}
                             {:email-domain (or (:email-domain org-editing) "")})]
@@ -284,11 +285,10 @@
                (gdom/removeNode img)))
             (gdom/append (.-body js/document) img)
             (set! (.-src img) (:logo-url first-team)))))
-      (when with-email-domain
-        (dis/dispatch!
-         [:update
-          [:org-editing]
-          #(merge % with-email-domain)])))))
+      (dis/dispatch!
+       [:update
+        [:org-editing]
+        #(merge % with-email-domain)]))))
 
 (rum/defcs lander-team < rum/reactive
                          (drv/drv :teams-data)
@@ -299,7 +299,7 @@
                            (dis/dispatch! [:input [:org-editing :email-domain] ""])
                            s)
                           :did-mount (fn [s]
-                           (setup-team-data s)
+                           (setup-team-data s true)
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
