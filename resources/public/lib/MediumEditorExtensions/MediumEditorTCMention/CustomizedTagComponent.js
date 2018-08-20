@@ -145,10 +145,14 @@ class CustomizedTagComponent extends React.PureComponent {
   }
 
   checkStringValue(value, searchValue){
+    console.log("XXX         value", value, "searchValue", searchValue);
     if (value && value.length) {
       let values = value.toLowerCase().split(/\s/g);
+      console.log("XXX            splittedValues", values);
       for (let i = 0; i < values.length; i++) {
+        console.log("XXX              checking", values[i]);
         if (values[i] && values[i].indexOf(searchValue.toLowerCase()) === 0){
+          console.log("XXX              found!");
           return true;
         }
       }
@@ -167,21 +171,28 @@ class CustomizedTagComponent extends React.PureComponent {
           filteredSlackUsernames = [];
       if (activeUser && user["slack-users"] && Object.values(user["slack-users"]).length > 0) {
         Object.values(user["slack-users"]).map(function(slackUser){
+          console.log("XXX        checking:", slackUser["display-name"], "=>", that.checkStringValue(slackUser["display-name"], currentText));
           if (that.checkStringValue(slackUser["display-name"], currentText))
             filteredSlackUsernames.push(slackUser);
         });
       }
+      console.log("XXX     slack-users", user["slack-users"], "->", Object.values(user["slack-users"]));
+      console.log("XXX     filteredSlackUsernames", filteredSlackUsernames);
       if (that.checkStringValue(user["name"], currentText))
         return Object.assign(user, { "selectedKey": "name" });
       else if (that.checkStringValue(user["first-name"], currentText))
         return Object.assign(user, { "selectedKey": "first-name" });
       else if (that.checkStringValue(user["last-name"], currentText))
         return Object.assign(user, { "selectedKey": "last-name" });
-      else if (activeUser && filteredSlackUsernames.length > 0)
+      else if (activeUser && filteredSlackUsernames.length > 0){
+        console.log("XXX   activeUser filteredSlackUsernames", filteredSlackUsernames);
         return Object.assign(user, { "selectedKey": "slack-username",
                                      "slack-username": filteredSlackUsernames[0]["display-name"] });
-      else if (!activeUser && that.checkStringValue(user["slack-display-name"], currentText))
+      }
+      else if (!activeUser && that.checkStringValue(user["slack-display-name"], currentText)){
+        console.log("XXX   !activeUser checkStringValue", that.checkStringValue(user["slack-display-name"], currentText));
         return Object.assign(user, { "selectedKey": "slack-display-name" });
+      }
       else if (that.checkStringValue(user["email"], currentText))
         return Object.assign(user, { "selectedKey": "email" });
       else return user;
