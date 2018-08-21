@@ -248,11 +248,11 @@
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
-         ;; dispatch that you are auto saving
-         (dis/dispatch! [:update [:entry-editing]
-                         #(merge % activity-data {:auto-saving true})])
          (when (and (:has-changes activity-data)
                     (not (:auto-saving activity-data)))
+           ;; dispatch that you are auto saving
+           (dis/dispatch! [:update [:entry-editing]
+                           #(merge % activity-data {:auto-saving true})])
            (entry-save activity-data section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
