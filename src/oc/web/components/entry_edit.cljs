@@ -517,6 +517,10 @@
                          :position "top"
                          :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                          :container-selector "div.entry-edit-modal"})
+          (when (= true (:auto-saving entry-editing))
+            [:div "Saving"])
+          (when (= false (:auto-saving entry-editing))
+            [:div "Saved"])
           [:div.entry-edit-legend-container
             {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))
              :ref "legend-container"}
