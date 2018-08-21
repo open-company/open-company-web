@@ -295,7 +295,7 @@ section.keep-aligned {
 div.core-values-list {
   width: calc(100% - 48px);
   text-align: center;
-  margin: 10px auto 0px;
+  margin: 40px auto 0px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -306,7 +306,6 @@ div.core-values-list {
     display: block;
     justify-content: unset;
     align-items: unset;
-    margin: 24px auto 0px;
   }
 
   div.core-value-container {
