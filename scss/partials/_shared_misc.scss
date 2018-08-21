@@ -169,7 +169,6 @@ div.cards-container {
 }
 
 section.testimonials-section {
-  background-color: #FFFDF9;
   text-align: center;
   padding: 72px 0px !important;
   position: relative;
@@ -246,7 +245,6 @@ section.testimonials-section {
 section.keep-aligned {
   padding: 120px 0px;
   text-align: center;
-  background-color: #FFFDF9;
 
   @include mobile() {
     width: 100%;
@@ -298,47 +296,118 @@ div.core-values-list {
   width: calc(100% - 48px);
   text-align: center;
   margin: 10px auto 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   @include mobile() {
     width: 251px;
+    height: auto;
+    display: block;
+    justify-content: unset;
+    align-items: unset;
     margin: 24px auto 0px;
   }
 
-  div.core-value {
-    padding-left: 48px;
-    position: relative;
-    margin: 0px 16px;
-    text-align: left;
-    @include avenir_M();
-    font-size: 18px;
-    color: $deep_navy;
-    display: inline-block;
-    padding-top: 6px;
-    margin-top: 16px;
+  div.core-value-container {
+    float: left;
+    margin-left: 20px;
 
-    @include mobile() {
-      margin: 16px 0px 0px;
-      width: 100%;
-      font-size: 16px;
-      padding-left: 32px;
+    div.core-value-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      @include mobile(){
+        margin-top: 24px;
+      }
+
+      div.core-value-icon {
+        width: 40px;
+        height: 40px;
+        background-size: 40px 40px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-right: 12px;
+      }
+
+      div.core-value {
+        @include avenir_B();
+        font-size: 14px;
+        line-height: 19px;
+        text-transform: uppercase;
+      }
     }
 
-    &:before {
-      content: "";
-      position: absolute;
-      left: 0px;
-      top: 0px;
-      background-image: cdnUrl("/img/ML/purple_checkmark.svg");
-      background-position: center;
-      background-size: 32px;
-      width: 32px;
-      height: 32px;
+    div.core-value-white-box {
+      background-color: white;
+      width: 246px;
+      padding: 20px;
+      box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.1);
+      text-align: left;
+      margin-top: 16px;
 
-      @include mobile() {
-        background-size: 24px;
-        width: 24px;
-        height: 24px;
-        top: 2px;
+      @include tablet() {
+        display: none;
+      }
+
+      div.core-value-box-header {
+        @include avenir_M();
+        font-size: 12px;
+        color: $ui_grey;
+
+        span.dot {
+          font-size: 8px;
+          color: $light_ui_grey;
+        }
+      }
+
+      div.core-value-box-title {
+        @include avenir_H();
+        color: $deep_navy;
+        font-size: 16px;
+        line-height: 18px;
+        margin-top: 16px;
+      }
+    }
+
+    &.key-announcement {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/key_announcements_icon.svg");
+      }
+
+      div.core-value {
+        color: #AF66F9;
+      }
+    }
+
+    &.team-updates {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/team_updates_icon.svg");
+      }
+
+      div.core-value {
+        color: #5789FA;
+      }
+    }
+
+    &.strategic-plans {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/strategic_plans_icon.svg");
+      }
+
+      div.core-value {
+        color: #32C97B;
+      }
+    }
+
+    &.stories {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/stories_icon.svg");
+      }
+
+      div.core-value {
+        color: #FB5E48;
       }
     }
   }
@@ -369,12 +438,30 @@ button.get-started-button {
 }
 
 section.home-keep-aligned {
-  background-color: #F8F7F3;
   padding: 120px 24px 160px;
   text-align: center;
 
   @include mobile() {
     padding: 80px 24px !important;
+  }
+
+  div.scroll-down {
+    width: 48px;
+    height: 48px;
+    @include image-2x("/img/ML/homepage_scroll_down");
+    background-size: 22px 22px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0 auto;
+    position: relative;
+    top: -142px;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    background-color: white;
+
+    @include mobile() {
+      top: -102px;
+    }
   }
 
   h2.keep-aligned-title {
@@ -396,77 +483,180 @@ section.home-keep-aligned {
     margin: 0px auto;
 
     div.keep-aligned-section-row {
-      width: 1080px;
+      width: 1176px;
       height: 354px;
       margin: 120px auto 0px;
 
-      &:first-child {
+      &.first-row {
+        width: 1127px;
+        height: 386px;
         margin: 80px auto 0px;
 
+        div.keep-aligned-section-copy {
+          width: 426px;
+          height: 200px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
         @include mobile() {
-          margin: 40px auto 0px
+          margin: 40px auto 0px;
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      &.second-row {
+        width: 1112px;
+        height: 400px;
+
+        div.keep-aligned-section-copy {
+          width: 400px;
+          height: 200px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
+        @include mobile() {
+          margin: 40px auto 0px;
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      &.third-row {
+        width: 1178px;
+        height: 330px;
+
+        div.keep-aligned-section-copy {
+          width: 467px;
+          height: 160px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
+        @include mobile() {
+          margin: 40px auto 0px;
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      &.fourth-row {
+        width: 1120px;
+        height: 406px;
+
+        div.keep-aligned-section-copy {
+          width: 400px;
+          height: 200px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
+        @include mobile() {
+          margin: 40px auto 0px;
+          width: 100%;
+          height: auto;
         }
       }
 
       @include mobile() {
         width: 100%;
         height: auto;
-        margin: 80px auto 0px
+        margin: 80px auto 0px;
       }
 
       div.keep-aligned-section-screenshot {
-        box-shadow: 0px 4px 20px 0px rgba(0,0,0,0.2);
-        width: 600px;
-        height: 330px;
-        background-size: 600px 330px;
         background-position: center;
         background-repeat: no-repeat;
         border-radius: 6px;
 
         &.screenshot-1 {
-          @include image-2x("/img/ML/keep_aligned_screenshot_1");
+          @include image-2x("/img/ML/homepage_screenshots_update_team");
+          background-size: 665px 386px;
+          width: 665px;
+          height: 386px;
         }
 
         &.screenshot-2 {
-          @include image-2x("/img/ML/keep_aligned_screenshot_2");
+          @include image-2x("/img/ML/homepage_screenshots_keep_informed");
+          background-size: 672px 439px;
+          width: 672px;
+          height: 439px;
         }
 
         &.screenshot-3 {
-          @include image-2x("/img/ML/keep_aligned_screenshot_3");
+          @include image-2x("/img/ML/homepage_screenshots_better_discussions");
+          background-size: 695px 370px;
+          width: 695px;
+          height: 370px;
         }
 
         &.screenshot-4 {
-          @include image-2x("/img/ML/keep_aligned_screenshot_4");
+          @include image-2x("/img/ML/homepage_screenshots_being_heard");
+          background-size: 710px 444px;
+          width: 710px;
+          height: 444px;
         }
 
         @include mobile() {
-          box-shadow: 0px 2px 20px 0px rgba(0,0,0,0.1);
           width: 247px;
           height: 440px;
           background-size: 247px 440px;
-          margin: 0px auto;
+          margin: 0;
+
+          &:not(:first-child) {
+            margin-top: 40px;
+          }
 
           &.screenshot-1 {
-            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_1");
+            @include image-2x("/img/ML/homepage_screenshots_update_team_mobile");
+            background-size: 327px 180px;
+            width: 327px;
+            height: 180px;
+            margin: 0 auto;
           }
 
           &.screenshot-2 {
-            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_2");
+            @include image-2x("/img/ML/homepage_screenshots_keep_informed_mobile");
+            background-size: 327px 180px;
+            width: 327px;
+            height: 180px;
+            margin: 0 auto;
           }
 
           &.screenshot-3 {
-            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_3");
+            @include image-2x("/img/ML/homepage_screenshots_better_discussions_mobile");
+            background-size: 367px 220px;
+            width: 367px;
+            height: 220px;
+            margin: 0 auto;
           }
 
           &.screenshot-4 {
-            @include image-2x("/img/ML/keep_aligned_screenshot_mobile_4");
+            @include image-2x("/img/ML/homepage_screenshots_being_heard_mobile");
+            background-size: 367px 232px;
+            width: 367px;
+            height: 232px;
+            margin: 0 auto;
           }
         }
       }
 
       div.keep-aligned-section-copy {
         margin-top: 82px;
-        width: 400px;
         text-align: left;
 
         @include mobile() {
@@ -479,16 +669,20 @@ section.home-keep-aligned {
           font-size: 24px;
           color: $deep_navy;
           line-height: 42px;
+
+          @include mobile() {
+            font-size: 22px;
+          }
         }
 
         div.keep-aligned-section-list-item {
-          padding-left: 24px;
           position: relative;
           @include avenir_R();
           font-size: 18px;
           line-height: 22px;
           color: $deep_navy;
           margin-top: 12px;
+          padding-left: 36px;
 
           @include mobile() {
             padding-top: 12px;
@@ -499,17 +693,32 @@ section.home-keep-aligned {
             position: absolute;
             top: 0px;
             left: 0px;
-            background-image: cdnUrl("/img/ML/keep_aligned_copy_checkmark.svg");
-            background-size: 16px 16px;
+            background-size: 24px 24px;
             background-position: center;
             background-repeat: no-repeat;
             content: "";
-            width: 16px;
-            height: 16px;
+            width: 24px;
+            height: 24px;
 
             @include mobile() {
               top: 14px;
             }
+          }
+
+          &.purple-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_purple.svg");
+          }
+
+          &.green-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_green.svg");
+          }
+
+          &.red-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_red.svg");
+          }
+
+          &.blue-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_blue.svg");
           }
         }
       }
@@ -540,7 +749,6 @@ section.home-keep-aligned {
 }
 
 section.access-anywhere-section {
-  background-color: #FFFDF9;
   height: 460px;
 
   @include mobile() {
@@ -622,10 +830,6 @@ section.access-anywhere-section {
           text-align: center;
           max-width: 294px;
           margin: 6px auto 0px;
-
-          &.second-line {
-            margin-top: 0px;
-          }
         }
       }
     }
@@ -636,7 +840,6 @@ section.slack-comparison {
   padding: 120px 32px;
   margin: 0px auto;
   text-align: center;
-  background-color: #F8F7F3;
 
   @include mobile() {
     text-align: left;
