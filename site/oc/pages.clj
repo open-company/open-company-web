@@ -106,7 +106,7 @@
       [:div.core-value-header.group
         [:div.core-value-icon]
         [:div.core-value
-          "Key announcements"]]
+          "Announcements"]]
       [:div.core-value-white-box
         [:div.core-value-box-header
           "Product "
@@ -130,7 +130,7 @@
       [:div.core-value-header.group
         [:div.core-value-icon]
         [:div.core-value
-          "Strategic plans"]]
+          "Discussions"]]
       [:div.core-value-white-box
         [:div.core-value-box-header
           "Strategy "
