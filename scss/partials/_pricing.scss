@@ -244,7 +244,9 @@ div.pricing-wrap {
                 }
 
                 span.info {
-                  display: inline-block;
+                  // display: inline-block;
+                  // Hide for now
+                  display: none;
                   width: 16px;
                   height: 16px;
                   margin-left: 8px;
