@@ -42,11 +42,16 @@
   (when s
     (when-let [body-el (sel1 [:div.rich-body-editor])]
       (let [modal-data @(drv/get-ref s :fullscreen-post-data)
-            section-editing @(drv/get-ref s :section-editing)
+            section-editing (:section-editing modal-data)
+            save-on-exit (:entry-save-on-exit modal-data)
             activity-data (:modal-editing-data modal-data)
             cleaned-body (when body-el
                           (utils/clean-body-html (.-innerHTML body-el)))]
-        (activity-actions/entry-save-on-exit :modal-editing-data activity-data cleaned-body section-editing)))))
+        (when save-on-exit
+          (activity-actions/entry-save-on-exit :modal-editing-data
+                                               activity-data
+                                               cleaned-body
+                                               section-editing))))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."

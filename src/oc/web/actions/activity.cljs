@@ -239,6 +239,7 @@
       (dis/dispatch! [:modal-editing-activate]))
     (dis/dispatch! [:modal-editing-deactivate])))
 
+
 (declare entry-save)
 
 (defn entry-save-on-exit
@@ -248,7 +249,8 @@
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
-         (when (and (:has-changes activity-data)
+         (when (and (= "draft" (:status activity-data))
+                    (:has-changes activity-data)
                     (not (:auto-saving activity-data)))
            ;; dispatch that you are auto saving
            (dis/dispatch! [:update [:entry-editing]
