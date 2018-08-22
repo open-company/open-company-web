@@ -210,9 +210,9 @@ div.slack-wrap {
         padding: 0px 16px;
 
         @include mobile() {
-          @include avenir_H();
+          @include avenir_R();
           font-size: 24px;
-          line-height: 30px;
+          line-height: 28px;
           text-align: left;
           padding: 0px;
           margin: 0px;
@@ -229,10 +229,11 @@ div.slack-wrap {
 
         @include mobile() {
           @include avenir_H();
-          font-size: 24px;
-          line-height: 30px;
+          font-size: 34px;
+          line-height: 40px;
           text-align: left;
           padding: 0px;
+          margin: 8px 0 0;
         }
       }
 

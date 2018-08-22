@@ -117,7 +117,7 @@ div.pricing-wrap {
         margin: 80px auto 0;
 
         @include mobile() {
-          width: auto;
+          width: 100%;
           margin: 40px auto 0;
         }
 

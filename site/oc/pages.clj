@@ -130,7 +130,7 @@
       [:div.core-value-header.group
         [:div.core-value-icon]
         [:div.core-value
-          "Discussions"]]
+          "Decisions"]]
       [:div.core-value-white-box
         [:div.core-value-box-header
           "Strategy "
@@ -399,7 +399,7 @@
                    :title "Number of new posts"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
               [:td.pricing-value
-                "100"]
+                "50"]
               [:td.pricing-value
                 "Unlimited"]
               [:td.pricing-value
@@ -415,7 +415,7 @@
                    :title "History retained"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
               [:td.pricing-value
-                "12 months"]
+                "6 months"]
               [:td.pricing-value
                 "Unlimited"]
               [:td.pricing-value
@@ -425,7 +425,7 @@
               [:td.pricing-description
                 "File upload"]
               [:td.pricing-value
-                "5 MB"]
+                "25 MB"]
               [:td.pricing-value
                 "Unlimited"]
               [:td.pricing-value
@@ -435,9 +435,9 @@
               [:td.pricing-description
                 "File storage"]
               [:td.pricing-value
-                "25 MB"]
+                "500 MB"]
               [:td.pricing-value
-                "Unlimited"]
+                "5 TB"]
               [:td.pricing-value
                 "Unlimited"]]
 
@@ -496,8 +496,7 @@
                    :data-container "body"
                    :title "Advanced permissions"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-              [:td.pricing-value
-                [:div.price-checkmark]]
+              [:td.pricing-value]
               [:td.pricing-value
                 [:div.price-checkmark]]
               [:td.pricing-value
@@ -577,28 +576,28 @@
                 "Up to 10 users"]]
             [:tr
               [:td.pricing-description
-                "100 new post cap"
+                "50 new post cap"
                 [:span.info
                   {:data-toggle "tooltip"
                    :data-placement "top"
                    :data-container "body"
-                   :title "100 new post cap"
+                   :title "50 new post cap"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
             [:tr
               [:td.pricing-description
-                "12 months of history retained"
+                "6 months of history retained"
                 [:span.info
                   {:data-toggle "tooltip"
                    :data-placement "top"
                    :data-container "body"
-                   :title "12 months of history retained"
+                   :title "6 months of history retained"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
             [:tr
               [:td.pricing-description
-                "5mb upload limit"]]
+                "25 MB upload limit"]]
             [:tr
               [:td.pricing-description
-                "25mb file storage"]]
+                "500 MB file storage"]]
             [:tr
               [:td.pricing-description
                 "G suite single sign-on"]]
@@ -616,10 +615,7 @@
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
             [:tr
               [:td.pricing-description
-                "Dropbox, Google Drive, and other integrations"]]
-            [:tr
-              [:td.pricing-description
-                "Advanced permissions"]]]]
+                "Dropbox, Google Drive, and other integrations"]]]]
 
         [:table.pricing-table.mobile-only
           [:thead
@@ -661,7 +657,7 @@
                 "No file size upload limit"]]
             [:tr
               [:td.pricing-description
-                "Unlimited file storage"]]
+                "5 TB file storage"]]
             [:tr
               [:td.pricing-description
                 "G suite single sign-on"]]
@@ -740,70 +736,71 @@
               [:td.pricing-description
                 "On premise"]]]]
 
-        [:div.pricing-faq
-          [:h2.faq-header
-            "Frequently asked questions"]
+        ; [:div.pricing-faq
+        ;   [:h2.faq-header
+        ;     "Frequently asked questions"]
 
-          [:div.faq-row
-            [:div.faq-question
-              "What are my payment options (credit card and/or invoicing)?"]
-            [:div.faq-response
-              (str
-               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-               "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-               " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-               "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-               "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-               "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          [:div.faq-row
-            [:div.faq-question
-              "My team has credits. How do we use them?"]
-            [:div.faq-response
-              (str
-               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-               "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-               " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-               "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-               "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-               "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          [:div.faq-row
-            [:div.faq-question
-              "We need to add new users to our team. How will that be billed?"]
-            [:div.faq-response
-              (str
-               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-               "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-               " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-               "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-               "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-               "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          [:div.faq-row
-            [:div.faq-question
-              "My team wasnts to cancel its subscription. How do we do that? Can we get a refund?"]
-            [:div.faq-response
-              (str
-               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-               "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-               " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-               "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-               "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-               "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          [:div.faq-row
-            [:div.faq-question
-              "What are my payment options (credit card and/or invoicing)?"]
-            [:div.faq-response
-              (str
-               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-               "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-               " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-               "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-               "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-               "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          [:div.contact-us-row
-            "If you have more questions, don’t hesitate to "
-            [:a.contact
-              {:href (:contact-mail-to options)}
-              "contact us"]]]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "What are my payment options (credit card and/or invoicing)?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "My team has credits. How do we use them?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "We need to add new users to our team. How will that be billed?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "My team wasnts to cancel its subscription. How do we do that? Can we get a refund?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "What are my payment options (credit card and/or invoicing)?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.contact-us-row
+        ;     "If you have more questions, don’t hesitate to "
+        ;     [:a.contact
+        ;       {:href oc-urls/contact-mail-to}
+        ;       "contact us"]]]
+        ]
 
       ; testimonials-section
 

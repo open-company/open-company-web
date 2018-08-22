@@ -62,7 +62,7 @@
       [:div.core-value-header.group
         [:div.core-value-icon]
         [:div.core-value
-          "Discussions"]]
+          "Decisions"]]
       [:div.core-value-white-box
         [:div.core-value-box-header
           "Strategy "
