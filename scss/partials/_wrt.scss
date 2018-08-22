@@ -11,6 +11,7 @@ div.wrt-container {
     @include avenir_M();
     font-size: 12px;
     color: $ui_grey;
+    cursor: pointer;
   }
 
   div.wrt-popup {
