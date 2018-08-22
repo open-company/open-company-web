@@ -952,7 +952,7 @@
               [:div.user-name
                 "Ryan Le Roux"]
               [:div.user-position
-                "CDO"]
+                "Chief Design Officer"]
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/ryanleroux/"
                  :target "_blank"}]]
