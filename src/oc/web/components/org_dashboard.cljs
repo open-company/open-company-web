@@ -16,6 +16,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
@@ -242,6 +243,7 @@
         (when (and media-input
                    (:media-chart media-input))
           (media-chart-modal))
+        (cmail)
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing

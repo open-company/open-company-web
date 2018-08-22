@@ -1,0 +1,92 @@
+div.cmail-outer {
+  position: fixed;
+  bottom: 0px;
+  right: 24px;
+  min-height: 360px;
+  width: 620px;
+  z-index: 1024;
+  background-color: white;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+
+  &.fullscreen {
+    display: table;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    right: unset;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background-color: rgba($deep_navy, 0.4);
+    min-height: initial;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.1);
+
+    div.cmail-middle {
+      display: table-cell;
+      vertical-align: middle;
+
+      div.cmail-container {
+        margin-left: auto;
+        margin-right: auto;
+        width: 720px;
+        height: auto;
+        min-height: 360px;
+        top: 50%;
+        background-color: white;
+        border-radius: 8px;
+
+        div.cmail-header {
+          background-color: $oc_gray_8;
+          color: $ui_grey;
+          border-bottom: 1px solid #ECECEC;
+
+          button.fullscreen-bt {
+            background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse.svg");
+          }
+        }
+      }
+    }
+  }
+
+  div.cmail-middle {
+    width: 100%;
+    height: 100%;
+
+    div.cmail-container {
+      width: 100%;
+      height: 100%;
+
+      div.cmail-header {
+        background-color: $deep_navy;
+        height: 56px;
+        color: white;
+        @include avenir_M();
+        font-size: 14px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding: 16px 24px;
+
+        @include user-profile(24);
+
+        div.user-avatar-img-container {
+          float: left;
+          margin-right: 16px;
+        }
+
+        button.fullscreen-bt {
+          float: right;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+      }
+    }
+  }
+}

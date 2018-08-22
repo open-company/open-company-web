@@ -658,3 +658,8 @@
                                                   ;; turn off video error since upload finished
                                                   :video-error false
                                                   :has-changes true})])))
+
+;; Cmail
+
+(defn cmail-toggle-fullscreen []
+  (dis/dispatch! [:update [:cmail-fullscreen] not]))
