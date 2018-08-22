@@ -249,21 +249,28 @@
 
 (defn- setup-team-data
   ""
-  [s]
+  [s & [setup-email-domain]]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)]
-    (when (and (zero? (count (:name org-editing)))
-               (zero? (count (:logo-url org-editing)))
-               (seq teams-data))
+        teams-data @(drv/get-ref s :teams-data)
+        google-domain (jwt/get-key :google-domain)
+        with-email-domain (if (and setup-email-domain
+                                   google-domain
+                                   (clojure.string/blank? (:email-domain org-editing)))
+                            {:email-domain google-domain}
+                            {:email-domain (or (:email-domain org-editing) "")})]
+    (if (and (zero? (count (:name org-editing)))
+             (zero? (count (:logo-url org-editing)))
+             (seq teams-data))
       (let [first-team (select-keys
                         (first teams-data)
-                        [:name :logo-url :logo-width :logo-height])]
+                        [:name :logo-url :logo-width :logo-height])
+            fixed-first-team (merge first-team with-email-domain)]
         (dis/dispatch!
          [:update
           [:org-editing]
-          first-team])
+          #(merge % fixed-first-team)])
         (when (and (not (zero? (count (:logo-url first-team))))
                    (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
@@ -277,7 +284,11 @@
                    :logo-height (.-height img)})])
                (gdom/removeNode img)))
             (gdom/append (.-body js/document) img)
-            (set! (.-src img) (:logo-url first-team))))))))
+            (set! (.-src img) (:logo-url first-team)))))
+      (dis/dispatch!
+       [:update
+        [:org-editing]
+        #(merge % with-email-domain)]))))
 
 (rum/defcs lander-team < rum/reactive
                          (drv/drv :teams-data)
@@ -285,21 +296,10 @@
                          (rum/local false ::saving)
                          {:will-mount (fn [s]
                            (dis/dispatch! [:input [:org-editing :name] ""])
+                           (dis/dispatch! [:input [:org-editing :email-domain] ""])
                            s)
                           :did-mount (fn [s]
-                           (setup-team-data s)
-                           (when (and (jwt/get-key :google-domain)
-                                      (clojure.string/blank?
-                                       (:email-domain @(drv/get-ref s :org-editing))))
-                             (dis/dispatch!
-                              [:input [:org-editing :email-domain]
-                               (jwt/get-key :google-domain)])
-
-                             (when-let [field (rum/ref-node
-                                                s
-                                                "um-domain-invite")]
-                               (set! (.-value field)
-                                     (jwt/get-key :google-domain))))
+                           (setup-team-data s true)
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
@@ -395,26 +395,12 @@
                  :type "text"
                  :auto-capitalize "none"
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :value (:email-domain org-editing)
                  :on-change #(let [domain (.. % -target -value)]
-                               (if (utils/valid-domain? domain)
-                                 (do
-                                   (dis/dispatch!
-                                    [:input [:org-editing :email-domain]
-                                     domain])
-                                   (dis/dispatch!
-                                    [:input [:org-editing :domain-error]
-                                     false]))
-                                 (do
-                                   (if (zero? (count domain))
-                                     (dis/dispatch!
-                                      [:input [:org-editing :domain-error]
-                                       false])
-                                     (dis/dispatch!
-                                      [:input [:org-editing :domain-error]
-                                       true]))
-                                   (dis/dispatch!
-                                    [:input [:org-editing :email-domain] nil]))))
-                 :placeholder "  Domain, e.g. acme.com"}]]
+                               (dis/dispatch! [:input [:org-editing :email-domain] domain])
+                               (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
+                                                                                        (not (utils/valid-domain? domain)))]))
+                 :placeholder "Domain, e.g. acme.com"}]]
             [:div.field-label.info "Anyone with email addresses at this domain can automatically join your team."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
