@@ -105,6 +105,16 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
+  $(".faq-row").each(function(){
+    $(this).on("click", function(){
+      var wasOpen = $(this).hasClass("expanded");
+      $(".faq-row").each(function(){$(this).removeClass("expanded");});
+      if (!wasOpen) {
+        $(this).addClass("expanded");
+      }
+    });
+  });
+
   if (jwt) {
     $("#site-header-login-item").hide();
     // Move the red guy up

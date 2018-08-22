@@ -175,15 +175,15 @@ section.testimonials-section {
 
   @include mobile() {
     width: 100%;
-    padding: 80px 24px !important;
+    padding: 80px 0px !important;
     padding-top: 80px !important;
     padding-bottom: 80px !important;
     text-align: left;
   }
 
   @include tablet() {
-    width: 100vw;
-    padding: 72px 32px;
+    width: 100%;
+    padding: 80px 0px;
   }
 
   div.testimonials-section-title {
