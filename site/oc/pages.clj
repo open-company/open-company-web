@@ -324,7 +324,7 @@
 
       (slack-comparison-section)
 
-      testimonials-section
+      ; testimonials-section
 
       keep-aligned-bottom
       ]])
@@ -805,7 +805,7 @@
               {:href (:contact-mail-to options)}
               "contact us"]]]]
 
-      testimonials-section
+      ; testimonials-section
 
       keep-aligned-bottom
     ]])
@@ -866,7 +866,7 @@
 
       access-anywhere-section
 
-      testimonials-section
+      ; testimonials-section
 
       keep-aligned-bottom
       ]])

@@ -76,7 +76,7 @@
 
         (shared-misc/slack-comparison-section)
 
-        shared-misc/carrot-testimonials
+        ; shared-misc/carrot-testimonials
 
         shared-misc/keep-aligned]]
 

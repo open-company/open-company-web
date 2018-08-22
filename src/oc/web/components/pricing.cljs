@@ -497,7 +497,7 @@
                 {:href oc-urls/contact-mail-to}
                 "contact us"]]]]
 
-        shared-misc/carrot-testimonials
+        ; shared-misc/carrot-testimonials
 
         (when-not (jwt/jwt)
           shared-misc/keep-aligned)
