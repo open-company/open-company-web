@@ -44,7 +44,7 @@
           [:div.balloon.small-purple]
 
           [:h1.headline
-            "Where leadership finds it's voice"]
+            "Where leadership finds its voice"]
           [:div.subheadline
             (str
              "Rise above the noise of chat and email to "
