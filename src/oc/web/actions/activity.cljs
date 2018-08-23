@@ -662,11 +662,12 @@
 ;; Cmail
 
 (defn cmail-show [initial-entry-data]
-  (load-cached-item initial-entry-data :cmail-data)
-  (dis/dispatch! [:input [:cmail-state] {:collapse false
-                                         :fullscreen false}]))
+  (load-cached-item initial-entry-data :cmail-data
+   #(dis/dispatch! [:input [:cmail-state] {:collapse false
+                                           :fullscreen false}])))
 
 (defn cmail-hide []
+  (dis/dispatch! [:input [:cmail-data] nil])
   (dis/dispatch! [:input [:cmail-state] nil]))
 
 (defn cmail-toggle-fullscreen []
