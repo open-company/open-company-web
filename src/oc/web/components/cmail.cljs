@@ -170,10 +170,10 @@
         (if published?
           (do
             (reset! (::saving s) true)
-            (activity-actions/entry-save updated-cmail-data section-editing))
+            (activity-actions/entry-save updated-cmail-data section-editing :cmail-data))
           (do
             (reset! (::publishing s) true)
-            (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing))))
+            (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
       (cond
         ;; Missing headline error
         (zero? (count fixed-headline))
