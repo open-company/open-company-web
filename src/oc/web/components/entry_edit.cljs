@@ -68,7 +68,7 @@
   (let [entry-editing @(drv/get-ref s :entry-editing)
         clean-fn (fn [dismiss-modal?]
                     (remove-autosave s)
-                    (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing)
+                    (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing entry-editing)
                     (when dismiss-modal?
                       (alert-modal/hide-alert))
                     (real-close s))]
