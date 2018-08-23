@@ -117,11 +117,11 @@
       [:div.keep-aligned-section
         [:div.keep-aligned-section-row.first-row.group
           [:img.keep-aligned-section-screenshot.screenshot-1.big-web-only
-            {:src (cdn "/img/ML/homepage_screenshots_update_team.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_update_team.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_update_team@2x.png") " 2x")}]
           [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
-            {:src (cdn "/img/ML/homepage_screenshots_update_team_mobile.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team_mobile@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_update_team_mobile.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_update_team_mobile@2x.png") " 2x")}]
           [:div.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
               "Update your team in seconds"]
@@ -136,11 +136,11 @@
 
         [:div.keep-aligned-section-row.second-row.group
           [:img.keep-aligned-section-screenshot.screenshot-2.big-web-only
-            {:src (cdn "/img/ML/homepage_screenshots_keep_informed.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_keep_informed.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_keep_informed@2x.png") " 2x")}]
           [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
-            {:src (cdn "/img/ML/homepage_screenshots_keep_informed_mobile.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed_mobile@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_keep_informed_mobile.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_keep_informed_mobile@2x.png") " 2x")}]
           [:div.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
               "Keep everyone informed"]
@@ -155,11 +155,11 @@
 
         [:div.keep-aligned-section-row.third-row.group
           [:img.keep-aligned-section-screenshot.screenshot-3.big-web-only
-            {:src (cdn "/img/ML/homepage_screenshots_better_discussions.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_better_discussions.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_better_discussions@2x.png") " 2x")}]
           [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
-            {:src (cdn "/img/ML/homepage_screenshots_better_discussions_mobile.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions_mobile@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_better_discussions_mobile.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_better_discussions_mobile@2x.png") " 2x")}]
           [:div.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
               "Spark better follow-on discussions"]
@@ -172,11 +172,11 @@
 
         [:div.keep-aligned-section-row.fourth-row.group
           [:img.keep-aligned-section-screenshot.screenshot-4.big-web-only
-            {:src (cdn "/img/ML/homepage_screenshots_being_heard.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_being_heard.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_being_heard@2x.png") " 2x")}]
           [:img.keep-aligned-section-screenshot.screenshot-4.mobile-only
-            {:src (cdn "/img/ML/homepage_screenshots_being_heard_mobile.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard_mobile@2x.png") " 2x")}]
+            {:src (utils/cdn "/img/ML/homepage_screenshots_being_heard_mobile.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_being_heard_mobile@2x.png") " 2x")}]
           [:div.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
               "Make sure you're being heard"]

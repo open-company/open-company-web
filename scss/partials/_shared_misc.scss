@@ -590,21 +590,41 @@ section.home-keep-aligned {
         &.screenshot-1 {
           width: 665px;
           height: 386px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
         }
 
         &.screenshot-2 {
           width: 672px;
           height: 439px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
         }
 
         &.screenshot-3 {
           width: 695px;
           height: 370px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
         }
 
         &.screenshot-4 {
           width: 710px;
           height: 444px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
         }
       }
 
