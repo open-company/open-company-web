@@ -32,8 +32,8 @@
       [:div.testimonial-card
         [:div.testimonial-quote
           (str
-           "Carrot helps me communicate progress the entire team should know "
-           "about - without burying it somewhere it won't get noticed.")]]]])
+           "Carrot helps me share things the entire team needs to know "
+           "about - instead of burying it somewhere it won't get noticed.")]]]])
 
 (def no-credit-card
   [:div.no-credit-card
