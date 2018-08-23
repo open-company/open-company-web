@@ -90,7 +90,9 @@
 
 (defn compose [s]
   (utils/remove-tooltips)
-  (activity-actions/entry-edit (get-board-for-edit s))
+  (if (responsive/is-tablet-or-mobile?)
+    (activity-actions/entry-edit (get-board-for-edit s))
+    (activity-actions/cmail-show (get-board-for-edit s)))
   ;; If the add post tooltip is visible
   (when @(drv/get-ref s :show-add-post-tooltip)
     ;; Dismiss it and bring up the invite people tooltip

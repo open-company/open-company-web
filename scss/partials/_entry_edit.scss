@@ -431,15 +431,6 @@ div.entry-edit-modal-container {
           outline: none;
         }
       }
-              
-
-      div.entry-edit-controls {
-        margin-bottom: 16px;
-
-        @include mobile() {
-          display: none;
-        }
-      }
     }
 
     div.entry-edit-modal-footer {

@@ -336,9 +336,11 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open})]
+                               :mobile-menu-open mobile-menu-open
+                               :show-cmail (boolean (:cmail-state base))})]
    ;; Cmail
-   :cmail-fullscreen      [[:base] (fn [base] (:cmail-fullscreen base))]})
+   :cmail-state           [[:base] (fn [base] (:cmail-state base))]
+   :cmail-data            [[:base] (fn [base] (:cmail-data base))]})
 
 
 ;; Action Loop =================================================================
