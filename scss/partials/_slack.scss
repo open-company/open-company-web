@@ -83,6 +83,21 @@ div.slack-wrap {
       }
     }
 
+    div.scroll-down {
+      display: none;
+    }
+
+    section {
+
+      &:nth-child(odd) {
+        background-color: #FFFDF9;
+      }
+
+      &:nth-child(even) {
+        background-color: #FAF8F4;
+      }
+    }
+
     @include mobile() {
       padding: 0 0px;
     }
@@ -91,14 +106,6 @@ div.slack-wrap {
       @include mobile(){
         padding: 0 24px;
       }
-    }
-
-    section.home-keep-aligned {
-      background-color: #FFFDF9;
-    }
-
-    section.access-anywhere-section {
-      background-color: #F8F7F3;
     }
 
     section.carrot-plus-slack {
@@ -203,9 +210,9 @@ div.slack-wrap {
         padding: 0px 16px;
 
         @include mobile() {
-          @include avenir_H();
+          @include avenir_R();
           font-size: 24px;
-          line-height: 30px;
+          line-height: 28px;
           text-align: left;
           padding: 0px;
           margin: 0px;
@@ -222,10 +229,11 @@ div.slack-wrap {
 
         @include mobile() {
           @include avenir_H();
-          font-size: 24px;
-          line-height: 30px;
+          font-size: 34px;
+          line-height: 40px;
           text-align: left;
           padding: 0px;
+          margin: 8px 0 0;
         }
       }
 
@@ -292,7 +300,6 @@ div.slack-wrap {
     section.keep-aligned {
       text-align: center;
       margin: 0px auto;
-      // background-color: #FFFDF9;
 
       div.keep-aligned-title {
         @include avenir_H();

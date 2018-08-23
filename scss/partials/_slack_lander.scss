@@ -25,7 +25,7 @@ div.slack-lander-wrap {
 
       @include tablet(){
         overflow: visible;
-        padding: 152px 24px;
+        padding: 148px 24px 80px;
       }
 
       div.balloon {
@@ -105,10 +105,10 @@ div.slack-lander-wrap {
 
         @include mobile() {
           @include avenir_H();
-          font-size: 24px;
-          line-height: 30px;
-          text-align: left;
+          font-size: 34px;
+          line-height: 40px;
           padding: 0px;
+          max-width: 270px;
         }
       }
 
@@ -118,17 +118,16 @@ div.slack-lander-wrap {
         font-size: 24px;
         line-height: 30px;
         color: $ui_grey;
-        max-width: 890px;
+        max-width: 690px;
         margin: 8px auto 0px;
         text-align: center;
 
         @include tablet(){
           width: 100%;
-          margin: 16px auto 0;
+          margin: 24px auto 0;
           padding: 0px;
-          font-size: 17px;
+          font-size: 18px;
           line-height: 23px;
-          text-align: left;
         }
       }
     }
@@ -156,11 +155,29 @@ div.slack-lander-wrap {
       text-align: center;
       margin: 0px auto;
       background-color: #F8F7F3;
+      padding: 120px 0;
+
+      @include mobile() {
+        padding: 80px 24px;
+      }
 
       div.keep-aligned-title {
         @include avenir_H();
         font-size: 28px;
         color: $deep_navy;
+      }
+
+      div.no-credit-card {
+        @include avenir_R();
+        color: $ui_grey;
+        font-size: 14px;
+        margin-top: 24px;
+        text-align: center;
+
+        @include mobile() {
+          font-size: 12px;
+          margin-top: 0px;
+        }
       }
     }
   }
