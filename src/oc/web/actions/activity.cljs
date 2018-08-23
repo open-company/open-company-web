@@ -18,6 +18,8 @@
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
+(def initial-revision (atom nil))
+
 (defn save-last-used-section [section-slug]
   (let [org-slug (router/current-org-slug)
         last-board-cookie (router/last-used-board-slug-cookie org-slug)]
@@ -142,6 +144,7 @@
 
 (defn load-cached-item
   [entry-data edit-key & [completed-cb]]
+  (reset! initial-revision (:revision-id entry-data))
   (let [cache-key (get-entry-cache-key (:uuid entry-data))]
     (uc/get-item cache-key
      (fn [item err]
@@ -249,7 +252,7 @@
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
-         (when (and (= "draft" (:status activity-data))
+         (when (and (not= "published" (:status activity-data))
                     (:has-changes activity-data)
                     (not (:auto-saving activity-data)))
            ;; dispatch that you are auto saving
@@ -337,8 +340,14 @@
     (fn [{:keys [status success body]}]
       (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))
 
-(defn entry-clear-local-cache [item-uuid edit-key]
+(declare entry-revert)
+
+(defn entry-clear-local-cache [item-uuid edit-key item]
   (remove-cached-item item-uuid)
+  ;; revert draft to old version
+  (timbre/debug "Reverting to " @initial-revision)
+  (when (not= "published" (:status item))
+    (entry-revert @initial-revision item))
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
 (defn entry-save
@@ -474,6 +483,19 @@
 (defn activity-share [activity-data share-data & [share-cb]]
   (api/share-activity activity-data share-data (or share-cb activity-share-cb))
   (dis/dispatch! [:activity-share share-data]))
+
+(defn entry-revert [revision-id entry-editing]
+  (timbre/debug (:links entry-editing))
+  (let [entry-exists? (seq (:links entry-editing))
+        org-slug (router/current-org-slug)
+        board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
+        revert-entry-link (when entry-exists?
+                            ;; If the entry already exists use the publish link in it
+                            (utils/link-for (:links entry-editing) "revert"))]
+    (if entry-exists?
+      (api/revert-entry entry-editing revert-entry-link
+                        (fn [] (dis/dispatch! [:entry-revert entry-editing])))
+      (dis/dispatch! [:entry-revert false]))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
   (when (= status 404)

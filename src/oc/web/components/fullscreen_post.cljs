@@ -218,8 +218,10 @@
                      (when dismiss-alert?
                        (alert-modal/hide-alert))
                      (stop-editing state)
-                     (activity-actions/entry-clear-local-cache (:uuid (:modal-editing-data modal-data))
-                      :modal-editing-data)
+                     (activity-actions/entry-clear-local-cache
+                        (:uuid (:modal-editing-data modal-data))
+                        :modal-editing-data
+                        (:modal-editing-data modal-data))
                      (when dismiss-modal?
                        (close-clicked state)))]
   (if @(::uploading-media state)
@@ -349,8 +351,7 @@
                                          (reset! (::initial-headline s) initial-headline)
                                          (reset! (::initial-body s) initial-body)
                                          (stop-editing s)
-                                         (activity-actions/entry-clear-local-cache (:uuid activity-data)
-                                          :modal-editing-data)
+                                         (activity-actions/entry-clear-local-cache (:uuid activity-data) :modal-editing-data activity-data)
                                          (cond
                                            ;; If the board change redirect to the board since the url we have is
                                            ;; not correct anymore

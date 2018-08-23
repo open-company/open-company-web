@@ -194,6 +194,10 @@
       (au/fix-entry shared-data (:board-slug shared-data) (dispatcher/change-data db))
       {:error true})))
 
+(defmethod dispatcher/action :entry-revert [db [_ entry]]
+  ;; do nothing for now
+  db)
+
 (defn add-remove-item-from-all-posts [db org-slug activity-data]
   (let [;; Add/remove item from AP
         is-ap? (= (:status activity-data) "published")
