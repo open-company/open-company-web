@@ -299,7 +299,11 @@
           [:div.cmail-header
             {:class (when (:must-see cmail-data) "on")}
             [:div.must-see-toggle
-              {:on-mouse-down #(activity-actions/cmail-toggle-must-see)}
+              {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :title "Toggle must see"}
               [:span.must-see-toggle-circle]]
             "New draft"
             [:button.mlb-reset.close-bt
