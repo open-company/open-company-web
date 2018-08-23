@@ -19,8 +19,8 @@
         [:div.testimonial-quote
           (str
            "As a busy leader it's hard to keep everyone up to date. "
-           "I can use Carrot to record a quick video update and it "
-           "let's me know that everyone's seen it.")]
+           "I use Carrot to record a quick video update and it "
+           "lets me know that everyone's seen it.")]
         [:div.testimonial-footer.group
           [:a
             {:href "https://skylight.digital/"
