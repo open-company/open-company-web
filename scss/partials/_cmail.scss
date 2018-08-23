@@ -61,7 +61,6 @@ div.cmail-outer {
         top: 50%;
         background-color: white;
         border-radius: 8px;
-        // position: relative;
 
         div.cmail-header {
 
@@ -72,10 +71,6 @@ div.cmail-outer {
 
         div.cmail-content {
           max-height: calc(100vh - 228px);
-        }
-
-        div.cmail-footer {
-          // width: 720px;
         }
       }
     }
@@ -381,9 +376,6 @@ div.cmail-outer {
       }
 
       div.cmail-footer {
-        // position: absolute;
-        // left: 0;
-        // bottom: 0;
         height: 52px;
         width: 100%;
         padding: 0px 16px 12px;
@@ -394,7 +386,6 @@ div.cmail-outer {
           color: $carrot_orange;
           width: 80px;
           height: 40px;
-          color: white;
           @include avenir_B();
           font-size: 14px;
           border-radius: 100px;
