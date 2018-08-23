@@ -261,6 +261,7 @@
            (entry-save activity-data section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
+                 (remove-cached-item (:uuid activity-data))
                  (let [entry-saved (assoc (json->cljs body) :auto-saving false)]
                    ;; merge with entry editing and only save once we have a uuid
                    (dis/dispatch! [:update [:entry-editing]
@@ -280,7 +281,7 @@
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
     (save-last-used-section board-slug)
     (refresh-org-data)
-    ; Remove saved cached item
+    ;; Remove saved cached item
     (remove-cached-item initial-uuid)
     (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
@@ -485,7 +486,6 @@
   (dis/dispatch! [:activity-share share-data]))
 
 (defn entry-revert [revision-id entry-editing]
-  (timbre/debug (:links entry-editing))
   (let [entry-exists? (seq (:links entry-editing))
         org-slug (router/current-org-slug)
         board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
