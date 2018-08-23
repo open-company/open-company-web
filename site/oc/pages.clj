@@ -188,7 +188,12 @@
 
     [:div.keep-aligned-section
       [:div.keep-aligned-section-row.first-row.group
-        [:div.keep-aligned-section-screenshot.screenshot-1]
+        [:img.keep-aligned-section-screenshot.screenshot-1.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_update_team.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_update_team_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
             "Update your team in seconds"]
@@ -202,7 +207,12 @@
           "Automate recurring team updates"]]]
 
       [:div.keep-aligned-section-row.second-row.group
-        [:div.keep-aligned-section-screenshot.screenshot-2]
+        [:img.keep-aligned-section-screenshot.screenshot-2.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_keep_informed.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_keep_informed_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
             "Keep everyone informed"]
@@ -216,7 +226,12 @@
             "A morning digest summarizes what’s new"]]]
 
       [:div.keep-aligned-section-row.third-row.group
-        [:div.keep-aligned-section-screenshot.screenshot-3]
+        [:img.keep-aligned-section-screenshot.screenshot-3.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_better_discussions.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_better_discussions_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
             "Spark better follow-on discussions"]
@@ -228,7 +243,12 @@
             "Syncs with Slack so discussions can happen anywhere"]]]
 
       [:div.keep-aligned-section-row.fourth-row.group
-        [:div.keep-aligned-section-screenshot.screenshot-4]
+        [:img.keep-aligned-section-screenshot.screenshot-4.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_being_heard.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-4.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_being_heard_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
             "Make sure you're being heard"]

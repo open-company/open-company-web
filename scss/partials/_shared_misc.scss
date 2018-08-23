@@ -335,6 +335,11 @@ div.core-values-list {
         font-size: 14px;
         line-height: 19px;
         text-transform: uppercase;
+
+        @include mobile(){
+          font-size: 16px;
+          line-height: 18px;
+        }
       }
     }
 
@@ -441,7 +446,7 @@ section.home-keep-aligned {
   text-align: center;
 
   @include mobile() {
-    padding: 80px 24px !important;
+    padding: 40px 24px 80px !important;
   }
 
   div.scroll-down {
@@ -459,7 +464,7 @@ section.home-keep-aligned {
     background-color: white;
 
     @include mobile() {
-      top: -102px;
+      top: -62px;
     }
   }
 
@@ -502,7 +507,6 @@ section.home-keep-aligned {
         }
 
         @include mobile() {
-          margin: 40px auto 0px;
           width: 100%;
           height: auto;
         }
@@ -523,7 +527,6 @@ section.home-keep-aligned {
         }
 
         @include mobile() {
-          margin: 40px auto 0px;
           width: 100%;
           height: auto;
         }
@@ -544,7 +547,6 @@ section.home-keep-aligned {
         }
 
         @include mobile() {
-          margin: 40px auto 0px;
           width: 100%;
           height: auto;
         }
@@ -565,7 +567,6 @@ section.home-keep-aligned {
         }
 
         @include mobile() {
-          margin: 40px auto 0px;
           width: 100%;
           height: auto;
         }
@@ -577,80 +578,33 @@ section.home-keep-aligned {
         margin: 80px auto 0px;
       }
 
-      div.keep-aligned-section-screenshot {
-        background-position: center;
-        background-repeat: no-repeat;
-        border-radius: 6px;
+      img.keep-aligned-section-screenshot {
+        width: auto;
+        height: auto;
+
+        @include mobile() {
+          margin: 0 auto;
+          max-width: 100%;
+        }
 
         &.screenshot-1 {
-          @include image-2x("/img/ML/homepage_screenshots_update_team");
-          background-size: 665px 386px;
           width: 665px;
           height: 386px;
         }
 
         &.screenshot-2 {
-          @include image-2x("/img/ML/homepage_screenshots_keep_informed");
-          background-size: 672px 439px;
           width: 672px;
           height: 439px;
         }
 
         &.screenshot-3 {
-          @include image-2x("/img/ML/homepage_screenshots_better_discussions");
-          background-size: 695px 370px;
           width: 695px;
           height: 370px;
         }
 
         &.screenshot-4 {
-          @include image-2x("/img/ML/homepage_screenshots_being_heard");
-          background-size: 710px 444px;
           width: 710px;
           height: 444px;
-        }
-
-        @include mobile() {
-          width: 247px;
-          height: 440px;
-          background-size: 247px 440px;
-          margin: 0;
-
-          &:not(:first-child) {
-            margin-top: 40px;
-          }
-
-          &.screenshot-1 {
-            @include image-2x("/img/ML/homepage_screenshots_update_team_mobile");
-            background-size: 327px 180px;
-            width: 327px;
-            height: 180px;
-            margin: 0 auto;
-          }
-
-          &.screenshot-2 {
-            @include image-2x("/img/ML/homepage_screenshots_keep_informed_mobile");
-            background-size: 327px 180px;
-            width: 327px;
-            height: 180px;
-            margin: 0 auto;
-          }
-
-          &.screenshot-3 {
-            @include image-2x("/img/ML/homepage_screenshots_better_discussions_mobile");
-            background-size: 367px 220px;
-            width: 367px;
-            height: 220px;
-            margin: 0 auto;
-          }
-
-          &.screenshot-4 {
-            @include image-2x("/img/ML/homepage_screenshots_being_heard_mobile");
-            background-size: 367px 232px;
-            width: 367px;
-            height: 232px;
-            margin: 0 auto;
-          }
         }
       }
 
@@ -684,7 +638,8 @@ section.home-keep-aligned {
           padding-left: 36px;
 
           @include mobile() {
-            padding-top: 12px;
+            padding-top: 20px;
+            padding-bottom: 8px;
             border-top: 1px solid #E3E4E2;
           }
 
@@ -724,7 +679,7 @@ section.home-keep-aligned {
 
       @include big_web() {
         &:nth-child(odd) {
-          div.keep-aligned-section-screenshot {
+          img.keep-aligned-section-screenshot {
             float: left;
           }
 
@@ -734,7 +689,7 @@ section.home-keep-aligned {
         }
 
         &:nth-child(even) {
-          div.keep-aligned-section-screenshot {
+          img.keep-aligned-section-screenshot {
             float: right;
           }
 
