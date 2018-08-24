@@ -17,25 +17,32 @@
       (:mention notification)
       (str first-name " mentioned you")
       (:interaction-id notification)
-      (str first-name " commented on your post"))))
+      (str first-name " commented on your post")
+      :else
+      nil)))
 
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
         is-interaction (seq (:interaction-id notification))
-        created-at (:notify-at notification)]
-    {:uuid (:entry-id notification)
-     :board-slug (:slug board-data)
-     :interaction-id (:interaction-id notification)
-     :is-interaction is-interaction
-     :unread unread
-     :mention (:mention notification)
-     :created-at (:notify-at notification)
-     :body (:content notification)
-     :title (notification-title notification)
-     :author (:author notification)}))
+        created-at (:notify-at notification)
+        title (notification-title notification)]
+    (when (seq title)
+      {:uuid (:entry-id notification)
+       :board-slug (:slug board-data)
+       :interaction-id (:interaction-id notification)
+       :is-interaction is-interaction
+       :unread unread
+       :mention (:mention notification)
+       :created-at (:notify-at notification)
+       :body (:content notification)
+       :title title
+       :author (:author notification)})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))
 
 (defn fix-notifications [notifications]
-  (sorted-notifications (map fix-notification notifications)))
+  (sorted-notifications
+   (remove nil?
+    (map fix-notification
+     notifications))))
