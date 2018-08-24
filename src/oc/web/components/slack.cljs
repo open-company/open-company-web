@@ -76,7 +76,7 @@
 
           shared-misc/keep-aligned-section
 
-          shared-misc/testimonials-section
+          ; shared-misc/carrot-testimonials
 
           shared-misc/keep-aligned-bottom]]
 

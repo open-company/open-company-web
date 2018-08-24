@@ -33,7 +33,9 @@
             [:h1.headline
               "Join your team on Carrot"]
             [:div.subheadline
-              "Your team is using Carrot to keep everyone aligned around what matters most."]
+              "Key updates and announcements get lost in fast-moving chat "
+              "and stuffed inboxes. Carrot makes it simple for Slack teams to "
+              "stay aligned around what matters most."]
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.get-started-button-container
               [:button.mlb-reset.get-started-button
@@ -41,7 +43,7 @@
                 [:span.slack-white-icon]
                 [:span.slack-copy
                   (if (responsive/is-tablet-or-mobile?)
-                    "Join your team"
+                    "Sign in with Slack"
                     "Sign in with Slack and join your team")]]]
 
             [:div.main-animation-container
@@ -53,13 +55,11 @@
 
           [:section.keep-aligned
             [:div.keep-aligned-title
-              "Sign in with Slack to to join your team on Carrot"]
+              "It’s never been easier to keep everyone on the same page"]
             [:button.mlb-reset.get-started-button
               {:on-click #(user-actions/login-with-slack slack-auth-link)}
-              [:span.slack-white-icon]
-              [:span.slack-copy
-                (if (responsive/is-tablet-or-mobile?)
-                  "Join your team"
-                  "Sign in with Slack and join your team")]]]]]
+              "Get started for free"]
+            [:div.no-credit-card
+              "No credit card required • Works with Slack"]]]]
 
       (site-footer)]))
