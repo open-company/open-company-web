@@ -175,7 +175,7 @@ section.testimonials-section {
 
   @include mobile() {
     width: 100%;
-    padding: 80px 0px !important;
+    padding: 80px 24px !important;
     padding-top: 80px !important;
     padding-bottom: 80px !important;
     text-align: left;
@@ -183,7 +183,7 @@ section.testimonials-section {
 
   @include tablet() {
     width: 100%;
-    padding: 80px 0px;
+    padding: 80px 24px;
   }
 
   div.testimonials-section-title {
@@ -227,6 +227,10 @@ section.testimonials-section {
       background-color: $deep_navy;
       padding: 24px;
       text-align: left;
+
+      &:nth-child(3) {
+        float: right;
+      }
 
       div.testimonial-image {
         width: 40px;
