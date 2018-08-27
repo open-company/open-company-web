@@ -326,6 +326,10 @@ div.fullscreen-post-container {
             line-height: 18px;
             color: $deep_navy;
             float: left;
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           @include new-tag();
