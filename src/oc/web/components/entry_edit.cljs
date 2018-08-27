@@ -207,7 +207,7 @@
         (if published?
           (do
             (reset! (::saving s) true)
-            (activity-actions/entry-save updated-entry-editing section-editing))
+            (activity-actions/entry-save :entry-editing updated-entry-editing section-editing))
           (do
             (reset! (::publishing s) true)
             (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
@@ -410,7 +410,7 @@
                                 (remove-autosave s)
                                 (clean-body s)
                                 (reset! (::saving s) true)
-                                (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
+                                (activity-actions/entry-save :entry-editing (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
                     (small-loading))
                   "Save draft"]))])]
@@ -522,9 +522,9 @@
                          :position "top"
                          :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                          :container-selector "div.entry-edit-modal"})
-          (when (= true (:auto-saving entry-editing))
+          (when (true? (:auto-saving entry-editing))
             [:div.saving-saved "Saving..."])
-          (when (= false (:auto-saving entry-editing))
+          (when (false? (:auto-saving entry-editing))
             [:div.saving-saved "Saved"])
           [:div.entry-edit-legend-container
             {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))
