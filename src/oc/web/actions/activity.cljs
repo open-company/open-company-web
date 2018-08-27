@@ -18,7 +18,7 @@
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
-(def initial-revision (atom nil))
+(def initial-revision (atom 0))
 
 (defn save-last-used-section [section-slug]
   (let [org-slug (router/current-org-slug)
@@ -144,7 +144,7 @@
 
 (defn load-cached-item
   [entry-data edit-key & [completed-cb]]
-  (reset! initial-revision (:revision-id entry-data))
+  (reset! initial-revision (or (:revision-id entry-data) 0))
   (let [cache-key (get-entry-cache-key (:uuid entry-data))]
     (uc/get-item cache-key
      (fn [item err]
@@ -258,7 +258,7 @@
            ;; dispatch that you are auto saving
            (dis/dispatch! [:update [:entry-editing]
                            #(merge % activity-data {:auto-saving true})])
-           (entry-save activity-data section-editing
+           (entry-save edit-key activity-data section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
                  (remove-cached-item (:uuid activity-data))
@@ -352,12 +352,12 @@
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
 (defn entry-save
-  ([edited-data section-editing]
-     (entry-save edited-data section-editing create-update-entry-cb))
+  ([edit-key edited-data section-editing]
+     (entry-save edit-key edited-data section-editing create-update-entry-cb))
 
-  ([edited-data section-editing entry-save-cb]
+  ([edit-key edited-data section-editing entry-save-cb]
      (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
-           fixed-edit-key :entry-editing]
+           fixed-edit-key (or edit-key :entry-editing)]
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                   section-editing)
