@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]))
 
 (defn board-by-uuid [board-uuid]
@@ -291,3 +292,17 @@
         request-set (set item-ids)
         diff-ids (clojure.set/difference request-set all-items)]
     (into [] diff-ids)))
+
+;; Last used section
+
+(defn last-used-section []
+  (let [org-slug (router/current-org-slug)
+        cookie-name (router/last-used-board-slug-cookie org-slug)]
+    (cook/get-cookie cookie-name)))
+
+(defn save-last-used-section [section-slug]
+  (let [org-slug (router/current-org-slug)
+        last-board-cookie (router/last-used-board-slug-cookie org-slug)]
+    (if section-slug
+      (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))
+      (cook/remove-cookie! last-board-cookie))))
