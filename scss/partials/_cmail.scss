@@ -441,6 +441,26 @@ div.cmail-outer {
             left: -8px;
           }
         }
+
+        div.cmail-footer-right {
+          float: right;
+  
+          button.delete-button {
+            float: right;
+            width: 22px;
+            height: 20px;
+            background-image: cdnUrl("/img/ML/cmail_delete.svg");
+            background-size: 14px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-top: 10px;
+            opacity: 0.4;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
       }
     }
   }

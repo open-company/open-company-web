@@ -193,6 +193,26 @@
     (.tooltip "hide")
     (.tooltip "fixTitle")))
 
+;; Delete handling
+
+(defn delete-clicked [e activity-data]
+  (let [post-type (if (= (:status activity-data) "published")
+                    "post"
+                    "draft")
+        alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-entry"
+                    :message (str "Delete this " post-type "?")
+                    :link-button-title "No"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
+                                       (activity-actions/activity-delete activity-data)
+                                       (alert-modal/hide-alert)
+                                       (real-close))
+                    }]
+    (alert-modal/show-alert alert-data)))
+
 (rum/defcs cmail < rum/reactive
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
@@ -448,4 +468,14 @@
                          :height 20
                          :position "top"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
-                         :container-selector "div.cmail-content"})]]]]))
+                         :container-selector "div.cmail-content"})
+          [:div.cmail-footer-right
+            [:div.footer-separator]
+            [:button.mlb-reset.delete-button
+              {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :data-trigger "hover"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :on-click #(delete-clicked % cmail-data)}]]]]]]))

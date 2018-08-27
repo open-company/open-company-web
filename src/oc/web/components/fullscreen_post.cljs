@@ -403,7 +403,6 @@
   (let [modal-data (drv/react s :fullscreen-post-data)
         activity-data (:activity-data modal-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
         editing (:modal-editing modal-data)
