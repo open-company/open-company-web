@@ -256,7 +256,7 @@
                     (:has-changes activity-data)
                     (not (:auto-saving activity-data)))
            ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [:entry-editing]
+           (dis/dispatch! [:update [edit-key]
                            #(merge % activity-data {:auto-saving true})])
            (entry-save edit-key activity-data section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
@@ -264,7 +264,7 @@
                  (remove-cached-item (:uuid activity-data))
                  (let [entry-saved (assoc (json->cljs body) :auto-saving false)]
                    ;; merge with entry editing and only save once we have a uuid
-                   (dis/dispatch! [:update [:entry-editing]
+                   (dis/dispatch! [:update [edit-key]
                                    #(merge % entry-saved)]))))))
          (dis/dispatch! [:entry-toggle-save-on-exit false]))))))
 
