@@ -267,10 +267,17 @@ div.entry-edit-modal-container {
           position: relative;
           padding-left: 26px;
 
+          &:not(.remove-video-bt) {
+            @include preload_image(cdnUrl("/img/ML/capture_video_icon_hover.svg"));
+          }
+
           &.remove-video-bt {
+            @include preload_image(cdnUrl("/img/ML/remove_video_icon_hover.svg"));
+
             &:before {
               background-image: cdnUrl("/img/ML/remove_video_icon.svg");
             }
+
             &:hover {
               &:before {
                 background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
