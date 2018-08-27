@@ -671,10 +671,12 @@
   (dis/dispatch! [:input [:cmail-state] nil]))
 
 (defn cmail-toggle-fullscreen []
-  (dis/dispatch! [:update [:cmail-state :fullscreen] not]))
+  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse false
+                                                    :fullscreen (not (:fullscreen %))})]))
 
 (defn cmail-toggle-collapse []
-  (dis/dispatch! [:update [:cmail-state :collapse] not]))
+  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse (not (:collapse %))
+                                                    :fullscreen false})]))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update [:cmail-data :must-see] not]))

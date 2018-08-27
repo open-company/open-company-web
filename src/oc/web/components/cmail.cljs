@@ -188,6 +188,11 @@
              (not @(::video-uploading s)))
         (show-post-error s "Please finish video recording.")))))
 
+(defn fix-tooltips [s]
+  (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+    (.tooltip "hide")
+    (.tooltip "fixTitle")))
+
 (rum/defcs cmail < rum/reactive
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
@@ -235,6 +240,7 @@
                    :did-remount (fn [_ s]
                     (when ls/oc-enable-transcriptions
                       (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
+
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -274,6 +280,9 @@
                                         (oc-urls/board (router/current-org-slug)
                                          (:board-slug cmail-data))))))))))))
                     s)
+                   :after-render (fn [s]
+                    (fix-tooltips s)
+                    s)
                    :will-unmount (fn [s]
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
@@ -291,8 +300,7 @@
         video-size {:width 548
                     :height 322}]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen (and (:fullscreen cmail-state)
-                                                 (not (:collapse cmail-state)))
+      {:class (utils/class-set {:fullscreen (:fullscreen cmail-state)
                                 :collapse (:collapse cmail-state)})}
       [:div.cmail-middle
         [:div.cmail-container
@@ -303,7 +311,9 @@
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
-               :title "Toggle must see"}
+               :data-trigger "hover"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title (if (:must-see cmail-data) "Must see" "Unmark")}
               [:span.must-see-toggle-circle]]
             "New draft"
             [:button.mlb-reset.close-bt
@@ -311,19 +321,26 @@
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
+               :data-trigger "hover"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Close"}]
             [:button.mlb-reset.fullscreen-bt
               {:on-click #(activity-actions/cmail-toggle-fullscreen)
                :data-toggle "tooltip"
                :data-placement "top"
+               :data-trigger "hover"
                :data-container "body"
-               :title "Fullscreen"}]
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title (if (:fullscreen cmail-state) "Exit fullscreen" "Fullscreen")}]
             [:button.mlb-reset.collapse-bt
-              {:on-click #(activity-actions/cmail-toggle-collapse)
+              {:on-click #(do
+                           (activity-actions/cmail-toggle-collapse))
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
-               :title "Collapse"}]]
+               :data-trigger "hover"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title (if (:collapse cmail-state) "Expand" "Collapse")}]]
           [:div.cmail-section
             [:div.board-name
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
