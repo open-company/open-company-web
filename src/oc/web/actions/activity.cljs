@@ -215,7 +215,7 @@
   [activity-data]
   (if (or (responsive/is-tablet-or-mobile?)
           (not= (:status activity-data) "published"))
-    (load-cached-item activity-data :entry-editing)
+    (load-cached-item activity-data :modal-editing-data)
     (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate]))
      (not (router/current-activity-id)))))
 
