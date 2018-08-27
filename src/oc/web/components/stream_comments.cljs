@@ -156,12 +156,12 @@
                        :title "Agree with this comment"
                        :data-toggle "tooltip"
                        :data-placement "top"
-                       :data-contaner "body"}
+                       :data-contaner "body"
+                       :on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
+                                   reaction-data (not (:reacted reaction-data)))}
                         (when (or (pos? (:count reaction-data))
                                   (:can-react comment-data))
-                          [:div.stream-comment-reaction-icon
-                            {:on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
-                              reaction-data (not (:reacted reaction-data)))}])
+                          [:div.stream-comment-reaction-icon])
                         (when (pos? (:count reaction-data))
                           [:div.stream-comment-reaction-count
                             (:count reaction-data)])])

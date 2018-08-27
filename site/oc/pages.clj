@@ -102,33 +102,71 @@
 
 (def core-values-list
   [:div.core-values-list.group
-    [:div.core-value.key-announcement
-      "Key announcements"]
-    [:div.core-value.company-updates
-      "Company & team updates"]
-    [:div.core-value.strategic-plans
-      "Strategic plans"]
-    [:div.core-value.ideas-discussions
-      "Decisions"]])
+    [:div.core-value-container.key-announcement
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Announcements"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "Product "
+          [:span.dot "•"]
+          " 45 views"]
+        [:div.core-value-box-title
+          "Updates to billing & subscriptions (beta edition)"]]]
+    [:div.core-value-container.team-updates
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Team updates"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "General "
+          [:span.dot "•"]
+          " 22 views"]
+        [:div.core-value-box-title
+          "June 25, 2018 all hands video highlights"]]]
+    [:div.core-value-container.strategic-plans
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Decisions"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "Strategy "
+          [:span.dot "•"]
+          " 67 views"]
+        [:div.core-value-box-title
+          "Product roadmap review presentation and PDF"]]]
+    [:div.core-value-container.stories
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Stories"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "Design "
+          [:span.dot "•"]
+          " 34 views"]
+        [:div.core-value-box-title
+          "How we pulled off our biggest launch ever 🤩"]]]])
 
 (def testimonials-section
-  [:div.hidden]
-  ; [:section.testimonials-section
-  ;   [:div.testimonials-section-title
-  ;     "Don’t take our word for it"]
-  ;   [:div.testimonials-section-subtitle
-  ;     "Here’s how we’re helping teams like yours."]
-  ;   [:div.testimonials-cards-container.group
-  ;     [:img.card
-  ;       {:src (cdn "/img/ML/testimonial_katie.png")
-  ;        :srcSet (str (cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
-  ;     [:img.card
-  ;       {:src (cdn "/img/ML/testimonial_riley.png")
-  ;        :srcSet (str (cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
-  ;     [:img.card
-  ;       {:src (cdn "/img/ML/testimonial_matt.png")
-  ;        :srcSet (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]]
-  )
+  [:section.testimonials-section
+    [:div.testimonials-section-title
+      "Don’t take our word for it"]
+    [:div.testimonials-section-subtitle
+      "Here’s how we’re helping teams like yours."]
+    [:div.testimonials-cards-container.group
+      [:img.card
+        {:src (cdn "/img/ML/testimonial_katie.png")
+         :srcSet (str (cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
+      [:img.card
+        {:src (cdn "/img/ML/testimonial_riley.png")
+         :srcSet (str (cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
+      [:img.card
+        {:src (cdn "/img/ML/testimonial_matt.png")
+         :srcSet (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
 
 (def no-credit-card
   [:div.no-credit-card
@@ -144,67 +182,100 @@
 
 (def keep-aligned-section
   [:section.home-keep-aligned
+    [:div.scroll-down]
     [:h2.keep-aligned-title
       "Carrot keeps leaders and teams aligned"]
 
     [:div.keep-aligned-section
-      [:div.keep-aligned-section-row
-        [:div.keep-aligned-section-screenshot.screenshot-2]
+      [:div.keep-aligned-section-row.first-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-1.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_update_team.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_update_team_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
-            "Create engaging updates"]
-          [:div.keep-aligned-section-list-item
-            "Room for more than a quick chat"]
-          [:div.keep-aligned-section-list-item
-            "Capture video to add a human touch"]
-          [:div.keep-aligned-section-list-item
-            "Attachments from Google, Dropbox, & others"]]]
+            "Update your team in seconds"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+            "Create compelling updates people want to read"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+            "Capture video updates to add a human touch"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+            "Link to Google, Dropbox, wikis and others"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+          "Automate recurring team updates"]]]
 
-      [:div.keep-aligned-section-row
-        [:div.keep-aligned-section-screenshot.screenshot-1]
+      [:div.keep-aligned-section-row.second-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-2.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_keep_informed.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_keep_informed_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
-            "Get up to speed quickly"]
-          [:div.keep-aligned-section-list-item
+            "Keep everyone informed"]
+          [:div.keep-aligned-section-list-item.green-checkmark
             "“Must see” updates rise to the top"]
-          [:div.keep-aligned-section-list-item
-            "Follow people and topics you can’t miss"]
-          [:div.keep-aligned-section-list-item
-            "Organized and easy to browse"]]]
+          [:div.keep-aligned-section-list-item.green-checkmark
+            "See what’s trending to stay in the loop"]
+          [:div.keep-aligned-section-list-item.green-checkmark
+            "Organized for easy browsing and search"]
+          [:div.keep-aligned-section-list-item.green-checkmark
+            "A morning digest summarizes what’s new"]]]
 
-      [:div.keep-aligned-section-row
-        [:div.keep-aligned-section-screenshot.screenshot-3]
+      [:div.keep-aligned-section-row.third-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-3.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_better_discussions.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_better_discussions_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
-            "Spark better discussions"]
-          [:div.keep-aligned-section-list-item
-            "Encourage more comments and questions"]
-          [:div.keep-aligned-section-list-item
+            "Spark better follow-on discussions"]
+          [:div.keep-aligned-section-list-item.red-checkmark
+            "Encourage thoughtful comments and questions"]
+          [:div.keep-aligned-section-list-item.red-checkmark
             "Keep interactions together for greater context"]
-          [:div.keep-aligned-section-list-item
-            "Sync to Slack to discuss anywhere"]]]
+          [:div.keep-aligned-section-list-item.red-checkmark
+            "Syncs with Slack so discussions can happen anywhere"]]]
 
-      [:div.keep-aligned-section-row
-        [:div.keep-aligned-section-screenshot.screenshot-4]
+      [:div.keep-aligned-section-row.fourth-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-4.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_being_heard.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-4.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_being_heard_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard_mobile@2x.png") " 2x")}]
         [:div.keep-aligned-section-copy
           [:div.keep-aligned-section-copy-title
-            "Know who’s up to date"]
-          [:div.keep-aligned-section-list-item
-            "Eliminate communication gaps"]
-          [:div.keep-aligned-section-list-item
+            "Make sure you're being heard"]
+          [:div.keep-aligned-section-list-item.blue-checkmark
+            "Know who's seen your post"]
+          [:div.keep-aligned-section-list-item.blue-checkmark
             "Send reminders with a single click"]
-          [:div.keep-aligned-section-list-item
-            "Ensures alignment on important items"]]]]])
+          [:div.keep-aligned-section-list-item.blue-checkmark
+            "Eliminate communication gaps"]
+          [:div.keep-aligned-section-list-item.blue-checkmark
+            "Ensure alignment on important items"]]]]])
 
 (def access-anywhere-section
   [:section.access-anywhere-section
     [:div.access-anywhere-section-container
       [:div.access-anywhere-copy
         [:div.access-anywhere-copy-title
-          "Stay informed on the go."]
-        [:div.access-anywhere-copy-subtitle
-          "Fully responsive mobile web app."]
-        [:div.access-anywhere-copy-subtitle.second-line
+          "Stay up to date on the go."]
+        [:div.access-anywhere-copy-title.big-web-only
+          "Access Carrot from anywhere."]
+        [:div.access-anywhere-copy-title.mobile-only
+          "Access Carrot anywhere."]
+        [:div.access-anywhere-copy-subtitle.big-web-only
+          "Fully responsive web app. No app install required."]
+        [:div.access-anywhere-copy-subtitle.mobile-only
+          "Fully responsive web app."]
+        [:div.access-anywhere-copy-subtitle.mobile-only
           "No app install required."]]
       [:div.access-anywhere-screenshot]]])
 
@@ -242,11 +313,11 @@
         [:div.balloon.small-purple]
 
         [:h1.headline
-          "The new way to provide meaningful team communication."]
+          "Where leadership finds its voice"]
         [:div.subheadline
           (str
-           "Rise above the noise of chat and email to keep your "
-           "growing and distributed teams aligned.")]
+           "Rise above the noise of chat and email to "
+           "keep your growing and distributed teams aligned.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -273,7 +344,7 @@
 
       (slack-comparison-section)
 
-      testimonials-section
+      ; testimonials-section
 
       keep-aligned-bottom
       ]])
@@ -288,251 +359,470 @@
         [:h1.pricing-headline
           "Pricing guide"]
 
-        [:div.pricing-block.group
-          [:div.pricing-block-column.free-column
-            [:div.price-column-title
-              "Free"]
-            [:div.price-column-price
-              "0"]
-            [:div.price-column-description
-              "Free for small teams"]
-            [:button.mlb-reset.price-button
-              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Free'});"}
-              "Create a digest"]]
+        [:table.pricing-table.big-web-only
+          [:thead
+            [:tr
+              [:th]
+              [:th
+                [:div.tire-title
+                  "Free"]
+                [:div.tire-price
+                  "$0"]
+                [:button.mlb-reset.price-button
+                  "Get started"]]
+              [:th
+                [:div.tire-title
+                  "Team"]
+                [:div.tire-price
+                  "$45"
+                  [:span.per-month
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]
+              [:th
+                [:div.tire-title
+                  "Enterprise"]
+                [:div.tire-price
+                  "$125"
+                  [:span.per-month
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Number of users included"]
+              [:td.pricing-value
+                "10"]
+              [:td.pricing-value
+                "25"]
+              [:td.pricing-value
+                "50"]]
 
-          [:div.pricing-block-column.standard-column
-            [:div.price-column-title
-              "Standard"]
-            [:div.price-column-price
-              "5"]
-            [:div.price-column-description
-              "Per user, per month, billed annually"]
-            [:div.price-column-description.second-line
-              "Or $6 monthly"]
-            [:button.mlb-reset.price-button
-              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Standard'});"}
-              "Buy standard"]]
+            [:tr
+              [:td.pricing-description
+                "Additional users"]
+              [:td.pricing-value
+                "—"]
+              [:td.pricing-value
+                "—"]
+              [:td.pricing-value
+                "$2 per user"]]
 
-          [:div.pricing-block-column.plus-column
-            [:div.price-column-title
-              "Plus"]
-            [:div.price-column-price
-              "8"]
-            [:div.price-column-description
-              "Per user, per month, billed annually"]
-            [:div.price-column-description.second-line
-              "Or $10 monthly"]
-            [:button.mlb-reset.price-button
-              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Plus'});"}
-              "Buy plus"]]]
-        [:div.enterprise-block
-          [:span.enterprise-block-title
-            "Enterprise Edition"]
-          [:span.enterprise-block-copy
-            "Let’s create a plan that’s right for your organization."]
-          [:a.enterprise-block-link
-            {:href (:contact-mail-to options)}
-            "Contact us"]]]
-      [:section.second-section
-        [:h1.compare-plans
-          "Compare Plans"]
+            [:tr
+              [:td.pricing-description
+                "Number of new posts"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Number of new posts"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value
+                "50"]
+              [:td.pricing-value
+                "Unlimited"]
+              [:td.pricing-value
+                "Unlimited"]]
 
-        [:div.pricing-table
-          [:table
-            {:cellpadding "0"
-             :cellspacing "0"}
-            [:thead
-              [:tr
-                [:th]
-                [:th
-                  [:div
-                    "Free"]]
-                [:th
-                  [:div
-                    "Standard"]]
-                [:th
-                  [:div
-                    "Plus"]]]]
-            [:tbody
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Searchable posts"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Searchable posts"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td
-                  [:div "100"]]
-                [:td
-                  [:div "Unlimited"]]
-                [:td
-                  [:div "Unlimited"]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "History kept"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "History kept"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td
-                  [:div "Last 12 months"]]
-                [:td
-                  [:div "Unlimited"]]
-                [:td
-                  [:div "Unlimited"]]]
-              [:tr
-                [:td
-                  [:div "File storage"]]
-                [:td
-                  [:div "1 GB"]]
-                [:td
-                  [:div "10 GB"]]
-                [:td
-                  [:div "50 GB"]]]
-              [:tr
-                [:td
-                  [:div "File upload"]]
-                [:td
-                  [:div "25 MB"]]
-                [:td
-                  [:div "50 MB"]]
-                [:td
-                  [:div "100 MB"]]]
-              [:tr
-                [:td
-                  [:div "Slack single sign-on"]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Slack sync"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Slack sync"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Dropbox, Google Drive and other integrations"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Dropbox, Google Drive and other integrations"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "OAuth with Google"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "OAuth with Google"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Private and public visibility"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Private and public visibility"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Who read what"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Who read what"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div "Analytics"]]
-                [:td]
-                [:td]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div "Priority support"]]
-                [:td]
-                [:td]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div "Uptime SLA"]]
-                [:td]
-                [:td]
-                [:td
-                  [:div.check]]]]]]]
+            [:tr
+              [:td.pricing-description
+                "History retained"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "History retained"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value
+                "6 months"]
+              [:td.pricing-value
+                "Unlimited"]
+              [:td.pricing-value
+                "Unlimited"]]
 
-      testimonials-section
+            [:tr
+              [:td.pricing-description
+                "File upload"]
+              [:td.pricing-value
+                "25 MB"]
+              [:td.pricing-value
+                "Unlimited"]
+              [:td.pricing-value
+                "Unlimited"]]
+
+            [:tr
+              [:td.pricing-description
+                "File storage"]
+              [:td.pricing-value
+                "500 MB"]
+              [:td.pricing-value
+                "5 TB"]
+              [:td.pricing-value
+                "Unlimited"]]
+
+            [:tr
+              [:td.pricing-description
+                "G suite single sign-on"]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Slack single sign-on"]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Sync with Slack"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Sync with Slack"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Dropbox, Google Drive and other integrations"]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Advanced permissions"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Advanced permissions"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Priority support"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Priority support"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Analytics"]
+              [:td.pricing-value]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Uptime SLA"]
+              [:td.pricing-value]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "On premise"]
+              [:td.pricing-value]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]]]
+          [:thead
+            [:tr
+              [:th]
+              [:th
+                [:div.tire-title
+                  "Free"]
+                [:button.mlb-reset.price-button
+                  "Get started"]]
+              [:th
+                [:div.tire-title
+                  "Team"]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]
+              [:th
+                [:div.tire-title
+                  "Enterprise"]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]]]]
+
+        [:table.pricing-table.mobile-only
+          [:thead
+            [:tr
+              [:th
+                [:div.tire-title
+                  "FREE"]
+                [:div.tire-price
+                  [:span.dollar "$"]
+                  "0"]
+                [:button.mlb-reset.price-button
+                  "Get started"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Up to 10 users"]]
+            [:tr
+              [:td.pricing-description
+                "50 new post cap"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "50 new post cap"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "6 months of history retained"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "6 months of history retained"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "25 MB upload limit"]]
+            [:tr
+              [:td.pricing-description
+                "500 MB file storage"]]
+            [:tr
+              [:td.pricing-description
+                "G suite single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Slack single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Sync with Slack"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Sync with Slack"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "Dropbox, Google Drive, and other integrations"]]]]
+
+        [:table.pricing-table.mobile-only
+          [:thead
+            [:tr
+              [:th
+                [:div.tire-title
+                  "TEAM"]
+                [:div.tire-price
+                  [:span.dollar "$"]
+                  "45"
+                  [:span.per-month\
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Get started"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Up to 25 users"]]
+            [:tr
+              [:td.pricing-description
+                "Unlimited posts"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Unlimited posts"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "No history limit"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "No history limit"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "No file size upload limit"]]
+            [:tr
+              [:td.pricing-description
+                "5 TB file storage"]]
+            [:tr
+              [:td.pricing-description
+                "G suite single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Slack single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Sync with Slack"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Sync with Slack"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "Dropbox, Google Drive, and other integrations"]]
+            [:tr
+              [:td.pricing-description
+                "Advanced permissions"]]
+            [:tr
+              [:td.pricing-description
+                "Priority support"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Priority support"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]]]
+
+        [:table.pricing-table.mobile-only
+          [:thead
+            [:tr
+              [:th
+                [:div.tire-title
+                  "ENTERPRISE"]
+                [:div.tire-price
+                  [:span.dollar "$"]
+                  "125"
+                  [:span.per-month\
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Get started"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Includes everthing in "
+                [:span.strong "team"]
+                " and:"]]
+            [:tr
+              [:td.pricing-description
+                "Up to 50 users"]]
+            [:tr
+              [:td.pricing-description
+                "$2 per additional user "]]
+            [:tr
+              [:td.pricing-description
+                "Analytics"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Analytics"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "Uptime SLA"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Uptime SLA"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "On premise"]]]]
+
+        ; [:div.pricing-faq
+        ;   [:h2.faq-header
+        ;     "Frequently asked questions"]
+
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "What are my payment options (credit card and/or invoicing)?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "My team has credits. How do we use them?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "We need to add new users to our team. How will that be billed?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "My team wasnts to cancel its subscription. How do we do that? Can we get a refund?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "What are my payment options (credit card and/or invoicing)?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.contact-us-row
+        ;     "If you have more questions, don’t hesitate to "
+        ;     [:a.contact
+        ;       {:href oc-urls/contact-mail-to}
+        ;       "contact us"]]]
+        ]
+
+      ; testimonials-section
 
       keep-aligned-bottom
     ]])
@@ -593,7 +883,7 @@
 
       access-anywhere-section
 
-      testimonials-section
+      ; testimonials-section
 
       keep-aligned-bottom
       ]])
@@ -679,7 +969,7 @@
               [:div.user-name
                 "Ryan Le Roux"]
               [:div.user-position
-                "CDO"]
+                "Chief Design Officer"]
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/ryanleroux/"
                  :target "_blank"}]]
@@ -763,7 +1053,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot | Company digest"]
+          [:title "Carrot | Leadership communication for growing and distributed teams"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           bootstrap-css
@@ -865,7 +1155,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot | Company digest"]
+          [:title "Carrot | Leadership communication for growing and distributed teams"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           bootstrap-css
