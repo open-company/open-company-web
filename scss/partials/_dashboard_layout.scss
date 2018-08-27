@@ -240,6 +240,10 @@ div.dashboard-layout {
             font-size: 28px;
             color: $carrot_gray;
             float: left;
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             @include mobile() {
               @include avenir_H();
