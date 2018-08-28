@@ -18,6 +18,7 @@
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
+
 (def initial-revision (atom {}))
 
 (defn save-last-used-section [section-slug]
@@ -144,6 +145,7 @@
 
 (defn load-cached-item
   [entry-data edit-key & [completed-cb]]
+  (reset! initial-revision (or (:revision-id entry-data) 0))
   (let [cache-key (get-entry-cache-key (:uuid entry-data))]
     (uc/get-item cache-key
      (fn [item err]
@@ -214,7 +216,7 @@
   [activity-data]
   (if (or (responsive/is-tablet-or-mobile?)
           (not= (:status activity-data) "published"))
-    (load-cached-item activity-data :entry-editing)
+    (load-cached-item activity-data :modal-editing-data)
     (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate]))
      (not (router/current-activity-id)))))
 
