@@ -18,7 +18,7 @@
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
-(def initial-revision (atom 0))
+(def initial-revision (atom {}))
 
 (defn save-last-used-section [section-slug]
   (let [org-slug (router/current-org-slug)
@@ -144,7 +144,6 @@
 
 (defn load-cached-item
   [entry-data edit-key & [completed-cb]]
-  (reset! initial-revision (or (:revision-id entry-data) 0))
   (let [cache-key (get-entry-cache-key (:uuid entry-data))]
     (uc/get-item cache-key
      (fn [item err]
@@ -252,21 +251,27 @@
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
-         (when (and (not= "published" (:status activity-data))
-                    (:has-changes activity-data)
-                    (not (:auto-saving activity-data)))
+         (when (and (not= "published" (:status entry-map))
+                    (:has-changes entry-map)
+                    (not (:auto-saving entry-map)))
            ;; dispatch that you are auto saving
            (dis/dispatch! [:update [edit-key]
-                           #(merge % activity-data {:auto-saving true})])
-           (entry-save edit-key activity-data section-editing
+                           #(merge % entry-map {:auto-saving true})])
+           (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
-                 (remove-cached-item (:uuid activity-data))
                  (let [entry-saved (assoc (json->cljs body) :auto-saving false)]
+                   (when (and (nil? (:uuid entry-map))
+                              (:uuid entry-saved))
+                     (remove-cached-item (:uuid entry-map)))
+                   (when (nil? (get @initial-revision (:uuid entry-saved)))
+                     (reset! initial-revision
+                             {(:uuid entry-saved)
+                              (or (:revision-id entry-map) -1)}))
                    ;; merge with entry editing and only save once we have a uuid
                    (dis/dispatch! [:update [edit-key]
-                                   #(merge % entry-saved)]))))))
-         (dis/dispatch! [:entry-toggle-save-on-exit false]))))))
+                                   #(merge % entry-saved)])))))
+           (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
 
 (defn entry-toggle-save-on-exit
   [enable?]
@@ -283,6 +288,7 @@
     (refresh-org-data)
     ;; Remove saved cached item
     (remove-cached-item initial-uuid)
+    (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
     (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
     (when (= (:status activity-data) "published")
@@ -299,6 +305,7 @@
         saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
     (save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
+    (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
@@ -346,9 +353,10 @@
 (defn entry-clear-local-cache [item-uuid edit-key item]
   (remove-cached-item item-uuid)
   ;; revert draft to old version
-  (timbre/debug "Reverting to " @initial-revision)
+  (timbre/debug "Reverting to " @initial-revision item-uuid)
   (when (not= "published" (:status item))
-    (entry-revert @initial-revision item))
+    (let [revision-id (get @initial-revision item-uuid)]
+      (entry-revert revision-id item)))
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
 (defn entry-save
@@ -392,6 +400,7 @@
   (refresh-org-data)
   ;; Remove entry cached edits
   (remove-cached-item initial-uuid)
+  (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
   ;; Send item read
   (send-item-read (:uuid activity-data)))
@@ -406,6 +415,7 @@
         saved-activity-data (first (:entries new-board-data))]
     (save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
+    (reset! initial-revision (dissoc @initial-revision entry-uuid))
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
@@ -487,14 +497,15 @@
 
 (defn entry-revert [revision-id entry-editing]
   (let [entry-exists? (seq (:links entry-editing))
+        entry-version (assoc entry-editing :revision-id revision-id)
         org-slug (router/current-org-slug)
         board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
         revert-entry-link (when entry-exists?
                             ;; If the entry already exists use the publish link in it
                             (utils/link-for (:links entry-editing) "revert"))]
     (if entry-exists?
-      (api/revert-entry entry-editing revert-entry-link
-                        (fn [] (dis/dispatch! [:entry-revert entry-editing])))
+      (api/revert-entry entry-version revert-entry-link
+                        (fn [] (dis/dispatch! [:entry-revert entry-version])))
       (dis/dispatch! [:entry-revert false]))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
