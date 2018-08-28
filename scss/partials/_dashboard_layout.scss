@@ -428,6 +428,9 @@ div.dashboard-layout {
             justify-content: center;
             align-items: center;
 
+            @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
+            @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
+
             // Remove to show settings button on mobile
             @include mobile() {
               display: none;
