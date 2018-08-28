@@ -139,7 +139,6 @@
 
 (defn load-cached-item
   [entry-data edit-key & [completed-cb]]
-  (reset! initial-revision (or (:revision-id entry-data) 0))
   (let [cache-key (get-entry-cache-key (:uuid entry-data))]
     (uc/get-item cache-key
      (fn [item err]
@@ -247,6 +246,7 @@
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
+         ;; auto save on drafts that have changes
          (when (and (not= "published" (:status entry-map))
                     (:has-changes entry-map)
                     (not (:auto-saving entry-map)))
@@ -257,9 +257,13 @@
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
                  (let [entry-saved (assoc (json->cljs body) :auto-saving false)]
+                   ;; remove the initial document cache now that we have a uuid
+                   ;; uuid didn't exist before
                    (when (and (nil? (:uuid entry-map))
                               (:uuid entry-saved))
                      (remove-cached-item (:uuid entry-map)))
+                   ;; set the initial version number after the first auto save
+                   ;; this is used to revert if user decides to lose the changes
                    (when (nil? (get @initial-revision (:uuid entry-saved)))
                      (reset! initial-revision
                              {(:uuid entry-saved)
@@ -284,6 +288,8 @@
     (refresh-org-data)
     ;; Remove saved cached item
     (remove-cached-item initial-uuid)
+    ;; reset initial revision after successful save.
+    ;; need a new revision number on the next edit.
     (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
     (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
@@ -301,6 +307,8 @@
         saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
     (au/save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
+    ;; reset initial revision after successful save.
+    ;; need a new revision number on the next edit.
     (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
@@ -347,6 +355,7 @@
 (declare entry-revert)
 
 (defn entry-clear-local-cache [item-uuid edit-key item]
+  "Removes user local cache and also reverts any auto saved drafts."
   (remove-cached-item item-uuid)
   ;; revert draft to old version
   (timbre/debug "Reverting to " @initial-revision item-uuid)
@@ -396,6 +405,8 @@
   (refresh-org-data)
   ;; Remove entry cached edits
   (remove-cached-item initial-uuid)
+  ;; reset initial revision after successful publish.
+  ;; need a new revision number on the next edit.
   (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
   ;; Send item read
@@ -411,6 +422,8 @@
         saved-activity-data (first (:entries new-board-data))]
     (au/save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
+    ;; reset initial revision after successful publish.
+    ;; need a new revision number on the next edit.
     (reset! initial-revision (dissoc @initial-revision entry-uuid))
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
