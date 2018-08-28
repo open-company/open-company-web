@@ -18,11 +18,6 @@
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
-(defn save-last-used-section [section-slug]
-  (let [org-slug (router/current-org-slug)
-        last-board-cookie (router/last-used-board-slug-cookie org-slug)]
-    (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))))
-
 (defn watch-boards [posts-data]
   (when (jwt/jwt) ; only for logged in users
     (let [board-slugs (distinct (map :board-slug (vals posts-data)))
@@ -63,7 +58,7 @@
         (router/redirect-404!))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
-        (save-last-used-section "all-posts")
+        (au/save-last-used-section "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards (:fixed-items fixed-all-posts))
@@ -91,7 +86,7 @@
           must-see-data (when success (json->cljs body))
           must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data))]
       (when (= (router/current-board-slug) "must-see")
-        (save-last-used-section "must-see"))
+        (au/save-last-used-section "must-see"))
       (watch-boards (:fixed-items must-see-posts))
       (dis/dispatch! [:must-see-get/finish org must-see-posts]))))
 
@@ -259,7 +254,7 @@
     (when (and (router/current-activity-id)
                (not= board-slug (router/current-board-slug)))
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
-    (save-last-used-section board-slug)
+    (au/save-last-used-section board-slug)
     (refresh-org-data)
     ; Remove saved cached item
     (remove-cached-item initial-uuid)
@@ -277,7 +272,7 @@
   (let [fixed-board-data (au/fix-board response)
         org-slug (router/current-org-slug)
         saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
-    (save-last-used-section (:slug fixed-board-data))
+    (au/save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
@@ -358,7 +353,7 @@
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
-  (save-last-used-section board-slug)
+  (au/save-last-used-section board-slug)
   (refresh-org-data)
   ;; Remove entry cached edits
   (remove-cached-item initial-uuid)
@@ -374,7 +369,7 @@
 (defn entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
   (let [board-slug (:slug new-board-data)
         saved-activity-data (first (:entries new-board-data))]
-    (save-last-used-section (:slug new-board-data))
+    (au/save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
