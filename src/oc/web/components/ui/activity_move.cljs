@@ -38,34 +38,35 @@
                                               (events/unlistenByKey @(::window-click s)))
                                             s)}
   [s {:keys [boards-list activity-data dismiss-cb]}]
-  [:div.activity-move
-    {:on-click #(do
-                  (utils/event-stop %)
-                  (when @(::show-boards-list s)
-                    (reset! (::show-boards-list s) false)))}
-    [:div.triangle]
-    [:div.move-post-inner
-      [:div.move-post-title
-        "Move"]
-      [:div.select-new-board
-        {:on-click #(do (utils/event-stop %) (reset! (::show-boards-list s) (not @(::show-boards-list s))))
-         :class (when (nil? @(::selected-board s)) "placeholder")}
-        (or (:name @(::selected-board s)) "Select a new board...")]
-      (when @(::show-boards-list s)
-        [:div.boards-list
-          (for [board boards-list]
-            [:div.board-item
-              {:key (str "activity-move-" (:uuid activity-data) "-board-list-" (:slug board))
-               :class (when (= (:board-slug activity-data) (:slug board)) "disabled")
-               :on-click #(when (not= (:board-slug activity-data) (:slug board))
-                            (reset! (::selected-board s) board)
-                            (reset! (::show-boards-list s) false))}
-              (:name board)])])
-      [:button.mlb-reset.mlb-default
-        {:on-click #(do (utils/event-stop %) (move-post s))
-         :disabled (not @(::selected-board s))}
-        "Apply"]
-      [:button.mlb-reset.mlb-link-black
-        {:on-click #(when (fn? dismiss-cb)
-                      (dismiss-cb))}
-        "Cancel"]]])
+  (let [sorted-boards-list (sort-by :name boards-list)]
+    [:div.activity-move
+      {:on-click #(do
+                    (utils/event-stop %)
+                    (when @(::show-boards-list s)
+                      (reset! (::show-boards-list s) false)))}
+      [:div.triangle]
+      [:div.move-post-inner
+        [:div.move-post-title
+          "Move"]
+        [:div.select-new-board
+          {:on-click #(do (utils/event-stop %) (reset! (::show-boards-list s) (not @(::show-boards-list s))))
+           :class (when (nil? @(::selected-board s)) "placeholder")}
+          (or (:name @(::selected-board s)) "Select a new board...")]
+        (when @(::show-boards-list s)
+          [:div.boards-list
+            (for [board sorted-boards-list]
+              [:div.board-item
+                {:key (str "activity-move-" (:uuid activity-data) "-board-list-" (:slug board))
+                 :class (when (= (:board-slug activity-data) (:slug board)) "disabled")
+                 :on-click #(when (not= (:board-slug activity-data) (:slug board))
+                              (reset! (::selected-board s) board)
+                              (reset! (::show-boards-list s) false))}
+                (:name board)])])
+        [:button.mlb-reset.mlb-default
+          {:on-click #(do (utils/event-stop %) (move-post s))
+           :disabled (not @(::selected-board s))}
+          "Apply"]
+        [:button.mlb-reset.mlb-link-black
+          {:on-click #(when (fn? dismiss-cb)
+                        (dismiss-cb))}
+          "Cancel"]]]))

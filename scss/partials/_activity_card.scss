@@ -180,6 +180,13 @@ div.activity-card {
       &>span, &>div {
         float: left;
       }
+
+      span.board-name {
+        max-width: 60%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     div.activity-card-headline {
