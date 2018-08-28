@@ -16,12 +16,14 @@ div.onboard-wrapper-container {
       background-color: $carrot_dark_bg_gray;
       padding: 21px;
       flex: 1;
-      position: absolute;
+      // position: absolute;
       position: fixed;
       top: 0px;
       bottom: 0px;
       left: 0px;
       width: 50%;
+      height: 100%;
+      display: table;
 
       @include mobile(){
         display: none;
@@ -33,19 +35,27 @@ div.onboard-wrapper-container {
         background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
         background-size: 82px 20px;
         background-repeat: no-repeat;
+        position: absolute;
+        left: 21px;
+        top: 21px;
       }
 
-      div.onboard-wrapper-box {
-        position: absolute;
-        left: 50%;
-        top: 220px;
-        margin-left: -147px;
-        margin-top: 0px;
-        width: 294px;
-        height: 301px;
-        @include image-2x("/img/ML/carrot_box");
-        background-size: 294px 301px;
-        background-repeat: no-repeat;
+      div.onboard-wrapper-left-inner {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+
+        div.onboard-wrapper-box {
+          margin-left: auto;
+          margin-right: auto;
+          width: 400px;
+          margin-top: 0px;
+          width: 294px;
+          height: 301px;
+          @include image-2x("/img/ML/carrot_box");
+          background-size: 294px 301px;
+          background-repeat: no-repeat;
+        }
       }
     }
 
@@ -175,7 +185,6 @@ div.onboard-lander {
       @include avenir_H();
       font-size: 32px;
       color: $deep_navy;
-      letter-spacing: auto;
       line-height: 44px;
       margin-top: 80px;
 
@@ -279,7 +288,6 @@ div.onboard-lander {
       @include avenir_R();
       font-size: 18px;
       color: $deep_navy;
-      letter-spacing: auto;
       margin-top: 24px;
       text-align: center;
 
@@ -307,15 +315,15 @@ div.onboard-lander {
     button.signup-with-slack, button.signup-with-google {
       width: 340px;
       height: 40px;
-      border: 1px solid $light_ui_grey;;
+      border: 1px solid #D8DBDF;
       color: $light_ui_grey;
-      border-radius: 4px;
+      border-radius: 100px;
       text-align: center;
 
       div.signup-with-slack-content, div.signup-with-google-content {
         @include avenir_H();
         font-size: 14px;
-        color: black;
+        color: $deep_navy;
         width: 100%;
         display: flex;
         justify-content: center;
@@ -371,9 +379,9 @@ div.onboard-lander {
         top: 0px;
         left: 71px;
         text-align: center;
-        @include avenir_H();
-        font-size: 16px;
-        color: rgba($oc_gray_7, 0.7);
+        @include avenir_R();
+        font-size: 14px;
+        color: $light_ui_grey;
         margin: 0 auto;
         width: 196px;
         background-color: white;
@@ -505,7 +513,7 @@ div.onboard-lander {
 
     div.field-label {
       @include avenir_H();
-      font-size: 15px;
+      font-size: 12px;
       color: $deep_navy;
       margin-top: 35px;
 
@@ -530,7 +538,7 @@ div.onboard-lander {
 
       a {
         text-decoration: underline;
-        color: rgba($oc_gray_7, 0.5);
+        color: $light_ui_grey;
       }
     }
 
@@ -538,15 +546,18 @@ div.onboard-lander {
       margin-top: 20px;
       @include avenir_R();
       font-size: 14px;
-      color: $oc_gray_7;
+      color: $deep_navy;
       text-align: center;
 
       a {
-        display: block;
-        @include avenir_H();
-        font-size: 16px;
-        color: $oc_gray_7;
-        text-decoration: underline;
+        @include avenir_R();
+        font-size: 14px;
+        color: $carrot_green;
+        margin-left: 8px;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
 

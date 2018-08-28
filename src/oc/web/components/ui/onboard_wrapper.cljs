@@ -54,7 +54,7 @@
            :on-click #(router/history-back!)
            :aria-label "Back"}]
         [:div.title.main-lander
-          "Welcome!"]
+          "Welcome to Carrot"]
         [:button.mlb-reset.top-continue
           {:class (when (or (not (utils/valid-email? @(::email s)))
                             (<= (count @(::pswd s)) 7))
@@ -641,7 +641,7 @@
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
         [:div.title.about-yourself
-          "Tell us a bit about yourself…"]
+          "Tell us a bit about you"]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -823,6 +823,7 @@
       {:class (str "onboard-" (name component))}
       [:div.onboard-wrapper-left
         [:div.onboard-wrapper-logo]
-        [:div.onboard-wrapper-box]]
+        [:div.onboard-wrapper-left-inner
+          [:div.onboard-wrapper-box]]]
       [:div.onboard-wrapper-right
         (get-component component)]]])
