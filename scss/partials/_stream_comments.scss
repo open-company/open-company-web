@@ -154,6 +154,9 @@ div.stream-comments {
             margin: 0;
             padding: 24px;
 
+            @include preload_image(cdnUrl("/img/ML/more_menu_edit_black.svg"));
+            @include preload_image(cdnUrl("/img/ML/more_menu_delete_black.svg"), "before");
+
             div.stream-comment-more-menu-item {
               height: 18px;
               @include avenir_H();
@@ -211,6 +214,9 @@ div.stream-comments {
             background-image: cdnUrl("/img/ML/comment_agree_off.svg");
             background-size: 14px 14px;
             background-position: center;
+
+            @include preload_image(cdnUrl("/img/ML/comment_agree_off.svg"));
+            @include preload_image(cdnUrl("/img/ML/comment_agree_hover.svg"), "before");
           }
 
           div.stream-comment-reaction-count {
