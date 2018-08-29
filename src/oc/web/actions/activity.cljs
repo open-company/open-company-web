@@ -289,7 +289,7 @@
     (remove-cached-item initial-uuid)
     ;; reset initial revision after successful save.
     ;; need a new revision number on the next edit.
-    (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
+    (swap! initial-revision dissoc (:uuid activity-data))
     (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
     (when (= (:status activity-data) "published")
@@ -308,7 +308,7 @@
     (remove-cached-item (:uuid activity-data))
     ;; reset initial revision after successful save.
     ;; need a new revision number on the next edit.
-    (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
+    (swap! initial-revision dissoc (:uuid activity-data))
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
@@ -359,7 +359,7 @@
   ;; revert draft to old version
   (timbre/debug "Reverting to " @initial-revision item-uuid)
   (when (not= "published" (:status item))
-    (let [revision-id (get @initial-revision item-uuid)]
+    (when-let [revision-id (get @initial-revision item-uuid)]
       (entry-revert revision-id item)))
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
@@ -406,7 +406,7 @@
   (remove-cached-item initial-uuid)
   ;; reset initial revision after successful publish.
   ;; need a new revision number on the next edit.
-  (reset! initial-revision (dissoc @initial-revision (:uuid activity-data)))
+  (swap! initial-revision dissoc (:uuid activity-data))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
   ;; Send item read
   (send-item-read (:uuid activity-data)))
@@ -423,7 +423,7 @@
     (remove-cached-item entry-uuid)
     ;; reset initial revision after successful publish.
     ;; need a new revision number on the next edit.
-    (reset! initial-revision (dissoc @initial-revision entry-uuid))
+    (swap! initial-revision dissoc entry-uuid)
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
