@@ -265,9 +265,8 @@
                    ;; set the initial version number after the first auto save
                    ;; this is used to revert if user decides to lose the changes
                    (when (nil? (get @initial-revision (:uuid entry-saved)))
-                     (reset! initial-revision
-                             {(:uuid entry-saved)
-                              (or (:revision-id entry-map) -1)}))
+                     (swap! initial-revision assoc (:uuid entry-saved)
+                      (or (:revision-id entry-map) -1)))
                    ;; merge with entry editing and only save once we have a uuid
                    (dis/dispatch! [:update [edit-key]
                                    #(merge % entry-saved)])))))
