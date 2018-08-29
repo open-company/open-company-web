@@ -505,17 +505,18 @@
   (dis/dispatch! [:activity-share share-data]))
 
 (defn entry-revert [revision-id entry-editing]
-  (let [entry-exists? (seq (:links entry-editing))
-        entry-version (assoc entry-editing :revision-id revision-id)
-        org-slug (router/current-org-slug)
-        board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
-        revert-entry-link (when entry-exists?
-                            ;; If the entry already exists use the publish link in it
-                            (utils/link-for (:links entry-editing) "revert"))]
-    (if entry-exists?
-      (api/revert-entry entry-version revert-entry-link
-                        (fn [] (dis/dispatch! [:entry-revert entry-version])))
-      (dis/dispatch! [:entry-revert false]))))
+  (when revision-id
+    (let [entry-exists? (seq (:links entry-editing))
+          entry-version (assoc entry-editing :revision-id revision-id)
+          org-slug (router/current-org-slug)
+          board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
+          revert-entry-link (when entry-exists?
+                              ;; If the entry already exists use the publish link in it
+                              (utils/link-for (:links entry-editing) "revert"))]
+      (if entry-exists?
+        (api/revert-entry entry-version revert-entry-link
+                          (fn [] (dis/dispatch! [:entry-revert entry-version])))
+        (dis/dispatch! [:entry-revert false])))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
   (when (= status 404)
