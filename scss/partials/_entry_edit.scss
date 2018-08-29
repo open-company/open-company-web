@@ -229,9 +229,13 @@ div.entry-edit-modal-container {
           font-size: 14px;
           float: left;
           color: $deep_navy;
+          max-width: 250px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding-right: 20px;
 
           &:after {
-            float: right;
             content: "";
             background-image: cdnUrl("/img/ML/board_settings.svg");
             background-size: 8px 8px;
@@ -239,8 +243,9 @@ div.entry-edit-modal-container {
             background-position: center;
             width: 20px;
             height: 20px;
-            margin-top: -2px;
-            margin-left: 4px;
+            position: absolute;
+            right: 0px;
+            top: -2px;
 
             &:hover {
               opacity: 1;
@@ -267,10 +272,17 @@ div.entry-edit-modal-container {
           position: relative;
           padding-left: 26px;
 
+          &:not(.remove-video-bt) {
+            @include preload_image(cdnUrl("/img/ML/capture_video_icon_hover.svg"));
+          }
+
           &.remove-video-bt {
+            @include preload_image(cdnUrl("/img/ML/remove_video_icon_hover.svg"));
+
             &:before {
               background-image: cdnUrl("/img/ML/remove_video_icon.svg");
             }
+
             &:hover {
               &:before {
                 background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
