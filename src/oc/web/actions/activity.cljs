@@ -505,7 +505,7 @@
   (dis/dispatch! [:activity-share share-data]))
 
 (defn entry-revert [revision-id entry-editing]
-  (when revision-id
+  (when (not (nil? revision-id))
     (let [entry-exists? (seq (:links entry-editing))
           entry-version (assoc entry-editing :revision-id revision-id)
           org-slug (router/current-org-slug)
