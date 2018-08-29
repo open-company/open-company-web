@@ -128,7 +128,7 @@
 (defn- org-created [org-data]
   (let [auth-source (jwt/get-key :auth-source)]
     (if (= auth-source "email")
-      (router/nav! (oc-urls/sign-up-invite (:slug org-data)))
+      (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))
       (org-redirect org-data))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
@@ -163,7 +163,9 @@
 
 (defn org-create [org-data]
   (when (seq (:name org-data))
-    (let [email-domains (remove clojure.string/blank? [(:email-domain org-data)])]
+    (let [email-domain (:email-domain org-data)
+          fixed-email-domain (if (.startsWith email-domain "@") (subs email-domain 1) email-domain)
+          email-domains (remove clojure.string/blank? [fixed-email-domain])]
       (api/create-org (:name org-data)
                       (:logo-url org-data)
                       (:logo-width org-data)

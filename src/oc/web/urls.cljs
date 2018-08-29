@@ -38,7 +38,14 @@
 (defn sign-up-invite
   ([]
     (sign-up-invite (router/current-org-slug)))
-  ([org-slug] (str "/sign-up-invite/" (name org-slug) )))
+  ([org-slug]
+    (str sign-up "/" (name org-slug) "/invite")))
+
+(defn sign-up-setup-sections
+  ([]
+    (sign-up-setup-sections (router/current-org-slug)))
+  ([org-slug]
+    (str sign-up "/" (name org-slug) "/sections")))
 
 (def slack-lander-check "/slack-lander/check")
 

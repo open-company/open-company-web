@@ -338,19 +338,31 @@
 
     (defroute signup-invite-route (urls/sign-up-invite ":org") {:as params}
       (timbre/info "Routing signup-invite-route" (urls/sign-up-invite ":org"))
-      (if (jwt/jwt)
-        (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
     (defroute signup-invite-slash-route (str (urls/sign-up-invite ":org") "/") {:as params}
       (timbre/info "Routing signup-invite-slash-route" (str (urls/sign-up-invite ":org") "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
+
+    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
+      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
       (if (jwt/jwt)
         (when (seq (cook/get-cookie (router/last-org-cookie)))
           (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
+
+    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
+      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
@@ -528,6 +540,8 @@
                                  signup-profile-slash-route
                                  signup-team-route
                                  signup-team-slash-route
+                                 signup-setup-sections-route
+                                 signup-setup-sections-slash-route
                                  signup-invite-route
                                  signup-invite-slash-route
                                  signup-route

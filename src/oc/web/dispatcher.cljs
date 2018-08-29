@@ -6,7 +6,67 @@
             [oc.web.lib.utils :as utils]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false}))
+                          :show-login-overlay false
+                          :sections-setup [{:name "All-hands"
+                                            :slug "all-hands"
+                                            :selected true}
+                                           {:name "Case Studies"
+                                            :slug "case-studies"
+                                            :selected false}
+                                           {:name "CEO Update"
+                                            :slug "ceo-update"
+                                            :selected false}
+                                           {:name "Competition"
+                                            :slug "competition"
+                                            :selected false}
+                                           {:name "Customer Wins"
+                                            :slug "customer-wins"
+                                            :selected false}
+                                           {:name "Decisions"
+                                            :slug "decisions"
+                                            :selected true}
+                                           {:name "Engineering"
+                                            :slug "engineering"
+                                            :selected false}
+                                           {:name "Events"
+                                            :slug "events"
+                                            :selected false}
+                                           {:name "Finances"
+                                            :slug "finances"
+                                            :selected false}
+                                           {:name "Key Metrics"
+                                            :slug "key-metrics"
+                                            :selected false}
+                                           {:name "Kudos"
+                                            :slug "kudos"
+                                            :selected false}
+                                           {:name "Lessons Learned"
+                                            :slug "lessons-learned"
+                                            :selected true}
+                                           {:name "People"
+                                            :slug "people"
+                                            :selected false}
+                                           {:name "Playbooks"
+                                            :slug "playbooks"
+                                            :selected false}
+                                           {:name "Press"
+                                            :slug "press"
+                                            :selected false}
+                                           {:name "Product Updates"
+                                            :slug "product-updates"
+                                            :selected false}
+                                           {:name "Sales"
+                                            :slug "sales"
+                                            :selected false}
+                                           {:name "Stories"
+                                            :slug "stories"
+                                            :selected false}
+                                           {:name "Team and Hiring"
+                                            :slug "team-and-hiring"
+                                            :selected false}
+                                           {:name "Week in review"
+                                            :slug "week-in-review"
+                                            :selected true}]}))
 
 ;; Data key paths
 
@@ -136,6 +196,7 @@
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :slack-bot-modal     [[:base] (fn [base] (:slack-bot-modal base))]
+   :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

@@ -265,8 +265,8 @@ div.onboard-lander {
   div.subtitle {
     @include avenir_R();
     font-size: 16px;
-    color: $oc_gray_7;
     margin-top: 16px;
+    color: $oc_gray_7;
     padding: 0px 24px;
 
     &.error {
@@ -421,17 +421,20 @@ div.onboard-lander {
 
         div.org-avatar.missing-logo {
           position: relative;
-          width: 80px;
-          height: 80px;
-          background-color: transparent;
-          background-image: cdnUrl("/img/ML/onboard_plus_icon.svg");
+          width: 72px;
+          height: 72px;
+          background-color: #F8FCFA;
+          border: 1px dashed $carrot_green;
+          border-radius: 8px;
+          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+          background-size: 16px 16px;
           background-position: center;
-          background-size: 80px 80px;
+          background-repeat: no-repeat;
         }
 
         div.org-avatar {
-          @include org-avatar(80);
-          margin-right: 10px;
+          @include org-avatar(72);
+          margin-right: 24px;
 
           @include mobile() {
             float: unset;
@@ -447,7 +450,7 @@ div.onboard-lander {
 
         div.add-picture-link {
           margin-left: 0px;
-          margin-top: 10px;
+          margin-top: 2px;
 
           @include mobile() {
             margin-top: 0px;
@@ -476,15 +479,15 @@ div.onboard-lander {
         }
       }
 
-      @include user-profile(82);
+      @include user-profile(72);
 
       div.add-picture-link {
         @include avenir_H();
-        font-size: 14px;
-        color: $carrot_green_2;
+        font-size: 16px;
+        color: $carrot_green;
         float: left;
         margin-left: 24px;
-        margin-top: 16px;
+        margin-top: 12px;
         width: 220px;
 
         @include mobile() {
@@ -497,10 +500,10 @@ div.onboard-lander {
       div.add-picture-link-subtitle {
         @include avenir_R();
         font-size: 14px;
-        color: rgba($oc_gray_7, 0.5);
+        color: $deep_navy;
         float: left;
         margin-left: 24px;
-        margin-top: 12px;
+        margin-top: 8px;
         width: 220px;
 
         @include mobile() {
@@ -521,6 +524,13 @@ div.onboard-lander {
         @include avenir_R();
         font-size: 14px;
         margin-top: 12px;
+        text-align: center;
+      }
+
+      span.info {
+        @include avenir_R();
+        font-size: 14px;
+        color: rgba($oc_gray_7, 0.5);
       }
 
       span.error {
@@ -566,20 +576,20 @@ div.onboard-lander {
       height: 40px;
       border-radius: 4px;
       background-color: white;
-      border: 1px solid rgba($carrot_light_gray_1, 0.5);
+      border: 1px solid $light_ui_grey;
       outline: none;
       padding: 10px 16px;
       position: relative;
-      @include avenir_BOOK();
-      font-size: 16px;
-      color: $oc_gray_7;
+      @include avenir_R();
+      font-size: 14px;
+      color: $deep_navy;
       line-height: 24px;
       letter-spacing: 0.2px;
       margin-top: 4px;
 
       @include placeholder() {
         @include avenir_R();
-        font-size: 16px;
+        font-size: 14px;
         color: $carrot_light_gray;
       }
 
@@ -588,15 +598,35 @@ div.onboard-lander {
       }
     }
 
+    textarea.field {
+      width: 100%;
+      height: 40px;
+      border-radius: 4px;
+      background-color: white;
+      border: 1px solid $light_ui_grey;
+      outline: none;
+      padding: 10px 16px;
+      position: relative;
+      @include avenir_R();
+      font-size: 14px;
+      color: rgba($deep_navy, 0.5);
+      margin-top: 4px;
+      resize: none;
+
+      &.has-value {
+        color: $deep_navy;
+      }
+    }
+
     div.description {
       @include avenir_R();
-      color: rgba($oc_gray_7, 0.5);
+      color: rgba($deep_navy, 0.5);
       font-size: 14px;
       margin-top: 24px;
 
       a {
         text-decoration: underline;
-        color: rgba($oc_gray_7, 0.5);
+        color: rgba($deep_navy, 0.5);
       }
     }
 
@@ -612,21 +642,12 @@ div.onboard-lander {
           width: 160px;
         }
 
-        label {
-           @include avenir_H();
-           font-size: 15px;
-           color: $deep_navy;
-           margin-top: 4px;
-
-           span.info {
-             @include avenir_R();
-             font-size: 14px;
-             color: rgba($oc_gray_7, 0.5);
-           }
-        }
-
         label.error {
           margin-left: 0px !important;
+          @include avenir_H();
+          font-size: 15px;
+          color: $deep_navy;
+          margin-top: 4px;
         }
       }
 
@@ -635,6 +656,7 @@ div.onboard-lander {
          height: 40px;
          border: 1px solid rgba($carrot_light_gray_1, 0.5);
          border-radius: 4px;
+         margin-top: 4px;
 
          input {
            float: left;
@@ -648,7 +670,7 @@ div.onboard-lander {
              @include avenir_R();
              margin-top: 10px;
              color: $ui_grey;
-             font-size: 16px;
+             font-size: 14px;
            }
          }
 
@@ -681,6 +703,15 @@ div.onboard-lander {
       font-size: 16px;
       border-radius: 100px;
 
+      &.invite-bt {
+        background-color: $carrot_orange_2;
+        color: white;
+
+        &.disabled {
+          background-color: rgba($carrot_orange_2, 0.2);
+        }
+      }
+
       &.disabled {
         background-color: $light_ui_grey;
       }
@@ -700,6 +731,55 @@ div.onboard-lander {
         @include mobile() {
           margin-top: 32px;
         }
+      }
+    }
+  }
+
+  &.lander-sections {
+
+    div.subtitle {
+      max-width: 400px;
+      text-align: center;
+      margin: 16px auto 0;
+    }
+
+    div.onboard-form {
+      width: 456px;
+      text-align: center;
+
+      div.sections-list {
+        margin: 24px auto;
+        width: 456px;
+        text-align: center;
+
+        div.section {
+          margin-left: 8px;
+          margin-top: 8px;
+          display: inline-block;
+          @include avenir_H();
+          font-size: 14px;
+          background-color: #F8FCFA;
+          color: $carrot_green;
+          border: 1px dashed #9FDEBE;
+          padding: 8px 16px;
+          border-radius: 6px;
+          cursor: pointer;
+          opacity: 0.9;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.selected {
+            color: white;
+            background-color: $carrot_green;
+            border: 1px solid $carrot_green;
+          }
+        }
+      }
+
+      button.continue {
+        width: 340px;
       }
     }
   }
@@ -724,7 +804,7 @@ div.onboard-lander {
 
       div.invite-rows {
         width: 340px;
-        margin: 24px auto;
+        margin: 0px auto;
 
         @include mobile(){
           width: 100%;
@@ -739,14 +819,18 @@ div.onboard-lander {
           height: 40px;
           padding: 8px 16px;
 
+          &:first-child {
+            margin-top: 0px;
+          }
+
           &.error {
             border: 1px solid $carrot_orange;
           }
 
           input {
-            @include avenir_BOOK();
-            font-size: 16px;
-            color: $ui_grey;
+            @include avenir_R();
+            font-size: 14px;
+            color: $deep_navy;
             outline: none;
             border: none;
             background-color: white;
@@ -755,13 +839,14 @@ div.onboard-lander {
             width: 100%;
 
             @include placeholder() {
-              color: #99A0A7;
+              color: $light_ui_grey;
             }
           }
         }
       }
 
       button.continue {
+        padding: 7px;
         @include mobile() {
           margin-bottom: 0px;
         }
@@ -769,14 +854,19 @@ div.onboard-lander {
 
       div.skip-container {
         width: 100%;
+        text-align: center;
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        margin: 24px auto 0px;
 
         button.skip-for-now {
-          color: $sea_blue;
-          margin: 16px auto 0;
-          width: 140px;
-          height: 25px;
-          text-align: center;
-          display: block;
+          display: inline-block;
+          @include avenir_H();
+          font-size: 14px;
+          color: $carrot_green;
+          margin: 0;
+          padding: 0;
         }
       }
     }

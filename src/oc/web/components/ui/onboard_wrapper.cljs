@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.user :as user-utils]
@@ -323,7 +324,7 @@
     [:div.onboard-lander.lander-team
       [:div.main-cta
         [:div.title.company-setup
-          "Your company"]
+          "Set up your company"]
         [:button.mlb-reset.top-continue
           {:class (when continue-disabled "disabled")
            :on-touch-start identity
@@ -364,8 +365,8 @@
               (org-avatar org-editing false :never)
               [:div.add-picture-link
                 (if (empty? (:logo-url org-editing))
-                  "+ Upload your company logo"
-                  "+ Change your company logo")]
+                  "Add company logo"
+                  "Change company logo")]
               [:div.add-picture-link-subtitle
                 "A 160x160 transparent Gif or PNG works best."]])
           [:div.field-label
@@ -382,8 +383,7 @@
                  ;; Email domains row
           [:div.org-email-domains-row.group
             [:div.field-label
-              [:label
-                "Allowed email domain " [:span.info "(optional)"]]
+              "Allowed email domain " [:span.info "(optional)"]
               (when (:error org-editing)
                 [:label.error
                    "Only company email domains are allowed."])]
@@ -401,12 +401,45 @@
                                (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
                                                                                         (not (utils/valid-domain? domain)))]))
                  :placeholder "Domain, e.g. acme.com"}]]
-            [:div.field-label.info "Anyone with email addresses at this domain can automatically join your team."]]
+            [:div.field-label.info "Anyone with email addresses at these domains can automatically join your company."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
             "Create team"]]]]))
+
+(rum/defcs lander-sections < rum/reactive
+                             (drv/drv :org-data)
+                             (drv/drv :sections-setup)
+  [s]
+  (let [sections-list (drv/react s :sections-setup)
+        org-data (drv/react s :org-data)
+        continue-fn (fn []
+                     (router/nav! (oc-urls/sign-up-invite (:slug org-data))))]
+    [:div.onboard-lander.lander-sections
+      [:div.main-cta
+        [:div.title
+          "Topics that matter"]
+        [:button.mlb-reset.top-continue
+          {:on-touch-start identity
+           :on-click continue-fn
+           :aria-label "Done"}
+         "Done"]
+        [:div.subtitle
+          "What do you commonly share with your team to keep them on the same page?"]]
+      [:div.onboard-form
+        [:div.sections-list
+          (for [idx (range (count sections-list))
+                :let [section (get sections-list idx)]]
+            [:div.section
+              {:key (str "sections-list-" (:slug section))
+               :class (when (:selected section) "selected")
+               :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
+              (:name section)])]
+        [:button.continue
+          {:on-touch-start identity
+           :on-click continue-fn}
+          "Continue"]]]))
 
 (def default-invite-row
   {:user ""
@@ -420,6 +453,11 @@
 (defn- check-invites [s]
   (reset! (::invite-rows s) (vec (map check-invite-row @(::invite-rows s)))))
 
+(def default-invite-note
+  (str
+    "Hey there, let's explore Carrot together. It's a place to make sure important "
+    "announcements, updates, and decisions don't get lost in the noise."))
+
 (rum/defcs lander-invite < rum/reactive
                            (drv/drv :org-data)
                            (drv/drv :invite-users)
@@ -427,9 +465,15 @@
                            (rum/local nil ::invite-error)
                            (rum/local (rand 3) ::invite-rand)
                            (rum/local (vec (repeat 3 default-invite-row)) ::invite-rows)
+                           (rum/local default-invite-note ::invite-note)
                            {:did-mount (fn [s]
                              ;; Load the list of teams if it's not already
                              (team-actions/teams-get-if-needed)
+                             (utils/after 500
+                              #(ui-utils/resize-textarea (rum/ref-node s "personal-note")))
+                             s)
+                            :did-remount (fn [_ s]
+                             (ui-utils/resize-textarea (rum/ref-node s "personal-note"))
                              s)
                             :will-update (fn [s]
                              ;; Load the list of teams if it's not already
@@ -452,6 +496,8 @@
   [s]
   (let [_ (drv/react s :invite-users)
         org-data (drv/react s :org-data)
+        valid-rows (filter #(and (seq (:user %))
+                                 (not (:error %))) @(::invite-rows s))
         continue-fn (fn []
                      (let [_ (check-invites s)
                            errors (filter :error @(::invite-rows s))]
@@ -463,23 +509,21 @@
     [:div.onboard-lander.lander-invite
       [:div.main-cta
         [:div.title
-          "Setup complete!"]
+          "Almost there!"]
         [:button.mlb-reset.top-continue
           {:on-touch-start identity
            :on-click continue-fn
            :aria-label "Done"}
          "Done"]]
       [:div.onboard-form
-        [:div.subtitle
-          "Invite a few colleagues to explore Carrot with you."]
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
           [:div.field-label
-            "Email address"
+            "Invite teammates " [:span.info "(optional)"]
             [:button.mlb-reset.add-another-invite-row
               {:on-click #(reset! (::invite-rows s) (vec (conj @(::invite-rows s) default-invite-row)))}
-              "+ Add another invitation"]]
+              "+ add another invitation"]]
           (when @(::invite-error s)
             [:div.error @(::invite-error s)])
           [:div.invite-rows.fs-hide
@@ -498,14 +542,23 @@
                                   (assoc invite :user (.. e -target -value)))))
                                (check-invites s))
                    :value (:user invite)}]])]
-          [:button.continue
+          [:div.field-label
+            "Personal note "
+            [:span.info "(optional)"]]
+          [:textarea.field
+            {:default-value @(::invite-note s)
+             :ref "personal-note"
+             :on-input #(let [target (.-target %)]
+                          (ui-utils/resize-textarea target)
+                          (reset! (::invite-note s) (.-innerText target)))
+             :class (when (pos? (count valid-rows)) "has-value")}]
+          [:button.continue.invite-bt
             {:on-touch-start identity
              :on-click continue-fn
              :class (when @(::inviting s) "disabled")}
-            (if @(::inviting s)
-              "Seding invites..."
-              "Send invites")]
+            "✨ Start using Carrot ✨"]
           [:div.skip-container
+            "Want to do this later? "
             [:button.mlb-reset.skip-for-now
               {:on-click #(org-actions/org-redirect org-data)}
               "Skip for now"]]]]]))
@@ -807,6 +860,7 @@
     :lander (lander)
     :lander-profile (lander-profile)
     :lander-team (lander-team)
+    :lander-sections (lander-sections)
     :lander-invite (lander-invite)
     :invitee-lander (invitee-lander)
     :invitee-lander-password (invitee-lander-password)
