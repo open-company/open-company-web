@@ -73,23 +73,6 @@ div.onboard-wrapper-container {
         width: 100%;
         position: unset;
       }
-
-      button.mobile-blue-back {
-        display: none;
-
-        @include mobile() {
-          display: block;
-          width: 19px;
-          height: 15px;
-          position: absolute;
-          top: 25px;
-          left: 24px;
-          background-image: cdnUrl("/img/ML/black_back_arrow.svg");
-          background-size: 19px 15px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-      }
     }
   }
 }
@@ -546,8 +529,9 @@ div.onboard-lander {
       &.info {
         @include avenir_R();
         font-size: 14px;
-        margin-top: 12px;
         text-align: center;
+        max-width: 300px;
+        margin: 21px auto 0;
       }
 
       span.info {
