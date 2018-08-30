@@ -401,7 +401,7 @@
                                (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
                                                                                         (not (utils/valid-domain? domain)))]))
                  :placeholder "Domain, e.g. acme.com"}]]
-            [:div.field-label.info "Anyone with email addresses at these domains can automatically join your company."]]
+            [:div.field-label.info "Anyone with this email domain can automatically join your company."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
