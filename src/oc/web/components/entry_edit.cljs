@@ -13,6 +13,7 @@
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -229,6 +230,7 @@
                         (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
                         (drv/drv :show-sections-picker)
+                        (drv/drv :show-edit-tooltip)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local "" ::initial-body)
@@ -506,7 +508,21 @@
                  :default-value (:video-transcript entry-editing)}]])
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
-           #(activity-actions/remove-attachment :entry-editing %))]
+           #(activity-actions/remove-attachment :entry-editing %))
+          (when-not (drv/react s :show-edit-tooltip)
+            [:div.edit-tooltip-container.group
+              [:button.mlb-reset.edit-tooltip-dismiss
+                {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+              [:div.edit-tooltips
+                [:div.edit-tooltip-title
+                  "✍️ Update your team in seconds"]
+                [:div.edit-tooltip
+                  (str
+                   "Carrot keeps everyone aligned around key announcements, updates, and decisions. "
+                   "Don't feel like typing? No worries, ")
+                   [:button.mlb-reset.edit-tooltip-record-video-bt
+                    "record a video"]
+                   " instead."]]])]
         [:div.entry-edit-modal-footer.group
           [:div.entry-edit-footer-multi-picker
             {:id "entry-edit-footer-multi-picker"}]

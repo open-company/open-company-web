@@ -10,6 +10,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
@@ -63,6 +64,7 @@
                          (drv/drv :org-data)
                          (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
+                         (drv/drv :show-add-comment-tooltip)
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
@@ -281,4 +283,16 @@
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data true)]])]))
+              (stream-comments activity-data comments-data true)
+              (when-not (drv/react s :show-add-comment-tooltip)
+                [:div.add-comment-tooltip-container.group
+                  [:button.mlb-reset.add-comment-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-add-comment-tooltip)}]
+                  [:div.add-comment-tooltips
+                    [:div.add-comment-tooltip-title
+                      "💭 Spark better follow-on discussions"]
+                    [:div.add-comment-tooltip
+                      (str
+                       "Team reactions and comments give everyone greater context for what's "
+                       "happening and why. Using Slack? Your team can join the discussion "
+                       "from Slack, too — Carrot keeps it all in sync.")]]])]])]))

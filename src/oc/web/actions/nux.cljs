@@ -69,7 +69,9 @@
 
 (def default-first-post-user-id "1111-1111-1111")
 
-(defn check-nux
+(defn check-nux [])
+
+(defn check-nux-ex
   "NUX Logic:
   if user is new
     if has only one post and no dismiss add post TT cookie
@@ -152,7 +154,8 @@
 
 (defn dismiss-add-post-tooltip []
   (when-let [new-user-cookie (get-new-user-cookie)]
-    (dis/dispatch! [:input [:show-add-post-tooltip] nil])
+    (dis/dispatch! [:update [:show-add-post-tooltip] not])
+    (dis/dispatch! [:update [:show-post-added-tooltip] not])
     (set-new-user-cookie (:user-type new-user-cookie) 2)
     (check-nux)))
 
@@ -164,3 +167,16 @@
 (defn dismiss-add-bot-notification []
   (when-let [new-user-cookie (get-new-user-cookie)]
     (set-new-user-cookie (:user-type new-user-cookie) 3)))
+
+(defn dismiss-add-comment-tooltip []
+  (dis/dispatch! [:update [:show-add-comment-tooltip] not]))
+
+(defn dismiss-edit-tooltip []
+  (dis/dispatch! [:update [:show-edit-tooltip] not]))
+
+(defn dismiss-post-added-tooltip []
+  (dis/dispatch! [:update [:show-post-added-tooltip] not])
+  (dis/dispatch! [:update [:show-being-heard-tooltip] not]))
+
+(defn dismiss-being-heard-tooltip []
+  (dis/dispatch! [:update [:show-being-heard-tooltip] not]))

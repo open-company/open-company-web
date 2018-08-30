@@ -7,6 +7,11 @@
 
 (defonce app-state (atom {:loading false
                           :show-login-overlay false
+                          :show-add-post-tooltip true
+                          :show-post-added-tooltip false
+                          :show-being-heard-tooltip false
+                          :show-edit-tooltip true
+                          :show-add-comment-tooltip true
                           :sections-setup [{:name "All-hands"
                                             :slug "all-hands"
                                             :selected true}
@@ -180,6 +185,10 @@
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
+   :show-add-comment-tooltip [[:base] (fn [base] (:show-add-comment-tooltip base))]
+   :show-edit-tooltip [[:base] (fn [base] (:show-edit-tooltip base))]
+   :show-post-added-tooltip [[:base] (fn [base] (:show-post-added-tooltip base))]
+   :show-being-heard-tooltip [[:base] (fn [base] (:show-being-heard-tooltip base))]
    :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
