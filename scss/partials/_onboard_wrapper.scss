@@ -173,74 +173,79 @@ div.onboard-lander {
 
   div.main-cta {
 
-    @include mobile() {
-      margin-top: 0px;
-      height: 64px;
-      text-align: center;
-      width: 100%;
-      box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+    div.mobile-header {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        margin-top: 0px;
+        height: 54px;
+        text-align: center;
+        width: 100%;
+        border-bottom: 1px solid #ECECEC;
+        position: relative;
+
+        div.mobile-logo {
+          position: absolute;
+          top: 8px;
+          left: 50%;
+          margin-left: -9px;
+          background-image: cdnUrl("/img/ML/carrot_logo.svg");
+          background-size: 18px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 18px;
+          height: 32px;
+          display: block;
+        }
+
+        button.top-back-button {
+          display: block;
+          float: left;
+          height: 40px;
+          width: 40px;
+          background-color: white;
+          background-image: cdnUrl("/img/ML/gray_back_x.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          padding: 0px;
+          position: absolute;
+          top: 8px;
+          left: 24px;
+        }
+
+        button.top-continue {
+          display: block;
+          float: right;
+          @include avenir_H();
+          font-size: 15px;
+          height: 32px;
+          width: 66px;
+          padding: 0px;
+          position: absolute;
+          top: 12px;
+          right: 24px;
+          color: $carrot_green;
+          text-align: right;
+
+          &.disabled {
+            color: $light_ui_grey;
+          }
+        }
+      }
     }
 
     div.title {
       @include avenir_H();
       font-size: 32px;
-      color: $deep_navy;
-      line-height: 44px;
       margin-top: 80px;
 
       @include mobile() {
         margin-top: 0px;
         padding-top: 21px;
-        @include avenir_H();
-        font-size: 18px;
-        color: $deep_navy;
-        height: 45px;
-        line-height: 25px;
-        width: 200px;
+        font-size: 24px;
         margin: 0 auto;
-      }
-    }
-
-    button.top-back-button {
-      display: none;
-
-      @include tablet(){
-        display: block;
-        float: left;
-        height: 40px;
-        width: 40px;
-        background-color: white;
-        background-image: cdnUrl("/img/ML/gray_back_x.svg");
-        background-size: 14px 14px;
-        background-position: center;
-        background-repeat: no-repeat;
-        padding: 0px;
-        position: absolute;
-        top: 12px;
-        left: 24px;
-      } 
-    }
-
-    button.top-continue {
-      display: none;
-
-      @include tablet(){
-        display: block;
-        float: right;
-        @include avenir_H();
-        font-size: 15px;
-        height: 32px;
-        width: 66px;
-        padding: 0px;
-        position: absolute;
-        top: 18px;
-        right: 24px;
-        color: $carrot_green;
-        text-align: right;
-
-        &.disabled {
-          color: $light_ui_grey;
-        }
       }
     }
 
@@ -492,6 +497,11 @@ div.onboard-lander {
         background-size: 16px 16px;
         background-position: center;
         background-repeat: no-repeat;
+
+        @include mobile() {
+          float: unset;
+          margin: 0 auto;
+        }
       }
 
       div.add-picture-link {

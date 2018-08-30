@@ -50,27 +50,29 @@
         auth-settings (drv/react s :auth-settings)]
     [:div.onboard-lander.lander
       [:div.main-cta
-        [:button.mlb-reset.top-back-button
-          {:on-touch-start identity
-           :on-click #(router/history-back!)
-           :aria-label "Back"}]
-        [:div.title.main-lander
-          "Welcome to Carrot"]
-        [:button.mlb-reset.top-continue
-          {:class (when (or (not (utils/valid-email? @(::email s)))
-                            (<= (count @(::pswd s)) 7))
-                    "disabled")
-           :on-touch-start identity
-           :on-click #(if (or (not (utils/valid-email? @(::email s)))
+        [:div.mobile-header
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+             :on-click #(router/history-back!)
+             :aria-label "Back"}]
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:class (when (or (not (utils/valid-email? @(::email s)))
                               (<= (count @(::pswd s)) 7))
-                        (do
-                          (when-not (utils/valid-email? @(::email s))
-                            (reset! (::email-error s) true))
-                          (when (<= (count @(::pswd s)) 7)
-                            (reset! (::password-error s) true)))
-                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
-           :aria-label "Continue"}
-           "Continue"]]
+                      "disabled")
+             :on-touch-start identity
+             :on-click #(if (or (not (utils/valid-email? @(::email s)))
+                                (<= (count @(::pswd s)) 7))
+                          (do
+                            (when-not (utils/valid-email? @(::email s))
+                              (reset! (::email-error s) true))
+                            (when (<= (count @(::pswd s)) 7)
+                              (reset! (::password-error s) true)))
+                          (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
+             :aria-label "Continue"}
+             "Continue"]]
+        [:div.title.main-lander
+          "Welcome to Carrot"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -200,14 +202,16 @@
         is-jelly-head-avatar (= (:avatar-url fixed-user-data) (:avatar-url user-data))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+           {:class (when continue-disabled "disabled")
+            :on-touch-start identity
+            :on-click continue-fn
+            :aria-label "Continue"}
+            "Continue"]]
         [:div.title.about-yourself
-          "Personal details"]
-        [:button.mlb-reset.top-continue
-          {:class (when continue-disabled "disabled")
-           :on-touch-start identity
-           :on-click continue-fn
-           :aria-label "Continue"}
-          "Continue"]]
+          "Personal details"]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -326,14 +330,16 @@
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:class (when continue-disabled "disabled")
+             :on-touch-start identity
+             :on-click continue-fn
+             :aria-label "Continue"}
+           "Continue"]]
         [:div.title.company-setup
-          "Set up your company"]
-        [:button.mlb-reset.top-continue
-          {:class (when continue-disabled "disabled")
-           :on-touch-start identity
-           :on-click continue-fn
-           :aria-label "Done"}
-         "Done"]]
+          "Set up your company"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -421,13 +427,15 @@
                      (router/nav! (oc-urls/sign-up-invite (:slug org-data))))]
     [:div.onboard-lander.lander-sections
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :aria-label "Continue"}
+           "Continue"]]
         [:div.title
           "Topics that matter"]
-        [:button.mlb-reset.top-continue
-          {:on-touch-start identity
-           :on-click continue-fn
-           :aria-label "Done"}
-         "Done"]
         [:div.subtitle
           "What do you commonly share with your team to keep them on the same page?"]]
       [:div.onboard-form
@@ -511,13 +519,15 @@
                            (team-actions/invite-users not-empty-invites "")))))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :aria-label "Done"}
+           "Done"]]
         [:div.title
-          "Almost there!"]
-        [:button.mlb-reset.top-continue
-          {:on-touch-start identity
-           :on-click continue-fn
-           :aria-label "Done"}
-         "Done"]]
+          "Almost there!"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -602,6 +612,7 @@
       [:div.main-cta
         [:div.title
           "Join your team on Carrot"]
+        [:div.mobile-logo.mobile-only]
         (if (:invitation-error confirm-invitation)
           [:div.subtitle
             "An error occurred while confirming your invitation, please try again."]
@@ -622,6 +633,8 @@
         invitation-confirmed (:invitation-confirmed collect-password)]
     [:div.onboard-lander.invitee-lander-password
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
         [:div.title
           "Join your team on Carrot"]
         [:div.subtitle
@@ -697,6 +710,8 @@
         is-jelly-head-avatar (= (:avatar-url fixed-user-data) (:avatar-url user-data))]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
         [:div.title.about-yourself
           "Tell us a bit about you"]
         [:div.subtitle
