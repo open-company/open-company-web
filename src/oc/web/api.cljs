@@ -423,7 +423,7 @@
        :json-params (cljs->json new-team-data)}
       callback)))
 
-(defn create-org [org-name logo-url logo-width logo-height email-domains callback]
+(defn create-org [org-name logo-url logo-width logo-height callback]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
         org-data {:name org-name :team-id team-id}
@@ -437,7 +437,7 @@
         {:headers (headers-for-link create-org-link)
          :json-params (cljs->json with-logo)}
         (fn [response]
-          (callback response email-domains))))))
+          (callback response))))))
 
 (defn create-board [board-data note callback]
   (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")

@@ -51,6 +51,7 @@
       max-width: #{$max_logo_height * 8}px;
       max-height: #{$max_logo_height}px;
       vertical-align: top;
+      border-radius: 8px;
     }
 
     span.org-name {

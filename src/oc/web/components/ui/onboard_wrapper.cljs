@@ -319,7 +319,7 @@
                          (if (and (seq org-name)
                                   (> (count org-name) 2))
                            ;; Create org and show setup screen
-                           (org-actions/org-create @(drv/get-ref s :org-editing))
+                           (org-actions/create-or-update-org @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
       [:div.main-cta

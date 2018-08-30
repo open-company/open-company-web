@@ -285,16 +285,18 @@
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
-      (when (and (jwt/jwt)
-                 (seq (cook/get-cookie (router/last-org-cookie))))
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when (jwt/jwt)
+        (if (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! urls/sign-up-profile)))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute sign-up-slack-route urls/sign-up-slack {:as params}
       (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
-      (when (and (jwt/jwt)
-                 (seq (cook/get-cookie (router/last-org-cookie))))
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when (jwt/jwt)
+        (if (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! urls/sign-up-profile)))
       (simple-handler slack-lander "slack-lander" target params))
 
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
@@ -306,17 +308,13 @@
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
-      (if (jwt/jwt)
-        (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
-      (if (jwt/jwt)
-        (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
@@ -336,6 +334,18 @@
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
+    (defroute signup-update-team-route (urls/sign-up-update-team ":org") {:as params}
+      (timbre/info "Routing signup-update-team-route" (urls/sign-up-update-team ":org"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+
+    (defroute signup-update-team-slash-route (str (urls/sign-up-update-team ":org") "/") {:as params}
+      (timbre/info "Routing signup-update-team-slash-route" (str (urls/sign-up-update-team ":org") "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+
     (defroute signup-invite-route (urls/sign-up-invite ":org") {:as params}
       (timbre/info "Routing signup-invite-route" (urls/sign-up-invite ":org"))
       (when-not (jwt/jwt)
@@ -350,17 +360,13 @@
 
     (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
       (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
-      (if (jwt/jwt)
-        (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
 
     (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
       (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
-      (if (jwt/jwt)
-        (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
 
@@ -540,6 +546,8 @@
                                  signup-profile-slash-route
                                  signup-team-route
                                  signup-team-slash-route
+                                 signup-update-team-route
+                                 signup-update-team-slash-route
                                  signup-setup-sections-route
                                  signup-setup-sections-slash-route
                                  signup-invite-route

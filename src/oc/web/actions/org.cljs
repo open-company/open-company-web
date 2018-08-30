@@ -146,32 +146,49 @@
     ;; if not redirect the user to the invite page
     (org-created org-data)))
 
-(defn org-create-cb [{:keys [success status body]} email-domains]
+(defn update-email-domains [email-domains org-data]
+  (let [team-data (dis/team-data (:team-id org-data))
+        redirect-cb #(handle-org-redirect team-data org-data)]
+    (if (pos? (count email-domains))
+      (doseq [domain email-domains]
+        (api/add-email-domain domain redirect-cb team-data))
+      (redirect-cb))))
+
+(defn org-create-check-errors [status]
+  (when (= status 409)
+    ;; Redirect to the already available org
+    (router/nav! (oc-urls/org (:slug (first (dis/orgs-data)))))))
+
+(defn org-create-cb [email-domains {:keys [success status body]}]
+  (if success
+    (when-let [org-data (when success (json->cljs body))]
+      ;; rewrite history so when user come back here we load org data and patch them
+      ;; instead of creating them
+      (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
+      (org-loaded org-data false)
+      (update-email-domains email-domains org-data))
+    (org-create-check-errors status)))
+
+(defn org-update-cb [email-domains {:keys [success status body]}]
   (if success
     (when-let [org-data (when success (json->cljs body))]
       (org-loaded org-data false)
-      (let [team-data (dis/team-data (:team-id org-data))]
-        (if (pos? (count email-domains))
-          (doseq [domain email-domains]
-            (api/add-email-domain domain
-                                  #(handle-org-redirect team-data org-data)
-                                  team-data))
-          (handle-org-redirect team-data org-data))))
-    (when (= status 409)
-      ;; Redirect to the already available org
-      (router/nav! (oc-urls/org (:slug (first (dis/orgs-data))))))))
+      (update-email-domains email-domains org-data))
+    (org-create-check-errors status)))
 
-(defn org-create [org-data]
+(defn create-or-update-org [org-data]
   (when (seq (:name org-data))
     (let [email-domain (:email-domain org-data)
           fixed-email-domain (if (.startsWith email-domain "@") (subs email-domain 1) email-domain)
-          email-domains (remove clojure.string/blank? [fixed-email-domain])]
-      (api/create-org (:name org-data)
-                      (:logo-url org-data)
-                      (:logo-width org-data)
-                      (:logo-height org-data)
-                      email-domains
-                      org-create-cb))))
+          email-domains (remove clojure.string/blank? [fixed-email-domain])
+          existing-org (dis/org-data)]
+      (if (seq (:slug existing-org))
+        (api/patch-org org-data (partial org-update-cb email-domains))
+        (api/create-org (:name org-data)
+                        (:logo-url org-data)
+                        (:logo-width org-data)
+                        (:logo-height org-data)
+                        (partial org-create-cb email-domains))))))
 
 ;; Org edit
 

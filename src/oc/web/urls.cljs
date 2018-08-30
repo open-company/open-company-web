@@ -35,6 +35,12 @@
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")
 
+(defn sign-up-update-team
+  ([]
+    (sign-up-update-team (router/current-org-slug)))
+  ([org-slug]
+    (str sign-up "/" (name org-slug) "/team")))
+
 (defn sign-up-invite
   ([]
     (sign-up-invite (router/current-org-slug)))
