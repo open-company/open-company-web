@@ -196,7 +196,8 @@
                               (empty? (:avatar-url user-data)))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
-                       (user-actions/user-profile-save current-user-data edit-user-profile))]
+                       (user-actions/user-profile-save current-user-data edit-user-profile))
+        is-jelly-head-avatar (= (:avatar-url fixed-user-data) (:avatar-url user-data))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.title.about-yourself
@@ -224,7 +225,9 @@
                           nil
                           (fn [_])
                           nil))}
-            (user-avatar-image fixed-user-data)
+            (if is-jelly-head-avatar
+              [:div.empty-user-avatar-placeholder]
+              (user-avatar-image fixed-user-data))
             [:div.add-picture-link
               "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
@@ -690,7 +693,8 @@
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)]
+                          user-data)
+        is-jelly-head-avatar (= (:avatar-url fixed-user-data) (:avatar-url user-data))]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
         [:div.title.about-yourself
@@ -714,7 +718,9 @@
                           nil
                           (fn [_])
                           nil))}
-            (user-avatar-image fixed-user-data)
+            (if is-jelly-head-avatar
+              [:div.empty-user-avatar-placeholder]
+              (user-avatar-image fixed-user-data))
             [:div.add-picture-link
               "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
