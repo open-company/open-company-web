@@ -472,10 +472,11 @@
                          :position "top"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
-          (if (:has-changes cmail-data)
-            [:div.saving-saved "Saving..."]
-            (when (false? (:auto-saving cmail-data))
-              [:div.saving-saved "Saved"]))
+          (when (not= (:status cmail-data) "published")
+            (if (:has-changes cmail-data)
+              [:div.saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.saving-saved "Saved"])))
           [:div.cmail-footer-right
             [:div.footer-separator]
             [:div.delete-button-container
