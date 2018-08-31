@@ -530,7 +530,9 @@
              :aria-label "Done"}
            "Done"]]
         [:div.title
-          "Almost there!"]]
+          "Invite your team"]
+        [:div.subtitle
+          "Invite other people to explore Carrot with you."]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]

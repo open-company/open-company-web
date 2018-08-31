@@ -295,4 +295,4 @@
                       (str
                        "Team reactions and comments give everyone greater context for what's "
                        "happening and why. Using Slack? Your team can join the discussion "
-                       "from Slack, too — Carrot keeps it all in sync.")]]])]])]))
+                       "from Slack, too.")]]])]])]))

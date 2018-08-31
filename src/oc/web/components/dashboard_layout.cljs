@@ -304,9 +304,8 @@
                       (str "Welcome to Carrot, " (:first-name current-user-data))]
                     [:div.add-post-tooltip
                       (str
-                       "Alignment happens when teams pull in the same direction. "
-                       "Create your first post in Carrot to see how simple it is to "
-                       "keep everyone in sync. ")
+                        "Alignment happens when teams pull in the same direction. "
+                        "Create your first post to get everyone in sync. ")
                       [:button.mlb-reset.add-post-bt
                         {:on-click #(when can-compose (compose s))}
                         "Create new post"]]
@@ -322,10 +321,12 @@
                     [:div.post-added-tooltip-title
                       "First post success!"]
                     [:div.post-added-tooltip
-                      "Being transparent means consistent communication for your team. "
+                      (str
+                       "Carrot shows you who's seen your post, and makes "
+                       "it easy to remind anyone that didn't. ")
                       [:button.mlb-reset.post-added-bt
                         "Invite other team leaders"]
-                      " to add their voices, too."]
+                      " to get started."]
                     [:div.post-added-tooltip-box]]])
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
