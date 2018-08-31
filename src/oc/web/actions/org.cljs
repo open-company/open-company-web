@@ -228,3 +228,10 @@
           (let [current-board-data (dis/board-data)]
             (when (= (:item-id change-data) (:uuid current-board-data))
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
+
+(defn update-org-sections [org-slug all-sections]
+  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
+        patch-payload {:boards (conj selected-sections "General")
+                       :samples true}]
+    (api/patch-org-sections patch-payload
+     #(router/nav! (oc-urls/sign-up-invite org-slug)))))

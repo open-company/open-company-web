@@ -268,6 +268,16 @@
          :headers (headers-for-link org-patch-link)}
         callback))))
 
+(defn patch-org-sections [data callback]
+  (when data
+    (let [json-data (cljs->json data)
+          links (:links (dispatcher/org-data))
+          org-patch-link (utils/link-for links "partial-update")]
+      (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
+        {:json-params json-data
+         :headers (headers-for-link org-patch-link)}
+        callback))))
+
 (defn get-auth-settings
   ([] (get-auth-settings #()))
   ([callback]

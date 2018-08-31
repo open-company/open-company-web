@@ -425,7 +425,7 @@
   (let [sections-list (drv/react s :sections-setup)
         org-data (drv/react s :org-data)
         continue-fn (fn []
-                     (router/nav! (oc-urls/sign-up-invite (:slug org-data))))]
+                     (org-actions/update-org-sections (:slug org-data) sections-list))]
     [:div.onboard-lander.lander-sections
       [:div.main-cta
         [:div.mobile-header.mobile-only
