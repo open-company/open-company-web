@@ -253,7 +253,7 @@ div.dashboard-layout {
         }
       }
 
-      div.being-heard-tooltip-container {
+      div.draft-post-tooltip-container {
         border: 1px dashed $carrot_gold;
         background-color: #FDF6E4;
         border-radius: 6px;
@@ -266,7 +266,7 @@ div.dashboard-layout {
           margin: 32px 24px;
         }
 
-        button.being-heard-tooltip-dismiss {
+        button.draft-post-tooltip-dismiss {
           position: absolute;
           top: 16px;
           right: 16px;
@@ -278,7 +278,7 @@ div.dashboard-layout {
           background-repeat: no-repeat;
         }
 
-        div.being-heard-tooltips {
+        div.draft-post-tooltips {
           width: 396px;
           float: left;
 
@@ -286,21 +286,21 @@ div.dashboard-layout {
             width: 100%;
           }
 
-          div.being-heard-tooltip-title {
+          div.draft-post-tooltip-title {
             @include avenir_H();
             font-size: 22px;
             color: $deep_navy;
             line-height: 20px;
           }
 
-          div.being-heard-tooltip {
+          div.draft-post-tooltip {
             @include avenir_R();
             font-size: 16px;
             color: $deep_navy;
             line-height: 20px;
             margin-top: 8px;
 
-            button.being-heard-bt {
+            button.draft-post-bt {
               display: inline;
               background-color: transparent;
               padding: 0;
@@ -318,7 +318,7 @@ div.dashboard-layout {
             }
           }
 
-          div.being-heard-tooltip-box {
+          div.draft-post-tooltip-box {
             position: absolute;
             bottom: 0px;
             right: 60px;

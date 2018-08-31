@@ -19,6 +19,7 @@
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.dom :as gdom]
@@ -199,7 +200,7 @@
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (user-actions/user-profile-save current-user-data edit-user-profile))
-        is-jelly-head-avatar (= (:avatar-url fixed-user-data) (:avatar-url user-data))]
+        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.mobile-header.mobile-only
@@ -440,13 +441,15 @@
           "What do you commonly share with your team to keep them on the same page?"]]
       [:div.onboard-form
         [:div.sections-list
-          (for [idx (range (count sections-list))
-                :let [section (get sections-list idx)]]
-            [:div.section
-              {:key (str "sections-list-" (:slug section))
-               :class (when (:selected section) "selected")
-               :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
-              (:name section)])]
+          (if (seq sections-list)
+            (for [idx (range (count sections-list))
+                  :let [section (get sections-list idx)]]
+              [:div.section
+                {:key (str "sections-list-" (:name section))
+                 :class (when (:selected section) "selected")
+                 :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
+                (:name section)])
+            (small-loading))]
         [:button.continue
           {:on-touch-start identity
            :on-click continue-fn}
@@ -832,7 +835,7 @@
                           (if (and (empty? (jwt/get-key :first-name))
                                    (empty? (jwt/get-key :last-name)))
                             (do
-                              (nux-actions/set-new-user-cookie "email")
+                              (nux-actions/new-user-registered "email")
                               (router/nav! oc-urls/confirm-invitation-profile))
                             (router/nav! (oc-urls/org (:slug org))))
                           (router/nav! oc-urls/login)))

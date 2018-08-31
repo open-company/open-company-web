@@ -6,72 +6,7 @@
             [oc.web.lib.utils :as utils]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false
-                          :show-add-post-tooltip true
-                          :show-post-added-tooltip false
-                          :show-being-heard-tooltip false
-                          :show-edit-tooltip true
-                          :show-add-comment-tooltip true
-                          :sections-setup [{:name "All-hands"
-                                            :slug "all-hands"
-                                            :selected true}
-                                           {:name "Case Studies"
-                                            :slug "case-studies"
-                                            :selected false}
-                                           {:name "CEO Update"
-                                            :slug "ceo-update"
-                                            :selected false}
-                                           {:name "Competition"
-                                            :slug "competition"
-                                            :selected false}
-                                           {:name "Customer Wins"
-                                            :slug "customer-wins"
-                                            :selected false}
-                                           {:name "Decisions"
-                                            :slug "decisions"
-                                            :selected true}
-                                           {:name "Engineering"
-                                            :slug "engineering"
-                                            :selected false}
-                                           {:name "Events"
-                                            :slug "events"
-                                            :selected false}
-                                           {:name "Finances"
-                                            :slug "finances"
-                                            :selected false}
-                                           {:name "Key Metrics"
-                                            :slug "key-metrics"
-                                            :selected false}
-                                           {:name "Kudos"
-                                            :slug "kudos"
-                                            :selected false}
-                                           {:name "Lessons Learned"
-                                            :slug "lessons-learned"
-                                            :selected true}
-                                           {:name "People"
-                                            :slug "people"
-                                            :selected false}
-                                           {:name "Playbooks"
-                                            :slug "playbooks"
-                                            :selected false}
-                                           {:name "Press"
-                                            :slug "press"
-                                            :selected false}
-                                           {:name "Product Updates"
-                                            :slug "product-updates"
-                                            :selected false}
-                                           {:name "Sales"
-                                            :slug "sales"
-                                            :selected false}
-                                           {:name "Stories"
-                                            :slug "stories"
-                                            :selected false}
-                                           {:name "Team and Hiring"
-                                            :slug "team-and-hiring"
-                                            :selected false}
-                                           {:name "Week in review"
-                                            :slug "week-in-review"
-                                            :selected true}]}))
+                          :show-login-overlay false}))
 
 ;; Data key paths
 
@@ -184,12 +119,7 @@
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
-   :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
-   :show-add-comment-tooltip [[:base] (fn [base] (:show-add-comment-tooltip base))]
-   :show-edit-tooltip [[:base] (fn [base] (:show-edit-tooltip base))]
-   :show-post-added-tooltip [[:base] (fn [base] (:show-post-added-tooltip base))]
-   :show-being-heard-tooltip [[:base] (fn [base] (:show-being-heard-tooltip base))]
-   :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
+   :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
    :email-verification  [[:base :auth-settings]
@@ -406,7 +336,14 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open})]})
+                               :mobile-menu-open mobile-menu-open})]
+   :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
+   :show-add-comment-tooltip   [[:nux] (fn [nux] (:show-add-comment-tooltip nux))]
+   :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
+   :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
+   :show-draft-post-tooltip    [[:nux] (fn [nux] (:show-draft-post-tooltip nux))]
+   :show-invite-people-tooltip [[:nux] (fn [nux] (:show-invite-people-tooltip nux))]
+   :nux-user-type              [[:nux] (fn [nux] (:user-type nux))]})
 
 
 ;; Action Loop =================================================================

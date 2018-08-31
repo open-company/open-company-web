@@ -256,14 +256,14 @@
   (pre-routing (:query-params params) true)
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
-      (na/set-new-user-cookie "slack"))
+      (na/new-user-registered "slack"))
     (user-actions/lander-check-team-redirect)))
 
 (defn google-lander-check [params]
   (pre-routing (:query-params params) true)
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
-      (na/set-new-user-cookie "google"))
+      (na/new-user-registered "google"))
     (user-actions/lander-check-team-redirect)))
 
 ;; Routes - Do not define routes when js/document#app

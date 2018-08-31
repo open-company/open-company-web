@@ -262,7 +262,7 @@
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
-      (nux-actions/set-new-user-cookie "email")
+      (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
@@ -297,7 +297,7 @@
             (cook/remove-cookie! :show-login-overlay)
             (utils/after 200 #(router/nav! oc-urls/login)))
           (do
-            (nux-actions/set-new-user-cookie "email")
+            (nux-actions/new-user-registered "email")
             (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))
   (dis/dispatch! [:pswd-collect password-reset?]))

@@ -758,6 +758,11 @@ div.onboard-lander {
         margin: 24px auto;
         width: 456px;
         text-align: center;
+        min-height: 276px;
+
+        div.small-loading {
+          margin-top: 50px;
+        }
 
         div.section {
           margin-left: 8px;

@@ -172,10 +172,6 @@ div.left-navigation-sidebar {
   height: calc(100vh - 80px);
   @include no-user-select();
 
-  &.showing-invite-people-tooltip {
-    width: 238px;
-  }
-
   @include mobile() {
     position: absolute;
     margin-top: 56px;

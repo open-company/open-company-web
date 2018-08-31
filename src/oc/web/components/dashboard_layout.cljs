@@ -105,7 +105,7 @@
                               (drv/drv :show-section-add)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :show-post-added-tooltip)
-                              (drv/drv :show-being-heard-tooltip)
+                              (drv/drv :show-draft-post-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
                               (drv/drv :current-user-data)
                               ;; Locals
@@ -171,7 +171,8 @@
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         can-compose (pos? (count all-boards))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))
-        current-user-data (drv/react s :current-user-data)]
+        current-user-data (drv/react s :current-user-data)
+        is-admin-or-author (utils/is-admin-or-author? org-data)]
       ;; Entries list
       [:div.dashboard-layout.group
         ;; Show create new section for desktop
@@ -292,7 +293,9 @@
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (if grid-view? "Stream view" "Grid view")}])])]
-              (when (drv/react s :show-add-post-tooltip)
+              (when (and is-all-posts
+                         is-admin-or-author
+                         (drv/react s :show-add-post-tooltip))
                 [:div.add-post-tooltip-container.group
                   [:button.mlb-reset.add-post-tooltip-dismiss
                     {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
@@ -308,7 +311,10 @@
                         {:on-click #(when can-compose (compose s))}
                         "Create new post"]]
                     [:div.add-post-tooltip-box]]])
-              (when (drv/react s :show-post-added-tooltip)
+              (when (and is-all-posts
+                         is-admin-or-author
+                         (not is-mobile?)
+                         (drv/react s :show-post-added-tooltip))
                 [:div.post-added-tooltip-container.group
                   [:button.mlb-reset.post-added-tooltip-dismiss
                     {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
@@ -321,19 +327,20 @@
                         "Invite other team leaders"]
                       " to add their voices, too."]
                     [:div.post-added-tooltip-box]]])
-              (when (drv/react s :show-being-heard-tooltip)
-                [:div.being-heard-tooltip-container.group
-                  [:button.mlb-reset.being-heard-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-being-heard-tooltip)}]
-                  [:div.being-heard-tooltips
-                    [:div.being-heard-tooltip-title
+              (when (and is-drafts-board
+                         (drv/react s :show-draft-post-tooltip))
+                [:div.draft-post-tooltip-container.group
+                  [:button.mlb-reset.draft-post-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
+                  [:div.draft-post-tooltips
+                    [:div.draft-post-tooltip-title
                       "Make sure you're being heard"]
-                    [:div.being-heard-tooltip
+                    [:div.draft-post-tooltip
                       (str
                        "When you share something important, it's nice to know your team "
                        "is paying attention! Carrot shows you who's seen what, and makes "
                        "it easy to remind those that haven't.")]
-                    [:div.being-heard-tooltip-box]]])
+                    [:div.draft-post-tooltip-box]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
