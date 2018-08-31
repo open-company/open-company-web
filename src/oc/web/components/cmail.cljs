@@ -33,8 +33,9 @@
   (let [cmail-data @(drv/get-ref s :cmail-data)
         body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerHTML body-el)))]
-    (activity-actions/entry-save-on-exit :cmail-data cmail-data cleaned-body)))
+                      (utils/clean-body-html (.-innerHTML body-el)))
+        section-editing @(drv/get-ref s :section-editing)]
+    (activity-actions/entry-save-on-exit :cmail-data cmail-data cleaned-body section-editing)))
 
 ;; Close dismiss handling
 
@@ -42,7 +43,7 @@
   (let [cmail-data @(drv/get-ref s :cmail-data)
         clean-fn (fn [dismiss-modal?]
                     (remove-autosave s)
-                    (activity-actions/entry-clear-local-cache (:uuid cmail-data) :cmail-data)
+                    (activity-actions/entry-clear-local-cache (:uuid cmail-data) :cmail-data cmail-data)
                     (when dismiss-modal?
                       (alert-modal/hide-alert))
                     (real-close))]
@@ -170,7 +171,7 @@
         (if published?
           (do
             (reset! (::saving s) true)
-            (activity-actions/entry-save updated-cmail-data section-editing :cmail-data))
+            (activity-actions/entry-save :cmail-data updated-cmail-data section-editing))
           (do
             (reset! (::publishing s) true)
             (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
@@ -218,7 +219,6 @@
                    (drv/drv :cmail-data)
                    (drv/drv :show-sections-picker)
                    (drv/drv :section-editing)
-                   (drv/drv :entry-save-on-exit)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
@@ -226,9 +226,7 @@
                    (rum/local nil ::uploading-media)
                    (rum/local false ::saving)
                    (rum/local false ::publishing)
-                   (rum/local false ::window-click-listener)
                    (rum/local nil ::autosave-timer)
-                   (rum/local false ::show-legend)
                    (rum/local false ::record-video)
                    (rum/local false ::video-uploading)
                    (rum/local false ::video-picking-cover)
@@ -248,11 +246,6 @@
                     (utils/after 300 #(setup-headline s))
                     (when-let [headline-el (rum/ref-node s "headline")]
                       (utils/to-end-of-content-editable headline-el))
-                    (reset! (::window-click-listener s)
-                     (events/listen js/window EventType/CLICK
-                      #(when (and @(::show-legend s)
-                                (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
-                         (reset! (::show-legend s) false))))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                     (when ls/oc-enable-transcriptions
                       (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
@@ -307,9 +300,6 @@
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
                       (reset! (::headline-input-listener s) nil))
-                    (when @(::window-click-listener s)
-                      (events/unlistenByKey @(::window-click-listener s))
-                      (reset! (::window-click-listener s) nil))
                     (remove-autosave s)
                     s)}
   [s]
@@ -440,7 +430,7 @@
                                :use-inline-media-picker false
                                :multi-picker-container-selector "div#cmail-footer-multi-picker"
                                :initial-body @(::initial-body s)
-                               :show-placeholder (not (contains? cmail-data :links))
+                               :show-placeholder true
                                :show-h2 true
                                :dispatch-input-key :cmail-data
                                :upload-progress-cb (fn [is-uploading?]
@@ -482,6 +472,10 @@
                          :position "top"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
+          (if (:has-changes cmail-data)
+            [:div.saving-saved "Saving..."]
+            (when (false? (:auto-saving cmail-data))
+              [:div.saving-saved "Saved"]))
           [:div.cmail-footer-right
             [:div.footer-separator]
             [:div.delete-button-container
