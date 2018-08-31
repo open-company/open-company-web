@@ -252,7 +252,7 @@
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
-                 (let [entry-saved (json->cljs body)]
+                 (let [entry-saved (merge (json->cljs body) {:auto-saving false :has-changes false})]
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
                    (when (and (nil? (:uuid entry-map))
