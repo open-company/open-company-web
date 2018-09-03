@@ -313,8 +313,7 @@
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
                                  ap-initial-at show-section-editor show-section-add show-sections-picker
                                  entry-editing mobile-menu-open jwt]
-                              {:show-onboard-overlay (:show-onboard-overlay base)
-                               :jwt jwt
+                              {:jwt jwt
                                :orgs orgs
                                :org-data org-data
                                :container-data container-data

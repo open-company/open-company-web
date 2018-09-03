@@ -25,7 +25,6 @@
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
-            [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.slack-bot-modal :refer (slack-bot-modal)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
@@ -76,7 +75,6 @@
                 board-data
                 container-data
                 posts-data
-                show-onboard-overlay
                 ap-initial-at
                 user-settings
                 org-settings-data
@@ -162,9 +160,6 @@
           ;; Activity not found
           show-activity-not-found
           (activity-not-found)
-          ;; Onboard overlay
-          show-onboard-overlay
-          (onboard-overlay)
           ;; Org settings
           org-settings-data
           (org-settings)
@@ -245,7 +240,6 @@
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing
-                           show-onboard-overlay
                            is-sharing-activity
                            show-section-add
                            show-section-editor))
