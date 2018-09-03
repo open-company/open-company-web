@@ -134,7 +134,6 @@
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
-   :slack-bot-modal     [[:base] (fn [base] (:slack-bot-modal base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
@@ -322,7 +321,6 @@
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
-                               :slack-bot-modal-data (:slack-bot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
