@@ -124,6 +124,13 @@
   (mark-nux-step-done :show-add-comment-tooltip)
   (check-nux))
 
+(defn show-post-added-tooltip []
+  (when-let [nux-cookie (get-nux-cookie)]
+    (set-nux-cookie (:user-type nux-cookie)
+     {:show-add-post-tooltip default-tooltip-done
+      :show-post-added-tooltip true}))
+  (check-nux))
+
 (defn dismiss-post-added-tooltip []
   (mark-nux-step-done :show-post-added-tooltip)
   (check-nux))

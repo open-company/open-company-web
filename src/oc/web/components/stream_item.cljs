@@ -302,5 +302,9 @@
                          "Team reactions and comments give everyone greater context for what's happening "
                          "and why. Using Slack? Your team can join the discussion from Slack, too — ")
                          [:button.mlb-reset.enable-slack-bt
-                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
+                          {:on-click
+                            #(do
+                              (nux-actions/dismiss-add-comment-tooltip)
+                              (org-actions/bot-auth team-data cur-user-data
+                               (str (router/get-token) "?org-settings=main")))}
                           "Enable Carrot for Slack"] "."]]]))]])]))

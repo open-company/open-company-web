@@ -326,6 +326,7 @@
     (if (:links fixed-edited-data)
       (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                section-editing)
+        ;; Save existing post to new board
         (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
               final-board-data (assoc section-editing :entries [fixed-entry-data])]
           (api/create-board final-board-data (:invite-note fixed-edited-data)
@@ -334,9 +335,11 @@
                 ;; Board name exists
                 (board-name-exists-error fixed-edit-key)
                 (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
+        ;; Update existing post
         (api/update-entry fixed-edited-data fixed-edit-key create-update-entry-cb))
       (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                section-editing)
+        ;; Save new post to new board
         (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
               final-board-data (assoc section-editing :entries [fixed-entry-data])]
           (api/create-board final-board-data (:invite-note fixed-edited-data)
@@ -345,6 +348,7 @@
                 ;; Board name exists
                 (board-name-exists-error fixed-edit-key)
                 (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
+        ;; Save new post to existing board
         (let [org-slug (router/current-org-slug)
               entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
               entry-create-link (utils/link-for (:links entry-board-data) "create")]

@@ -324,6 +324,7 @@
                                                           (= (router/current-board-slug) "all-posts"))
                                               go-to-ap (and (not (:new-section entry-editing))
                                                             from-ap)]
+                                          (nux-actions/show-post-added-tooltip)
                                           ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
                                             (if go-to-ap
@@ -521,6 +522,9 @@
                    "Carrot keeps everyone aligned around key announcements, updates, and decisions. "
                    "Don't feel like typing? No worries, ")
                    [:button.mlb-reset.edit-tooltip-record-video-bt
+                    {:on-click #(do
+                                 (nux-actions/dismiss-edit-tooltip)
+                                 (video-record-clicked s))}
                     "record a video"]
                    " instead."]]])]
         [:div.entry-edit-modal-footer.group
