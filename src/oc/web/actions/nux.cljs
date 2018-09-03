@@ -12,7 +12,10 @@
   "Read the cookie from the document only if the nux-cookie-value atom is nil.
   In all the other cases return the read value in the atom."
   []
-  (json->cljs (cook/get-cookie (router/nux-cookie (jwt/user-id)))))
+  (let [cookie-name (router/nux-cookie (jwt/user-id))
+        cookie-value (cook/get-cookie cookie-name)]
+    (when cookie-value
+      (json->cljs cookie-value))))
 
 (defn set-nux-cookie
   "Create a map for the new user cookie and save it. Also update the value of
