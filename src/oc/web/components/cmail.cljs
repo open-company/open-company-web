@@ -333,7 +333,7 @@
                :data-container "body"
                :data-trigger "hover"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:must-see cmail-data) "Must see" "Unmark")}
+               :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
               [:span.must-see-toggle-circle]]
             "New draft"
             [:button.mlb-reset.close-bt
@@ -343,7 +343,7 @@
                :data-container "body"
                :data-trigger "hover"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Close"}]
+               :title (if (:has-changes cmail-data) "Save & Close" "Close")}]
             [:button.mlb-reset.fullscreen-bt
               {:on-click #(activity-actions/cmail-toggle-fullscreen)
                :data-toggle "tooltip"
