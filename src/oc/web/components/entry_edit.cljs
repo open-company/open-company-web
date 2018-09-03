@@ -509,7 +509,7 @@
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
            #(activity-actions/remove-attachment :entry-editing %))
-          (when-not (drv/react s :show-edit-tooltip)
+          (when (drv/react s :show-edit-tooltip)
             [:div.edit-tooltip-container.group
               [:button.mlb-reset.edit-tooltip-dismiss
                 {:on-click #(nux-actions/dismiss-edit-tooltip)}]

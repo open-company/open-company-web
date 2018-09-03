@@ -304,11 +304,12 @@
                       (str "Welcome to Carrot, " (:first-name current-user-data))]
                     [:div.add-post-tooltip
                       (str
-                        "Alignment happens when teams pull in the same direction. "
-                        "Create your first post to get everyone in sync. ")
+                        "Alignment happens when teams pull in the same direction. Create your "
+                        "first post to get everyone in sync. ")
                       [:button.mlb-reset.add-post-bt
                         {:on-click #(when can-compose (compose s))}
-                        "Create new post"]]
+                        "Create new post"]
+                      "."]
                     [:div.add-post-tooltip-box]]])
               (when (and is-all-posts
                          is-admin-or-author
@@ -319,13 +320,13 @@
                     {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
                   [:div.post-added-tooltips
                     [:div.post-added-tooltip-title
-                      "First post success!"]
+                      "Post success!"]
                     [:div.post-added-tooltip
                       (str
-                       "Carrot shows you who's seen your post, and makes "
-                       "it easy to remind anyone that didn't. ")
+                       "Carrot shows you who's seen your post, "
+                       "and makes it easy to remind anyone that didn't. ")
                       [:button.mlb-reset.post-added-bt
-                        "Invite other team leaders"]
+                        "Invite your team"]
                       " to get started."]
                     [:div.post-added-tooltip-box]]])
               (when (and is-drafts-board
@@ -335,12 +336,12 @@
                     {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
                   [:div.draft-post-tooltips
                     [:div.draft-post-tooltip-title
-                      "Make sure you're being heard"]
+                      "😎 Finish this draft post to add some personality"]
                     [:div.draft-post-tooltip
                       (str
-                       "When you share something important, it's nice to know your team "
-                       "is paying attention! Carrot shows you who's seen what, and makes "
-                       "it easy to remind those that haven't.")]
+                       "According to smart people on the Internet, the single most important "
+                       "thing people like about their job is the people that they work with. "
+                       "Help your team get to know you better by finishing this draft post.")]
                     [:div.draft-post-tooltip-box]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond

@@ -10,6 +10,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
@@ -62,6 +63,8 @@
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
+                         (drv/drv :team-data)
+                         (drv/drv :current-user-data)
                          (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
                          (drv/drv :show-add-comment-tooltip)
@@ -120,6 +123,8 @@
                     (first (:author activity-data))
                     (:publisher activity-data))
         dom-node-class (str "stream-item-" (:uuid activity-data))
+        team-data (drv/react s :team-data)
+        cur-user-data (drv/react s :current-user-data)
         has-video (seq (:fixed-video-id activity-data))
         video-size (when has-video
                      (if is-mobile?
@@ -284,15 +289,18 @@
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
               (stream-comments activity-data comments-data true)
-              (when-not (drv/react s :show-add-comment-tooltip)
-                [:div.add-comment-tooltip-container.group
-                  [:button.mlb-reset.add-comment-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-add-comment-tooltip)}]
-                  [:div.add-comment-tooltips
-                    [:div.add-comment-tooltip-title
-                      "💭 Spark better follow-on discussions"]
-                    [:div.add-comment-tooltip
-                      (str
-                       "Team reactions and comments give everyone greater context for what's "
-                       "happening and why. Using Slack? Your team can join the discussion "
-                       "from Slack, too.")]]])]])]))
+              (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
+                (when (drv/react s :show-add-comment-tooltip)
+                  [:div.add-comment-tooltip-container.group
+                    [:button.mlb-reset.add-comment-tooltip-dismiss
+                      {:on-click #(nux-actions/dismiss-add-comment-tooltip)}]
+                    [:div.add-comment-tooltips
+                      [:div.add-comment-tooltip-title
+                        "💭 Spark better follow-on discussions"]
+                      [:div.add-comment-tooltip
+                        (str
+                         "Team reactions and comments give everyone greater context for what's happening "
+                         "and why. Using Slack? Your team can join the discussion from Slack, too — ")
+                         [:button.mlb-reset.enable-slack-bt
+                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
+                          "Enable Carrot for Slack"] "."]]]))]])]))

@@ -490,6 +490,17 @@ div.stream-item {
           line-height: 18px;
           margin-top: 8px;
 
+          button.enable-slack-bt {
+            display: inline;
+            background-color: transparent;
+            padding: 0;
+            margin: 0;
+            color: $carrot_green;
+            @include avenir_H();
+            font-size: 16px;
+            line-height: 20px;
+          }
+
           @include tablet() {
             float: unset;
             margin: 24px auto 0px;

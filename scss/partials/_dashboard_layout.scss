@@ -155,11 +155,11 @@ div.dashboard-layout {
           div.add-post-tooltip-box {
             position: absolute;
             bottom: 0px;
-            right: 60px;
-            width: 114px;
-            height: 150px;
+            right: 80px;
+            width: 98px;
+            height: 130px;
             @include image-2x("/img/ML/add_post_tooltip_box");
-            background-size: 114px 150px;
+            background-size: 98px 130px;
             background-repeat: no-repeat;
             background-position: center;
 
@@ -237,12 +237,12 @@ div.dashboard-layout {
 
           div.post-added-tooltip-box {
             position: absolute;
-            top: 24px;
+            bottom: 0px;
             right: 60px;
-            width: 160px;
-            height: 96px;
+            width: 154px;
+            height: 119px;
             @include image-2x("/img/ML/post_added_tooltip_box");
-            background-size: 160px 96px;
+            background-size: 154px 119px;
             background-repeat: no-repeat;
             background-position: center;
 
@@ -279,7 +279,6 @@ div.dashboard-layout {
         }
 
         div.draft-post-tooltips {
-          width: 396px;
           float: left;
 
           @include tablet(){
