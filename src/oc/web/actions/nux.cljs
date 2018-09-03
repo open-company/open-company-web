@@ -35,49 +35,40 @@
 ;                                              :secondary-bt-style :default-link
 ;                                              :secondary-bt-dismiss true})))
 
-(def new-user-cookie-value (atom nil))
+(defn get-nux-cookie
+  "Read the cookie from the document only if the nux-cookie-value atom is nil.
+  In all the other cases return the read value in the atom."
+  []
+  (json->cljs (cook/get-cookie (router/nux-cookie (jwt/user-id)))))
 
-(defn set-new-user-cookie
+(defn set-nux-cookie
   "Create a map for the new user cookie and save it. Also update the value of
-  the new-user-cookie-value atom."
+  the nux-cookie-value atom."
   [user-type value-map]
-  (let [value-map (merge {:user-type user-type} value-map)
+  (let [old-nux-cookie (get-nux-cookie)
+        value-map (merge {:user-type user-type} old-nux-cookie value-map)
         json-map (cljs->json value-map)
         json-string (.stringify js/JSON json-map)]
-    (reset! new-user-cookie-value value-map)
     (cook/set-cookie!
-     (router/new-user-cookie (jwt/user-id))
+     (router/nux-cookie (jwt/user-id))
       json-string
       (* 60 60 24 7))))
 
 (defn new-user-registered [user-type]
-  (set-new-user-cookie user-type
+  (set-nux-cookie user-type
     {:show-add-post-tooltip true
      :show-post-added-tooltip false
      :show-draft-post-tooltip true
      :show-edit-tooltip true
      :show-add-comment-tooltip true}))
 
-(defn get-new-user-cookie
-  "Read the cookie from the document only if the new-user-cookie-value atom is nil.
-  In all the other cases return the read value in the atom."
-  []
-  (when-not (map? @new-user-cookie-value)
-    (if-let [string-json (cook/get-cookie (router/new-user-cookie (jwt/user-id)))]
-      (reset! new-user-cookie-value (json->cljs string-json))
-      (reset! new-user-cookie-value {})))
-  @new-user-cookie-value)
-
 (defn nux-end
-  "NUX completed for the current user, remove the cookie and update the new-user-cookie-value."
+  "NUX completed for the current user, remove the cookie and update the nux-cookie-value."
   []
-  (cook/remove-cookie! (router/new-user-cookie (jwt/user-id)))
-  (reset! new-user-cookie-value {}))
+  (cook/remove-cookie! (router/nux-cookie (jwt/user-id))))
 
-(def default-first-post-user-id "1111-1111-1111")
-
-(defn- nux-cookie-value [v]
-  (if (= v :done)
+(defn- parse-nux-cookie-value [v]
+  (if (= v "done")
     false
     (boolean v)))
 
@@ -86,15 +77,17 @@
    if user is new
      if "
   []
-  (let [nv (get-new-user-cookie)]
+  (let [nv (get-nux-cookie)]
     (dis/dispatch! [:input [:nux]
-     {:show-add-post-tooltip (nux-cookie-value (:show-add-post-tooltip nv))
-      :show-post-added-tooltip (nux-cookie-value (:show-post-added-tooltip nv))
-      :show-draft-post-tooltip (nux-cookie-value (:show-draft-post-tooltip nv))
-      :show-edit-tooltip (nux-cookie-value (:show-edit-tooltip nv))
-      :show-add-comment-tooltip (nux-cookie-value (:show-add-comment-tooltip nv))
+     {:show-add-post-tooltip (parse-nux-cookie-value (:show-add-post-tooltip nv))
+      :show-post-added-tooltip (parse-nux-cookie-value (:show-post-added-tooltip nv))
+      :show-draft-post-tooltip (parse-nux-cookie-value (:show-draft-post-tooltip nv))
+      :show-edit-tooltip (parse-nux-cookie-value (:show-edit-tooltip nv))
+      :show-add-comment-tooltip (parse-nux-cookie-value (:show-add-comment-tooltip nv))
       :user-type (:user-type nv)}])))
 
+; (def default-first-post-user-id "1111-1111-1111")
+;
 ; (defn check-nux-ex
 ;   "NUX Logic:
 ;   if user is new
@@ -114,7 +107,7 @@
 ;       -> show nux
 ;          on dismiss remove new user cookie"
 ;   []
-;   (when-let [{:keys [user-type step] :as new-user-cookie} (get-new-user-cookie)]
+;   (when-let [{:keys [user-type step] :as nux-cookie} (get-nux-cookie)]
 ;     (when-let* [org-data (dis/org-data)
 ;                 posts-data (dis/posts-data)]
 ;       (let [team-data (dis/team-data (:team-id org-data))
@@ -145,7 +138,7 @@
 ;             should-show-second-tip (= (count (:users team-data)) 1) ;; user is alone in the team
 ;             should-show-add-bot-notif (not (jwt/team-has-bot? (:team-id org-data)))
 ;             iterate-next-step (fn []
-;                                 (set-new-user-cookie user-type (inc step))
+;                                 (set-nux-cookie user-type (inc step))
 ;                                 (check-nux))]
 ;         (when (= step 1)
 ;           (if should-show-first-tip
@@ -170,47 +163,38 @@
 ;         (when (= step 3)
 ;           (nux-end))))))
 
+(defn mark-nux-step-done [nux-step-key]
+  (when-let [nux-cookie (get-nux-cookie)]
+    (set-nux-cookie (:user-type nux-cookie)
+     {nux-step-key "done"})
+    (check-nux)))
+
 (defn dismiss-onboard-overlay []
-  (when-let [new-user-cookie (get-new-user-cookie)]
+  (when-let [nux-cookie (get-nux-cookie)]
     (dis/dispatch! [:input [:show-onboard-overlay] nil])
-    ; (set-new-user-cookie (:user-type new-user-cookie) 2)
+    ; (set-nux-cookie (:user-type nux-cookie) 2)
     (check-nux)))
 
 (defn dismiss-add-post-tooltip []
-  (when-let [new-user-cookie (get-new-user-cookie)]
-    (set-new-user-cookie (:user-type new-user-cookie)
-     {:show-add-post-tooltip :done})
-    (check-nux)))
+  (mark-nux-step-done :show-add-post-tooltip))
 
 ; (defn dismiss-invite-people-tooltip []
-;   (when-let [new-user-cookie (get-new-user-cookie)]
+;   (when-let [nux-cookie (get-nux-cookie)]
 ;     (dis/dispatch! [:input [:show-invite-people-tooltip] nil])
-;     (set-new-user-cookie (:user-type new-user-cookie) 3)))
+;     (set-nux-cookie (:user-type nux-cookie) 3)))
 
 ; (defn dismiss-add-bot-notification []
-;   (when-let [new-user-cookie (get-new-user-cookie)]
-;     (set-new-user-cookie (:user-type new-user-cookie) 3)))
+;   (when-let [nux-cookie (get-nux-cookie)]
+;     (set-nux-cookie (:user-type nux-cookie) 3)))
 
 (defn dismiss-add-comment-tooltip []
-  (when-let [new-user-cookie (get-new-user-cookie)]
-    (set-new-user-cookie (:user-type new-user-cookie)
-     {:show-add-comment-tooltip :done})
-    (check-nux)))
+  (mark-nux-step-done :show-add-comment-tooltip))
 
 (defn dismiss-edit-tooltip []
-  (when-let [new-user-cookie (get-new-user-cookie)]
-    (set-new-user-cookie (:user-type new-user-cookie)
-     {:show-edit-tooltip :done})
-    (check-nux)))
+  (mark-nux-step-done :show-edit-tooltip))
 
 (defn dismiss-post-added-tooltip []
-  (when-let [new-user-cookie (get-new-user-cookie)]
-    (set-new-user-cookie (:user-type new-user-cookie)
-     {:show-post-added-tooltip :done})
-    (check-nux)))
+  (mark-nux-step-done :show-post-added-tooltip))
 
 (defn dismiss-draft-post-tooltip []
-  (when-let [new-user-cookie (get-new-user-cookie)]
-    (set-new-user-cookie (:user-type new-user-cookie)
-     {:show-draft-post-tooltip :done})
-    (check-nux)))
+  (mark-nux-step-done :show-draft-post-tooltip))
