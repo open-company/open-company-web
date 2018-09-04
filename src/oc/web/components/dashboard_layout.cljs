@@ -140,6 +140,8 @@
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
+                                ;; Reopen cmail if it was open
+                                (activity-actions/cmail-reopen?)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
