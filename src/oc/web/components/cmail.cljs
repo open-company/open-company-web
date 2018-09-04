@@ -77,7 +77,7 @@
   (when-let [headline (rum/ref-node state "headline")]
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
-                                                          :has-changes true})]))))
+                                                       :has-changes true})]))))
 
 ;; Headline setup and paste handler
 
@@ -320,7 +320,8 @@
         video-size {:width 548
                     :height 322}]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen (:fullscreen cmail-state)
+      {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
+                                                 (:fullscreen cmail-state))
                                 :collapse (:collapse cmail-state)})}
       [:div.cmail-middle
         [:div.cmail-container
@@ -335,9 +336,15 @@
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
               [:span.must-see-toggle-circle]]
-            "New draft"
+            [:div.cmail-header-title
+              (if (seq (:headline cmail-data))
+                (:headline cmail-data)
+                utils/default-headline)]
             [:button.mlb-reset.close-bt
-              {:on-click #(activity-actions/cmail-hide)
+              {:on-click #(if (and (= (:status cmail-data) "published")
+                                   (:has-changes cmail-data))
+                           (cancel-clicked s)
+                           (activity-actions/cmail-hide))
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
@@ -459,7 +466,9 @@
                :on-click #(post-clicked s)
                :class (utils/class-set {:disabled disabled?
                                         :loading working?})}
-              "POST"])
+              (if (= (:status cmail-data) "published")
+                "SAVE"
+                "POST")])
           [:div.footer-separator]
           [:div.cmail-footer-multi-picker
             {:id "cmail-footer-multi-picker"}]

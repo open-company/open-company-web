@@ -661,22 +661,43 @@
 
 ;; Cmail
 
-(defn cmail-show [initial-entry-data]
-  (load-cached-item initial-entry-data :cmail-data
-   #(dis/dispatch! [:input [:cmail-state] {:collapse false
-                                           :fullscreen false}])))
+(defn- cmail-fullscreen-cookie []
+  (str "cmail-fullscreen-" (jwt/user-id)))
+
+(defn- cmail-fullscreen-save [fullscreen?]
+  (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
+
+(defn- cmail-open-cookie []
+  (str "cmail-open-" (jwt/user-id) "-" (:slug (dis/org-data))))
+
+(defn cmail-show [initial-entry-data & [cmail-state]]
+  (let [cmail-default-state {:collapse false
+                             :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
+        fixed-cmail-state (merge cmail-default-state cmail-state)]
+    (cook/set-cookie! (cmail-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365))
+    (load-cached-item initial-entry-data :cmail-data
+     #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
 
 (defn cmail-hide []
+  (cook/remove-cookie! (cmail-open-cookie))
   (dis/dispatch! [:input [:cmail-data] nil])
   (dis/dispatch! [:input [:cmail-state] nil]))
 
 (defn cmail-toggle-fullscreen []
+  (cmail-fullscreen-save (not (:fullscreen (:cmail-state @dis/app-state))))
   (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse false
                                                     :fullscreen (not (:fullscreen %))})]))
 
 (defn cmail-toggle-collapse []
   (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse (not (:collapse %))
-                                                    :fullscreen false})]))
+                                                    :fullscreen (:fullscreen %)})]))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update [:cmail-data :must-see] not]))
+
+(defonce cmail-reopen-only-one (atom false))
+
+(defn cmail-reopen? []
+  (when (compare-and-set! cmail-reopen-only-one false true)
+    (when-let [activity-uuid (cook/get-cookie (cmail-open-cookie))]
+      (cmail-show (dis/activity-data activity-uuid) {:collapse true}))))
