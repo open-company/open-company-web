@@ -700,4 +700,4 @@
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
     (when-let [activity-uuid (cook/get-cookie (cmail-open-cookie))]
-      (cmail-show (dis/activity-data activity-uuid) {:collapse true}))))
+      (cmail-show (dis/activity-data activity-uuid)))))
