@@ -316,22 +316,6 @@ div.dashboard-layout {
               width: 100%;
             }
           }
-
-          div.draft-post-tooltip-box {
-            position: absolute;
-            bottom: 0px;
-            right: 60px;
-            width: 180px;
-            height: 139px;
-            @include image-2x("/img/ML/being_heard_tooltip_box");
-            background-size: 180px 139px;
-            background-repeat: no-repeat;
-            background-position: center;
-
-            @include tablet() {
-              display: none;
-            }
-          }
         }
       }
 

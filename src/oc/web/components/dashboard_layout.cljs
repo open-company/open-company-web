@@ -12,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
@@ -326,6 +327,7 @@
                        "Carrot shows you who's seen your post, "
                        "and makes it easy to remind anyone that didn't. ")
                       [:button.mlb-reset.post-added-bt
+                        {:on-click #(nav-actions/show-invite)}
                         "Invite your team"]
                       " to get started."]
                     [:div.post-added-tooltip-box]]])
@@ -341,8 +343,7 @@
                       (str
                        "According to smart people on the Internet, the single most important "
                        "thing people like about their job is the people that they work with. "
-                       "Help your team get to know you better by finishing this draft post.")]
-                    [:div.draft-post-tooltip-box]]])
+                       "Help your team get to know you better by finishing this draft post.")]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
