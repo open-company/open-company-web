@@ -52,11 +52,6 @@
     false
     (boolean v)))
 
-(defn- is-sample-entry? [entry-map]
-  (let [published-at (:published-at entry-map)
-        user-created-at (jwt/get-key :created-at)]
-    (< published-at user-created-at)))
-
 (defn mark-nux-step-done [nux-step-key]
   (when-let [nux-cookie (get-nux-cookie)]
     (set-nux-cookie (:user-type nux-cookie)
@@ -78,7 +73,7 @@
           edit-tooltip (:show-edit-tooltip nv)
           fixed-add-comment-tooltip (parse-nux-cookie-value (:show-add-comment-tooltip nv))
           user-type (:user-type nv)
-          has-only-sample-posts (every? is-sample-entry? posts-data)
+          has-only-sample-posts (every? map? (vals posts-data))
           team-has-more-users? (> (count (:users team-data)) 1)
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already
@@ -91,25 +86,26 @@
                                       (not post-added-tooltip))
           ;; Show the first post added tooltip
           fixed-post-added-tooltip (and ;; has not been done already
-                                        (not= (:show-post-added-tooltip nv) default-tooltip-done)
+                                        (true? post-added-tooltip)
                                         ;; team has only one user (self)
-                                        team-has-more-users?)
+                                        (not team-has-more-users?))
           ;; Show the tooltip inside editing
           fixed-edit-tooltip (and ;; has not been done already
-                                  (not= (:show-edit-tooltip nv) default-tooltip-done)
+                                  (not= edit-tooltip default-tooltip-done)
                                   ;; user is not a viewer
                                   can-edit?)]
-
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
-                 (not= add-post-tooltip default-tooltip-done))
+                 (or (not can-edit?)
+                     (not has-only-sample-posts)
+                     post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
       (when (and (not fixed-post-added-tooltip)
-                 (not= post-added-tooltip default-tooltip-done))
+                 team-has-more-users?)
         (mark-nux-step-done :show-post-added-tooltip))
       (when (and (not fixed-edit-tooltip)
-                 (not= edit-tooltip default-tooltip-done))
+                 (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip fixed-add-post-tooltip
