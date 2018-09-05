@@ -385,7 +385,9 @@
   [db [_ activity-data]]
   (let [org-slug (utils/post-org-slug activity-data)
         board-slug (:board-slug activity-data)
-        activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
-        activity-board-data (dispatcher/board-data db org-slug board-slug)
-        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))]
-    (assoc-in db activity-key fixed-activity-data)))
+        activity-key (dispatcher/activity-key org-slug (:uuid activity-data))]
+    (if (:board-slug activity-data)
+      (let [activity-board-data (dispatcher/board-data db org-slug board-slug)
+            fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))]
+        (assoc-in db activity-key fixed-activity-data))
+      (update-in db (butlast activity-key) dissoc (last activity-key)))))
