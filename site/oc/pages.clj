@@ -184,7 +184,7 @@
           "On Carrot, my updates get noticed and get the team talking. I love that."]
         [:div.testimonial-footer.group
           [:a
-            {:href "https://message.io/"
+            {:href "https://m.io/"
              :target "_blank"}
             [:div.testimonial-logo]]]]
       [:div.testimonial-card
