@@ -368,3 +368,24 @@
   [db [_ org-slug video-id]]
   (let [uploading-video-key (dispatcher/uploading-video-key org-slug video-id)]
     (assoc-in db uploading-video-key true)))
+
+(defmethod dispatcher/action :entry-auto-save/finish
+  [db [_ activity-data edit-key]]
+  (let [org-slug (utils/post-org-slug activity-data)
+        board-slug (:board-slug activity-data)
+        activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
+        activity-board-data (dispatcher/board-data db org-slug board-slug)
+        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))]
+    (-> db
+      (assoc-in activity-key fixed-activity-data)
+      (dissoc :entry-toggle-save-on-exit)
+      (assoc-in [edit-key] (assoc activity-data :auto-saving false)))))
+
+(defmethod dispatcher/action :entry-revert/finish
+  [db [_ activity-data]]
+  (let [org-slug (utils/post-org-slug activity-data)
+        board-slug (:board-slug activity-data)
+        activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
+        activity-board-data (dispatcher/board-data db org-slug board-slug)
+        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))]
+    (assoc-in db activity-key fixed-activity-data)))

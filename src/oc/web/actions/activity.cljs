@@ -256,7 +256,7 @@
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
-                 (let [entry-saved (assoc (json->cljs body) :auto-saving false)]
+                 (let [entry-saved (json->cljs body)]
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
                    (when (and (nil? (:uuid entry-map))
@@ -267,9 +267,9 @@
                    (when (nil? (get @initial-revision (:uuid entry-saved)))
                      (swap! initial-revision assoc (:uuid entry-saved)
                       (or (:revision-id entry-map) -1)))
-                   ;; merge with entry editing and only save once we have a uuid
-                   (dis/dispatch! [:update [edit-key]
-                                   #(merge % entry-saved)])))))
+                   ;; add or update the entry in the app-state list of posts
+                   ;; also move the updated data to the entry editing
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key])))))
            (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
 
 (defn entry-toggle-save-on-exit
@@ -514,7 +514,10 @@
                               (utils/link-for (:links entry-editing) "revert"))]
       (if entry-exists?
         (api/revert-entry entry-version revert-entry-link
-                          (fn [] (dis/dispatch! [:entry-revert entry-version])))
+                          (fn [{:keys [success body]}]
+                            (dis/dispatch! [:entry-revert entry-version])
+                            (when success
+                              (dis/dispatch! [:entry-revert/finish (json->cljs body)]))))
         (dis/dispatch! [:entry-revert false])))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
