@@ -404,7 +404,6 @@ div.onboard-lander {
 
         @include mobile() {
           max-width: 100%;
-          text-align: center;
         }
 
         div.org-avatar.missing-logo {
@@ -441,9 +440,8 @@ div.onboard-lander {
           margin-top: 2px;
 
           @include mobile() {
-            margin-top: 0px;
-            text-align: center;
-            width: 100%;
+            width: calc(100% - 96px);
+            text-align: left;
           }
         }
 
@@ -452,8 +450,8 @@ div.onboard-lander {
           margin-top: 10px;
 
           @include mobile() {
-            text-align: center;
-            width: 100%;
+            width: calc(100% - 96px);
+            text-align: left;
           }
         }
       }
@@ -480,11 +478,6 @@ div.onboard-lander {
         background-size: 16px 16px;
         background-position: center;
         background-repeat: no-repeat;
-
-        @include mobile() {
-          float: unset;
-          margin: 0 auto;
-        }
       }
 
       div.add-picture-link {
@@ -497,9 +490,8 @@ div.onboard-lander {
         width: 220px;
 
         @include mobile() {
-          text-align: center;
-          width: 100%;
-          margin-left: 0px;
+          width: calc(100% - 96px);
+          text-align: left;
         }
       }
 
@@ -513,9 +505,8 @@ div.onboard-lander {
         width: 220px;
 
         @include mobile() {
-          text-align: center;
-          width: 100%;
-          margin-left: 0px;
+          width: calc(100% - 96px);
+          text-align: left;
         }
       }
     }
@@ -755,11 +746,19 @@ div.onboard-lander {
       width: 456px;
       text-align: center;
 
+      @include mobile() {
+        width: 100%;
+      }
+
       div.sections-list {
         margin: 24px auto;
         width: 456px;
         text-align: center;
         min-height: 276px;
+
+        @include mobile() {
+          width: 100%;
+        }
 
         div.small-loading {
           margin-top: 50px;
@@ -805,6 +804,12 @@ div.onboard-lander {
           float: right;
           @include avenir_M();
           font-size: 13px;
+
+          @media screen and (max-width: 380px){
+            float: unset;
+            width: 100%;
+            text-align: right;
+          }
         }
       }
 

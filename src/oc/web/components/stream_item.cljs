@@ -290,7 +290,8 @@
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
               (stream-comments activity-data comments-data true)
               (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
-                (when (drv/react s :show-add-comment-tooltip)
+                (when (and (drv/react s :show-add-comment-tooltip)
+                           (not is-mobile?))
                   [:div.add-comment-tooltip-container.group
                     [:button.mlb-reset.add-comment-tooltip-dismiss
                       {:on-click #(nux-actions/dismiss-add-comment-tooltip)}]

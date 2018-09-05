@@ -453,13 +453,8 @@ div.stream-item {
       background-color: #FDF6E4;
       border-radius: 6px;
       padding: 24px 24px;
-      margin: 32px 0px;
+      margin: 32px 0;
       position: relative;
-
-      @include tablet() {
-        width: calc(100% - 48px);
-        margin: 32px 24px;
-      }
 
       button.add-comment-tooltip-dismiss {
         position: absolute;

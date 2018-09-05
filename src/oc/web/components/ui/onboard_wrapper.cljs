@@ -254,7 +254,7 @@
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
-            "That’s me"]]]]))
+            "Continue"]]]]))
 
 (defn- setup-team-data
   ""
@@ -416,7 +416,7 @@
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
-            "Create team"]]]]))
+            "Continue"]]]]))
 
 (rum/defcs lander-sections < rum/reactive
                              (drv/drv :org-data)
@@ -537,7 +537,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label
+          [:div.field-label.invite-teammates
             "Invite teammates " [:span.info "(optional)"]
             [:button.mlb-reset.add-another-invite-row
               {:on-click #(reset! (::invite-rows s) (vec (conj @(::invite-rows s) default-invite-row)))}
@@ -766,7 +766,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/user-profile-save current-user-data edit-user-profile))}
-            "That’s me"]]]]))
+            "Continue"]]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]

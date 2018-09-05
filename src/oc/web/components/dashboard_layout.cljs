@@ -301,6 +301,7 @@
                   [:button.mlb-reset.add-post-tooltip-dismiss
                     {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
                   [:div.add-post-tooltips
+                    [:div.add-post-tooltip-box-mobile]
                     [:div.add-post-tooltip-title
                       (str "Welcome to Carrot, " (:first-name current-user-data))]
                     [:div.add-post-tooltip

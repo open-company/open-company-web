@@ -450,6 +450,23 @@
         [:div.entry-edit-modal-separator]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          (when (drv/react s :show-edit-tooltip)
+            [:div.edit-tooltip-container.group
+              [:button.mlb-reset.edit-tooltip-dismiss
+                {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+              [:div.edit-tooltips
+                [:div.edit-tooltip-title
+                  "✍️ Update your team in seconds"]
+                [:div.edit-tooltip
+                  (str
+                   "Carrot keeps everyone aligned around key announcements, updates, and decisions. "
+                   "Don't feel like typing? No worries, ")
+                   [:button.mlb-reset.edit-tooltip-record-video-bt
+                    {:on-click #(do
+                                 (nux-actions/dismiss-edit-tooltip)
+                                 (video-record-clicked s))}
+                    "record a video"]
+                   " instead."]]])
           ;; Video elements
           (when (and (not is-mobile?)
                      (:fixed-video-id entry-editing)
@@ -509,24 +526,7 @@
                  :default-value (:video-transcript entry-editing)}]])
           ; Attachments
           (stream-attachments (:attachments entry-editing) nil
-           #(activity-actions/remove-attachment :entry-editing %))
-          (when (drv/react s :show-edit-tooltip)
-            [:div.edit-tooltip-container.group
-              [:button.mlb-reset.edit-tooltip-dismiss
-                {:on-click #(nux-actions/dismiss-edit-tooltip)}]
-              [:div.edit-tooltips
-                [:div.edit-tooltip-title
-                  "✍️ Update your team in seconds"]
-                [:div.edit-tooltip
-                  (str
-                   "Carrot keeps everyone aligned around key announcements, updates, and decisions. "
-                   "Don't feel like typing? No worries, ")
-                   [:button.mlb-reset.edit-tooltip-record-video-bt
-                    {:on-click #(do
-                                 (nux-actions/dismiss-edit-tooltip)
-                                 (video-record-clicked s))}
-                    "record a video"]
-                   " instead."]]])]
+           #(activity-actions/remove-attachment :entry-editing %))]
         [:div.entry-edit-modal-footer.group
           [:div.entry-edit-footer-multi-picker
             {:id "entry-edit-footer-multi-picker"}]
