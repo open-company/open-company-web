@@ -164,7 +164,7 @@
               [:div.drafts-label.group
                 "Drafts "
                 (when (pos? (:count drafts-link))
-                  [:span.count "(" (:count drafts-link) ")"])]]))
+                  [:span.count "(" (or (:entry-count board-data) (:count drafts-link)) ")"])]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
