@@ -228,15 +228,57 @@ section.testimonials-section {
       padding: 24px;
       text-align: left;
 
+      &:first-child {
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_1_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 84px;
+            height: 18px;
+            @include image-2x("/img/ML/testimonial_1_logo");
+            background-size: 84px 18px;
+          }
+        }
+      }
+
+      &:nth-child(2) {
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_2_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 120px;
+            height: 18px;
+            @include image-2x("/img/ML/testimonial_2_logo");
+            background-size: 120px 18px;
+          }
+        }
+      }
+
       &:nth-child(3) {
         float: right;
+
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_3_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 196px;
+            height: 20px;
+            @include image-2x("/img/ML/testimonial_3_logo");
+            background-size: 196px 20px;
+          }
+        }
       }
 
       div.testimonial-image {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background-image: cdnUrl("/img/ML/testimonial_1_image.jpg");
         background-position: center;
         background-size: 40px 40px;
         background-repeat: no-repeat;
@@ -257,6 +299,9 @@ section.testimonials-section {
         font-size: 14px;
         color: rgba(white, 0.6);
         line-height: 19px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       div.testimonial-quote {
@@ -264,6 +309,11 @@ section.testimonials-section {
         font-size: 16px;
         color: white;
         line-height: 20px;
+        height: 96px;
+
+        @include mobile() {
+          min-height: 80px;
+        }
 
         &:not(:first-child){
           padding-top: 16px;
@@ -279,10 +329,6 @@ section.testimonials-section {
 
         div.testimonial-logo {
           float: right;
-          width: 16px;
-          height: 16px;
-          background-image: cdnUrl("/img/ML/testimonial_1_logo.png");
-          background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
         }
