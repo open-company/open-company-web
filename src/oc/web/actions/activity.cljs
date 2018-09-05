@@ -693,7 +693,8 @@
                                                     :fullscreen (:fullscreen %)})]))
 
 (defn cmail-toggle-must-see []
-  (dis/dispatch! [:update [:cmail-data :must-see] not]))
+  (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))
+                                                   :has-changes true})]))
 
 (defonce cmail-reopen-only-one (atom false))
 
