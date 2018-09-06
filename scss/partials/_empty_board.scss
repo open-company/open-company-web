@@ -22,6 +22,7 @@ div.empty-board {
     padding: 80px 153px;
     text-align: center;
     border-collapse: collapse;
+    margin: 8px auto 0;
 
     @include mobile() {
       width: 100%;
