@@ -85,7 +85,7 @@
                     {:on-click #(change! s :digest-medium "email")}
                     "Email"]
                   ;; Show Slack digest option if
-                  (when (user-stores/has-slack-bot? org-data)
+                  (when (jwt/team-has-bot? (:team-id org-data))
                     [:li
                       {:on-click #(change! s :digest-medium "slack")}
                       "Slack"])]]]]]

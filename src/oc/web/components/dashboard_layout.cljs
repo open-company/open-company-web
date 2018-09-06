@@ -294,25 +294,30 @@
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (if grid-view? "Stream view" "Grid view")}])])]
-              (when (and is-all-posts
-                         is-admin-or-author
-                         (drv/react s :show-add-post-tooltip))
-                [:div.add-post-tooltip-container.group
-                  [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
-                  [:div.add-post-tooltips
-                    [:div.add-post-tooltip-box-mobile]
-                    [:div.add-post-tooltip-title
-                      (str "Welcome to Carrot, " (:first-name current-user-data))]
-                    [:div.add-post-tooltip
-                      (str
-                        "Alignment happens when teams pull in the same direction. Create your "
-                        "first post to get everyone in sync. ")
-                      [:button.mlb-reset.add-post-bt
-                        {:on-click #(when can-compose (compose s))}
-                        "Create new post"]
-                      "."]
-                    [:div.add-post-tooltip-box]]])
+              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
+                (when (and is-all-posts
+                           is-admin-or-author
+                           add-post-tooltip)
+                  [:div.add-post-tooltip-container.group
+                    [:button.mlb-reset.add-post-tooltip-dismiss
+                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                    [:div.add-post-tooltips
+                      [:div.add-post-tooltip-box-mobile]
+                      [:div.add-post-tooltip-title
+                        (str "Welcome to Carrot, " (:first-name current-user-data))]
+                      (if (= add-post-tooltip :has-organic-post)
+                        [:div.add-post-tooltip
+                          (str
+                            "Carrot is where you'll find key announcements, updates, "
+                            "and decisions to keep you and your team pulling in the same direction.")]
+                        [:div.add-post-tooltip
+                          (str
+                            "Alignment happens when teams pull in the same direction. Create your "
+                            "first post to get everyone in sync. ")
+                          [:button.mlb-reset.add-post-bt
+                            {:on-click #(when can-compose (compose s))}
+                            "Create new post"]])
+                      [:div.add-post-tooltip-box]]]))
               (when (and is-all-posts
                          is-admin-or-author
                          (not is-mobile?)

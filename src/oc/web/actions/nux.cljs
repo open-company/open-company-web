@@ -71,17 +71,16 @@
           post-added-tooltip (:show-post-added-tooltip nv)
           fixed-draft-post-tooltip (parse-nux-cookie-value (:show-draft-post-tooltip nv))
           edit-tooltip (:show-edit-tooltip nv)
-          fixed-add-comment-tooltip (parse-nux-cookie-value (:show-add-comment-tooltip nv))
+          add-comment-tooltip (:show-add-comment-tooltip nv)
           user-type (:user-type nv)
           has-only-sample-posts (every? map? (vals posts-data))
           team-has-more-users? (> (count (:users team-data)) 1)
+          team-has-bot? (jwt/team-has-bot? (:team-id org-data))
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already
                                       (not= add-post-tooltip default-tooltip-done)
                                       ;; the user is not a viewer
                                       can-edit?
-                                      ;; there are no added posts
-                                      has-only-sample-posts
                                       ;; we are not showing the next tooltip (post added)
                                       (not post-added-tooltip))
           ;; Show the first post added tooltip
@@ -93,12 +92,16 @@
           fixed-edit-tooltip (and ;; has not been done already
                                   (not= edit-tooltip default-tooltip-done)
                                   ;; user is not a viewer
-                                  can-edit?)]
+                                  can-edit?)
+          ;; Show the tooltip below the comment
+          fixed-add-comment-tooltip (and ;; jas not been done already
+                                         (not= add-comment-tooltip default-tooltip-done)
+                                         ;; the team has not a bot already
+                                         (not team-has-bot?))]
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
                  (or (not can-edit?)
-                     (not has-only-sample-posts)
                      post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
       (when (and (not fixed-post-added-tooltip)
@@ -107,8 +110,15 @@
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
+      (when (and (not fixed-add-comment-tooltip)
+                 team-has-bot?)
+        (mark-nux-step-done :show-add-comment-tooltip))
       (dis/dispatch! [:input [:nux]
-       {:show-add-post-tooltip fixed-add-post-tooltip
+       {:show-add-post-tooltip (if fixed-add-post-tooltip
+                                 (if has-only-sample-posts
+                                  true
+                                  :has-organic-post)
+                                 false)
         :show-post-added-tooltip fixed-post-added-tooltip
         :show-edit-tooltip fixed-edit-tooltip
         :show-add-comment-tooltip fixed-add-comment-tooltip
