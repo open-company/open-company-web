@@ -253,23 +253,11 @@ div.left-navigation-sidebar {
   }
 
   a.all-posts {
-    margin-bottom: 16px;
-
-    &.showing-must-see {
-      margin-bottom: 0px;
-    }
-
-    &.showing-drafts {
-      margin-bottom: 0px;
-    }
+    margin-bottom: 0px;
   }
 
   a.must-see {
     margin-bottom: 16px;
-
-    @include mobile() {
-      margin-bottom: 0px;
-    }
 
     &.showing-drafts {
       margin-bottom: 0px;
