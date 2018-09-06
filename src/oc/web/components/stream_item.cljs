@@ -129,18 +129,6 @@
                                 :new-item (:new activity-data)})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
-       :on-click (fn [e]
-                   (let [ev-in? (partial utils/event-inside? e)
-                         dom-node-selector (str "div." dom-node-class)]
-                     (when (and is-mobile?
-                                (not @(::more-menu-open s))
-                                (not is-drafts-board)
-                                (not (ev-in? (sel1 [dom-node-selector :div.more-menu])))
-                                (not (ev-in? (rum/ref-node s :expand-button)))
-                                (not (ev-in? (sel1 [dom-node-selector :div.reactions])))
-                                (not (ev-in? (sel1 [dom-node-selector :div.stream-body-comments])))
-                                (not (ev-in? (sel1 [dom-node-selector :div.mobile-summary]))))
-                       (activity-actions/activity-modal-fade-in activity-data))))
        :id dom-element-id}
       [:div.activity-share-container]
       [:div.stream-item-header.group
