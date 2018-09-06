@@ -121,27 +121,34 @@ div.cmail-outer {
           }
         }
 
-        div.must-see-toggle {
-          background-color: #1F262F;
-          border-radius: 100px;
+        div.must-see-toogle-container {
           width: 32px;
           height: 16px;
           float: left;
-          cursor: pointer;
-          margin: 2px 16px 2px 0px;
 
-          span.must-see-toggle-circle {
-            display: block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #617487;
-            background-image: cdnUrl("/img/ML/cmail_must_see_bolt.svg");
-            background-size: 8px 10px;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin-top: -2px;
-            transition: margin-left 180ms ease-in, background-color 180ms ease-in;
+          .tooltip {
+            margin-top: -16px;
+          }
+
+          div.must-see-toggle {
+            background-color: #1F262F;
+            border-radius: 100px;
+            cursor: pointer;
+            margin: 2px 16px 2px 0px;
+
+            span.must-see-toggle-circle {
+              display: block;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              background-color: #617487;
+              background-image: cdnUrl("/img/ML/cmail_must_see_bolt.svg");
+              background-size: 8px 10px;
+              background-position: center;
+              background-repeat: no-repeat;
+              margin-top: -2px;
+              transition: margin-left 180ms ease-in, background-color 180ms ease-in;
+            }
           }
         }
 
@@ -149,36 +156,64 @@ div.cmail-outer {
           margin-top: -2px;
         }
 
-        button.collapse-bt {
+        div.collapse-bt-container {
           float: right;
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/cmail_collapse.svg");
-          background-size: 14px 2px;
-          background-position: 5px 16px;
-          background-repeat: no-repeat;
+
+          button.collapse-bt {
+            width: 24px;
+            height: 24px;
+            background-image: cdnUrl("/img/ML/cmail_collapse.svg");
+            background-size: 14px 2px;
+            background-position: 5px 16px;
+            background-repeat: no-repeat;
+          }
+
+          .tooltip {
+            margin-top: -16px;
+          }
         }
 
-        button.fullscreen-bt {
+        div.fullscreen-bt-container {
           float: right;
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          margin-left: 8px;
+
+          button.fullscreen-bt {
+            width: 24px;
+            height: 24px;
+            background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
+            background-size: 12px 12px;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-left: 8px;
+          }
+
+          .tooltip {
+            margin-top: -16px;
+          }
         }
 
-        button.close-bt {
+        div.close-bt-container {
           float: right;
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          margin-left: 8px;
+
+          button.close-bt {
+            width: 24px;
+            height: 24px;
+            background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+            background-size: 12px 12px;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-left: 8px;
+          }
+
+          &.long-tooltip {
+            .tooltip {
+              width: 122px;
+              margin-left: -24px;
+            }
+          }
+
+          .tooltip {
+            margin-top: -16px;
+          }
         }
       }
 
@@ -452,20 +487,28 @@ div.cmail-outer {
 
         div.cmail-footer-right {
           float: right;
-  
-          button.delete-button {
-            float: right;
-            width: 22px;
-            height: 20px;
-            background-image: cdnUrl("/img/ML/cmail_delete.svg");
-            background-size: 14px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin-top: 10px;
-            opacity: 0.4;
 
-            &:hover {
-              opacity: 1;
+          div.delete-button-container {
+            float: right;
+  
+            button.delete-button {
+              width: 22px;
+              height: 20px;
+              background-image: cdnUrl("/img/ML/cmail_delete.svg");
+              background-size: 14px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              margin-top: 10px;
+              opacity: 0.4;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+
+            .tooltip {
+              width: 122px;
+              margin-left: -24px;
             }
           }
         }

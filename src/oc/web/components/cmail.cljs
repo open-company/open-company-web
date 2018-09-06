@@ -327,47 +327,50 @@
         [:div.cmail-container
           [:div.cmail-header
             {:class (when (:must-see cmail-data) "on")}
-            [:div.must-see-toggle
-              {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-container "body"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
-              [:span.must-see-toggle-circle]]
+            [:div.must-see-toogle-container
+              [:div.must-see-toggle
+                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
+                [:span.must-see-toggle-circle]]]
             [:div.cmail-header-title
               (if (seq (:headline cmail-data))
                 (:headline cmail-data)
                 utils/default-headline)]
-            [:button.mlb-reset.close-bt
-              {:on-click #(if (and (= (:status cmail-data) "published")
-                                   (:has-changes cmail-data))
-                           (cancel-clicked s)
-                           (activity-actions/cmail-hide))
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-container "body"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:has-changes cmail-data) "Save & Close" "Close")}]
-            [:button.mlb-reset.fullscreen-bt
-              {:on-click #(activity-actions/cmail-toggle-fullscreen)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-trigger "hover"
-               :data-container "body"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:fullscreen cmail-state) "Exit fullscreen" "Fullscreen")}]
-            [:button.mlb-reset.collapse-bt
-              {:on-click #(do
-                           (activity-actions/cmail-toggle-collapse))
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-container "body"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:collapse cmail-state) "Expand" "Collapse")}]]
+            (let [long-tooltip (:has-changes cmail-data)]
+              [:div.close-bt-container
+                {:class (when long-tooltip "long-tooltip")}
+                [:button.mlb-reset.close-bt
+                  {:on-click #(if (and (= (:status cmail-data) "published")
+                                       (:has-changes cmail-data))
+                               (cancel-clicked s)
+                               (activity-actions/cmail-hide))
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-trigger "hover"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                   :title (if long-tooltip
+                            "Save & Close"
+                            "Close")}]])
+            [:div.fullscreen-bt-container
+              [:button.mlb-reset.fullscreen-bt
+                {:on-click #(activity-actions/cmail-toggle-fullscreen)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title (if (:fullscreen cmail-state) "Exit fullscreen" "Fullscreen")}]]
+            [:div.collapse-bt-container
+              [:button.mlb-reset.collapse-bt
+                {:on-click #(activity-actions/cmail-toggle-collapse)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title (if (:collapse cmail-state) "Expand" "Collapse")}]]]
           [:div.cmail-section
             [:div.board-name
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
@@ -480,11 +483,11 @@
                          :container-selector "div.cmail-content"})
           [:div.cmail-footer-right
             [:div.footer-separator]
-            [:button.mlb-reset.delete-button
-              {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-container "body"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :on-click #(delete-clicked % cmail-data)}]]]]]]))
+            [:div.delete-button-container
+              [:button.mlb-reset.delete-button
+                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :on-click #(delete-clicked % cmail-data)}]]]]]]]))
