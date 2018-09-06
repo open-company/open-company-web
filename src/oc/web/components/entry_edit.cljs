@@ -282,14 +282,6 @@
                             (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                           s)
                          :before-render (fn [s]
-                          ;; Set or remove the onBeforeUnload prompt
-                          (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
-                            (set! (.-onbeforeunload js/window)
-                             (if save-on-exit
-                              #(do
-                                (save-on-exit? s)
-                                "Do you want to save before leaving?")
-                              nil)))
                           ;; Handle saving/publishing states to dismiss the component
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
@@ -335,7 +327,6 @@
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
-                          (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)

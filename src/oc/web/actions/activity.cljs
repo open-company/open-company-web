@@ -204,8 +204,12 @@
       :from-all-posts false}))
   (dis/dispatch! [:activity-modal-fade-out activity-board-slug]))
 
+(defn- edit-open-cookie []
+  (str "edit-open-" (jwt/user-id) "-" (:slug (dis/org-data))))
+
 (defn entry-edit
   [initial-entry-data]
+  (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 30))
   (load-cached-item initial-entry-data :entry-editing))
 
 (defn activity-edit
@@ -667,19 +671,16 @@
 (defn- cmail-fullscreen-save [fullscreen?]
   (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
 
-(defn- cmail-open-cookie []
-  (str "cmail-open-" (jwt/user-id) "-" (:slug (dis/org-data))))
-
 (defn cmail-show [initial-entry-data & [cmail-state]]
   (let [cmail-default-state {:collapse false
                              :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
         fixed-cmail-state (merge cmail-default-state cmail-state)]
-    (cook/set-cookie! (cmail-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365))
+    (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365))
     (load-cached-item initial-entry-data :cmail-data
      #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
 
 (defn cmail-hide []
-  (cook/remove-cookie! (cmail-open-cookie))
+  (cook/remove-cookie! (edit-open-cookie))
   (dis/dispatch! [:input [:cmail-data] nil])
   (dis/dispatch! [:input [:cmail-state] nil]))
 
@@ -700,5 +701,7 @@
 
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
-    (when-let [activity-uuid (cook/get-cookie (cmail-open-cookie))]
-      (cmail-show (dis/activity-data activity-uuid)))))
+    (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
+      (if (responsive/is-tablet-or-mobile?)
+        (entry-edit (dis/activity-data activity-uuid))
+        (cmail-show (dis/activity-data activity-uuid))))))
