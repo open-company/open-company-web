@@ -99,9 +99,6 @@
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        edit-link (utils/link-for (:links activity-data) "partial-update")
-        delete-link (utils/link-for (:links activity-data) "delete")
-        share-link (utils/link-for (:links activity-data) "share")
         truncated? @(::truncated s)
         expanded? @(::expanded s)
         ;; Fallback to the activity inline comments if we didn't load
