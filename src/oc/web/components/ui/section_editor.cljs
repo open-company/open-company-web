@@ -112,6 +112,7 @@
                               s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
+        no-drafts-boards (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data))
         section-editing (drv/react s :section-editing)
         section-data (if (seq (:slug section-editing)) (drv/react s :board-data) section-editing)
         team-data (drv/react s :team-data)
@@ -124,7 +125,8 @@
         ;; he's creating a new section
         ;; or if he's in the authors list of the existing section
         can-change (or (= (:slug section-editing) utils/default-section-slug)
-                       (some #{current-user-id} (:authors section-editing)))]
+                       (some #{current-user-id} (:authors section-editing)))
+        last-section-standing (= (count no-drafts-boards) 1)]
     [:div.section-editor.group.fs-hide
       {:on-click (fn [e]
                    (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
@@ -371,25 +373,33 @@
                      (utils/link-for (:links section-data) "delete"))
             [:button.mlb-reset.delete-bt
               {:on-click (fn []
-                          (alert-modal/show-alert
-                           {:icon "/img/ML/trash.svg"
-                            :action "delete-section"
-                            :message [:span
-                                       [:span "Are you sure?"]
-                                       (when (-> section-data :entry-count pos?)
-                                         [:span
-                                           " This will delete the section and "
-                                           [:strong "all"]
-                                           " its posts, too."])]
-                            :link-button-title "No"
-                            :link-button-cb #(alert-modal/hide-alert)
-                            :solid-button-style :red
-                            :solid-button-title "Yes, I'm sure"
-                            :solid-button-cb (fn []
-                                               (section-actions/section-delete
-                                                 (:slug section-data))
-                                               (alert-modal/hide-alert)
-                                               (dismiss))}))}
+                          (when-not last-section-standing
+                            (alert-modal/show-alert
+                             {:icon "/img/ML/trash.svg"
+                              :action "delete-section"
+                              :message [:span
+                                         [:span "Are you sure?"]
+                                         (when (-> section-data :entry-count pos?)
+                                           [:span
+                                             " This will delete the section and "
+                                             [:strong "all"]
+                                             " its posts, too."])]
+                              :link-button-title "No"
+                              :link-button-cb #(alert-modal/hide-alert)
+                              :solid-button-style :red
+                              :solid-button-title "Yes, I'm sure"
+                              :solid-button-cb (fn []
+                                                 (section-actions/section-delete
+                                                   (:slug section-data))
+                                                 (alert-modal/hide-alert)
+                                                 (dismiss))})))
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :title (if last-section-standing
+                       "You cannot delete the last remaining section."
+                       "Delete this section and all its posts.")
+               :class (when last-section-standing "disabled")}
               "Delete section"])
           [:button.mlb-reset.create-bt
             {:on-click (fn [_]
