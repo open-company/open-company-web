@@ -295,13 +295,14 @@
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (if grid-view? "Stream view" "Grid view")}])])]
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
-                (when (and is-all-posts
+                (when (and (not is-drafts-board)
                            is-admin-or-author
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
                       {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
                     [:div.add-post-tooltips
+                      {:class (when (= add-post-tooltip :has-organic-post) "second-user")}
                       [:div.add-post-tooltip-box-mobile]
                       [:div.add-post-tooltip-title
                         (str "Welcome to Carrot, " (:first-name current-user-data))]
@@ -318,7 +319,7 @@
                             {:on-click #(when can-compose (compose s))}
                             "Create new post"]])
                       [:div.add-post-tooltip-box]]]))
-              (when (and is-all-posts
+              (when (and (not is-drafts-board)
                          is-admin-or-author
                          (not is-mobile?)
                          (drv/react s :show-post-added-tooltip))
