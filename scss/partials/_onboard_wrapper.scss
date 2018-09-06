@@ -798,6 +798,10 @@ div.onboard-lander {
 
       button.continue {
         width: 340px;
+
+        @include mobile() {
+          width: 170px;
+        }
       }
     }
   }

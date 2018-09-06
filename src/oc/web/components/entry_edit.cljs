@@ -353,11 +353,6 @@
         media-input (drv/react s :media-input)
         published? (= (:status entry-editing) "published")
         show-sections-picker (drv/react s :show-sections-picker)
-        posting-title (if (:uuid entry-editing)
-                        (if (= (:status entry-editing) "published")
-                          "Posted to "
-                          "Draft for ")
-                        "Posting to ")
         video-size (if is-mobile?
                      {:width (win-width)
                       :height @(::mobile-video-height s)}
@@ -418,8 +413,6 @@
             {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                           (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
             (user-avatar-image current-user-data)
-            [:span.posting-in-span
-              posting-title]
             [:div.board-name
               (:board-name entry-editing)]
             (when show-sections-picker

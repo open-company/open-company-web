@@ -478,9 +478,13 @@
                            (rum/local false ::inviting)
                            (rum/local nil ::invite-error)
                            (rum/local (rand 3) ::invite-rand)
-                           (rum/local (vec (repeat 3 default-invite-row)) ::invite-rows)
+                           (rum/local [] ::invite-rows)
                            (rum/local default-invite-note ::invite-note)
-                           {:did-mount (fn [s]
+                           {:will-mount (fn [s]
+                             (let [rows (if (responsive/is-tablet-or-mobile?) 2 3)]
+                               (reset! (::invite-rows s) (vec (repeat rows default-invite-row))))
+                             s)
+                            :did-mount (fn [s]
                              ;; Load the list of teams if it's not already
                              (team-actions/teams-get-if-needed)
                              (utils/after 500
