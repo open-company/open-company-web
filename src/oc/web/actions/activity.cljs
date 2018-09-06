@@ -409,21 +409,7 @@
 (defn activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
-    (refresh-org-data)
-    (let [org-slug (router/current-org-slug)
-          org-data (dis/org-data)
-          boards-no-draft (sort-by :name
-                           (filterv #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
-          filtered-posts-data (dis/filtered-posts-data)]
-      (when (zero? (count filtered-posts-data))
-        (utils/after
-         100
-         #(router/nav!
-            (if (pos? (count boards-no-draft))
-              ;; If there is at least one board redirect to it
-              (oc-urls/board org-slug (:slug (first boards-no-draft)))
-              ;; If not boards are available redirect to the empty org
-              (oc-urls/org org-slug))))))))
+    (refresh-org-data)))
 
 (defn activity-delete [activity-data]
   (api/delete-activity activity-data activity-delete-finish)
