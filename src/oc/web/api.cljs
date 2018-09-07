@@ -453,6 +453,15 @@
          :json-params (cljs->json with-personal-note)}
         callback))))
 
+(defn pre-flight-section-check [pre-flight-link section-name callback]
+  (when (and pre-flight-link
+             section-name)
+    (storage-http (method-for-link pre-flight-link) (relative-href pre-flight-link)
+     {:headers (headers-for-link pre-flight-link)
+      :json-params (cljs->json {:name section-name
+                                :pre-flight true})}
+     callback)))
+
 (defn add-author
   "Given a user-id add him as an author to the current org.
   Refresh the user list and the org-data when finished."
