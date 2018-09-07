@@ -235,6 +235,7 @@
                         (rum/local false ::dismiss)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
+                        (rum/local nil ::initial-uuid)
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
@@ -262,7 +263,8 @@
                                                      (:headline entry-editing)
                                                      ""))]
                             (reset! (::initial-body s) initial-body)
-                            (reset! (::initial-headline s) initial-headline))
+                            (reset! (::initial-headline s) initial-headline)
+                            (reset! (::initial-uuid s) (:uuid entry-editing)))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -443,7 +445,8 @@
         [:div.entry-edit-modal-separator]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
-          (when (drv/react s :show-edit-tooltip)
+          (when (and (drv/react s :show-edit-tooltip)
+                     (not (seq @(::initial-uuid s))))
             [:div.edit-tooltip-container.group
               [:button.mlb-reset.edit-tooltip-dismiss
                 {:on-click #(nux-actions/dismiss-edit-tooltip)}]
