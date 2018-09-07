@@ -348,9 +348,9 @@
                       "😎 Finish this draft post to add some personality"]
                     [:div.draft-post-tooltip
                       (str
-                       "According to smart people on the Internet, the single most important "
-                       "thing people like about their job is the people that they work with. "
-                       "Help your team get to know you better by finishing this draft post.")]]])
+                       "According to smart people on the Internet, "
+                       "everyone likes knowing who they work with. "
+                       "Help your team by finishing this draft post.")]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
