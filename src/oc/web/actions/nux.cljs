@@ -64,9 +64,9 @@
   []
   (when-let* [nv (get-nux-cookie)
               org-data (dis/org-data)
-              posts-data (dis/posts-data)
-              team-data (dis/team-data)]
-    (let [can-edit? (utils/is-admin-or-author? org-data)
+              posts-data (dis/posts-data)]
+    (let [team-data (dis/team-data)
+          can-edit? (utils/is-admin-or-author? org-data)
           add-post-tooltip (:show-add-post-tooltip nv)
           post-added-tooltip (:show-post-added-tooltip nv)
           fixed-draft-post-tooltip (parse-nux-cookie-value (:show-draft-post-tooltip nv))
@@ -74,7 +74,7 @@
           add-comment-tooltip (:show-add-comment-tooltip nv)
           user-type (:user-type nv)
           has-only-sample-posts (every? map? (vals posts-data))
-          team-has-more-users? (> (count (:users team-data)) 1)
+          team-has-more-users? (and team-data (> (count (:users team-data)) 1))
           team-has-bot? (jwt/team-has-bot? (:team-id org-data))
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already
