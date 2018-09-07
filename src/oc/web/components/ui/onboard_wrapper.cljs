@@ -716,7 +716,7 @@
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)
-        is-jelly-head-avatar (= (:avatar-url fixed-user-data) (:avatar-url user-data))]
+        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
         [:div.mobile-header.mobile-only
