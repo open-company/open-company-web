@@ -295,7 +295,7 @@
   (dis/dispatch!
    [:input
     [edit-key :section-name-error]
-    "Board name already exists or isn't allowed"]))
+    utils/section-name-exists-error]))
 
 (defn entry-modal-save [activity-data section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
@@ -391,7 +391,7 @@
 (defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
     ; Board name already exists
-    (dis/dispatch! [:section-edit/error "Board name already exists or isn't allowed"])
+    (board-name-exists-error :section-editing)
     (entry-publish-with-board-finish entry-uuid edit-key (when success (json->cljs body)))))
 
 (defn entry-publish [entry-editing section-editing & [edit-key]]
