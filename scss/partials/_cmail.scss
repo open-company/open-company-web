@@ -257,6 +257,8 @@ div.cmail-outer {
           top: 32px;
           left: 16px;
           z-index: 1000;
+          max-height: 370px;
+          overflow: auto;
         }
 
         div.cmail-section-right {
