@@ -126,10 +126,7 @@
 ;; Org create
 
 (defn- org-created [org-data]
-  (let [auth-source (jwt/get-key :auth-source)]
-    (if (= auth-source "email")
-      (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))
-      (org-redirect org-data))))
+  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -232,6 +229,9 @@
 (defn update-org-sections [org-slug all-sections]
   (let [selected-sections (vec (map :name (filterv :selected all-sections)))
         patch-payload {:boards (conj selected-sections "General")
-                       :samples true}]
+                       :samples true}
+        auth-source (jwt/get-key :auth-source)]
     (api/patch-org-sections patch-payload
-     #(router/nav! (oc-urls/sign-up-invite org-slug)))))
+     #(if (= auth-source "email")
+        (router/nav! (oc-urls/sign-up-invite org-slug))
+        (router/nav! (oc-urls/all-posts org-slug))))))
