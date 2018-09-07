@@ -259,6 +259,10 @@ div.cmail-outer {
           z-index: 1000;
           max-height: 370px;
           overflow: auto;
+
+          @include mobile(){
+            max-height: initial;
+          }
         }
 
         div.cmail-section-right {
