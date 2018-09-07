@@ -155,7 +155,8 @@
             (wrt activity-data read-data)]]
         (when (and (not is-drafts-board)
                    (or @(::hovering-tile s)
-                       @(::more-menu-open s)))
+                       @(::more-menu-open s)
+                       is-mobile?))
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
