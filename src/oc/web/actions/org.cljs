@@ -229,9 +229,6 @@
 (defn update-org-sections [org-slug all-sections]
   (let [selected-sections (vec (map :name (filterv :selected all-sections)))
         patch-payload {:boards (conj selected-sections "General")
-                       :samples true}
-        auth-source (jwt/get-key :auth-source)]
+                       :samples true}]
     (api/patch-org-sections patch-payload
-     #(if (= auth-source "email")
-        (router/nav! (oc-urls/sign-up-invite org-slug))
-        (router/nav! (oc-urls/all-posts org-slug))))))
+     #(router/nav! (oc-urls/all-posts org-slug)))))
