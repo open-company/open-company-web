@@ -262,6 +262,8 @@
                                                    (if (seq (:headline entry-editing))
                                                      (:headline entry-editing)
                                                      ""))]
+                            (when-not (seq (:uuid entry-editing))
+                              (nux-actions/dismiss-add-post-tooltip))
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
                             (reset! (::initial-uuid s) (:uuid entry-editing)))
