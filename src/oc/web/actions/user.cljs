@@ -196,6 +196,7 @@
 (defn invitation-confirmed [status body success]
  (when success
     (when (= status 201)
+      (nux-actions/new-user-registered "email")
       (api/get-entry-point entry-point-get-finished)
       (auth-settings-get))
     (update-jwt body)
