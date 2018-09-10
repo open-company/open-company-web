@@ -8,9 +8,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
@@ -59,10 +60,10 @@
 (defn get-default-section [s]
   (let [editable-boards @(drv/get-ref s :editable-boards)
         org-slug (router/current-org-slug)
-        cookie-name (router/last-used-board-slug-cookie org-slug)
-        cookie-value (cook/get-cookie cookie-name)
+        cookie-value (au/last-used-section)
         board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
-        board-data (or board-from-cookie (first (sort-by :name (vals editable-boards))))]
+        filtered-boards (filterv #(not (:draft %)) (vals editable-boards))
+        board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
     {:board-name (:name board-data)
      :board-slug (:slug board-data)}))
 
@@ -314,15 +315,15 @@
                 ;; No boards
                 (zero? (count (:boards org-data)))
                 (empty-org)
+                ;; Empty board
+                empty-board?
+                (empty-board (get-board-for-edit s))
                 ;; All Posts
                 (and (or is-all-posts
                          is-must-see)
                      (= @board-switch :stream))
                 (rum/with-key (all-posts)
                  (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
-                ;; Empty board
-                empty-board?
-                (empty-board)
                 ;; Layout boards activities
                 :else
                 (cond

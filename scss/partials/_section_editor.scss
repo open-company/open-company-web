@@ -123,7 +123,7 @@ div.section-editor {
     div.section-editor-add-name {
       border-radius: 4px;
       border: 1px solid $carrot_light_gray_1;
-      height: 40px;
+      min-height: 40px;
       width: 100%;
       @include avenir_M();
       font-size: 15px;
@@ -133,6 +133,8 @@ div.section-editor {
       cursor: text;
       outline: none;
       margin-top: 8px;
+      overflow-y: auto;
+      overflow-x: hidden;
 
       &:empty:before {
         padding: 10px 16px;

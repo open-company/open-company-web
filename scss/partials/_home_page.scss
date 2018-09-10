@@ -9,6 +9,15 @@ div.home-wrap {
     }
 
     section {
+
+      &:nth-child(odd) {
+        background-color: #FFFDF9;
+      }
+
+      &:nth-child(even) {
+        background-color: #FAF8F4;
+      }
+
       @include mobile(){
         padding: 0 24px;
       }
@@ -100,7 +109,7 @@ div.home-wrap {
         font-size: 40px;
         @include avenir_H();
         color: $deep_navy;
-        max-width: 670px;
+        max-width: 640px;
         margin: 0 auto;
         z-index: 2;
         position: relative;
@@ -117,7 +126,7 @@ div.home-wrap {
         font-size: 24px;
         line-height: 32px;
         @include avenir_R();
-        max-width: 650px;
+        max-width: 510px;
         margin: 4px auto 0px;
         z-index: 2;
         position: relative;
@@ -155,4 +164,8 @@ div.home-wrap {
       }
     }
   }
+}
+
+div.home-wrap + footer.navbar.navbar-default.navbar-bottom {
+  background-color: #FFFDF9 !important;
 }

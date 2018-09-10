@@ -82,7 +82,10 @@
 (defn section-delete [section-slug]
   (api/delete-board section-slug (fn [status success body]
     (if success
-      (let [org-slug (router/current-org-slug)]
+      (let [org-slug (router/current-org-slug)
+            last-used-section-slug (au/last-used-section)]
+        (when (= last-used-section-slug section-slug)
+          (au/save-last-used-section nil))
         (if (= section-slug (router/current-board-slug))
           (router/redirect! (oc-urls/all-posts org-slug))
           (dispatcher/dispatch! [:section-delete org-slug section-slug])))

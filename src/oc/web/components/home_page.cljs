@@ -44,11 +44,11 @@
           [:div.balloon.small-purple]
 
           [:h1.headline
-            "The new way to provide meaningful team communication."]
+            "Where leadership finds its voice"]
           [:div.subheadline
             (str
-             "Rise above the noise of chat and email to keep your "
-             "growing and distributed teams aligned.")]
+             "Rise above the noise of chat and email to "
+             "keep your growing and distributed teams aligned.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container
             [:button.mlb-reset.get-started-button
@@ -68,15 +68,7 @@
               {:src (utils/cdn "/img/ML/homepage_screenshot.png")
                :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-          [:div.core-values-list.group
-            [:div.core-value.key-announcement
-              "Key announcements"]
-            [:div.core-value.company-updates
-              "Company & team updates"]
-            [:div.core-value.strategic-plans
-              "Strategic plans"]
-            [:div.core-value.ideas-discussions
-              "Decisions"]]]
+          shared-misc/core-values-list]
 
         shared-misc/keep-aligned-section
 
@@ -84,7 +76,7 @@
 
         (shared-misc/slack-comparison-section)
 
-        shared-misc/carrot-testimonials
+        shared-misc/testimonials-section
 
         shared-misc/keep-aligned]]
 

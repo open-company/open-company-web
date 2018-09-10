@@ -19,13 +19,7 @@ div.is-comments {
       border-radius: 12px;
       margin-left: -9px;
 
-      img {
-        max-width: 22px;
-        max-height: 22px;
-        margin-top: -2px;
-        margin-left: 1px;
-        border-radius: 11px;
-      }
+      @include user-profile(22);
 
       &:first-child {
         margin-left: 0px;
