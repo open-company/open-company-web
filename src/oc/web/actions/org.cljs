@@ -231,7 +231,10 @@
         patch-payload {:boards (conj selected-sections "General")
                        :samples true}]
     (api/patch-org-sections patch-payload
-     #(router/nav! (oc-urls/all-posts org-slug)))))
+     (fn [{:keys [success status body]}]
+       (when success
+         (org-loaded (json->cljs body) false))
+       (router/nav! (oc-urls/all-posts org-slug))))))
 
 (defn signup-invite-completed [org-data]
   (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
