@@ -141,3 +141,7 @@
 (defn dismiss-draft-post-tooltip []
   (mark-nux-step-done :show-draft-post-tooltip)
   (check-nux))
+
+(defn maybe-dismiss-draft-post-tooltip [activity-data]
+  (when (not= (.index-of (:headline activity-data) "10 thing to know about") -1)
+    (dismiss-draft-post-tooltip)))

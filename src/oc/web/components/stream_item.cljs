@@ -235,7 +235,9 @@
             [:div.stream-item-footer.group
               [:div.stream-body-draft-edit
                 [:button.mlb-reset.edit-draft-bt
-                  {:on-click #(activity-actions/activity-edit activity-data)}
+                  {:on-click #(do
+                               (nux-actions/maybe-dismiss-draft-post-tooltip activity-data)
+                               (activity-actions/activity-edit activity-data))}
                   "Continue editing"]]
               [:div.stream-body-draft-delete
                 [:button.mlb-reset.delete-draft-bt
