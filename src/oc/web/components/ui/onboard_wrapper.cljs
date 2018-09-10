@@ -433,8 +433,8 @@
           [:button.mlb-reset.top-continue
             {:on-touch-start identity
              :on-click continue-fn
-             :aria-label "Continue"}
-           "Continue"]]
+             :aria-label "Start using Carrot"}
+           "Start"]]
         [:div.title
           "Topics that matter"]
         [:div.subtitle
@@ -516,6 +516,8 @@
         org-data (drv/react s :org-data)
         valid-rows (filter #(and (seq (:user %))
                                  (not (:error %))) @(::invite-rows s))
+        error-rows (filter #(and (seq (:user %))
+                                 (:error %)) @(::invite-rows s))
         continue-fn (fn []
                      (let [_ (check-invites s)
                            errors (filter :error @(::invite-rows s))]
@@ -523,7 +525,8 @@
                          (reset! (::inviting s) true)
                          (reset! (::invite-error s) nil)
                          (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
-                           (team-actions/invite-users not-empty-invites "")))))]
+                           (team-actions/invite-users not-empty-invites "")))))
+        continue-disabled (not (zero? (count error-rows)))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
         [:div.mobile-header.mobile-only
@@ -535,6 +538,13 @@
            "Done"]]
         [:div.title
           "Invite your team"]
+        [:button.mlb-reset.top-continue
+          {:on-touch-start identity
+           :on-click continue-fn
+           :class (when continue-disabled "disabled")
+           :aria-label "Done"}
+         "Continue"]]
+      [:div.onboard-form
         [:div.subtitle
           "Invite other people to explore Carrot with you."]]
       [:div.onboard-form
@@ -577,7 +587,8 @@
           [:button.continue
             {:on-touch-start identity
              :on-click continue-fn
-             :class (when @(::inviting s) "disabled")}
+             :class (when (or @(::inviting s)
+                              continue-disabled) "disabled")}
             "Continue"]
           [:div.skip-container
             "Want to do this later? "
