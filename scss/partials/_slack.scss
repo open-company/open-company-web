@@ -309,3 +309,7 @@ div.slack-wrap {
     }
   }
 }
+
+div.slack-wrap + footer.navbar.navbar-default.navbar-bottom {
+  background-color: #FFFDF9 !important;
+}

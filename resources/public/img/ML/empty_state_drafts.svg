@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="56px" height="56px" viewBox="0 0 56 56" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>Rectangle Copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Empty-states" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Empty-state:-Drafts" transform="translate(-624.000000, -232.000000)">
+            <g id="Group-10" transform="translate(445.000000, 232.000000)">
+                <g id="Rectangle-Copy" transform="translate(179.000000, 0.000000)">
+                    <rect fill="#D9D7D7" x="0" y="0" width="56" height="56" rx="8"></rect>
+                    <path d="M19.4285714,33.7877413 L19.4300205,34.7026387 C19.9429763,34.5271289 20.5340354,34.6436152 20.9433166,35.0520975 C21.354378,35.4623565 21.4703217,36.0556204 21.2911475,36.5691158 L22.1984066,36.5714286 L23.7142857,35.0585084 L20.9360685,32.2857143 C20.023702,33.1947642 19.4285714,33.7877413 19.4285714,33.7877413 Z M34.5807614,18.5864934 L37.4138439,21.420667 C38.1946941,22.2018179 38.1956305,23.467377 37.41518,24.2481281 L24.0210026,37.6474645 C23.8263775,37.8421645 23.4463868,38 23.1655521,38 L19.0003838,38 C18.4478871,38 18,37.5550771 18,36.9993527 L18,32.8330872 C18,32.5551868 18.1600693,32.1699307 18.3525814,31.9775341 L31.753661,18.584493 C32.5341753,17.8044469 33.7997943,17.8052256 34.5807614,18.5864934 Z" id="Combined-Shape" fill="#FFFFFF"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

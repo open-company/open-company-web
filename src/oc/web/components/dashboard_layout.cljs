@@ -360,15 +360,15 @@
                 ;; No boards
                 (zero? (count (:boards org-data)))
                 (empty-org)
+                ;; Empty board
+                empty-board?
+                (empty-board (get-board-for-edit s))
                 ;; All Posts
                 (and (or is-all-posts
                          is-must-see)
                      (= @board-switch :stream))
                 (rum/with-key (all-posts)
                  (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
-                ;; Empty board
-                empty-board?
-                (empty-board)
                 ;; Layout boards activities
                 :else
                 (cond
