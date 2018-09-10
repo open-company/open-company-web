@@ -175,7 +175,7 @@ section.testimonials-section {
 
   @include mobile() {
     width: 100%;
-    padding: 80px 0px !important;
+    padding: 80px 24px !important;
     padding-top: 80px !important;
     padding-bottom: 80px !important;
     text-align: left;
@@ -183,7 +183,7 @@ section.testimonials-section {
 
   @include tablet() {
     width: 100%;
-    padding: 80px 0px;
+    padding: 80px 24px;
   }
 
   div.testimonials-section-title {
@@ -220,10 +220,119 @@ section.testimonials-section {
       margin: 16px auto 0px;
     }
 
-    img.card {
+    div.testimonial-card {
       float: left;
       width: 340px;
       border-radius: 8px;
+      background-color: $deep_navy;
+      padding: 24px;
+      text-align: left;
+
+      &:first-child {
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_1_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 84px;
+            height: 18px;
+            @include image-2x("/img/ML/testimonial_1_logo");
+            background-size: 84px 18px;
+          }
+        }
+      }
+
+      &:nth-child(2) {
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_2_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 120px;
+            height: 18px;
+            @include image-2x("/img/ML/testimonial_2_logo");
+            background-size: 120px 18px;
+          }
+        }
+      }
+
+      &:nth-child(3) {
+        float: right;
+
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_3_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 196px;
+            height: 20px;
+            @include image-2x("/img/ML/testimonial_3_logo");
+            background-size: 196px 20px;
+          }
+        }
+      }
+
+      div.testimonial-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-position: center;
+        background-size: 40px 40px;
+        background-repeat: no-repeat;
+        margin-right: 16px;
+        float: left;
+      }
+
+      div.testimonial-name {
+        @include avenir_B();
+        font-size: 15px;
+        color: white;
+        text-transform: uppercase;
+        line-height: 24px;
+      }
+
+      div.testimonial-role {
+        @include avenir_M();
+        font-size: 14px;
+        color: rgba(white, 0.6);
+        line-height: 19px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      div.testimonial-quote {
+        @include avenir_M();
+        font-size: 16px;
+        color: white;
+        line-height: 20px;
+        height: 96px;
+
+        @include mobile() {
+          min-height: 80px;
+        }
+
+        &:not(:first-child){
+          padding-top: 16px;
+        }
+      }
+
+      div.testimonial-footer {
+        margin-top: 16px;
+
+        a, a:active, a:focus {
+          text-decoration: none;
+        }
+
+        div.testimonial-logo {
+          float: right;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+      }
 
       @include tablet() {
         float: unset;

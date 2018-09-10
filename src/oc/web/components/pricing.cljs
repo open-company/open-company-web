@@ -494,7 +494,7 @@
           ;       "contact us"]]]
         ]
 
-        ; shared-misc/carrot-testimonials
+        shared-misc/testimonials-section
 
         (when-not (jwt/jwt)
           shared-misc/keep-aligned)

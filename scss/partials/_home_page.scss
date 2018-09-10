@@ -165,3 +165,7 @@ div.home-wrap {
     }
   }
 }
+
+div.home-wrap + footer.navbar.navbar-default.navbar-bottom {
+  background-color: #FFFDF9 !important;
+}
