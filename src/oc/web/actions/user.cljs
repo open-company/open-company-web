@@ -226,6 +226,7 @@
   (if success
     (do
       (update-jwt body)
+      (nux-actions/new-user-registered "email")
       (auth-with-token-success token-type body))
     (cond
       (= status 401)
