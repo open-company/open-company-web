@@ -4,6 +4,7 @@
             [dommy.core :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
@@ -304,10 +305,12 @@
                         (str
                          "Give your team a dedicated space to comment and ask questions. "
                          "They can also join the discussion from Slack. ")
-                         [:button.mlb-reset.enable-slack-bt
-                          {:on-click
-                            #(do
-                              (nux-actions/dismiss-add-comment-tooltip)
-                              (org-actions/bot-auth team-data cur-user-data
-                               (str (router/get-token) "?org-settings=main")))}
-                          "Enable Carrot for Slack"] "."]]]))]])]))
+                         (if (jwt/is-admin? (:team-id org-data))
+                           [:button.mlb-reset.enable-slack-bt
+                            {:on-click
+                              #(do
+                                (nux-actions/dismiss-add-comment-tooltip)
+                                (org-actions/bot-auth team-data cur-user-data
+                                 (str (router/get-token) "?org-settings=main")))}
+                            "Enable Carrot for Slack."]
+                            "Ask your Carrot admin to enable Carrot for Slack.")]]]))]])]))
