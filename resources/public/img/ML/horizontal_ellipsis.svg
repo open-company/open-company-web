@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="20px" height="4px" viewBox="0 0 20 4" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
     <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Redlines" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Comment-box-states" transform="translate(-758.000000, -495.000000)" fill="#C4C6C9">
-            <g id="Group-2" transform="translate(129.000000, 470.000000)">
-                <path d="M639,21 C637.895431,21 637,20.1045695 637,19 C637,17.8954305 637.895431,17 639,17 C640.104569,17 641,17.8954305 641,19 C641,20.1045695 640.104569,21 639,21 Z M639,29 C637.895431,29 637,28.1045695 637,27 C637,25.8954305 637.895431,25 639,25 C640.104569,25 641,25.8954305 641,27 C641,28.1045695 640.104569,29 639,29 Z M639,37 C637.895431,37 637,36.1045695 637,35 C637,33.8954305 637.895431,33 639,33 C640.104569,33 641,33.8954305 641,35 C641,36.1045695 640.104569,37 639,37 Z" id="Combined-Shape" transform="translate(639.000000, 27.000000) rotate(90.000000) translate(-639.000000, -27.000000) "></path>
+    <g id="Must-see" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Must-see-posts-/-July-29" transform="translate(-938.000000, -183.000000)" fill="#34414F">
+            <g id="Group-11" transform="translate(854.000000, 178.000000)">
+                <g id="Group-29" transform="translate(0.000000, 5.000000)">
+                    <path d="M94,-4 C92.8954305,-4 92,-4.8954305 92,-6 C92,-7.1045695 92.8954305,-8 94,-8 C95.1045695,-8 96,-7.1045695 96,-6 C96,-4.8954305 95.1045695,-4 94,-4 Z M94,4 C92.8954305,4 92,3.1045695 92,2 C92,0.8954305 92.8954305,0 94,0 C95.1045695,0 96,0.8954305 96,2 C96,3.1045695 95.1045695,4 94,4 Z M94,12 C92.8954305,12 92,11.1045695 92,10 C92,8.8954305 92.8954305,8 94,8 C95.1045695,8 96,8.8954305 96,10 C96,11.1045695 95.1045695,12 94,12 Z" id="Combined-Shape" transform="translate(94.000000, 2.000000) rotate(90.000000) translate(-94.000000, -2.000000) "></path>
+                </g>
             </g>
         </g>
     </g>

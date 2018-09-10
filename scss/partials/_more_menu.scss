@@ -22,17 +22,13 @@ div.more-menu {
     height: 30px;
     display: inline;
     background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
-    background-size: 22px 4px;
+    background-size: 20px 4px;
     background-position: 0px 15px;
     background-repeat: no-repeat;
-    opacity: 0.8;
+    opacity: 0.4;
 
-    &:hover {
+    &:hover, &:active, &:focus {
       opacity: 1;
-    }
-
-    &:hover, &.active {
-      background-image: cdnUrl("/img/ML/horizontal_ellipsis_ui_grey.svg");
     }
   }
 
@@ -48,11 +44,7 @@ div.more-menu {
     margin-left: 7px;
     display: inline-block;
 
-    &:hover {
-      opacity: 0.8;
-    }
-
-    &:active, &:focus {
+    &:hover, &:active, &:focus {
       opacity: 1;
     }
   }
