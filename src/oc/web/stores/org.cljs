@@ -15,7 +15,7 @@
   (read-only-org org-data))
 
 (defmethod dispatcher/action :org-loaded
-  [db [_ org-data saved?]]
+  [db [_ org-data saved? email-domain]]
   ;; We need to remove the boards that are no longer in the org
   (let [boards-key (dispatcher/boards-key (:slug org-data))
         old-boards (get-in db boards-key)
@@ -30,6 +30,7 @@
       (assoc-in (dispatcher/org-data-key (:slug org-data)) (fix-org org-data))
       (assoc :org-editing (-> org-data
                               (assoc :saved saved?)
+                              (assoc :email-domain email-domain)
                               (dissoc :has-changes)))
       (assoc :sections-setup sections)
       (assoc-in boards-key next-boards))))
