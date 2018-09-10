@@ -224,6 +224,7 @@ div.onboard-lander {
 
           &.disabled {
             color: $light_ui_grey;
+            opacity: 0;
           }
         }
       }
