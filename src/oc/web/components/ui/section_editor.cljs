@@ -112,7 +112,7 @@
                               s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
-        no-drafts-boards (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data))
+        no-drafts-boards (filter #(and (not (:draft %)) (not= (:slug %) utils/default-drafts-board-slug)) (:boards org-data))
         section-editing (drv/react s :section-editing)
         section-data (if (seq (:slug section-editing)) (drv/react s :board-data) section-editing)
         team-data (drv/react s :team-data)
