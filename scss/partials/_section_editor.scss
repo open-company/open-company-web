@@ -490,6 +490,14 @@ div.section-editor {
         margin-left: 0px;
         padding-left: 0px;
         text-align: left;
+
+        &:not(.disabled):hover {
+          color: $deep_navy;
+        }
+
+        &.disabled {
+          color: $light_ui_grey;
+        }
       }
 
       button.mlb-reset.create-bt {
