@@ -21,8 +21,8 @@
       (router/nav! url)))
   (close-navigation-sidebar))
 
-(defn mobile-nav-sidebar [mobile-navigation-sidebar]
-  (dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)]))
+(defn mobile-nav-sidebar []
+  (dis/dispatch! [:update [:mobile-navigation-sidebar] not]))
 
 
 (defn show-section-add []

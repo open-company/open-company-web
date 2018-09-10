@@ -105,9 +105,6 @@
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        edit-link (utils/link-for (:links activity-data) "partial-update")
-        delete-link (utils/link-for (:links activity-data) "delete")
-        share-link (utils/link-for (:links activity-data) "share")
         truncated? @(::truncated s)
         expanded? @(::expanded s)
         ;; Fallback to the activity inline comments if we didn't load
@@ -140,18 +137,6 @@
                                 :new-item (:new activity-data)})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
-       :on-click (fn [e]
-                   (let [ev-in? (partial utils/event-inside? e)
-                         dom-node-selector (str "div." dom-node-class)]
-                     (when (and is-mobile?
-                                (not @(::more-menu-open s))
-                                (not is-drafts-board)
-                                (not (ev-in? (sel1 [dom-node-selector :div.more-menu])))
-                                (not (ev-in? (rum/ref-node s :expand-button)))
-                                (not (ev-in? (sel1 [dom-node-selector :div.reactions])))
-                                (not (ev-in? (sel1 [dom-node-selector :div.stream-body-comments])))
-                                (not (ev-in? (sel1 [dom-node-selector :div.mobile-summary]))))
-                       (activity-actions/activity-modal-fade-in activity-data))))
        :id dom-element-id}
       [:div.activity-share-container]
       [:div.stream-item-header.group
@@ -178,7 +163,8 @@
             (wrt activity-data read-data)]]
         (when (and (not is-drafts-board)
                    (or @(::hovering-tile s)
-                       @(::more-menu-open s)))
+                       @(::more-menu-open s)
+                       is-mobile?))
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
