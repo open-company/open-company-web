@@ -450,10 +450,10 @@
                  :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
                 (:name section)])
             (small-loading))]
-        [:button.continue
+        [:button.continue.start-using-carrot
           {:on-touch-start identity
            :on-click continue-fn}
-          "Continue"]]]))
+          "✨ Start using Carrot ✨"]]]))
 
 (def default-invite-row
   {:user ""
@@ -574,11 +574,11 @@
                           (ui-utils/resize-textarea target)
                           (reset! (::invite-note s) (.-innerText target)))
              :class (when (pos? (count valid-rows)) "has-value")}]
-          [:button.continue.invite-bt
+          [:button.continue
             {:on-touch-start identity
              :on-click continue-fn
              :class (when @(::inviting s) "disabled")}
-            "✨ Start using Carrot ✨"]
+            "Continue"]
           [:div.skip-container
             "Want to do this later? "
             [:button.mlb-reset.skip-for-now
