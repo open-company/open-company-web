@@ -237,7 +237,7 @@ div.onboard-lander {
 
       @include mobile() {
         margin-top: 0px;
-        padding-top: 21px;
+        padding-top: 32px;
         font-size: 24px;
         margin: 0 auto;
       }
@@ -309,6 +309,10 @@ div.onboard-lander {
 
     button.signup-with-slack {
       margin-top: 52px;
+
+      @include mobile() {
+        margin-top: 24px;
+      }
     }
 
     button.signup-with-google {
@@ -362,6 +366,10 @@ div.onboard-lander {
       height: 19px;
       margin-top: 36px;
       position: relative;
+
+      @include mobile() {
+        margin-top: 24px;
+      }
 
       div.or-with-email-line {
         position: absolute;
@@ -532,6 +540,14 @@ div.onboard-lander {
       color: $deep_navy;
       margin-top: 35px;
 
+      @include mobile() {
+        margin-top: 16px;
+
+        &.email-field {
+          margin-top: 8px;
+        }
+      }
+
       &.info {
         @include avenir_R();
         font-size: 14px;
@@ -572,6 +588,10 @@ div.onboard-lander {
       color: $deep_navy;
       text-align: center;
 
+      @include mobile() {
+        margin-top: 0px;
+      }
+
       a {
         @include avenir_R();
         font-size: 14px;
@@ -599,6 +619,10 @@ div.onboard-lander {
       line-height: 24px;
       letter-spacing: 0.2px;
       margin-top: 4px;
+
+      @include mobile() {
+        margin-top: 8px;
+      }
 
       @include placeholder() {
         @include avenir_R();
@@ -731,7 +755,8 @@ div.onboard-lander {
       }
 
       @include mobile() {
-        margin-bottom: 32px;
+        margin-top: 32px;
+        margin-bottom: 24px;
       }
     }
   }

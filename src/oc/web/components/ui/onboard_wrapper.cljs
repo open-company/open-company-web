@@ -104,7 +104,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label
+          [:div.field-label.email-field
             "Enter email"
             (cond
               (= (:error signup-with-email) 409)
