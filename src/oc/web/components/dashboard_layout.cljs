@@ -334,12 +334,8 @@
                       "Post success!"]
                     [:div.post-added-tooltip
                       (str
-                       "Carrot shows you who's seen your post, "
-                       "and makes it easy to remind anyone that didn't. ")
-                      [:button.mlb-reset.post-added-bt
-                        {:on-click #(nav-actions/show-invite)}
-                        "Invite your team"]
-                      " to get started."]
+                       "Will everyone see it? Carrot shows who’s seen your post, "
+                       "and makes it easy to remind anyone that hasn’t.")]
                     [:div.post-added-tooltip-box]]])
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
@@ -348,12 +344,11 @@
                     {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
                   [:div.draft-post-tooltips
                     [:div.draft-post-tooltip-title
-                      "😎 Finish this draft post to add some personality"]
+                      "Finish this draft post to add some personality"]
                     [:div.draft-post-tooltip
                       (str
                        "According to smart people on the Internet, "
-                       "everyone likes knowing who they work with. "
-                       "Help your team by finishing this draft post.")]]])
+                       "everyone likes knowing who they work with")]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards

@@ -297,11 +297,11 @@
                       {:on-click #(nux-actions/dismiss-add-comment-tooltip)}]
                     [:div.add-comment-tooltips
                       [:div.add-comment-tooltip-title
-                        "💭 Spark better follow-on discussions"]
+                        "Spark better follow-on discussions"]
                       [:div.add-comment-tooltip
                         (str
-                         "Team reactions and comments give everyone greater context for what's happening "
-                         "and why. Using Slack? Your team can join the discussion from Slack, too — ")
+                         "Give your team a dedicated space to comment and ask questions. "
+                         "They can also join the discussion from Slack. ")
                          [:button.mlb-reset.enable-slack-bt
                           {:on-click
                             #(do

@@ -454,11 +454,11 @@
                 {:on-click #(nux-actions/dismiss-edit-tooltip)}]
               [:div.edit-tooltips
                 [:div.edit-tooltip-title
-                  "✍️ Update your team in seconds"]
+                  "Update your team in seconds"]
                 [:div.edit-tooltip
                   (str
-                   "Carrot keeps everyone aligned around key announcements, updates, and decisions. "
-                   "Don't feel like typing? No worries, ")
+                   "Carrot makes it easy to share announcements, updates, "
+                   "and decisions. Short on time? No worries, ")
                    [:button.mlb-reset.edit-tooltip-record-video-bt
                     {:on-click #(do
                                  (nux-actions/dismiss-edit-tooltip)
