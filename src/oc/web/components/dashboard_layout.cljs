@@ -335,7 +335,13 @@
                     [:div.post-added-tooltip
                       (str
                        "Will everyone see it? Carrot shows who’s seen your post, "
-                       "and makes it easy to remind anyone that hasn’t.")]
+                       "and makes it easy to remind anyone that hasn’t. ")
+                      (when is-admin-or-author
+                        [:button.mlb-reset.post-added-bt
+                          {:on-click #(nav-actions/show-invite)}
+                          "Invite your team"])
+                      (when is-admin-or-author
+                        " to get started."]
                     [:div.post-added-tooltip-box]]])
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
