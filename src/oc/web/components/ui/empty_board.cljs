@@ -29,13 +29,13 @@
         [:div.empty-board-title
           (cond
            is-all-posts? "Catch up with your team"
-           is-must-see? "Your “must see” posts"
+           is-must-see? "“Must see” posts"
            is-drafts-board? "Jot down your ideas and notes"
            :else "This section is empty")]
         [:div.empty-board-subtitle
           (cond
            is-all-posts? "All posts is a stream of what’s new across all sections."
-           is-must-see? "When someone marks a post as “must see” you’ll see it here."
+           is-must-see? "When someone marks a post as “must see” everyone will see it here."
            is-drafts-board? "Keep a private draft until you're ready to share it with your team."
            :else (str "Looks like there aren’t any posts in " (:name board-data) "."))]
         (when-not is-must-see?
