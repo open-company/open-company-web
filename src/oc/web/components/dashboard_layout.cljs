@@ -354,7 +354,8 @@
                     [:div.draft-post-tooltip
                       (str
                        "According to smart people on the Internet, "
-                       "everyone likes knowing who they work with")]]])
+                       "everyone likes knowing who they work with. "
+                       "Help your team by finishing this draft post.")]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
