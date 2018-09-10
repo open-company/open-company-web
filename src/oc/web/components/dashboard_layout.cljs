@@ -344,7 +344,7 @@
                     {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
                   [:div.draft-post-tooltips
                     [:div.draft-post-tooltip-title
-                      "Finish this draft post to add some personality"]
+                      "😎 Finish this draft post to add some personality"]
                     [:div.draft-post-tooltip
                       (str
                        "According to smart people on the Internet, "

@@ -297,7 +297,7 @@
                       {:on-click #(nux-actions/dismiss-add-comment-tooltip)}]
                     [:div.add-comment-tooltips
                       [:div.add-comment-tooltip-title
-                        "Spark better follow-on discussions"]
+                        "💭 Spark better follow-on discussions"]
                       [:div.add-comment-tooltip
                         (str
                          "Give your team a dedicated space to comment and ask questions. "

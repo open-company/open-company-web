@@ -454,7 +454,7 @@
                 {:on-click #(nux-actions/dismiss-edit-tooltip)}]
               [:div.edit-tooltips
                 [:div.edit-tooltip-title
-                  "Update your team in seconds"]
+                  "✍️ Update your team in seconds"]
                 [:div.edit-tooltip
                   (str
                    "Carrot makes it easy to share announcements, updates, "
