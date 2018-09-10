@@ -79,8 +79,6 @@
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already
                                       (not= add-post-tooltip default-tooltip-done)
-                                      ;; the user is not a viewer
-                                      can-edit?
                                       ;; we are not showing the next tooltip (post added)
                                       (not post-added-tooltip))
           ;; Show the first post added tooltip
@@ -101,8 +99,7 @@
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
-                 (or (not can-edit?)
-                     post-added-tooltip))
+                 post-added-tooltip)
         (mark-nux-step-done :show-add-post-tooltip))
       (when (and (not fixed-post-added-tooltip)
                  team-has-more-users?)

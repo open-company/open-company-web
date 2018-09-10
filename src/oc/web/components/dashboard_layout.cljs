@@ -296,7 +296,6 @@
                          :title (if grid-view? "Stream view" "Grid view")}])])]
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
                 (when (and (not is-drafts-board)
-                           is-admin-or-author
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
@@ -306,18 +305,22 @@
                       [:div.add-post-tooltip-box-mobile]
                       [:div.add-post-tooltip-title
                         (str "Welcome to Carrot, " (:first-name current-user-data))]
-                      (if (= add-post-tooltip :has-organic-post)
                         [:div.add-post-tooltip
-                          (str
-                            "Carrot is where you'll find key announcements, updates, "
-                            "and decisions to keep you and your team pulling in the same direction.")]
-                        [:div.add-post-tooltip
-                          (str
-                            "Alignment happens when teams pull in the same direction. Create your "
-                            "first post to get everyone in sync. ")
-                          [:button.mlb-reset.add-post-bt
-                            {:on-click #(when can-compose (compose s))}
-                            "Create new post"]])
+                          (if is-admin-or-author
+                            (if (= add-post-tooltip :has-organic-post)
+                              (str
+                                "Carrot is where you’ll find announcements, updates, and "
+                                "decisions that keep your team pulling in the same direction.")
+                              (str
+                                "Create a post to see how easy it is to keep your team pulling in the "
+                                "same direction. "))
+                            (str
+                             "Carrot is where you’ll find announcements, updates, and decisions "
+                             "that keep your team pulling in the same direction."))
+                          (when is-admin-or-author
+                            [:button.mlb-reset.add-post-bt
+                              {:on-click #(when can-compose (compose s))}
+                              "Create a new post"])]
                       [:div.add-post-tooltip-box]]]))
               (when (and (not is-drafts-board)
                          is-admin-or-author
