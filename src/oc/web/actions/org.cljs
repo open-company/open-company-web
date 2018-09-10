@@ -126,7 +126,7 @@
 ;; Org create
 
 (defn- org-created [org-data]
-  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
+  (router/nav! (oc-urls/sign-up-invite (:slug org-data))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -232,3 +232,6 @@
                        :samples true}]
     (api/patch-org-sections patch-payload
      #(router/nav! (oc-urls/all-posts org-slug)))))
+
+(defn signup-invite-completed [org-data]
+  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))

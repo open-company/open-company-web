@@ -509,7 +509,7 @@
                                        (reset! (::invite-error s) "An error occurred inviting the following users, please try again.")
                                        (reset! (::invite-rows s) (vec invite-errors)))
                                      ;; All invites sent, redirect to dashboard
-                                     (org-actions/org-redirect @(drv/get-ref s :org-data))))))
+                                     (org-actions/signup-invite-completed @(drv/get-ref s :org-data))))))
                              s)}
   [s]
   (let [_ (drv/react s :invite-users)
@@ -582,7 +582,7 @@
           [:div.skip-container
             "Want to do this later? "
             [:button.mlb-reset.skip-for-now
-              {:on-click #(org-actions/org-redirect org-data)}
+              {:on-click #(org-actions/signup-invite-completed org-data)}
               "Skip for now"]]]]]))
 
 (defn dots-animation [s]
