@@ -190,8 +190,9 @@
     img.user-avatar-img {
       width: #{$size}px;
       height: #{$size}px;
-      border-radius: #{$size / 2}px;
+      border-radius: 50%;
       vertical-align: middle;
+      object-fit: cover;
     }
   }
 }

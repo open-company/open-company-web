@@ -158,15 +158,50 @@
     [:div.testimonials-section-subtitle
       "Here’s how we’re helping teams like yours."]
     [:div.testimonials-cards-container.group
-      [:img.card
-        {:src (cdn "/img/ML/testimonial_katie.png")
-         :srcSet (str (cdn "/img/ML/testimonial_katie@2x.png") " 2x")}]
-      [:img.card
-        {:src (cdn "/img/ML/testimonial_riley.png")
-         :srcSet (str (cdn "/img/ML/testimonial_riley@2x.png") " 2x")}]
-      [:img.card
-        {:src (cdn "/img/ML/testimonial_matt.png")
-         :srcSet (str (cdn "/img/ML/testimonial_matt@2x.png") " 2x")}]]])
+      [:div.testimonial-card
+        [:div.testimonial-image]
+        [:div.testimonial-name
+          "CHRIS CAIRNS"]
+        [:div.testimonial-role
+          "Managing Partner"]
+        [:div.testimonial-quote
+          (str
+           "As a busy leader it's hard to keep everyone up to date. "
+           "I use Carrot to record a quick video update and it "
+           "lets me know that everyone's seen it.")]
+        [:div.testimonial-footer.group
+          [:a
+            {:href "https://skylight.digital/"
+             :target "_blank"}
+            [:div.testimonial-logo]]]]
+      [:div.testimonial-card
+        [:div.testimonial-image]
+        [:div.testimonial-name
+          "Tom Hadfield"]
+        [:div.testimonial-role
+          "CEO"]
+        [:div.testimonial-quote
+          "On Carrot, my updates get noticed and get the team talking. I love that."]
+        [:div.testimonial-footer.group
+          [:a
+            {:href "https://m.io/"
+             :target "_blank"}
+            [:div.testimonial-logo]]]]
+      [:div.testimonial-card
+        [:div.testimonial-image]
+        [:div.testimonial-name
+          "Nick DeNardis"]
+        [:div.testimonial-role
+          "Director of Digital Communications"]
+        [:div.testimonial-quote
+          (str
+           "Carrot helps me share things the entire team needs to know "
+           "about - instead of burying it somewhere it won’t get noticed.")]
+        [:div.testimonial-footer.group
+          [:a
+            {:href "https://wayne.edu/"
+             :target "_blank"}
+            [:div.testimonial-logo]]]]]])
 
 (def no-credit-card
   [:div.no-credit-card
@@ -344,7 +379,7 @@
 
       (slack-comparison-section)
 
-      ; testimonials-section
+      testimonials-section
 
       keep-aligned-bottom
       ]])
@@ -822,7 +857,7 @@
         ;       "contact us"]]]
         ]
 
-      ; testimonials-section
+      testimonials-section
 
       keep-aligned-bottom
     ]])
@@ -883,7 +918,7 @@
 
       access-anywhere-section
 
-      ; testimonials-section
+      testimonials-section
 
       keep-aligned-bottom
       ]])
