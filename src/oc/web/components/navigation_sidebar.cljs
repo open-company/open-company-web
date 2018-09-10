@@ -115,7 +115,7 @@
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952) 2) "px"))}}
       [:div.mobile-board-name-container
-        {:on-click #(nav-actions/mobile-nav-sidebar (not mobile-navigation-sidebar))}
+        {:on-click #(nav-actions/mobile-nav-sidebar)}
         [:div.board-name
           (cond
             is-all-posts "All posts"

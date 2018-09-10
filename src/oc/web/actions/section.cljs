@@ -87,7 +87,11 @@
         (when (= last-used-section-slug section-slug)
           (au/save-last-used-section nil))
         (if (= section-slug (router/current-board-slug))
-          (router/redirect! (oc-urls/all-posts org-slug))
+          (do
+            (router/nav! (oc-urls/all-posts org-slug))
+            (api/get-org (dispatcher/org-data)
+              (fn [{:keys [status body success]}]
+                (dispatcher/dispatch! [:org-loaded (json->cljs body)]))))
           (dispatcher/dispatch! [:section-delete org-slug section-slug])))
       (.reload (.-location js/window))))))
 
