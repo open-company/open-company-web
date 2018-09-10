@@ -341,7 +341,7 @@
                           {:on-click #(nav-actions/show-invite)}
                           "Invite your team"])
                       (when is-admin-or-author
-                        " to get started."]
+                        " to get started.")]
                     [:div.post-added-tooltip-box]]])
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
