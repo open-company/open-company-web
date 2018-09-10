@@ -145,6 +145,10 @@ div.onboard-email-container {
     outline: none;
     border: none;
 
+    @include mobile() {
+      width: 100%;
+    }
+
     &.disabled {
       background-color: $light_ui_grey;
     }
@@ -249,6 +253,10 @@ div.onboard-lander {
       border-radius: 4px;
       outline: none;
       border: none;
+
+      @include mobile() {
+        width: 100%;
+      }
 
       &.disabled {
         background-color: $light_ui_grey;
@@ -800,7 +808,7 @@ div.onboard-lander {
         width: 340px;
 
         @include mobile() {
-          width: 170px;
+          width: 100%;
         }
       }
     }
