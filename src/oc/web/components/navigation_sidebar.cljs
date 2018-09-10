@@ -97,12 +97,8 @@
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
-        show-must-see (or is-must-see
-                          (pos? (:must-see-count org-data)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)
-                        (pos? (:count drafts-link)))
         org-slug (router/current-org-slug)
         show-invite-people (and org-slug
                                 (utils/is-admin-or-author? org-data))
@@ -130,26 +126,24 @@
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-all-posts
-                                      :showing-must-see show-must-see
-                                      :showing-drafts show-drafts})
+            {:class (utils/class-set {:item-selected is-all-posts})
              :href (oc-urls/all-posts)
              :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
               "All posts"]])
-        (when show-must-see
+        (when show-all-posts
            [:a.must-see.hover-item.group
             {:class (utils/class-set {:item-selected is-must-see
-                                      :showing-drafts show-drafts})
+                                      :showing-drafts drafts-link})
               :href (oc-urls/must-see)
               :on-click #(nav-actions/nav-to-url! % (oc-urls/must-see))}
              [:div.must-see-icon
                {:class (when is-must-see "selected")}]
              [:div.must-see-label
                "Must see"]])
-        (when show-drafts
+        (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-all-posts)
