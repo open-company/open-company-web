@@ -465,6 +465,14 @@
              items-list (:posts-list (get-in data container-key))]
         (zipmap items-list (map #(get posts-data %) items-list)))))))
 
+(defn draft-posts-data
+  ([]
+    (draft-posts-data @app-state (router/current-org-slug)))
+  ([org-slug]
+    (draft-posts-data @app-state org-slug))
+  ([data org-slug]
+    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
+
 (defn activity-data
   "Get activity data."
   ([]
