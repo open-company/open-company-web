@@ -69,6 +69,7 @@
           can-edit? (utils/is-admin-or-author? org-data)
           add-post-tooltip (:show-add-post-tooltip nv)
           post-added-tooltip (:show-post-added-tooltip nv)
+          fixed-post-added-tooltip (parse-nux-cookie-value post-added-tooltip)
           fixed-draft-post-tooltip (parse-nux-cookie-value (:show-draft-post-tooltip nv))
           edit-tooltip (:show-edit-tooltip nv)
           add-comment-tooltip (:show-add-comment-tooltip nv)
@@ -81,11 +82,6 @@
                                       (not= add-post-tooltip default-tooltip-done)
                                       ;; we are not showing the next tooltip (post added)
                                       (not post-added-tooltip))
-          ;; Show the first post added tooltip
-          fixed-post-added-tooltip (and ;; has not been done already
-                                        (true? post-added-tooltip)
-                                        ;; team has only one user (self)
-                                        (not team-has-more-users?))
           ;; Show the tooltip inside editing
           fixed-edit-tooltip (and ;; has not been done already
                                   (not= edit-tooltip default-tooltip-done)
@@ -99,11 +95,8 @@
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
-                 post-added-tooltip)
+                 (true? post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
-      (when (and (not fixed-post-added-tooltip)
-                 team-has-more-users?)
-        (mark-nux-step-done :show-post-added-tooltip))
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
