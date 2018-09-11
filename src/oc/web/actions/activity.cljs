@@ -643,3 +643,16 @@
                                                   ;; turn off video error since upload finished
                                                   :video-error false
                                                   :has-changes true})])))
+
+(defn delete-all-sample-posts []
+  (let [all-posts (dis/posts-data)
+        sample-posts (filterv :sample (vals all-posts))]
+    (when (router/current-activity-id)
+      (router/nav! (oc-urls/all-posts)))
+    (doseq [post sample-posts]
+      (activity-delete post))))
+
+(defn has-sample-posts []
+  (let [all-posts (dis/posts-data)
+        sample-posts (filterv :sample (vals all-posts))]
+    (pos? (count sample-posts))))
