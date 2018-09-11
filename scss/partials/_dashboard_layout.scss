@@ -412,6 +412,9 @@ div.dashboard-layout {
           float: right;
           margin-left: 24px;
 
+          @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
+          @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
+
           button.add-to-board-top-button {
             height: 42px;
             background-color: $carrot_orange_light;
@@ -427,9 +430,6 @@ div.dashboard-layout {
             display: flex;
             justify-content: center;
             align-items: center;
-
-            @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
-            @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
 
             // Remove to show settings button on mobile
             @include mobile() {
