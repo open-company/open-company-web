@@ -75,7 +75,6 @@
           add-comment-tooltip (:show-add-comment-tooltip nv)
           user-type (:user-type nv)
           has-only-sample-posts (every? map? (vals posts-data))
-          team-has-more-users? (and team-data (> (count (:users team-data)) 1))
           team-has-bot? (jwt/team-has-bot? (:team-id org-data))
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already
@@ -97,6 +96,9 @@
       (when (and (not fixed-add-post-tooltip)
                  (true? post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
+      (when (and (not fixed-post-added-tooltip)
+                 (not can-edit?))
+        (mark-nux-step-done :show-post-added-tooltip))
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
@@ -113,7 +115,14 @@
         :show-edit-tooltip fixed-edit-tooltip
         :show-add-comment-tooltip fixed-add-comment-tooltip
         :show-draft-post-tooltip fixed-draft-post-tooltip
-        :user-type user-type}]))))
+        :user-type user-type}])
+      ;; Check if we need to remove the nux cookie
+      (when (and (= (:show-add-post-tooltip nv) default-tooltip-done)
+                 (= (:show-post-added-tooltip nv) default-tooltip-done)
+                 (= (:show-edit-tooltip nv) default-tooltip-done)
+                 (= (:show-draft-post-tooltip nv) default-tooltip-done)
+                 (= (:show-add-comment-tooltip nv) default-tooltip-done))
+        (nux-end)))))
 
 (defn dismiss-add-post-tooltip []
   (mark-nux-step-done :show-add-post-tooltip)
@@ -127,7 +136,7 @@
   (when-let [nux-cookie (get-nux-cookie)]
     (set-nux-cookie (:user-type nux-cookie)
      {:show-add-post-tooltip default-tooltip-done
-      :show-post-added-tooltip true}))
+      :show-post-added-tooltip (or (:show-post-added-tooltip nux-cookie) true)}))
   (check-nux))
 
 (defn dismiss-post-added-tooltip []
