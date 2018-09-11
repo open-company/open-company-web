@@ -3,6 +3,10 @@ div.all-caught-up {
   height: 55px;
   margin: 10px 0;
 
+  @include mobile() {
+    display: none;
+  }
+
   div.all-caught-up-inner {
     background-image: cdnUrl("/img/ML/caught_up.svg");
     background-size: 26px 33px;
