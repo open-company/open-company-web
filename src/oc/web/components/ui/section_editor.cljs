@@ -81,10 +81,13 @@
       (do
         (when (:section-name-error section-editing)
           (dis/dispatch! [:input [:section-editing :section-name-error] nil]))
-        (when (and (= (:slug section-editing) utils/default-section-slug)
-                   (>= (count sec-name) section-actions/min-section-name-length))
-          (section-actions/pre-flight-check sec-name)
-          (reset! (::pre-flight-check s) true))))))
+        (if (>= (count sec-name) section-actions/min-section-name-length)
+          (if (not= (:slug section-editing) utils/default-section-slug)
+            (do
+              (section-actions/pre-flight-check sec-name)
+              (reset! (::pre-flight-check s) true))
+            (reset! (::pre-flight-check s) false))
+          (reset! (::pre-flight-check s) false))))))
 
 (rum/defcs section-editor < rum/reactive
                             ;; Locals
