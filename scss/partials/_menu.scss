@@ -114,6 +114,12 @@ div.menu {
 
       div.org-avatar {
         @include org-avatar(20);
+
+        div.org-avatar-container {
+          span.org-name {
+            display: none !important;
+          }
+        }
       }
     }
 

@@ -5,15 +5,15 @@
 
   &:before {
     content: "";
-    width: #{$max_logo_height}px;
+    width: #{$max_logo_height * (66 / 119)}px;
     height: #{$max_logo_height}px;
     background-image: cdnUrl("/img/ML/carrot_logo.svg");
     background-repeat: no-repeat;
-    background-size: #{$max_logo_height}px #{$max_logo_height}px;
+    background-size: #{$max_logo_height * (66 / 119)}px #{$max_logo_height}px;
     background-position: center;
     position: absolute;
     top: 0px;
-    left: 0px;
+    left: 3px;
   }
 
   img.org-avatar-img {
@@ -38,7 +38,7 @@
         @include oc-letter($max_logo_height);
 
         span.org-name {
-          display: block !important;
+          display: block;
         }
       }
     }
