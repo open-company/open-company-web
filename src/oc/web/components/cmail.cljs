@@ -343,9 +343,11 @@
                    :data-placement "top"
                    :data-trigger "hover"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                   :title (if long-tooltip
-                            "Save & Close"
-                            "Close")}]])
+                   :title (if (and (not= (:status cmail-data) "published")
+                               (or (:has-changes cmail-data)
+                                   (:auto-saving cmail-data)))
+                        "Save & Close"
+                        "Close")}]
             [:div.fullscreen-bt-container
               [:button.mlb-reset.fullscreen-bt
                 {:on-click #(activity-actions/cmail-toggle-fullscreen)
