@@ -107,46 +107,56 @@ div.cmail-outer {
           float: left;
         }
 
-        &.on {
+        &.must-see-on {
           background-color: $sea_blue;
-
-          div.must-see-toggle {
-            background-color: #4D6DCD;
-
-            span.must-see-toggle-circle {
-              margin-left: 12px;
-              background-color: white;
-              background-image: cdnUrl("/img/ML/cmail_must_see_bolt_on.svg");
-            }
-          }
         }
 
         div.must-see-toogle-container {
-          width: 32px;
-          height: 16px;
           float: left;
+          position: relative;
+          width: 32px;
+          height: 20px;
+          margin-right: 16px;
 
           .tooltip {
             margin-top: -16px;
           }
 
+          &.on {
+            div.must-see-toggle {
+              background-color: #4D6DCD;
+
+              span.must-see-toggle-circle {
+                margin-left: 12px;
+                background-color: white;
+                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_on.svg");
+              }
+            }
+          }
+
           div.must-see-toggle {
+            width: 32px;
+            height: 16px;
+            position: absolute;
+            top: 2px;
+            left: 0px;
             background-color: #1F262F;
             border-radius: 100px;
             cursor: pointer;
-            margin: 2px 16px 2px 0px;
 
             span.must-see-toggle-circle {
               display: block;
               width: 20px;
               height: 20px;
+              position: absolute;
+              top: -2px;
+              left: 0px;
               border-radius: 50%;
               background-color: #617487;
               background-image: cdnUrl("/img/ML/cmail_must_see_bolt.svg");
               background-size: 8px 10px;
               background-position: center;
               background-repeat: no-repeat;
-              margin-top: -2px;
               transition: margin-left 180ms ease-in, background-color 180ms ease-in;
             }
           }

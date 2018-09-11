@@ -326,8 +326,9 @@
       [:div.cmail-middle
         [:div.cmail-container
           [:div.cmail-header
-            {:class (when (:must-see cmail-data) "on")}
+            {:class (when (:must-see cmail-data) "must-see-on")}
             [:div.must-see-toogle-container
+              {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle
                 {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
                  :data-toggle "tooltip"
