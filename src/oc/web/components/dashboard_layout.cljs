@@ -335,8 +335,8 @@
                       "Post success!"]
                     [:div.post-added-tooltip
                       (str
-                       "Will everyone see it? Carrot shows who’s seen your post, "
-                       "and makes it easy to remind anyone that hasn’t. ")
+                       "Carrot shows who’s seen your post, and makes "
+                       "it easy to remind anyone that hasn’t. ")
                       (when is-admin-or-author
                         [:button.mlb-reset.post-added-bt
                           {:on-click #(nav-actions/show-invite)}
