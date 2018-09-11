@@ -11,8 +11,7 @@
 (defn internal-org-avatar
   [s org-data show-org-avatar? show-org-name? force-label]
   [:div.org-avatar-container.group
-    {:data-letter (first (:name org-data))
-     :class (utils/class-set {:no-avatar (not show-org-avatar?)
+    {:class (utils/class-set {:no-avatar (not show-org-avatar?)
                               :force-label force-label})}
     (when show-org-avatar?
       [:img.org-avatar-img
