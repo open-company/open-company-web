@@ -753,5 +753,5 @@
 (defn activity-edit
   [activity-data]
   (if (responsive/is-tablet-or-mobile?)
-    (load-cached-item activity-data :entry-editing)
+    (entry-edit activity-data)
     (cmail-show activity-data)))
