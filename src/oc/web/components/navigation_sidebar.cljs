@@ -150,8 +150,6 @@
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
                :on-click #(nav-actions/nav-to-url! % board-url)}
-              [:div.drafts-icon
-                {:class (when is-drafts-board "selected")}]
               [:div.drafts-label.group
                 "Drafts "
                 (when (pos? (:count drafts-link))

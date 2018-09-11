@@ -352,28 +352,6 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/must_see_bolt_green.svg");
       }
     }
-
-    div.drafts-icon {
-      display: none;
-
-      @include mobile() {
-        background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 16px;
-        height: 28px;
-        float: left;
-        opacity: 1;
-        display: block;
-
-        @include preload_image(cdnUrl("/img/ML/drafts_icon_green.svg"));
-      }
-
-      &.selected {
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/drafts_icon_green.svg");
-      }
-    }
   }
 
   a.drafts {
