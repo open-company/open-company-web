@@ -207,14 +207,6 @@
   (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 30))
   (load-cached-item initial-entry-data :entry-editing))
 
-(defn activity-edit
-  [activity-data]
-  (if (or (responsive/is-tablet-or-mobile?)
-          (not= (:status activity-data) "published"))
-    (load-cached-item activity-data :entry-editing)
-    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate]))
-     (not (router/current-activity-id)))))
-
 (defn entry-edit-dismiss
   []
   ;; If the user was looking at the modal, dismiss it too
@@ -686,3 +678,9 @@
       (if (responsive/is-tablet-or-mobile?)
         (entry-edit (dis/activity-data activity-uuid))
         (cmail-show (dis/activity-data activity-uuid))))))
+
+(defn activity-edit
+  [activity-data]
+  (if (responsive/is-tablet-or-mobile?)
+    (load-cached-item activity-data :entry-editing)
+    (cmail-show activity-data)))
