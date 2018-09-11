@@ -469,10 +469,7 @@ div.dashboard-layout {
             margin-left: 16px;
 
             @include mobile() {
-              float: unset;
-              display: inline;
-              margin-left: 0px;
-              top: -5px;
+              display: none;
             }
 
             &:before {
