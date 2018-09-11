@@ -56,22 +56,7 @@
             {:on-touch-start identity
              :on-click #(router/history-back!)
              :aria-label "Back"}]
-          [:div.mobile-logo]
-          [:button.mlb-reset.top-continue
-            {:class (when (or (not (utils/valid-email? @(::email s)))
-                              (<= (count @(::pswd s)) 7))
-                      "disabled")
-             :on-touch-start identity
-             :on-click #(if (or (not (utils/valid-email? @(::email s)))
-                                (<= (count @(::pswd s)) 7))
-                          (do
-                            (when-not (utils/valid-email? @(::email s))
-                              (reset! (::email-error s) true))
-                            (when (<= (count @(::pswd s)) 7)
-                              (reset! (::password-error s) true)))
-                          (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
-             :aria-label "Continue"}
-             "Continue"]]
+          [:div.mobile-logo]]
         [:div.title.main-lander
           "Welcome to Carrot"]]
       [:div.onboard-form
