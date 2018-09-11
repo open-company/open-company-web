@@ -166,6 +166,10 @@ div.onboard-lander {
     div.mobile-header {
       display: none;
 
+      button.top-continue {
+        display: none;
+      }
+
       @include mobile() {
         display: block;
         margin-top: 0px;

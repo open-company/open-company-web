@@ -519,16 +519,11 @@
           [:button.mlb-reset.top-continue
             {:on-touch-start identity
              :on-click continue-fn
-             :aria-label "Done"}
-           "Done"]]
+             :class (when continue-disabled "disabled")
+             :aria-label "Continue"}
+           "Continue"]]
         [:div.title
-          "Invite your team"]
-        [:button.mlb-reset.top-continue
-          {:on-touch-start identity
-           :on-click continue-fn
-           :class (when continue-disabled "disabled")
-           :aria-label "Done"}
-         "Continue"]]
+          "Invite your team"]]
       [:div.onboard-form
         [:div.subtitle
           "Invite other people to explore Carrot with you."]]
