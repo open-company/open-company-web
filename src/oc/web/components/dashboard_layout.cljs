@@ -92,9 +92,7 @@
 
 (defn compose [s]
   (utils/remove-tooltips)
-  (if (responsive/is-tablet-or-mobile?)
-    (activity-actions/entry-edit (get-board-for-edit s))
-    (activity-actions/cmail-show (get-board-for-edit s)))
+  (activity-actions/activity-edit (get-board-for-edit s))
   ;; If the add post tooltip is visible
   (when @(drv/get-ref s :show-add-post-tooltip)
     ;; Dismiss it and bring up the invite people tooltip
@@ -280,8 +278,8 @@
                         :on-blur #(reset! (::show-top-boards-dropdown s) false)
                         :on-change (fn [item]
                                      (reset! (::show-top-boards-dropdown s) false)
-                                     (activity-actions/entry-edit {:board-slug (:value item)
-                                                                   :board-name (:label item)}))}))])
+                                     (activity-actions/activity-edit {:board-slug (:value item)
+                                                                      :board-name (:label item)}))}))])
                 (when-not is-mobile?
                   [:div.board-switcher.group
                     (let [grid-view? (= @board-switch :grid)]
