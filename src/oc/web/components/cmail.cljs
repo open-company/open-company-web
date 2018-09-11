@@ -331,7 +331,9 @@
               (if (seq (:headline cmail-data))
                 (:headline cmail-data)
                 utils/default-headline)]
-            (let [long-tooltip (:has-changes cmail-data)]
+            (let [long-tooltip (and (not= (:status cmail-data) "published")
+                                    (or (:has-changes cmail-data)
+                                        (:auto-saving cmail-data)))]
               [:div.close-bt-container
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
@@ -343,11 +345,9 @@
                    :data-placement "top"
                    :data-trigger "hover"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                   :title (if (and (not= (:status cmail-data) "published")
-                               (or (:has-changes cmail-data)
-                                   (:auto-saving cmail-data)))
+                   :title (if long-tooltip
                         "Save & Close"
-                        "Close")}]
+                        "Close")}]])
             [:div.fullscreen-bt-container
               [:button.mlb-reset.fullscreen-bt
                 {:on-click #(activity-actions/cmail-toggle-fullscreen)
