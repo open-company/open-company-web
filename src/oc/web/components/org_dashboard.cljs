@@ -16,6 +16,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
@@ -93,7 +94,8 @@
                 entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
-                mobile-menu-open]} (drv/react s :org-dashboard-data)
+                mobile-menu-open
+                show-cmail]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -231,9 +233,9 @@
             (if portal-element
               (rum/portal (activity-share) portal-element)
               (activity-share))))
-        ;; Alert modal
-        (when is-showing-alert
-          (alert-modal))
+        ;; cmail editor
+        (when show-cmail
+          (cmail))
         ;; Media video modal for entry editing
         (when (and media-input
                    (:media-video media-input))
@@ -242,6 +244,9 @@
         (when (and media-input
                    (:media-chart media-input))
           (media-chart-modal))
+        ;; Alert modal
+        (when is-showing-alert
+          (alert-modal))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing

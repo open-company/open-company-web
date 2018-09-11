@@ -92,7 +92,9 @@
 
 (defn compose [s]
   (utils/remove-tooltips)
-  (activity-actions/entry-edit (get-board-for-edit s))
+  (if (responsive/is-tablet-or-mobile?)
+    (activity-actions/entry-edit (get-board-for-edit s))
+    (activity-actions/cmail-show (get-board-for-edit s)))
   ;; If the add post tooltip is visible
   (when @(drv/get-ref s :show-add-post-tooltip)
     ;; Dismiss it and bring up the invite people tooltip
@@ -140,6 +142,8 @@
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
+                                ;; Reopen cmail if it was open
+                                (activity-actions/cmail-reopen?)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)

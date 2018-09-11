@@ -226,14 +226,12 @@
                         (drv/drv :entry-editing)
                         (drv/drv :section-editing)
                         (drv/drv :editable-boards)
-                        (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
                         (drv/drv :show-sections-picker)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
-                        (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
                         (rum/local false ::saving)
@@ -284,14 +282,6 @@
                             (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                           s)
                          :before-render (fn [s]
-                          ;; Set or remove the onBeforeUnload prompt
-                          (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
-                            (set! (.-onbeforeunload js/window)
-                             (if save-on-exit
-                              #(do
-                                (save-on-exit? s)
-                                "Do you want to save before leaving?")
-                              nil)))
                           ;; Handle saving/publishing states to dismiss the component
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
@@ -337,17 +327,12 @@
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
-                          (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
-        new-entry?        (empty? (:uuid entry-editing))
         is-mobile? (responsive/is-tablet-or-mobile?)
-        fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
-        wh (.-innerHeight js/window)
-        media-input (drv/react s :media-input)
         published? (= (:status entry-editing) "published")
         show-sections-picker (drv/react s :show-sections-picker)
         posting-title (if (:uuid entry-editing)

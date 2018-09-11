@@ -227,3 +227,13 @@
                                                        :name section-name})]
       (dispatcher/dispatch! [:input [:section-editing] next-section-editing])
       (success-cb next-section-editing))))
+
+(defn pre-flight-check [section-name]
+  (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] true])
+  (let [org-data (dispatcher/org-data)
+        pre-flight-link (utils/link-for (:links org-data) "pre-flight-create")]
+    (api/pre-flight-section-check pre-flight-link section-name
+     (fn [{:keys [success body status]}]
+       (when-not success
+         (section-name-error status))
+       (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))

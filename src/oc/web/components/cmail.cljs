@@ -1,0 +1,494 @@
+(ns oc.web.components.cmail
+  (:require [rum.core :as rum]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
+            [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
+            [oc.web.utils.ui :as ui-utils]
+            [oc.web.local-settings :as ls]
+            [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
+            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+
+(defn real-close []
+  (utils/after 180 activity-actions/cmail-hide))
+
+;; Local cache for outstanding edits
+
+(defn remove-autosave [s]
+  (when @(::autosave-timer s)
+    (.clearInterval js/window @(::autosave-timer s))
+    (reset! (::autosave-timer s) nil)))
+
+(defn autosave [s]
+  (let [cmail-data @(drv/get-ref s :cmail-data)
+        body-el (sel1 [:div.rich-body-editor])
+        cleaned-body (when body-el
+                      (utils/clean-body-html (.-innerHTML body-el)))]
+    (activity-actions/entry-save-on-exit :cmail-data cmail-data cleaned-body)))
+
+;; Close dismiss handling
+
+(defn cancel-clicked [s]
+  (let [cmail-data @(drv/get-ref s :cmail-data)
+        clean-fn (fn [dismiss-modal?]
+                    (remove-autosave s)
+                    (activity-actions/entry-clear-local-cache (:uuid cmail-data) :cmail-data)
+                    (when dismiss-modal?
+                      (alert-modal/hide-alert))
+                    (real-close))]
+    (if @(::uploading-media s)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "dismiss-edit-uploading-media"
+                        :message (str "Leave before finishing upload?")
+                        :link-button-title "Stay"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Cancel upload"
+                        :solid-button-cb #(clean-fn true)}]
+        (alert-modal/show-alert alert-data))
+      (if (:has-changes cmail-data)
+        (let [alert-data {:icon "/img/ML/trash.svg"
+                          :action "dismiss-edit-dirty-data"
+                          :message (str "Leave without saving your changes?")
+                          :link-button-title "Stay"
+                          :link-button-cb #(alert-modal/hide-alert)
+                          :solid-button-style :red
+                          :solid-button-title "Lose changes"
+                          :solid-button-cb #(clean-fn true)}]
+          (alert-modal/show-alert alert-data))
+        (clean-fn false)))))
+
+;; Data change handling
+
+(defn body-on-change [state]
+  (dis/dispatch! [:input [:cmail-data :has-changes] true]))
+
+(defn- headline-on-change [state]
+  (when-let [headline (rum/ref-node state "headline")]
+    (let [emojied-headline (.-innerText headline)]
+      (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
+                                                       :has-changes true})]))))
+
+;; Headline setup and paste handler
+
+(defn- setup-headline [state]
+  (when-let [headline-el  (rum/ref-node state "headline")]
+    (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state))))
+  (js/emojiAutocomplete))
+
+(defn headline-on-paste
+  "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
+  [state e]
+  ; Prevent the normal paste behaviour
+  (utils/event-stop e)
+  (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
+        pasted-data   (.getData clipboardData "text/plain")]
+    ; replace the selected text of headline with the text/plain data of the clipboard
+    (js/replaceSelectedText pasted-data)
+    ; call the headline-on-change to check for content length
+    (headline-on-change state)
+    (when (= (.-activeElement js/document) (.-body js/document))
+      (when-let [headline-el (rum/ref-node state "headline")]
+        ; move cursor at the end
+        (utils/to-end-of-content-editable headline-el)))))
+
+(defn add-emoji-cb [s]
+  (headline-on-change s)
+  (body-on-change s))
+
+(defn- clean-body [s]
+  (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (dis/dispatch! [:input [:cmail-data :body] (utils/clean-body-html (.-innerHTML body-el))]))
+  (when ls/oc-enable-transcriptions
+    (let [editing-data @(drv/get-ref s :cmail-data)]
+      (when (:fixed-video-id editing-data)
+        (when-let [transcription-el (rum/ref-node s "transcript-edit")]
+          (dis/dispatch! [:update [:cmail-data] #(merge % {:video-transcript (.-value transcription-el)})]))))))
+
+(defn- fix-headline [cmail-data]
+  (utils/trim (:headline cmail-data)))
+
+(defn- is-publishable? [s cmail-data]
+  (and (seq (:board-slug cmail-data))
+       (or (and @(::record-video s)
+                @(::video-uploading s))
+           (not @(::record-video s)))
+       (not (zero? (count (fix-headline cmail-data))))))
+
+(defn video-record-clicked [s]
+  (let [cmail-data @(drv/get-ref s :cmail-data)
+        start-recording-fn #(do
+                              (reset! (::record-video s) true)
+                              (reset! (::video-picking-cover s) false)
+                              (reset! (::video-uploading s) false))]
+    (cond
+      (:fixed-video-id cmail-data)
+      (activity-actions/prompt-remove-video :cmail-data)
+      @(::record-video s)
+      (reset! (::record-video s) false)
+      :else
+      (start-recording-fn))))
+
+(defn show-post-error [s message]
+  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
+    (if-not (.data $post-btn "bs.tooltip")
+      (.tooltip $post-btn
+       (clj->js {:container "body"
+                 :placement "top"
+                 :trigger "manual"
+                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                  "<div class=\"tooltip-arrow\"></div>"
+                                  "<div class=\"tooltip-inner\"></div>"
+                                "</div>")
+                 :title message}))
+      (doto $post-btn
+        (.attr "data-original-title" message)
+        (.tooltip "fixTitle")))
+    (utils/after 10 #(.tooltip $post-btn "show"))
+    (utils/after 5000 #(.tooltip $post-btn "hide"))))
+
+(defn post-clicked [s]
+  (clean-body s)
+  (let [cmail-data @(drv/get-ref s :cmail-data)
+        fixed-headline (fix-headline cmail-data)
+        published? (= (:status cmail-data) "published")]
+    (if (is-publishable? s cmail-data)
+      (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
+            updated-cmail-data @(drv/get-ref s :cmail-data)
+            section-editing @(drv/get-ref s :section-editing)]
+        (remove-autosave s)
+        (if published?
+          (do
+            (reset! (::saving s) true)
+            (activity-actions/entry-save updated-cmail-data section-editing :cmail-data))
+          (do
+            (reset! (::publishing s) true)
+            (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
+      (cond
+        ;; Missing headline error
+        (zero? (count fixed-headline))
+        (show-post-error s "A title is required in order to save or share this post.")
+        ;; User needs to pick a cover shot
+        (and @(::record-video s)
+             (not @(::video-uploading s))
+             @(::video-picking-cover s))
+        (show-post-error s "Please pick a cover image for your video.")
+        ;; Video still recording
+        (and @(::record-video s)
+             (not @(::video-uploading s)))
+        (show-post-error s "Please finish video recording.")))))
+
+(defn fix-tooltips [s]
+  (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+    (.tooltip "hide")
+    (.tooltip "fixTitle")))
+
+;; Delete handling
+
+(defn delete-clicked [e activity-data]
+  (let [post-type (if (= (:status activity-data) "published")
+                    "post"
+                    "draft")
+        alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-entry"
+                    :message (str "Delete this " post-type "?")
+                    :link-button-title "No"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
+                                       (activity-actions/activity-delete activity-data)
+                                       (alert-modal/hide-alert)
+                                       (real-close))
+                    }]
+    (alert-modal/show-alert alert-data)))
+
+(rum/defcs cmail < rum/reactive
+                   (drv/drv :cmail-state)
+                   (drv/drv :cmail-data)
+                   (drv/drv :show-sections-picker)
+                   (drv/drv :section-editing)
+                   (drv/drv :entry-save-on-exit)
+                   ;; Locals
+                   (rum/local "" ::initial-body)
+                   (rum/local "" ::initial-headline)
+                   (rum/local nil ::headline-input-listener)
+                   (rum/local nil ::uploading-media)
+                   (rum/local false ::saving)
+                   (rum/local false ::publishing)
+                   (rum/local false ::window-click-listener)
+                   (rum/local nil ::autosave-timer)
+                   (rum/local false ::show-legend)
+                   (rum/local false ::record-video)
+                   (rum/local false ::video-uploading)
+                   (rum/local false ::video-picking-cover)
+                   {:will-mount (fn [s]
+                    (let [cmail-data @(drv/get-ref s :cmail-data)
+                          initial-body (if (seq (:body cmail-data))
+                                         (:body cmail-data)
+                                         "")
+                          initial-headline (utils/emojify
+                                             (if (seq (:headline cmail-data))
+                                               (:headline cmail-data)
+                                               ""))]
+                      (reset! (::initial-body s) initial-body)
+                      (reset! (::initial-headline s) initial-headline))
+                    s)
+                   :did-mount (fn [s]
+                    (utils/after 300 #(setup-headline s))
+                    (when-let [headline-el (rum/ref-node s "headline")]
+                      (utils/to-end-of-content-editable headline-el))
+                    (reset! (::window-click-listener s)
+                     (events/listen js/window EventType/CLICK
+                      #(when (and @(::show-legend s)
+                                (not (utils/event-inside? % (rum/ref-node s "legend-container"))))
+                         (reset! (::show-legend s) false))))
+                    (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                    (when ls/oc-enable-transcriptions
+                      (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
+                    s)
+                   :did-remount (fn [_ s]
+                    (when ls/oc-enable-transcriptions
+                      (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
+
+                    s)
+                   :before-render (fn [s]
+                    ;; Handle saving/publishing states to dismiss the component
+                    (let [cmail-data @(drv/get-ref s :cmail-data)]
+                      ;; Entry is saving
+                      (when @(::saving s)
+                        ;: Save request finished
+                        (when-not (:loading cmail-data)
+                          (reset! (::saving s) false)
+                          (when-not (:error cmail-data)
+                            (real-close)
+                            (let [to-draft? (not= (:status cmail-data) "published")]
+                              ;; If it's not published already redirect to drafts board
+                              (utils/after 180
+                               #(router/nav!
+                                 (if to-draft?
+                                   (oc-urls/drafts (router/current-org-slug))
+                                   (oc-urls/board (:board-slug cmail-data)))))))))
+                      (when @(::publishing s)
+                        (when-not (:publishing cmail-data)
+                          (reset! (::publishing s) false)
+                          (when-not (:error cmail-data)
+                            (let [redirect? (seq (:board-slug cmail-data))]
+                              ;; Redirect to the publishing board if the slug is available
+                              (when redirect?
+                                (real-close)
+                                (utils/after
+                                 180
+                                 #(let [from-ap (or (:from-all-posts @router/path)
+                                                    (= (router/current-board-slug) "all-posts"))
+                                        go-to-ap (and (not (:new-section cmail-data))
+                                                      from-ap)]
+                                    ;; Redirect to AP if coming from it or if the post is not published
+                                    (router/nav!
+                                      (if go-to-ap
+                                        (oc-urls/all-posts (router/current-org-slug))
+                                        (oc-urls/board (router/current-org-slug)
+                                         (:board-slug cmail-data))))))))))))
+                    s)
+                   :after-render (fn [s]
+                    (fix-tooltips s)
+                    s)
+                   :will-unmount (fn [s]
+                    (when @(::headline-input-listener s)
+                      (events/unlistenByKey @(::headline-input-listener s))
+                      (reset! (::headline-input-listener s) nil))
+                    (when @(::window-click-listener s)
+                      (events/unlistenByKey @(::window-click-listener s))
+                      (reset! (::window-click-listener s) nil))
+                    (remove-autosave s)
+                    s)}
+  [s]
+  (let [cmail-state (drv/react s :cmail-state)
+        cmail-data (drv/react s :cmail-data)
+        show-sections-picker (drv/react s :show-sections-picker)
+        published? (= (:status cmail-data) "published")
+        video-size {:width 548
+                    :height 322}]
+    [:div.cmail-outer
+      {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
+                                                 (:fullscreen cmail-state))
+                                :collapse (:collapse cmail-state)})}
+      [:div.cmail-middle
+        [:div.cmail-container
+          [:div.cmail-header
+            {:class (when (:must-see cmail-data) "must-see-on")}
+            [:div.must-see-toogle-container
+              {:class (when (:must-see cmail-data) "on")}
+              [:div.must-see-toggle
+                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
+                [:span.must-see-toggle-circle]]]
+            [:div.cmail-header-title
+              (if (seq (:headline cmail-data))
+                (:headline cmail-data)
+                utils/default-headline)]
+            (let [long-tooltip (:has-changes cmail-data)]
+              [:div.close-bt-container
+                {:class (when long-tooltip "long-tooltip")}
+                [:button.mlb-reset.close-bt
+                  {:on-click #(if (and (= (:status cmail-data) "published")
+                                       (:has-changes cmail-data))
+                               (cancel-clicked s)
+                               (activity-actions/cmail-hide))
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-trigger "hover"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                   :title (if long-tooltip
+                            "Save & Close"
+                            "Close")}]])
+            [:div.fullscreen-bt-container
+              [:button.mlb-reset.fullscreen-bt
+                {:on-click #(activity-actions/cmail-toggle-fullscreen)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title (if (:fullscreen cmail-state) "Exit fullscreen" "Fullscreen")}]]
+            [:div.collapse-bt-container
+              [:button.mlb-reset.collapse-bt
+                {:on-click #(activity-actions/cmail-toggle-collapse)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title (if (:collapse cmail-state) "Expand" "Collapse")}]]]
+          [:div.cmail-section
+            [:div.board-name
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
+              (:board-name cmail-data)]
+            (when show-sections-picker
+              [:div
+                {:ref :picker-container}
+                (sections-picker (:board-slug cmail-data)
+                 (fn [board-data note]
+                   (dis/dispatch! [:input [:show-sections-picker] false])
+                   (when (and board-data
+                              (seq (:name board-data)))
+                    (dis/dispatch! [:input [:cmail-data]
+                     (merge cmail-data {:board-slug (:slug board-data)
+                                        :board-name (:name board-data)
+                                        :has-changes true
+                                        :invite-note note})]))))])
+            [:div.cmail-section-right
+              [:button.mlb-reset.video-record-bt
+                {:on-click #(video-record-clicked s)
+                 :class (when (or (:fixed-video-id cmail-data)
+                                  @(::record-video s))
+                          "remove-video-bt")}
+                (if (or (:fixed-video-id cmail-data)
+                        @(::record-video s))
+                  "Remove video"
+                  "Record video")]]]
+          [:div.cmail-content
+            ;; Video elements
+            (when (and (:fixed-video-id cmail-data)
+                       (not @(::record-video s)))
+              (ziggeo-player {:video-id (:fixed-video-id cmail-data)
+                              :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data)
+                              :width (:width video-size)
+                              :height (:height video-size)
+                              :video-processed (:video-processed cmail-data)}))
+            (when @(::record-video s)
+              (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
+                                :upload-started-cb #(do
+                                                      (activity-actions/uploading-video %)
+                                                      (reset! (::video-picking-cover s) false)
+                                                      (reset! (::video-uploading s) true))
+                                :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
+                                :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
+                                :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
+                                :width (:width video-size)
+                                :height (:height video-size)
+                                :remove-recorder-cb (fn []
+                                  (activity-actions/remove-video :cmail-data)
+                                  (reset! (::record-video s) false))}))
+            ; Headline element
+            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group.fs-hide
+              {:content-editable true
+               :ref "headline"
+               :placeholder utils/default-headline
+               :on-paste    #(headline-on-paste s %)
+               :on-key-down #(headline-on-change s)
+               :on-click    #(headline-on-change s)
+               :on-key-press (fn [e]
+                             (when (= (.-key e) "Enter")
+                               (utils/event-stop e)
+                               (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
+               :dangerouslySetInnerHTML @(::initial-headline s)}]
+            (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker false
+                               :multi-picker-container-selector "div#cmail-footer-multi-picker"
+                               :initial-body @(::initial-body s)
+                               :show-placeholder (not (contains? cmail-data :links))
+                               :show-h2 true
+                               :dispatch-input-key :cmail-data
+                               :upload-progress-cb (fn [is-uploading?]
+                                                     (reset! (::uploading-media s) is-uploading?))
+                               :media-config ["photo" "video"]
+                               :classes "emoji-autocomplete emojiable fs-hide"})
+            (when (and ls/oc-enable-transcriptions
+                       (:fixed-video-id cmail-data)
+                       (:video-processed cmail-data))
+              [:div.cmail-data-transcript
+                [:textarea.video-transcript
+                  {:ref "transcript-edit"
+                   :on-input #(ui-utils/resize-textarea (.-target %))
+                   :default-value (:video-transcript cmail-data)}]])
+            ; Attachments
+            (stream-attachments (:attachments cmail-data) nil
+             #(activity-actions/remove-attachment :cmail-data %))]
+        [:div.cmail-footer
+          (let [disabled? (or @(::publishing s)
+                              (not (is-publishable? s cmail-data)))
+                working? (or (and published?
+                                  @(::saving s))
+                             (and (not published?)
+                                  @(::publishing s)))]
+            [:button.mlb-reset.post-button
+              {:ref "mobile-post-btn"
+               :on-click #(post-clicked s)
+               :class (utils/class-set {:disabled disabled?
+                                        :loading working?})}
+              (if (= (:status cmail-data) "published")
+                "SAVE"
+                "POST")])
+          [:div.footer-separator]
+          [:div.cmail-footer-multi-picker
+            {:id "cmail-footer-multi-picker"}]
+          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                         :width 20
+                         :height 20
+                         :position "top"
+                         :default-field-selector "div.cmail-content div.rich-body-editor"
+                         :container-selector "div.cmail-content"})
+          [:div.cmail-footer-right
+            [:div.footer-separator]
+            [:div.delete-button-container
+              [:button.mlb-reset.delete-button
+                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :on-click #(delete-clicked % cmail-data)}]]]]]]]))

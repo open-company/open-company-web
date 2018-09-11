@@ -199,17 +199,13 @@
       :from-all-posts false}))
   (dis/dispatch! [:activity-modal-fade-out activity-board-slug]))
 
+(defn- edit-open-cookie []
+  (str "edit-open-" (jwt/user-id) "-" (:slug (dis/org-data))))
+
 (defn entry-edit
   [initial-entry-data]
+  (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 30))
   (load-cached-item initial-entry-data :entry-editing))
-
-(defn activity-edit
-  [activity-data]
-  (if (or (responsive/is-tablet-or-mobile?)
-          (not= (:status activity-data) "published"))
-    (load-cached-item activity-data :entry-editing)
-    (activity-modal-fade-in activity-data true (fn [] (dis/dispatch! [:modal-editing-activate]))
-     (not (router/current-activity-id)))))
 
 (defn entry-edit-dismiss
   []
@@ -286,7 +282,7 @@
   (dis/dispatch!
    [:input
     [edit-key :section-name-error]
-    "Board name already exists or isn't allowed"]))
+    utils/section-name-exists-error]))
 
 (defn entry-modal-save [activity-data section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
@@ -382,7 +378,7 @@
 (defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
     ; Board name already exists
-    (dis/dispatch! [:section-edit/error "Board name already exists or isn't allowed"])
+    (board-name-exists-error :section-editing)
     (entry-publish-with-board-finish entry-uuid edit-key (when success (json->cljs body)))))
 
 (defn entry-publish [entry-editing section-editing & [edit-key]]
@@ -639,3 +635,52 @@
                                                   ;; turn off video error since upload finished
                                                   :video-error false
                                                   :has-changes true})])))
+
+;; Cmail
+
+(defn- cmail-fullscreen-cookie []
+  (str "cmail-fullscreen-" (jwt/user-id)))
+
+(defn- cmail-fullscreen-save [fullscreen?]
+  (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
+
+(defn cmail-show [initial-entry-data & [cmail-state]]
+  (let [cmail-default-state {:collapse false
+                             :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
+        fixed-cmail-state (merge cmail-default-state cmail-state)]
+    (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365))
+    (load-cached-item initial-entry-data :cmail-data
+     #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
+
+(defn cmail-hide []
+  (cook/remove-cookie! (edit-open-cookie))
+  (dis/dispatch! [:input [:cmail-data] nil])
+  (dis/dispatch! [:input [:cmail-state] nil]))
+
+(defn cmail-toggle-fullscreen []
+  (cmail-fullscreen-save (not (:fullscreen (:cmail-state @dis/app-state))))
+  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse false
+                                                    :fullscreen (not (:fullscreen %))})]))
+
+(defn cmail-toggle-collapse []
+  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse (not (:collapse %))
+                                                    :fullscreen (:fullscreen %)})]))
+
+(defn cmail-toggle-must-see []
+  (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))
+                                                   :has-changes true})]))
+
+(defonce cmail-reopen-only-one (atom false))
+
+(defn cmail-reopen? []
+  (when (compare-and-set! cmail-reopen-only-one false true)
+    (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
+      (if (responsive/is-tablet-or-mobile?)
+        (entry-edit (dis/activity-data activity-uuid))
+        (cmail-show (dis/activity-data activity-uuid))))))
+
+(defn activity-edit
+  [activity-data]
+  (if (responsive/is-tablet-or-mobile?)
+    (load-cached-item activity-data :entry-editing)
+    (cmail-show activity-data)))

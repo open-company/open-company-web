@@ -336,7 +336,11 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open})]})
+                               :mobile-menu-open mobile-menu-open
+                               :show-cmail (boolean (:cmail-state base))})]
+   ;; Cmail
+   :cmail-state           [[:base] (fn [base] (:cmail-state base))]
+   :cmail-data            [[:base] (fn [base] (:cmail-data base))]})
 
 
 ;; Action Loop =================================================================
@@ -460,6 +464,14 @@
        (let [container-key (container-key org-slug posts-filter)
              items-list (:posts-list (get-in data container-key))]
         (zipmap items-list (map #(get posts-data %) items-list)))))))
+
+(defn draft-posts-data
+  ([]
+    (draft-posts-data @app-state (router/current-org-slug)))
+  ([org-slug]
+    (draft-posts-data @app-state org-slug))
+  ([data org-slug]
+    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
 
 (defn activity-data
   "Get activity data."
