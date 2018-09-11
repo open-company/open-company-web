@@ -18,6 +18,8 @@
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
+(def initial-revision (atom {}))
+
 (defn watch-boards [posts-data]
   (when (jwt/jwt) ; only for logged in users
     (let [board-slugs (distinct (map :board-slug (vals posts-data)))
@@ -230,14 +232,41 @@
       (dis/dispatch! [:modal-editing-activate]))
     (dis/dispatch! [:modal-editing-deactivate])))
 
+
+(declare entry-save)
+
 (defn entry-save-on-exit
-  [edit-key activity-data entry-body]
+  [edit-key activity-data entry-body section-editing]
   (let [entry-map (assoc activity-data :body entry-body)
         cache-key (get-entry-cache-key (:uuid activity-data))]
     (uc/set-item cache-key entry-map
      (fn [err]
        (when-not err
-         (dis/dispatch! [:entry-toggle-save-on-exit false]))))))
+         ;; auto save on drafts that have changes
+         (when (and (not= "published" (:status entry-map))
+                    (:has-changes entry-map)
+                    (not (:auto-saving entry-map)))
+           ;; dispatch that you are auto saving
+           (dis/dispatch! [:update [edit-key]
+                           #(merge % entry-map {:auto-saving true})])
+           (entry-save edit-key entry-map section-editing
+             (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
+               (when success
+                 (let [entry-saved (json->cljs body)]
+                   ;; remove the initial document cache now that we have a uuid
+                   ;; uuid didn't exist before
+                   (when (and (nil? (:uuid entry-map))
+                              (:uuid entry-saved))
+                     (remove-cached-item (:uuid entry-map)))
+                   ;; set the initial version number after the first auto save
+                   ;; this is used to revert if user decides to lose the changes
+                   (when (nil? (get @initial-revision (:uuid entry-saved)))
+                     (swap! initial-revision assoc (:uuid entry-saved)
+                      (or (:revision-id entry-map) -1)))
+                   ;; add or update the entry in the app-state list of posts
+                   ;; also move the updated data to the entry editing
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key])))))
+           (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
 
 (defn entry-toggle-save-on-exit
   [enable?]
@@ -252,8 +281,11 @@
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
     (au/save-last-used-section board-slug)
     (refresh-org-data)
-    ; Remove saved cached item
+    ;; Remove saved cached item
     (remove-cached-item initial-uuid)
+    ;; reset initial revision after successful save.
+    ;; need a new revision number on the next edit.
+    (swap! initial-revision dissoc (:uuid activity-data))
     (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
     (when (= (:status activity-data) "published")
@@ -270,6 +302,9 @@
         saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
     (au/save-last-used-section (:slug fixed-board-data))
     (remove-cached-item (:uuid activity-data))
+    ;; reset initial revision after successful save.
+    ;; need a new revision number on the next edit.
+    (swap! initial-revision dissoc (:uuid activity-data))
     (refresh-org-data)
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
@@ -312,40 +347,52 @@
     (fn [{:keys [status success body]}]
       (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))
 
-(defn entry-clear-local-cache [item-uuid edit-key]
+(declare entry-revert)
+
+(defn entry-clear-local-cache [item-uuid edit-key item]
+  "Removes user local cache and also reverts any auto saved drafts."
   (remove-cached-item item-uuid)
+  ;; revert draft to old version
+  (timbre/debug "Reverting to " @initial-revision item-uuid)
+  (when (not= "published" (:status item))
+    (when-let [revision-id (get @initial-revision item-uuid)]
+      (entry-revert revision-id item)))
   (dis/dispatch! [:entry-clear-local-cache edit-key]))
 
-(defn entry-save [edited-data & [section-editing edit-key]]
-  (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
-        fixed-edit-key (or edit-key :entry-editing)]
-    (if (:links fixed-edited-data)
-      (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
-               section-editing)
-        (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-              final-board-data (assoc section-editing :entries [fixed-entry-data])]
-          (api/create-board final-board-data (:invite-note fixed-edited-data)
-            (fn [{:keys [success status body] :as response}]
-              (if (= status 409)
-                ;; Board name exists
-                (board-name-exists-error fixed-edit-key)
-                (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
-        (api/update-entry fixed-edited-data fixed-edit-key create-update-entry-cb))
-      (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
-               section-editing)
-        (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-              final-board-data (assoc section-editing :entries [fixed-entry-data])]
-          (api/create-board final-board-data (:invite-note fixed-edited-data)
-            (fn [{:keys [success status body] :as response}]
-              (if (= status 409)
-                ;; Board name exists
-                (board-name-exists-error fixed-edit-key)
-                (create-update-entry-cb fixed-edited-data fixed-edit-key response)))))
-        (let [org-slug (router/current-org-slug)
-              entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
-              entry-create-link (utils/link-for (:links entry-board-data) "create")]
-          (api/create-entry fixed-edited-data fixed-edit-key entry-create-link create-update-entry-cb))))
-    (dis/dispatch! [:entry-save fixed-edit-key])))
+(defn entry-save
+  ([edit-key edited-data section-editing]
+     (entry-save edit-key edited-data section-editing create-update-entry-cb))
+
+  ([edit-key edited-data section-editing entry-save-cb]
+     (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
+           fixed-edit-key (or edit-key :entry-editing)]
+       (if (:links fixed-edited-data)
+         (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+                  section-editing)
+           (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
+                 final-board-data (assoc section-editing :entries [fixed-entry-data])]
+             (api/create-board final-board-data (:invite-note fixed-edited-data)
+               (fn [{:keys [success status body] :as response}]
+                 (if (= status 409)
+                   ;; Board name exists
+                   (board-name-exists-error fixed-edit-key)
+                   (entry-save-cb fixed-edited-data fixed-edit-key response)))))
+           (api/update-entry fixed-edited-data fixed-edit-key entry-save-cb))
+         (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+                  section-editing)
+           (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
+                 final-board-data (assoc section-editing :entries [fixed-entry-data])]
+             (api/create-board final-board-data (:invite-note fixed-edited-data)
+               (fn [{:keys [success status body] :as response}]
+                 (if (= status 409)
+                   ;; Board name exists
+                   (board-name-exists-error fixed-edit-key)
+                   (entry-save-cb fixed-edited-data fixed-edit-key response)))))
+           (let [org-slug (router/current-org-slug)
+                 entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
+                 entry-create-link (utils/link-for (:links entry-board-data) "create")]
+             (api/create-entry fixed-edited-data fixed-edit-key entry-create-link entry-save-cb))))
+       (dis/dispatch! [:entry-save fixed-edit-key]))))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
@@ -353,6 +400,9 @@
   (refresh-org-data)
   ;; Remove entry cached edits
   (remove-cached-item initial-uuid)
+  ;; reset initial revision after successful publish.
+  ;; need a new revision number on the next edit.
+  (swap! initial-revision dissoc (:uuid activity-data))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
   ;; Send item read
   (send-item-read (:uuid activity-data)))
@@ -367,6 +417,9 @@
         saved-activity-data (first (:entries new-board-data))]
     (au/save-last-used-section (:slug new-board-data))
     (remove-cached-item entry-uuid)
+    ;; reset initial revision after successful publish.
+    ;; need a new revision number on the next edit.
+    (swap! initial-revision dissoc entry-uuid)
     (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
@@ -431,6 +484,23 @@
 (defn activity-share [activity-data share-data & [share-cb]]
   (api/share-activity activity-data share-data (or share-cb activity-share-cb))
   (dis/dispatch! [:activity-share share-data]))
+
+(defn entry-revert [revision-id entry-editing]
+  (when (not (nil? revision-id))
+    (let [entry-exists? (seq (:links entry-editing))
+          entry-version (assoc entry-editing :revision-id revision-id)
+          org-slug (router/current-org-slug)
+          board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
+          revert-entry-link (when entry-exists?
+                              ;; If the entry already exists use the publish link in it
+                              (utils/link-for (:links entry-editing) "revert"))]
+      (if entry-exists?
+        (api/revert-entry entry-version revert-entry-link
+                          (fn [{:keys [success body]}]
+                            (dis/dispatch! [:entry-revert entry-version])
+                            (when success
+                              (dis/dispatch! [:entry-revert/finish (json->cljs body)]))))
+        (dis/dispatch! [:entry-revert false])))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
   (when (= status 404)

@@ -482,6 +482,15 @@ div.entry-edit-modal-container {
         }
       }
 
+      div.saving-saved {
+        display: inline;
+        width: 40px;
+        @include avenir_M();
+        color: $light_ui_grey;
+        font-size: 12px;
+        margin: 5px 1px 1px 20px;
+      }
+
       div.entry-edit-legend-container {
         float: right;
         position: relative;
