@@ -156,6 +156,7 @@
        (not (zero? (count (fix-headline entry-editing))))))
 
 (defn video-record-clicked [s]
+  (nux-actions/dismiss-edit-tooltip)
   (let [entry-editing @(drv/get-ref s :entry-editing)
         start-recording-fn #(do
                               (reset! (::record-video s) true)
@@ -334,6 +335,7 @@
                                                (:board-slug entry-editing))))))))))))
                           s)
                          :will-unmount (fn [s]
+                          (nux-actions/dismiss-edit-tooltip)
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
@@ -452,9 +454,7 @@
                    "Carrot makes it easy to share announcements, updates, "
                    "and decisions. Short on time? No worries, ")
                    [:button.mlb-reset.edit-tooltip-record-video-bt
-                    {:on-click #(do
-                                 (nux-actions/dismiss-edit-tooltip)
-                                 (video-record-clicked s))}
+                    {:on-click #(video-record-clicked s)}
                     "record a video"]
                    " instead."]]])
           ;; Video elements
