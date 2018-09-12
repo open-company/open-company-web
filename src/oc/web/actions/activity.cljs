@@ -252,7 +252,7 @@
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
-                 (let [entry-saved (merge (json->cljs body) {:auto-saving false :has-changes false})]
+                 (let [entry-saved (merge (json->cljs body) {:has-changes false})]
                    (cook/set-cookie! (edit-open-cookie) (:uuid entry-saved) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
