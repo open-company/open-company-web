@@ -316,7 +316,7 @@
                 (empty-org)
                 ;; Empty board
                 empty-board?
-                (empty-board (get-board-for-edit s))
+                (empty-board (when can-compose (get-board-for-edit s)))
                 ;; All Posts
                 (and (or is-all-posts
                          is-must-see)
