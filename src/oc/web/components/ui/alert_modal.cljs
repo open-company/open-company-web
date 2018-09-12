@@ -94,15 +94,15 @@
               (when (:link-button-title alert-modal)
                 [:button.mlb-reset.mlb-link-black
                   {:on-click #(link-button-clicked alert-modal %)
-                   :class (name (:link-button-style alert-modal))}
+                   :class (when (:link-button-style alert-modal) (name (:link-button-style alert-modal)))}
                   (:link-button-title alert-modal)])
               (when (:solid-button-title alert-modal)
                 [:button.mlb-reset.mlb-default
                   {:on-click #(solid-button-clicked alert-modal %)
-                   :class (when (= (:solid-button-style alert-modal) :red) "red")}
+                   :class (when (:solid-button-style alert-modal) (name (:solid-button-style alert-modal)))}
                   (:solid-button-title alert-modal)])])
           (when (seq (:bottom-button-title alert-modal))
             [:button.mlb-reset.bottom-button
               {:on-click #(bottom-button-clicked alert-modal %)
-               :class (name (:bottom-button-style alert-modal))}
+               :class (when (:bottom-button-style alert-modal) (name (:bottom-button-style alert-modal)))}
               (:bottom-button-title alert-modal)])]]]))
