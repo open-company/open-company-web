@@ -93,7 +93,11 @@
 
 (defn compose [s]
   (utils/remove-tooltips)
-  (activity-actions/entry-edit (get-board-for-edit s)))
+  (activity-actions/activity-edit (get-board-for-edit s))
+  ;; If the add post tooltip is visible
+  (when @(drv/get-ref s :show-add-post-tooltip)
+    ;; Dismiss it and bring up the invite people tooltip
+    (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -140,6 +144,8 @@
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
+                                ;; Reopen cmail if it was open
+                                (activity-actions/cmail-reopen?)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -278,8 +284,8 @@
                         :on-blur #(reset! (::show-top-boards-dropdown s) false)
                         :on-change (fn [item]
                                      (reset! (::show-top-boards-dropdown s) false)
-                                     (activity-actions/entry-edit {:board-slug (:value item)
-                                                                   :board-name (:label item)}))}))])
+                                     (activity-actions/activity-edit {:board-slug (:value item)
+                                                                      :board-name (:label item)}))}))])
                 (when-not is-mobile?
                   [:div.board-switcher.group
                     (let [grid-view? (= @board-switch :grid)]

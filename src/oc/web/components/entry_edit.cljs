@@ -41,10 +41,16 @@
 
 (defn autosave [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
+        section-editing @(drv/get-ref s :section-editing)
+        save-on-exit @(drv/get-ref s :entry-save-on-exit)
         body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
                       (utils/clean-body-html (.-innerHTML body-el)))]
-    (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body)))
+    (when save-on-exit
+      (activity-actions/entry-save-on-exit :entry-editing
+                                           entry-editing
+                                           cleaned-body
+                                           section-editing))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
@@ -63,7 +69,7 @@
   (let [entry-editing @(drv/get-ref s :entry-editing)
         clean-fn (fn [dismiss-modal?]
                     (remove-autosave s)
-                    (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing)
+                    (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing entry-editing)
                     (when dismiss-modal?
                       (alert-modal/hide-alert))
                     (real-close s))]
@@ -202,7 +208,7 @@
         (if published?
           (do
             (reset! (::saving s) true)
-            (activity-actions/entry-save updated-entry-editing section-editing))
+            (activity-actions/entry-save :entry-editing updated-entry-editing section-editing))
           (do
             (reset! (::publishing s) true)
             (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
@@ -227,7 +233,6 @@
                         (drv/drv :entry-editing)
                         (drv/drv :section-editing)
                         (drv/drv :editable-boards)
-                        (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
                         (drv/drv :show-sections-picker)
                         (drv/drv :show-edit-tooltip)
@@ -290,14 +295,6 @@
                             (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                           s)
                          :before-render (fn [s]
-                          ;; Set or remove the onBeforeUnload prompt
-                          (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
-                            (set! (.-onbeforeunload js/window)
-                             (if save-on-exit
-                              #(do
-                                (save-on-exit? s)
-                                "Do you want to save before leaving?")
-                              nil)))
                           ;; Handle saving/publishing states to dismiss the component
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
@@ -344,17 +341,12 @@
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
-                          (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
-        new-entry?        (empty? (:uuid entry-editing))
         is-mobile? (responsive/is-tablet-or-mobile?)
-        fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
-        wh (.-innerHeight js/window)
-        media-input (drv/react s :media-input)
         published? (= (:status entry-editing) "published")
         show-sections-picker (drv/react s :show-sections-picker)
         video-size (if is-mobile?
@@ -406,7 +398,7 @@
                                 (remove-autosave s)
                                 (clean-body s)
                                 (reset! (::saving s) true)
-                                (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
+                                (activity-actions/entry-save :entry-editing (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
                     (small-loading))
                   "Save draft"]))])]
@@ -534,6 +526,10 @@
                          :position "top"
                          :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                          :container-selector "div.entry-edit-modal"})
+          (when (true? (:auto-saving entry-editing))
+            [:div.saving-saved "Saving..."])
+          (when (false? (:auto-saving entry-editing))
+            [:div.saving-saved "Saved"])
           [:div.entry-edit-legend-container
             {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))
              :ref "legend-container"}

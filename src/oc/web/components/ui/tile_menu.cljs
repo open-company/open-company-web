@@ -80,4 +80,4 @@
              :data-toggle "tooltip"
              :data-placement fixed-tooltip-position
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-             :title "Share"}])])))
+             :title "Move"}])])))

@@ -40,5 +40,5 @@
            :else (str "Looks like there aren’t any posts in " (:name board-data) "."))]
         (when edit-board
           [:button.mlb-reset.create-new-post-bt
-            {:on-click #(activity-actions/entry-edit edit-board)}
+            {:on-click #(activity-actions/activity-edit edit-board)}
             "Create a new post"])]]))

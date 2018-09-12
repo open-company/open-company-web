@@ -463,6 +463,15 @@
          :json-params (cljs->json with-personal-note)}
         callback))))
 
+(defn pre-flight-section-check [pre-flight-link section-name callback]
+  (when (and pre-flight-link
+             section-name)
+    (storage-http (method-for-link pre-flight-link) (relative-href pre-flight-link)
+     {:headers (headers-for-link pre-flight-link)
+      :json-params (cljs->json {:name section-name
+                                :pre-flight true})}
+     callback)))
+
 (defn add-author
   "Given a user-id add him as an author to the current org.
   Refresh the user list and the org-data when finished."
@@ -640,6 +649,16 @@
     (when-let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
       (storage-http (method-for-link activity-delete-link) (relative-href activity-delete-link)
         {:headers (headers-for-link activity-delete-link)}
+        callback))))
+
+(defn revert-entry
+  [entry-data revert-entry-link callback]
+  (when (and entry-data
+             revert-entry-link)
+    (let [cleaned-entry-data (select-keys entry-data [:revision-id])]
+      (storage-http (method-for-link revert-entry-link) (relative-href revert-entry-link)
+        {:headers (headers-for-link revert-entry-link)
+         :json-params (cljs->json cleaned-entry-data)}
         callback))))
 
 (defn get-all-posts [activity-link from callback]

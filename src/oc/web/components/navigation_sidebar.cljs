@@ -4,6 +4,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
@@ -141,7 +142,8 @@
              [:div.must-see-label
                "Must see"]])
         (when drafts-link
-          (let [board-url (oc-urls/board (:slug drafts-board))]
+          (let [board-url (oc-urls/board (:slug drafts-board))
+                draft-posts (dis/draft-posts-data)]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-all-posts)
                                  (= (router/current-board-slug) (:slug drafts-board)))
@@ -152,8 +154,9 @@
                :on-click #(nav-actions/nav-to-url! % board-url)}
               [:div.drafts-label.group
                 "Drafts "
-                (when (pos? (:count drafts-link))
-                  [:span.count "(" (:count drafts-link) ")"])]]))
+                (when (or (pos? (count draft-posts))
+                          (pos? (:count drafts-link)))
+                  [:span.count "(" (or (count draft-posts) (:count drafts-link)) ")"])]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
