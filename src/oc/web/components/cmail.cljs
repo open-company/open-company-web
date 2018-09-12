@@ -247,7 +247,7 @@
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
-                      (reset! (::intial-uuid s) (:uuid cmail-data)))
+                      (reset! (::initial-uuid s) (:uuid cmail-data)))
                     s)
                    :did-mount (fn [s]
                     (utils/after 300 #(setup-headline s))
