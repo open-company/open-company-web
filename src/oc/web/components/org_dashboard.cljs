@@ -26,13 +26,10 @@
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
-            [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
-            [oc.web.components.ui.slack-bot-modal :refer (slack-bot-modal)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
-            [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
@@ -77,11 +74,9 @@
                 board-data
                 container-data
                 posts-data
-                show-onboard-overlay
                 ap-initial-at
                 user-settings
                 org-settings-data
-                slack-bot-modal-data
                 made-with-carrot-modal-data
                 is-entry-editing
                 is-sharing-activity
@@ -164,18 +159,12 @@
           ;; Activity not found
           show-activity-not-found
           (activity-not-found)
-          ;; Onboard overlay
-          show-onboard-overlay
-          (onboard-overlay)
           ;; Org settings
           org-settings-data
           (org-settings)
           ;; User settings
           user-settings
           (user-profile)
-          ;; Slack bot modal
-          slack-bot-modal-data
-          (slack-bot-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
@@ -240,17 +229,12 @@
         (when (and media-input
                    (:media-video media-input))
           (media-video-modal))
-        ;; Media chart modal for entry editing
-        (when (and media-input
-                   (:media-chart media-input))
-          (media-chart-modal))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing
-                           show-onboard-overlay
                            is-sharing-activity
                            show-section-add
                            show-section-editor))

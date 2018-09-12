@@ -54,7 +54,6 @@
                                 (drv/drv :board-data)
                                 (drv/drv :change-cache-data)
                                 (drv/drv :mobile-navigation-sidebar)
-                                (drv/drv :show-invite-people-tooltip)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -107,11 +106,9 @@
                             (not @(::footer-height s))
                             (< @(::content-height s)
                              (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
-        show-invite-people-tooltip (drv/react s :show-invite-people-tooltip)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :showing-invite-people-tooltip show-invite-people-tooltip})
+      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952) 2) "px"))}}
       [:div.mobile-board-name-container
@@ -155,8 +152,6 @@
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
                :on-click #(nav-actions/nav-to-url! % board-url)}
-              [:div.drafts-icon
-                {:class (when is-drafts-board "selected")}]
               [:div.drafts-label.group
                 "Drafts "
                 (when (or (pos? (count draft-posts))
@@ -207,17 +202,6 @@
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
-        ;; invite people tooltip
-        (when show-invite-people-tooltip
-          [:div.invite-people-tooltip-container.group
-            [:button.mlb-reset.invite-people-tooltip-dismiss
-              {:on-click #(nux-actions/dismiss-invite-people-tooltip)}]
-            [:div.invite-people-tooltip-icon]
-            [:div.invite-people-tooltip-title
-              "Well done on your first post!"]
-            [:div.invite-people-tooltip-description
-              "You can invite your team so they can see it."]
-            [:div.invite-people-tooltip-arrow]])
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(nav-actions/show-invite)}

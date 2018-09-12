@@ -12,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -109,7 +110,10 @@
                               (drv/drv :show-section-editor)
                               (drv/drv :show-section-add)
                               (drv/drv :show-add-post-tooltip)
+                              (drv/drv :show-post-added-tooltip)
+                              (drv/drv :show-draft-post-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
+                              (drv/drv :current-user-data)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
@@ -174,7 +178,9 @@
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         can-compose (pos? (count all-boards))
-        should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
+        should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))
+        current-user-data (drv/react s :current-user-data)
+        is-admin-or-author (utils/is-admin-or-author? org-data)]
       ;; Entries list
       [:div.dashboard-layout.group
         ;; Show create new section for desktop
@@ -295,20 +301,68 @@
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (if grid-view? "Stream view" "Grid view")}])])]
-              (when (drv/react s :show-add-post-tooltip)
-                [:div.add-post-tooltip-container.group
-                  [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
-                  [:div.add-post-tooltip-icon]
-                  [:div.add-post-tooltips
-                    [:div.add-post-tooltip
-                      "Welcome! Now you’re ready to post new updates and information for your team."]
-                    [:div.add-post-tooltip.second-line
-                      "You can delete the sample post at anytime."]]
-                  [:div.add-post-tooltip-arrow]
-                  [:button.mlb-reset.add-post-tooltip-compose-bt
-                    {:on-click #(compose s)}
-                    "Create new post"]])
+              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
+                (when (and (not is-drafts-board)
+                           add-post-tooltip)
+                  [:div.add-post-tooltip-container.group
+                    [:button.mlb-reset.add-post-tooltip-dismiss
+                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                    [:div.add-post-tooltips
+                      {:class (when (= add-post-tooltip :has-organic-post) "second-user")}
+                      [:div.add-post-tooltip-box-mobile]
+                      [:div.add-post-tooltip-title
+                        (str "Welcome to Carrot, " (:first-name current-user-data))]
+                        [:div.add-post-tooltip
+                          (if is-admin-or-author
+                            (if (= add-post-tooltip :has-organic-post)
+                              (str
+                                "Carrot is where you’ll find announcements, updates, and "
+                                "decisions that keep your team pulling in the same direction.")
+                              (str
+                                "Create a post to see how easy it is to keep your team pulling in the "
+                                "same direction. "))
+                            (str
+                             "Carrot is where you’ll find announcements, updates, and decisions "
+                             "that keep your team pulling in the same direction."))
+                          (when is-admin-or-author
+                            [:button.mlb-reset.add-post-bt
+                              {:on-click #(when can-compose (compose s))}
+                              "Create a new post"])]
+                      [:div.add-post-tooltip-box]]]))
+              (when (and (not is-drafts-board)
+                         is-admin-or-author
+                         (not is-mobile?)
+                         (drv/react s :show-post-added-tooltip))
+                [:div.post-added-tooltip-container.group
+                  [:button.mlb-reset.post-added-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
+                  [:div.post-added-tooltips
+                    [:div.post-added-tooltip-title
+                      "Post success!"]
+                    [:div.post-added-tooltip
+                      (str
+                       "Carrot shows who’s seen your post, and makes "
+                       "it easy to remind anyone that hasn’t. ")
+                      (when is-admin-or-author
+                        [:button.mlb-reset.post-added-bt
+                          {:on-click #(nav-actions/show-invite)}
+                          "Invite your team"])
+                      (when is-admin-or-author
+                        " to get started.")]
+                    [:div.post-added-tooltip-box]]])
+              (when (and is-drafts-board
+                         (drv/react s :show-draft-post-tooltip))
+                [:div.draft-post-tooltip-container.group
+                  [:button.mlb-reset.draft-post-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
+                  [:div.draft-post-tooltips
+                    [:div.draft-post-tooltip-title
+                      "😎 Finish this draft post to add some personality"]
+                    [:div.draft-post-tooltip
+                      (str
+                       "According to smart people on the Internet, "
+                       "everyone likes knowing who they work with. "
+                       "Help your team by finishing this draft post.")]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards

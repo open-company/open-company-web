@@ -80,7 +80,7 @@
     (rum/local 0 ::sending)
     {:will-mount (fn [s]
                    (setup-initial-rows s)
-                   (nux-actions/dismiss-invite-people-tooltip)
+                   (nux-actions/dismiss-post-added-tooltip)
                    s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")

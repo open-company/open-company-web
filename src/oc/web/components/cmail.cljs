@@ -11,6 +11,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -127,6 +128,7 @@
        (not (zero? (count (fix-headline cmail-data))))))
 
 (defn video-record-clicked [s]
+  (nux-actions/dismiss-edit-tooltip)
   (let [cmail-data @(drv/get-ref s :cmail-data)
         start-recording-fn #(do
                               (reset! (::record-video s) true)
@@ -219,9 +221,11 @@
                    (drv/drv :cmail-data)
                    (drv/drv :show-sections-picker)
                    (drv/drv :section-editing)
+                   (drv/drv :show-edit-tooltip)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
+                   (rum/local nil ::initial-uuid)
                    (rum/local nil ::headline-input-listener)
                    (rum/local nil ::uploading-media)
                    (rum/local false ::saving)
@@ -239,8 +243,11 @@
                                              (if (seq (:headline cmail-data))
                                                (:headline cmail-data)
                                                ""))]
+                      (when-not (seq (:uuid cmail-data))
+                        (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
-                      (reset! (::initial-headline s) initial-headline))
+                      (reset! (::initial-headline s) initial-headline)
+                      (reset! (::initial-uuid s) (:uuid cmail-data)))
                     s)
                    :did-mount (fn [s]
                     (utils/after 300 #(setup-headline s))
@@ -286,6 +293,8 @@
                                                     (= (router/current-board-slug) "all-posts"))
                                         go-to-ap (and (not (:new-section cmail-data))
                                                       from-ap)]
+                                    ;; Show the first post added tooltip if needed
+                                    (nux-actions/show-post-added-tooltip)
                                     ;; Redirect to AP if coming from it or if the post is not published
                                     (router/nav!
                                       (if go-to-ap
@@ -297,6 +306,7 @@
                     (fix-tooltips s)
                     s)
                    :will-unmount (fn [s]
+                    (nux-actions/dismiss-edit-tooltip)
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
                       (reset! (::headline-input-listener s) nil))
@@ -449,7 +459,23 @@
                    :default-value (:video-transcript cmail-data)}]])
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))]
+             #(activity-actions/remove-attachment :cmail-data %))
+            (when (and (drv/react s :show-edit-tooltip)
+                       (not (seq @(::initial-uuid s))))
+              [:div.edit-tooltip-container.group
+                [:button.mlb-reset.edit-tooltip-dismiss
+                  {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+                [:div.edit-tooltips
+                  [:div.edit-tooltip-title
+                    "✍️ Update your team in seconds"]
+                  [:div.edit-tooltip
+                    (str
+                     "Carrot keeps everyone aligned around key announcements, updates, and decisions. "
+                     "Don't feel like typing? No worries, ")
+                     [:button.mlb-reset.edit-tooltip-record-video-bt
+                      {:on-click #(video-record-clicked s)}
+                      "record a video"]
+                     " instead."]]])]
         [:div.cmail-footer
           (let [disabled? (or @(::publishing s)
                               (not (is-publishable? s cmail-data)))

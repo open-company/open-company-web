@@ -13,6 +13,7 @@
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -155,6 +156,7 @@
        (not (zero? (count (fix-headline entry-editing))))))
 
 (defn video-record-clicked [s]
+  (nux-actions/dismiss-edit-tooltip)
   (let [entry-editing @(drv/get-ref s :entry-editing)
         start-recording-fn #(do
                               (reset! (::record-video s) true)
@@ -234,10 +236,13 @@
                         (drv/drv :editable-boards)
                         (drv/drv :entry-save-on-exit)
                         (drv/drv :show-sections-picker)
+                        (drv/drv :show-edit-tooltip)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
+                        (rum/local nil ::initial-uuid)
+                        (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
                         (rum/local false ::saving)
@@ -263,8 +268,11 @@
                                                    (if (seq (:headline entry-editing))
                                                      (:headline entry-editing)
                                                      ""))]
+                            (when-not (seq (:uuid entry-editing))
+                              (nux-actions/dismiss-add-post-tooltip))
                             (reset! (::initial-body s) initial-body)
-                            (reset! (::initial-headline s) initial-headline))
+                            (reset! (::initial-headline s) initial-headline)
+                            (reset! (::initial-uuid s) (:uuid entry-editing)))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -318,6 +326,7 @@
                                                           (= (router/current-board-slug) "all-posts"))
                                               go-to-ap (and (not (:new-section entry-editing))
                                                             from-ap)]
+                                          (nux-actions/show-post-added-tooltip)
                                           ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
                                             (if go-to-ap
@@ -326,6 +335,7 @@
                                                (:board-slug entry-editing))))))))))))
                           s)
                          :will-unmount (fn [s]
+                          (nux-actions/dismiss-edit-tooltip)
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
@@ -341,11 +351,6 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         published? (= (:status entry-editing) "published")
         show-sections-picker (drv/react s :show-sections-picker)
-        posting-title (if (:uuid entry-editing)
-                        (if (= (:status entry-editing) "published")
-                          "Posted to "
-                          "Draft for ")
-                        "Posting to ")
         video-size (if is-mobile?
                      {:width (win-width)
                       :height @(::mobile-video-height s)}
@@ -406,8 +411,6 @@
             {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                           (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
             (user-avatar-image current-user-data)
-            [:span.posting-in-span
-              posting-title]
             [:div.board-name
               (:board-name entry-editing)]
             (when show-sections-picker
@@ -438,6 +441,22 @@
         [:div.entry-edit-modal-separator]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          (when (and (drv/react s :show-edit-tooltip)
+                     (not (seq @(::initial-uuid s))))
+            [:div.edit-tooltip-container.group
+              [:button.mlb-reset.edit-tooltip-dismiss
+                {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+              [:div.edit-tooltips
+                [:div.edit-tooltip-title
+                  "✍️ Update your team in seconds"]
+                [:div.edit-tooltip
+                  (str
+                   "Carrot makes it easy to share announcements, updates, "
+                   "and decisions. Short on time? No worries, ")
+                   [:button.mlb-reset.edit-tooltip-record-video-bt
+                    {:on-click #(video-record-clicked s)}
+                    "record a video"]
+                   " instead."]]])
           ;; Video elements
           (when (and (not is-mobile?)
                      (:fixed-video-id entry-editing)

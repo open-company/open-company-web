@@ -195,10 +195,11 @@
 ;;Invitation
 (defn invitation-confirmed [status body success]
  (when success
+    (update-jwt body)
     (when (= status 201)
+      (nux-actions/new-user-registered "email")
       (api/get-entry-point entry-point-get-finished)
       (auth-settings-get))
-    (update-jwt body)
     ;; Go to password setup
     (router/nav! oc-urls/confirm-invitation-password))
   (dis/dispatch! [:invitation-confirmed success]))
@@ -225,6 +226,8 @@
   (if success
     (do
       (update-jwt body)
+      (when (not= token-type :password-reset)
+        (nux-actions/new-user-registered "email"))
       (auth-with-token-success token-type body))
     (cond
       (= status 401)
@@ -262,7 +265,7 @@
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
-      (nux-actions/set-new-user-cookie "email")
+      (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
@@ -297,7 +300,7 @@
             (cook/remove-cookie! :show-login-overlay)
             (utils/after 200 #(router/nav! oc-urls/login)))
           (do
-            (nux-actions/set-new-user-cookie "email")
+            (nux-actions/new-user-registered "email")
             (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))
   (dis/dispatch! [:pswd-collect password-reset?]))

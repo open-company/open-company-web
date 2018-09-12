@@ -47,7 +47,7 @@
       (cook/remove-cookie! (router/last-org-cookie)))
     (router/redirect-404!)))
 
-(defn org-loaded [org-data saved?]
+(defn org-loaded [org-data saved? & [email-domain]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
@@ -105,7 +105,7 @@
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
       (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
-  (dis/dispatch! [:org-loaded org-data saved?])
+  (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-bot-added-notification?))
 
 (defn get-org-cb [{:keys [status body success]}]
@@ -126,16 +126,13 @@
 ;; Org create
 
 (defn- org-created [org-data]
-  (let [auth-source (jwt/get-key :auth-source)]
-    (if (= auth-source "email")
-      (router/nav! (oc-urls/sign-up-invite (:slug org-data)))
-      (org-redirect org-data))))
+  (router/nav! (oc-urls/sign-up-invite (:slug org-data))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
     (org-created org-data)))
 
-(defn- handle-org-redirect [team-data org-data]
+(defn- handle-org-redirect [team-data org-data email-domain]
   (if (and (empty? (:name team-data))
            (utils/link-for (:links team-data) "partial-update"))
     ;; if the current team has no name and
@@ -146,30 +143,47 @@
     ;; if not redirect the user to the invite page
     (org-created org-data)))
 
-(defn org-create-cb [{:keys [success status body]} email-domains]
+(defn update-email-domains [email-domain org-data]
+  (let [team-data (dis/team-data (:team-id org-data))
+        redirect-cb #(handle-org-redirect team-data org-data email-domain)]
+    (if (seq email-domain)
+      (api/add-email-domain email-domain redirect-cb team-data)
+      (redirect-cb))))
+
+(defn org-create-check-errors [status]
+  (when (= status 409)
+    ;; Redirect to the already available org
+    (router/nav! (oc-urls/org (:slug (first (dis/orgs-data)))))))
+
+(defn org-create-cb [email-domain {:keys [success status body]}]
   (if success
     (when-let [org-data (when success (json->cljs body))]
-      (org-loaded org-data false)
-      (let [team-data (dis/team-data (:team-id org-data))]
-        (if (pos? (count email-domains))
-          (doseq [domain email-domains]
-            (api/add-email-domain domain
-                                  #(handle-org-redirect team-data org-data)
-                                  team-data))
-          (handle-org-redirect team-data org-data))))
-    (when (= status 409)
-      ;; Redirect to the already available org
-      (router/nav! (oc-urls/org (:slug (first (dis/orgs-data))))))))
+      ;; rewrite history so when user come back here we load org data and patch them
+      ;; instead of creating them
+      (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
+      (org-loaded org-data false email-domain)
+      (update-email-domains email-domain org-data))
+    (org-create-check-errors status)))
 
-(defn org-create [org-data]
+(defn org-update-cb [email-domain {:keys [success status body]}]
+  (if success
+    (when-let [org-data (when success (json->cljs body))]
+      (org-loaded org-data false email-domain)
+      (update-email-domains email-domain org-data))
+    (org-create-check-errors status)))
+
+(defn create-or-update-org [org-data]
   (when (seq (:name org-data))
-    (let [email-domains (remove clojure.string/blank? [(:email-domain org-data)])]
-      (api/create-org (:name org-data)
-                      (:logo-url org-data)
-                      (:logo-width org-data)
-                      (:logo-height org-data)
-                      email-domains
-                      org-create-cb))))
+    (let [email-domain (:email-domain org-data)
+          fixed-email-domain (if (.startsWith email-domain "@") (subs email-domain 1) email-domain)
+          existing-org (dis/org-data)]
+      (if (seq (:slug existing-org))
+        (api/patch-org org-data (partial org-update-cb fixed-email-domain))
+        (api/create-org (:name org-data)
+                        (:logo-url org-data)
+                        (:logo-width org-data)
+                        (:logo-height org-data)
+                        (partial org-create-cb fixed-email-domain))))))
 
 ;; Org edit
 
@@ -209,3 +223,16 @@
           (let [current-board-data (dis/board-data)]
             (when (= (:item-id change-data) (:uuid current-board-data))
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
+
+(defn update-org-sections [org-slug all-sections]
+  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
+        patch-payload {:boards (conj selected-sections "General")
+                       :samples true}]
+    (api/patch-org-sections patch-payload
+     (fn [{:keys [success status body]}]
+       (when success
+         (org-loaded (json->cljs body) false))
+       (router/nav! (oc-urls/all-posts org-slug))))))
+
+(defn signup-invite-completed [org-data]
+  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))

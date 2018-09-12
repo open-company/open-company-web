@@ -88,7 +88,16 @@ div.org-settings {
           }
         }
 
-        @include org-avatar(46);
+        @include org-avatar(40);
+
+        div.org-avatar.missing-logo {
+          div.org-avatar-container.no-avatar.force-label {
+            &:before {
+              left: 10px;
+              top: 2px;
+            }
+          }
+        }
 
         div.org-avatar * {
           border-radius: 4px;

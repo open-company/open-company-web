@@ -27,19 +27,27 @@
 ;; Delete handling
 
 (defn delete-clicked [e activity-data]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message (str "Delete this post?")
-                    :link-button-title "No"
+  (let [alert-data {:action "delete-entry"
+                    :title "Delete this post?"
+                    :message "This action cannot be undone."
+                    :link-button-style :green
+                    :link-button-title "No, keep post"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
-                    :solid-button-title "Yes"
+                    :solid-button-title "Yes, delete post"
                     :solid-button-cb #(let [org-slug (router/current-org-slug)
                                             board-slug (router/current-board-slug)
                                             board-url (oc-urls/board org-slug board-slug)]
                                        (router/nav! board-url)
                                        (activity-actions/activity-delete activity-data)
                                        (alert-modal/hide-alert))
+                    :bottom-button-title (when (and (:sample activity-data)
+                                                    (activity-actions/has-sample-posts))
+                                           "Delete all sample posts")
+                    :bottom-button-style :red
+                    :bottom-button-cb #(do
+                                         (activity-actions/delete-all-sample-posts)
+                                         (alert-modal/hide-alert))
                     }]
     (alert-modal/show-alert alert-data)))
 

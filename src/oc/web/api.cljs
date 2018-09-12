@@ -268,6 +268,16 @@
          :headers (headers-for-link org-patch-link)}
         callback))))
 
+(defn patch-org-sections [data callback]
+  (when data
+    (let [json-data (cljs->json data)
+          links (:links (dispatcher/org-data))
+          org-patch-link (utils/link-for links "partial-update")]
+      (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
+        {:json-params json-data
+         :headers (headers-for-link org-patch-link)}
+        callback))))
+
 (defn get-auth-settings
   ([] (get-auth-settings #()))
   ([callback]
@@ -423,7 +433,7 @@
        :json-params (cljs->json new-team-data)}
       callback)))
 
-(defn create-org [org-name logo-url logo-width logo-height email-domains callback]
+(defn create-org [org-name logo-url logo-width logo-height callback]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
         org-data {:name org-name :team-id team-id}
@@ -437,7 +447,7 @@
         {:headers (headers-for-link create-org-link)
          :json-params (cljs->json with-logo)}
         (fn [response]
-          (callback response email-domains))))))
+          (callback response))))))
 
 (defn create-board [board-data note callback]
   (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")

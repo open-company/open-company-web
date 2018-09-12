@@ -88,7 +88,7 @@
 
   .internal, div.all-posts-label, div.drafts-label, div.must-see-label {
     color: $carrot_green;
-    @include avenir_M();
+    @include avenir_H();
     font-size: 14px;
     line-height: 25px;
     text-decoration: none;
@@ -171,10 +171,6 @@ div.left-navigation-sidebar {
   top: 96px;
   height: calc(100vh - 80px);
   @include no-user-select();
-
-  &.showing-invite-people-tooltip {
-    width: 238px;
-  }
 
   @include mobile() {
     position: absolute;
@@ -354,28 +350,6 @@ div.left-navigation-sidebar {
       &.selected {
         opacity: 1;
         background-image: cdnUrl("/img/ML/must_see_bolt_green.svg");
-      }
-    }
-
-    div.drafts-icon {
-      display: none;
-
-      @include mobile() {
-        background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 16px;
-        height: 28px;
-        float: left;
-        opacity: 1;
-        display: block;
-
-        @include preload_image(cdnUrl("/img/ML/drafts_icon_green.svg"));
-      }
-
-      &.selected {
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/drafts_icon_green.svg");
       }
     }
   }
@@ -617,7 +591,7 @@ div.left-navigation-sidebar {
 
     div.invite-people-tooltip-container {
       border: 2px dashed $carrot_gold;
-      background-color: $light_gold;
+      background-color: #FDF6E4;
       border-radius: 6px;
       padding: 32px 16px;
       margin: 0px 0px 16px 7px;

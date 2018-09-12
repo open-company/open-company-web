@@ -4,20 +4,16 @@
   height: #{$max_logo_height}px;
 
   &:before {
-    content: attr(data-letter);
-    width: #{$max_logo_height}px;
+    content: "";
+    width: #{$max_logo_height * (66 / 119)}px;
     height: #{$max_logo_height}px;
+    background-image: cdnUrl("/img/ML/carrot_logo.svg");
+    background-repeat: no-repeat;
+    background-size: #{$max_logo_height * (66 / 119)}px #{$max_logo_height}px;
+    background-position: center;
     position: absolute;
     top: 0px;
-    left: 0px;
-    background-color: $coral;
-    text-align: center;
-    color: $carrot_orange;
-    @include avenir_H();
-    font-size: #{$max_logo_height * 0.56}px;
-    vertical-align: middle;
-    border-radius: 4px;
-    padding-top: #{$max_logo_height * 0.531}px;
+    left: 3px;
   }
 
   img.org-avatar-img {
@@ -42,7 +38,7 @@
         @include oc-letter($max_logo_height);
 
         span.org-name {
-          display: block !important;
+          display: block;
         }
       }
     }
@@ -51,13 +47,14 @@
       max-width: #{$max_logo_height * 8}px;
       max-height: #{$max_logo_height}px;
       vertical-align: top;
+      border-radius: 8px;
     }
 
     span.org-name {
       @include avenir_B();
-      font-size: 22px;
-      line-height: 1.2;
-      color: $oc_gray_5;
+      font-size: 18px;
+      line-height: 1;
+      color: $deep_navy;
       // margin-top: -34px;
       // margin-left: 54px;
       float: left;
