@@ -29,7 +29,7 @@
         [:div.empty-board-title
           (cond
            is-all-posts? "Catch up with your team"
-           is-must-see? "“Must see” posts"
+           is-must-see? "Highlight what's important"
            is-drafts-board? "Jot down your ideas and notes"
            :else "This section is empty")]
         [:div.empty-board-subtitle
@@ -38,7 +38,7 @@
            is-must-see? "When someone marks a post as “must see” everyone will see it here."
            is-drafts-board? "Keep a private draft until you're ready to share it with your team."
            :else (str "Looks like there aren’t any posts in " (:name board-data) "."))]
-        (when-not is-must-see?
+        (when edit-board
           [:button.mlb-reset.create-new-post-bt
             {:on-click #(activity-actions/activity-edit edit-board)}
             "Create a new post"])]]))
