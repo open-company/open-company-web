@@ -67,10 +67,11 @@
               posts-data (dis/posts-data)]
     (let [team-data (dis/team-data)
           can-edit? (utils/is-admin-or-author? org-data)
+          is-admin? (jwt/is-admin? (:team-id org-data))
           add-post-tooltip (:show-add-post-tooltip nv)
           post-added-tooltip (:show-post-added-tooltip nv)
           fixed-post-added-tooltip (parse-nux-cookie-value post-added-tooltip)
-          fixed-draft-post-tooltip (parse-nux-cookie-value (:show-draft-post-tooltip nv))
+          draft-post-tooltip (:show-draft-post-tooltip nv)
           edit-tooltip (:show-edit-tooltip nv)
           add-comment-tooltip (:show-add-comment-tooltip nv)
           user-type (:user-type nv)
@@ -80,7 +81,7 @@
           fixed-add-post-tooltip (and ;; it has not been done already
                                       (not= add-post-tooltip default-tooltip-done)
                                       ;; we are not showing the next tooltip (post added)
-                                      (not post-added-tooltip))
+                                      (not (true? post-added-tooltip)))
           ;; Show the tooltip inside editing
           fixed-edit-tooltip (and ;; has not been done already
                                   (not= edit-tooltip default-tooltip-done)
@@ -90,7 +91,13 @@
           fixed-add-comment-tooltip (and ;; jas not been done already
                                          (not= add-comment-tooltip default-tooltip-done)
                                          ;; the team has not a bot already
-                                         (not team-has-bot?))]
+                                         (not team-has-bot?)
+                                         ;; the user is an admin
+                                         is-admin?)
+          fixed-draft-post-tooltip (and ;; draft post is not already done
+                                        (not= draft-post-tooltip default-tooltip-done)
+                                        ;; user has edit permissions
+                                        can-edit?)]
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
@@ -103,8 +110,12 @@
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
       (when (and (not fixed-add-comment-tooltip)
-                 team-has-bot?)
+                 (or team-has-bot?
+                     (not is-admin?)))
         (mark-nux-step-done :show-add-comment-tooltip))
+      (when (and (not fixed-draft-post-tooltip)
+                 (not can-edit?))
+        (mark-nux-step-done :show-draft-post-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip (if fixed-add-post-tooltip
                                  (if has-only-sample-posts
@@ -116,6 +127,7 @@
         :show-add-comment-tooltip fixed-add-comment-tooltip
         :show-draft-post-tooltip fixed-draft-post-tooltip
         :user-type user-type}])
+
       ;; Check if we need to remove the nux cookie
       (when (and (= (:show-add-post-tooltip nv) default-tooltip-done)
                  (= (:show-post-added-tooltip nv) default-tooltip-done)
