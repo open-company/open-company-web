@@ -617,5 +617,5 @@
 
 (def section-name-exists-error "Section name already exists or isn't allowed")
 
-(defn calc-video-height [widht]
+(defn calc-video-height [width]
   (* width (/ 3 4)))
