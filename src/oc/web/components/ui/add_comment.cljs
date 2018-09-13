@@ -87,27 +87,27 @@
         [:div.add-comment-internal
           [:div.add-comment.emoji-autocomplete.emojiable.fs-hide
            {:ref "add-comment"
-            :content-editable true}]]
+            :content-editable true}]
+          (when (and (not (js/isIE))
+                     (not (responsive/is-tablet-or-mobile?)))
+            (emoji-picker {:width 32
+                           :height 32
+                           :position "bottom"
+                           :add-emoji-cb (fn [active-element emoji already-added?]
+                                           (let [add-comment (rum/ref-node s "add-comment")]
+                                             (.focus add-comment)
+                                             (utils/after 100
+                                              #(do
+                                                 (when-not already-added?
+                                                   (js/pasteHtmlAtCaret
+                                                    (.-native emoji)
+                                                    (.getSelection js/window)
+                                                    false))
+                                                 (enable-add-comment? s)))))
+                           :force-enabled true
+                           :container-selector "div.add-comment-box"}))]
         (when add-comment-focus
           [:div.add-comment-footer.group
-            (when (and (not (js/isIE))
-                       (not (responsive/is-tablet-or-mobile?)))
-              (emoji-picker {:width 32
-                             :height 32
-                             :position "bottom"
-                             :add-emoji-cb (fn [active-element emoji already-added?]
-                                             (let [add-comment (rum/ref-node s "add-comment")]
-                                               (.focus add-comment)
-                                               (utils/after 100
-                                                #(do
-                                                   (when-not already-added?
-                                                     (js/pasteHtmlAtCaret
-                                                      (.-native emoji)
-                                                      (.getSelection js/window)
-                                                      false))
-                                                   (enable-add-comment? s)))))
-                             :force-enabled true
-                             :container-selector "div.add-comment-box"}))
             [:button.mlb-reset.reply-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                 comment-body (cu/add-comment-content add-comment-div)]
