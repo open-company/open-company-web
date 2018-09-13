@@ -59,7 +59,7 @@
 
 (defn calc-video-height [s]
   (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
+    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -129,7 +129,7 @@
                        {:width (win-width)
                         :height @(::mobile-video-height s)}
                        {:width (if expanded? 640 180)
-                        :height (if expanded? 377 106)}))]
+                        :height (if expanded? (utils/calc-video-height 640) (utils/calc-video-height 180))}))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?

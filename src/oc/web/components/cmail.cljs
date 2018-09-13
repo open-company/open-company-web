@@ -318,7 +318,7 @@
         show-sections-picker (drv/react s :show-sections-picker)
         published? (= (:status cmail-data) "published")
         video-size {:width 548
-                    :height 411}]
+                    :height (utils/calc-video-height 548)}]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
                                                  (:fullscreen cmail-state))
