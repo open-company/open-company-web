@@ -42,10 +42,16 @@
   (when s
     (when-let [body-el (sel1 [:div.rich-body-editor])]
       (let [modal-data @(drv/get-ref s :fullscreen-post-data)
+            section-editing (:section-editing modal-data)
+            save-on-exit (:entry-save-on-exit modal-data)
             activity-data (:modal-editing-data modal-data)
             cleaned-body (when body-el
                           (utils/clean-body-html (.-innerHTML body-el)))]
-        (activity-actions/entry-save-on-exit :modal-editing-data activity-data cleaned-body)))))
+        (when save-on-exit
+          (activity-actions/entry-save-on-exit :modal-editing-data
+                                               activity-data
+                                               cleaned-body
+                                               section-editing))))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
@@ -212,8 +218,10 @@
                      (when dismiss-alert?
                        (alert-modal/hide-alert))
                      (stop-editing state)
-                     (activity-actions/entry-clear-local-cache (:uuid (:modal-editing-data modal-data))
-                      :modal-editing-data)
+                     (activity-actions/entry-clear-local-cache
+                        (:uuid (:modal-editing-data modal-data))
+                        :modal-editing-data
+                        (:modal-editing-data modal-data))
                      (when dismiss-modal?
                        (close-clicked state)))]
   (if @(::uploading-media state)
@@ -343,8 +351,7 @@
                                          (reset! (::initial-headline s) initial-headline)
                                          (reset! (::initial-body s) initial-body)
                                          (stop-editing s)
-                                         (activity-actions/entry-clear-local-cache (:uuid activity-data)
-                                          :modal-editing-data)
+                                         (activity-actions/entry-clear-local-cache (:uuid activity-data) :modal-editing-data activity-data)
                                          (cond
                                            ;; If the board change redirect to the board since the url we have is
                                            ;; not correct anymore
@@ -403,7 +410,6 @@
   (let [modal-data (drv/react s :fullscreen-post-data)
         activity-data (:activity-data modal-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
         editing (:modal-editing modal-data)

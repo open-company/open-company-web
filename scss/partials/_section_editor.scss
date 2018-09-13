@@ -87,6 +87,26 @@ div.section-editor {
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
+      height: 21px;
+
+      span.section-name {
+        float: left;
+      }
+
+      span.checkmark {
+        float: left;
+        margin-left: 6px;
+        font-size: 18px;
+        color: $carrot_green;
+      }
+
+      div.small-loading {
+        margin-right: 0px;
+        margin-top: 0px;
+        margin-left: 6px;
+        float: left;
+        display: block;
+      }
 
       span.role-header {
         float: right;
@@ -490,6 +510,14 @@ div.section-editor {
         margin-left: 0px;
         padding-left: 0px;
         text-align: left;
+
+        &:not(.disabled):hover {
+          color: $deep_navy;
+        }
+
+        &.disabled {
+          color: $light_ui_grey;
+        }
       }
 
       button.mlb-reset.create-bt {

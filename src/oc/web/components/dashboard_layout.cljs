@@ -12,7 +12,9 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
@@ -92,7 +94,7 @@
 
 (defn compose [s]
   (utils/remove-tooltips)
-  (activity-actions/entry-edit (get-board-for-edit s))
+  (activity-actions/activity-edit (get-board-for-edit s))
   ;; If the add post tooltip is visible
   (when @(drv/get-ref s :show-add-post-tooltip)
     ;; Dismiss it and bring up the invite people tooltip
@@ -109,7 +111,10 @@
                               (drv/drv :show-section-editor)
                               (drv/drv :show-section-add)
                               (drv/drv :show-add-post-tooltip)
+                              (drv/drv :show-post-added-tooltip)
+                              (drv/drv :show-draft-post-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
+                              (drv/drv :current-user-data)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
@@ -140,6 +145,8 @@
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
+                                ;; Reopen cmail if it was open
+                                (activity-actions/cmail-reopen?)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -172,7 +179,9 @@
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         can-compose (pos? (count all-boards))
-        should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))]
+        should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))
+        current-user-data (drv/react s :current-user-data)
+        is-admin-or-author (utils/is-admin-or-author? org-data)]
       ;; Entries list
       [:div.dashboard-layout.group
         ;; Show create new section for desktop
@@ -195,7 +204,7 @@
               {:class (when is-all-posts "all-posts-container")}
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
-                {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] (not mobile-navigation-sidebar)])}
+                {:on-click #(nav-actions/mobile-nav-sidebar)}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)
@@ -276,8 +285,8 @@
                         :on-blur #(reset! (::show-top-boards-dropdown s) false)
                         :on-change (fn [item]
                                      (reset! (::show-top-boards-dropdown s) false)
-                                     (activity-actions/entry-edit {:board-slug (:value item)
-                                                                   :board-name (:label item)}))}))])
+                                     (activity-actions/activity-edit {:board-slug (:value item)
+                                                                      :board-name (:label item)}))}))])
                 (when-not is-mobile?
                   [:div.board-switcher.group
                     (let [grid-view? (= @board-switch :grid)]
@@ -293,34 +302,82 @@
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (if grid-view? "Stream view" "Grid view")}])])]
-              (when (drv/react s :show-add-post-tooltip)
-                [:div.add-post-tooltip-container.group
-                  [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
-                  [:div.add-post-tooltip-icon]
-                  [:div.add-post-tooltips
-                    [:div.add-post-tooltip
-                      "Welcome! Now you’re ready to post new updates and information for your team."]
-                    [:div.add-post-tooltip.second-line
-                      "You can delete the sample post at anytime."]]
-                  [:div.add-post-tooltip-arrow]
-                  [:button.mlb-reset.add-post-tooltip-compose-bt
-                    {:on-click #(compose s)}
-                    "Create new post"]])
+              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
+                (when (and (not is-drafts-board)
+                           add-post-tooltip)
+                  [:div.add-post-tooltip-container.group
+                    [:button.mlb-reset.add-post-tooltip-dismiss
+                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                    [:div.add-post-tooltips
+                      {:class (when (= add-post-tooltip :has-organic-post) "second-user")}
+                      [:div.add-post-tooltip-box-mobile]
+                      [:div.add-post-tooltip-title
+                        (str "Welcome to Carrot, " (:first-name current-user-data))]
+                        [:div.add-post-tooltip
+                          (if is-admin-or-author
+                            (if (= add-post-tooltip :has-organic-post)
+                              (str
+                                "Carrot is where you’ll find announcements, updates, and "
+                                "decisions that keep your team pulling in the same direction.")
+                              (str
+                                "Create a post to see how easy it is to keep your team pulling in the "
+                                "same direction. "))
+                            (str
+                             "Carrot is where you’ll find announcements, updates, and decisions "
+                             "that keep your team pulling in the same direction."))
+                          (when is-admin-or-author
+                            [:button.mlb-reset.add-post-bt
+                              {:on-click #(when can-compose (compose s))}
+                              "Create a new post"])]
+                      [:div.add-post-tooltip-box]]]))
+              (when (and (not is-drafts-board)
+                         is-admin-or-author
+                         (not is-mobile?)
+                         (drv/react s :show-post-added-tooltip))
+                [:div.post-added-tooltip-container.group
+                  [:button.mlb-reset.post-added-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
+                  [:div.post-added-tooltips
+                    [:div.post-added-tooltip-title
+                      "Post success!"]
+                    [:div.post-added-tooltip
+                      (str
+                       "Carrot shows who’s seen your post, and makes "
+                       "it easy to remind anyone that hasn’t. ")
+                      (when is-admin-or-author
+                        [:button.mlb-reset.post-added-bt
+                          {:on-click #(nav-actions/show-invite)}
+                          "Invite your team"])
+                      (when is-admin-or-author
+                        " to get started.")]
+                    [:div.post-added-tooltip-box]]])
+              (when (and is-drafts-board
+                         (drv/react s :show-draft-post-tooltip))
+                [:div.draft-post-tooltip-container.group
+                  [:button.mlb-reset.draft-post-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
+                  [:div.draft-post-tooltips
+                    [:div.draft-post-tooltip-title
+                      "😎 Finish this draft post to add some personality"]
+                    [:div.draft-post-tooltip
+                      (str
+                       "According to smart people on the Internet, "
+                       "everyone likes knowing who they work with. "
+                       "Help your team by finishing this draft post.")]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
                 (zero? (count (:boards org-data)))
                 (empty-org)
+                ;; Empty board
+                empty-board?
+                (empty-board (when can-compose (get-board-for-edit s)))
                 ;; All Posts
                 (and (or is-all-posts
                          is-must-see)
                      (= @board-switch :stream))
                 (rum/with-key (all-posts)
                  (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
-                ;; Empty board
-                empty-board?
-                (empty-board)
                 ;; Layout boards activities
                 :else
                 (cond

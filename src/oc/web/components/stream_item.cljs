@@ -4,12 +4,15 @@
             [dommy.core :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
@@ -62,8 +65,11 @@
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
+                         (drv/drv :team-data)
+                         (drv/drv :current-user-data)
                          (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
+                         (drv/drv :show-add-comment-tooltip)
                          ;; Locals
                          (rum/local false ::expanded)
                          (rum/local false ::truncated)
@@ -101,9 +107,6 @@
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        edit-link (utils/link-for (:links activity-data) "partial-update")
-        delete-link (utils/link-for (:links activity-data) "delete")
-        share-link (utils/link-for (:links activity-data) "share")
         truncated? @(::truncated s)
         expanded? @(::expanded s)
         ;; Fallback to the activity inline comments if we didn't load
@@ -120,6 +123,8 @@
                     (first (:author activity-data))
                     (:publisher activity-data))
         dom-node-class (str "stream-item-" (:uuid activity-data))
+        team-data (drv/react s :team-data)
+        cur-user-data (drv/react s :current-user-data)
         has-video (seq (:fixed-video-id activity-data))
         video-size (when has-video
                      (if is-mobile?
@@ -134,18 +139,6 @@
                                 :new-item (:new activity-data)})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
-       :on-click (fn [e]
-                   (let [ev-in? (partial utils/event-inside? e)
-                         dom-node-selector (str "div." dom-node-class)]
-                     (when (and is-mobile?
-                                (not @(::more-menu-open s))
-                                (not is-drafts-board)
-                                (not (ev-in? (sel1 [dom-node-selector :div.more-menu])))
-                                (not (ev-in? (rum/ref-node s :expand-button)))
-                                (not (ev-in? (sel1 [dom-node-selector :div.reactions])))
-                                (not (ev-in? (sel1 [dom-node-selector :div.stream-body-comments])))
-                                (not (ev-in? (sel1 [dom-node-selector :div.mobile-summary]))))
-                       (activity-actions/activity-modal-fade-in activity-data))))
        :id dom-element-id}
       [:div.activity-share-container]
       [:div.stream-item-header.group
@@ -172,7 +165,8 @@
             (wrt activity-data read-data)]]
         (when (and (not is-drafts-board)
                    (or @(::hovering-tile s)
-                       @(::more-menu-open s)))
+                       @(::more-menu-open s)
+                       is-mobile?))
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
@@ -230,7 +224,9 @@
             [:div.stream-item-footer.group
               [:div.stream-body-draft-edit
                 [:button.mlb-reset.edit-draft-bt
-                  {:on-click #(activity-actions/activity-edit activity-data)}
+                  {:on-click #(do
+                               (nux-actions/maybe-dismiss-draft-post-tooltip activity-data)
+                               (activity-actions/activity-edit activity-data))}
                   "Continue editing"]]
               [:div.stream-body-draft-delete
                 [:button.mlb-reset.delete-draft-bt
@@ -283,4 +279,26 @@
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data true)]])]))
+              (stream-comments activity-data comments-data true)
+              (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
+                (when (and (drv/react s :show-add-comment-tooltip)
+                           (not is-mobile?))
+                  [:div.add-comment-tooltip-container.group
+                    [:button.mlb-reset.add-comment-tooltip-dismiss
+                      {:on-click #(nux-actions/dismiss-add-comment-tooltip)}]
+                    [:div.add-comment-tooltips
+                      [:div.add-comment-tooltip-title
+                        "💭 Spark better follow-on discussions"]
+                      [:div.add-comment-tooltip
+                        (str
+                         "Give your team a dedicated space to comment and ask questions. "
+                         "They can also join the discussion from Slack. ")
+                         (if (jwt/is-admin? (:team-id org-data))
+                           [:button.mlb-reset.enable-slack-bt
+                            {:on-click
+                              #(do
+                                (nux-actions/dismiss-add-comment-tooltip)
+                                (org-actions/bot-auth team-data cur-user-data
+                                 (str (router/get-token) "?org-settings=main")))}
+                            "Enable Carrot for Slack."]
+                            "Ask your Carrot admin to enable Carrot for Slack.")]]]))]])]))

@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.user :as user-utils]
@@ -18,6 +19,7 @@
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.dom :as gdom]
@@ -49,27 +51,14 @@
         auth-settings (drv/react s :auth-settings)]
     [:div.onboard-lander.lander
       [:div.main-cta
-        [:button.mlb-reset.top-back-button
-          {:on-touch-start identity
-           :on-click #(router/history-back!)
-           :aria-label "Back"}]
+        [:div.mobile-header
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+             :on-click #(router/history-back!)
+             :aria-label "Back"}]
+          [:div.mobile-logo]]
         [:div.title.main-lander
-          "Welcome!"]
-        [:button.mlb-reset.top-continue
-          {:class (when (or (not (utils/valid-email? @(::email s)))
-                            (<= (count @(::pswd s)) 7))
-                    "disabled")
-           :on-touch-start identity
-           :on-click #(if (or (not (utils/valid-email? @(::email s)))
-                              (<= (count @(::pswd s)) 7))
-                        (do
-                          (when-not (utils/valid-email? @(::email s))
-                            (reset! (::email-error s) true))
-                          (when (<= (count @(::pswd s)) 7)
-                            (reset! (::password-error s) true)))
-                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
-           :aria-label "Continue"}
-           "Continue"]]
+          "Welcome to Carrot"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -100,7 +89,7 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label
+          [:div.field-label.email-field
             "Enter email"
             (cond
               (= (:error signup-with-email) 409)
@@ -195,17 +184,20 @@
                               (empty? (:avatar-url user-data)))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
-                       (user-actions/user-profile-save current-user-data edit-user-profile))]
+                       (user-actions/user-profile-save current-user-data edit-user-profile))
+        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+           {:class (when continue-disabled "disabled")
+            :on-touch-start identity
+            :on-click continue-fn
+            :aria-label "Continue"}
+            "Continue"]]
         [:div.title.about-yourself
-          "Personal details"]
-        [:button.mlb-reset.top-continue
-          {:class (when continue-disabled "disabled")
-           :on-touch-start identity
-           :on-click continue-fn
-           :aria-label "Continue"}
-          "Continue"]]
+          "Personal details"]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -223,7 +215,9 @@
                           nil
                           (fn [_])
                           nil))}
-            (user-avatar-image fixed-user-data)
+            (if is-jelly-head-avatar
+              [:div.empty-user-avatar-placeholder]
+              (user-avatar-image fixed-user-data))
             [:div.add-picture-link
               "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
@@ -245,7 +239,7 @@
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
-            "That’s me"]]]]))
+            "Continue"]]]]))
 
 (defn- setup-team-data
   ""
@@ -318,18 +312,20 @@
                          (if (and (seq org-name)
                                   (> (count org-name) 2))
                            ;; Create org and show setup screen
-                           (org-actions/org-create @(drv/get-ref s :org-editing))
+                           (org-actions/create-or-update-org @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:class (when continue-disabled "disabled")
+             :on-touch-start identity
+             :on-click continue-fn
+             :aria-label "Continue"}
+           "Continue"]]
         [:div.title.company-setup
-          "Your company"]
-        [:button.mlb-reset.top-continue
-          {:class (when continue-disabled "disabled")
-           :on-touch-start identity
-           :on-click continue-fn
-           :aria-label "Done"}
-         "Done"]]
+          "Set up your company"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -364,8 +360,8 @@
               (org-avatar org-editing false :never)
               [:div.add-picture-link
                 (if (empty? (:logo-url org-editing))
-                  "+ Upload your company logo"
-                  "+ Change your company logo")]
+                  "Add company logo"
+                  "Change company logo")]
               [:div.add-picture-link-subtitle
                 "A 160x160 transparent Gif or PNG works best."]])
           [:div.field-label
@@ -382,8 +378,7 @@
                  ;; Email domains row
           [:div.org-email-domains-row.group
             [:div.field-label
-              [:label
-                "Allowed email domain " [:span.info "(optional)"]]
+              "Allowed email domain " [:span.info "(optional)"]
               (when (:error org-editing)
                 [:label.error
                    "Only company email domains are allowed."])]
@@ -401,12 +396,49 @@
                                (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
                                                                                         (not (utils/valid-domain? domain)))]))
                  :placeholder "Domain, e.g. acme.com"}]]
-            [:div.field-label.info "Anyone with email addresses at this domain can automatically join your team."]]
+            [:div.field-label.info "Anyone with this email domain can automatically join your team."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
-            "Create team"]]]]))
+            "Continue"]]]]))
+
+(rum/defcs lander-sections < rum/reactive
+                             (drv/drv :org-data)
+                             (drv/drv :sections-setup)
+  [s]
+  (let [sections-list (drv/react s :sections-setup)
+        org-data (drv/react s :org-data)
+        continue-fn (fn []
+                     (org-actions/update-org-sections (:slug org-data) sections-list))]
+    [:div.onboard-lander.lander-sections
+      [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :aria-label "Start using Carrot"}
+           "Start"]]
+        [:div.title
+          "Topics that matter"]
+        [:div.subtitle
+          "What do you commonly share with your team to keep them on the same page?"]]
+      [:div.onboard-form
+        [:div.sections-list
+          (if (seq sections-list)
+            (for [idx (range (count sections-list))
+                  :let [section (get sections-list idx)]]
+              [:div.section
+                {:key (str "sections-list-" (:name section))
+                 :class (when (:selected section) "selected")
+                 :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
+                (:name section)])
+            (small-loading))]
+        [:button.continue.start-using-carrot
+          {:on-touch-start identity
+           :on-click continue-fn}
+          "✨ Start using Carrot ✨"]]]))
 
 (def default-invite-row
   {:user ""
@@ -420,16 +452,31 @@
 (defn- check-invites [s]
   (reset! (::invite-rows s) (vec (map check-invite-row @(::invite-rows s)))))
 
+(def default-invite-note
+  (str
+    "Hey there, let's explore Carrot together. It's a place to make sure important "
+    "announcements, updates, and decisions don't get lost in the noise."))
+
 (rum/defcs lander-invite < rum/reactive
                            (drv/drv :org-data)
                            (drv/drv :invite-users)
                            (rum/local false ::inviting)
                            (rum/local nil ::invite-error)
                            (rum/local (rand 3) ::invite-rand)
-                           (rum/local (vec (repeat 3 default-invite-row)) ::invite-rows)
-                           {:did-mount (fn [s]
+                           (rum/local [] ::invite-rows)
+                           (rum/local default-invite-note ::invite-note)
+                           {:will-mount (fn [s]
+                             (let [rows (if (responsive/is-tablet-or-mobile?) 2 3)]
+                               (reset! (::invite-rows s) (vec (repeat rows default-invite-row))))
+                             s)
+                            :did-mount (fn [s]
                              ;; Load the list of teams if it's not already
                              (team-actions/teams-get-if-needed)
+                             (utils/after 500
+                              #(ui-utils/resize-textarea (rum/ref-node s "personal-note")))
+                             s)
+                            :did-remount (fn [_ s]
+                             (ui-utils/resize-textarea (rum/ref-node s "personal-note"))
                              s)
                             :will-update (fn [s]
                              ;; Load the list of teams if it's not already
@@ -447,11 +494,15 @@
                                        (reset! (::invite-error s) "An error occurred inviting the following users, please try again.")
                                        (reset! (::invite-rows s) (vec invite-errors)))
                                      ;; All invites sent, redirect to dashboard
-                                     (org-actions/org-redirect @(drv/get-ref s :org-data))))))
+                                     (org-actions/signup-invite-completed @(drv/get-ref s :org-data))))))
                              s)}
   [s]
   (let [_ (drv/react s :invite-users)
         org-data (drv/react s :org-data)
+        valid-rows (filter #(and (seq (:user %))
+                                 (not (:error %))) @(::invite-rows s))
+        error-rows (filter #(and (seq (:user %))
+                                 (:error %)) @(::invite-rows s))
         continue-fn (fn []
                      (let [_ (check-invites s)
                            errors (filter :error @(::invite-rows s))]
@@ -459,27 +510,32 @@
                          (reset! (::inviting s) true)
                          (reset! (::invite-error s) nil)
                          (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
-                           (team-actions/invite-users not-empty-invites "")))))]
+                           (team-actions/invite-users not-empty-invites (.-value (rum/ref-node s "personal-note")))))))
+        continue-disabled (not (zero? (count error-rows)))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :class (when continue-disabled "disabled")
+             :aria-label "Continue"}
+           "Continue"]]
         [:div.title
-          "Setup complete!"]
-        [:button.mlb-reset.top-continue
-          {:on-touch-start identity
-           :on-click continue-fn
-           :aria-label "Done"}
-         "Done"]]
+          "Invite your team"]]
       [:div.onboard-form
         [:div.subtitle
-          "Invite a few colleagues to explore Carrot with you."]
+          "Invite other people to explore Carrot with you."]]
+      [:div.onboard-form
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label
-            "Email address"
+          [:div.field-label.invite-teammates
+            "Invite teammates " [:span.info "(optional)"]
             [:button.mlb-reset.add-another-invite-row
               {:on-click #(reset! (::invite-rows s) (vec (conj @(::invite-rows s) default-invite-row)))}
-              "+ Add another invitation"]]
+              "+ add another invitation"]]
           (when @(::invite-error s)
             [:div.error @(::invite-error s)])
           [:div.invite-rows.fs-hide
@@ -498,16 +554,26 @@
                                   (assoc invite :user (.. e -target -value)))))
                                (check-invites s))
                    :value (:user invite)}]])]
+          [:div.field-label
+            "Personal note "
+            [:span.info "(optional)"]]
+          [:textarea.field
+            {:default-value @(::invite-note s)
+             :ref "personal-note"
+             :on-input #(let [target (.-target %)]
+                          (ui-utils/resize-textarea target)
+                          (reset! (::invite-note s) (.-innerText target)))
+             :class (when (pos? (count valid-rows)) "has-value")}]
           [:button.continue
             {:on-touch-start identity
              :on-click continue-fn
-             :class (when @(::inviting s) "disabled")}
-            (if @(::inviting s)
-              "Seding invites..."
-              "Send invites")]
+             :class (when (or @(::inviting s)
+                              continue-disabled) "disabled")}
+            "Continue"]
           [:div.skip-container
+            "Want to do this later? "
             [:button.mlb-reset.skip-for-now
-              {:on-click #(org-actions/org-redirect org-data)}
+              {:on-click #(org-actions/signup-invite-completed org-data)}
               "Skip for now"]]]]]))
 
 (defn dots-animation [s]
@@ -546,6 +612,7 @@
       [:div.main-cta
         [:div.title
           "Join your team on Carrot"]
+        [:div.mobile-logo.mobile-only]
         (if (:invitation-error confirm-invitation)
           [:div.subtitle
             "An error occurred while confirming your invitation, please try again."]
@@ -566,6 +633,8 @@
         invitation-confirmed (:invitation-confirmed collect-password)]
     [:div.onboard-lander.invitee-lander-password
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
         [:div.title
           "Join your team on Carrot"]
         [:div.subtitle
@@ -637,11 +706,14 @@
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)]
+                          user-data)
+        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
         [:div.title.about-yourself
-          "Tell us a bit about yourself…"]
+          "Tell us a bit about you"]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -661,7 +733,9 @@
                           nil
                           (fn [_])
                           nil))}
-            (user-avatar-image fixed-user-data)
+            (if is-jelly-head-avatar
+              [:div.empty-user-avatar-placeholder]
+              (user-avatar-image fixed-user-data))
             [:div.add-picture-link
               "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
@@ -687,7 +761,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/user-profile-save current-user-data edit-user-profile))}
-            "That’s me"]]]]))
+            "Continue"]]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]
@@ -758,7 +832,7 @@
                           (if (and (empty? (jwt/get-key :first-name))
                                    (empty? (jwt/get-key :last-name)))
                             (do
-                              (nux-actions/set-new-user-cookie "email")
+                              (nux-actions/new-user-registered "email")
                               (router/nav! oc-urls/confirm-invitation-profile))
                             (router/nav! (oc-urls/org (:slug org))))
                           (router/nav! oc-urls/login)))
@@ -807,6 +881,7 @@
     :lander (lander)
     :lander-profile (lander-profile)
     :lander-team (lander-team)
+    :lander-sections (lander-sections)
     :lander-invite (lander-invite)
     :invitee-lander (invitee-lander)
     :invitee-lander-password (invitee-lander-password)
@@ -823,6 +898,7 @@
       {:class (str "onboard-" (name component))}
       [:div.onboard-wrapper-left
         [:div.onboard-wrapper-logo]
-        [:div.onboard-wrapper-box]]
+        [:div.onboard-wrapper-left-inner
+          [:div.onboard-wrapper-box]]]
       [:div.onboard-wrapper-right
         (get-component component)]]])

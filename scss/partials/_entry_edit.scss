@@ -197,7 +197,7 @@ div.entry-edit-modal-container {
       padding-bottom: 16px;
 
       @include mobile() {
-        padding: 24px 24px 0px;
+        padding: 16px 24px 0px;
         height: 56px;
       }
 
@@ -410,7 +410,7 @@ div.entry-edit-modal-container {
             }
 
             p:not(:last-child):not(:first-child) {
-              margin: 16px 0px;
+              margin: 22px 0px;
             }
 
             &.medium-editor-placeholder:after {
@@ -443,7 +443,72 @@ div.entry-edit-modal-container {
           outline: none;
         }
       }
-              
+
+      div.edit-tooltip-container {
+        border: 1px dashed $carrot_gold;
+        background-color: #FDF6E4;
+        border-radius: 6px;
+        padding: 24px 24px;
+        margin: 0 0 32px;
+        position: relative;
+
+        @include tablet() {
+          width: 100%;
+          margin: 0 0 32px;
+        }
+
+        button.edit-tooltip-dismiss {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 33px;
+          height: 33px;
+          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
+          background-size: 32px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        div.edit-tooltips {
+          width: 100%;
+
+          div.edit-tooltip-title {
+            @include avenir_H();
+            font-size: 18px;
+            color: $deep_navy;
+            line-height: 20px;
+
+            @include mobile() {
+              max-width: 90%;
+            }
+          }
+
+          div.edit-tooltip {
+            @include avenir_R();
+            font-size: 14px;
+            color: $deep_navy;
+            line-height: 18px;
+            margin-top: 8px;
+
+            @include tablet() {
+              float: unset;
+              margin: 24px auto 0px;
+              width: 100%;
+            }
+
+            button.edit-tooltip-record-video-bt {
+              display: inline;
+              background-color: transparent;
+              padding: 0;
+              margin: 0;
+              color: $carrot_green;
+              @include avenir_H();
+              font-size: 14px;
+              line-height: 18px;
+            }
+          }
+        }
+      }
 
       div.entry-edit-controls {
         margin-bottom: 16px;
@@ -489,6 +554,15 @@ div.entry-edit-modal-container {
         div.picker-container {
           left: -8px;
         }
+      }
+
+      div.saving-saved {
+        display: inline;
+        width: 40px;
+        @include avenir_M();
+        color: $light_ui_grey;
+        font-size: 12px;
+        margin: 5px 1px 1px 20px;
       }
 
       div.entry-edit-legend-container {

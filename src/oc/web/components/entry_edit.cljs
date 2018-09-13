@@ -13,6 +13,7 @@
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
@@ -41,10 +42,16 @@
 
 (defn autosave [s]
   (let [entry-editing @(drv/get-ref s :entry-editing)
+        section-editing @(drv/get-ref s :section-editing)
+        save-on-exit @(drv/get-ref s :entry-save-on-exit)
         body-el (sel1 [:div.rich-body-editor])
         cleaned-body (when body-el
                       (utils/clean-body-html (.-innerHTML body-el)))]
-    (activity-actions/entry-save-on-exit :entry-editing entry-editing cleaned-body)))
+    (when save-on-exit
+      (activity-actions/entry-save-on-exit :entry-editing
+                                           entry-editing
+                                           cleaned-body
+                                           section-editing))))
 
 (defn save-on-exit?
   "Locally save the current outstanding edits if needed."
@@ -63,7 +70,7 @@
   (let [entry-editing @(drv/get-ref s :entry-editing)
         clean-fn (fn [dismiss-modal?]
                     (remove-autosave s)
-                    (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing)
+                    (activity-actions/entry-clear-local-cache (:uuid entry-editing) :entry-editing entry-editing)
                     (when dismiss-modal?
                       (alert-modal/hide-alert))
                     (real-close s))]
@@ -150,6 +157,7 @@
        (not (zero? (count (fix-headline entry-editing))))))
 
 (defn video-record-clicked [s]
+  (nux-actions/dismiss-edit-tooltip)
   (let [entry-editing @(drv/get-ref s :entry-editing)
         start-recording-fn #(do
                               (reset! (::record-video s) true)
@@ -202,7 +210,7 @@
         (if published?
           (do
             (reset! (::saving s) true)
-            (activity-actions/entry-save updated-entry-editing section-editing))
+            (activity-actions/entry-save :entry-editing updated-entry-editing section-editing))
           (do
             (reset! (::publishing s) true)
             (activity-actions/entry-publish (dissoc updated-entry-editing :status) section-editing))))
@@ -227,13 +235,14 @@
                         (drv/drv :entry-editing)
                         (drv/drv :section-editing)
                         (drv/drv :editable-boards)
-                        (drv/drv :media-input)
                         (drv/drv :entry-save-on-exit)
                         (drv/drv :show-sections-picker)
+                        (drv/drv :show-edit-tooltip)
                         ;; Locals
                         (rum/local false ::dismiss)
                         (rum/local "" ::initial-body)
                         (rum/local "" ::initial-headline)
+                        (rum/local nil ::initial-uuid)
                         (rum/local 330 ::entry-edit-modal-height)
                         (rum/local nil ::headline-input-listener)
                         (rum/local nil ::uploading-media)
@@ -261,8 +270,11 @@
                                                    (if (seq (:headline entry-editing))
                                                      (:headline entry-editing)
                                                      ""))]
+                            (when-not (seq (:uuid entry-editing))
+                              (nux-actions/dismiss-add-post-tooltip))
                             (reset! (::initial-body s) initial-body)
-                            (reset! (::initial-headline s) initial-headline))
+                            (reset! (::initial-headline s) initial-headline)
+                            (reset! (::initial-uuid s) (:uuid entry-editing)))
                           s)
                          :did-mount (fn [s]
                           (utils/after 300 #(setup-headline s))
@@ -286,14 +298,6 @@
                             (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                           s)
                          :before-render (fn [s]
-                          ;; Set or remove the onBeforeUnload prompt
-                          (let [save-on-exit @(drv/get-ref s :entry-save-on-exit)]
-                            (set! (.-onbeforeunload js/window)
-                             (if save-on-exit
-                              #(do
-                                (save-on-exit? s)
-                                "Do you want to save before leaving?")
-                              nil)))
                           ;; Handle saving/publishing states to dismiss the component
                           (let [entry-editing @(drv/get-ref s :entry-editing)]
                             ;; Entry is saving
@@ -324,6 +328,7 @@
                                                           (= (router/current-board-slug) "all-posts"))
                                               go-to-ap (and (not (:new-section entry-editing))
                                                             from-ap)]
+                                          (nux-actions/show-post-added-tooltip)
                                           ;; Redirect to AP if coming from it or if the post is not published
                                           (router/nav!
                                             (if go-to-ap
@@ -332,6 +337,7 @@
                                                (:board-slug entry-editing))))))))))))
                           s)
                          :will-unmount (fn [s]
+                          (nux-actions/dismiss-edit-tooltip)
                           (when @(::headline-input-listener s)
                             (events/unlistenByKey @(::headline-input-listener s))
                             (reset! (::headline-input-listener s) nil))
@@ -339,24 +345,14 @@
                             (events/unlistenByKey @(::window-click-listener s))
                             (reset! (::window-click-listener s) nil))
                           (remove-autosave s)
-                          (set! (.-onbeforeunload js/window) nil)
                           s)}
   [s]
   (let [org-data          (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
         entry-editing     (drv/react s :entry-editing)
-        new-entry?        (empty? (:uuid entry-editing))
         is-mobile? (responsive/is-tablet-or-mobile?)
-        fixed-entry-edit-modal-height (max @(::entry-edit-modal-height s) 330)
-        wh (.-innerHeight js/window)
-        media-input (drv/react s :media-input)
         published? (= (:status entry-editing) "published")
         show-sections-picker (drv/react s :show-sections-picker)
-        posting-title (if (:uuid entry-editing)
-                        (if (= (:status entry-editing) "published")
-                          "Posted to "
-                          "Draft for ")
-                        "Posting to ")
         video-size (if is-mobile?
                      {:width (win-width)
                       :height @(::mobile-video-height s)}
@@ -406,7 +402,7 @@
                                 (remove-autosave s)
                                 (clean-body s)
                                 (reset! (::saving s) true)
-                                (activity-actions/entry-save (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
+                                (activity-actions/entry-save :entry-editing (assoc @(drv/get-ref s :entry-editing) :status "draft") @(drv/get-ref s :section-editing))))}
                   (when working?
                     (small-loading))
                   "Save draft"]))])]
@@ -417,8 +413,6 @@
             {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                           (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))}
             (user-avatar-image current-user-data)
-            [:span.posting-in-span
-              posting-title]
             [:div.board-name
               (:board-name entry-editing)]
             (when show-sections-picker
@@ -449,6 +443,22 @@
         [:div.entry-edit-modal-separator]
         [:div.entry-edit-modal-body
           {:ref "entry-edit-modal-body"}
+          (when (and (drv/react s :show-edit-tooltip)
+                     (not (seq @(::initial-uuid s))))
+            [:div.edit-tooltip-container.group
+              [:button.mlb-reset.edit-tooltip-dismiss
+                {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+              [:div.edit-tooltips
+                [:div.edit-tooltip-title
+                  "✍️ Update your team in seconds"]
+                [:div.edit-tooltip
+                  (str
+                   "Carrot makes it easy to share announcements, updates, "
+                   "and decisions. Short on time? No worries, ")
+                   [:button.mlb-reset.edit-tooltip-record-video-bt
+                    {:on-click #(video-record-clicked s)}
+                    "record a video"]
+                   " instead."]]])
           ;; Video elements
           (when (and (not is-mobile?)
                      (:fixed-video-id entry-editing)
@@ -518,6 +528,10 @@
                          :position "top"
                          :default-field-selector "div.entry-edit-modal div.rich-body-editor"
                          :container-selector "div.entry-edit-modal"})
+          (when (true? (:auto-saving entry-editing))
+            [:div.saving-saved "Saving..."])
+          (when (false? (:auto-saving entry-editing))
+            [:div.saving-saved "Saved"])
           [:div.entry-edit-legend-container
             {:on-click #(reset! (::show-legend s) (not @(::show-legend s)))
              :ref "legend-container"}

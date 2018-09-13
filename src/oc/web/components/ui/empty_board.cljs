@@ -1,9 +1,9 @@
 (ns oc.web.components.ui.empty-board
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.activity :as activity-actions]))
 
@@ -15,32 +15,30 @@
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :board-data)
                          section-mixins/container-nav-in
-  [s]
+  [s edit-board]
   (let [board-data (drv/react s :board-data)
-        mobile? (responsive/is-mobile-size?)
-        ww (when mobile? (responsive/ww))]
+        is-all-posts? (= (router/current-board-slug) "all-posts")
+        is-must-see? (= (router/current-board-slug) "must-see")
+        is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)]
     [:div.empty-board.group
-      (when-not mobile?
-        [:div.empty-board-headline
-          (if (= (:slug board-data) utils/default-drafts-board-slug)
-            "You have no drafts."
-            (str "There aren’t any posts in " (:name board-data) " yet. "))
-          (when-not (:read-only board-data)
-            [:button.mlb-reset
-              {:on-click #(activity-actions/entry-edit {:board-slug (:slug board-data)
-                                                        :board-name (:name board-data)})}
-              "Add one?"])])
-      [:img.empty-board-image
-        {:src (utils/cdn "/img/ML/empty_board.svg")
-         :style {:width (str (if mobile? (- ww 24 24) 416) "px")
-                 :height (str (if mobile? (* (- ww 24 24) (:ratio mobile-image-size)) 424) "px")
-                 :max-width (str (if mobile? (:width mobile-image-size) 416) "px")
-                 :max-height (str (if mobile? (:height mobile-image-size) 424) "px")}}]
-      (when mobile?
-        [:div.empty-board-footer
-          "Add a team update, announcement, or story to get started."])
-      (when false ;; mobile?
-        [:button.mlb-reset.empty-board-create-first-post
-          [:div.empty-board-first-post-container
-            [:div.empty-board-first-post-pencil]
-            "Create the first post"]])]))
+      [:div.empty-board-grey-box
+        [:div.empty-board-illustration
+          {:class (utils/class-set {:ap-section (and (not is-must-see?) (not is-drafts-board?))
+                                    :must-see is-must-see?
+                                    :drafts is-drafts-board?})}]
+        [:div.empty-board-title
+          (cond
+           is-all-posts? "Catch up with your team"
+           is-must-see? "Highlight what's important"
+           is-drafts-board? "Jot down your ideas and notes"
+           :else "This section is empty")]
+        [:div.empty-board-subtitle
+          (cond
+           is-all-posts? "All posts is a stream of what’s new across all sections."
+           is-must-see? "When someone marks a post as “must see” everyone will see it here."
+           is-drafts-board? "Keep a private draft until you're ready to share it with your team."
+           :else (str "Looks like there aren’t any posts in " (:name board-data) "."))]
+        (when edit-board
+          [:button.mlb-reset.create-new-post-bt
+            {:on-click #(activity-actions/activity-edit edit-board)}
+            "Create a new post"])]]))

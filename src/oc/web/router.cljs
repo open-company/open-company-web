@@ -136,10 +136,10 @@
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
-(defn new-user-cookie
+(defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
-  (str "new-user-" user-id))
+  (str "nux-" user-id))
 
 (defn show-add-post-tooltip-cookie
   "Cookie to check if the add first post tooltip shuold be visible."

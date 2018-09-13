@@ -88,10 +88,10 @@ div.dashboard-layout {
       }
 
       div.add-post-tooltip-container {
-        border: 2px dashed $carrot_gold;
-        background-color: $light_gold;
+        border: 1px dashed $carrot_gold;
+        background-color: #FDF6E4;
         border-radius: 6px;
-        padding: 32px 40px;
+        padding: 34px 40px;
         margin: 32px 0px;
         position: relative;
 
@@ -102,87 +102,242 @@ div.dashboard-layout {
 
         button.add-post-tooltip-dismiss {
           position: absolute;
-          top: 8px;
-          left: 8px;
-          width: 30px;
-          height: 30px;
+          top: 16px;
+          right: 16px;
+          width: 33px;
+          height: 33px;
           background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
-          background-size: 14px 14px;
+          background-size: 32px 32px;
           background-position: center;
           background-repeat: no-repeat;
-
-          @include tablet() {
-            top: 16px;
-            left: 16px;
-          }
-        }
-
-        div.add-post-tooltip-icon {
-          @include image-2x("/img/ML/balloon_small_yellow_face");
-          background-size: 48px 48px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 48px;
-          height: 48px;
-          float: left;
-          margin-top: 12px;
-
-          @include tablet() {
-            float: unset;
-            margin: 0px auto;
-          }
         }
 
         div.add-post-tooltips {
-          width: 530px;
-          margin-left: 24px;
+          width: 474px;
           float: left;
 
-          div.add-post-tooltip {
-            @include avenir_M();
-            font-size: 18px;
-            color: $deep_navy;
+          &.second-user {
+            width: 484px;
+          }
 
-            &.second-line {
-              padding-top: 10px;
-              @include tablet() {
-                margin: 0px auto;
-              }
+          @include tablet() {
+            width: 100%;
+          }
+
+          div.add-post-tooltip-box-mobile {
+            display: none;
+
+            @include mobile() {
+              display: block;
+              width: 98px;
+              height: 130px;
+              @include image-2x("/img/ML/add_post_tooltip_box");
+              background-size: 98px 130px;
+              background-repeat: no-repeat;
+              background-position: center;
+              margin: 0 auto 20px;
+            }
+          }
+
+          div.add-post-tooltip-title {
+            @include avenir_H();
+            font-size: 22px;
+            color: $deep_navy;
+            line-height: 20px;
+          }
+
+          div.add-post-tooltip {
+            @include avenir_R();
+            font-size: 16px;
+            color: $deep_navy;
+            line-height: 20px;
+            margin-top: 8px;
+
+            button.add-post-bt {
+              display: inline;
+              background-color: transparent;
+              padding: 0;
+              margin: 0;
+              color: $carrot_green;
+              @include avenir_H();
+              font-size: 16px;
+              line-height: 20px;
             }
 
             @include tablet() {
               float: unset;
               margin: 24px auto 0px;
               width: 100%;
-              text-align: center;
+            }
+          }
+
+          div.add-post-tooltip-box {
+            position: absolute;
+            bottom: 0px;
+            right: 80px;
+            width: 98px;
+            height: 130px;
+            @include image-2x("/img/ML/add_post_tooltip_box");
+            background-size: 98px 130px;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            @include mobile() {
+              display: none;
             }
           }
         }
+      }
 
-        div.add-post-tooltip-arrow {
-          background-image: cdnUrl("/img/ML/add_post_tooltip_arrow.svg");
-          background-size: 32px 38px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 32px;
-          height: 38px;
-          float: right;
-          margin-top: 18px;
+      div.post-added-tooltip-container {
+        border: 1px dashed $carrot_gold;
+        background-color: #FDF6E4;
+        border-radius: 6px;
+        padding: 34px 40px;
+        margin: 32px 0px;
+        position: relative;
 
-          @include tablet() {
-            display: none;
-          }
+        @include tablet() {
+          width: calc(100% - 48px);
+          margin: 32px 24px;
         }
 
-        button.add-post-tooltip-compose-bt {
-          display: none;
+        button.post-added-tooltip-dismiss {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 33px;
+          height: 33px;
+          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
+          background-size: 32px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        div.post-added-tooltips {
+          width: 444px;
+          float: left;
 
           @include tablet() {
-            display: block;
-            color: $carrot_orange;
+            width: 100%;
+          }
+
+          div.post-added-tooltip-title {
             @include avenir_H();
-            font-size: 15px;
-            margin: 24px auto 0px;
+            font-size: 22px;
+            color: $deep_navy;
+            line-height: 20px;
+          }
+
+          div.post-added-tooltip {
+            @include avenir_R();
+            font-size: 16px;
+            color: $deep_navy;
+            line-height: 20px;
+            margin-top: 8px;
+
+            button.post-added-bt {
+              display: inline;
+              background-color: transparent;
+              padding: 0;
+              margin: 0;
+              color: $carrot_green;
+              @include avenir_H();
+              font-size: 16px;
+              line-height: 20px;
+            }
+
+            @include tablet() {
+              float: unset;
+              margin: 24px auto 0px;
+              width: 100%;
+            }
+          }
+
+          div.post-added-tooltip-box {
+            position: absolute;
+            bottom: 0px;
+            right: 60px;
+            width: 151px;
+            height: 118px;
+            @include image-2x("/img/ML/post_added_tooltip_box");
+            background-size: 151px 118px;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            @include tablet(){
+              display: none;
+            }
+          }
+        }
+      }
+
+      div.draft-post-tooltip-container {
+        border: 1px dashed $carrot_gold;
+        background-color: #FDF6E4;
+        border-radius: 6px;
+        padding: 34px 40px;
+        margin: 32px 0px;
+        position: relative;
+
+        @include tablet() {
+          width: calc(100% - 48px);
+          margin: 32px 24px;
+        }
+
+        button.draft-post-tooltip-dismiss {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 33px;
+          height: 33px;
+          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
+          background-size: 32px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        div.draft-post-tooltips {
+          float: left;
+
+          @include tablet(){
+            width: 100%;
+          }
+
+          div.draft-post-tooltip-title {
+            @include avenir_H();
+            font-size: 22px;
+            color: $deep_navy;
+            line-height: 20px;
+
+            @include mobile() {
+              max-width: 90%;
+            }
+          }
+
+          div.draft-post-tooltip {
+            @include avenir_R();
+            font-size: 16px;
+            color: $deep_navy;
+            line-height: 20px;
+            margin-top: 8px;
+
+            button.draft-post-bt {
+              display: inline;
+              background-color: transparent;
+              padding: 0;
+              margin: 0;
+              color: $carrot_green;
+              @include avenir_H();
+              font-size: 16px;
+              line-height: 20px;
+            }
+
+            @include tablet() {
+              float: unset;
+              margin: 24px auto 0px;
+              width: 100%;
+            }
           }
         }
       }
@@ -238,7 +393,7 @@ div.dashboard-layout {
           div.board-name-with-icon {
             @include avenir_H();
             font-size: 28px;
-            color: $carrot_gray;
+            color: $deep_navy;
             float: left;
             max-width: 350px;
             overflow: hidden;
@@ -314,10 +469,7 @@ div.dashboard-layout {
             margin-left: 16px;
 
             @include mobile() {
-              float: unset;
-              display: inline;
-              margin-left: 0px;
-              top: -5px;
+              display: none;
             }
 
             &:before {
@@ -350,10 +502,7 @@ div.dashboard-layout {
             margin-left: 16px;
 
             @include mobile() {
-              float: unset;
-              display: inline;
-              margin-left: 0px;
-              top: -5px;
+              display: none;
             }
 
             &:before {
@@ -412,6 +561,9 @@ div.dashboard-layout {
           float: right;
           margin-left: 24px;
 
+          @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
+          @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
+
           button.add-to-board-top-button {
             height: 42px;
             background-color: $carrot_orange_light;
@@ -427,9 +579,6 @@ div.dashboard-layout {
             display: flex;
             justify-content: center;
             align-items: center;
-
-            @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
-            @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
 
             // Remove to show settings button on mobile
             @include mobile() {

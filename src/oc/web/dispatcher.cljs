@@ -124,8 +124,7 @@
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
-   :show-add-post-tooltip [[:base] (fn [base] (:show-add-post-tooltip base))]
-   :show-invite-people-tooltip [[:base] (fn [base] (:show-invite-people-tooltip base))]
+   :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
    :email-verification  [[:base :auth-settings]
@@ -140,7 +139,7 @@
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
-   :slack-bot-modal     [[:base] (fn [base] (:slack-bot-modal base))]
+   :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -322,8 +321,7 @@
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
                                  ap-initial-at show-section-editor show-section-add show-sections-picker
                                  entry-editing mobile-menu-open jwt]
-                              {:show-onboard-overlay (:show-onboard-overlay base)
-                               :jwt jwt
+                              {:jwt jwt
                                :orgs orgs
                                :org-data org-data
                                :container-data container-data
@@ -332,7 +330,6 @@
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
-                               :slack-bot-modal-data (:slack-bot-modal base)
                                :is-entry-editing (boolean (:entry-editing base))
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
@@ -345,8 +342,18 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open})]})
-
+                               :mobile-menu-open mobile-menu-open
+                               :show-cmail (boolean (:cmail-state base))})]
+   :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
+   :show-add-comment-tooltip   [[:nux] (fn [nux] (:show-add-comment-tooltip nux))]
+   :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
+   :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
+   :show-draft-post-tooltip    [[:nux] (fn [nux] (:show-draft-post-tooltip nux))]
+   :show-invite-people-tooltip [[:nux] (fn [nux] (:show-invite-people-tooltip nux))]
+   :nux-user-type              [[:nux] (fn [nux] (:user-type nux))]
+   ;; Cmail
+   :cmail-state           [[:base] (fn [base] (:cmail-state base))]
+   :cmail-data            [[:base] (fn [base] (:cmail-data base))]})
 
 ;; Action Loop =================================================================
 
@@ -469,6 +476,14 @@
        (let [container-key (container-key org-slug posts-filter)
              items-list (:posts-list (get-in data container-key))]
         (zipmap items-list (map #(get posts-data %) items-list)))))))
+
+(defn draft-posts-data
+  ([]
+    (draft-posts-data @app-state (router/current-org-slug)))
+  ([org-slug]
+    (draft-posts-data @app-state org-slug))
+  ([data org-slug]
+    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
 
 (defn activity-data
   "Get activity data."

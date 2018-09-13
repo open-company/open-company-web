@@ -129,14 +129,10 @@ div.stream-comments {
             background-position: 50% 3px;
             background-size: 20px 4px;
             background-repeat: no-repeat;
-            opacity: 0.8;
+            opacity: 0.4;
 
-            &:hover {
+            &:hover, &:hover, &.active {
               opacity: 1;
-            }
-
-            &:hover, &.active {
-              background-image: cdnUrl("/img/ML/horizontal_ellipsis_ui_grey.svg");
             }
           }
 

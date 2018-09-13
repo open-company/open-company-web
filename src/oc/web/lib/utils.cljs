@@ -614,3 +614,5 @@
   (if (string? value)
     (s/trim value)
     value))
+
+(def section-name-exists-error "Section name already exists or isn't allowed")

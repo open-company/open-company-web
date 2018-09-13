@@ -4,6 +4,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
@@ -53,7 +54,6 @@
                                 (drv/drv :board-data)
                                 (drv/drv :change-cache-data)
                                 (drv/drv :mobile-navigation-sidebar)
-                                (drv/drv :show-invite-people-tooltip)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -97,12 +97,8 @@
         show-boards (or create-link (pos? (count boards)))
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
-        show-must-see (or is-must-see
-                          (pos? (:must-see-count org-data)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-drafts (or (= (router/current-board-slug) utils/default-drafts-board-slug)
-                        (pos? (:count drafts-link)))
         org-slug (router/current-org-slug)
         show-invite-people (and org-slug
                                 (utils/is-admin-or-author? org-data))
@@ -110,15 +106,13 @@
                             (not @(::footer-height s))
                             (< @(::content-height s)
                              (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
-        show-invite-people-tooltip (drv/react s :show-invite-people-tooltip)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :showing-invite-people-tooltip show-invite-people-tooltip})
+      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952) 2) "px"))}}
       [:div.mobile-board-name-container
-        {:on-click #(nav-actions/mobile-nav-sidebar (not mobile-navigation-sidebar))}
+        {:on-click #(nav-actions/mobile-nav-sidebar)}
         [:div.board-name
           (cond
             is-all-posts "All posts"
@@ -130,27 +124,26 @@
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-all-posts
-                                      :showing-must-see show-must-see
-                                      :showing-drafts show-drafts})
+            {:class (utils/class-set {:item-selected is-all-posts})
              :href (oc-urls/all-posts)
              :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
               "All posts"]])
-        (when show-must-see
+        (when show-all-posts
            [:a.must-see.hover-item.group
             {:class (utils/class-set {:item-selected is-must-see
-                                      :showing-drafts show-drafts})
+                                      :showing-drafts drafts-link})
               :href (oc-urls/must-see)
               :on-click #(nav-actions/nav-to-url! % (oc-urls/must-see))}
              [:div.must-see-icon
                {:class (when is-must-see "selected")}]
              [:div.must-see-label
                "Must see"]])
-        (when show-drafts
-          (let [board-url (oc-urls/board (:slug drafts-board))]
+        (when drafts-link
+          (let [board-url (oc-urls/board (:slug drafts-board))
+                draft-posts (dis/draft-posts-data)]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-all-posts)
                                  (= (router/current-board-slug) (:slug drafts-board)))
@@ -159,12 +152,11 @@
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
                :on-click #(nav-actions/nav-to-url! % board-url)}
-              [:div.drafts-icon
-                {:class (when is-drafts-board "selected")}]
               [:div.drafts-label.group
                 "Drafts "
-                (when (pos? (:count drafts-link))
-                  [:span.count "(" (:count drafts-link) ")"])]]))
+                (when (or (pos? (count draft-posts))
+                          (pos? (:count drafts-link)))
+                  [:span.count "(" (or (count draft-posts) (:count drafts-link)) ")"])]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
@@ -210,17 +202,6 @@
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
-        ;; invite people tooltip
-        (when show-invite-people-tooltip
-          [:div.invite-people-tooltip-container.group
-            [:button.mlb-reset.invite-people-tooltip-dismiss
-              {:on-click #(nux-actions/dismiss-invite-people-tooltip)}]
-            [:div.invite-people-tooltip-icon]
-            [:div.invite-people-tooltip-title
-              "Well done on your first post!"]
-            [:div.invite-people-tooltip-description
-              "You can invite your team so they can see it."]
-            [:div.invite-people-tooltip-arrow]])
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(nav-actions/show-invite)}

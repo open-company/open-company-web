@@ -2,15 +2,16 @@
   (:require [rum.core :as rum]
             [goog.object :as gobj]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [cuerdas.core :as string]
+            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.section :as section-actions]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.section :as section-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -67,6 +68,27 @@
   (dis/dispatch! [:input [:show-section-editor] false])
   (dis/dispatch! [:input [:show-section-add] false]))
 
+(defn check-section-name-error [s]
+  (let [section-editing @(drv/get-ref s :section-editing)
+        org-data @(drv/get-ref s :org-data)
+        boards (filter #(not= (:slug %) (:slug section-editing)) (:boards org-data))
+        sec-name @(::section-name s)
+        equal-names (filter #(.match sec-name (js/RegExp. (str "^" (:name %) "$") "ig")) boards)]
+    (reset! (::pre-flight-check s) false)
+    (reset! (::pre-flight-ok s) false)
+    (if (pos? (count equal-names))
+      (dis/dispatch! [:input [:section-editing :section-name-error] utils/section-name-exists-error])
+      (do
+        (when (:section-name-error section-editing)
+          (dis/dispatch! [:input [:section-editing :section-name-error] nil]))
+        (if (>= (count sec-name) section-actions/min-section-name-length)
+          (if (not= (:slug section-editing) utils/default-section-slug)
+            (do
+              (section-actions/pre-flight-check sec-name)
+              (reset! (::pre-flight-check s) true))
+            (reset! (::pre-flight-check s) false))
+          (reset! (::pre-flight-check s) false))))))
+
 (rum/defcs section-editor < rum/reactive
                             ;; Locals
                             (rum/local "" ::query)
@@ -79,6 +101,9 @@
                             (rum/local nil ::click-listener)
                             (rum/local false ::slack-enabled)
                             (rum/local "" ::section-name)
+                            (rum/local false ::pre-flight-check)
+                            (rum/local false ::pre-flight-ok)
+                            (rum/local nil ::section-name-check-timeout)
                             ;; Derivatives
                             (drv/drv :org-data)
                             (drv/drv :board-data)
@@ -105,6 +130,14 @@
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
                                    (dismiss))))
                               s)
+                             :did-remount (fn [_ s]
+                              (let [section-editing @(drv/get-ref s :section-editing)]
+                                (when @(::pre-flight-check s)
+                                  (when-not (:pre-flight-loading section-editing)
+                                    (reset! (::pre-flight-check s) false)
+                                    (when-not (:section-name-error section-editing)
+                                      (reset! (::pre-flight-ok s) true)))))
+                              s)
                              :will-unmount (fn [s]
                               (when @(::click-listener s)
                                 (events/unlistenByKey @(::click-listener s))
@@ -112,6 +145,7 @@
                               s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
+        no-drafts-boards (filter #(and (not (:draft %)) (not= (:slug %) utils/default-drafts-board-slug)) (:boards org-data))
         section-editing (drv/react s :section-editing)
         section-data (if (seq (:slug section-editing)) (drv/react s :board-data) section-editing)
         team-data (drv/react s :team-data)
@@ -124,7 +158,8 @@
         ;; he's creating a new section
         ;; or if he's in the authors list of the existing section
         can-change (or (= (:slug section-editing) utils/default-section-slug)
-                       (some #{current-user-id} (:authors section-editing)))]
+                       (some #{current-user-id} (:authors section-editing)))
+        last-section-standing (= (count no-drafts-boards) 1)]
     [:div.section-editor.group.fs-hide
       {:on-click (fn [e]
                    (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
@@ -144,18 +179,29 @@
                "Create a new section"))}]]
       [:div.section-editor-add
         [:div.section-editor-add-label
-          "Section name"]
+          [:span.section-name "Section name"]
+          (when @(::pre-flight-ok s)
+            [:span.checkmark " ✓"])
+          (when @(::pre-flight-check s)
+            (small-loading))]
         (when (:section-name-error section-editing)
-          [:div.section-editor-error-label (:section-name-error section-editing)])
+          [:div.section-editor-error-label
+            (:section-name-error section-editing)])
         [:div.section-editor-add-name
           {:content-editable true
            :placeholder "Section name"
            :ref "section-name"
            :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "section-name") %)
            :on-key-up (fn [e]
-                        (reset! (::section-name s) (clojure.string/trim (.. e -target -innerText)))
-                        (when (:section-name-error section-editing)
-                          (dis/dispatch! [:input [:section-editing :section-name-error] nil])))
+                        (let [next-section-name (clojure.string/trim (.. e -target -innerText))]
+                          (when (not= @(::section-name s) next-section-name)
+                            (when @(::section-name-check-timeout s)
+                              (.clearTimeout js/window @(::section-name-check-timeout s)))
+                            (reset! (::section-name-check-timeout s)
+                             (utils/after 500
+                              (fn []
+                                (reset! (::section-name s) next-section-name)
+                                (check-section-name-error s)))))))
            :on-key-press (fn [e]
                            (when (or (>= (count (.. e -target -innerText)) 50)
                                     (= (.-key e) "Enter"))
@@ -371,38 +417,51 @@
                      (utils/link-for (:links section-data) "delete"))
             [:button.mlb-reset.delete-bt
               {:on-click (fn []
-                          (alert-modal/show-alert
-                           {:icon "/img/ML/trash.svg"
-                            :action "delete-section"
-                            :message [:span
-                                       [:span "Are you sure?"]
-                                       (when (-> section-data :entry-count pos?)
-                                         [:span
-                                           " This will delete the section and "
-                                           [:strong "all"]
-                                           " its posts, too."])]
-                            :link-button-title "No"
-                            :link-button-cb #(alert-modal/hide-alert)
-                            :solid-button-style :red
-                            :solid-button-title "Yes, I'm sure"
-                            :solid-button-cb (fn []
-                                               (section-actions/section-delete
-                                                 (:slug section-data))
-                                               (alert-modal/hide-alert)
-                                               (dismiss))}))}
+                          (when-not last-section-standing
+                            (alert-modal/show-alert
+                             {:icon "/img/ML/trash.svg"
+                              :action "delete-section"
+                              :message [:span
+                                         [:span "Are you sure?"]
+                                         (when (-> section-data :entry-count pos?)
+                                           [:span
+                                             " This will delete the section and "
+                                             [:strong "all"]
+                                             " its posts, too."])]
+                              :link-button-title "No"
+                              :link-button-cb #(alert-modal/hide-alert)
+                              :solid-button-style :red
+                              :solid-button-title "Yes, I'm sure"
+                              :solid-button-cb (fn []
+                                                 (section-actions/section-delete
+                                                   (:slug section-data))
+                                                 (alert-modal/hide-alert)
+                                                 (dismiss))})))
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :title (if last-section-standing
+                       "You cannot delete the last remaining section."
+                       "Delete this section and all its posts.")
+               :class (when last-section-standing "disabled")}
               "Delete section"])
-          [:button.mlb-reset.create-bt
-            {:on-click (fn [_]
-                        (let [section-node (rum/ref-node s "section-name")
-                              section-name (.-innerText section-node)
-                              personal-note-node (rum/ref-node s "personal-note")
-                              personal-note (when personal-note-node (.-innerText personal-note-node))
-                              success-cb #(when (fn? on-change)
-                                            (on-change % personal-note))]
-                          (section-actions/section-save-create section-editing section-name success-cb)))
-             :class (when (< (count @(::section-name s)) section-actions/min-section-name-length) "disabled")}
-            (if @(::editing-existing-section s)
-              "Save"
-              (if from-section-picker
-                "Done"
-                "Create"))]]]]))
+          (let [disable-bt (or (< (count @(::section-name s)) section-actions/min-section-name-length)
+                               @(::pre-flight-check s)
+                               (:pre-flight-loading section-editing)
+                               (seq (:section-name-error section-editing)))]
+            [:button.mlb-reset.create-bt
+              {:on-click (fn [_]
+                          (when-not disable-bt
+                            (let [section-node (rum/ref-node s "section-name")
+                                  section-name (.-innerText section-node)
+                                  personal-note-node (rum/ref-node s "personal-note")
+                                  personal-note (when personal-note-node (.-innerText personal-note-node))
+                                  success-cb #(when (fn? on-change)
+                                                (on-change % personal-note))]
+                              (section-actions/section-save-create section-editing section-name success-cb))))
+               :class (when disable-bt "disabled")}
+              (if @(::editing-existing-section s)
+                "Save"
+                (if from-section-picker
+                  "Done"
+                  "Create"))])]]]))
