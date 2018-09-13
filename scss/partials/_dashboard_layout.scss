@@ -384,6 +384,8 @@ div.dashboard-layout {
           
         div.board-name {
           float: left;
+          @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
+          @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
 
           @include mobile() {
             float: unset;
@@ -560,9 +562,6 @@ div.dashboard-layout {
           position: relative;
           float: right;
           margin-left: 24px;
-
-          @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
-          @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
 
           button.add-to-board-top-button {
             height: 42px;

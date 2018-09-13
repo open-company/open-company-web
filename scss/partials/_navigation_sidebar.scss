@@ -95,7 +95,7 @@
 }
 
 @mixin item-selected() {
-  background-color: #E4FAEF;
+  background-color: #D4F6E4;
   border-radius: 6px;
 
   @include mobile() {
@@ -353,7 +353,7 @@ div.left-navigation-sidebar {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
       background-size: 16px 16px;
       background-repeat: no-repeat;
-      background-position: center 4px;
+      background-position: center 6px;
       width: 16px;
       height: 28px;
       float: left;
@@ -361,7 +361,7 @@ div.left-navigation-sidebar {
       @include mobile() {
         margin-left: 0px;
         margin-top: 0px;
-        background-position: center 2px;
+        background-position: center 4px;
         opacity: 1;
       }
       
@@ -376,7 +376,7 @@ div.left-navigation-sidebar {
     div.must-see-icon {
       background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
       background-size: 13px 16px;
-      background-position: center 4px;
+      background-position: center 6px;
       background-repeat: no-repeat;
       width: 16px;
       height: 28px;
@@ -387,7 +387,7 @@ div.left-navigation-sidebar {
       @include mobile() {
         margin-left: 0px;
         margin-top: 0px;
-        background-position: center 2px;
+        background-position: center 4px;
         opacity: 1;
       }
 
@@ -415,9 +415,11 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
+    height: 20px;
 
     @include mobile() {
       border-top: 1px solid #ECECEC;
+      height: 56px;
     }
 
     .left-navigation-sidebar-top-title {
@@ -458,6 +460,12 @@ div.left-navigation-sidebar {
       }
     }
 
+    &:hover, &.show-section-add {
+      button.left-navigation-sidebar-top-title-button {
+        display: block;
+      }      
+    }
+
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
@@ -474,6 +482,7 @@ div.left-navigation-sidebar {
       background-size: 8px 8px;
       border-radius: 10px;
       @include avenir_H();
+      display: none;
 
       @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
 
@@ -756,7 +765,7 @@ div.left-navigation-sidebar {
 
       div.invite-people-icon {
         background-image: cdnUrl("/img/ML/invite_people.svg");
-        background-size: 16px auto;
+        background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center 5px;
         width: 16px;

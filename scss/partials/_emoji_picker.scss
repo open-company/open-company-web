@@ -6,11 +6,11 @@ div.emoji-picker {
   position: relative;
 
   button.emoji-button{
-    padding: 1px 0 0 0;
-    width: 25px;
-    height: 24px;
+    padding: 0;
+    width: 20px;
+    height: 20px;
     background-image: cdnUrl("/img/ML/new_post_emoji_button.svg");
-    background-size: 20px 20px;
+    background-size: 16px 16px;
     background-position: center;
     background-position: 50%;
     background-repeat: no-repeat;
