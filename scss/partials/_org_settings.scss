@@ -10,59 +10,146 @@ div.org-settings {
   top: 0px;
   left: 0px;
   z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
 
-  button.carrot-modal-close {
-    // Fallback for mobile that doesn't support fix positioning
-    position: absolute;
-    position: fixed;
-    left: 50%;
-    margin-left: #{($settings_content_width / 2 * -1) - 28}px;
-    top: 4px;
+  @include mobile() {
+    top: 65px;
+    background-color: white;
+    height: calc(100vh - 65px);
   }
 
   div.org-settings-inner {
     width: #{$settings_content_width}px;
-    margin: 0 auto;
+    margin: 72px auto;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     background-color: white;
-    height: 100vh;
     overflow-x: visible;
     overflow-y: auto;
+    overflow: visible;
     position: relative;
     border-radius: 4px;
+    padding: 32px 24px;
 
     @include mobile() {
       width: 100%;
+      box-shadow: none;
+      border: none;
+      border-radius: 0px;
+      margin-top: 0px;
     }
 
-    & > div {
-      padding: 0 32px;
+    button.settings-modal-close {
+      right: -56px;
+      top: 0px;
+
+      @include mobile() {
+        display: none;
+      }
     }
 
     div.org-settings-header {
       position: relative;
-      font-size: 32px;
-      font-weight: 500;
-      color: $carrot_gray;
-      background-color: $carrot_dark_bg_gray;
       height: $settings_header_height;
-      padding: 40px 32px;
+      margin-bottom: 32px;
+
+      div.org-settings-header-avatar {
+        float: left;
+        border: 1px solid #D8DBDF;
+        border-radius: 4px;
+        width: 48px;
+        height: 48px;
+
+        &.main-panel {
+          cursor: pointer;
+        }
+
+        &.missing-logo {
+          &:hover {
+            background-color: $carrot_green;
+
+            @include preload_image(cdnUrl("/img/ML/upload_avatar_placeholder.svg"));
+            @include preload_image(cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg"));
+
+            div.org-avatar-img-empty {
+              background-image: cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg");
+            }
+          }
+
+          div.org-avatar-img-empty {
+            width: 22px;
+            height: 19px;
+            margin: 14px auto;
+            background-image: cdnUrl("/img/ML/upload_avatar_placeholder.svg");
+            background-size: 22px 19px;
+            background-position: center;
+            background-repeat: no-repeat;
+          }
+        }
+
+        @include org-avatar(40);
+
+        div.org-avatar.missing-logo {
+          div.org-avatar-container.no-avatar.force-label {
+            &:before {
+              left: 10px;
+              top: 2px;
+            }
+          }
+        }
+
+        div.org-avatar * {
+          border-radius: 4px;
+        }
+
+        &.main-panel:hover {
+          border: 1px solid $carrot_green;
+        }
+      }
+
+      div.org-name {
+        margin-left: 64px;
+        @include avenir_H();
+        font-size: 22px;
+        color: $deep_navy;
+        line-height: 32px;
+      }
+
+      div.org-url {
+        margin-left: 64px;
+        @include avenir_R();
+        font-size: 18px;
+        color: $light_ui_grey;
+      }
     }
 
     div.org-settings-footer {
       margin-top: 64px;
-      margin-bottom: 32px;
-      height: 42px;
+      margin-bottom: 0px;
+      height: 40px;
       width: 100%;
       padding: 0px;
 
       button {
         float: right;
         margin-left: 24px;
-        height: 42px;
+        height: 40px;
+
+        &.cancel-btn {
+          background-color: transparent;
+          @include avenir_M();
+          font-size: 16px;
+          color: $ui_grey;
+        }
 
         &.save-btn {
-          width: 124px;
+          width: 100px;
+          border-radius: 100px;
+          background-color: $carrot_green;
+          color: white;
+          @include avenir_H();
+          font-size: 16px;
         }
       }
     }
@@ -99,6 +186,7 @@ div.org-settings {
           @include avenir_R();
           font-size: 16px;
           color: $carrot_dark_gray;
+          resize: none;
 
           &.error {
             border: 1px solid rgba($carrot_orange, 0.5);
@@ -117,7 +205,7 @@ div.org-settings {
           @include placeholder() {
             @include avenir_R();
             font-size: 16px;
-            color: $carrot_light_gray;
+            color: $light_ui_grey;
           }
 
           input, textarea {
@@ -207,14 +295,16 @@ div.org-settings {
 
         .org-settings-label {
           width: 100%;
-          @include avenir_H();
-          font-size: 14px;
-          color: $oc_gray_7;
+          @include avenir_M();
+          font-size: 15px;
+          color: $deep_navy;
+          margin-bottom: 8px;
 
           label {
-            @include avenir_H();
-            font-size: 14px;
-            color: $oc_gray_7;
+            @include avenir_M();
+            font-size: 15px;
+            color: $deep_navy;
+            margin-bottom: 0px;
           }
 
           .error {
@@ -234,15 +324,23 @@ div.org-settings {
 
 div.org-settings-tabs {
   min-height: 24px;
-  background-color: $carrot_dark_bg_gray;
-  padding: 0 32px;
+  position: relative;
+
+  div.org-settings-bottom-line {
+    width: 100%;
+    height: 1px;
+    background-color: rgba($deep_tan, 0.3);
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+  }
 
   div.org-settings-tab {
-    height: 28px;
+    height: 33px;
     float: left;
     width: auto;
-    margin: 0px 24px 0px 0px;
-    border-bottom: 4px solid transparent;
+    margin: 1px 24px 0px 0px;
+    border-bottom: 1px solid transparent;
 
     a.org-settings-tab-link {
       display: block;
@@ -251,10 +349,11 @@ div.org-settings-tabs {
       margin: 0;
       padding: 0;
       cursor: pointer;
-      @include avenir_M();
-      font-size: 16px;
-      color: $carrot_light_gray;
+      @include avenir_B();
+      font-size: 13px;
+      color: $ui_grey;
       text-decoration: none;
+      text-transform: uppercase;
       outline: none;
 
       @include mobile() {
@@ -267,17 +366,15 @@ div.org-settings-tabs {
     }
 
     &:hover {
-      border-bottom: 4px solid $carrot_light_gray;
+      border-bottom: 1px solid $carrot_orange;
     }
 
     &.active {
-      border-bottom: 4px solid $carrot_text_blue;
+      border-bottom: 1px solid $carrot_orange;
 
       a.org-settings-tab-link {
         padding: 0;
-        @include avenir_H();
-        font-size: 16px;
-        color: $carrot_text_blue;
+        color: $carrot_orange;
 
         @include mobile() {
           font-size: 14px;

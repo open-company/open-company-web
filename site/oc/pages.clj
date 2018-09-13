@@ -3,6 +3,41 @@
             [oc.privacy :as privacy]
             [environ.core :refer (env)]))
 
+(def bootstrap-css
+  ;; Bootstrap CSS //getbootstrap.com/
+  [:link
+    {:rel "stylesheet"
+     :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+     :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+     :crossorigin "anonymous"}])
+
+(def bootstrap-js
+  ;; Bootstrap JavaScript //getf.com/
+  [:script
+    {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+     :type "text/javascript"
+     :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+     :crossorigin "anonymous"}])
+
+(def font-awesome
+  ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
+  [:link
+    {:rel "stylesheet"
+     :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}])
+
+(def jquery
+  [:script
+    {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"
+     :crossorigin "anonymous"}])
+
+(def ziggeo-css
+  [:link {:rel "stylesheet" :href "/lib/ziggeo/ziggeo.css"}])
+  ; [:link {:rel "stylesheet" :href "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.css"}])
+
+(def ziggeo-js
+  [:script {:src "/lib/ziggeo/ziggeo.js"}])
+  ; [:script {:src "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.js"}])
+
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")
@@ -11,6 +46,9 @@
                                   (str "'" (env :ga-tracking-id) "'")
                                   false)]
              (str "CarrotGA.init(" ga-version "," ga-tracking-id ");"))])
+
+(defn fullstory-init []
+  [:script (str "init_fullstory();")])
 
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
@@ -56,202 +94,271 @@
          :id "mc-embedded-subscribe"}
         "Get Early Access"]]])
 
-(def mobile-horizontal-carousell
-  [:div.horizontal-carousell
-    [:div.horizontal-carousell-inner
-      [:img.horizontal-carousell-1
-        {:src (cdn "/img/ML/homepage_mobile_screenshot_1.png")
-         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_1@2x.png") " 2x")}]
-      [:img.horizontal-carousell-2
-        {:src (cdn "/img/ML/homepage_mobile_screenshot_2.png")
-         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_2@2x.png") " 2x")}]
-      [:img.horizontal-carousell-3
-        {:src (cdn "/img/ML/homepage_mobile_screenshot_3.png")
-         :src-set (str (cdn "/img/ML/homepage_mobile_screenshot_3@2x.png") " 2x")}]]])
-
 (def desktop-video
   [:div.main-animation-container
-    [:video.main-animation
-      {:controls false
-       :autoPlay true
-       :poster (cdn "/img/ML/new_homepage_screenshot.png")
-       :onClick "this.play();"
-       :loop true}
-      [:source
-        {:src (cdn "/img/ML/animation.webm")
-         :type "video/webm"}]
-      [:source
-        {:src (cdn "/img/ML/animation.mp4")
-         :type "video/mp4"}]
-      [:div.fallback
-        "Your browser doesn´t support this video format."]]])
+    [:img.main-animation
+      {:src (cdn "/img/ML/homepage_screenshot.png")
+       :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]])
 
-(def carrot-cards
-  [:div.cards-container
-    [:div.cards-row.group
-      [:div.card.card-1
-        [:div.card-icon]
-        [:div.card-title
-          "Say what’s important "]
-        [:div.card-content
-          (str
-            "Space to write more "
-            "than a quick chat - like "
-            "key updates, announcements, "
-            "plans, and stories.")]]
-      [:div.card.card-2
-        [:div.card-icon]
-        [:div.card-title
-          "Read without interruptions"]
-        [:div.card-content
-          (str
-            "Stay in sync without worrying "
-            "you missed something important "
-            "in a fast-moving conversation.")]]
-      [:div.card.card-3
-        [:div.card-icon]
-        [:div.card-title
-          "Focused, topic-based discussion"]
-        [:div.card-content
-          (str
-            "Keep team reactions, comments "
-            "and questions together in one "
-            "place for better context.")]]]
-    [:div.cards-row.group
-      [:div.card.card-4
-        [:div.card-icon]
-        [:div.card-title
-          "Find anything fast"]
-        [:div.card-content
-          (str
-            "Get up to speed quickly with the "
-            "full picture in one place. Great "
-            "for distributed teams, too.")]]
-      [:div.card.card-5
-        [:div.card-icon]
-        [:div.card-title
-          "See who’s engaged"]
-        [:div.card-content
-          (str
-            "Carrot shows you who's reading "
-            "what so leaders can see if "
-            "their teams are aligned.")]]
-      [:div.card.card-6
-        [:div.card-icon]
-        [:div.card-title
-          (str
-            "In sync "
-            "with Slack")]
-        [:div.card-content
-          (str
-            "Discussions are automatically "
-            "shared to the right channels. ")
-          [:a
-            {:href "/slack"}
-            "Learn more"]]]]])
+(def core-values-list
+  [:div.core-values-list.group
+    [:div.core-value-container.key-announcement
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Announcements"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "Product "
+          [:span.dot "•"]
+          " 45 views"]
+        [:div.core-value-box-title
+          "Updates to billing & subscriptions (beta edition)"]]]
+    [:div.core-value-container.team-updates
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Team updates"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "General "
+          [:span.dot "•"]
+          " 22 views"]
+        [:div.core-value-box-title
+          "June 25, 2018 all hands video highlights"]]]
+    [:div.core-value-container.strategic-plans
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Decisions"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "Strategy "
+          [:span.dot "•"]
+          " 67 views"]
+        [:div.core-value-box-title
+          "Product roadmap review presentation and PDF"]]]
+    [:div.core-value-container.stories
+      [:div.core-value-header.group
+        [:div.core-value-icon]
+        [:div.core-value
+          "Stories"]]
+      [:div.core-value-white-box
+        [:div.core-value-box-header
+          "Design "
+          [:span.dot "•"]
+          " 34 views"]
+        [:div.core-value-box-title
+          "How we pulled off our biggest launch ever 🤩"]]]])
 
 (def testimonials-section
   [:section.testimonials-section
-    [:div.balloon.big-yellow-1]
-    [:div.balloon.small-blue-1]
     [:div.testimonials-section-title
       "Don’t take our word for it"]
     [:div.testimonials-section-subtitle
       "Here’s how we’re helping teams like yours."]
     [:div.testimonials-cards-container.group
-      [:div.card
-        [:div.card-content
+      [:div.testimonial-card
+        [:div.testimonial-image]
+        [:div.testimonial-name
+          "CHRIS CAIRNS"]
+        [:div.testimonial-role
+          "Managing Partner"]
+        [:div.testimonial-quote
           (str
-           "We love Slack for spontaneous "
-           "stuff, but when it’s time to "
-           "post key updates that can’t "
-           "be missed, Carrot is awesome.")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (cdn "/img/ML/happy_face_blue.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]
-      [:div.card
-        [:div.card-content
+           "As a busy leader it's hard to keep everyone up to date. "
+           "I use Carrot to record a quick video update and it "
+           "lets me know that everyone's seen it.")]
+        [:div.testimonial-footer.group
+          [:a
+            {:href "https://skylight.digital/"
+             :target "_blank"}
+            [:div.testimonial-logo]]]]
+      [:div.testimonial-card
+        [:div.testimonial-image]
+        [:div.testimonial-name
+          "Tom Hadfield"]
+        [:div.testimonial-role
+          "CEO"]
+        [:div.testimonial-quote
+          "On Carrot, my updates get noticed and get the team talking. I love that."]
+        [:div.testimonial-footer.group
+          [:a
+            {:href "https://m.io/"
+             :target "_blank"}
+            [:div.testimonial-logo]]]]
+      [:div.testimonial-card
+        [:div.testimonial-image]
+        [:div.testimonial-name
+          "Nick DeNardis"]
+        [:div.testimonial-role
+          "Director of Digital Communications"]
+        [:div.testimonial-quote
           (str
-           "Carrot makes sure our crucial "
-           "updates aren’t drowned out "
-           "by \"taco Tuesday?\" and "
-           "silly memes!")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (cdn "/img/ML/happy_face_purple.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]
-      [:div.card
-        [:div.card-content
-          (str
-           "RIP team email! 👻  With "
-           "Carrot, email is finally "
-           "obsolete for team updates "
-           "and the rest.")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (cdn "/img/ML/happy_face_red.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]
-      [:div.card
-        [:div.card-content
-          (str
-           "Before Carrot, I never knew "
-           "if anyone saw my updates! "
-           "Now I know who's engaged "
-           "and aligned.  🙏")]
-        [:div.card-author.group
-          [:img.card-avatar
-            {:src (cdn "/img/ML/happy_face_yellow.svg")}]
-          [:div.author-name
-            ""]
-          [:div.author-company
-            ""]]]]])
+           "Carrot helps me share things the entire team needs to know "
+           "about - instead of burying it somewhere it won’t get noticed.")]
+        [:div.testimonial-footer.group
+          [:a
+            {:href "https://wayne.edu/"
+             :target "_blank"}
+            [:div.testimonial-logo]]]]]])
 
-(def keep-aligned
+(def no-credit-card
+  [:div.no-credit-card
+    "No credit card required&nbsp;&nbsp;•&nbsp;&nbsp;Works with Slack"])
+
+(def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "Keep everyone aligned around what matters most."]
+      "It’s never been easier to keep everyone on the same page"]
     [:button.mlb-reset.get-started-button
-      "Get started for free"]])
+      "Get started for free"]
+    no-credit-card])
+
+(def keep-aligned-section
+  [:section.home-keep-aligned
+    [:div.scroll-down]
+    [:h2.keep-aligned-title
+      "Carrot keeps leaders and teams aligned"]
+
+    [:div.keep-aligned-section
+      [:div.keep-aligned-section-row.first-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-1.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_update_team.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_update_team_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_update_team_mobile@2x.png") " 2x")}]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Update your team in seconds"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+            "Create compelling updates people want to read"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+            "Capture video updates to add a human touch"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+            "Link to Google, Dropbox, wikis and others"]
+          [:div.keep-aligned-section-list-item.purple-checkmark
+          "Automate recurring team updates"]]]
+
+      [:div.keep-aligned-section-row.second-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-2.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_keep_informed.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_keep_informed_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_keep_informed_mobile@2x.png") " 2x")}]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Keep everyone informed"]
+          [:div.keep-aligned-section-list-item.green-checkmark
+            "“Must see” updates rise to the top"]
+          [:div.keep-aligned-section-list-item.green-checkmark
+            "See what’s trending to stay in the loop"]
+          [:div.keep-aligned-section-list-item.green-checkmark
+            "Organized for easy browsing and search"]
+          [:div.keep-aligned-section-list-item.green-checkmark
+            "A morning digest summarizes what’s new"]]]
+
+      [:div.keep-aligned-section-row.third-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-3.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_better_discussions.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_better_discussions_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_better_discussions_mobile@2x.png") " 2x")}]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Spark better follow-on discussions"]
+          [:div.keep-aligned-section-list-item.red-checkmark
+            "Encourage thoughtful comments and questions"]
+          [:div.keep-aligned-section-list-item.red-checkmark
+            "Keep interactions together for greater context"]
+          [:div.keep-aligned-section-list-item.red-checkmark
+            "Syncs with Slack so discussions can happen anywhere"]]]
+
+      [:div.keep-aligned-section-row.fourth-row.group
+        [:img.keep-aligned-section-screenshot.screenshot-4.big-web-only
+          {:src (cdn "/img/ML/homepage_screenshots_being_heard.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard@2x.png") " 2x")}]
+        [:img.keep-aligned-section-screenshot.screenshot-4.mobile-only
+          {:src (cdn "/img/ML/homepage_screenshots_being_heard_mobile.png")
+           :srcSet (str (cdn "/img/ML/homepage_screenshots_being_heard_mobile@2x.png") " 2x")}]
+        [:div.keep-aligned-section-copy
+          [:div.keep-aligned-section-copy-title
+            "Make sure you're being heard"]
+          [:div.keep-aligned-section-list-item.blue-checkmark
+            "Know who's seen your post"]
+          [:div.keep-aligned-section-list-item.blue-checkmark
+            "Send reminders with a single click"]
+          [:div.keep-aligned-section-list-item.blue-checkmark
+            "Eliminate communication gaps"]
+          [:div.keep-aligned-section-list-item.blue-checkmark
+            "Ensure alignment on important items"]]]]])
+
+(def access-anywhere-section
+  [:section.access-anywhere-section
+    [:div.access-anywhere-section-container
+      [:div.access-anywhere-copy
+        [:div.access-anywhere-copy-title
+          "Stay up to date on the go."]
+        [:div.access-anywhere-copy-title.big-web-only
+          "Access Carrot from anywhere."]
+        [:div.access-anywhere-copy-title.mobile-only
+          "Access Carrot anywhere."]
+        [:div.access-anywhere-copy-subtitle.big-web-only
+          "Fully responsive web app. No app install required."]
+        [:div.access-anywhere-copy-subtitle.mobile-only
+          "Fully responsive web app."]
+        [:div.access-anywhere-copy-subtitle.mobile-only
+          "No app install required."]]
+      [:div.access-anywhere-screenshot]]])
+
+(defn slack-comparison-section
+  [& [slack-version?]]
+  [:section.slack-comparison
+    [:div.slack-comparison-headline
+      "PERFECT FOR SLACK TEAMS"]
+    (when-not slack-version?
+      [:div.slack-comparison-headline-1
+        "Slack keeps your team connected in the moment."])
+    (if slack-version? 
+      [:div.slack-comparison-headline-2
+        "Keep your team informed without distractions."]
+      [:div.slack-comparison-headline-2
+        "Carrot keeps it aligned over time."])
+    [:img.slack-comparison-screenshot.big-web-only
+      {:src (cdn "/img/ML/slack_comparison_screenshot.png")
+       :srcSet (str (cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]
+    [:img.slack-comparison-screenshot.mobile-only
+      {:src (cdn "/img/ML/slack_comparison_screenshot_mobile.png")
+       :srcSet (str (cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]])
 
 (defn index [options]
-  [:div
+  [:div.home-wrap
     {:id "wrap"}
     [:div.main.home-page
       ; Hope page header
       [:section.cta.group
-        [:div.balloon.big-yellow]
-        [:div.balloon.big-red]
-        [:div.balloon.big-purple]
+        [:div.balloon.big-blue]
+        [:div.balloon.small-green]
         [:div.balloon.big-green]
-        [:div.balloon.small-blue]
-        [:div.balloon.small-yellow-face]
+        [:div.balloon.small-purple-face]
+        [:div.balloon.big-yellow]
         [:div.balloon.small-purple]
-        [:div.balloon.small-red]
-        [:div.balloon.small-purple-2]
-        [:div.balloon.big-green-2]
-        [:div.balloon.small-yellow]
 
         [:h1.headline
-          "Better informed, less noise."]
+          "Where leadership finds its voice"]
         [:div.subheadline
           (str
-            "Your company digest keeps everyone aligned "
-            "around what matters most.")]
+           "Rise above the noise of chat and email to "
+           "keep your growing and distributed teams aligned.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
             {:id "get-started-centred-bt"}
             "Get started for free"]]
+        no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style {:display "none"}}
@@ -259,391 +366,571 @@
             [:div.thanks-headline "You are Confirmed!"]
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        mobile-horizontal-carousell
+        [:div.main-animation-container
+          [:img.main-animation
+            {:src (cdn "/img/ML/homepage_screenshot.png")
+             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-        desktop-video
+        core-values-list]
 
-        [:div.stay-aligned-container
-          [:div.stay-aligned-icon]
-          [:div.stay-aligned-message
-            "Rise above the noise."]]
+      keep-aligned-section
 
-        carrot-cards]
+      access-anywhere-section
+
+      (slack-comparison-section)
 
       testimonials-section
 
-      keep-aligned
+      keep-aligned-bottom
       ]])
 
 (defn pricing
   "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
   [options]
-  [:div
+  [:div.pricing-wrap
     {:id "wrap"}
     [:div.main.pricing
       [:section.pricing-header
-        ;; Top left
-        [:div.balloon.big-red]
-        [:div.balloon.big-green]
-        [:div.balloon.small-blue]
-        [:div.balloon.big-purple]
-
         [:h1.pricing-headline
           "Pricing guide"]
 
-        [:div.pricing-block.group
-          [:div.pricing-block-column.free-column
-            [:div.price-column-title
-              "Free"]
-            [:div.price-column-price
-              "0"]
-            [:div.price-column-description
-              "Free for small teams for an unlimited period of time"]
-            [:button.mlb-reset.price-button
-              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Free'});"}
-              "Create a digest"]]
+        [:table.pricing-table.big-web-only
+          [:thead
+            [:tr
+              [:th]
+              [:th
+                [:div.tire-title
+                  "Free"]
+                [:div.tire-price
+                  "$0"]
+                [:button.mlb-reset.price-button
+                  "Get started"]]
+              [:th
+                [:div.tire-title
+                  "Team"]
+                [:div.tire-price
+                  "$45"
+                  [:span.per-month
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]
+              [:th
+                [:div.tire-title
+                  "Enterprise"]
+                [:div.tire-price
+                  "$125"
+                  [:span.per-month
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Number of users included"]
+              [:td.pricing-value
+                "10"]
+              [:td.pricing-value
+                "25"]
+              [:td.pricing-value
+                "50"]]
 
-          [:div.pricing-block-column.standard-column
-            [:div.price-column-title
-              "Standard"]
-            [:div.price-column-price
-              "8"]
-            [:div.price-column-description
-              "Per contributor per month billed annually"]
-            [:div.price-column-description.second-line
-              "Or $10 billed monthly"]
-            [:div.price-column-description.more-info
-              "Viewers are always free"]
-            [:button.mlb-reset.price-button
-              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Standard'});"}
-              "Buy standard"]]
+            [:tr
+              [:td.pricing-description
+                "Additional users"]
+              [:td.pricing-value
+                "—"]
+              [:td.pricing-value
+                "—"]
+              [:td.pricing-value
+                "$2 per user"]]
 
-          [:div.pricing-block-column.plus-column
-            [:div.price-column-title
-              "Plus"]
-            [:div.price-column-price
-              "12"]
-            [:div.price-column-description
-              "Per contributor per month billed annually"]
-            [:div.price-column-description.second-line
-              "Or $14 billed monthly"]
-            [:div.price-column-description.more-info
-              "Viewers are always free"]
-            [:button.mlb-reset.price-button
-              {:onClick "CarrotGA.trackEvent({eventCategory: 'purchase-click', eventAction: 'click', eventLabel: 'Plus'});"}
-              "Buy plus"]]]
-        [:div.enterprise-block
-          [:span.enterprise-block-title
-            "Enterprise Edition"]
-          [:span.enterprise-block-copy
-            "Let’s create a plan that’s right for your organization."]
-          [:a.enterprise-block-link
-            {:href (:contact-mail-to options)}
-            "Contact us"]]]
-      [:section.second-section
-        [:h1.compare-plans
-          "Compare Plans"]
+            [:tr
+              [:td.pricing-description
+                "Number of new posts"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Number of new posts"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value
+                "50"]
+              [:td.pricing-value
+                "Unlimited"]
+              [:td.pricing-value
+                "Unlimited"]]
 
-        [:div.pricing-table
-          [:table
-            {:cellpadding "0"
-             :cellspacing "0"}
-            [:thead
-              [:tr
-                [:th]
-                [:th
-                  [:div
-                    "Free"]]
-                [:th
-                  [:div
-                    "Standard"]]
-                [:th
-                  [:div
-                    "Plus"]]]]
-            [:tbody
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Searchable posts"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Searchable posts"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td
-                  [:div "100"]]
-                [:td
-                  [:div "Unlimited"]]
-                [:td
-                  [:div "Unlimited"]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "History kept"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "History kept"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td
-                  [:div "Last 12 months"]]
-                [:td
-                  [:div "Unlimited"]]
-                [:td
-                  [:div "Unlimited"]]]
-              [:tr
-                [:td
-                  [:div "File storage"]]
-                [:td
-                  [:div "1 GB"]]
-                [:td
-                  [:div "10 GB"]]
-                [:td
-                  [:div "50 GB"]]]
-              [:tr
-                [:td
-                  [:div "File upload"]]
-                [:td
-                  [:div "25 MB"]]
-                [:td
-                  [:div "50 MB"]]
-                [:td
-                  [:div "100 MB"]]]
-              [:tr
-                [:td
-                  [:div "Slack single sign-on"]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Slack sync"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Slack sync"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Dropbox, Google Drive and other integrations"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Dropbox, Google Drive and other integrations"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "OAuth with Google"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "OAuth with Google"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Private and public visibility"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Private and public visibility"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div.more-info
-                    "Who read what"
-                    [:span.more-info-icon]
-                    [:div.more-info-bubble
-                      [:div.more-info-title
-                        "Who read what"]
-                      [:div.more-info-desc
-                        (str
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing "
-                          "elit. Vestibulum nisi augue, pharetra nec tempus ac, "
-                          "rhoncus eu felis. Sed tempus massa a ipsum commodo, sed condimentum.")]]]]
-                [:td]
-                [:td
-                  [:div.check]]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div "Analytics"]]
-                [:td]
-                [:td]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div "Priority support"]]
-                [:td]
-                [:td]
-                [:td
-                  [:div.check]]]
-              [:tr
-                [:td
-                  [:div "Uptime SLA"]]
-                [:td]
-                [:td]
-                [:td
-                  [:div.check]]]]]]]
+            [:tr
+              [:td.pricing-description
+                "History retained"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "History retained"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value
+                "6 months"]
+              [:td.pricing-value
+                "Unlimited"]
+              [:td.pricing-value
+                "Unlimited"]]
+
+            [:tr
+              [:td.pricing-description
+                "File upload"]
+              [:td.pricing-value
+                "25 MB"]
+              [:td.pricing-value
+                "Unlimited"]
+              [:td.pricing-value
+                "Unlimited"]]
+
+            [:tr
+              [:td.pricing-description
+                "File storage"]
+              [:td.pricing-value
+                "500 MB"]
+              [:td.pricing-value
+                "5 TB"]
+              [:td.pricing-value
+                "Unlimited"]]
+
+            [:tr
+              [:td.pricing-description
+                "G suite single sign-on"]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Slack single sign-on"]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Sync with Slack"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Sync with Slack"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Dropbox, Google Drive and other integrations"]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Advanced permissions"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Advanced permissions"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Priority support"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Priority support"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Analytics"]
+              [:td.pricing-value]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "Uptime SLA"]
+              [:td.pricing-value]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]]
+
+            [:tr
+              [:td.pricing-description
+                "On premise"]
+              [:td.pricing-value]
+              [:td.pricing-value]
+              [:td.pricing-value
+                [:div.price-checkmark]]]]
+          [:thead
+            [:tr
+              [:th]
+              [:th
+                [:div.tire-title
+                  "Free"]
+                [:button.mlb-reset.price-button
+                  "Get started"]]
+              [:th
+                [:div.tire-title
+                  "Team"]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]
+              [:th
+                [:div.tire-title
+                  "Enterprise"]
+                [:button.mlb-reset.price-button
+                  "Try for free"]]]]]
+
+        [:table.pricing-table.mobile-only
+          [:thead
+            [:tr
+              [:th
+                [:div.tire-title
+                  "FREE"]
+                [:div.tire-price
+                  [:span.dollar "$"]
+                  "0"]
+                [:button.mlb-reset.price-button
+                  "Get started"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Up to 10 users"]]
+            [:tr
+              [:td.pricing-description
+                "50 new post cap"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "50 new post cap"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "6 months of history retained"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "6 months of history retained"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "25 MB upload limit"]]
+            [:tr
+              [:td.pricing-description
+                "500 MB file storage"]]
+            [:tr
+              [:td.pricing-description
+                "G suite single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Slack single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Sync with Slack"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Sync with Slack"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "Dropbox, Google Drive, and other integrations"]]]]
+
+        [:table.pricing-table.mobile-only
+          [:thead
+            [:tr
+              [:th
+                [:div.tire-title
+                  "TEAM"]
+                [:div.tire-price
+                  [:span.dollar "$"]
+                  "45"
+                  [:span.per-month\
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Get started"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Up to 25 users"]]
+            [:tr
+              [:td.pricing-description
+                "Unlimited posts"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Unlimited posts"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "No history limit"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "No history limit"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "No file size upload limit"]]
+            [:tr
+              [:td.pricing-description
+                "5 TB file storage"]]
+            [:tr
+              [:td.pricing-description
+                "G suite single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Slack single sign-on"]]
+            [:tr
+              [:td.pricing-description
+                "Sync with Slack"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Sync with Slack"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "Dropbox, Google Drive, and other integrations"]]
+            [:tr
+              [:td.pricing-description
+                "Advanced permissions"]]
+            [:tr
+              [:td.pricing-description
+                "Priority support"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Priority support"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]]]
+
+        [:table.pricing-table.mobile-only
+          [:thead
+            [:tr
+              [:th
+                [:div.tire-title
+                  "ENTERPRISE"]
+                [:div.tire-price
+                  [:span.dollar "$"]
+                  "125"
+                  [:span.per-month\
+                    "per month"]]
+                [:button.mlb-reset.price-button
+                  "Get started"]]]]
+          [:tbody
+            [:tr
+              [:td.pricing-description
+                "Includes everthing in "
+                [:span.strong "team"]
+                " and:"]]
+            [:tr
+              [:td.pricing-description
+                "Up to 50 users"]]
+            [:tr
+              [:td.pricing-description
+                "$2 per additional user "]]
+            [:tr
+              [:td.pricing-description
+                "Analytics"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Analytics"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "Uptime SLA"
+                [:span.info
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Uptime SLA"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+            [:tr
+              [:td.pricing-description
+                "On premise"]]]]
+
+        ; [:div.pricing-faq
+        ;   [:h2.faq-header
+        ;     "Frequently asked questions"]
+
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "What are my payment options (credit card and/or invoicing)?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "My team has credits. How do we use them?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "We need to add new users to our team. How will that be billed?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "My team wasnts to cancel its subscription. How do we do that? Can we get a refund?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.faq-row
+        ;     [:div.faq-question
+        ;       "What are my payment options (credit card and/or invoicing)?"]
+        ;     [:div.faq-response
+        ;       (str
+        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
+        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
+        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
+        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
+        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
+        ;   [:div.contact-us-row
+        ;     "If you have more questions, don’t hesitate to "
+        ;     [:a.contact
+        ;       {:href oc-urls/contact-mail-to}
+        ;       "contact us"]]]
+        ]
 
       testimonials-section
 
-      keep-aligned
+      keep-aligned-bottom
     ]])
 
 (defn slack
   "Slack page. This is a copy of oc.web.components.slack and
    every change here should be reflected there and vice versa."
   [options]
-  [:div
+  [:div.slack-wrap
     {:id "wrap"}
-    [:div.main.slack.group
+    [:div.main.slack
+      ; Hope page header
       [:section.carrot-plus-slack.group
-        ;; Top Left
-        [:div.balloon.big-green]
-        [:div.balloon.small-purple]
-        [:div.balloon.small-yellow]
-        ;; Top Right
-        [:div.balloon.big-red]
-        [:div.balloon.small-yellow-face]
-        [:div.balloon.small-purple-1]
-        ;; Center Left
         [:div.balloon.big-blue]
-        [:div.balloon.small-purple-2]
         [:div.balloon.small-green]
-        [:div.balloon.big-purple]
-        [:div.balloon.small-red]
-
+        [:div.balloon.big-green]
+        [:div.balloon.small-purple-face]
+        [:div.balloon.big-yellow]
+        [:div.balloon.small-purple]
 
         [:div.carrot-plus-slack]
 
+        [:h3.slack
+          "Slack keeps your team connected in the moment."]
+
         [:h1.slack
-          "Rise above the noise"]
+          "Carrot keeps it aligned over time."]
 
         [:div.slack-subline
           (str
-           "Slack keeps your team connected in the moment. "
-           "Carrot keeps it aligned over time.")]
+           "Key updates and announcements get lost in fast-moving chat and stuffed inboxes. "
+           "Carrot makes it simple for Slack teams to stay aligned around what matters most.")]
 
-        [:div.sigin-with-slack-container
-          [:button.signin-with-slack.mlb-reset
-            {:onClick "javascript:window.location=\"/sign-up\";"}
-            "Sign up with"
-            [:div.slack-white-icon]]
-          [:div.signin-with-slack-disclaimer
-            [:div.signin-with-slack-description
-              "By signing in, you agree to the "
-              [:a
-                {:href "/terms"}
-                "Terms of Use"]
-              " and "
-              [:a
-                {:href "/privacy"}
-                "Privacy Policy."]]]]
+        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+        [:div.get-started-button-container
+          [:button.mlb-reset.signin-with-slack
+            {:id "get-started-centred-bt"}
+            [:span.slack-white-icon]
+            [:span.slack-copy "Add to Slack"]]]
+        no-credit-card
+        (carrot-box-thanks "carrot-box-thanks-top")
+        [:div.carrot-box-container.confirm-thanks.group
+          {:style {:display "none"}}
+          [:div.carrot-box-thanks
+            [:div.thanks-headline "You are Confirmed!"]
+            [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-        mobile-horizontal-carousell
+        [:div.main-animation-container
+          [:img.main-animation
+            {:src (cdn "/img/ML/slack_screenshot.png")
+             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
-        desktop-video        
+        core-values-list]
 
-        [:div.designed-for-container
-          [:div.designed-for
-            "Designed for Slack"]
-          [:div.designed-for-content
-            (str
-             "Slack is fun and awesome for real-time work, "
-             "but gets noisy. With Carrot, what matters most "
-             "rises above the noise to keep everyone "
-             "on the same page.")]]
+      (slack-comparison-section true)
 
-        carrot-cards]
+      keep-aligned-section
+
+      access-anywhere-section
 
       testimonials-section
 
-      [:section.keep-aligned
-        [:div.keep-aligned-title
-          "Keep everyone aligned around what matters most."]
-        [:div.sigin-with-slack-container
-          [:button.signin-with-slack.mlb-reset
-            {:onClick "javascript:window.location=\"/sign-up\";"}
-            "Sign up with"
-            [:div.slack-white-icon]]]]
-
-      ] ;<!-- main -->
-  ])
+      keep-aligned-bottom
+      ]])
 
 (defn about
   "About page. This is a copy of oc.web.components.about and
    every change here should be reflected there and vice versa."
   [options]
-  [:div
+  [:div.about-wrap
     {:id "wrap"}
     [:div.main.about
       [:section.about-header
-        [:div.balloon.big-red]
-        [:div.balloon.big-green]
-        [:div.balloon.small-green-face]
-        [:div.balloon.small-blue]
-        [:div.balloon.small-purple]
-        [:div.balloon.big-purple]
-        [:div.balloon.small-yellow]
-        [:div.balloon.big-yellow]
-        [:div.balloon.small-purple-1]
-        [:div.balloon.small-purple-2]
-        [:div.balloon.small-blue-1]
-
         [:h1.about "About us"]
         [:div.about-subline
           "We believe real transparency and alignment requires focused communication."]
@@ -682,7 +969,7 @@
               [:div.user-position
                 "Software Engineer"]
               [:a.linkedin-link
-                {:href "https://www.linkedin.com/in/iacopocarraro/"
+                {:href "https://linkedin.com/in/iacopocarraro/"
                  :target "_blank"}]]
             [:div.team-card.sean-johnson
               [:div.user-avatar]
@@ -693,6 +980,16 @@
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/snootymonkey/"
                  :target "_blank"}]]
+            [:div.team-card.georgiana-laudi
+              [:div.user-avatar]
+              [:div.user-name
+                "Georgiana Laudi"]
+              [:div.user-position
+                "Marketing and CX Advisor"]
+              [:a.linkedin-link
+                {:href "https://linkedin.com/in/georgianalaudi/"
+                 :target "_blank"}]]]
+          [:div.team-row.group.three-cards
             [:div.team-card.stuart-levinson
               [:div.user-avatar]
               [:div.user-name
@@ -701,16 +998,15 @@
                 "CEO and co-founder"]
               [:a.linkedin-link
                 {:href "https://linkedin.com/in/stuartlevinson/"
-                 :target "_blank"}]]]
-          [:div.team-row.group.two-cards
+                 :target "_blank"}]]
             [:div.team-card.ryan-le-roux
               [:div.user-avatar]
               [:div.user-name
                 "Ryan Le Roux"]
               [:div.user-position
-                "CDO"]
+                "Chief Design Officer"]
               [:a.linkedin-link
-                {:href "https://www.linkedin.com/in/ryanleroux/"
+                {:href "https://linkedin.com/in/ryanleroux/"
                  :target "_blank"}]]
             [:div.team-card.nathan-zorn
               [:div.user-avatar]
@@ -719,7 +1015,7 @@
               [:div.user-position
                 "Software Engineer"]
               [:a.linkedin-link
-                {:href "https://www.linkedin.com/in/nathanzorn/"
+                {:href "https://linkedin.com/in/nathanzorn/"
                  :target "_blank"}]]]]
 
         [:div.other-cards.group
@@ -792,20 +1088,14 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot | Company digest"]
+          [:title "Carrot | Leadership communication for growing and distributed teams"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
-          ;; Bootstrap CSS //getbootstrap.com/
-          [:link
-            {:rel "stylesheet"
-             :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-             :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-             :crossorigin "anonymous"}]
+          bootstrap-css
           ;; Normalize.css //necolas.github.io/normalize.css/
           ;; TODO inline this into app.main.css
           [:link {:rel "stylesheet" :href "/css/normalize.css"}]
-          ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          font-awesome
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; jQuery UI CSS
@@ -833,14 +1123,17 @@
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
-          [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]]
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
+          ;; Ziggeo
+          ziggeo-css
+          ziggeo-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
                 [:div.oc-loading-body]]]]
-          [:div#oc-error-banner]
+          [:div#oc-notifications-container]
           [:div#oc-loading]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
@@ -849,10 +1142,8 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
-          ;; JWT decode library
-          [:script {:src "/lib/jwt_decode/jwt-decode.min.js" :type "text/javascript"}]
           ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          jquery
           ;; Truncate html string
           [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
           ;; Rangy
@@ -871,12 +1162,7 @@
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
-          ;; Bootstrap JavaScript //getf.com/
-          [:script
-            {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-             :type "text/javascript"
-             :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-             :crossorigin "anonymous"}]
+          bootstrap-js
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
@@ -904,17 +1190,11 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot | Company digest"]
+          [:title "Carrot | Leadership communication for growing and distributed teams"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
-          ;; Bootstrap CSS //getbootstrap.com/
-          [:link
-            {:rel "stylesheet"
-             :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-             :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-             :crossorigin "anonymous"}]
-          ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
-          [:link {:rel "stylesheet" :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}]
+          bootstrap-css
+          font-awesome
           ;; jQuery UI CSS
           [:link
             {:rel "stylesheet"
@@ -926,17 +1206,20 @@
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+          jquery
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
-          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
+          ;; Ziggeo
+          ziggeo-css
+          ziggeo-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active
               [:div.oc-loading-inner
                 [:div.oc-loading-heart]
                 [:div.oc-loading-body]]]]
-          [:div#oc-error-banner]
+          [:div#oc-notifications-container]
           [:div#oc-loading]
           ;; Static js files
           [:script {:src (cdn "/js/static-js.js")}]
@@ -950,16 +1233,13 @@
           [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
-          ;; Bootstrap JavaScript //getf.com/
-          [:script
-            {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-             :type "text/javascript"
-             :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-             :crossorigin "anonymous"}]
+          bootstrap-js
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
           ;; Compiled oc.min.js from our CDN
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]
+          (when (= (env :fullstory) "true")
+            (fullstory-init))
           (google-analytics-init)]})

@@ -2,8 +2,13 @@
   background-color: transparent;
 
   @include mobile() {
-    height: 70px;
-    padding: 24px;
+    height: 56px;
+    padding: 16px 32px;
+    border-top: 1px solid #ECECEC;
+
+    &:last-child {
+      border-bottom: 1px solid #ECECEC;
+    }
 
     &:not(:last-child) {
       position: relative;
@@ -20,28 +25,28 @@
   }
 
   .internal {
-    @include avenir_M();
-    font-size: 16px;
-    line-height: 1.71;
+    @include avenir_R();
+    font-size: 14px;
+    line-height: 25px;
     color: $ui_grey;
     text-decoration: none;
 
     &.new {
-      @include avenir_M();
+      @include avenir_H();
       color: $deep_navy;
     }
   }
 
   div.drafts-label {
-    @include avenir_M();
-    font-size: 16px;
-    line-height: 1.71;
+    @include avenir_R();
+    font-size: 14px;
+    line-height: 25px;
     color: $ui_grey;
     text-decoration: none;
 
     span.count {
       @include avenir_M();
-      font-size: 16px;
+      font-size: 14px;
       color: #C5C6C8;
     }
 
@@ -52,49 +57,71 @@
 
   div.all-posts-label {
     @include avenir_H();
-    font-size: 16px;
-    line-height: 1.71;
+    font-size: 14px;
+    line-height: 25px;
     color: $deep_navy;
     text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    span.count {
-      @include avenir_M();
-      font-size: 16px;
-      color: #C5C6C8;
-    }
+  div.must-see-label {
+    @include avenir_R();
+    font-size: 14px;
+    line-height: 25px;
+    color: $ui_grey;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
 @mixin item-selected() {
-  background-color: $feint_emerald;
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
+  background-color: #E4FAEF;
+  border-radius: 6px;
 
   @include mobile() {
     border-radius: 0px;
   }
 
-  .internal, div.all-posts-label, div.drafts-label {
+  .internal, div.all-posts-label, div.drafts-label, div.must-see-label {
     color: $carrot_green;
-    @include avenir_M();
-    font-size: 16px;
-    line-height: 1.71;
+    @include avenir_H();
+    font-size: 14px;
+    line-height: 25px;
     text-decoration: none;
+
+    @include mobile() {
+      @include avenir_H();
+      font-size: 14px;
+    }
 
     span.count {
       color: $carrot_green;
+
+      @include mobile() {
+        @include avenir_H();
+        font-size: 14px;
+      }
     }
   }
 
-  div.all-posts-label {
+  div.all-posts-label, div.drafts-label, div.must-see-label {
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  div.all-posts-label, div.must-see-label {
     @include avenir_H();
+    text-decoration: none;
   }
 }
 
 @mixin item-hover(){
-  background-color: rgba($carrot_light_gray_4, 0.2);
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
+  background-color: #EFF0ED;
+  border-radius: 6px;
 
   @include mobile() {
     background-color: transparent;
@@ -102,21 +129,33 @@
   }
 
   .internal {
+    color: $ui_grey;
+    @include avenir_R();
+    font-size: 14px;
+    line-height: 25px;
+    text-decoration: none;
+
+    @include mobile() {
+      @include avenir_M();
+    }
+
+    &.new {
+      @include avenir_H();
+      color: $deep_navy;
+    }
+  }
+
+  div.all-posts-label {
     color: $deep_navy;
-    @include avenir_M();
-    font-size: 16px;
-    line-height: 1.71;
+    font-size: 14px;
+    line-height: 25px;
     text-decoration: none;
   }
 
-  div.public, div.private, div.all-posts-icon {
-    opacity: 1;
-  }
-
-  div.all-posts-label, div.drafts-label {
-    color: $deep_navy;
-    font-size: 16px;
-    line-height: 1.71;
+  div.drafts-label, div.must-see-label {
+    color: $ui_grey;
+    font-size: 14px;
+    line-height: 25px;
     text-decoration: none;
   }
 }
@@ -124,19 +163,18 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - 122px);
+  max-height: calc(100vh - 96px);
   overflow-y: auto;
   overflow-x: visible;
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 118px;
-  left: 0px;
-  height: calc(100vh - 118px);
+  top: 96px;
+  height: calc(100vh - 80px);
   @include no-user-select();
 
   @include mobile() {
     position: absolute;
-    margin-top: 65px;
+    margin-top: 56px;
     top: 0px;
     left: 0px;
     width: 100%;
@@ -154,36 +192,82 @@ div.left-navigation-sidebar {
     }
   }
 
+  div.mobile-board-name-container {
+    position: relative;
+    display: none;
+
+    @include mobile() {
+      display: block;
+      height: 48px;
+      padding: 15px;
+      background-color: white;
+      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+      border-top: 1px solid $light_tan;
+      @include avenir_H();
+      font-size: 15px;
+      color: $deep_navy;
+
+      &:before {
+        display: block;
+        content: "";
+        width: 14px;
+        height: 8px;
+        background-image: cdnUrl("/img/ML/section_chevron.svg");
+        background-size: 14px 8px;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: absolute;
+        top: 21px;
+        left: 28px;
+        transform: rotate(180deg);
+      }
+      
+      div.board-name {
+        max-width: 350px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+        @include mobile() {
+          margin: 0 auto;
+          text-align: center;
+        }
+      }
+    }
+  }
+
   div.left-navigation-sidebar-content {
     padding-bottom: 32px;
+    width: #{$left_navigation_sidebar_width}px;
 
     @include mobile() {
       position: relative;
       padding-bottom: 0px;
       background-color: white;
+      width: 100%;
     }
   }
 
   a.all-posts {
-    margin-bottom: 40px;
+    margin-bottom: 0px;
+  }
 
-    @include mobile() {
-      margin-bottom: 0px;
-    }
+  a.must-see {
+    margin-bottom: 16px;
 
     &.showing-drafts {
       margin-bottom: 0px;
     }
   }
 
-  a.all-posts, a.drafts {
+  a.all-posts, a.drafts, a.must-see {
     display: block;
     background-color: transparent;
     border: none;
     outline: none;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
-    padding-left: 32px;
+    padding-left: 16px;
 
     @include mobile() {
       padding-left: 0px;
@@ -197,7 +281,7 @@ div.left-navigation-sidebar {
       }
 
       @include big_web() {
-        &:not(.item-selected):hover {
+        &:not(.item-selected):hover, &:not(.item-selected):active {
           @include item-hover();
         }
       }
@@ -207,11 +291,12 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-posts-label, div.drafts-label {
-      padding: 7px 5px 2px 5px;
+    div.all-posts-label, div.drafts-label, div.must-see-label {
+      padding: 2px 0px 0px 16px;
       width: 148px;
       text-align: left;
       margin-left: 16px;
+      text-decoration: none;
 
       @include mobile() {
         margin-left: 34px;
@@ -222,28 +307,55 @@ div.left-navigation-sidebar {
 
     div.all-posts-icon {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
-      background-size: 18px 18px;
-      width: 18px;
-      height: 18px;
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: center 4px;
+      width: 16px;
+      height: 28px;
       float: left;
-      margin-left: -4px;
-      margin-top: 8px;
 
       @include mobile() {
         margin-left: 0px;
-        margin-top: 3px;
+        margin-top: 0px;
+        background-position: center 2px;
         opacity: 1;
       }
+      
+      @include preload_image(cdnUrl("/img/ML/digest_icon_green.svg"));
 
       &.selected {
         opacity: 1;
         background-image: cdnUrl("/img/ML/digest_icon_green.svg");
       }
     }
+
+    div.must-see-icon {
+      background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+      background-size: 13px 16px;
+      background-position: center 4px;
+      background-repeat: no-repeat;
+      width: 16px;
+      height: 28px;
+      float: left;
+
+      @include preload_image(cdnUrl("/img/ML/must_see_bolt_green.svg"));
+
+      @include mobile() {
+        margin-left: 0px;
+        margin-top: 0px;
+        background-position: center 2px;
+        opacity: 1;
+      }
+
+      &.selected {
+        opacity: 1;
+        background-image: cdnUrl("/img/ML/must_see_bolt_green.svg");
+      }
+    }
   }
 
   a.drafts {
-    margin-bottom: 40px;
+    margin-bottom: 16px;
 
     @include mobile() {
       margin-bottom: 0px;
@@ -260,16 +372,20 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-top{
 
+    @include mobile() {
+      border-top: 1px solid #ECECEC;
+    }
+
     .left-navigation-sidebar-top-title {
-      padding: 0px 0 0px 32px;
+      padding: 0px 0px 0px 48px;
       margin: 0;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
 
       @include mobile() {
         background-color: $oc_gray_8;
-        height: 40px;
+        height: 56px;
         width: 100%;
-        padding: 13px 24px 13px 58px;
+        padding: 16px 32px;
         margin-bottom: 0px;
       }
 
@@ -279,10 +395,10 @@ div.left-navigation-sidebar {
         color: $light_ui_grey;
         float: left;
         cursor: default;
-        margin-left: 21px;
 
         @include mobile() {
-          margin-left: 0px;
+          margin-left: 34px;
+          margin-top: 7px;
         }
       }
 
@@ -315,6 +431,8 @@ div.left-navigation-sidebar {
       border-radius: 10px;
       @include avenir_H();
 
+      @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
+
       &:hover, &.active {
         background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
         background-color: $carrot_green_2;
@@ -339,8 +457,13 @@ div.left-navigation-sidebar {
       cursor: default;
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
-      padding-left: 24px;
+      padding-left: 16px;
       margin: 0;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: none;
+      }
 
       @include mobile() {
         padding-left: 0px;
@@ -365,7 +488,7 @@ div.left-navigation-sidebar {
         }
 
         @include big_web() {
-          &:not(.item-selected):hover {
+          &:not(.item-selected):hover, &:not(.item-selected):active {
             @include item-hover();
           }
         }
@@ -377,17 +500,16 @@ div.left-navigation-sidebar {
 
       div.public {
         float: left;
-        margin-left: 8px;
-        margin-top: 10px;
-        width: 12px;
-        height: 12px;
+        width: 16px;
+        height: 28px;
         background-image: cdnUrl("/img/ML/board_public.svg");
         background-size: 12px 12px;
-        opacity: 0.5;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        @include preload_image(cdnUrl("/img/ML/board_public_green.svg"));
 
         @include mobile() {
-          margin-left: 4px;
-          margin-top: 6px;
           opacity: 1;
         }
 
@@ -397,19 +519,18 @@ div.left-navigation-sidebar {
         }
       }
 
-      div.private{
+      div.private {
         float: left;
-        margin-left: 9px;
-        margin-top: 9px;
-        width: 9px;
-        height: 11px;
+        width: 16px;
+        height: 28px;
         background-image: cdnUrl("/img/ML/board_private.svg");
         background-size: 9px 11px;
-        opacity: 0.5;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        @include preload_image(cdnUrl("/img/ML/board_private_green.svg"));
 
         @include mobile() {
-          margin-left: 4px;
-          margin-top: 6px;
           opacity: 1;
         }
 
@@ -420,25 +541,10 @@ div.left-navigation-sidebar {
       }
 
       div.board-name {
-        margin-left: 24px;
-
-        @include mobile() {
-
-          &.team-board {
-            margin-left: 32px;
-          }
-
-          &.private-board {
-            margin-left: 24px;
-          }
-
-          &.public-board {
-            margin-left: 24px;
-          }
-        }
+        margin-left: 32px;
 
         div.internal {
-          padding: 4px 5px 1px 4px;
+          padding: 3px 0px 0px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -448,12 +554,7 @@ div.left-navigation-sidebar {
 
           @include mobile() {
             width: auto;
-            padding: 0px 0px 0px 2px;
             margin-left: 0px;
-
-            &.has-icon {
-              margin-left: 8px;
-            }
           }
 
           .emojione {
@@ -465,9 +566,9 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-footer {
-    margin-left: 20px;
+    margin-left: 16px;
     position: relative;
-    bottom: 16px;
+    padding-bottom: 23px;
 
     @include mobile() {
       // Temp remove bottom links on mobile
@@ -482,9 +583,87 @@ div.left-navigation-sidebar {
       }
     }
 
+    &.navigation-sidebar-overflow {
+      position: absolute;
+      bottom: 23px;
+      padding-bottom: 0px;
+    }
+
+    div.invite-people-tooltip-container {
+      border: 2px dashed $carrot_gold;
+      background-color: #FDF6E4;
+      border-radius: 6px;
+      padding: 32px 16px;
+      margin: 0px 0px 16px 7px;
+      position: relative;
+      width: 192px;
+
+      @include tablet() {
+        display: none;
+      }
+
+      button.invite-people-tooltip-dismiss {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 30px;
+        height: 30px;
+        background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        @include tablet() {
+          top: 16px;
+          left: 16px;
+        }
+      }
+
+      div.invite-people-tooltip-icon {
+        background-image: cdnUrl("/img/ML/happy_face_green.svg");
+        background-size: 48px 48px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 48px;
+        height: 48px;
+        margin: 0px auto;
+      }
+
+      div.invite-people-tooltip-title {
+        @include avenir_H();
+        font-size: 14px;
+        color: $deep_navy;
+        width: 100%;
+        margin: 24px auto 0px;
+        text-align: center;
+        max-width: 146px;
+      }
+
+      div.invite-people-tooltip-description {
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        width: 100%;
+        margin: 8px auto 0px;
+        text-align: center;
+      }
+
+      div.invite-people-tooltip-arrow {
+        background-image: cdnUrl("/img/ML/invite_people_tooltip_arrow.svg");
+        background-size: 20px 38px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 20px;
+        height: 38px;
+        margin: 8px auto 0px;
+      }
+    }
+
     button.about-carrot-btn {
       @include avenir_M();
       margin-top: 4px;
+      width: 100%;
+      text-align: left;
 
       &:hover {
         text-decoration: underline;
@@ -510,7 +689,7 @@ div.left-navigation-sidebar {
 
       span {
         font-size: 14px;
-        line-height: 1.71;
+        line-height: 25px;
         color: $ui_grey;
         margin-left: 5px;
 
@@ -522,6 +701,10 @@ div.left-navigation-sidebar {
 
     button.invite-people-btn {
       @include avenir_M();
+      width: 100%;
+      text-align: left;
+      padding: 2px 0px;
+      height: 28px;
 
       &:hover {
         text-decoration: underline;
@@ -531,12 +714,10 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/invite_people.svg");
         background-size: 16px auto;
         background-repeat: no-repeat;
-        background-position: center;
+        background-position: center 5px;
         width: 16px;
-        height: 16px;
-        margin-right: 5px;
+        height: 28px;
         float: left;
-        margin-top: 1px;
         opacity: 0.6;
 
         @include mobile() {
@@ -546,9 +727,11 @@ div.left-navigation-sidebar {
 
       span {
         font-size: 14px;
-        line-height: 1.71;
+        line-height: 28px;
         color: $ui_grey;
-        margin-left: 5px;
+        display: block;
+        float: left;
+        margin-left: 16px;
 
         @include mobile() {
           color: white;

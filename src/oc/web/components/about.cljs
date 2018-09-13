@@ -26,18 +26,6 @@
 
       [:div.main.about
         [:section.about-header.group
-          [:div.balloon.big-red]
-          [:div.balloon.big-green]
-          [:div.balloon.small-green-face]
-          [:div.balloon.small-blue]
-          [:div.balloon.small-purple]
-          [:div.balloon.big-purple]
-          [:div.balloon.small-yellow]
-          [:div.balloon.big-yellow]
-          [:div.balloon.small-purple-1]
-          [:div.balloon.small-purple-2]
-          [:div.balloon.small-blue-1]
-
           [:h1.about "About us"]
           [:div.about-subline
             "We believe real transparency and alignment requires focused communication."]
@@ -77,7 +65,7 @@
                 [:div.user-position
                   "Software Engineer"]
                 [:a.linkedin-link
-                  {:href "https://www.linkedin.com/in/iacopocarraro/"
+                  {:href "https://linkedin.com/in/iacopocarraro/"
                    :target "_blank"}]]
               [:div.team-card.sean-johnson
                 [:div.user-avatar]
@@ -88,6 +76,16 @@
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/snootymonkey/"
                    :target "_blank"}]]
+              [:div.team-card.georgiana-laudi
+                [:div.user-avatar]
+                [:div.user-name
+                  "Georgiana Laudi"]
+                [:div.user-position
+                  "Marketing and CX Advisor"]
+                [:a.linkedin-link
+                  {:href "https://linkedin.com/in/georgianalaudi/"
+                   :target "_blank"}]]]
+            [:div.team-row.group.two-cards
               [:div.team-card.stuart-levinson
                 [:div.user-avatar]
                 [:div.user-name
@@ -96,16 +94,15 @@
                   "CEO and co-founder"]
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/stuartlevinson/"
-                   :target "_blank"}]]]
-            [:div.team-row.group.two-cards
+                   :target "_blank"}]]
               [:div.team-card.ryan-le-roux
                 [:div.user-avatar]
                 [:div.user-name
                   "Ryan Le Roux"]
                 [:div.user-position
-                  "CDO"]
+                  "Chief Design Officer"]
                 [:a.linkedin-link
-                  {:href "https://www.linkedin.com/in/ryanleroux/"
+                  {:href "https://linkedin.com/in/ryanleroux/"
                    :target "_blank"}]]
               [:div.team-card.nathan-zorn
                 [:div.user-avatar]
@@ -114,7 +111,7 @@
                 [:div.user-position
                   "Software Engineer"]
                 [:a.linkedin-link
-                  {:href "https://www.linkedin.com/in/nathanzorn/"
+                  {:href "https://linkedin.com/in/nathanzorn/"
                    :target "_blank"}]]]]
 
           [:div.other-cards.group

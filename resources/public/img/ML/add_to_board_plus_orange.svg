@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Video-/-GA" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Stream:-new-button" transform="translate(-937.000000, -102.000000)" fill="#FA6654">
+            <g id="Group-4" transform="translate(758.000000, 88.000000)">
+                <g id="Group" transform="translate(179.000000, 9.000000)">
+                    <path d="M4.8,9.8 L4.8,6.19447708 C4.8,5.53478561 5.33263779,5 6,5 C6.6627417,5 7.2,5.53892743 7.2,6.19447708 L7.2,9.8 L10.8055229,9.8 C11.4652144,9.8 12,10.3326378 12,11 C12,11.6627417 11.4610726,12.2 10.8055229,12.2 L7.2,12.2 L7.2,15.8055229 C7.2,16.4652144 6.66736221,17 6,17 C5.3372583,17 4.8,16.4610726 4.8,15.8055229 L4.8,12.2 L1.19447708,12.2 C0.534785605,12.2 0,11.6673622 0,11 C0,10.3372583 0.538927428,9.8 1.19447708,9.8 L4.8,9.8 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

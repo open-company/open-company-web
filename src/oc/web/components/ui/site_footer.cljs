@@ -8,29 +8,17 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]))
 
-(rum/defc bottom-footer
-  [container-class]
-  [:div
-    {:class container-class}
-    [:div.small-logos
-      [:a.twitter
-        {:target "_blank" :href oc-urls/oc-twitter :title "Carrot on Twitter"}
-        [:img {:src (utils/cdn "/img/ML/home_page_twitter.svg")}]]
-      [:a.medium
-        {:target "_blank" :href oc-urls/blog :title "Carrot on Medium"}
-        [:img {:src (utils/cdn "/img/ML/home_page_medium.svg")}]]]
-    [:div.copyright "© Copyright 2017. All rights reserved"]])
-
 (defn navigate-to-your-digest [your-digest-url]
   (router/redirect! your-digest-url))
 
 (rum/defcs site-footer  < (rum/local nil ::expanded)
   [s]
-  ;; <!-- footer -->
   [:footer.navbar.navbar-default.navbar-bottom
+    {:class (when (utils/in? (:route @router/path) "slack-lander") "light-background")}
     [:div.container-fluid.group
-
-      [:div.right-column
+      [:div.footer-balloon.big-green]
+      [:div.footer-balloon.small-purple]
+      [:div.right-column.group
 
         [:div.column.column-company
           {:class (when (= @(::expanded s) :company) "expanded")}
@@ -39,11 +27,12 @@
                           (if (= @(::expanded s) :company)
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :company)))}
-            "COMPANY"]
+            "Company"]
           [:div.column-item [:a {:href oc-urls/home-no-redirect} "Home"]]
           [:div.column-item [:a {:href oc-urls/about} "About"]]
           [:div.column-item [:a {:href oc-urls/pricing} "Pricing"]]
-          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]]
+          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
+          [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]]
 
         [:div.column.column-resources
           {:class (when (= @(::expanded s) :resources) "expanded")}
@@ -52,10 +41,10 @@
                           (if (= @(::expanded s) :resources)
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :resources)))}
-            "RESOURCES"]
+            "Resources"]
           [:div.column-item [:a {:href oc-urls/oc-github :target "_blank"} "GitHub"]]
-          [:div.column-item [:a {:href oc-urls/privacy} "Privacy Policy"]]
-          [:div.column-item [:a {:href oc-urls/terms} "Terms of Use"]]]
+          [:div.column-item [:a {:href oc-urls/privacy} "Privacy"]]
+          [:div.column-item [:a {:href oc-urls/terms} "Terms"]]]
 
         [:div.column.column-support
           {:class (when (= @(::expanded s) :support) "expanded")}
@@ -64,9 +53,9 @@
                           (if (= @(::expanded s) :support)
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :support)))}
-            "SUPPORT"]
+            "Support"]
           [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
-          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          ; [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
           [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
 
         [:div.column.column-integrations
@@ -76,25 +65,23 @@
                           (if (= @(::expanded s) :integrations)
                             (reset! (::expanded s) nil)
                             (reset! (::expanded s) :integrations)))}
-            "INTEGRATIONS"]
+            "Integrations"]
           [:div.column-item [:a {:href oc-urls/slack} "Slack"]]]]
-
-      [:div.left-column
+      [:div.left-column.group
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
+        [:div.footer-communication-copy
+          "Leadership communication for growing and distributed teams."]
         (when-not (jwt/jwt)
           [:div.footer-small-links
             [:a
               {:href oc-urls/sign-up
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/sign-up))}
-              "Get Started"]
+              "Get started for free"]
             "or"
             [:a
               {:href oc-urls/login
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
-              "Log in"]])
-        (when-not (responsive/is-mobile-size?)
-          (bottom-footer "big-web-footer"))]
-
-        (when (responsive/is-mobile-size?)
-          (bottom-footer "mobile-footer"))]])
+              "Login"]])
+        [:div.copyright
+          "Copyright © 2018 Carrot. All rights reserved"]]]])

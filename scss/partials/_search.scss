@@ -3,10 +3,12 @@ div.search-box {
 
   @include mobile() {
     display: inline;
-    width: 40px;
+    width: auto;
     min-height: 40px;
+    margin-left: 24px;
 
     &.active {
+      margin-left: 0px;
       position: absolute;
       min-width: 160px;
       width: 100vw;
@@ -15,7 +17,7 @@ div.search-box {
       left: 0px;
       background-color: white;
       z-index: 1081;
-      padding: 24px;
+      padding: 14px 24px;
     }
   }
 
@@ -80,7 +82,7 @@ div.search-results.inactive {
 
 div.triangle {
   position: absolute;
-  top: 82px;
+  top: 67px;
   left: 96px;
   background-color: white;
   border-top: 1px solid rgba(177,184,192,0.50);
@@ -101,7 +103,7 @@ div.search-results {
   border: 1px solid rgba(177,184,192,0.50);
   border-radius: 5px;
 
-  margin: 41px 0px 0px 45px;
+  margin: 31px 0px 0px 45px;
   width: 450px;
   box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
 

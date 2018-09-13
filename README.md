@@ -1,6 +1,5 @@
 # [OpenCompany](https://github.com/open-company) Web Application
 
-[![MPL License](http://img.shields.io/badge/license-MPL-blue.svg?style=flat)](https://www.mozilla.org/MPL/2.0/)
 [![Build Status](https://travis-ci.org/open-company/open-company-web.svg?branch=master)](https://travis-ci.org/open-company/open-company-web)
 
 ## Background
@@ -9,19 +8,13 @@
 
 > -- [John Gerzema](http://www.johngerzema.com/)
 
-Companies struggle to keep everyone on the same page. People are hyper-connected in the moment but still don’t know what’s happening across the company. Employees and investors, co-founders and execs, customers and community, they all want more transparency. The solution is surprisingly simple and effective - great company updates that build transparency and alignment.
+Teams struggle to keep everyone on the same page. People are hyper-connected in the moment with chat and email, but it gets noisy as teams grow, and people miss key information. Everyone needs clear and consistent leadership, and the solution is surprisingly simple and effective - **great leadership updates that build transparency and alignment**.
 
-With that in mind we designed the [Carrot](https://carrot.io/) software-as-a-service application, powered by the open source [OpenCompany platform](https://github.com/open-company). The product design is based on three principles:
+With that in mind we designed [Carrot](https://carrot.io/), a software-as-a-service application powered by the open source [OpenCompany platform](https://github.com/open-company) and a source-available [web UI](https://github.com/open-company/open-company-web).
 
-1. It has to be easy or no one will play.
-2. The "big picture" should always be visible.
-3. Alignment is valuable beyond the team, too.
+With Carrot, important company updates, announcements, stories, and strategic plans create focused, topic-based conversations that keep everyone aligned without interruptions. When information is shared transparently, it inspires trust, new ideas and new levels of stakeholder engagement. Carrot makes it easy for leaders to engage with employees, investors, and customers, creating alignment for everyone.
 
-Carrot simplifies how key business information is shared with stakeholders to create alignment. When information about growth, finances, ownership and challenges is shared transparently, it inspires trust, new ideas and new levels of stakeholder engagement. Carrot makes it easy for founders to engage with employees and investors, creating alignment for everyone.
-
-[Carrot](https://carrot.io/) is GitHub for the rest of your company.
-
-Transparency expectations are changing. Organizations need to change as well if they are going to attract and retain savvy employees and investors. Just as open source changed the way we build software, transparency changes how we build successful companies with information that is open, interactive, and always accessible. Carrot turns transparency into a competitive advantage.
+Transparency expectations are changing. Organizations need to change as well if they are going to attract and retain savvy teams, investors and customers. Just as open source changed the way we build software, transparency changes how we build successful companies with information that is open, interactive, and always accessible. Carrot turns transparency into a competitive advantage.
 
 To get started, head to: [Carrot](https://carrot.io/)
 
@@ -89,10 +82,37 @@ Open your browser to [http://localhost:3559/](http://localhost:3559/).
 To create a **production** build run:
 
 ```console
-boot prod-build
+boot prod-build target
 ```
 
 Open `target/public/app-shell.html` in your browser. Using production rather than dev, you will not get the live reloading nor a REPL.
+
+To get a jetty server along with the production build:
+
+Download the google closure compiler.
+https://developers.google.com/closure/compiler/
+
+```console
+mkdir ~/closure_compiler
+mv <download location>/compiler_latest.zip ~/closure_compiler/
+cd ~/closure_compiler
+unzip compiler_latest.zip
+```
+
+```console
+boot dev-advanced target
+```
+
+```console
+script/compile_assets.sh <compiler version> ~/path/to/open-company-web localhost:3559
+cp ~/path/to/open-company-web/target/public/oc_assets.js* ~/path/to/open-company-way/resources/public/
+```
+
+#### Ziggeo media player and recorder development
+
+To change the Ziggeo video player and recorder you need to change [our fork](https://github.com/open-company/betajs-media-components) of [betajs/betajs-media-components](https://github.com/betajs/betajs-media-components).
+Once you changed everything you need you only need to run this `source script/local_ziggeo_dev.sh` to compile the ziggeo sdk and copy it here.
+Do not forget to commit the changes made to betajs-media-compoentns and the changed files here in oc-web.
 
 ### Project REPL
 
@@ -169,6 +189,8 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## License
 
-Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
+Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/) with the [Commons Clause](https://commonsclause.com/).
 
 Copyright © 2015-2018 OpenCompany, LLC.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [Commons Clause](https://commonsclause.com/) and the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/) for more details.

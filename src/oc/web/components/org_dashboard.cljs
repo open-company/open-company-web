@@ -4,10 +4,8 @@
             [taoensso.timbre :as timbre]
             [oc.web.lib.raven :as raven]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.stores.search :as search]
@@ -17,22 +15,25 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
+            [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-results-view)]
             [oc.web.components.fullscreen-post :refer (fullscreen-post)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
-            [oc.web.components.ui.onboard-overlay :refer (onboard-overlay)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
-            [oc.web.components.ui.whats-new-modal :refer (whats-new-modal)]
+            [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
-            [oc.web.components.ui.media-chart-modal :refer (media-chart-modal)]
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data [s]
@@ -41,16 +42,19 @@
      (let [{:keys [org-data
                    board-data
                    ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
-       (if (= (router/current-board-slug) "all-posts")
-         (do
-           (activity-actions/all-posts-get org-data ap-initial-at)
-           (utils/after 2000
-             #(section-actions/load-other-sections (:boards org-data))))
+       (cond
 
-         (let [fixed-board-data (or
-                                 board-data
-                                 (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
-           (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
+        (= (router/current-board-slug) "all-posts")
+        (activity-actions/all-posts-get org-data ap-initial-at)
+
+        (= (router/current-board-slug) "must-see")
+        (activity-actions/must-see-get org-data)
+
+        :default
+        (let [fixed-board-data (or
+                                board-data
+                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
+          (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
 
 (rum/defcs org-dashboard < ;; Mixins
                            rum/static
@@ -70,15 +74,15 @@
                               (utils/after 2500 #(router/redirect-500!))
                               (assoc s ::keep-loading true))}
   [s]
-  (let [{:keys [org-data
+  (let [{:keys [orgs
+                org-data
+                jwt
                 board-data
-                all-posts-data
-                nux
-                nux-loading
-                nux-end
+                container-data
+                posts-data
                 ap-initial-at
+                user-settings
                 org-settings-data
-                whats-new-modal-data
                 made-with-carrot-modal-data
                 is-entry-editing
                 is-sharing-activity
@@ -89,78 +93,114 @@
                 show-section-add
                 show-sections-picker
                 entry-editing-board-slug
-                mobile-navigation-sidebar]} (drv/react s :org-dashboard-data)
+                mobile-navigation-sidebar
+                activity-share-container
+                mobile-menu-open
+                show-cmail]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        should-show-onboard-overlay? (some #{nux} [:1 :2])
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
-                          (:results (drv/react s search/search-key))))]
+                          (:results (drv/react s search/search-key))))
+        loading? (or ;; There was an error
+                     (::keep-loading s)
+                     ;; the org data are not loaded yet
+                     (not org-data)
+                     ;; No board specified
+                     (and (not (router/current-board-slug))
+                          ;; but there are some
+                          (pos? (count (:boards org-data))))
+                     ;; Board specified
+                     (and (not= (router/current-board-slug) "all-posts")
+                          (not= (router/current-board-slug) "must-see")
+                          (not ap-initial-at)
+                          ;; But no board data yet
+                          (not board-data))
+                     ;; Another container
+                     (and (or (= (router/current-board-slug) "all-posts")
+                              (= (router/current-board-slug) "must-see")
+                              ap-initial-at)
+                          ;; But no all-posts data yet
+                         (not container-data)))
+        org-not-found (and orgs
+                           (not ((set (map :slug orgs)) (router/current-org-slug))))
+        section-not-found (and (not org-not-found)
+                               org-data
+
+                               (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
+        entry-not-found (and (not section-not-found)
+                             (or board-data
+                                 container-data)
+                             posts-data
+                             (not ((set (keys posts-data)) (router/current-activity-id))))
+        show-activity-not-found (and (not jwt)
+                                     (router/current-activity-id)
+                                     (or org-not-found
+                                         section-not-found
+                                         entry-not-found))
+        show-activity-removed (and jwt
+                                   (router/current-activity-id)
+                                   (or org-not-found
+                                       section-not-found
+                                       entry-not-found))
+        is-loading (and (not show-activity-not-found)
+                        (not show-activity-removed)
+                        loading?)]
     ;; Show loading if
-    (if (or ;; There was an error
-            (::keep-loading s)
-            ;; the org data are not loaded yet
-            (not org-data)
-            ;; No board specified
-            (and (not (router/current-board-slug))
-                 ;; but there are some
-                 (pos? (count (:boards org-data))))
-            ;; Board specified
-            (and (not= (router/current-board-slug) "all-posts")
-                 (not ap-initial-at)
-                 ;; But no board data yet
-                 (not board-data))
-            ;; All posts
-            (and (or (= (router/current-board-slug) "all-posts")
-                     ap-initial-at)
-                 ;; But no all-posts data yet
-                 (not all-posts-data))
-            ;; First ever user nux, not enough time
-            (and nux-loading
-                 (not nux-end)))
+    (if is-loading
       [:div.org-dashboard
-        (when should-show-onboard-overlay?
-          [:div.screenshots-preload
-            [:div.screenshot-preload.screenshot-1]
-            [:div.screenshot-preload.screenshot-2]])
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :modal-activity-view (router/current-activity-id)
                                   :mobile-or-tablet is-mobile?
+                                  :activity-not-found show-activity-not-found
+                                  :activity-removed show-activity-removed
                                   :no-scroll (and (not is-mobile?)
                                                   (router/current-activity-id))})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
+        (login-overlays-handler)
         (cond
-          should-show-onboard-overlay?
-          (onboard-overlay nux)
+          ;; Activity removed
+          show-activity-removed
+          (activity-removed)
+          ;; Activity not found
+          show-activity-not-found
+          (activity-not-found)
           ;; Org settings
           org-settings-data
           (org-settings)
-          ;; About carrot
-          whats-new-modal-data
-          (whats-new-modal)
+          ;; User settings
+          user-settings
+          (user-profile)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
           ;; Mobile create a new section
           (and is-mobile?
                show-section-editor)
-          (section-editor board-data #(section-actions/section-save (:section-editing s)))
+          (section-editor board-data
+           (fn [sec-data note]
+            (when sec-data
+              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-editor] false])))))
           ;; Mobile edit current section data
           (and is-mobile?
                show-section-add)
-          (section-editor nil #(dis/dispatch! [:input [:show-section-add] false]))
+          (section-editor nil
+           (fn [sec-data note]
+            (when sec-data
+              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-add] false])))))
           ;; Mobile sections picker
           (and is-mobile?
                show-sections-picker)
           (sections-picker entry-editing-board-slug
-            (fn [board-data]
+            (fn [board-data note]
              (dis/dispatch! [:input [:show-sections-picker] false])
              (when board-data
               (dis/dispatch! [:update [:entry-editing]
                #(merge % {:board-slug (:slug board-data)
-                          :board-name (:name board-data)})]))))
+                          :board-name (:name board-data)
+                          :invite-note note})]))))
           ;; Entry editing
           is-entry-editing
           (entry-edit)
@@ -178,28 +218,31 @@
           ;; Activity modal
           (and (router/current-activity-id)
                (not entry-edit-dissmissing))
-          (let [from-ap (:from-all-posts @router/path)
-                board-slug (if from-ap :all-posts (router/current-board-slug))]
-            (fullscreen-post)))
+          (fullscreen-post))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
-          (activity-share))
-        ;; Alert modal
-        (when is-showing-alert
-          (alert-modal))
+          ;; If we have an element id find the share container inside that element
+          ;; and portal the component to that element
+          (let [portal-element (when activity-share-container
+                                  (.get (.find (js/$ (str "#" activity-share-container))
+                                         ".activity-share-container") 0))]
+            (if portal-element
+              (rum/portal (activity-share) portal-element)
+              (activity-share))))
+        ;; cmail editor
+        (when show-cmail
+          (cmail))
         ;; Media video modal for entry editing
         (when (and media-input
                    (:media-video media-input))
           (media-video-modal))
-        ;; Media chart modal for entry editing
-        (when (and media-input
-                   (:media-chart media-input))
-          (media-chart-modal))
+        ;; Alert modal
+        (when is-showing-alert
+          (alert-modal))
         (when-not (and is-mobile?
                        (or (router/current-activity-id)
                            is-entry-editing
-                           should-show-onboard-overlay?
                            is-sharing-activity
                            show-section-add
                            show-section-editor))
@@ -208,6 +251,9 @@
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when-not (and is-mobile?
-                              (and search-active? search-results?)
-                              mobile-navigation-sidebar)
+                              (or (and search-active? search-results?)
+                                  mobile-navigation-sidebar
+                                  org-settings-data
+                                  user-settings
+                                  mobile-menu-open))
                  (dashboard-layout))]]])])))

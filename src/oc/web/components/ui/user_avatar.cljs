@@ -14,7 +14,8 @@
         user-avatar-url (if (or use-default (empty? (:avatar-url user-data)))
                          (utils/cdn default-avatar)
                          (:avatar-url user-data))]
-    [:div.user-avatar-img-container
+    [:div.user-avatar-img-container.fs-hide
+      {:data-user-id (:user-id user-data)}
       [:div.user-avatar-img-helper]
       [:img.user-avatar-img
         {:src user-avatar-url
@@ -22,6 +23,7 @@
          :data-toggle (if tooltip? "tooltip" "")
          :data-placement "top"
          :data-container "body"
+         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
          :title (if tooltip? (:name user-data) "")}]]))
 
 (rum/defcs user-avatar < rum/static

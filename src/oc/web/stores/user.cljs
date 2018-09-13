@@ -35,17 +35,28 @@
 
 ;; Auth Settings
 (defn auth-settings? []
-  (contains? @dispatcher/app-state :auth-settings))
+  (contains? @dispatcher/app-state (first dispatcher/auth-settings-key)))
+
+(defn auth-settings-status? []
+  (and (auth-settings?)
+       (contains? (dispatcher/auth-settings) :status)))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
   (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
     (assoc-in next-db dispatcher/auth-settings-key body)))
 
-(defn- with-fixed-avatar [user-data]
-  (if (empty? (:avatar-url user-data))
-    (merge user-data {:avatar-url (utils/cdn default-avatar-url true)})
-    user-data))
+(defn- fixed-avatar-url [avatar-url]
+  (if (empty? avatar-url)
+    (utils/cdn default-avatar-url true)
+    avatar-url))
+
+(def default-invite-type "email")
+
+(defn parse-user-data [user-data]
+  (-> user-data
+    (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
+    (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))))
 
 (defn- fix-user-values [user-data]
   (let [with-first-name (if (empty? (:first-name user-data))
@@ -66,15 +77,15 @@
         with-timezone (if (empty? (:timezone with-email))
                        (merge with-email {:timezone (or (.. js/moment -tz guess) "")})
                        with-email)
-        with-user-avatar (with-fixed-avatar with-timezone)
-        with-has-changes (assoc with-user-avatar :has-changes false)]
+        with-has-changes (assoc with-timezone :has-changes false)]
     with-has-changes))
 
 (defn update-user-data [db user-data]
-  (-> db
-      (assoc :current-user-data (with-fixed-avatar user-data))
-      (assoc :edit-user-profile (fix-user-values user-data))
-      (dissoc :edit-user-profile-failed)))
+  (let [fixed-user-data (parse-user-data user-data)]
+    (-> db
+        (assoc :current-user-data fixed-user-data)
+        (assoc :edit-user-profile (fix-user-values fixed-user-data))
+        (dissoc :edit-user-profile-failed))))
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]
@@ -151,20 +162,6 @@
   [db [_ jwt]]
   (assoc db :email-verification-success true))
 
-(defmethod dispatcher/action :name-pswd-collect
-  [db [_]]
-  (dissoc db :latest-entry-point :latest-auth-settings))
-
-(defmethod dispatcher/action :name-pswd-collect/finish
-  [db [_ status user-data]]
-  (if (and status
-           (>= status 200)
-           (<= status 299))
-    (do
-      (cook/remove-cookie! :show-login-overlay)
-      (dissoc (update-user-data db user-data) :show-login-overlay))
-    (assoc db :collect-name-password-error status)))
-
 (defmethod dispatcher/action :pswd-collect
   [db [_ password-reset?]]
   (-> db
@@ -193,8 +190,12 @@
 (defmethod dispatcher/action :user-profile-save
   [db [_]]
   (-> db
+      ;; Loading user data
       (assoc-in [:edit-user-profile :loading] true)
-      (dissoc :latest-entry-point :latest-auth-settings)))
+      ;; Force a refresh of entry-point and auth-settings
+      (dissoc :latest-entry-point :latest-auth-settings)
+      ;; Remove the new-slack-user flag to avoid redirecting to the profile again
+      (dissoc :new-slack-user)))
 
 (defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
@@ -222,13 +223,16 @@
   [db _]
   (dissoc db :jwt :latest-entry-point :latest-auth-settings))
 
+(defn orgs? []
+  (contains? @dispatcher/app-state dispatcher/orgs-key))
+
 ;; API entry point
 (defmethod dispatcher/action :entry-point
   [db [_ orgs collection]]
   (-> db
       (assoc :latest-entry-point (.getTime (js/Date.)))
       (dissoc :loading)
-      (assoc :orgs orgs)
+      (assoc dispatcher/orgs-key orgs)
       (assoc-in dispatcher/api-entry-point-key (:links collection))
       (dissoc :slack-lander-check-team-redirect :email-lander-check-team-redirect)))
 
@@ -239,10 +243,13 @@
       (assoc :email-confirmed confirmed)
       (dissoc :latest-entry-point :latest-auth-settings)))
 
-;; What's new get
-(defmethod dispatcher/action :whats-new/finish
-  [db [_ whats-new-data]]
-  (if whats-new-data
-    (let [fixed-whats-new-data (zipmap (map :uuid (:entries whats-new-data)) (:entries whats-new-data))]
-      (assoc-in db dispatcher/whats-new-key fixed-whats-new-data))
-    db))
+(defn user-role [org-data user-data]
+  (let [is-admin? (j/is-admin? (:team-id org-data))
+        is-author? (utils/link-for (:links org-data) "create")]
+    (cond
+      is-admin? :admin
+      is-author? :author
+      :else :viewer)))
+
+(defn has-slack-bot? [org-data]
+  (j/team-has-bot? (:team-id org-data)))

@@ -34,7 +34,7 @@
           {:date-time t
            :data-toggle "tooltip"
            :data-placement "top"
-           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
            :data-title (utils/activity-date-tooltip result)}
           (utils/time-since t)])]
       ]]))
@@ -72,7 +72,7 @@
   (let [search-results (drv/react s store/search-key)
         search-active? (drv/react s store/search-active?)]
     [:div.search-results {:ref "results"
-                          :class (when (not search-active?) "inactive")}
+                          :class (when-not search-active? "inactive")}
       (when-not (responsive/is-mobile-size?) (results-header search-results))
       [:div.search-results-container
         (when (responsive/is-mobile-size?)

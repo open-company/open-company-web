@@ -54,7 +54,7 @@
   (let [slack-teams (drv/react s :team-channels)]
     [:div.slack-channels-dropdown
       {:class (if disabled "disabled" "")
-       :on-click #(when (not disabled)
+       :on-click #(when-not disabled
                     (reset! (::typing s) false)
                     (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
                     (utils/event-stop %))}

@@ -16,6 +16,7 @@
     (.. js/Raven (config ls/local-dsn (ravenParameters)) install)
     (when (jwt/jwt)
       (.setUserContext js/Raven (clj->js {:user-id (jwt/get-key :user-id)
+                                          :id (jwt/get-key :user-id)
                                           :first-name (jwt/get-key :first-name)
                                           :last-name (jwt/get-key :last-name)})))))
 

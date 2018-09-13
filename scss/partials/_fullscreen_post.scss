@@ -31,15 +31,25 @@ div.fullscreen-post-container {
 
   &.editing {
     div.fullscreen-post-header {
-      button.mobile-modal-close-bt {
-        @include image-2x("/img/ML/fullscreen_closing_x");
-        background-size: 14px 14px;
-      }
+      background-color: $sea_blue;
+
       div.header-title-container {
-        opacity: 0;
+        color: white;
       }
-      div.header-title-editing-post {
-        opacity: 1;
+
+      button.mobile-modal-close-bt {
+        background-image: cdnUrl("/img/ML/white_close.svg");
+      }
+    }
+
+    div.fullscreen-post {
+      padding: 32px 40px;
+      border: 1px solid transparent;
+      box-shadow: 0px 2px 4px 0px rgba(#E4E3DE, 0.5);
+      margin: 112px auto 0px;
+
+      div.fullscreen-post-right-column {
+        display: none;
       }
     }
   }
@@ -50,162 +60,102 @@ div.fullscreen-post-container {
     top: 0px;
     left: 0px;
     width: 100vw;
-    height: 64px;
+    height: 56px;
     background-color: white;
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
-    padding: 12px 24px;
+    padding: 16px 24px;
     z-index: #{$navbar_zindex + 101};
+    text-align: center;
+    transition: background-color 180ms ease-in;
 
     @include tablet() {
       width: 100%;
     }
 
     button.mobile-modal-close-bt {
-      @include image-2x("/img/ML/fullscreen_back_arrow");
-      width: 24px;
+      background-image: cdnUrl("/img/ML/fullscreen_closing_x.svg");
+      width: 16px;
       height: 24px;
       background-repeat: no-repeat;
-      background-size: 20px 15px;
+      background-size: 14px 14px;
       background-position: center;
       padding: 0;
-      margin: 8px 0px 0px;
-      float: left;
-      transition: background-image 180ms easi-in;
-    }
-
-    div.header-title-editing-post {
-      margin: 0px auto;
-      width: auto;
+      transition: background-image 180ms ease-in;
       position: absolute;
-      left: 50%;
-      width: 105px;
-      margin-left: -52px;
-      opacity: 0;
-      transition: opacity 180ms ease-in;
-      margin-top: 12px;
-
-      div.header-title-container-edit-pen {
-        float: left;
-        width: 16px;
-        height: 16px;
-        @include image-2x("/img/ML/editing_pen");
-        background-size: 16px 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-
-      div.header-title-container-edit-title {
-        @include avenir_H();
-        font-size: 18px;
-        color: $deep_navy;
-        margin-left: 24px;
-        margin-top: -2px;
-      }
+      top: 16px;
+      left: 24px;
     }
 
     div.header-title-container {
-      margin: 0px auto;
+      margin: 2px auto 0px;
       width: auto;
       opacity: 1;
-      position: absolute;
-      left: 50%;
-      transition: opacity 180ms ease-in;
-      margin-top: 12px;
+      transition: color 180ms ease-in;
+      @include avenir_H();
+      font-size: 16px;
+      line-height: 22px;
+      color: $deep_navy;
+      max-width: 50%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-wrap: break-word;
 
-      @include tablet() {
-        position: relative;
-        left: unset;
-        width: 70%;
-        margin: 0px auto;
-        text-align: center;
-      }
-
-      @include activity-author(32);
-
-      div.user-avatar-img-container {
-        float: left;
-        margin-top: -8px;
-        margin-right: 0px;
-
-        @include tablet() {
-          display: none;
-        }
-      }
-
-      div.header-title {
-        float: left;
-        margin-left: 8px;
-        @include avenir_H();
-        font-size: 14px;
-        color: $deep_navy;
-        max-width: 50vw;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        word-wrap: break-word;
-
-        @include tablet() {
-          margin-left: 0px;
-          max-width: initial;
-          width: 100%;
-        }
-      }
-
-      div.header-timing {
-        @include avenir_M();
-        font-size: 14px;
-        color: rgba($ui_grey, 0.5);
-        margin-left: 8px;
-        float: left;
-        margin-top: 1px;
-
-        @include tablet() {
-          display: none;
-        }
+      @include mobile() {
+        display: none;
       }
     }
 
     div.fullscreen-post-header-right {
       position: absolute;
-      top: 20px;
+      top: 16px;
       right: 24px;
 
       div.more-menu {
-        margin-top: 0px;
+        div.activity-move {
+          right: -4px;
+        }
       }
 
       button.post-publish-bt {
-        position: absolute;
-        top: -8px;
-        right: 0px;
-        width: 164px;
-        height: 40px;
-        padding: 8px 24px 8px 52px;
-        border-radius: 100px;
-        background-color: $carrot_green;
+        float: right;
+        height: 24px;
+        padding-top: 4px;
         color: white;
-        @include avenir_H();
+        @include avenir_B();
         font-size: 14px;
         transition: opacity 180ms ease-in;
+        opacity: 0.8;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.disabled {
+          opacity: 0.6
+        }
 
         &.loading {
           &:before {
-            background-size: 20px 20px;
+            content: "";
             background-image: cdnUrl("/img/small_loading.gif");
+            background-size: 20px 20px;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 24px;
+            top: 10px;
           }
         }
+      }
 
-        &:before {
-          content: "";
-          @include image-2x("/img/ML/post_publish");
-          background-size: 20px 20px;
-          background-position: center;
-          background-repeat: no-repeat;
-          position: absolute;
-          width: 20px;
-          height: 20px;
-          left: 24px;
-          top: 10px;
+      div.activity-share-container {
+        div.activity-share-modal-container {
+          top: 32px;
+          right: 0px;
+          margin-top: 0px;
         }
       }
     }
@@ -213,23 +163,22 @@ div.fullscreen-post-container {
 
   &.editing, &.no-comments {
     div.fullscreen-post {
-      div.fullscreen-post-left-column {
-        left: 170px;
-      }
-
       div.fullscreen-post-right-column {
         opacity: 0;
-        pointer-events: none;
       }
     }
   }
 
   div.fullscreen-post {
-    margin: 100px auto 32px;
-    width: 1060px;
+    margin: 112px auto 32px;
+    width: 720px;
     position: relative;
-    min-height: calc(100vh - 132px);
     height: auto;
+    border: 1px solid #ECECEC;
+    border-radius: 6px;
+    background-color: white;
+    padding: 32px 40px 0px;
+    box-shadow: none;
 
     @include tablet() {
       margin: 0px auto 32px;
@@ -242,68 +191,23 @@ div.fullscreen-post-container {
     }
 
     div.fullscreen-post-author-header {
-      display: none;
 
-      @include tablet() {
-        display: block;
-        height: 64px;
-        background-color: $light_tan;
-        padding: 16px 24px;
-
-        @include activity-author(32);
-
-        div.user-avatar-img-container {
-          float: left;
-        }
-
-        div.fullscreen-post-author-header-title {
-          margin-left: 48px;
-          @include avenir_H();
-          font-size: 14px;
-          color: $deep_navy;
-        }
-
-        div.fullscreen-post-author-header-subtitle {
-          margin-left: 48px;
-          @include avenir_M();
-          font-size: 12px;
-          color: $ui_grey;
-        }
-      }
-    }
-
-    div.fullscreen-post-left-column {
-      width: 720px;
-      position: relative;
-      left: 0px;
-      top: 0px;
-      transition: left 180ms ease-in;
-
-      @include tablet() {
-        width: 100%;
-        left: unset;
-        top: unset;
+      @include mobile() {
+        padding: 24px 24px 0px;
       }
 
-      div.fullscreen-post-left-column-content {
-        box-shadow: 0px 2px 4px rgba($deep_tan, 0.5);
-        background-color: white;
-        border-radius: 6px;
-        padding: 40px;
+      &.section-editing {
 
-        @include tablet() {
-          box-shadow: none;
-          border-radius: 0px;
-          padding: 32px 24px 0px;
-        }
+        div.fullscreen-post-author-header-author {
+          overflow: visible;
 
-        div.fullscreen-post-box-content-board {
-          @include avenir_M();
-          font-size: 14px;
-          color: $ui_grey;
-
-          &.section-editing {
-            color: $carrot_dark_gray;
+          div.fullscreen-post-box-content-board {
+            @include avenir_M();
+            font-size: 14px;
+            color: $deep_navy;
+            margin-top: 6px;
+            position: relative;
+            cursor: pointer;
 
             @include mobile() {
               float: none;
@@ -315,87 +219,204 @@ div.fullscreen-post-container {
               float: left;
             }
 
-            div.boards-dropdown-caret {
+            div.board-name {
               @include avenir_M();
-              color: $carrot_green;
+              position: relative;
               float: left;
               margin-left: 6px;
-              cursor: pointer;
-              position: relative;
+              max-width: 250px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              padding-right: 20px;
 
-              @include mobile() {
-                @include avenir_H();
-                font-size: 15px;
-              }
-
-              div.board-name {
-                @include avenir_M();
-                color: $carrot_green;
-                margin-bottom: 0px;
-                cursor: pointer;
-                position: relative;
-                float: left;
-
-                &:after {
-                  float: right;
-                  content: "";
-                  background-image: cdnUrl("/img/ML/board_settings.svg");
-                  background-size: 8px 8px;
-                  background-repeat: no-repeat;
-                  background-position: center;
-                  background-color: $deep_tan;
-                  border-radius: 10px;
-                  width: 20px;
-                  height: 20px;
-                  margin-top: 0px;
-                  margin-left: 6px;
-                  opacity: 0.8;
-
-                  @include mobile() {
-                    width: 8px 5px;
-                    margin-top: -3px;
-                    background-size: 8px 5px;
-                    background-position: 0px 9px;
-                    background-color: transparent;
-                    background-image: cdnUrl("/img/ML/board_chevron_green.svg");
-                  }
-
-                  &:hover {
-                    opacity: 1;
-                  }
-                }
-              }
-
-              div.sections-picker-container {
+              &:after {
+                content: "";
+                background-image: cdnUrl("/img/ML/board_settings.svg");
+                background-size: 8px 8px;
+                background-repeat: no-repeat;
+                background-position: center;
+                width: 20px;
+                height: 20px;
                 position: absolute;
-                top: 32px;
-                left: 50%;
-                margin-left: -180px;
-                z-index: 1000;
+                right: 0px;
+                top: -2px;
 
-                @include mobile() {
-                  position: fixed;
-                  top: 0px;
-                  left: 0px;
-                  margin-left: 0px;
-                  z-index: 1500;
+                &:hover {
+                  opacity: 1;
                 }
               }
             }
+
+            div.sections-picker-container {
+              position: absolute;
+              top: 24px;
+              left: 46px;
+              z-index: #{$navbar_zindex + 102};
+
+              @include mobile() {
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                margin-left: 0px;
+              }
+            }
           }
+        }
+      }
+
+      div.fullscreen-post-author-header-video-bt-container {
+        float: right;
+
+        button.video-record-bt {
+          @include avenir_M();
+          color: $light_ui_grey;
+          font-size: 14px;
+          height: 20px;
+          position: relative;
+          padding-left: 26px;
+          margin-top: 4px;
+
+          &:not(.remove-video-bt) {
+            @include preload_image(cdnUrl("/img/ML/capture_video_icon_hover.svg"));
+          }
+
+          &.remove-video-bt {
+            @include preload_image(cdnUrl("/img/ML/remove_video_icon_hover.svg"));
+
+            &:before {
+              background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+            }
+            &:hover {
+              &:before {
+                background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+              }
+            }
+          }
+
+          &:hover {
+            color: $ui_grey;
+
+            &:before {
+              background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+            }
+          }
+
+          &:before {
+            content: "";
+            left: 0px;
+            top: 3px;
+            position: absolute;
+            height: 12px;
+            width: 20px;
+            background-image: cdnUrl("/img/ML/capture_video_icon.svg");
+            background-size: 20px 12px;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+        }
+      }
+
+      div.fullscreen-post-author-header-author {
+        width: 75%;
+        padding-right: 20px;
+        line-height: 18px;
+        float: left;
+
+        @include activity-author(32);
+
+        div.name-container {
+          height: 18px;
+
+          div.name {
+            line-height: 18px;
+            color: $deep_navy;
+            float: left;
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          @include new-tag();
+
+          div.new-tag {
+            display: inline-block;
+            position: relative;
+            top: -1px;
+          }
+        }
+
+        div.fullscreen-post-author-header-sub {
+
+          div.time-since {
+            @include avenir_M();
+            font-size: 12px;
+            line-height: 14px;
+            color: $ui_grey;
+            float: left;
+          }
+
+          div.separator {
+            width: 4px;
+            height: 4px;
+            border-radius: 4px;
+            background-color: $ui_grey;
+            margin: 6px 8px 0px;
+            float: left;
+          }
+
+          div.fullscreen-post-wrt {
+            &>span, &>div {
+              float: left;
+            }
+          }
+        }
+      }
+    }
+
+    div.fullscreen-post-left-column {
+      position: relative;
+      background-color: white;
+
+      @include tablet() {
+        width: 100%;
+        left: unset;
+        top: unset;
+      }
+
+      div.fullscreen-post-left-column-content {
+        padding: 16px 0px 0px;
+
+        @include tablet() {
+          padding: 32px 24px 0px;
         }
 
         div.fullscreen-post-box-content-headline {
           @include activity-headline();
 
           @include avenir_H();
-          font-size: 28px;
+          font-size: 22px;
           color: $deep_navy;
-          line-height: 36px;
-          margin-top: 16px;
+          line-height: 28px;
           cursor: text;
           outline: none;
+          display: inline;
+
+          &.headline-edit {
+            display: block;
+          }
+
+          &:empty:before {
+            content: attr(placeholder);
+            display: inline-block;
+            color: $light_ui_grey !important;
+            font-style: none;
+            height: 26px;
+          }
         }
+
+        @include must-see();
 
         div.rich-body-editor-container {
           position: relative;
@@ -410,25 +431,31 @@ div.fullscreen-post-container {
           div.rich-body-editor {
             border: none;
             outline: none;
-            margin: 24px 0px 0px;
+            margin: 8px 0px 0px;
             cursor: text;
-            min-height: 85px;
-            @include activity-body(18);
+            @include activity-body(16, 22, 22, $deep_navy);
             color: $deep_navy;
-            @include avenir_BOOK();
-            font-size: 18px;
-            line-height: 30px;
+            @include avenir_R();
+            font-size: 16px;
+            line-height: 22px;
+            
+            @media screen and (min-height: 556px) {
+              min-height: 240px;
+              max-height: calc(100vh - 315px);
+              overflow-y: auto;
+              overflow-x: hidden;
+            }
 
-            p:not(:last-child) {
+            & > *:first-child {
+              margin-top: 0px;
+            }
+
+            p:not(:last-child):not(:first-child) {
               margin: 16px 0px;
             }
 
-            div.carrot-no-preview, a.carrot-no-preview {
-              display: none;
-            }
-
             &.medium-editor-placeholder:after {
-              color: $deep_navy !important;
+              color: $light_ui_grey !important;
             }
 
             &:after {
@@ -437,26 +464,102 @@ div.fullscreen-post-container {
           }
         }
 
+        div.ziggeo-player, div.ziggeo-recorder {
+          margin: 8px auto 24px;
+          @include tablet(){
+            margin-left: -24px;
+          }
+        }
+
         div.fullscreen-post-box-content-body {
-          @include activity-body(18);
-
-          @include avenir_BOOK();
-          font-size: 18px;
+          border: none;
+          outline: none;
+          margin: 8px 0px 0px;
+          @include activity-body(18, 22, 22, $deep_navy);
           color: $deep_navy;
-          line-height: 30px;
-          margin-top: 32px;
+          @include avenir_R();
+          font-size: 16px;
+          line-height: 22px;
 
-          div.carrot-no-preview, a.carrot-no-preview {
-            display: none;
+          @include mobile() {
+            min-height: initial;
+          }
+        }
+
+        div.fullscreen-post-transcript {
+          max-height: 330px;
+          margin-top: 16px;
+          width: 100%;
+          background-color: rgba(#ECECEC, 0.2);
+          border-top: 1px solid #ECECEC;
+          padding: 24px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+
+          textarea.fullscreen-post-transcript-edit {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            min-height: 80px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+          }
+
+          div.fullscreen-post-transcript-header {
+            @include avenir_M();
+            font-size: 12px;
+            color: $light_ui_grey;
+          }
+
+          div.fullscreen-post-transcript-content {
+            margin-top: 24px;
+            @include avenir_BOOK();
+            font-size: 16px;
+            color: $deep_navy;
           }
         }
 
         div.fullscreen-post-box-footer {
           margin-top: 32px;
 
+          @include tablet() {
+            margin-top: 16px;
+          }
+
+          &.wrap-reactions {
+            div.reactions {
+              float: left;
+              margin-top: 16px;
+            }
+          }
+
+          div.reactions {
+            float: right;
+
+            div.reactions-picker-container {
+              div.emoji-mart {
+                right: 0px;
+                left: unset;
+                bottom: unset;
+                top: 32px;
+              }
+            }
+          }
+
+          div.is-comments {
+            float: left;
+          }
+
           div.fullscreen-post-box-footer-editing {
             div.fullscreen-post-box-footer-multi-picker {
               float: left;
+              height: 20px;
             }
 
             div.emoji-picker {
@@ -484,14 +587,16 @@ div.fullscreen-post-container {
             }
 
             div.fullscreen-post-box-footer-legend-container {
-              float: left;
+              float: right;
               margin-left: 16px;
               position: relative;
+              width: 20px;
+              height: 20px;
 
               button.fullscreen-post-box-footer-legend-trigger {
                 width: 20px;
                 height: 20px;
-                @include image-2x("/img/ML/new_post_legend_button");
+                background-image: cdnUrl("/img/ML/new_post_legend_button.svg");
                 background-repeat: no-repeat;
                 background-size: 20px 20px;
                 background-position: 0px 0px;
@@ -499,6 +604,11 @@ div.fullscreen-post-container {
                 position: absolute;
                 top: 0px;
                 left: 0px;
+                opacity: 0.4;
+
+                &:hover {
+                  opacity: 1;
+                }
               }
 
               div.fullscreen-post-box-footer-legend-image {
@@ -507,7 +617,7 @@ div.fullscreen-post-container {
                 left: -8px;
                 width: 212px;
                 height: 281px;
-                @include image-2x("/img/ML/new_post_legend");
+                background-image: cdnUrl("/img/ML/new_post_legend.svg");
                 background-size: 212px 281px;
                 background-position: center;
                 background-repeat: no-repeat;
@@ -519,18 +629,13 @@ div.fullscreen-post-container {
     }
 
     div.fullscreen-post-right-column {
-      width: 300px;
-      position: fixed;
-      top: 100px;
-      height: calc(100vh - 132px);
-      transition: opacity 180ms ease-in;
+      padding: 24px 0px;
 
       @include tablet() {
         width: 100%;
         left: unset;
         top: unset;
         position: relative;
-        margin-top: 24px;
         padding: 0px 24px;
         height: auto;
         background-color: white;
@@ -553,19 +658,8 @@ div.fullscreen-post-container {
         }
       }
 
-      &.add-comment-focused {
-        div.stream-comments {
-          max-height: calc(100% - 132px);
-
-          @include tablet() {
-            max-height: initial;
-          }
-        }
-      }
-
       div.stream-comments {
         margin-top: 16px;
-        max-height: calc(100% - 64px);
 
         @include tablet() {
           background-color: white;
@@ -576,7 +670,6 @@ div.fullscreen-post-container {
         }
 
         @include tablet() {
-          max-height: initial;
 
           &:before {
             @include top-gradient(white);
@@ -589,8 +682,6 @@ div.fullscreen-post-container {
       }
 
       div.add-comment-box-container {
-        padding-right: 12px;
-        padding-top: 0px;
 
         @include tablet() {
           padding-right: 0px;

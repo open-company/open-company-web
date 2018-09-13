@@ -54,3 +54,11 @@
 
 ;; Mailchimp api endpoing
 (def mailchimp-api-endpoint "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
+
+;; AP seen TTL in days
+(def oc-seen-ttl 30)
+
+;; Ziggeo
+(def oc-ziggeo-app "c9b611b2b996ee5a1f318d3bacc36b27")
+(def oc-ziggeo-profiles [])
+(def oc-enable-transcriptions false)

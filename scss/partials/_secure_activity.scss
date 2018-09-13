@@ -3,155 +3,234 @@ div.secure-activity-container {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: white;
+  background-color: $oc_gray_8;
   min-height: 100vh;
 
-  div.activity-header {
-    height: 72px;
+  div.secure-activity-login-header {
     position: fixed;
+    height: 48px;
     width: 100%;
-    background-color: white;
-    padding: 16px 32px;
-    box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, 0.05);
+    background-color: $deep_navy;
     text-align: center;
     z-index: 10;
+    padding: 12px 32px;
 
-    @include mobile() {
+    button.remove-header-bt {
+      width: 24px;
+      height: 24px;
       position: absolute;
+      top: 12px;
+      left: 18px;
+      background-image: cdnUrl("/img/ML/secure_activity_remove_header.svg");
+      background-size: 12px;
+      background-repeat: no-repeat;
+      background-position: center;
     }
 
-    div.org-avatar {
-      height: 40px;
-      position: absolute;
-      left: 50%;
-      margin-left: -20px;
+    div.secure-activity-login-header-center {
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-      @include mobile(){
-        left: unset;
-        margin-left: 0px;
+      div.carrot-logo-copy {
+        width: 82px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/carrot_logo_with_copy.svg");
+        background-size: 82px 24px;
+        background-position: center;
+        background-repeat: no-repeat;
+        float: left;
       }
 
-      div.org-avatar-container {
-        height: 40px;
-        div.org-avatar-border {
-          height: 40px;
+      div.separator {
+        width: 1px;
+        height: 24px;
+        background-color: rgba($light_tan, 0.2);
+        margin: 0px 16px;
+        float: left;
+      }
 
-          img.org-avatar-img {
-            max-width: 120px;
-            max-height: 40px;
-          }
+      div.signup-login-copy {
+        @include avenir_H();
+        font-size: 14px;
+        color: $ui_grey;
+        float: left;
+
+        a {
+          color: $carrot_green;
+          text-decoration: none;
         }
       }
     }
   }
 
+  div.activity-header {
+    height: 56px;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    background-color: white;
+    padding: 16px 32px;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 10;
+
+    &.showing-login-header {
+      top: 48px;
+    }
+
+    @include mobile() {
+      position: absolute;
+    }
+
+    div.activity-header-title {
+      @include avenir_H();
+      font-size: 16px;
+      color: $deep_navy;
+      text-align: center;
+    }
+  }
+
   div.activity-content-outer {
-    margin: 0px auto 32px;
-    width: 840px;
-    transition: margin-left 230ms;
+    margin: 96px auto 96px;
+    width: 800px;
+    border-radius: 6px;
+    background-color: white;
+
+    &.showing-login-header {
+      margin-top: 144px;
+    }
 
     @include mobile() {
       width: 100%;
       margin: 0px auto;
     }
 
+    div.activity-content-header {
+      height: 65px;
+      background-color: $light_tan;
+      padding: 16px 24px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+
+      @include tablet() {
+        display: block;
+        background-color: $light_tan;
+        padding: 16px 24px;
+
+        @include activity-author(32);
+      }
+
+      div.activity-content-header-author {
+        width: 55%;
+        padding-right: 20px;
+        overflow: hidden;
+        line-height: 18px;
+        float: left;
+
+        @include activity-author(32);
+      }
+
+      div.activity-content-header-right {
+        float: right;
+        width: 45%;
+      }
+    }
+
     div.activity-content {
-      min-height: 136px;
-      padding: 68px 80px 32px;
-      border-radius: 8px;
+      width: 800px;
+      position: relative;
+      background-color: white;
+      box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.1);
+      padding: 36px 70px;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+
+      @include tablet() {
+        width: 100%;
+        left: unset;
+        top: unset;
+      }
 
       @include mobile() {
         padding: 32px;
       }
 
-      div.activity-banner {
-        margin-left: -80px;
-        margin-top: 50px;
-        margin-bottom: 20px;
-        width: 840px;
-        max-height: 520px;
-        background-position: 50%;
-        background-size: cover;
-        background-repeat: no-repeat;
-
-        @include mobile() {
-          width: 100%;
+      div.ziggeo-player {
+        margin-top: 16px;
+        @include tablet(){
+          margin-left: -24px;
         }
       }
 
-      div.activity-tags {
-        margin-top: 21px;
-        @include activity-tag();
-      }
-
       div.activity-title {
-        margin-top: 59px;
         @include activity-title();
-        @include avenir_M();
-        font-size: 44px;
-        text-align: center;
+        @include avenir_H();
+        font-size: 28px;
+        color: $deep_navy;
 
         .emojione {
           @include emoji-size(30);
         }
       }
 
-      div.activity-author {
-        text-align: center;
-        width: 100%;
+      div.activity-body {
+        border: none;
+        outline: none;
+        margin: 22px 0px 0px;
+        cursor: text;
+        min-height: 85px;
+        @include activity-body(20, 30, 30);
+        color: $deep_navy;
+        @include avenir_BOOK();
+        font-size: 20px;
+        line-height: 30px;
 
-        div.activity-author-inner {
-          // float: center;
-          margin: auto 1.5em;
-          display: inline-block;
-          text-align: center;
-          @include user-profile(30);
+        & > *:first-child {
+          margin-top: 0px;
+        }
 
-          div.user-avatar-img-conatiner {
-            // display: inline-block;
-          }
+        p:not(:last-child) {
+          margin: 30px 0px;
+        }
 
-          div.posted-by {
-            // display: inline-block;
-            margin-left: 38px;
-            margin-top: -25px;
-            color: #333333;
-            opacity: 0.5;
-            @include avenir_R();
-            font-size: 14px;
-          }
+        div.carrot-no-preview, a.carrot-no-preview {
+          display: none;
+        }
+
+        &.medium-editor-placeholder:after {
+          color: $deep_navy !important;
+        }
+
+        &:after {
+          margin: 0;
         }
       }
 
-      div.activity-body {
-        margin-top: 40px;
-        @include activity-body(20);
-        @include avenir_M();
-        color: $oc_gray_7;
-        padding-bottom: 50px;
-        * {
-          color: $oc_gray_7;
+      div.activity-video-transcript {
+        max-height: 330px;
+        margin-top: 16px;
+        width: 100%;
+        background-color: rgba(#ECECEC, 0.2);
+        border-top: 1px solid #ECECEC;
+        padding: 24px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+
+        div.activity-video-transcript-header {
+          @include avenir_M();
+          font-size: 12px;
+          color: $light_ui_grey;
         }
-        outline: none;
-        cursor: text;
 
-        h2 {
-          font-size: 26px;
-        }
-
-        @include activity-attachment();
-
-        a.media-attachment {
-          display: inline-block;
-
-          label.media-attachment-title {
-            font-size: 16px;
-            margin-top: 4px;
-          }
-
-          label.media-attachment-subtitle {
-            display: none;
-          }
+        div.activity-video-transcript-content {
+          margin-top: 24px;
+          @include avenir_BOOK();
+          font-size: 16px;
+          color: $deep_navy;
         }
       }
     }
@@ -162,10 +241,11 @@ div.secure-activity-container {
     bottom: 0px;
     left: 0px;
     width: 100%;
-    height: 72px;
-    padding: 21px 32px;
+    height: 56px;
+    padding: 13px 32px;
     text-align: center;
-    background-color: $oc_gray_8;
+    background-color: white;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
     cursor: pointer;
 
     @include mobile() {

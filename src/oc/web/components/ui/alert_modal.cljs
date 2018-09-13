@@ -29,6 +29,11 @@
   (when (fn? (:solid-button-cb alert-modal))
     ((:solid-button-cb alert-modal))))
 
+(defn bottom-button-clicked [alert-modal e]
+  (utils/event-stop e)
+  (when (fn? (:bottom-button-cb alert-modal))
+    ((:bottom-button-cb alert-modal))))
+
 (rum/defcs alert-modal < rum/reactive
                          ;; Derivatives
                          (drv/drv :alert-modal)
@@ -48,11 +53,15 @@
    :icon The src to use for an image, it's encapsulated in utils/cdn.
    :title The title of the view.
    :message A description message to show in the view.
+   :link-button-style The color of the font for the link button
    :link-button-title The title for the first button, it's black link styled.
    :link-button-cb The function to execute when the first button is clicked.
    :solid-button-style The style of the button: default green, :red.
    :solid-button-title The title for the second button, it's green solid styled.
-   :solid-button-cb The function to execute when the second button is clicked."
+   :solid-button-cb The function to execute when the second button is clicked.
+   :bottom-button-style The style for the button at the bottom of the view.
+   :bottom-button-title The title for the bottom button, it's green solid styled.
+   :bottom-button-cb The function to execute when the bottom button is clicked."
   [s]
   (let [alert-modal (drv/react s :alert-modal)
         action (if (empty? (:action alert-modal)) "no-action" (:action alert-modal))
@@ -65,10 +74,11 @@
        :on-click #(when-not has-buttons
                     (hide-alert))}
       [:div.modal-wrapper
-        [:button.carrot-modal-close.mlb-reset
+        [:button.settings-modal-close.mlb-reset
           {:on-click #(if (fn? (:link-button-cb alert-modal)) (link-button-clicked alert-modal %) (close-clicked s))}]
         [:div.alert-modal
-          {:class (when has-buttons "has-buttons")}
+          {:class (utils/class-set {:has-buttons has-buttons
+                                    :has-bottom-button (seq (:bottom-button-title alert-modal))})}
           (when (:icon alert-modal)
             [:img.alert-modal-icon {:src (utils/cdn (:icon alert-modal))}])
           (when (:title alert-modal)
@@ -79,14 +89,20 @@
               (:message alert-modal)])
           (when has-buttons
             [:div.alert-modal-buttons.group
-              {:class (when (or (not (:link-button-title alert-modal))
-                                (not (:solid-button-title alert-modal))) "single-button")}
+              {:class (utils/class-set {:single-button (or (not (:link-button-title alert-modal))
+                                                           (not (:solid-button-title alert-modal)))})}
               (when (:link-button-title alert-modal)
                 [:button.mlb-reset.mlb-link-black
-                  {:on-click #(link-button-clicked alert-modal %)}
+                  {:on-click #(link-button-clicked alert-modal %)
+                   :class (when (:link-button-style alert-modal) (name (:link-button-style alert-modal)))}
                   (:link-button-title alert-modal)])
               (when (:solid-button-title alert-modal)
                 [:button.mlb-reset.mlb-default
                   {:on-click #(solid-button-clicked alert-modal %)
-                   :class (when (= (:solid-button-style alert-modal) :red) "red")}
-                  (:solid-button-title alert-modal)])])]]]))
+                   :class (when (:solid-button-style alert-modal) (name (:solid-button-style alert-modal)))}
+                  (:solid-button-title alert-modal)])])
+          (when (seq (:bottom-button-title alert-modal))
+            [:button.mlb-reset.bottom-button
+              {:on-click #(bottom-button-clicked alert-modal %)
+               :class (when (:bottom-button-style alert-modal) (name (:bottom-button-style alert-modal)))}
+              (:bottom-button-title alert-modal)])]]]))

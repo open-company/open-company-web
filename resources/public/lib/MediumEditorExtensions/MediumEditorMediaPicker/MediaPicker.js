@@ -1,6 +1,6 @@
 function log(){
-  var args = Array.prototype.slice.call(arguments);
-  console.debug("XXX MediaPicker", args);
+  // var args = Array.prototype.slice.call(arguments);
+  // console.debug("XXX MediaPicker", args);
 }
 
 function PlaceCaretAtEnd(el) {
@@ -245,12 +245,21 @@ function PlaceCaretAtEnd(el) {
           element.appendChild(p);
         // if it's a P already
         } else if (element.tagName == "P"){
-          // if it has a BR inside
-          if (element.childNodes.length == 1){
-            // remove it
-            element.removeChild(element.childNodes[0]);
+          // If the paragraph is empty
+          if (element.innerText.length === 0 || element.innerText === "\n") {
+              // if it has a BR inside
+            if (element.childNodes.length == 1){
+              // remove it
+              element.removeChild(element.childNodes[0]);
+            }
+            p = element;
+          } else {
+            // If the current P is not empty create a new paragraph, append it
+            // after the current paragraph and add the image there
+            p = this.document.createElement("p");
+            $(element).after(p);
+            element = p.parentNode;
           }
-          p = element;
         }
         var img = this.document.createElement("img");
         img.src = photoUrl;

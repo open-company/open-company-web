@@ -1,19 +1,33 @@
+div.activity-share-container {
+  position: relative;
+}
+
 div.activity-share-modal-container {
-  width: 100%;
-  height: 100vh;
-  position: fixed;
+  position: absolute;
   top: 0px;
-  left: 0px;
+  right: 16px;
   background-color: $carrot_modal_bg;
-  z-index: #{$navbar_zindex + 103};
+  z-index: 103;
   transition: opacity 180ms ease-in;
-  overflow: auto;
+  width: 360px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 32px 24px;
+  margin-top: 55px;
+  border: 1px solid $deep_tan;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  text-align: left;
 
   @include mobile() {
     position: unset;
     top: unset;
     left: unset;
     height: auto;
+    margin: 0px;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    padding: 0px;
   }
 
   &.will-appear {
@@ -24,398 +38,419 @@ div.activity-share-modal-container {
     opacity: 1;
   }
 
-  div.modal-wrapper {
-    width: #{520 + 20 + 8}px;
-    margin: 60px auto 50px;
+  div.activity-share-modal {
     position: relative;
 
     @include mobile() {
       width: 100%;
-      margin: 0;
+      margin: 0px;
+      border-radius: 0px;
     }
 
-    div.activity-share-modal {
-      width: 520px;
-      margin: 0px 0px 0px 28px;
+    div.activity-share-main-cta {
+      @include avenir_H();
+      font-size: 16px;
+      color: $deep_navy;
+      line-height: 22px;
       position: relative;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
-      padding: 32px 24px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
 
       @include mobile() {
         width: 100%;
-        margin: 0px;
-        border-radius: 0px;
+        height: 56px;
+        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        padding: 20px 24px;
       }
 
-      div.activity-share-main-cta {
-        @include avenir_H();
-        font-size: 20px;
-        color: $carrot_dark_gray;
-        position: relative;
-        padding-bottom: 32px;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+      button.mobile-modal-close-bt {
+        display: none;
 
         @include mobile() {
-          padding-bottom: 24px;
-          text-align: center;
-          width: 100%;
+          display: block;
+          @include image-2x("/img/ML/mobile_modal_close");
+          width: 24px;
+          height: 24px;
+          background-repeat: no-repeat;
+          background-size: 14px 14px;
+          background-position: 5px 5px;
+          position: absolute;
+          top: 16px;
+          left: 24px;
+        }
+      }
+    }
 
-          span {
-            margin-left: 28px;
-          } 
+    div.activity-share-divider-line {
+      height: 1px;
+      background-color: rgba($carrot_light_gray, 0.2);
+
+      @include mobile(){
+        margin: 0px 24px;
+      }
+    }
+
+    div.activity-share-subheadline {
+      @include avenir_M();
+      font-size: 14px;
+      color: $oc_gray_3;
+      line-height: 20px;
+      text-align: center;
+      position: relative;
+      padding-bottom: 24px;
+      margin-top: 20px;
+
+      @include mobile() {
+        padding-bottom: 16px;
+        margin-top: 8px;
+      }
+    }
+
+    div.activity-share-medium-selector-container {
+      width: 100%;
+      height: 33px;
+      margin-top: 24px;
+
+      @include mobile() {
+        padding: 0px 24px;
+      }
+
+      div.activity-share-medium-selector {
+        height: 33px;
+        @include avenir_H();
+        font-size: 13px;
+        line-height: 18px;
+        text-align: left;
+        color: $ui_grey;
+        float: left;
+        cursor: pointer;
+        margin: 0px 16px;
+        padding-bottom: 12px;
+        text-transform: uppercase;
+        margin-top: 1px;
+
+        &:first-child {
+          margin-left: 0px;
         }
 
-        button.mobile-modal-close-bt {
-          display: none;
+        &:last-child {
+          margin-right: 0px;
+        }
+
+        &.medium-selector-disabled {
+          opacity: 0.5;
+        }
+
+        &.selected {
+          color: $carrot_orange;
+          border-bottom: 1px solid $carrot_orange;
+        }
+      }
+    }
+
+    div.activity-share-share {
+
+      @include mobile() {
+        padding: 0px 24px;
+      }
+
+      div.mediums-box {
+        
+        div.medium {
+          @include avenir_M();
+          color: $carrot_dark_gray;
+          font-size: 16px;
 
           @include mobile() {
-            display: block;
-            @include image-2x("/img/ML/mobile_modal_close");
-            width: 24px;
-            height: 24px;
-            background-repeat: no-repeat;
-            background-size: 14px 14px;
-            background-position: 5px 5px;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-          }
-        }
-
-        span.activity-share-post-title {
-          @include avenir_BOOK();
-        }
-      }
-
-      div.activity-share-divider-line {
-        width: calc(100% + 48px);
-        margin-left: -24px;
-        height: 1px;
-        background-color: rgba($carrot_light_gray, 0.2);
-      }
-
-      div.activity-share-subheadline {
-        @include avenir_M();
-        font-size: 14px;
-        color: $oc_gray_3;
-        line-height: 20px;
-        text-align: center;
-        position: relative;
-        padding-bottom: 24px;
-        margin-top: 20px;
-
-        @include mobile() {
-          padding-bottom: 16px;
-          margin-top: 8px;
-        }
-      }
-
-      div.activity-share-medium-selector-container {
-        width: 100%;
-        height: 80px;
-        padding-bottom: 32px;
-
-        @include mobile() {
-          padding-bottom: 16px;
-          height: 63px;
-        }
-
-        div.activity-share-medium-selector {
-          width: 33%;
-          height: 48px;
-          border: 1px solid #D8DBDF;
-          @include avenir_H();
-          font-size: 15px;
-          text-align: center;
-          padding-top: 15px;
-          background-color: white;
-          color: $carrot_light_gray_3;
-          float: left;
-          cursor: pointer;
-
-          &.medium-selector-disabled {
-            opacity: 0.5;
+            padding: 0px 0px;
           }
 
-          &.selected {
-            background-color: $carrot_light_gray_9;
-            color: $carrot_dark_gray;
+          & > div.medium-row {
+            height: 26px;
+            min-height: 26px !important;
           }
 
-          &:first-child {
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-            border-right: 0px;
-
-            @include mobile() {
-              border-top-left-radius: 100px;
-              border-bottom-left-radius: 100px;
-            }
+          div.carrot-checkbox {
+            float: right;
           }
 
-          &:last-child {
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-            border-left: 0px;
+          div.email-medium, div.slack-medium {
 
-            @include mobile() {
-              border-top-right-radius: 100px;
-              border-bottom-right-radius: 100px;
-            }
-          }
-        }
-      }
+            div.medium-row {
+              min-height: 40px;
+              margin-top: 16px;
 
-      div.activity-share-share {
+              div.fields.error {
+                position: relative;
 
-        div.mediums-box {
-          
-          div.medium {
-            @include avenir_M();
-            color: $carrot_dark_gray;
-            font-size: 16px;
-            padding: 16px 24px;
-
-            @include mobile() {
-              padding: 0px 0px;
-            }
-
-            & > div.medium-row {
-              height: 26px;
-              min-height: 26px !important;
-            }
-
-            div.carrot-checkbox {
-              float: right;
-            }
-
-            div.email-medium, div.slack-medium {
-
-              div.medium-row {
-                min-height: 40px;
-                margin-top: 16px;
-
-                div.fields.error {
-                  position: relative;
-
-                  & > input, & > textarea, & > div.email-field, & > div.slack-channels-dropdown input {
-                    border: 1px solid $carrot_orange !important;
-                  }
-
-                  & > div.slack-channels-dropdown i.fa{
-                    display: none;
-                  }
-
-                  &:after {
-                    font-family: "Material Design Icons";
-                    position: absolute;
-                    bottom: 8px;
-                    right: 4px;
-                    content: "\f5D6";
-                    font-size: 20px;
-                    color: $carrot_orange;
-                  }
+                & > input, & > textarea, & > div.email-field, & > div.slack-channels-dropdown input {
+                  border: 1px solid $carrot_orange !important;
                 }
 
-                div.labels {
-                  @include avenir_H();
-                  font-size: 12px;
-                  color: $carrot_dark_gray;
-                  padding-top: 8px;
-                  display: block;
-
-                  span.optional {
-                    @include avenir_M();
-                    font-size: 12px;
-                    color: #94989D;
-                  }
+                & > div.slack-channels-dropdown i.fa{
+                  display: none;
                 }
 
-                div.fields {
-                  margin-top: 8px;
+                &:after {
+                  font-family: "Material Design Icons";
+                  position: absolute;
+                  bottom: 8px;
+                  right: 4px;
+                  content: "\f5D6";
+                  font-size: 20px;
+                  color: $carrot_orange;
+                }
+              }
 
-                  div.email-field {
-                    width: 100%;
-                    min-height: 40px;
-                    border-radius: 4px;
-                    background-color: white;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $oc_gray_7;
-                    padding: 0rem 0.8rem 0.4rem;
-                    outline: none;
-                    border: 1px solid $carrot_light_gray_1;
-                    box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+              div.labels {
+                @include avenir_M();
+                font-size: 15px;
+                color: $deep_navy;
+                padding-top: 8px;
+                display: block;
+              }
 
-                    &:empty {
-                      padding: 0.4rem 0.8rem;
-                    }
+              div.fields {
+                margin-top: 8px;
 
-                    div.email-item {
-                      margin-right: .4rem;
-                      margin-top: .4rem;
-                      margin-bottom: 0px;
-                      display: inline-block;
-                      border-radius: 3px;
-                      height: 26px;
+                div.email-field {
+                  width: 100%;
+                  min-height: 40px;
+                  border-radius: 4px;
+                  background-color: white;
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $oc_gray_7;
+                  padding: 0rem 0.8rem 0.4rem;
+                  outline: none;
+                  border: 1px solid $carrot_light_gray_1;
+                  box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
 
-                      span.email-item {
-                        padding: .25rem .4rem;
-                        display: inline-block;
-                      }
-                    }
-
-                    input {
-                      border: none;
-                      box-shadow: none;
-                      padding: 0px;
-                      margin: 0px;
-                      outline: none;
-                      background-color: transparent;
-                      @include avenir_M();
-                      font-size: 14px;
-                      color: $oc_gray_7;
-                      height: 26px;
-                      width: auto;
-                      max-width: 100%;
-                      margin-top: 0.4rem;
-                    }
-                  }
-
-                  textarea {
-                    width: 100%;
-                    min-height: 77px;
-                    border-radius: 4px;
-                    background-color: white;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $oc_gray_7;
+                  &:empty {
                     padding: 0.4rem 0.8rem;
-                    outline: none;
-                    border: 1px solid $carrot_light_gray_1;
-                    box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+                  }
+
+                  div.email-item {
+                    margin-right: .4rem;
+                    margin-top: .4rem;
+                    margin-bottom: 0px;
+                    display: inline-block;
+                    border-radius: 3px;
+                    height: 26px;
+
+                    span.email-item {
+                      padding: .25rem .4rem;
+                      display: inline-block;
+                    }
                   }
 
                   input {
-                    width: 100%;
-                    height: 40px;
-                    border-radius: 4px;
-                    background-color: white;
+                    border: none;
+                    box-shadow: none;
+                    padding: 0px;
+                    margin: 0px;
+                    outline: none;
+                    background-color: transparent;
                     @include avenir_M();
                     font-size: 14px;
                     color: $oc_gray_7;
-                    padding: 0.4rem 0.8rem;
-                    outline: none;
-                    border: 1px solid $carrot_light_gray_1;
-                    box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+                    height: 26px;
+                    width: auto;
+                    max-width: 100%;
+                    margin-top: 0.4rem;
                   }
+                }
+
+                textarea {
+                  width: 100%;
+                  min-height: 77px;
+                  border-radius: 4px;
+                  background-color: white;
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $oc_gray_7;
+                  padding: 0.4rem 0.8rem;
+                  outline: none;
+                  border: 1px solid $carrot_light_gray_1;
+                  box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+                }
+
+                input {
+                  width: 100%;
+                  height: 40px;
+                  border-radius: 4px;
+                  background-color: white;
+                  @include avenir_M();
+                  font-size: 14px;
+                  color: $oc_gray_7;
+                  padding: 0.4rem 0.8rem;
+                  outline: none;
+                  border: 1px solid $carrot_light_gray_1;
+                  box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
                 }
               }
             }
           }
         }
+      }
 
-        div.share-footer{
+      div.share-footer{
+        button {
+          height: 48px;
+          padding: .2em 1.8em;
+
+          &.disabled {
+            opacity: 0.6;
+          }
+        }
+
+        div.left-buttons {
+          float: left;
+          height: 48px;
+          margin-top: 24px;
+
           button {
-            height: 48px;
-            padding: .2em 1.8em;
-
-            &.disabled {
-              opacity: 0.6;
-            }
+            @include avenir_H();
+            font-size: 14px;
+            color: #8B8F95;
           }
+        }
 
-          div.left-buttons {
-            float: left;
-            height: 48px;
-            margin-top: 24px;
+        div.right-buttons {
+          float: right;
+          height: 48px;
+          margin-top: 24px;
 
-            button {
-              @include avenir_H();
-              font-size: 14px;
-              color: #8B8F95;
-            }
-          }
+          button {
+            @include avenir_H();
+            font-size: 16px;
 
-          div.right-buttons {
-            float: right;
-            height: 48px;
-            margin-top: 24px;
-
-            button {
-              @include avenir_H();
-              font-size: 16px;
+            &.share-button {
+              background-color: $carrot_green;
+              color: white;
+              border-radius: 100px;
             }
           }
         }
       }
+    }
 
-      div.activity-share-modal-shared {
-        margin-top: 32px;
+    div.activity-share-modal-shared {
+      margin-top: 24px;
 
-        div.share-headline {
-          @include avenir_H();
-          font-size: 12px;
-          color: $carrot_dark_gray;
-          margin-bottom: 8px;
-        }
+      @include mobile() {
+        padding: 0px 24px;
+      }
 
-        div.shared-subheadline {
-          @include avenir_BOOK();
-          font-size: 12px;
-          color: $carrot_dark_gray_1;
-          margin-top: 8px;
-          display: block;
-          float: left;
-        }
+      select.url-audience {
+        height: 40px;
+        width: 100%;
+        border: 1px solid rgba($carrot_light_gray_1, 0.5);
+        @include avenir_M();
+        font-size: 15px;
+        color: $deep_navy;
+        margin-top: 8px;
+        padding: 0px 12px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -o-appearance: none;
+        display: block;
+        position: relative;
+      }
 
-        div.shared-url-container {
-          border: 1px solid rgba($carrot_light_gray_1, 0.6);
-          padding: 7px 4px 7px 8px;
-          border-radius: 4px;
-          width: 333px;
-          height: 40px;
-          float: left;
+      div.chevron {
+        width: 8px;
+        height: 5px;
+        background-image: cdnUrl("/img/ML/section_access_chevron.svg");
+        background-size: 8px 5px;
+        background-position: center;
+        background-repeat: no-repeat;
+        pointer-events: none;
+        float: right;
+        margin-top: -22px;
+        margin-right: 12px;
+      }
 
-          @include mobile() {
-            width: 62%;
-          }
+      div.url-audience-description {
+        @include avenir_M();
+        font-size: 12px;
+        line-height: 18px;
+        color: $ui_grey;
+        margin-top: 24px;
+      }
 
-          input {
-            border: none;
-            outline: none;
-            padding: 0.3rem;
-            margin: 0;
-            width: 100%;
-            @include avenir_R();
-            color: $carrot_dark_gray;
-            font-size: 14px;
-          }
+      div.medium-row.url-field-row {
+        margin-top: 24px;
+      }
 
-          div.tooltip {
-            margin-top: -10px;
-          }
-        }
+      div.share-headline {
+        @include avenir_H();
+        font-size: 12px;
+        color: $carrot_dark_gray;
+        margin-bottom: 8px;
+      }
 
-        button.copy-btn {
-          height: 40px;
-          text-align: center;
-          padding: 4px 16px;
+      div.shared-subheadline {
+        @include avenir_BOOK();
+        font-size: 12px;
+        color: $carrot_dark_gray_1;
+        margin-top: 8px;
+        display: block;
+        float: left;
+      }
+
+      div.shared-url-container {
+        border-top: 1px solid rgba($carrot_light_gray_1, 0.5);
+        border-left: 1px solid rgba($carrot_light_gray_1, 0.5);
+        border-bottom: 1px solid rgba($carrot_light_gray_1, 0.5);
+        padding: 7px 4px 7px 8px;
+        width: calc(100% - 72px);
+        height: 40px;
+        float: left;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        margin-top: 8px;
+
+        input {
+          border: none;
+          outline: none;
+          padding: 0;
           margin: 0;
-          @include avenir_H();
-          font-size: 12px;
-          float: left;
-          margin-left: 16px;
+          width: 100%;
+          @include avenir_M();
+          color: $deep_navy;
+          font-size: 15px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
-        button.done-btn {
-          margin-top: 24px;
+        div.tooltip {
+          margin-top: -10px;
         }
+      }
+
+      button.copy-btn {
+        width: 72px;
+        height: 40px;
+        text-align: center;
+        padding: 4px 0px;
+        margin: 0;
+        @include avenir_H();
+        font-size: 12px;
+        float: left;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        background-color: $carrot_green;
+        color: white;
+        margin-top: 8px;
+      }
+
+      button.done-btn {
+        margin-top: 24px;
       }
     }
   }

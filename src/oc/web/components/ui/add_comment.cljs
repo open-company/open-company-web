@@ -6,10 +6,11 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
-            [oc.web.actions.comment :as comment-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
-            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]))
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn enable-add-comment? [s]
   (let [add-comment-div (rum/ref-node s "add-comment")
@@ -26,7 +27,6 @@
                          ;; Mixins
                          first-render-mixin
                          ;; Derivatives
-                         (drv/drv :current-user-data)
                          (drv/drv :add-comment-focus)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
@@ -80,40 +80,44 @@
                              (reset! (::blur-listener s) nil))
                            s)}
   [s activity-data]
-  (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))
-        current-user-data (drv/react s :current-user-data)]
+  (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))]
     [:div.add-comment-box-container
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
         [:div.add-comment-internal
-          [:div.add-comment.emoji-autocomplete.emojiable
+          [:div.add-comment.emoji-autocomplete.emojiable.fs-hide
            {:ref "add-comment"
-            :content-editable true}]
+            :content-editable true}]]
         (when add-comment-focus
           [:div.add-comment-footer.group
-            [:div.reply-button-container
-              [:button.mlb-reset.reply-btn
-                {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
-                                  comment-body (cu/add-comment-content add-comment-div)]
-                              (comment-actions/add-comment activity-data comment-body)
-                              (set! (.-innerHTML add-comment-div) ""))
-                 :disabled @(::add-button-disabled s)}
-                "Post"]]])]
-       (when (and (not (js/isIE))
-                  (not (responsive/is-tablet-or-mobile?)))
-         (emoji-picker {:width 32
-                        :height 32
-                        :position "bottom"
-                        :add-emoji-cb (fn [active-element emoji already-added?]
-                                        (let [add-comment (rum/ref-node s "add-comment")]
-                                          (.focus add-comment)
-                                          (utils/after 100
-                                           #(do
-                                              (when-not already-added?
-                                                (js/pasteHtmlAtCaret
-                                                 (.-native emoji)
-                                                 (.getSelection js/window)
-                                                 false))
-                                              (enable-add-comment? s)))))
-                        :force-enabled true
-                        :container-selector "div.add-comment-box"}))]]))
+            (when (and (not (js/isIE))
+                       (not (responsive/is-tablet-or-mobile?)))
+              (emoji-picker {:width 32
+                             :height 32
+                             :position "bottom"
+                             :add-emoji-cb (fn [active-element emoji already-added?]
+                                             (let [add-comment (rum/ref-node s "add-comment")]
+                                               (.focus add-comment)
+                                               (utils/after 100
+                                                #(do
+                                                   (when-not already-added?
+                                                     (js/pasteHtmlAtCaret
+                                                      (.-native emoji)
+                                                      (.getSelection js/window)
+                                                      false))
+                                                   (enable-add-comment? s)))))
+                             :force-enabled true
+                             :container-selector "div.add-comment-box"}))
+            [:button.mlb-reset.reply-btn
+              {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
+                                comment-body (cu/add-comment-content add-comment-div)]
+                            (comment-actions/add-comment activity-data comment-body)
+                            (set! (.-innerHTML add-comment-div) ""))
+               :disabled @(::add-button-disabled s)}
+              "Comment"]
+            [:button.mlb-reset.cancel-btn
+              {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
+                                comment-body (cu/add-comment-content add-comment-div)]
+                            (set! (.-innerHTML add-comment-div) "")
+                            (comment-actions/add-comment-focus nil))}
+              "Cancel"]])]]))

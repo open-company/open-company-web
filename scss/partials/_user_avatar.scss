@@ -4,10 +4,24 @@ button.user-avatar-button{
   margin: 0;
   border: 0px solid transparent;
   background-color: transparent;
-  width: #{$avatar_size}px;
+  width: #{$avatar_size + 16}px;
   height: #{$avatar_size}px;
   border-radius: #{$avatar-size / 2}px;
-  padding: 0;
+  padding: 0px 16px 0px 0px;
+  position: relative;
+
+  &:after {
+    content: "";
+    width: 9px;
+    height: 6px;
+    background-image: cdnUrl("/img/ML/user_menu_chevron.svg");
+    background-size: 9px 6px;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: #{($avatar_size - 6) / 2}px;
+    right: 0px;
+  }
 
   &.disabled-user-menu {
     cursor: default;

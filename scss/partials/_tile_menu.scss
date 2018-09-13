@@ -1,0 +1,53 @@
+div.tile-menu {
+  float: right;
+  height: 24px;
+  margin-top: 3px;
+  transform: opacity 180ms ease-in;
+  opacity: 1;
+  position: relative;
+
+  div.activity-move {
+    position: absolute;
+    top: 100%;
+    right: 0px;
+  }
+
+  button.tile-menu-bt {
+    width: 20px;
+    height: 26px;
+    display: block;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    margin-left: 16px;
+    display: inline-block;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &:active, &:focus {
+      opacity: 1;
+    }
+
+    &.tile-menu-delete-bt {
+      background-image: cdnUrl("/img/ML/stream_tile_delete.svg");
+      background-size: 14px 16px;
+    }
+
+    &.tile-menu-edit-bt {
+      background-image: cdnUrl("/img/ML/stream_tile_edit.svg");
+      background-size: 16px 16px;
+    }
+
+    &.tile-menu-share-bt {
+      background-image: cdnUrl("/img/ML/stream_tile_share.svg");
+      background-size: 14px 14px;
+    }
+
+    &.tile-menu-move-bt {
+      background-image: cdnUrl("/img/ML/move_activity.svg");
+      background-size: 14px 14px;
+    }
+  }
+}

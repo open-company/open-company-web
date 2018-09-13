@@ -1,6 +1,6 @@
 /***** About ******/
 
-div#wrap {
+div.about-wrap {
   background-color: $oc_gray_8;
 
   div.main.about {
@@ -22,124 +22,6 @@ div#wrap {
       text-align: center;
       position: relative;
       overflow: hidden;
-
-      div.balloon {
-        position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
-
-        @include mobile() {
-          display: none;
-        }
-
-        &.big-red {
-          @include image-2x("/img/ML/about_balloon_big_red");
-          background-size: 172px 172px;
-          width: 172px;
-          height: 172px;
-          top: 6px;
-          left: -50px;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/about_balloon_big_green");
-          background-size: 226px 209px;
-          width: 226px;
-          height: 209px;
-          top: -10px;
-          right: -81px;
-        }
-
-        &.small-green-face {
-          @include image-2x("/img/ML/about_balloon_small_green_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 165px;
-          left: 131px;
-        }
-
-        &.small-blue {
-          @include image-2x("/img/ML/about_balloon_small_blue");
-          background-size: 67px 59px;
-          width: 67px;
-          height: 59px;
-          top: 189px;
-          right: 80px;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/about_balloon_small_purple");
-          background-size: 23px 21px;
-          width: 23px;
-          height: 21px;
-          top: 149px;
-          right: 184px;
-        }
-
-        &.big-purple {
-          @include image-2x("/img/ML/balloon_big_purple");
-          background-size: 201px 172px;
-          width: 201px;
-          height: 172px;
-          top: 926px;
-          left: 50%;
-          margin-left: -557px;
-          transform: rotate(210deg);
-        }
-
-        &.small-yellow {
-          @include image-2x("/img/ML/balloon_small_yellow");
-          background-size: 25px 25px;
-          width: 25px;
-          height: 25px;
-          top: 893px;
-          left: 50%;
-          margin-left: -512px;
-        }
-
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow_1");
-          background-size: 135px 135px;
-          width: 135px;
-          height: 135px;
-          top: 1587px;
-          left: 50%;
-          margin-left: 226px;
-        }
-
-        &.small-purple-1 {
-          @include image-2x("/img/ML/about_balloon_small_purple_1");
-          background-size: 50px 44px;
-          width: 50px;
-          height: 44px;
-          top: 1669px;
-          left: 50%;
-          margin-left: 340px;
-          transform: rotate(90deg);
-        }
-
-        &.small-purple-2 {
-          @include image-2x("/img/ML/about_balloon_small_purple_2");
-          background-size: 17px 15px;
-          width: 17px;
-          height: 15px;
-          top: 2068px;
-          left: 50%;
-          margin-left: -556px;
-        }
-
-        &.small-blue-1 {
-          @include image-2x("/img/ML/about_balloon_small_blue_1");
-          background-size: 47px 48px;
-          width: 47px;
-          height: 48px;
-          top: 2102px;
-          left: 50%;
-          margin-left: -539px;
-        }
-      }
 
       h1.about {
         @include avenir_H();
@@ -251,6 +133,10 @@ div#wrap {
               @include image-2x("/img/ML/about_team_sean_johnson");
             }
 
+            &.georgiana-laudi div.user-avatar {
+              @include image-2x("/img/ML/about_team_georgiana_laudi");
+            }
+
             &.stuart-levinson div.user-avatar {
               @include image-2x("/img/ML/about_team_stuart_levinson");
             }
@@ -281,7 +167,7 @@ div#wrap {
 
             div.user-position {
               @include avenir_R();
-              font-size: 18px;
+              font-size: 16px;
               color: rgba($carrot_light_gray_3, 0.8);
               line-height: 27px;
             }

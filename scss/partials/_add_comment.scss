@@ -1,6 +1,7 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
+  margin-bottom: 8px;
 
   @include tablet() {
     padding: 16px 0px 0px;
@@ -9,114 +10,66 @@ div.add-comment-box-container {
   }
 
   div.add-comment-box {
-    background-color: white;
-    border-radius: 4px;
-    border: 2px solid $deep_tan;
     position: relative;
     left: 0;
     right: 0;
     bottom: 0px;
     width: 100%;
-    padding: 15px 16px;
-
-    &:hover, &.show-buttons {
-      box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
-      border: 2px solid $light_ui_grey;
-    }
 
     @include tablet(){
       box-shadow: none;
     }
 
-    div.emoji-picker {
-      position: absolute;
-      right: 6px;
-      top: 9px;
-
-      button.emoji-button {
-        background-size: 16px 16px;
-      }
-
-      @include tablet() {
-        display: none;
-      }
-
-      div.picker-container {
-        right: -92px !important;
-      }
-    }
-
     &.show-buttons {
-      div.emoji-picker {
-        right: 52px;
-        top: 94px;
-      }
 
       div.add-comment-internal {
-        padding: 0px;
-
-        &:before {
-          display: none;
-        }
-
-        div.emoji-picker {
-          right: 60px;
-          bottom: 7px;
-          top: unset;
-        }
+        min-height: unset;
+        box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
+        border: 2px solid $light_ui_grey;
 
         div.add-comment {
-          height: 58px;
-          padding-top: 0px;
-          padding-right: 0px;
-          margin-right: 0px;
-          width: 100%;
+          min-height: 58px;
 
           @include tablet() {
             height: auto;
+            width: auto;
           }
         }
       }
     }
 
     div.add-comment-internal{
-      position: relative;
-      padding-left: 24px;
+      min-height: 24px;
+      width: 100%;
+      background-color: white;
+      border-radius: 6px;
+      border: 2px solid $deep_tan;
+      padding: 9px 16px;
 
-      &:before {
-        content: "";
-        width: 16px;
-        height: 16px;
-        background-image: cdnUrl("/img/ML/reply_comment_shape.svg");
-        background-size: 16px 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-        position: absolute;
-        top: 0px;
-        left: 0px;
+      &:hover {
+        border: 2px solid #D8DBDF;
       }
 
       div.add-comment {
         resize: none;
-        width: 218px;
         border: none;
         outline: none;
-        @include avenir_BOOK();
+        @include avenir_R();
         color: $deep_navy;
-        font-size: 14px;
+        font-size: 16px;
         cursor: text;
-        margin: 0px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        height: 16px;
+        height: 24px;
         min-height: initial;
         white-space: pre-wrap;
         word-wrap: break-word;
-        padding-right: 32px;
+        padding: 4px 0px 0px 0px;
+        margin: 0px;
+        height: auto;
 
         &.medium-editor-placeholder:after {
-          @include avenir_M();
+          @include avenir_R();
           color: rgba($ui_grey, 0.5);
+          margin-left: 0px;
         }
 
         @include tablet() {
@@ -125,35 +78,70 @@ div.add-comment-box-container {
           padding-right: 0px;
         }
 
+        p {
+          margin-bottom: 0px;
+        }
+
         .emojione {
           @include emoji-size(13);
         }
+      }
+    }
 
-        &:after {
-          @include avenir_M();
-          font-size: 14px;
-          content: attr(placeholder);
-          color: rgba($carrot_light_gray_3, 0.4);
-          cursor: text;
-          font-style: none;
+    div.add-comment-footer {
+      margin-top: 16px;
+      height: 40px;
+      position: relative;
+
+      button.cancel-btn {
+        float: right;
+        width: 112px;
+        height: 40px;
+        padding: 10px 24px;
+        text-align: center;
+        color: $ui_grey;
+        @include avenir_H();
+        font-size: 14px;
+
+        &:disabled {
+          color: $light_ui_grey;
         }
       }
 
-      div.add-comment-footer {
-        height: 16px;
-        margin-top: 24px;
+      button.reply-btn {
+        float: right;
+        width: 112px;
+        height: 40px;
+        padding: 10px 24px;
+        background-color: $carrot_green;
+        text-align: center;
+        color: white;
+        @include avenir_H();
+        font-size: 14px;
+        border-radius: 100px;
 
-        div.reply-button-container {
-          float: right;
-          button.reply-btn {
-            float: right;
-            color: $carrot_green;
-            @include avenir_H();
-            font-size: 14px;
-            height: 32px;
-            margin-top: -16px;
-            padding: 16px 0px 0px 16px;
-          }
+        &:disabled {
+          background-color: $light_ui_grey;
+        }
+      }
+
+      div.emoji-picker {
+        position: absolute;
+        top: 8px;
+        left: 0px;
+        right: unset;
+
+        div.picker-container {
+          left: 0px;
+        }
+
+        button.emoji-button {
+          background-size: 20px 20px;
+          background-position: 0% 0%;
+        }
+
+        @include tablet() {
+          display: none;
         }
       }
     }

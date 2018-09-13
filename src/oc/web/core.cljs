@@ -8,6 +8,7 @@
             [oc.web.rum-utils :as ru]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
+            [oc.web.stores.routing]
             [oc.web.stores.org]
             [oc.web.stores.team]
             [oc.web.stores.user]
@@ -15,23 +16,27 @@
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
-            [oc.web.stores.error-banner]
             [oc.web.stores.subscription]
             [oc.web.stores.section]
+            [oc.web.stores.notifications]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.lib.ws-interaction-client]
             [oc.web.actions.team]
+            [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
+            [oc.web.actions.nux :as na]
             [oc.web.actions.user :as user-actions]
-            [oc.web.actions.error-banner :as error-banner-actions]
+            [oc.web.actions.notifications :as notification-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.ziggeo :as ziggeo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -46,19 +51,23 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
-            ; [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.error-banner :refer (error-banner)]
+            [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.secure-activity :refer (secure-activity)]
-            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]))
+            [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
+            [oc.web.components.ui.notifications :refer (notifications)]))
 
 (enable-console-print!)
 
 (defn drv-root [component target]
-  (swap! dis/app-state assoc :router-path @router/path)
   (ru/drv-root {:state dis/app-state
                 :drv-spec (dis/drv-spec dis/app-state router/path)
                 :component component
-                :target target}))
+                :target target})
+  (when-let [notifications-mount-point (sel1 [:div#oc-notifications-container])]
+    (ru/drv-root {:state dis/app-state
+                  :drv-spec (dis/drv-spec dis/app-state router/path)
+                  :component notifications
+                  :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
@@ -110,33 +119,13 @@
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
+  (when (= (:new query-params) "true")
+    (swap! dis/app-state assoc :new-slack-user true))
   (inject-loading))
 
 (defn post-routing []
-  (utils/after 10 (fn []
-    (let [force-refresh (or (utils/in? (:route @router/path) "org")
-                            (utils/in? (:route @router/path) "login"))
-          latest-entry-point (if (or force-refresh
-                                     (nil? (:latest-entry-point @dis/app-state)))
-                               0
-                               (:latest-entry-point @dis/app-state))
-          latest-auth-settings (if (or force-refresh
-                                       (nil? (:latest-auth-settings @dis/app-state)))
-                                 0
-                                 (:latest-auth-settings @dis/app-state))
-          now (.getTime (js/Date.))
-          reload-time (* 1000 60 20)] ; every 20m
-      (when (or (> (- now latest-entry-point) reload-time)
-                (and (router/current-org-slug)
-                     (nil? (dis/org-data))))
-        (user-actions/entry-point-get (router/current-org-slug)))
-      (when (> (- now latest-auth-settings) reload-time)
-        (user-actions/auth-settings-get
-          #(when (and (utils/in? (:route @router/path) "confirm-invitation")
-                      (contains? (:query-params @router/path) :token))
-             (utils/after 100 (fn []
-               (user-actions/confirm-invitation
-                (:token (:query-params @router/path))))))))))))
+  (routing-actions/routing @router/path)
+  (user-actions/initial-loading))
 
 ;; home
 (defn home-handler [target params]
@@ -148,39 +137,30 @@
   (drv-root home-page target))
 
 (defn check-nux [query-params]
-  (let [nux-setup-time 3000
-        has-at-param (contains? query-params :at)
-        nux-cookie (cook/get-cookie
-                    (router/show-nux-cookie
-                     (jwt/get-key :user-id)))
-        show-nux (and (not (:show-login-overlay @dis/app-state))
-                      (jwt/jwt)
-                      (or (some #(= % nux-cookie) (vals router/nux-cookie-values))
-                          (contains? query-params :show-nux-again-please)))
+  (let [has-at-param (contains? query-params :at)
         loading (or (and ;; if is board page
                          (not (contains? query-params :ap))
                          ;; if the board data are not present
-                         (not (:fixed-items (dis/board-data))))
+                         (not (dis/posts-data)))
                          ;; if the all-posts data are not preset
                     (and (contains? query-params :ap)
                          ;; this latter is used when displaying modal over AP
-                         (not (:fixed-items (dis/all-posts-data)))))
-        org-settings (if (and (contains? query-params :org-settings)
+                         (not (dis/posts-data))))
+        user-settings (when (and (contains? query-params :user-settings)
+                                 (#{:profile :notifications} (keyword (:user-settings query-params))))
+                        (keyword (:user-settings query-params)))
+        org-settings (when (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
-                       (keyword (:org-settings query-params))
-                       (when (contains? query-params :access)
-                         :main))
-        next-app-state {:nux (when show-nux (if (or (responsive/is-tablet-or-mobile?)
-                                                    (= (.. js/window -location -hash) "#nux2"))
-                                              :2 :1))
-                        :loading loading
+                       (keyword (:org-settings query-params)))
+        bot-access (when (and (contains? query-params :access)
+                              (= (:access query-params) "bot"))
+                      :slack-bot-success-notification)
+        next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
-                        :nux-loading show-nux
-                        :nux-end nil}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))
-        (utils/after nux-setup-time
-         #(swap! dis/app-state assoc :nux-end true))))
+                        :user-settings user-settings
+                        :bot-access bot-access}]
+        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -253,7 +233,7 @@
     (when (or ;; if the company data are not present
               (not (dis/board-data))
               ;; or the entries key is missing that means we have only
-              (not (:fixed-items (dis/board-data)))
+              (not (:posts-list (dis/board-data)))
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
@@ -276,14 +256,15 @@
   (pre-routing (:query-params params) true)
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
-      (cook/set-cookie!
-       (router/show-nux-cookie
-        (jwt/get-key :user-id))
-       (:new-user router/nux-cookie-values)
-       (* 60 60 24 7)))
-    (if new-user
-      (utils/after 100 #(router/nav! urls/sign-up-profile))
-      (user-actions/slack-lander-check-team-redirect))))
+      (na/new-user-registered "slack"))
+    (user-actions/lander-check-team-redirect)))
+
+(defn google-lander-check [params]
+  (pre-routing (:query-params params) true)
+  (let [new-user (= (:new (:query-params params)) "true")]
+    (when new-user
+      (na/new-user-registered "google"))
+    (user-actions/lander-check-team-redirect)))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
@@ -304,10 +285,19 @@
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
-      (when (and (jwt/jwt)
-                 (seq (cook/get-cookie (router/last-org-cookie))))
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when (jwt/jwt)
+        (if (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! urls/sign-up-profile)))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
+
+    (defroute sign-up-slack-route urls/sign-up-slack {:as params}
+      (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
+      (when (jwt/jwt)
+        (if (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! urls/sign-up-profile)))
+      (simple-handler slack-lander "slack-lander" target params))
 
     (defroute signup-slash-route (str urls/sign-up "/") {:as params}
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
@@ -318,17 +308,13 @@
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
-      (if (jwt/jwt)
-        (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-profile-slash-route (str urls/sign-up-profile "/") {:as params}
       (timbre/info "Routing signup-profile-slash-route" (str urls/sign-up-profile "/"))
-      (if (jwt/jwt)
-        (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
@@ -342,9 +328,47 @@
 
     (defroute signup-team-slash-route (str urls/sign-up-team "/") {:as params}
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
+      (if (jwt/jwt)
+        (when (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+
+    (defroute signup-update-team-route (urls/sign-up-update-team ":org") {:as params}
+      (timbre/info "Routing signup-update-team-route" (urls/sign-up-update-team ":org"))
       (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+
+    (defroute signup-update-team-slash-route (str (urls/sign-up-update-team ":org") "/") {:as params}
+      (timbre/info "Routing signup-update-team-slash-route" (str (urls/sign-up-update-team ":org") "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+
+    (defroute signup-invite-route (urls/sign-up-invite ":org") {:as params}
+      (timbre/info "Routing signup-invite-route" (urls/sign-up-invite ":org"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
+
+    (defroute signup-invite-slash-route (str (urls/sign-up-invite ":org") "/") {:as params}
+      (timbre/info "Routing signup-invite-slash-route" (str (urls/sign-up-invite ":org") "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
+
+    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
+      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
+
+    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
+      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
+      (when-not (jwt/jwt)
+        (router/redirect! urls/sign-up))
+      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
 
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
@@ -355,6 +379,16 @@
       (timbre/info "Routing slack-lander-check-slash-route" (str urls/slack-lander-check "/"))
       ;; Check if the user already have filled the needed data or if it needs to
       (slack-lander-check params))
+
+    (defroute google-lander-check-route urls/google-lander-check {:as params}
+      (timbre/info "Routing google-lander-check-route" urls/google-lander-check)
+      ;; Check if the user already have filled the needed data or if it needs to
+      (google-lander-check params))
+
+    (defroute google-lander-check-slash-route (str urls/google-lander-check "/") {:as params}
+      (timbre/info "Routing google-lander-check-slash-route" (str urls/google-lander-check "/"))
+      ;; Check if the user already have filled the needed data or if it needs to
+      (google-lander-check params))
 
     (defroute about-route urls/about {:as params}
       (timbre/info "Routing about-route" urls/about)
@@ -389,15 +423,17 @@
         (cook/remove-cookie! :show-login-overlay))
       (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
 
+    (defroute confirm-invitation-password-route urls/confirm-invitation-password {:as params}
+      (timbre/info "Routing confirm-invitation-password-route" urls/confirm-invitation-password)
+      (when-not (jwt/jwt)
+        (router/redirect! urls/home))
+      (simple-handler #(onboard-wrapper :invitee-lander-password) "confirm-invitation" target params))
+
     (defroute confirm-invitation-profile-route urls/confirm-invitation-profile {:as params}
       (timbre/info "Routing confirm-invitation-profile-route" urls/confirm-invitation-profile)
       (when-not (jwt/jwt)
         (router/redirect! urls/home))
       (simple-handler #(onboard-wrapper :invitee-lander-profile) "confirm-invitation" target params))
-
-    ; (defroute subscription-callback-route urls/subscription-callback {}
-    ;   (when-let [s (cook/get-cookie :subscription-callback-slug)]
-    ;     (router/redirect! (urls/org-settings s))))
 
     (defroute email-wall-route urls/email-wall {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-route" urls/email-wall)
@@ -446,13 +482,30 @@
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
 
+    (defroute must-see-route (urls/must-see ":org") {:as params}
+      (timbre/info "Routing must-see-route" (urls/must-see ":org"))
+      (org-handler "must-see" target org-dashboard (assoc-in params [:params :board] "must-see")))
+
+    (defroute must-see-slash-route (str (urls/must-see ":org") "/") {:as params}
+      (timbre/info "Routing must-see-slash-route" (str (urls/must-see ":org") "/"))
+      (org-handler "must-see" target org-dashboard (assoc-in params [:params :board] "must-see")))
+
+    (defroute user-notifications-route urls/user-notifications {:as params}
+      (timbre/info "Routing user-notifications-route" urls/user-notifications)
+      (pre-routing (:query-params params))
+      (router/set-route! ["user-profile"] {:query-params (:query-params params)})
+      (post-routing)
+      (if (jwt/jwt)
+        (router/redirect! (str (utils/your-digest-url) "?user-settings=notifications"))
+        (router/redirect! urls/home)))
+
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
       (pre-routing (:query-params params))
       (router/set-route! ["user-profile"] {:query-params (:query-params params)})
       (post-routing)
       (if (jwt/jwt)
-        (drv-root user-profile target)
+        (router/redirect! (str (utils/your-digest-url) "?user-settings=profile"))
         (router/redirect! urls/home)))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
@@ -488,15 +541,25 @@
       (secretary/uri-dispatcher [_loading_route
                                  login-route
                                  ;; Signup email
+                                 sign-up-slack-route
                                  signup-profile-route
                                  signup-profile-slash-route
                                  signup-team-route
                                  signup-team-slash-route
+                                 signup-update-team-route
+                                 signup-update-team-slash-route
+                                 signup-setup-sections-route
+                                 signup-setup-sections-slash-route
+                                 signup-invite-route
+                                 signup-invite-slash-route
                                  signup-route
                                  signup-slash-route
                                  ;; Signup slack
                                  slack-lander-check-route
                                  slack-lander-check-slash-route
+                                 ;; Signup google
+                                 google-lander-check-route
+                                 google-lander-check-slash-route
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route
@@ -507,23 +570,19 @@
                                  logout-route
                                  email-confirmation-route
                                  confirm-invitation-route
+                                 confirm-invitation-password-route
                                  confirm-invitation-profile-route
                                  password-reset-route
                                  ;  ; subscription-callback-route
                                  ;; Home page
                                  home-page-route
                                  user-profile-route
+                                 user-notifications-route
                                  ;; Org routes
                                  org-route
                                  org-slash-route
                                  all-posts-route
                                  all-posts-slash-route
-                                 ; org-settings-route
-                                 ; org-settings-slash-route
-                                 ; org-settings-team-route
-                                 ; org-settings-team-slash-route
-                                 ; org-settings-invite-route
-                                 ; org-settings-invite-slash-route
                                  ; Drafts board
                                  drafts-route
                                  drafts-slash-route
@@ -564,12 +623,13 @@
    #(user-actions/update-jwt %) ;; success jwt refresh after expire
    #(user-actions/logout) ;; failed to refresh jwt
    ;; network error
-   #(error-banner-actions/show-banner utils/generic-network-error 10000))
+   #(notification-actions/show-notification (assoc utils/network-error :expire 10)))
 
   ;; Persist JWT in App State
   (user-actions/dispatch-jwt)
 
   ;; Subscribe to websocket client events
+  (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
   (sa/ws-interaction-subscribe)
   (oa/subscribe)
@@ -578,12 +638,11 @@
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
-  ; mount the error banner
-  (drv-root error-banner (sel1 [:div#oc-error-banner]))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when (and handle-url-change route-dispatch!)
-    (router/setup-navigation! handle-url-change route-dispatch!)))
+    (router/setup-navigation! handle-url-change route-dispatch!))
+  (ziggeo/init-ziggeo true))
 
 (defn on-js-reload []
   (.clear js/console)

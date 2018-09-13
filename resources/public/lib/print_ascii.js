@@ -6,7 +6,6 @@ function OCWebHelp(){
               "OCWebPrintTeamRoster(): to print the current team roster of users,\n" +
               "OCWebPrintChangeData(): to print the current change data,\n" +
               "OCWebPrintBoardData(): to print the current board data,\n" +
-              "OCWebPrintActivitiesData(): to print all the activities loaded for the current board,\n" +
               "OCWebPrintActivityData(): to print the current activity data,\n" +
               "OCWebPrintSecureStoryData(): to print the current story in a secure link,\n" +
               "OCWebPrintReactionsData(): to print the current activity reactions data,\n" +

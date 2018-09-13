@@ -35,7 +35,7 @@
             [:div.sections-picker-section-name
               (:name b)]
             [:div.sections-picker-section-posts
-              (str (count (:fixed-items b)) " posts")]]))]))
+              (str (:entry-count b) " posts")]]))]))
 
 (rum/defcs sections-picker < rum/reactive
                              (drv/drv :editable-boards)
@@ -82,9 +82,10 @@
       [:button.mlb-reset.mobile-modal-close-bt
         {:on-click #(on-change nil)}]
       (if @(::show-add-section s)
-        (section-editor nil #(do
+        (section-editor nil (fn [sec-data note]
                               (reset! (::show-add-section s) false)
-                              (on-change %)))
+                              (on-change sec-data note))
+         true)
         [:div.sections-picker.group
           {:class (when should-show-headers? "show-headers")}
           [:div.sections-picker-header

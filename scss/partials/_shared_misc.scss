@@ -1,68 +1,24 @@
 div.main-animation-container {
-  width: 939px;
-  height: 771px;
-  overflow: hidden;
-  margin: 85px auto 0px;
-  padding: 0;
-  z-index: 10;
   position: relative;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
-
-  @include tablet() {
-    width: 100%;
-  }
 
   @include mobile() {
-    display: none;
+    width: 100%;
+    margin: 80px 0px 0px;
   }
 
-  video.main-animation {
-    width: 940px;
-    height: 771px;
+  img.main-animation {
+    max-width: 1280px;
+    width: calc(100% - 48px);
+    margin: 120px auto 0px;
+    padding: 0;
+    z-index: 10;
+    position: relative;
 
-    @include tablet() {
+    @include mobile() {
       width: 100%;
-    }
-  }
-}
-
-div.horizontal-carousell {
-  width: 100vw;
-  height: 482px;
-  margin-top: 64px;
-  margin-left: -32px;
-  z-index: 10;
-  overflow-x: auto;
-
-  @include big_web(){
-    display: none;
-  }
-
-  div.horizontal-carousell-inner {
-    width: calc(893px + 24px);
-    height: 482px;
-
-    img {
-      width: 271px;
-      height: 482px;
-      float: left;
-      display: inline;
-      border-radius: 8px;
-      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
-    }
-
-    img.horizontal-carousell-1 {
-      margin-left: 32px;
-    }
-
-    img.horizontal-carousell-2 {
-      margin-left: 20px;
-    }
-
-    img.horizontal-carousell-3 {
-      margin-left: 20px;
-      margin-right: 32px;
+      height: auto;
+      margin: 0px auto;
+      max-width: 327px;
     }
   }
 }
@@ -213,123 +169,182 @@ div.cards-container {
 }
 
 section.testimonials-section {
-  background-color: $carrot_dark_gray;
   text-align: center;
-  padding: 72px 0px;
+  padding: 72px 0px !important;
   position: relative;
 
   @include mobile() {
-    margin-left: -32px;
-    width: 100vw;
-    padding: 72px 32px;
+    width: 100%;
+    padding: 80px 24px !important;
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+    text-align: left;
   }
 
   @include tablet() {
-    width: 100vw;
-    padding: 72px 32px;
-  }
-
-  div.balloon {
-    position: absolute;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 1;
-
-    @include tablet() {
-      display: none;
-    }
-
-    &.big-yellow-1 {
-      @include image-2x("/img/ML/balloon_big_yellow_1");
-      background-size: 135px 135px;
-      width: 135px;
-      height: 135px;
-      top: -67px;
-      left: 18.71%;
-    }
-
-    &.small-blue-1 {
-      @include image-2x("/img/ML/balloon_small_blue_1");
-      background-size: 50px 44px;
-      width: 50px;
-      height: 44px;
-      top: -87px;
-      left: 24.71%;
-    }
+    width: 100%;
+    padding: 80px 24px;
   }
 
   div.testimonials-section-title {
-    @include avenir_M();
-    color: white;
+    @include avenir_H();
+    color: $deep_navy;
     font-size: 38px;
+    line-height: 44px;
+
+    @include mobile(){
+      font-size: 24px;
+      line-height: 30px;
+    }
   }
 
   div.testimonials-section-subtitle {
-    @include avenir_M();
+    @include avenir_R();
     font-size: 20px;
-    color: $light_ui_grey;
+    line-height: 26px;
+    color: $ui_grey;
     margin-top: 11px;
+
+    @include mobile(){
+      font-size: 16px;
+      line-height: 22px;
+    }
   }
 
   div.testimonials-cards-container {
-    width: 1164px;
+    width: 1080px;
     margin: 50px auto 0px;
 
     @include tablet() {
       width: 100%;
+      margin: 16px auto 0px;
     }
 
-    div.card {
+    div.testimonial-card {
       float: left;
-      width: 276px;
-      background-color: white;
+      width: 340px;
       border-radius: 8px;
-      padding: 24px 26px;
+      background-color: $deep_navy;
+      padding: 24px;
       text-align: left;
+
+      &:first-child {
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_1_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 84px;
+            height: 18px;
+            @include image-2x("/img/ML/testimonial_1_logo");
+            background-size: 84px 18px;
+          }
+        }
+      }
+
+      &:nth-child(2) {
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_2_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 120px;
+            height: 18px;
+            @include image-2x("/img/ML/testimonial_2_logo");
+            background-size: 120px 18px;
+          }
+        }
+      }
+
+      &:nth-child(3) {
+        float: right;
+
+        div.testimonial-image {
+          @include image-2x("/img/ML/testimonial_3_image");
+        }
+
+        div.testimonial-footer {
+          div.testimonial-logo {
+            width: 196px;
+            height: 20px;
+            @include image-2x("/img/ML/testimonial_3_logo");
+            background-size: 196px 20px;
+          }
+        }
+      }
+
+      div.testimonial-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-position: center;
+        background-size: 40px 40px;
+        background-repeat: no-repeat;
+        margin-right: 16px;
+        float: left;
+      }
+
+      div.testimonial-name {
+        @include avenir_B();
+        font-size: 15px;
+        color: white;
+        text-transform: uppercase;
+        line-height: 24px;
+      }
+
+      div.testimonial-role {
+        @include avenir_M();
+        font-size: 14px;
+        color: rgba(white, 0.6);
+        line-height: 19px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      div.testimonial-quote {
+        @include avenir_M();
+        font-size: 16px;
+        color: white;
+        line-height: 20px;
+        height: 96px;
+
+        @include mobile() {
+          min-height: 80px;
+        }
+
+        &:not(:first-child){
+          padding-top: 16px;
+        }
+      }
+
+      div.testimonial-footer {
+        margin-top: 16px;
+
+        a, a:active, a:focus {
+          text-decoration: none;
+        }
+
+        div.testimonial-logo {
+          float: right;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+      }
 
       @include tablet() {
         float: unset;
-        margin: 20px auto 0px;
+        margin: 20px 0px 0px;
         width: 100%;
       }
 
       &:not(:first-child) {
-        margin-left: 20px;
+        margin-left: 30px;
 
         @include tablet() {
-          margin: 20px auto 0px;
-        }
-      }
-
-      div.card-content {
-        @include avenir_M();
-        font-size: 16px;
-        color: rgba($carrot_dark_gray, 0.8);
-        line-height: 24px;
-      }
-
-      div.card-author {
-        margin-top: 8px;
-
-        img.card-avatar {
-          max-width: 40px;
-          max-height: 40px;
-          border-radius: 50%;
-          float: left;
-        }
-
-        div.author-name {
-          @include avenir_H();
-          font-size: 14px;
-          color: $carrot_dark_gray;
-          margin-left: 48px;
-        }
-
-        div.author-company {
-          @include avenir_M();
-          font-size: 12px;
-          color: rgba($carrot_light_gray_3, 0.5);
-          margin-left: 48px;
+          margin: 20px 0px 0px;
         }
       }
     }
@@ -337,21 +352,625 @@ section.testimonials-section {
 }
 
 section.keep-aligned {
-  padding: 72px 0px;
+  padding: 120px 0px;
   text-align: center;
+
+  @include mobile() {
+    width: 100%;
+    padding: 72px 32px;
+    padding-top: 72px !important;
+    padding-bottom: 72px !important;
+    text-align: left;
+  }
 
   @include mobile_to_tablet(){
     padding: 0 32px;
   }
 
   div.keep-aligned-title {
-    @include avenir_M();
-    font-size: 34px;
-    color: $carrot_dark_gray;
+    @include avenir_H();
+    font-size: 28px;
+    line-height: 38px;
+    color: $deep_navy;
     margin-bottom: 20px;
+
+    @include mobile() {
+      @include avenir_H();
+      font-size: 22px;
+      line-height: 26px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
   }
 
   button.get-started-button {
     margin-top: 0px;
+  }
+
+  div.no-credit-card {
+    @include avenir_R();
+    color: $ui_grey;
+    font-size: 14px;
+    margin-top: 24px;
+    text-align: center;
+
+    @include mobile() {
+      font-size: 12px;
+      margin-top: 0px;
+    }
+  }
+}
+
+div.core-values-list {
+  width: calc(100% - 48px);
+  text-align: center;
+  margin: 40px auto 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @include mobile() {
+    width: 251px;
+    height: auto;
+    display: block;
+    justify-content: unset;
+    align-items: unset;
+  }
+
+  div.core-value-container {
+    float: left;
+    margin-left: 20px;
+
+    div.core-value-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      @include mobile(){
+        margin-top: 24px;
+      }
+
+      div.core-value-icon {
+        width: 40px;
+        height: 40px;
+        background-size: 40px 40px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-right: 12px;
+      }
+
+      div.core-value {
+        @include avenir_B();
+        font-size: 14px;
+        line-height: 19px;
+        text-transform: uppercase;
+
+        @include mobile(){
+          font-size: 16px;
+          line-height: 18px;
+        }
+      }
+    }
+
+    div.core-value-white-box {
+      background-color: white;
+      width: 246px;
+      padding: 20px;
+      box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.1);
+      text-align: left;
+      margin-top: 16px;
+
+      @include tablet() {
+        display: none;
+      }
+
+      div.core-value-box-header {
+        @include avenir_M();
+        font-size: 12px;
+        color: $ui_grey;
+
+        span.dot {
+          font-size: 8px;
+          color: $light_ui_grey;
+        }
+      }
+
+      div.core-value-box-title {
+        @include avenir_H();
+        color: $deep_navy;
+        font-size: 16px;
+        line-height: 18px;
+        margin-top: 16px;
+      }
+    }
+
+    &.key-announcement {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/key_announcements_icon.svg");
+      }
+
+      div.core-value {
+        color: #AF66F9;
+      }
+    }
+
+    &.team-updates {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/team_updates_icon.svg");
+      }
+
+      div.core-value {
+        color: #5789FA;
+      }
+    }
+
+    &.strategic-plans {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/strategic_plans_icon.svg");
+      }
+
+      div.core-value {
+        color: #32C97B;
+      }
+    }
+
+    &.stories {
+      div.core-value-icon {
+        background-image: cdnUrl("/img/ML/stories_icon.svg");
+      }
+
+      div.core-value {
+        color: #FB5E48;
+      }
+    }
+  }
+}
+
+button.get-started-button {
+  width: 255px;
+  height: 48px;
+  border-radius: 100px;
+  background-color: $carrot_orange;
+  color: white;
+  @include avenir_H();
+  font-size: 20px;
+  margin: 48px auto 0;
+  position: relative;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+
+  @include mobile(){
+    width: 100%;
+    margin: 16px auto;
+    padding: 0px;
+    font-size: 16px;
+  }
+}
+
+section.home-keep-aligned {
+  padding: 120px 24px 160px;
+  text-align: center;
+
+  @include mobile() {
+    padding: 40px 24px 80px !important;
+  }
+
+  div.scroll-down {
+    width: 48px;
+    height: 48px;
+    @include image-2x("/img/ML/homepage_scroll_down");
+    background-size: 22px 22px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0 auto;
+    position: relative;
+    top: -142px;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    background-color: white;
+
+    @include mobile() {
+      top: -62px;
+    }
+  }
+
+  h2.keep-aligned-title {
+    @include avenir_H();
+    font-size: 38px;
+    line-height: 42px;
+    color: $deep_navy;
+    text-align: center;
+    margin: 0px;
+
+    @include mobile() {
+      text-align: left;
+      font-size: 24px;
+      line-height: 30px;
+    }
+  }
+
+  div.keep-aligned-section {
+    margin: 0px auto;
+
+    div.keep-aligned-section-row {
+      width: 1176px;
+      height: 354px;
+      margin: 120px auto 0px;
+
+      &.first-row {
+        width: 1127px;
+        height: 386px;
+        margin: 80px auto 0px;
+
+        div.keep-aligned-section-copy {
+          width: 426px;
+          height: 200px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
+        @include mobile() {
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      &.second-row {
+        width: 1112px;
+        height: 400px;
+
+        div.keep-aligned-section-copy {
+          width: 400px;
+          height: 200px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
+        @include mobile() {
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      &.third-row {
+        width: 1178px;
+        height: 330px;
+
+        div.keep-aligned-section-copy {
+          width: 467px;
+          height: 160px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
+        @include mobile() {
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      &.fourth-row {
+        width: 1120px;
+        height: 406px;
+
+        div.keep-aligned-section-copy {
+          width: 400px;
+          height: 200px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+          }
+        }
+
+        @include mobile() {
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      @include mobile() {
+        width: 100%;
+        height: auto;
+        margin: 80px auto 0px;
+      }
+
+      img.keep-aligned-section-screenshot {
+        width: auto;
+        height: auto;
+
+        @include mobile() {
+          margin: 0 auto;
+          max-width: 100%;
+        }
+
+        &.screenshot-1 {
+          width: 665px;
+          height: 386px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
+        }
+
+        &.screenshot-2 {
+          width: 672px;
+          height: 439px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
+        }
+
+        &.screenshot-3 {
+          width: 695px;
+          height: 370px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
+        }
+
+        &.screenshot-4 {
+          width: 710px;
+          height: 444px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+          }
+        }
+      }
+
+      div.keep-aligned-section-copy {
+        margin-top: 82px;
+        text-align: left;
+
+        @include mobile() {
+          width: 100%;
+          margin-top: 40px;
+        }
+
+        div.keep-aligned-section-copy-title {
+          @include avenir_H();
+          font-size: 24px;
+          color: $deep_navy;
+          line-height: 42px;
+
+          @include mobile() {
+            font-size: 22px;
+            line-height: 32px;
+          }
+        }
+
+        div.keep-aligned-section-list-item {
+          position: relative;
+          @include avenir_R();
+          font-size: 18px;
+          line-height: 22px;
+          color: $deep_navy;
+          margin-top: 12px;
+          padding-left: 36px;
+
+          @include mobile() {
+            padding-top: 20px;
+            padding-bottom: 8px;
+            border-top: 1px solid #E3E4E2;
+          }
+
+          &:before {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            background-size: 24px 24px;
+            background-position: center;
+            background-repeat: no-repeat;
+            content: "";
+            width: 24px;
+            height: 24px;
+
+            @include mobile() {
+              top: 14px;
+            }
+          }
+
+          &.purple-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_purple.svg");
+          }
+
+          &.green-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_green.svg");
+          }
+
+          &.red-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_red.svg");
+          }
+
+          &.blue-checkmark:before {
+            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_blue.svg");
+          }
+        }
+      }
+
+      @include big_web() {
+        &:nth-child(odd) {
+          img.keep-aligned-section-screenshot {
+            float: left;
+          }
+
+          div.keep-aligned-section-copy {
+            float: right;
+          }
+        }
+
+        &:nth-child(even) {
+          img.keep-aligned-section-screenshot {
+            float: right;
+          }
+
+          div.keep-aligned-section-copy {
+            float: left;
+          }
+        }
+      }
+    }
+  }
+}
+
+section.access-anywhere-section {
+  height: 460px;
+
+  @include mobile() {
+    width: 100%;
+    height: auto;
+    padding: 80px 24px !important;
+  }
+
+  div.access-anywhere-section-container {
+    width: 1080px;
+    margin: 0px auto;
+    position: relative;
+
+    @include mobile() {
+      width: 100%;
+    }
+
+    div.access-anywhere-screenshot {
+      width: 235px;
+      height: 300px;
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      margin-left: -335px;
+      @include image-2x("/img/ML/access_anywhere_screenshot");
+      background-size: 235px 300px;
+      background-repeat: no-repeat;
+      background-position: center;
+
+      @include mobile() {
+        position: relative;
+        top: unset;
+        left: unset;
+        width: 235px;
+        height: 309px;
+        margin: 40px auto 0px;
+        background-size: 235px 309px;
+      }
+    }
+
+    div.access-anywhere-copy {
+      width: 406px;
+      height: 98px;
+      position: absolute;
+      top: 181px;
+      left: 50%;
+      margin-left: -60px;
+      text-align: left;
+
+      @include mobile() {
+        position: relative;
+        top: unset;
+        left: unset;
+        margin-left: 0px;
+        width: 100%;
+        height: auto;
+      }
+
+      div.access-anywhere-copy-title {
+        @include avenir_H();
+        font-size: 28px;
+        line-height: 32px;
+        color: $deep_navy;
+
+        @include mobile(){
+          font-size: 24px;
+          line-height: 30px;
+          text-align: center;
+        }
+      }
+
+      div.access-anywhere-copy-subtitle {
+        @include avenir_R();
+        font-size: 18px;
+        line-height: 26px;
+        color: $deep_navy;
+
+        @include mobile(){
+          text-align: center;
+          max-width: 294px;
+          margin: 6px auto 0px;
+        }
+      }
+    }
+  }
+}
+
+section.slack-comparison {
+  padding: 120px 32px;
+  margin: 0px auto;
+  text-align: center;
+
+  @include mobile() {
+    text-align: left;
+    padding: 80px 32px !important;
+  }
+
+  div.slack-comparison-headline {
+    color: #BA61FC;
+    @include avenir_B();
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+
+  div.slack-comparison-headline-1 {
+    color: $deep_navy;
+    @include avenir_R();
+    font-size: 38px;
+    line-height: 54px;
+    margin-top: 8px;
+
+    @include mobile(){
+      font-size: 24px;
+      line-height: 30px;
+      margin-top: 24px;
+    }
+  }
+
+  div.slack-comparison-headline-2 {
+    color: $deep_navy;
+    @include avenir_H();
+    font-size: 38px;
+    line-height: 54px;
+
+    @include mobile(){
+      font-size: 20px;
+      line-height: 30px;
+      margin-top: 24px;
+    }
+  }
+
+  img.slack-comparison-screenshot {
+    max-width: 1080px;
+    box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.07);
+    margin: 40px auto 0px;
+
+    @include mobile() {
+      width: 100%;
+    }
   }
 }

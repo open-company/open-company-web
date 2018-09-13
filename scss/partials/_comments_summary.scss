@@ -19,13 +19,7 @@ div.is-comments {
       border-radius: 12px;
       margin-left: -9px;
 
-      img {
-        max-width: 22px;
-        max-height: 22px;
-        margin-top: -2px;
-        margin-left: 1px;
-        border-radius: 11px;
-      }
+      @include user-profile(22);
 
       &:first-child {
         margin-left: 0px;
@@ -35,18 +29,44 @@ div.is-comments {
 
   div.is-comments-summary {
     float: left;
-    font-size: 14px;
+    font-size: 12px;
     color: $ui_grey;
     @include avenir_M();
-    margin-top: 3px;
+    margin-top: 6px;
     text-align: left;
     white-space: nowrap;
-    max-width: 74%;
+    // max-width: 74%;
     overflow: hidden;
     text-overflow: ellipsis;
 
+    &.add-a-comment {
+      opacity: 0.3;
+    }
+
     @include mobile() {
       max-width: 68vw;
+      opacity: 1;
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+
+    span.add-a-comment {
+      padding-left: 6px;
+      color: $deep_navy;
+
+      &:before {
+        content: "";
+        background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 14px;
+        height: 14px;
+        float: left;
+        display: block;
+      }
     }
   }
 }

@@ -2,21 +2,23 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            [oc.web.components.drafts-layout :refer (drafts-layout)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
@@ -60,20 +62,17 @@
 (defn get-default-section [s]
   (let [editable-boards @(drv/get-ref s :editable-boards)
         org-slug (router/current-org-slug)
-        cookie-name (router/last-used-board-slug-cookie org-slug)
-        cookie-value (cook/get-cookie cookie-name)
+        cookie-value (au/last-used-section)
         board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
-        board-data (or board-from-cookie (first (sort-by :name (vals editable-boards))))]
+        filtered-boards (filterv #(not (:draft %)) (vals editable-boards))
+        board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
     {:board-name (:name board-data)
      :board-slug (:slug board-data)}))
 
 (defn get-board-for-edit [s]
-  (let [board-data @(drv/get-ref s :board-data)
-        route @(drv/get-ref s :route)
-        is-all-posts (or (utils/in? (:route route) "all-posts")
-                         (:from-all-posts route))
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)]
-    (if (or is-drafts-board is-all-posts)
+  (let [board-data @(drv/get-ref s :board-data)]
+    (if (or (not board-data)
+            (= (:slug board-data) utils/default-drafts-board-slug))
       (get-default-section s)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -83,18 +82,38 @@
   [s]
   (reset! (::ww s) (responsive/ww)))
 
+(defn- update-tooltips [s]
+  (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
+    (.tooltip $compose-button (.attr $compose-button "data-viewer")))
+  (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
+    (.tooltip $board-switcher)
+    (doto $board-switcher
+     (.tooltip "hide")
+     (.tooltip "fixTitle"))))
+
+(defn compose [s]
+  (utils/remove-tooltips)
+  (activity-actions/activity-edit (get-board-for-edit s))
+  ;; If the add post tooltip is visible
+  (when @(drv/get-ref s :show-add-post-tooltip)
+    ;; Dismiss it and bring up the invite people tooltip
+    (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
+
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :board-data)
-                              (drv/drv :all-posts)
-                              (drv/drv :nux)
+                              (drv/drv :ap-initial-at)
+                              (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-section-editor)
                               (drv/drv :show-section-add)
                               (drv/drv :show-add-post-tooltip)
+                              (drv/drv :show-post-added-tooltip)
+                              (drv/drv :show-draft-post-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
+                              (drv/drv :current-user-data)
                               ;; Locals
                               (rum/local nil ::force-update)
                               (rum/local nil ::ww)
@@ -105,15 +124,16 @@
                               ;; Mixins
                               (ui-mixins/render-on-resize win-width)
                               {:before-render (fn [s]
-                                ;; Check if it still needs the add post tooltip
-                                (activity-actions/check-add-post-tooltip)
+                                ;; Check if it needs any NUX stuff
+                                (nux-actions/check-nux)
                                 s)
                                :will-mount (fn [s]
                                 (win-width s)
                                 (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
                                       cookie-value (cook/get-cookie board-view-cookie)
                                       board-view (or (keyword cookie-value) :stream)
-                                      fixed-board-view (if (responsive/is-tablet-or-mobile?)
+                                      fixed-board-view (if (or (responsive/is-tablet-or-mobile?)
+                                                               (not (nil? @(drv/get-ref s :ap-initial-at))))
                                                         :stream
                                                         board-view)]
                                   (reset! (::board-switch s) fixed-board-view))
@@ -123,50 +143,44 @@
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
+                                (update-tooltips s)
+                                ;; Reopen cmail if it was open
+                                (activity-actions/cmail-reopen?)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)
                                   (when @(::scroll-listener s)
                                     (events/unlistenByKey @(::scroll-listener s))
                                     (reset! (::scroll-listener s) nil)))
+                                s)
+                               :did-update (fn [s]
+                                (update-tooltips s)
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        all-posts-data (drv/react s :all-posts)
+        posts-data (drv/react s :filtered-posts)
         route (drv/react s :route)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
-        nux (drv/react s :nux)
+        is-must-see (utils/in? (:route route) "must-see")
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        empty-board? (and (not nux)
-                          (zero? (count (:fixed-items board-data))))
-        sidebar-width (+ responsive/left-navigation-sidebar-width
-                         responsive/left-navigation-sidebar-minimum-right-margin)
-        board-container-style {:marginLeft (if is-mobile?
-                                             "0px"
-                                             (str (max
-                                                   sidebar-width
-                                                   (+
-                                                    (/
-                                                     (- @(::ww s) responsive/dashboard-container-width sidebar-width)
-                                                     2)
-                                                    sidebar-width))
-                                             "px"))}
+        empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
-        compose-fn (fn [_]
-                    (utils/remove-tooltips)
-                    (activity-actions/entry-edit (get-board-for-edit s)))
         show-section-editor (drv/react s :show-section-editor)
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
+        board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        all-posts-key (str "all-posts-stream-" (clojure.string/join "-" (keys (:fixed-items all-posts-data))))]
+        can-compose (pos? (count all-boards))
+        should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))
+        current-user-data (drv/react s :current-user-data)
+        is-admin-or-author (utils/is-admin-or-author? org-data)]
       ;; Entries list
       [:div.dashboard-layout.group
         ;; Show create new section for desktop
@@ -174,10 +188,10 @@
                    (not (responsive/is-tablet-or-mobile?)))
           [:div.section-add
             {:class (when show-drafts "has-drafts")}
-           (section-editor nil (fn [board-data]
-                                  (dis/dispatch! [:input [:show-section-add] false])
+           (section-editor nil (fn [board-data note]
                                   (when board-data
-                                    (section-actions/section-save board-data))))])
+                                    (section-actions/section-save board-data note
+                                     #(dis/dispatch! [:input [:show-section-add] false])))))])
         [:div.dashboard-layout-container.group
           (when-not is-mobile?
             (navigation-sidebar))
@@ -186,41 +200,50 @@
           (when (or (not is-mobile?)
                     (not mobile-navigation-sidebar))
             [:div.board-container.group
-              {:class (when is-all-posts "all-posts-container")
-               :style board-container-style}
+              {:class (when is-all-posts "all-posts-container")}
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
+                {:on-click #(nav-actions/mobile-nav-sidebar)}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:dangerouslySetInnerHTML (if is-all-posts
-                                                  #js {"__html" "All Posts"}
-                                                  (utils/emojify (:name board-data)))}])
+                      {:dangerouslySetInnerHTML (cond
+                                                 is-all-posts
+                                                 #js {"__html" "All posts"}
+
+                                                 is-must-see
+                                                 #js {"__html" "Must see"}
+
+                                                 :default
+                                                 (utils/emojify (:name board-data)))}])
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)
+                             (not is-must-see)
                              (not (:read-only board-data)))
                     [:div.board-settings-container.group
                       [:button.mlb-reset.board-settings-bt
                         {:data-toggle (when-not is-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (str (:name board-data) " settings")
                          :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
                       ;; Show section settings for desktop
                       (when (and show-section-editor
                                  (not (responsive/is-tablet-or-mobile?)))
                         (section-editor board-data
-                         (fn [section-data]
-                           (dis/dispatch! [:input [:show-section-editor] false])
+                         (fn [section-data note]
                            (when section-data
-                             (section-actions/section-save section-data)))))])
+                             (section-actions/section-save section-data note
+                               #(dis/dispatch! [:input [:show-section-editor] false]))))))])
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}
@@ -230,19 +253,26 @@
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
                       "Public"])]
                 ;; Add entry button
-                (when (and (not (:read-only org-data))
-                           (or (utils/link-for (:links board-data) "create")
-                               is-drafts-board
-                               is-all-posts))
+                (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
-                    [:button.mlb-reset.mlb-default.add-to-board-top-button.group
-                      {:on-click compose-fn}
-                      [:div.add-to-board-pencil]
-                      [:label.add-to-board-label
-                        "Compose"]]
+                    (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
+                      [:button.mlb-reset.mlb-default.add-to-board-top-button.group
+                        {:ref :top-compose-button
+                         :on-click #(when can-compose (compose s))
+                         :class (when-not can-compose "disabled")
+                         :title (when show-tooltip? "You are a view-only user.")
+                         :data-viewer (if show-tooltip? "enable" "disable")
+                         :data-toggle (when show-tooltip? "tooltip")
+                         :data-placement (when show-tooltip? "top")
+                         :data-container (when show-tooltip? "body")
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                        [:div.add-to-board-plus]
+                        [:label.add-to-board-label
+                          "New"]])
                     (when @(::show-top-boards-dropdown s)
                       (dropdown-list
                        {:items (map
@@ -254,63 +284,110 @@
                         :on-blur #(reset! (::show-top-boards-dropdown s) false)
                         :on-change (fn [item]
                                      (reset! (::show-top-boards-dropdown s) false)
-                                     (activity-actions/entry-edit {:board-slug (:value item)
-                                                                   :board-name (:label item)}))}))])
-                (when (and (not is-mobile?)
-                           (not is-drafts-board))
+                                     (activity-actions/activity-edit {:board-slug (:value item)
+                                                                      :board-name (:label item)}))}))])
+                (when-not is-mobile?
                   [:div.board-switcher.group
-                    [:button.mlb-reset.board-switcher-bt.stream-view
-                      {:class (when (= @(::board-switch s) :stream) "active")
-                       :on-click #(do
-                                    (reset! (::board-switch s) :stream)
-                                    (cook/set-cookie! board-view-cookie "stream" (* 60 60 24 365)))}]
-                    [:button.mlb-reset.board-switcher-bt.grid-view
-                      {:class (when (= @(::board-switch s) :grid) "active")
-                       :on-click #(do
-                                    (reset! (::board-switch s) :grid)
-                                    (cook/set-cookie! board-view-cookie "grid" (* 60 60 24 365)))}]])]
-              (when (drv/react s :show-add-post-tooltip)
-                [:div.add-post-tooltip-container.group
-                  [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(activity-actions/hide-add-post-tooltip)}]
-                  [:div.add-post-tooltip-icon]
-                  [:div.add-post-tooltip
-                    "Get started by creating a new post to share an update, announcement, or plans."]
-                  [:div.add-post-tooltip.second-line
-                    "The sample post below can be deleted anytime."]
-                  [:div.add-post-tooltip-arrow]
-                  [:button.mlb-reset.add-post-tooltip-compose-bt
-                    {:on-click compose-fn}
-                    "Create new post"]])
+                    (let [grid-view? (= @board-switch :grid)]
+                      [:button.mlb-reset.board-switcher-bt
+                        {:class (if grid-view? "stream-view" "grid-view")
+                         :ref "board-switcher"
+                         :on-click #(do
+                                      (reset! board-switch (if grid-view? :stream :grid))
+                                      (cook/set-cookie! board-view-cookie (if grid-view? "stream" "grid")
+                                       (* 60 60 24 365)))
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title (if grid-view? "Stream view" "Grid view")}])])]
+              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
+                (when (and (not is-drafts-board)
+                           add-post-tooltip)
+                  [:div.add-post-tooltip-container.group
+                    [:button.mlb-reset.add-post-tooltip-dismiss
+                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                    [:div.add-post-tooltips
+                      {:class (when (= add-post-tooltip :has-organic-post) "second-user")}
+                      [:div.add-post-tooltip-box-mobile]
+                      [:div.add-post-tooltip-title
+                        (str "Welcome to Carrot, " (:first-name current-user-data))]
+                        [:div.add-post-tooltip
+                          (if is-admin-or-author
+                            (if (= add-post-tooltip :has-organic-post)
+                              (str
+                                "Carrot is where you’ll find announcements, updates, and "
+                                "decisions that keep your team pulling in the same direction.")
+                              (str
+                                "Create a post to see how easy it is to keep your team pulling in the "
+                                "same direction. "))
+                            (str
+                             "Carrot is where you’ll find announcements, updates, and decisions "
+                             "that keep your team pulling in the same direction."))
+                          (when is-admin-or-author
+                            [:button.mlb-reset.add-post-bt
+                              {:on-click #(when can-compose (compose s))}
+                              "Create a new post"])]
+                      [:div.add-post-tooltip-box]]]))
+              (when (and (not is-drafts-board)
+                         is-admin-or-author
+                         (not is-mobile?)
+                         (drv/react s :show-post-added-tooltip))
+                [:div.post-added-tooltip-container.group
+                  [:button.mlb-reset.post-added-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
+                  [:div.post-added-tooltips
+                    [:div.post-added-tooltip-title
+                      "Post success!"]
+                    [:div.post-added-tooltip
+                      (str
+                       "Carrot shows who’s seen your post, and makes "
+                       "it easy to remind anyone that hasn’t. ")
+                      (when is-admin-or-author
+                        [:button.mlb-reset.post-added-bt
+                          {:on-click #(nav-actions/show-invite)}
+                          "Invite your team"])
+                      (when is-admin-or-author
+                        " to get started.")]
+                    [:div.post-added-tooltip-box]]])
+              (when (and is-drafts-board
+                         (drv/react s :show-draft-post-tooltip))
+                [:div.draft-post-tooltip-container.group
+                  [:button.mlb-reset.draft-post-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
+                  [:div.draft-post-tooltips
+                    [:div.draft-post-tooltip-title
+                      "😎 Finish this draft post to add some personality"]
+                    [:div.draft-post-tooltip
+                      (str
+                       "According to smart people on the Internet, "
+                       "everyone likes knowing who they work with. "
+                       "Help your team by finishing this draft post.")]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
                 (zero? (count (:boards org-data)))
                 (empty-org)
-                ;; All Posts
-                (and is-all-posts
-                     (= @(::board-switch s) :stream))
-                (rum/with-key (all-posts) all-posts-key)
                 ;; Empty board
                 empty-board?
-                (empty-board)
+                (empty-board (when can-compose (get-board-for-edit s)))
+                ;; All Posts
+                (and (or is-all-posts
+                         is-must-see)
+                     (= @board-switch :stream))
+                (rum/with-key (all-posts)
+                 (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
                 ;; Layout boards activities
                 :else
                 (cond
-                  ;; Drafts
-                  is-drafts-board
-                  (drafts-layout board-data)
                   ;; Entries grid view
-                  (= @(::board-switch s) :grid)
+                  (= @board-switch :grid)
                   (entries-layout)
                   ;; Entries stream view
                   :else
                   (section-stream)))
               ;; Add entry floating button
-              (when (and (not (:read-only org-data))
-                         (or (utils/link-for (:links board-data) "create")
-                             is-drafts-board
-                             is-all-posts))
+              (when can-compose
                 (let [opacity (if (responsive/is-tablet-or-mobile?)
                                 1
                                 (calc-opacity (document-scroll-top)))]
@@ -323,5 +400,6 @@
                        :data-container "body"
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
-                       :on-click compose-fn}
-                      [:div.add-to-board-pencil]]]))])]]))
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :on-click #(compose s)}
+                      [:div.add-to-board-plus]]]))])]]))

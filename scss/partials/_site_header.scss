@@ -2,7 +2,7 @@
 
 span.go-to-digest {
   width: 174px;
-  height: 42px;
+  height: 40px;
   border-radius: 100px;
   background-color: $carrot_green;
   color: white;
@@ -38,25 +38,126 @@ span.go-to-digest {
 }
 
 nav.site-navbar {
-  height: 72px;
-  background-color: white;
-  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+  height: 64px;
   position: fixed;
   width: 100vw;
   z-index: 100;
+  background-color: transparent;
+  box-shadow: 0px 0px 0px 0px tranparent;
+  transform: background-color 180ms, box-shadow 180ms;
+
+  @include mobile() {
+    height: 72px;
+  }
+
+  &.sticky {
+    background-color: white;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    height: 56px;
+
+    div.site-navbar-container {
+      padding: 12px 40px;
+      height: 56px;
+
+      @include mobile() {
+        padding: 14px 24px;
+      }
+
+      div.mobile-ham-menu {
+        @include mobile() {
+          position: absolute;
+          height: 24px;
+          top: 16px;
+        }
+      }
+
+      a.navbar-brand-left {
+        margin: 4px 0px 0px;
+        width: 99px;
+        height: 24px;
+        background-size: 99px 24px;
+
+        @include mobile() {
+          margin: 2px 0px 0px -50px;
+        }
+      }
+
+      div.navbar-brand-center {
+        margin: 2px auto 0px;
+      }
+
+      div.site-navbar-right {
+        top: 12px;
+        height: 32px;
+
+        @include mobile() {
+          top: 16px;
+          height: 24px;
+
+          a.your-digest {
+            margin-top: 0px;
+            height: 32px;
+          }
+        }
+
+        a.login {
+          height: 32px;
+          padding: 6px 24px;
+
+          @include mobile() {
+            height: 24px;
+            padding: 2px 12px;
+          }
+        }
+
+        a.start {
+          background-color: $carrot_orange;
+          color: white;
+          height: 32px;
+          padding: 6px 24px;
+
+          @include mobile() {
+            height: 24px;
+            padding: 2px 12px;
+          }
+
+          span.slack-orange-icon {
+            @include image-2x("/img/ML/slack_white_icon");
+          }
+
+          span.start-copy {
+            position: relative;
+            top: 0px;
+          }
+
+          &:not(.your-digest).slack-get-started {
+            background-color: $carrot_orange;
+            color: white;
+            height: 32px;
+            padding: 4px 24px;
+          }
+        }
+      }
+    }
+  }
 
   div.site-navbar-container {
-    height: 72px;
-    padding: 15px 24px;
+    height: 64px;
+    padding: 24px 40px 0px;
     position: relative;
+
+    @include mobile() {
+      padding: 22px 24px;
+      height: 72px;
+    }
 
     div.mobile-ham-menu {
       @include mobile() {
         position: absolute;
         width: 32px;
-        height: 32px;
+        height: 28px;
         background-image: cdnUrl("/img/ML/mobile_ham_menu.svg");
-        background-size: 18px 14px;
+        background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center;
         top: 22px;
@@ -79,17 +180,23 @@ nav.site-navbar {
     }
 
     div.site-navbar-left {
-      position: absolute;
-      top: 15px;
-      left: 16px;
-      height: 42px;
+      // position: absolute;
+      // top: 15px;
+      // left: 16px;
+      // height: 40px;
+      float: left;
     }
 
     div.site-navbar-right {
       position: absolute;
-      top: 15px;
-      right: 24px;
-      height: 42px;
+      top: 24px;
+      right: 40px;
+
+      @include mobile() {
+        top: 22px;
+        right: 24px;
+        height: 28px;
+      }
 
       a {
         margin: 0px 0px 0px 8px;
@@ -97,13 +204,13 @@ nav.site-navbar {
 
       a.login {
         min-width: 96px;
-        height: 42px;
+        height: 40px;
         color: $carrot_light_gray_3;
         @include avenir_M();
         font-size: 16px;
         padding: 10px 24px;
         text-align: center;
-        margin-top: 3px;
+        margin-top: 0px;
         border-radius: 100px;
         opacity: 0.8;
         float: left;
@@ -127,46 +234,62 @@ nav.site-navbar {
 
       a.start {
         min-width: 84px;
-        height: 42px;
-        border: 2px solid $carrot_light_blue_2;
+        height: 40px;
         border-radius: 100px;
         @include avenir_H();
         font-size: 16px;
-        color: $carrot_text_blue_3;
+        color: $carrot_orange;
+        background-color: $coral;
         padding: 10px 24px;
         text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-top: 0px;
         opacity: 0.8;
 
+        @include mobile() {
+          height: 28px;
+          width: auto;
+          text-align: center;
+          padding: 4px 12px;
+          font-size: 13px;
+          letter-spacing: 0.46px;
+          min-width: 64px;
+
+          span.slack-copy {
+            top: 2px;
+            position: relative;
+          }
+
+          span.copy {
+            top: 2px;
+            position: relative; 
+          }
+        }
+
+        span.slack-orange-icon {
+          width: 16px;
+          height: 16px;
+          @include image-2x("/img/ML/slack_orange_icon");
+          background-repeat: no-repeat;
+          background-size: 16px 16px;
+          margin-right: 6px;
+          position: relative;
+        }
+
         &:not(.your-digest).slack-get-started {
-          height: 42px;
-          background-color: transparent;
+          height: 40px;
+          background-color: $coral;
           @include avenir_H();
-          font-size: 18px;
-          color: $carrot_orange_2;
+          font-size: 16px;
+          color: $carrot_orange;
           text-align: left;
           border: 2px solid $carrot_orange_light;
           padding: 9px 24px;
 
-          @include tablet() {
-            border: 0px solid $carrot_orange_light;
-            padding: 10px 0px;
-            margin-right: -8px;
-          }
-
           @media screen and (max-width: 320px) {
             display: none;
-          }
-
-          span.slack-orange-icon {
-            width: 60px;
-            height: 18px;
-            @include image-2x("/img/ML/slack_orange_icon");
-            background-repeat: no-repeat;
-            background-size: 60px 18px;
-            margin-left: 4px;
-            margin-top: 3px;
-            float: right;
           }
         }
 
@@ -187,10 +310,8 @@ nav.site-navbar {
     }
 
     a.navbar-brand-left {
-      position: relative;
-      top: 7px;
-      left: 0px;
-      margin: 0px;
+      float: left;
+      margin: 6px 0px 0px;
       width: 115px;
       height: 28px;
       background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
@@ -200,11 +321,51 @@ nav.site-navbar {
       display: block;
 
       @include mobile() {
-        left: 40px;
+        position: absolute;
+        float: unset;
+        left: 50%;
+        margin: 2px 0px 0px -50px;
+        width: 99px;
+        height: 24px;
+        background-size: 99px 24px;
+
+        &.is-slack-header {
+          float: left;
+          position: relative;
+          left: unset;
+          margin: 2px 0px 0px;
+        }
       }
 
       @media screen and (max-width: 320px) {
-        width: 30px;
+        width: 20px;
+        margin-left: -10px;
+      }
+    }
+
+    div.navbar-brand-center {
+      width: 327px;
+      height: 28px;
+      margin: 6px auto 0px;
+      text-align: center;
+
+      @include tablet() {
+        display: none;
+      }
+
+      a {
+        @include avenir_M();
+        padding: 4px 12px;
+        display: inline-block;
+        font-size: 16px;
+        line-height: 20px;
+        color: $ui_grey;
+        margin: 0px;
+        height: 28px;
+
+        &.active {
+          color: #373F4F;
+        }
       }
     }
   }
@@ -219,10 +380,10 @@ nav.site-navbar {
           background-size: 14px 14px;
         }
 
-        a.navbar-brand-left {
-          left: 50%;
-          margin-left: -62px;
-        }
+        // a.navbar-brand-left {
+        //   left: 50%;
+        //   margin-left: -62px;
+        // }
 
         div.site-navbar-right {
           opacity: 0;

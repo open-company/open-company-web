@@ -62,12 +62,26 @@ nav.oc-navbar {
     }
 
     div.oc-navbar-header-container{
-      height: 40px;
+      height: 32px;
+
+      div.mobile-underline {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          position: absolute;
+          top: 55px;
+          left: 0px;
+          width: 18%;
+          height: 1px;
+          background-color: $carrot_orange;
+        }
+      }
 
       div.navbar-center {
         text-align: center;
         width: 320px;
-        height: 40px;
+        height: 32px;
         position: absolute;
         left: 50%;
         top: 12px;
@@ -76,29 +90,20 @@ nav.oc-navbar {
         font-size: 26px;
 
         @include mobile() {
-          width: 160px;
+          width: 80px;
           height: 32px;
-          margin-left: -80px;
-          margin-top: 4px;
+          margin-left: -40px;
         }
 
         button.orgs-dropdown div.org-avatar {
-          height: 40px;
-
-          @include big_web() {
-            @include org-avatar(40);
-          }
-
-          @include mobile() {
-            height: 32px;
-            @include org-avatar(32);
-          }
+          height: 32px;
+          @include org-avatar(32);
         }
       }
 
       div.navbar-left {
         float: left;
-        margin-top: 8px;
+        margin-top: 3px;
         height: 24px;
 
         @include mobile() {
@@ -108,13 +113,19 @@ nav.oc-navbar {
         button.mobile-navigation-sidebar-ham-bt {
           display: none;
 
+          &.active {
+            @include mobile() {
+              background-image: cdnUrl("/img/ML/navbar_all_posts_active.svg");
+            }
+          }
+
           @include mobile() {
             width: 24px;
             height: 24px;
-            background-image: cdnUrl("/img/ML/mobile_navigation_sidebar_ham.svg");
+            background-image: cdnUrl("/img/ML/navbar_all_posts.svg");
             background-repeat: no-repeat;
-            background-size: 18px 14px;
-            background-position: 3px 5px;
+            background-size: 19px 19px;
+            background-position: center;
             display: inline;
 
             &.close-bt {
@@ -131,15 +142,28 @@ nav.oc-navbar {
         margin-right: 0px;
 
         div.user-menu {
-          margin-top: 4px;
-          width: 32px;
+          width: 48px;
           height: 32px;
         }
 
         button.mobile-menu {
           font-size: 24px;
-          padding: 0px;
+          padding: 0px 16px 0px 0px;
           margin-top: 2px;
+          position: relative;
+
+          &:after {
+            content: "";
+            width: 9px;
+            height: 6px;
+            background-image: cdnUrl("/img/ML/user_menu_chevron.svg");
+            background-size: 9px 6px;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            top: 12px;
+            right: 0px;
+          }
 
           @include user-profile(32);
         }

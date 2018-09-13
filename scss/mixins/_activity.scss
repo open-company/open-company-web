@@ -2,12 +2,12 @@
 @import "../modules/_fonts";
 
 $bottom_margin: 16;
-$h2_top_margin: 20;
+$h2_top_margin: 24;
 
 @mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
     float: left;
-    margin-right: 16px;
+    margin-right: 13px;
   }
 
   @include user-profile($avatar_size);
@@ -15,9 +15,9 @@ $h2_top_margin: 20;
   div.name {
     overflow: hidden;
     text-overflow: ellipsis;
-    @include avenir_H();
-    color: $carrot_dark_gray;
-    font-size: 15px;
+    @include avenir_M();
+    color: $deep_navy;
+    font-size: 14px;
     white-space: nowrap;
   }
 
@@ -25,7 +25,7 @@ $h2_top_margin: 20;
     overflow: hidden;
     text-overflow: ellipsis;
     @include avenir_M();
-    color: $carrot_light_gray_3;
+    color: $ui_grey;
     font-size: 12px;
     white-space: nowrap;
 
@@ -34,6 +34,77 @@ $h2_top_margin: 20;
         white-space:pre-wrap;
         max-width: none;
         text-align: center;
+      }
+    }
+  }
+}
+
+@mixin new-tag() {
+  div.new-tag {
+    @include avenir_B();
+    color: #FFB03D;
+    font-size: 11px;
+    line-height: 17px;
+    padding: 2px 0px 0px;
+    border-radius: 3px;
+    height: 18px;
+    width: 36px;
+    background-color: rgba(255,176,61,.2);
+    text-transform: uppercase;
+    text-align: center;
+    margin-left: 8px;
+  }
+}
+
+@mixin must-see(){
+  div.must-see {
+    display: inline;
+    padding-left: 16px;
+    padding-bottom: 10px;
+    padding-top: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    @include avenir_M();
+    color: $ui_grey;
+    font-size: 12px;
+    white-space: nowrap;
+    background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: 2px 0px;
+    margin-left: 8px;
+
+    &.must-see-on {
+      background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+    }
+
+    @include mobile() {
+      width: auto;
+    }
+  }
+}
+
+@mixin section-tag($max_width: null) {
+  div.section-tag {
+    float: right;
+    margin-right: 8px;
+    background-color: #E7E6E1;
+    border-radius: 100px;
+    height: 26px;
+    color: $ui_grey;
+    @include avenir_H();
+    font-size: 12px;
+    padding: 5px 12px 6px 12px;
+    border: 1px solid #E7E6E1;
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @if $max_width {
+      max-width: #{$max_width - 8 - 24}px;
+
+      &.has-new {
+        max-width: #{$max_width - 46 - 8 - 8 - 24}px;
       }
     }
   }
@@ -106,7 +177,7 @@ $h2_top_margin: 20;
   }
 }
 
-@mixin activity-body($font-size: 16){
+@mixin activity-body($font-size: 16, $separator: $bottom_margin, $h2_margin: $h2_top_margin, $color: $deep_navy){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -129,28 +200,34 @@ $h2_top_margin: 20;
   &.medium-editor-placeholder:after {
     @include avenir_R();
     font-size: #{$font-size}px;
+    line-height: #{$separator}px;
     color: $carrot_light_gray_1;
     font-style: none !important;
   }
 
   @include avenir_R();
   font-size: #{$font-size}px;
-  color: $deep_navy;
+  line-height: #{$separator}px;
+  color: $color;
   white-space: pre-wrap;
   word-wrap: break-word;
 
   * {
-    color: $deep_navy;
+    color: $color;
+  }
+
+  & > *:first-child {
+    margin: 0px;
   }
 
   & > *:not(:last-child) {
-    margin: #{$bottom_margin}px 0px;
+    margin: #{$separator}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
-  & > *:last-child {
-    margin: 0px 0px #{$bottom_margin}px;
+  & > *:last-child:not(:first-child) {
+    margin: #{$separator}px 0px 0px;
     padding-bottom: 0px;
   }
 
@@ -159,26 +236,23 @@ $h2_top_margin: 20;
   }
 
   b, strong{
-    @include avenir_BOOK();
-    color: $deep_navy;
+    @include avenir_R();
+    color: $color;
     font-weight: 700;
   }
 
-  h2:first-child {
+  *:first-child {
     margin-top: 0px;
   }
 
-  h2:not(:first-child) {
-    margin-top: #{$bottom_margin + $h2_top_margin}px;
+  & > *:not(:first-child) {
+    margin-top: #{$separator}px;
   }
 
   h2 {
     @include avenir_H();
-    font-size: #{$font-size + 3}px;
-
-    .emojione {
-      @include emoji-size($font-size + 1);
-    }
+    font-size: #{$font-size}px;
+    line-height: #{$separator}px
   }
 
   a, span[data-auto-link] {
@@ -206,7 +280,7 @@ $h2_top_margin: 20;
     left: 50%;
     margin-left: -30px;
     height: 1px;
-    background-color: $deep_navy;
+    background-color: $color;
     margin-top: 0px;
     margin-bottom: 0px;
   }

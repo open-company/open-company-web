@@ -104,6 +104,9 @@
 (defn current-board-slug []
   (:board @path))
 
+(defn current-posts-filter []
+  (:board @path))
+
 (defn current-activity-id []
   (:activity @path))
 
@@ -133,21 +136,22 @@
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
-(defn show-nux-cookie
+(defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
-  (str "show-nux-" user-id))
+  (str "nux-" user-id))
 
 (defn show-add-post-tooltip-cookie
-  "Cookie to remember if the boards and journals tooltips where shown."
+  "Cookie to check if the add first post tooltip shuold be visible."
   []
   (str "add-post-tooltip-" (jwt/user-id)))
 
-;; Values for NUX cookie
+(defn show-invite-people-tooltip-cookie
+  "Cookie to check if the invite people tooltip shuold be visible."
+  []
+  (str "invite-people-tooltip-" (jwt/user-id)))
 
-(def nux-cookie-values
-  {:new-user "new-user"
-   :first-ever-user "first-ever-user"})
+;; Debug
 
 (defn print-router-path []
   (js/console.log @path))

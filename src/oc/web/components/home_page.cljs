@@ -28,70 +28,56 @@
                                      s)}
   [s]
   [:div
-    [:div {:id "wrap"} ; <!-- used to push footer to the bottom -->
-      (site-header)
-      (site-mobile-menu)
-      ;; preload slack button as hidden
-      [:img.hidden {:src "https://api.slack.com/img/sign_in_with_slack.png"}]
+    (site-header)
+    (site-mobile-menu)
+    [:div.home-wrap
+      {:id "wrap"}
       (login-overlays-handler)
-
       [:div.main.home-page
-        {:class (when (jwt/jwt) "no-get-started-button")}
         ; Hope page header
         [:section.cta.group
-          [:div.balloon.big-yellow]
-          [:div.balloon.big-red]
-          [:div.balloon.big-purple]
+          [:div.balloon.big-blue]
+          [:div.balloon.small-green]
           [:div.balloon.big-green]
-          [:div.balloon.small-blue]
-          [:div.balloon.small-yellow-face]
+          [:div.balloon.small-purple-face]
+          [:div.balloon.big-yellow]
           [:div.balloon.small-purple]
-          [:div.balloon.small-red]
-          [:div.balloon.small-purple-2]
-          [:div.balloon.big-green-2]
-          [:div.balloon.small-yellow]
 
           [:h1.headline
-            "Better informed, less noise."]
+            "Where leadership finds its voice"]
           [:div.subheadline
             (str
-             "Your company digest keeps everyone aligned "
-             "around what matters most.")]
-          ; (when (and (not @(::confirm s))
-          ;            (not @(::thanks-box-top s)))
-          ;   (try-it-form "try-it-form-central" #(reset! (::thanks-box-top s) true)))
+             "Rise above the noise of chat and email to "
+             "keep your growing and distributed teams aligned.")]
+          ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container
-            (when-not (jwt/jwt)
-              [:button.mlb-reset.get-started-button
-                {:on-click #(if (utils/in? (:route @router/path) "login")
-                              (user/show-login :signup-with-slack)
-                              (router/nav! oc-urls/sign-up))}
-                "Get started for free"])]
-          (when (and (not @(::confirm s))
-                     @(::thanks-box-top s))
-            (carrot-box-thanks))
-          (when @(::confirm s)
-            [:div.carrot-box-container.group
-              [:div.carrot-box-thanks
-                [:div.thanks-headline "You are Confirmed!"]
-                [:div.thanks-subheadline "Thank you for subscribing."]]])
+            [:button.mlb-reset.get-started-button
+              {:id "get-started-centred-bt"
+               :on-click #(router/nav! oc-urls/sign-up)}
+              "Get started for free"]]
+          shared-misc/no-credit-card
+          ; (carrot-box-thanks "carrot-box-thanks-top")
+          [:div.carrot-box-container.confirm-thanks.group
+            {:style {:display "none"}}
+            [:div.carrot-box-thanks
+              [:div.thanks-headline "You are Confirmed!"]
+              [:div.thanks-subheadline "Thank you for subscribing."]]]
 
-          shared-misc/video
+          [:div.main-animation-container
+            [:img.main-animation
+              {:src (utils/cdn "/img/ML/homepage_screenshot.png")
+               :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-          shared-misc/horizontal-carousell
+          shared-misc/core-values-list]
 
-          [:div.stay-aligned-container
-            [:div.stay-aligned-icon]
-            [:div.stay-aligned-message
-              "Rise above the noise."]]
+        shared-misc/keep-aligned-section
 
-          shared-misc/carrot-cards]
+        shared-misc/access-anywhere-section
 
-        shared-misc/carrot-testimonials
+        (shared-misc/slack-comparison-section)
 
-        (when-not (jwt/jwt)
-          shared-misc/keep-aligned)
-      ] ; <!-- .main -->
-    ] ;  <!-- #wrap -->
+        shared-misc/testimonials-section
+
+        shared-misc/keep-aligned]]
 
     (site-footer)])

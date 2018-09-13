@@ -3,11 +3,8 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
-            [cljs-time.format :as f]
-            [cljs-time.core :as time]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dispatcher]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
@@ -120,7 +117,7 @@
       (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
 
       :else
-      "just now")))
+      "Just now")))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
@@ -155,19 +152,6 @@
   (let [update-link (link-for links "partial-update")]
     (nil? update-link)))
 
-(defn readonly-board? [links]
-  (let [new-link (link-for links "new")
-        update-link (link-for links "partial-update")
-        delete-link (link-for links "delete")]
-    (and (nil? new-link)
-         (nil? update-link)
-         (nil? delete-link))))
-
-(defn readonly-entry? [links]
-  (let [partial-update (link-for links "partial-update")
-        delete (link-for links "delete")]
-    (and (nil? partial-update) (nil? delete))))
-
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
@@ -178,77 +162,6 @@
         green (take 2 (drop 2 colors))
         blue (take 2 (drop 4 colors))]
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
-
-(defn post-new?
-  "
-  An entry is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-      -and-
-    user is not the post's author
-      -and-
-    published-at is < 30 days
-      -and-
-    published-at of the entry is newer than seen at
-      -or-
-    no seen at
-  "
-  [entry changes]
-  (let [published-at (:published-at entry)
-        too-old (f/unparse (f/formatters :date-time) (-> 30 time/days time/ago))
-        seen-at (:seen-at changes)
-        user-id (jwt/get-key :user-id)
-        author-id (-> entry :author first :user-id)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
-        new? (and in-team?
-                  (not= author-id user-id)
-                  (> published-at too-old)
-                  (or (> published-at seen-at)
-                      (nil? seen-at)))]
-    new?))
-
-(defn fix-entry
-  "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-data board-data changes]
-  (let [comments-link (link-for (:links entry-data) "comments")
-        add-comment-link (link-for (:links entry-data) "create" "POST")
-        fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
-        fixed-board-name (or (:board-name entry-data) (:name board-data))]
-    (-> entry-data
-      (assoc :content-type "entry")
-      (assoc :new (post-new? (:body entry-data) changes))
-      (assoc :read-only (readonly-entry? (:links entry-data)))
-      (assoc :board-slug fixed-board-slug)
-      (assoc :board-name fixed-board-name)
-      (assoc :has-comments (boolean comments-link))
-      (assoc :can-comment (boolean add-comment-link)))))
-
-(defn fix-board
-  "Add `:read-only` and fix each entry of the board, then create a :fixed-entries map with the entry UUID."
-  ([board-data] (fix-board board-data {}))
-
-  ([board-data changes]
-     (let [links (:links board-data)
-           read-only (readonly-board? links)
-           with-read-only (assoc board-data :read-only read-only)
-           fixed-entries (zipmap
-                          (map :uuid (:entries board-data))
-                          (map #(fix-entry % board-data changes) (:entries board-data)))
-           with-fixed-entries (assoc with-read-only :fixed-items fixed-entries)]
-       with-fixed-entries)))
-
-(defn fix-activity [activity collection-data]
-  (fix-entry activity collection-data {}))
-
-(defn fix-all-posts
-  "Fix org data coming from the API."
-  [all-posts-data]
-  (let [fixed-activities-list (map
-                               #(fix-activity % {:slug (:board-slug %) :name (:board-name %)})
-                               (:items all-posts-data))
-        without-items (dissoc all-posts-data :items)
-        fixed-activities (zipmap (map :uuid fixed-activities-list) fixed-activities-list)
-        with-fixed-activities (assoc without-items :fixed-items fixed-activities)]
-    with-fixed-activities))
 
 (defn scroll-to-y [scroll-y & [duration]]
   (.play
@@ -395,6 +308,19 @@
     :else
     :viewer))
 
+(defn is-admin?
+  [org-data]
+  (let [user-data (jwt/get-contents)
+        user-type (get-user-type user-data org-data)]
+    (= :admin user-type)))
+
+(defn is-admin-or-author?
+  [org-data]
+  (let [user-data (jwt/get-contents)
+        user-type (get-user-type user-data org-data)]
+    (or (= :admin user-type)
+        (= :author user-type))))
+
 (defn index-of
   "Given a collection and a function return the index that make the function truely."
   [s f]
@@ -430,8 +356,19 @@
     (when (seq user-id) (str user-id ":"))
     redirect)))
 
-(def generic-network-error
- "There may be a problem with your network, or with our servers. Please try again later.")
+(def network-error
+ {:title "Network error"
+  :description "Shoot, looks like there might be a connection issue. Please try again."
+  :server-error true
+  :id :generic-network-error
+  :dismiss true})
+
+(def app-update-error
+  {:title "App has been updated"
+   :description "You’re using an out of date version of Carrot. Please refresh your browser."
+   :app-update true
+   :id :app-update-error
+   :dismiss true})
 
 (defn clean-google-chart-url [gchart-url]
   (if (string? gchart-url)
@@ -444,8 +381,8 @@
       (not= (.indexOf cleaned-url "://docs.google.com/spreadsheets/d/") -1))))
 
 (defn cdn [img-src & [no-deploy-folder]]
-  (let [use-cdn? (empty? ls/cdn-url)
-        cdn (if use-cdn? "" (str "/" ls/cdn-url))
+  (let [use-cdn? (seq ls/cdn-url)
+        cdn (if use-cdn? ls/cdn-url "")
         deploy-key (if (empty? ls/deploy-key) "" (str "/" ls/deploy-key))
         with-deploy-folder (if no-deploy-folder
                              cdn
@@ -515,7 +452,7 @@
       (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
 
       :else
-      "just now")))
+      "Just now")))
 
 (defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
@@ -601,6 +538,12 @@
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
+        last-p-html (.html (.find $container "p:last-child"))
+        has-empty-ending-paragraph (when (seq last-p-html)
+                                     (.match last-p-html reg-ex))
+        _ (when has-empty-ending-paragraph
+            (.remove (js/$ "p:last-child" $container)))
         cleaned-html (.html $container)
         _ (.detach $container)]
     cleaned-html))
@@ -614,11 +557,25 @@
       (oc-urls/org org-slug))
     oc-urls/login))
 
-(defn storage-url-org-slug [storage-url]
+(defn url-org-slug [storage-url]
   (let [parts (s/split storage-url "/")]
     (if (s/starts-with? storage-url "http")
       (nth parts 4)
       (nth parts 2))))
+
+(defn storage-url-org-slug [url] (url-org-slug url))
+
+(defn url-board-slug [url]
+  (let [parts (s/split url "/")]
+    (if (s/starts-with? url "http")
+      (nth parts 5)
+      (nth parts 3))))
+
+(defn section-org-slug [section-data]
+  (url-org-slug (link-for (:links section-data) ["item" "self"] "GET")))
+
+(defn post-org-slug [post-data]
+  (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
 (def default-headline "Untitled post")
 
@@ -636,7 +593,6 @@
    :slug default-drafts-board-slug
    :name default-drafts-board-name
    :entries []
-   :fixed-items {}
    :access "private"
    :read-only true})
 
@@ -651,3 +607,10 @@
 (defn retina-src [url]
   {:src (cdn (str url ".png"))
    :src-set (str (cdn (str url "@2x.png")) " 2x")})
+
+(defn trim [value]
+  (if (string? value)
+    (s/trim value)
+    value))
+
+(def section-name-exists-error "Section name already exists or isn't allowed")

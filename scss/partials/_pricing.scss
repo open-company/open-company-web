@@ -1,29 +1,38 @@
 /***** Pricing ******/
 
-div#wrap {
+div.pricing-wrap {
   background-color: $oc_gray_8;
 
   div.main.pricing {
     width: 100%;
 
-    @include mobile() {
-      padding: 0 32px;
+    section {
+      @include tablet(){
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+      }
     }
 
     section {
-      @include mobile_to_tablet(){
-        padding: 0 32px;
+
+      &:nth-child(odd) {
+        background-color: #FFFDF9;
+      }
+
+      &:nth-child(even) {
+        background-color: #FAF8F4;
       }
     }
 
     section.pricing-header {
-      padding-top: 72px;
+      padding: 184px 0 120px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
       @include mobile() {
         overflow: visible;
+        padding: 148px 0 80px;
       }
 
       div.balloon {
@@ -75,17 +84,6 @@ div#wrap {
           margin-left: -558px;
         }
 
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow_1");
-          background-size: 135px 135px;
-          width: 135px;
-          height: 135px;
-          top: 1540px;
-          left: 50%;
-          margin-left: -438px;
-          z-index: 2;
-        }
-
         &.small-blue-1 {
           @include image-2x("/img/ML/balloon_small_blue_1");
           background-size: 50px 44px;
@@ -103,207 +101,278 @@ div#wrap {
         @include avenir_H();
         color: $deep_navy;
         min-width: 300px;
-        margin: 88px auto 0px;
+        margin: 0 auto;
+
+        @include mobile() {
+          margin: 0 auto;
+        }
       }
 
-      div.pricing-block {
-        width: 940px;
-        padding: 32px 8px;
+      table.pricing-table {
         background-color: white;
         border-radius: 8px;
-        box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.12);
-        margin: 80px auto 32px;
-        position: relative;
-        z-index: 2;
+        box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 1080px;
+        margin: 80px auto 0;
 
         @include mobile() {
           width: 100%;
-          padding: 0px;
-          box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
+          margin: 40px auto 0;
         }
 
-        div.pricing-block-column {
-          text-align: center;
-          float: left;
-          width: 33.33%;
-          @include avenir_H();
-          color: $deep_navy;
-          padding: 0px 40px;
+        th {
+          padding: 40px;
 
-          @include mobile() {
-            float: unset;
-            width: 100%;
-            padding: 40px 32px;
+          @include mobile(){
+            padding: 32px;
+          }
+        }
+
+        th, td {
+          padding: 24px;
+          border-right: 1px solid #EFEEEB;
+
+          @include mobile(){
+            padding: 16px;
           }
 
-          &:not(:first-child):not(:last-child) {
-            border-left: 1px solid $light_tan;
-            border-right: 1px solid $light_tan;
+          &:last-child {
+            border-right: none;
+          }
+        }
+
+        tr {
+          border-bottom: 1px solid #EFEEEB;
+
+          &:last-child {
+            border-right: none;
+          }
+        }
+
+        thead tr th {
+          text-align: center;
+
+          div.tire-title {
+            @include avenir_H();
+            font-size: 22px;
+            color: $deep_navy;
+          }
+
+          div.tire-price {
+            margin: 24px auto 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            @include avenir_H();
+            font-size: 30px;
+            color: $deep_navy;
 
             @include mobile() {
-              border-left: none;
-              border-right: none;
-              border-bottom: 1px solid $light_tan;
-              border-top: 1px solid $light_tan;
-            }
-          }
-
-          &.free-column {
-            div.price-column-price {
-              width: 80px;
+              margin: 16px auto;
+              display: block;
+              justify-content: unset;
+              align-items: unset;
             }
 
-            button.price-button {
-              margin-top: 108px;
+            span.dollar {
+              color: $ui_grey;
+              @include avenir_R();
+              font-size: 14px;
+              text-align: left;
+              line-height: 15px;
+              margin-right: 8px;
+              position: relative;
+              top: -10px;
+            }
+
+            span.per-month {
+              color: $ui_grey;
+              @include avenir_R();
+              font-size: 14px;
+              max-width: 48px;
+              text-align: left;
+              line-height: 15px;
+              margin-left: 8px;
+              margin-top: -5px;
 
               @include mobile() {
-                margin-top: 24px;
+                max-width: unset;
+                text-align: center;
+                display: block;
               }
             }
-          }
 
-          &.standard-column {
-            div.price-column-price {
-              width: 80px;
-            }
-          }
+            div.mobile-per-month {
 
-          &.plus-column {
-            div.price-column-price {
-              width: 116px;
-            }
-          }
-
-          div.price-column-title {
-            font-size: 26px;
-            line-height: 42px;
-          }
-
-          div.price-column-price {
-            font-size: 56px;
-            position: relative;
-            margin: 8px auto;
-            width: 48px;
-
-            &:before {
-              content: "$";
-              color: $ui_grey;
-              font-size: 16px;
-              position: absolute;
-              top: 16px;
-              left: 0px;
-              width: 24px;
-              height: 24px;
-            }
-          }
-
-          div.price-column-description {
-            margin-top: 8px;
-            @include avenir_M();
-            font-size: 16px;
-
-            &.second-line {
-              margin-top: 16px;
-            }
-
-            &.more-info {
-              @include avenir_H();
-              position: relative;
-              margin-top: 24px;
-
-              &:after {
-                content: "";
-                position: absolute;
-                top: 1px;
-                right: 0px;
-                background-image: cdnUrl("/img/ML/pricing_more_info.svg");
-                background-size: 16px 16px;
-                background-position: center;
-                background-repeat: no-repeat;
-                width: 16px;
-                height: 16px;
-
-                //////////////
-                // Uncomment this to show the more info icon
-                display: none;
-                //////////////
-              }
             }
           }
 
           button.price-button {
-            margin: 24px auto 0px;
+            background-color: $carrot_orange;
+            border-radius: 100px;
+            @include avenir_H();
+            font-size: 16px;
+            color: white;
+            margin: 24px auto 0;
+            width: 152px;
+            height: 40px;
+
+            @include mobile() {
+              margin: 16px auto;
+              width: 200px;
+            }
+          }
+        }
+
+        tbody {
+          tr {
+
+            &:nth-child(even) {
+              background-color: rgba(#E4E3DE, 0.2);
+            }
+
+            td {
+              &.pricing-description {
+                @include avenir_R();
+                font-size: 16px;
+                color: $deep_navy;
+                text-align: left;
+
+                span.strong {
+                  @include avenir_H();
+                }
+
+                span.info {
+                  // display: inline-block;
+                  // Hide for now
+                  display: none;
+                  width: 16px;
+                  height: 16px;
+                  margin-left: 8px;
+                  background-image: cdnUrl("/img/ML/pricing_more_info.svg");
+                  background-size: 16px 16px;
+                  background-repeat: no-repeat;
+                  background-position: center;
+                }
+              }
+
+              &.pricing-value {
+                @include avenir_H();
+                font-size: 16px;
+                color: $deep_navy;
+                text-align: center;
+
+                div.price-checkmark {
+                  width: 24px;
+                  height: 24px;
+                  background-size: 24px 24px;
+                  background-image: cdnUrl("/img/ML/green_checkmark.svg");
+                  background-repeat: no-repeat;
+                  background-position: center;
+                  margin: 0 auto;
+                }
+              }
+            }
           }
         }
       }
 
-      div.enterprise-block {
-        background-color: $light_gold;
-        border-radius: 8px;
+      div.pricing-faq {
         width: 940px;
-        margin: 40px auto 0px;
-        padding: 24px;
-        text-align: center;
+        margin: 120px auto 0;
 
         @include mobile() {
           width: 100%;
-          padding: 32px;
+          margin-top: 80px;
         }
 
-        span.enterprise-block-title {
-          @include avenir_H();
+        h2.faq-header {
+          @include avenir_M();
+          font-size: 34px;
           color: $deep_navy;
-          font-size: 16px;
+          text-align: center;
+          margin-bottom: 24px;
 
           @include mobile() {
-            display: block;
-            width: 100%;
-            text-align: center;
+            @include avenir_H();
+            font-size: 24px;
+            text-align: left;
           }
         }
 
-        span.enterprise-block-copy {
-          @include avenir_R();
-          color: $ui_grey;
-          font-size: 16px;
-          margin: 0px 8px;
+        div.faq-row {
+          margin-top: 16px;
+          border-radius: 8px;
+          background-color: $oc_gray_8;
+          border: 1px solid #EAE9E4;
+          padding: 24px;
+          cursor: pointer;
 
-          @include mobile() {
+          &.expanded {
+            div.faq-question:before {
+              position: absolute;
+              top: 10px;
+              left: 0px;
+              width: 10px;
+              height: 2px;
+              background-image: cdnUrl("/img/ML/pricing_faq_expanded.svg");
+              background-size: 10px 2px;
+            }
+
+            div.faq-response {
+              display: block;
+            }
+          }
+
+          div.faq-question {
+            position: relative;
+            padding-left: 32px;
+            @include avenir_H();
+            font-size: 16px;
+            color: $deep_navy;
+            text-align: left;
+            @include no-user-select();
+
+            &:before {
+              content: "";
+              position: absolute;
+              top: 6px;
+              left: 0px;
+              width: 10px;
+              height: 10px;
+              background-image: cdnUrl("/img/ML/pricing_faq_collapsed.svg");
+              background-size: 10px 10px;
+              background-position: center;
+              background-repeat: no-repeat;
+            }
+          }
+
+          div.faq-response {
+            display: none;
+            position: relative;
+            padding-left: 32px;
+            @include avenir_BOOK();
+            font-size: 18px;
+            color: $deep_navy;
             margin-top: 16px;
-            display: block;
-            width: 100%;
-            text-align: center;
+            text-align: left;
           }
         }
 
-        a.enterprise-block-link {
+        div.contact-us-row {
           @include avenir_M();
           font-size: 16px;
-          color: $sea_blue;
-          text-decoration: none;
+          color: $deep_navy;
+          max-width: 1080px;
+          text-align: center;
+          margin: 32px auto 0;
 
-          @include mobile() {
-            margin-top: 8px;
-            display: block;
-            width: 100%;
-            text-align: center;
-          }
-
-          &:hover {
-            text-decoration: underline;
+          a.contact {
+            color: $carrot_green;
           }
         }
       }
-    }
-
-    button.price-button {
-      margin: px auto 0px;
-      background-color: $sea_blue;
-      color: white;
-      font-size: 16px;
-      width: 175px;
-      height: 40px;
-      border-radius: 100px;
     }
 
     section.second-section {

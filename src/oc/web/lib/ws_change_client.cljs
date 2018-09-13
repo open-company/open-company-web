@@ -1,6 +1,7 @@
 (ns oc.web.lib.ws-change-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
+            [defun.core :refer (defun)]
             [taoensso.sente :as s]
             [taoensso.timbre :as timbre]
             [taoensso.encore :as encore :refer-macros (have)]
@@ -24,20 +25,55 @@
 
 ;; ----- Actions -----
 
-(defn container-watch
-  ([]
-    (container-watch @container-ids))
+(defun container-watch
+  ([watch-id :guard string?]
+    (timbre/debug "Adding container/watch for:" watch-id)
+    (container-watch [watch-id]))
 
-  ([watch-ids]
+  ([watch-ids :guard sequential?]
+    (timbre/debug "Adding container/watch for:" watch-ids)
+    ;; Remove duplicated sections by moving old and new ids into sets
+    ;; and replacing with the union of the 2.
+    (let [current-set (set @container-ids)
+          new-set (set watch-ids)
+          union-set (clojure.set/union current-set new-set)]
+      (reset! container-ids (into [] union-set)))
+    (container-watch))
+
+  ([]
     (when @chsk-send!
-      (timbre/debug "Sending container/watch for:" watch-ids)
-      (swap! container-ids conj watch-ids)
-      (@chsk-send! [:container/watch watch-ids] 1000))))
+      (timbre/debug "Sending container/watch for:" @container-ids)
+      (@chsk-send! [:container/watch @container-ids] 1000))))
 
 (defn container-seen [container-id]
   (when @chsk-send!
     (timbre/debug "Sending container/seen for:" container-id)
     (@chsk-send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}] 1000)))
+
+(defn item-seen [publisher-id container-id item-id]
+  (when @chsk-send!
+    (timbre/debug "Sending item/seen for container:" container-id "item:" item-id)
+    (@chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}] 1000)))
+
+(defn item-read [org-id container-id item-id user-name avatar-url]
+  (when @chsk-send!
+    (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
+    (@chsk-send! [:item/read {:org-id org-id
+                              :container-id container-id
+                              :item-id item-id
+                              :name user-name
+                              :avatar-url avatar-url
+                              :read-at (time/current-timestamp)}] 1000)))
+
+(defn who-read-count [item-ids]
+  (when @chsk-send!
+    (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
+    (@chsk-send! [:item/who-read-count item-ids] 1000)))
+
+(defn who-read [item-ids]
+  (when @chsk-send!
+    (timbre/debug "Sending item/who-read for item-ids:" item-ids)
+    (@chsk-send! [:item/who-read item-ids] 1000)))
 
 (defn subscribe
   [topic handler-fn]
@@ -68,10 +104,30 @@
   (timbre/debug "Status event:" body)
   (go (>! ch-pub { :topic :container/status :data body })))
 
+(defmethod event-handler :org/change
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :org/change :data body })))
+
 (defmethod event-handler :container/change
   [_ body]
   (timbre/debug "Change event:" body)
   (go (>! ch-pub { :topic :container/change :data body })))
+
+(defmethod event-handler :item/change
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :item/change :data body })))
+
+(defmethod event-handler :item/counts
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :item/counts :data body })))
+
+(defmethod event-handler :item/status
+  [_ body]
+  (timbre/debug "Change event:" body)
+  (go (>! ch-pub { :topic :item/status :data body })))
 
 ;; ----- Sente event handlers -----
 

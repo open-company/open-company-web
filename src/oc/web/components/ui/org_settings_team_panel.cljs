@@ -30,10 +30,18 @@
                     :solid-button-cb nil}]
    (alert-modal/show-alert alert-data)))
 
+(defn user-match [query user]
+  (let [r (js/RegExp (str "^.*(" query ").*$") "i")]
+    (or (and (:name user) (.match (:name user) r))
+        (and (:first-name user) (.match (:first-name user) r))
+        (and (:last-name user) (.match (:last-name user) r))
+        (and (:email user) (.match (:email user) r)))))
+
 (rum/defcs org-settings-team-panel
   < rum/reactive
     (drv/drv :invite-data)
     (rum/local false ::resending-invite)
+    (rum/local "" ::query)
     {:after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
@@ -48,19 +56,31 @@
   (let [invite-users-data (drv/react s :invite-data)
         team-data (:team-data invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
-        org-authors (:authors org-data)]
+        org-authors (:authors org-data)
+        all-users (:users team-data)
+        filtered-users (if (seq @(::query s))
+                         (filter #(user-match @(::query s) %) all-users)
+                         all-users)
+        sorted-users (sort-by utils/name-or-email filtered-users)]
     [:div.org-settings-panel
       ;; Panel rows
       [:div.org-settings-team.org-settings-panel-row
+        (when true ;(> (count all-users) 4)
+          ;; Search team members
+          [:div.org-settings-team-search.org-settings-field
+            [:input.org-settings-team-search-field
+              {:value @(::query s)
+               :placeholder "Find a member..."
+               :on-change #(reset! (::query s) (.. % -target -value))}]])
         ;; Team table
-        [:table.org-settings-table
+        [:table.org-settings-table.org-settings-team-table.fs-hide
           [:thead
             [:tr
-              [:th "Name"]
-              [:th "Status"]
-              [:th.role "Role"]]]
+              [:th "MEMBER"]
+              [:th.status "STATUS"]
+              [:th.role "ROLE"]]]
           [:tbody
-            (for [user (sort-by utils/name-or-email (:users team-data))
+            (for [user sorted-users
                   :let [user-type (utils/get-user-type user (dis/org-data))
                         author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)
                         remove-fn (fn []
@@ -89,7 +109,7 @@
                   (user-avatar-image user)
                   (let [display-name (utils/name-or-email user)]
                     [:div.user-name-label
-                      {:title (if (not= display-name (:email user)) (:email user) "")
+                      {:title (:email user)
                        :data-toggle "tooltip"
                        :data-placement "top"}
                       display-name])]
@@ -113,7 +133,7 @@
                                                           :role user-type
                                                           :error nil}]])
                                        (reset! (::resending-invite s) true)
-                                       (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)))))}
+                                       (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)) "")))}
                         "Resend"])
                     (when (and (= "pending" (:status user))
                                (utils/link-for (:links user) "remove"))

@@ -28,75 +28,61 @@ div.entry-edit-modal-container {
   }
 
   div.entry-edit-modal-header {
-    height: 64px;
-    background-color: white;
+    height: 56px;
+    background-color: $sea_blue;
     width: 100vw;
     position: fixed;
     top: 0px;
     left: 0px;
     right: 0px;
     z-index: 1;
-    box-shadow: 0px 2px 6px 0px rgba($deep_tan,0.5);
-    padding: 20px 24px;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+    padding: 16px 24px;
     z-index: #{$navbar_zindex + 106};
 
     @include mobile() {
-      box-shadow: none;
-      height: 112px;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
     }
 
     div.entry-edit-modal-header-title {
       @include avenir_H();
-      font-size: 18px;
-      color: $deep_navy;
-      width: 162px;
-      text-align: right;
+      font-size: 16px;
+      line-height: 24px;
+      color: white;
+      text-align: center;
       position: relative;
-      margin: 0px auto;
-
-      &.editing {
-        width: 125px;
-      }
-
-      &:before {
-        content: "";
-        position: absolute;
-        top: 2px;
-        left: 0px;
-        width: 15px;
-        height: 16px;
-        background-image: cdnUrl("/img/ML/edit_pencil.svg");
-        background-size: 15px 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
+      margin: 2px auto 0px;
+      max-width: 50%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
 
       @include mobile() {
         display: none;
       }
     }
 
-    button.mobile-modal-close-bt {
-      @include image-2x("/img/ML/mobile_modal_close");
-      width: 24px;
+    button.modal-close-bt {
+      background-image: cdnUrl("/img/ML/white_close.svg");
+      width: 16px;
       height: 24px;
       background-repeat: no-repeat;
       background-size: 14px 14px;
-      background-position: 5px 5px;
+      background-position: center;
       position: absolute;
-      top: 20px;
-      left: 18px;
+      padding: 0px;
+      top: 16px;
+      left: 24px;
     }
 
     div.entry-edit-modal-header-right {
       position: absolute;
-      top: 12px;
+      top: 16px;
       right: 24px;
       max-width: 80%;
 
       @include mobile() {
-        top: 20px;
+        top: 16px;
       }
 
       div.mobile-buttons-divider-line {
@@ -105,468 +91,287 @@ div.entry-edit-modal-container {
         @include mobile() {
           float: right;
           width: 1px;
-          background-color: $light_tan;
-          height: 64px;
-          margin: -20px 16px 0px 16px;
+          background-color: rgba(white, 0.2);
+          height: 24px;
+          margin: 0px 16px;
           display: block;
         }
       }
 
       button.header-buttons {
-        height: 40px;
-        @include avenir_H();
+        height: 24px;
+        @include avenir_M();
         font-size: 14px;
         float: right;
-        color: $carrot_green;
+        color: white;
         margin: 0px;
         position: relative;
+        padding: 0px;
+        opacity: 0.6;
+        padding-top: 4px;
 
-        div.button-icon {
+        &:hover {
+          opacity: 1;
+        }
+
+        div.small-loading {
           position: absolute;
-          top: 10px;
-          left: 20px;
-          width: 20px;
-          height: 20px;
-          background-repeat: no-repeat;
-          background-color: transparent;
-          background-position: center;
+          top: 3px;
+          left: 0px;
         }
 
         &.post-button {
-          border-radius: 100px;
-          background-color: $carrot_green;
+          @include avenir_B();
           color: white;
-          padding: 0px 32px 0px 48px;
           margin-left: 24px;
-
-          div.small-loading {
-            position: absolute;
-            top: 10px;
-            left: 20px;
-          }
-
-          div.button-icon {
-            background-size: 20px 20px;
-            @include image-2x("/img/ML/entry_post_button_icon_white");
-          }
-        }
-
-        @include mobile() {
-          height: 24px;
-          font-size: 15px;
-          line-height: 24px;
-          padding: 2px 0px 0px 32px;
-          border-radius: 0px;
-          color: $carrot_green;
-
-          &.disabled {
-            color: $carrot_light_gray_3;
-            opacity: 1;
-          }
-
-          div.button-icon {
-            top: 2px;
-            left: 0px;
-          }
-
-          &.post-button {
-            margin-left: 0px;
-            background-color: transparent;
-            padding: 2px 0px 0px 32px;
-            color: $carrot_green;
-            background-color: transparent;
-
-            div.button-icon {
-              background-size: 20px 20px;
-              @include image-2x("/img/ML/entry_post_button_icon_green");
-            }
-
-
-            &.disabled {
-              color: $carrot_light_gray_3;
-
-              div.button-icon {
-                background-size: 20px 20px;
-                @include image-2x("/img/ML/entry_post_button_icon");
-              }
-            }
-          }
-
-          &.save-button {
-            &.disabled {
-              div.button-icon {
-                @include image-2x("/img/ML/entry_save_button_icon");
-              }
-            }
-
-            div.button-icon {
-              @include image-2x("/img/ML/entry_save_button_icon_green");
-              background-size: 20px 20px;
-            }
-          }
-        }
-      }
-    }
-
-    div.entry-edit-modal-mobile-subheader {
-      height: 48px;
-      margin-top: 44px;
-      width: calc(100% + 48px);
-      margin-left: -24px;
-      padding: 12px 24px;
-      border-top: 1px solid $light_tan;
-      display: none;
-
-      @include mobile() {
-        display: block;
-      }
-    }
-  }
-
-  div.posting-in {
-    @include avenir_M();
-    font-size: 16px;
-    color: $carrot_dark_gray;
-    float: left;
-    margin-top: 5px;
-    margin-left: 16px;
-
-    @include mobile() {
-      float: none;
-      margin-left: 0px;
-      font-size: 15px;
-    }
-
-    span.posting-in-span {
-      float: left;
-    }
-
-    div.boards-dropdown-caret {
-      @include avenir_M();
-      color: $carrot_green;
-      float: left;
-      margin-left: 6px;
-      cursor: pointer;
-      position: relative;
-
-      @include mobile() {
-        @include avenir_H();
-        font-size: 15px;
-        width: calc(100% - 78px);
-      }
-
-      div.board-name {
-        @include avenir_M();
-        color: $carrot_green;
-        margin-bottom: 0px;
-        cursor: pointer;
-        position: relative;
-        float: left;
-        padding-right: 28px;
-
-        @include mobile() {
-          float: unset;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        &:after {
-          position: absolute;
-          top: 0px;
-          right: 0px;
-          content: "";
-          background-image: cdnUrl("/img/ML/board_settings.svg");
-          background-size: 8px 8px;
-          background-repeat: no-repeat;
-          background-position: center;
-          background-color: $deep_tan;
-          border-radius: 10px;
-          width: 20px;
-          height: 20px;
           opacity: 0.8;
-
-          @include mobile() {
-            margin-top: -3px;
-            background-size: 8px 5px;
-            background-position: 12px 9px;
-            top: 0px;
-            left: unset;
-            right: 0px;
-            background-color: transparent;
-            background-image: cdnUrl("/img/ML/board_chevron_green.svg");
-          }
 
           &:hover {
             opacity: 1;
           }
         }
-      }
 
-      div.sections-picker-container {
-        position: absolute;
-        top: 32px;
-        left: 50%;
-        margin-left: -180px;
-        z-index: 1000;
+        @include tablet() {
+          height: 24px;
+          font-size: 15px;
+          line-height: 24px;
+          padding: 2px 0px 0px 0px;
+          border-radius: 0px;
 
-        @include mobile() {
-          position: fixed;
-          top: 0px;
-          left: 0px;
-          margin-left: 0px;
-          z-index: 1500;
+          &.loading {
+            padding-left: 32px;
+          }
+
+          &.disabled {
+            opacity: 0.6
+          }
+
+
+          &.post-button {
+            margin-left: 0px;
+            color: white;
+            background-color: transparent;
+            padding: 2px 0px 0px 0px;
+
+            &.loading {
+              padding-left: 32px;
+            }
+
+            &.disabled {
+              opacity: 0.6;
+            }
+          }
         }
       }
     }
   }
 
-  div.modal-wrapper {
-    width: #{672 + 20 +8}px;
-    min-height: 330px;
-    margin: 104px auto 50px;
+  div.entry-edit-modal {
+    width: 720px;
+    margin: 112px auto 32px;
     position: relative;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0px 2px 4px 0px rgba(#E4E3DE, 0.5);
+    padding: 16px 24px 32px;
 
     @include mobile() {
-      min-height: initial;
-      max-height: initial;
-      height: initial;
       width: 100%;
-      margin: 0px;
-      margin-top: 136px;
+      border-radius: 0px;
+      box-shadow: none;
+      position: initial;
+      height: initial;
+      padding: 0px;
+      margin: 56px auto 32px;
     }
 
-    div.entry-edit-modal {
-      width: 700px;
-      margin: 0px 0px 0px 28px;
-      position: relative;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
-      padding: 0px;
+    div.entry-edit-modal-separator {
+      width: calc(100% + 48px);
+      height: 1px;
+      margin-left: -24px;
+      background-color: rgba($ui_grey, 0.2);
+    }
+
+    div.entry-edit-modal-section {
+      width: 100%;
+      padding-bottom: 16px;
 
       @include mobile() {
-        width: 100%;
-        margin: 0px;
-        border-radius: 0px;
-        box-shadow: none;
-        position: initial;
-        height: initial;
+        padding: 16px 24px 0px;
+        height: 56px;
       }
 
-      div.entry-edit-modal-headline {
-        height: 88px;
-        width: 100%;
-        padding: 28px 41px;
-        border-bottom: 1px solid $light_tan;
+      div.posting-in {
+        @include avenir_M();
+        font-size: 14px;
+        color: $deep_navy;
+        float: left;
+        position: relative;
 
-        @include mobile() {
-          display: none;
+        @include user-profile(24);
+
+        div.user-avatar-img-container {
+          float: left;
         }
 
-        @include user-profile(32);
-
-        & > div.user-avatar-img-container {
+        span {
           float: left;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-
-        div.posting-in {
-          @include avenir_M();
-          font-size: 16px;
-          color: $carrot_dark_gray;
-          float: left;
-          margin-top: 5px;
           margin-left: 16px;
+          margin-top: 2px;
+        }
 
-          span {
-            float: left;
-          }
+        div.board-name {
+          margin-top: 2px;
+          margin-left: 6px;
+          cursor: pointer;
+          position: relative;
+          @include avenir_M();
+          font-size: 14px;
+          float: left;
+          color: $deep_navy;
+          max-width: 250px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding-right: 20px;
 
-          div.boards-dropdown-caret {
-            @include avenir_M();
-            color: $carrot_green;
-            float: left;
-            margin-left: 6px;
-            cursor: pointer;
-            position: relative;
+          &:after {
+            content: "";
+            background-image: cdnUrl("/img/ML/board_settings.svg");
+            background-size: 8px 8px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            right: 0px;
+            top: -2px;
 
-            div.board-name {
-              @include avenir_M();
-              color: $carrot_green;
-              margin-bottom: 0px;
-              cursor: pointer;
-              position: relative;
-              float: left;
-
-              @include mobile() {
-                @include avenir_H();
-                color: $carrot_text_blue_3;
-              }
-
-              &:after {
-                float: right;
-                content: "";
-                background-image: cdnUrl("/img/ML/board_settings.svg");
-                background-size: 8px 8px;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-color: $deep_tan;
-                border-radius: 10px;
-                width: 20px;
-                height: 20px;
-                margin-top: 0px;
-                margin-left: 6px;
-                opacity: 0.8;
-
-                &:hover {
-                  opacity: 1;
-                }
-              }
-
-              @include mobile() {
-
-                &:after {
-                  width: 8px 5px;
-                  margin-top: -3px;
-                  background-size: 8px 5px;
-                  background-position: 0px 9px;
-                  background-color: transparent;
-                  background-image: cdnUrl("/img/ML/board_blue_chevron.svg");
-                }
-              }
-            }
-
-            div.dropdown-list-container {
-              top: 32px;
-              left: 50%;
-              margin-left: -100px;
-              width: 200px;
-
-              @include mobile() {
-                width: 100vw;
-                height: calc(100vh - 64px - 48px);
-                top: 34px;
-                left: 0px;
-                text-align: left;
-                background-color: white;
-
-                div.triangle {
-                  display: none;
-                }
-
-                div.dropdown-list-content {
-                  border: none;
-                  border-radius: 0px;
-                  padding: 24px;
-                  margin: 0px;
-                  box-shadow: none;
-
-                  div.add-section-tooltip-container {
-                    display: block !important;
-                    width: 100%;
-                    text-align: center;
-                    margin-top: 32px;
-
-                    div.add-section-tooltip-arrow {
-                      width: 20px;
-                      height: 38px;
-                      @include image-2x("/img/ML/section_tooltip_arrow");
-                      background-size: 20px 38px;
-                      background-position: center;
-                      background-repeat: no-repeat;
-                      margin: 0 auto;
-                    }
-
-                    div.add-section-tooltip {
-                      width: 100%;
-                      margin: 24px auto;
-                      @include avenir_M();
-                      font-size: 18px;
-                      color: $ui_grey;
-                      text-align: center;
-                      max-width: 311px;
-                    }
-                  }
-                }
-              }
-
-              div.dropdown-list-content {
-                div.add-section-tooltip-container {
-                  display: none;
-                }
-              }
+            &:hover {
+              opacity: 1;
             }
           }
+        }
+
+        div.sections-picker-container {
+          position: absolute;
+          top: 24px;
+          left: 0px;
+          z-index: 1000;
         }
       }
 
-      div.entry-edit-modal-body {
-        margin: 0px;
-        padding: 0px 42px 24px 42px;
-        width: 100%;
-        border-bottom: 1px solid $light_tan;
+      div.entry-edit-modal-video-bt-container {
+        float: right;
 
-        @include mobile() {
-          min-height: calc(100vh - 139px);
-          max-height: initial;
-          padding: 0px;
-          width: 100%;
-          margin: 0px;
-          border-bottom: none;
-        }
+        button.video-record-bt {
+          @include avenir_M();
+          color: $light_ui_grey;
+          font-size: 14px;
+          height: 20px;
+          position: relative;
+          padding-left: 26px;
 
-        div.entry-edit-headline {
-          border: none;
-          outline: none;
-          cursor: text;
-          @include activity-headline();
-          @include avenir_H();
-          font-size: 18px;
-          color: $deep_navy;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-          margin-top: 35px;
-          min-height: 26px;
-
-          @include tablet() {
-            width: 100%;
-            @include avenir_H();
-            font-size: 20px;
-            margin: 27px 0px 0px;
-            padding: 0px 24px;
+          &:not(.remove-video-bt) {
+            @include preload_image(cdnUrl("/img/ML/capture_video_icon_hover.svg"));
           }
 
-          &:empty:before {
-            content: attr(placeholder);
-            display: inline-block;
-            color: $deep_navy !important;
-            font-style: none;
-            height: 26px;
+          &.remove-video-bt {
+            @include preload_image(cdnUrl("/img/ML/remove_video_icon_hover.svg"));
 
-            @include tablet() {
-              color: $deep_navy !important;
+            &:before {
+              background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+            }
+
+            &:hover {
+              &:before {
+                background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+              }
             }
           }
-        }
 
-        div.stream-view-attachments {
-          @include mobile(){
-            padding: 0px 24px;
+          &:hover {
+            color: $ui_grey;
+
+            &:before {
+              background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+            }
+          }
+
+          &:before {
+            content: "";
+            left: 0px;
+            top: 3px;
+            position: absolute;
+            height: 12px;
+            width: 20px;
+            background-image: cdnUrl("/img/ML/capture_video_icon.svg");
+            background-size: 20px 12px;
+            background-repeat: no-repeat;
+            background-position: center;
           }
         }
+      }
+    }
+
+    div.entry-edit-modal-body {
+      margin: 0px;
+      width: 100%;
+      padding: 32px 16px 0px;
+
+      @include tablet() {
+        padding: 24px 24px 0px;
+
+        div.ziggeo-player, div.ziggeo-recorder {
+          margin-left: -24px;
+        }
+      }
+
+      div.ziggeo-player, div.ziggeo-recorder {
+        margin: 0px auto 24px;
+
+        div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
+          margin: 0px auto;
+        }
+      }
+
+      div.entry-edit-headline {
+        border: none;
+        outline: none;
+        cursor: text;
+        @include activity-headline();
+        @include avenir_H();
+        font-size: 22px;
+        color: $deep_navy;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        min-height: 28px;
+        line-height: 28px;
+
+        @include tablet() {
+          width: 100%;
+          @include avenir_H();
+          font-size: 20px;
+          margin: 0px;
+        }
+
+        &:empty:before {
+          content: attr(placeholder);
+          display: inline-block;
+          color: $light_ui_grey !important;
+          font-style: none;
+          height: 28px;
+        }
+      }
+
+      div.rich-body-editor-wrapper {
+        overflow-x: hidden;
+        overflow-y: auto;
 
         div.rich-body-editor-container {
           position: relative;
           overflow: visible;
-
-          @include tablet() {
-            margin: 8px 0px 0px;
-            padding: 0px 24px;
-          }
+          height: auto;
 
           div.medium-editor-media-picker {
             margin-top: 0px;
@@ -577,30 +382,39 @@ div.entry-edit-modal-container {
           div.rich-body-editor {
             border: none;
             outline: none;
+            margin: 8px 0px 0px;
+            cursor: text;
+            @include activity-body(16, 22, 22, $deep_navy);
             color: $deep_navy;
             @include avenir_R();
             font-size: 16px;
-            margin: 16px 0;
-            cursor: text;
-            min-height: 85px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            @include activity-body();
+            line-height: 22px;
+            height: auto;
+            overflow-y: auto;
+            overflow-x: hidden;
 
-            @include tablet() {
-              width: 100%;
-              margin: 24px 0px 0px;
-              min-height: 64px;
-
-              @include avenir_BOOK();
-              font-size: 18px;
-              line-height: 30px;
+            @media screen and (min-height: 556px) {
+              min-height: 240px;
+              max-height: calc(100vh - 315px);
             }
 
-            @include activity-attachment(true);
+            @include mobile() {
+              min-height: initial;
+              max-height: initial;
+              overflow-x: auto;
+              overflow-y: auto;
+            }
+
+            & > *:first-child {
+              margin-top: 0px;
+            }
+
+            p:not(:last-child):not(:first-child) {
+              margin: 22px 0px;
+            }
 
             &.medium-editor-placeholder:after {
-              color: $deep_navy !important;
+              color: $light_ui_grey !important;
             }
 
             &:after {
@@ -608,87 +422,192 @@ div.entry-edit-modal-container {
             }
           }
         }
+      }
 
-        div.entry-edit-controls {
-          margin-bottom: 16px;
+      div.entry-edit-transcript {
+        max-height: 330px;
+        margin-top: 16px;
+        width: 100%;
+        background-color: rgba(#ECECEC, 0.2);
+        border-top: 1px solid #ECECEC;
+        padding: 24px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
 
-          @include mobile() {
-            display: none;
+        textarea.video-transcript {
+          width: 100%;
+          background-color: transparent;
+          border: none;
+          outline: none;
+        }
+      }
+
+      div.edit-tooltip-container {
+        border: 1px dashed $carrot_gold;
+        background-color: #FDF6E4;
+        border-radius: 6px;
+        padding: 24px 24px;
+        margin: 0 0 32px;
+        position: relative;
+
+        @include tablet() {
+          width: 100%;
+          margin: 0 0 32px;
+        }
+
+        button.edit-tooltip-dismiss {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 33px;
+          height: 33px;
+          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
+          background-size: 32px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        div.edit-tooltips {
+          width: 100%;
+
+          div.edit-tooltip-title {
+            @include avenir_H();
+            font-size: 18px;
+            color: $deep_navy;
+            line-height: 20px;
+
+            @include mobile() {
+              max-width: 90%;
+            }
+          }
+
+          div.edit-tooltip {
+            @include avenir_R();
+            font-size: 14px;
+            color: $deep_navy;
+            line-height: 18px;
+            margin-top: 8px;
+
+            @include tablet() {
+              float: unset;
+              margin: 24px auto 0px;
+              width: 100%;
+            }
+
+            button.edit-tooltip-record-video-bt {
+              display: inline;
+              background-color: transparent;
+              padding: 0;
+              margin: 0;
+              color: $carrot_green;
+              @include avenir_H();
+              font-size: 14px;
+              line-height: 18px;
+            }
           }
         }
       }
 
-      div.media-attachments {
-        padding: 0px 36px;
+      div.entry-edit-controls {
+        margin-bottom: 16px;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+
+    div.entry-edit-modal-footer {
+      margin-top: 32px;
+      padding: 0px 16px;
+      position: relative;
+
+      @include mobile() {
+        display: none;
       }
 
-      div.entry-edit-modal-footer {
-        height: 20px;
-        margin: 28px 36px;
-        position: relative;
+      div.entry-edit-footer-multi-picker {
+        float: left;
+      }
+
+      div.emoji-picker {
+        float: left;
+        margin-left: 16px;
+
+        button.emoji-button {
+          width: 20px;
+          height: 20px;
+          background-position: 0px 0px;
+          padding: 0px;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          cursor: pointer;
+        }
 
         @include mobile() {
           display: none;
         }
 
-        div.entry-edit-footer-multi-picker {
-          float: left;
+        div.picker-container {
+          left: -8px;
+        }
+      }
+
+      div.saving-saved {
+        display: inline;
+        width: 40px;
+        @include avenir_M();
+        color: $light_ui_grey;
+        font-size: 12px;
+        margin: 5px 1px 1px 20px;
+      }
+
+      div.entry-edit-legend-container {
+        float: right;
+        position: relative;
+        width: 20px;
+        height: 20px;
+
+        button.entry-edit-legend-trigger {
+          width: 20px;
+          height: 20px;
+          background-image: cdnUrl("/img/ML/new_post_legend_button.svg");
+          background-repeat: no-repeat;
+          background-size: 20px 20px;
+          background-position: 0px 0px;
+          cursor: pointer;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          opacity: 0.4;
+
+          &:hover {
+            opacity: 1;
+          }
         }
 
-        div.emoji-picker {
-          float: left;
-          margin-left: 16px;
-
-          button.emoji-button {
-            width: 20px;
-            height: 20px;
-            background-position: 0px 0px;
-            padding: 0px;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            cursor: pointer;
-          }
-
-          @include mobile() {
-            display: none;
-          }
-
-          div.picker-container {
-            left: -8px;
-          }
+        div.entry-edit-legend-image {
+          position: absolute;
+          top: -283px;
+          left: -8px;
+          width: 212px;
+          height: 281px;
+          @include image-2x("/img/ML/new_post_legend");
+          background-size: 212px 281px;
+          background-position: center;
+          background-repeat: no-repeat;
         }
+      }
 
-        div.entry-edit-legend-container {
-          float: left;
-          margin-left: 16px;
-          position: relative;
-
-          button.entry-edit-legend-trigger {
-            width: 20px;
-            height: 20px;
-            @include image-2x("/img/ML/new_post_legend_button");
-            background-repeat: no-repeat;
-            background-size: 20px 20px;
-            background-position: 0px 0px;
-            cursor: pointer;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-          }
-
-          div.entry-edit-legend-image {
-            position: absolute;
-            top: -283px;
-            left: -8px;
-            width: 212px;
-            height: 281px;
-            @include image-2x("/img/ML/new_post_legend");
-            background-size: 212px 281px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
-        }
+      div.entry-edit-footer-separator {
+        width: 1px;
+        height: 20px;
+        background-color: $light_ui_grey;
+        margin: 0px 16px;
+        float: left;
       }
     }
   }

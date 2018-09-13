@@ -11,7 +11,7 @@ div.site-mobile-menu {
   height: calc(100vh - 73px);
   top: 73px;
   left: 0px;
-  background-color: white;
+  background-color: #FFFDF9;
   z-index: 1081;
   padding: 0px 16px;
 
@@ -43,7 +43,7 @@ div.site-mobile-menu {
     padding: 16px;
 
     button.login-btn {
-      background-color: whtie;
+      background-color: white;
       border-radius: 100px;
       border: 2px solid $carrot_light_blue_2;
       @include avenir_H();

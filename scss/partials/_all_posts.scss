@@ -1,5 +1,5 @@
 div.all-posts {
-  width: 932px;
+  width: #{$board_container_width}px;
 
   @include mobile() {
     width: 100%;
@@ -29,12 +29,12 @@ div.all-posts {
 
       div.activities-overlay {
         position: fixed;
-        top: 62px;
+        top: 50px;
         left: 50%;
         z-index: 1;
-        height: calc(100vh - 62px);
-        width: 767px;
-        margin-left: -400px;
+        height: calc(100vh - 50px);
+        width: #{$board_container_width}px;
+        margin-left: -244px;
         background-color: $oc_gray_8;
         text-align: center;
 
@@ -54,7 +54,7 @@ div.all-posts {
         div.top-loading-message {
           top: 300px;
           position: absolute;
-          width: 667px;
+          width: 100%;
           color: rgba($oc_gray_7, 0.5);
           font-size: 16px;
           @include avenir_M();

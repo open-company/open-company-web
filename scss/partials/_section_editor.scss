@@ -75,11 +75,38 @@ div.section-editor {
       margin-top: 64px;
     }
 
+    div.section-editor-error-label {
+      margin-top: 8px;
+      @include avenir_M();
+      font-size: 13px;
+      color: $carrot_orange;
+    }
+
     div.section-editor-add-label {
       margin-top: 24px;
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
+      height: 21px;
+
+      span.section-name {
+        float: left;
+      }
+
+      span.checkmark {
+        float: left;
+        margin-left: 6px;
+        font-size: 18px;
+        color: $carrot_green;
+      }
+
+      div.small-loading {
+        margin-right: 0px;
+        margin-top: 0px;
+        margin-left: 6px;
+        float: left;
+        display: block;
+      }
 
       span.role-header {
         float: right;
@@ -96,7 +123,7 @@ div.section-editor {
     div.section-editor-add-name {
       border-radius: 4px;
       border: 1px solid $carrot_light_gray_1;
-      height: 40px;
+      min-height: 40px;
       width: 100%;
       @include avenir_M();
       font-size: 15px;
@@ -106,6 +133,8 @@ div.section-editor {
       cursor: text;
       outline: none;
       margin-top: 8px;
+      overflow-y: auto;
+      overflow-x: hidden;
 
       &:empty:before {
         padding: 10px 16px;
@@ -213,6 +242,13 @@ div.section-editor {
           height: 40px;
         }
       }
+    }
+
+    div.sectoin-editor-access-public-description {
+      @include avenir_R();
+      font-size: 14px;
+      color: $ui_grey;
+      margin-top: 8px;
     }
 
     div.section-editor-add-access {
@@ -431,6 +467,33 @@ div.section-editor {
       }
     }
 
+    div.section-editor-add-personal-note {
+      border-radius: 4px;
+      border: 1px solid $carrot_light_gray_1;
+      min-height: 80px;
+      width: 100%;
+      @include avenir_M();
+      font-size: 15px;
+      color: $deep_navy;
+      padding: 10px 16px;
+      position: relative;
+      cursor: text;
+      outline: none;
+      margin-top: 8px;
+
+      &:empty:before {
+        padding: 10px 16px;
+        height: 40px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        content: attr(placeholder);
+        opacity: 0.5;
+        font-style: none;
+        display: block;
+      }
+    }
+
     div.section-editor-add-footer {
       margin-top: 24px;
       height: 24px;
@@ -447,6 +510,14 @@ div.section-editor {
         margin-left: 0px;
         padding-left: 0px;
         text-align: left;
+
+        &:not(.disabled):hover {
+          color: $deep_navy;
+        }
+
+        &.disabled {
+          color: $light_ui_grey;
+        }
       }
 
       button.mlb-reset.create-bt {
@@ -455,6 +526,10 @@ div.section-editor {
         color: $carrot_green;
         @include avenir_H();
         font-size: 15px;
+
+        &.disabled {
+          opacity: 0.5;
+        }
       }
     }
   }

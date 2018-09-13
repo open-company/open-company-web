@@ -8,10 +8,12 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local_settings :as ls]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
-            [oc.web.actions.error-banner :as error-banner-actions]))
+            [oc.web.actions.notifications :as notification-actions]))
 
 ;; Logout
 
@@ -41,31 +43,56 @@
 (defn jwt-refresh []
   (api/jwt-refresh update-jwt logout))
 
-;; Whats new callback
-(defn get-whats-new-cb [{:keys [body success]}]
-  (dis/dispatch! [:whats-new/finish (if success (json->cljs body) {:entries []})]))
+;;User walls
+(defn- check-user-walls
+  "Check if one of the following is present and redirect to the proper wall if needed:
+  :password-required redirect to password collect
+  :name-required redirect to first and last name collect
+
+  Use the orgs value to determine if the user has already at least one org set"
+  ([]
+    ; Delay to let the last api request set the app-state data
+    (when (jwt/jwt)
+      (utils/after 100
+        #(when (and (user-store/orgs?)
+                    (user-store/auth-settings?)
+                    (user-store/auth-settings-status?))
+            (check-user-walls (dis/auth-settings) (dis/orgs-data))))))
+  ([auth-settings orgs]
+    (let [status-response (set (map keyword (:status auth-settings)))
+          has-orgs (pos? (count orgs))]
+      (cond
+        (status-response :password-required)
+        (router/nav! oc-urls/confirm-invitation-password)
+
+        (status-response :name-required)
+        (if has-orgs
+          (router/nav! oc-urls/confirm-invitation-profile)
+          (router/nav! oc-urls/sign-up-profile))
+
+        :else
+        (when-not has-orgs
+          (router/nav! oc-urls/sign-up-team))))))
 
 ;; API Entry point
 (defn entry-point-get-finished
-  ([success body] (entry-point-get-finished success body #()))
+  ([success body] (entry-point-get-finished success body nil))
 
   ([success body callback]
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
-        (when-let [whats-new-link (utils/link-for (:links collection) "whats-new")]
-          (api/get-whats-new whats-new-link get-whats-new-cb))
-        (callback orgs collection)
-        (dis/dispatch! [:entry-point orgs collection]))
-      (error-banner-actions/show-banner utils/generic-network-error 0)))))
+        (when (fn? callback)
+          (callback orgs collection))
+        (dis/dispatch! [:entry-point orgs collection])
+        (check-user-walls))
+      (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug]
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (when (= status 404)
-        (error-banner-actions/show-banner (str "You have an older version of the Carrot web app, "
-                                               "please refresh your browser window!")
-         0))))
+        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
   (api/get-entry-point
    (fn [success body]
      (entry-point-get-finished success body
@@ -73,14 +100,25 @@
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (org-actions/get-org org-data)
-             ;; 404 only if the user is not looking at a secure post page
-             ;; if so the entry point response can not include the specified org
-             (when-not (router/current-secure-activity-id)
-               (router/redirect-404!)))
-           (when (and (jwt/jwt) (utils/in? (:route @router/path) "login"))
+             (let [ap-initial-at (:ap-initial-at @dis/app-state)
+                   currently-logged-in (jwt/jwt)]
+               (when-not (or (router/current-activity-id)
+                             ap-initial-at)
+                 ;; 404 only if the user is not looking at a secure post page
+                 ;; if so the entry point response can not include the specified org
+                 (when-not (router/current-secure-activity-id)
+                   ;; avoid infinite loop of the Go to digest button
+                   ;; by changing the value of the last visited slug
+                   (if (pos? (count orgs))
+                     (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+                     (cook/remove-cookie! (router/last-org-cookie)))
+                   (router/redirect-404!)))))
+           (when (and (jwt/jwt)
+                      (utils/in? (:route @router/path) "login")
+                      (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
-(defn slack-lander-check-team-redirect []
+(defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point
     (fn [success body]
       (entry-point-get-finished success body
@@ -101,7 +139,8 @@
           (api/get-entry-point
            (fn [success body] (entry-point-get-finished success body
              (fn [orgs collection]
-               (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
+               (when (pos? (count orgs))
+                 (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -121,6 +160,10 @@
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
+(defn login-with-google [auth-url]
+  (router/redirect! (:href auth-url))
+  (dis/dispatch! [:login-with-google]))
+
 (defn refresh-slack-user []
   (api/refresh-slack-user (fn [status body success]
     (if success
@@ -131,37 +174,35 @@
   (dis/dispatch! [:login-overlay-show login-type]))
 
 ;; Auth
-(defn auth-settings-get
-  ([] (auth-settings-get #()))
-  ([cb]
-    (api/get-auth-settings (fn [body]
-      (when body
-        ;; auth settings loaded
-        (api/get-current-user body (fn [data]
-          (dis/dispatch! [:user-data (json->cljs data)])))
-        (dis/dispatch! [:auth-settings body])
-        ;; Start teams retrieve if we have a link
-        (team-actions/teams-get)
-        (cb body))))))
 
-(defn bot-auth [org-data team-data user-data]
-  (let [current (router/get-token)
-        auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:id team-data)
-                        (router/get-token))]
-    (router/redirect! fixed-auth-url)))
+(defn auth-settings-get
+  "Entry point call for auth service."
+  []
+  (api/get-auth-settings (fn [body]
+    (when body
+      ;; auth settings loaded
+      (api/get-current-user body (fn [data]
+        (dis/dispatch! [:user-data (json->cljs data)])
+        (utils/after 100 nux-actions/check-nux)))
+      (dis/dispatch! [:auth-settings body])
+      (check-user-walls)
+      ;; Start teams retrieve if we have a link
+      (team-actions/teams-get)))))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))
 
 ;;Invitation
 (defn invitation-confirmed [status body success]
-  (when (= status 201)
-    (api/get-entry-point entry-point-get-finished)
-    (auth-settings-get))
-  (when success
-    (update-jwt body))
-  (dis/dispatch! [:invitation-confirmed (= status 201)]))
+ (when success
+    (update-jwt body)
+    (when (= status 201)
+      (nux-actions/new-user-registered "email")
+      (api/get-entry-point entry-point-get-finished)
+      (auth-settings-get))
+    ;; Go to password setup
+    (router/nav! oc-urls/confirm-invitation-password))
+  (dis/dispatch! [:invitation-confirmed success]))
 
 (defn confirm-invitation [token]
   (api/confirm-invitation token invitation-confirmed))
@@ -185,6 +226,8 @@
   (if success
     (do
       (update-jwt body)
+      (when (not= token-type :password-reset)
+        (nux-actions/new-user-registered "email"))
       (auth-with-token-success token-type body))
     (cond
       (= status 401)
@@ -217,16 +260,12 @@
        (fn [success body]
          (entry-point-get-finished success body
            (fn [orgs collection]
-             (if (zero? (count orgs))
-               (router/nav! oc-urls/sign-up-team)
+             (when (pos? (count orgs))
                (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
-      (cook/set-cookie!
-       (router/show-nux-cookie (jwt/user-id))
-       (:new-user router/nux-cookie-values)
-       (* 60 60 24 7))
+      (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
@@ -249,19 +288,6 @@
 (defn signup-with-email-reset-errors []
   (dis/dispatch! [:input [:signup-with-email] {}]))
 
-(defn name-password-collect [form-data]
-  (api/collect-name-password
-   (:firstname form-data)
-   (:lastname form-data)
-   (:pswd form-data)
-   (fn [status body success]
-     (if-not success
-       (dis/dispatch! [:name-pswd-collect/finish status nil])
-       (when success
-         (dis/dispatch! [:name-pswd-collect/finish status (json->cljs body)])
-         (utils/after 1000 jwt-refresh)))))
-  (dis/dispatch! [:name-pswd-collect]))
-
 (defn pswd-collect [form-data password-reset?]
   (api/collect-password (:pswd form-data)
     (fn [status body success]
@@ -274,10 +300,7 @@
             (cook/remove-cookie! :show-login-overlay)
             (utils/after 200 #(router/nav! oc-urls/login)))
           (do
-            (cook/set-cookie!
-             (router/show-nux-cookie (jwt/user-id))
-             (:new-user router/nux-cookie-values)
-             (* 60 60 24 7))
+            (nux-actions/new-user-registered "email")
             (router/nav! oc-urls/confirm-invitation-profile))))
       (dis/dispatch! [:pswd-collect/finish status])))
   (dis/dispatch! [:pswd-collect password-reset?]))
@@ -314,6 +337,37 @@
            (utils/after 1000 jwt-refresh)
            (dis/dispatch! [:user-data (json->cljs body)])))))
     (dis/dispatch! [:user-profile-save])))
+
+(defn user-profile-reset []
+  (dis/dispatch! [:user-profile-reset]))
+
+;; Initial loading
+
+(defn initial-loading [& [force-refresh]]
+  (let [force-refresh (or force-refresh
+                          (utils/in? (:route @router/path) "org")
+                          (utils/in? (:route @router/path) "login"))
+        latest-entry-point (if (or force-refresh
+                                   (nil? (:latest-entry-point @dis/app-state)))
+                             0
+                             (:latest-entry-point @dis/app-state))
+        latest-auth-settings (if (or force-refresh
+                                     (nil? (:latest-auth-settings @dis/app-state)))
+                               0
+                               (:latest-auth-settings @dis/app-state))
+        now (.getTime (js/Date.))
+        reload-time (* 1000 60 20)] ; every 20m
+    (when (or (> (- now latest-entry-point) reload-time)
+              (and (router/current-org-slug)
+                   (nil? (dis/org-data))))
+      (entry-point-get (router/current-org-slug)))
+    (when (> (- now latest-auth-settings) reload-time)
+      (auth-settings-get))))
+
+;; User profile tab
+
+(defn change-user-profile-panel [panel]
+  (dis/dispatch! [:input [:user-settings] panel]))
 
 ;; Debug
 

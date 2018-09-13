@@ -9,12 +9,17 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.image-upload :as iu]
+            [oc.web.utils.org :as org-utils]
+            [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.dom :as gdom]
@@ -46,27 +51,14 @@
         auth-settings (drv/react s :auth-settings)]
     [:div.onboard-lander.lander
       [:div.main-cta
-        [:button.mlb-reset.top-back-button
-          {:on-touch-start identity
-           :on-click #(router/history-back!)
-           :aria-label "Back"}]
+        [:div.mobile-header
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+             :on-click #(router/history-back!)
+             :aria-label "Back"}]
+          [:div.mobile-logo]]
         [:div.title.main-lander
-          "Welcome!"]
-        [:button.mlb-reset.top-continue
-          {:class (when (or (not (utils/valid-email? @(::email s)))
-                            (<= (count @(::pswd s)) 7))
-                    "disabled")
-           :on-touch-start identity
-           :on-click #(if (or (not (utils/valid-email? @(::email s)))
-                              (<= (count @(::pswd s)) 7))
-                        (do
-                          (when (not (utils/valid-email? @(::email s)))
-                            (reset! (::email-error s) true))
-                          (when (<= (count @(::pswd s)) 7)
-                            (reset! (::password-error s) true)))
-                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
-           :aria-label "Continue"}
-           "Continue"]]
+          "Welcome to Carrot"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -76,9 +68,20 @@
                                              {:auth-source "slack"})]
                          (user-actions/login-with-slack auth-link)))}
           [:div.signup-with-slack-content
-            "Sign Up with "
-            [:div.slack-blue-icon
-              {:aria-label "slack"}]]]
+            [:div.slack-icon
+              {:aria-label "slack"}]
+            "Continue with Slack"]]
+       [:button.mlb-reset.signup-with-google
+         {:on-touch-start identity
+          :on-click #(do
+                       (.preventDefault %)
+                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                            {:auth-source "google"})]
+                         (user-actions/login-with-google auth-link)))}
+          [:div.signup-with-google-content
+            [:div.google-icon
+              {:aria-label "google"}]
+            "Continue with Google "]]
         [:div.or-with-email
           [:div.or-with-email-line]
           [:div.or-with-email-copy
@@ -86,14 +89,14 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label
+          [:div.field-label.email-field
             "Enter email"
             (cond
               (= (:error signup-with-email) 409)
               [:span.error "Email already exists"]
               @(::email-error s)
               [:span.error "Email is not valid"])]
-          [:input.field
+          [:input.field.fs-hide
             {:type "email"
              :class (when (= (:error signup-with-email) 409) "error")
              :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
@@ -134,7 +137,7 @@
              :on-click #(if (or (not (utils/valid-email? @(::email s)))
                                 (<= (count @(::pswd s)) 7))
                           (do
-                            (when (not (utils/valid-email? @(::email s)))
+                            (when-not (utils/valid-email? @(::email s))
                               (reset! (::email-error s) true))
                             (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))
@@ -151,10 +154,9 @@
                                   (rum/local false ::saving)
                                   (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
-                                    (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
-                                    (utils/after 100
-                                     #(user-actions/user-profile-save @(drv/get-ref s :current-user-data)
-                                       @(drv/get-ref s :edit-user-profile)))
+                                    (user-actions/user-profile-reset)
+                                    (let [avatar-with-cdn (:avatar-url (:user-data @(drv/get-ref s :edit-user-profile)))]
+                                      (reset! (::temp-user-avatar s) avatar-with-cdn))
                                     s)
                                    :did-mount (fn [s]
                                     (delay-focus-field-with-ref s "first-name")
@@ -176,23 +178,26 @@
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
                           user-data)
-        orgs (drv/react s :orgs)]
+        orgs (drv/react s :orgs)
+        continue-disabled (or (and (empty? (:first-name user-data))
+                                   (empty? (:last-name user-data)))
+                              (empty? (:avatar-url user-data)))
+        continue-fn #(when-not continue-disabled
+                       (reset! (::saving s) true)
+                       (user-actions/user-profile-save current-user-data edit-user-profile))
+        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
-        [:div.title.about-yourself
-          "Personal details"]
-        (let [top-continue-disabled (or (and (empty? (:first-name user-data))
-                                             (empty? (:last-name user-data)))
-                                        (empty? (:avatar-url user-data)))]
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
           [:button.mlb-reset.top-continue
-            {:class (when top-continue-disabled
-                      "disabled")
-             :on-touch-start identity
-             :on-click #(when-not top-continue-disabled
-                          (reset! (::saving s) true)
-                          (user-actions/user-profile-save current-user-data edit-user-profile))
-             :aria-label "Continue"}
-            "Continue"])]
+           {:class (when continue-disabled "disabled")
+            :on-touch-start identity
+            :on-click continue-fn
+            :aria-label "Continue"}
+            "Continue"]]
+        [:div.title.about-yourself
+          "Personal details"]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -200,64 +205,66 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.group
+          [:div.logo-upload-container.group.fs-hide
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
+                        (iu/upload! user-utils/user-avatar-filestack-config
                           (fn [res]
                             (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
                           nil
                           (fn [_])
                           nil))}
-            (user-avatar-image fixed-user-data)
+            (if is-jelly-head-avatar
+              [:div.empty-user-avatar-placeholder]
+              (user-avatar-image fixed-user-data))
             [:div.add-picture-link
               "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :ref "first-name"
              :value (or (:first-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :value (or (:last-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
           [:button.continue
-            {:disabled (or (and (empty? (:first-name user-data))
-                                (empty? (:last-name user-data)))
-                           (empty? (:avatar-url user-data)))
+            {:class (when continue-disabled "disabled")
              :on-touch-start identity
-             :on-click #(do
-                          (reset! (::saving s) true)
-                          (user-actions/user-profile-save current-user-data edit-user-profile))}
-            "That’s me"]]]]))
+             :on-click continue-fn}
+            "Continue"]]]]))
 
 (defn- setup-team-data
   ""
-  [s]
+  [s & [setup-email-domain]]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)]
-    (when (and (zero? (count (:name org-editing)))
-               (zero? (count (:logo-url org-editing)))
-               (seq teams-data))
+        teams-data @(drv/get-ref s :teams-data)
+        google-domain (jwt/get-key :google-domain)
+        with-email-domain (if (and setup-email-domain
+                                   google-domain
+                                   (clojure.string/blank? (:email-domain org-editing)))
+                            {:email-domain google-domain}
+                            {:email-domain (or (:email-domain org-editing) "")})]
+    (if (and (zero? (count (:name org-editing)))
+             (zero? (count (:logo-url org-editing)))
+             (seq teams-data))
       (let [first-team (select-keys
                         (first teams-data)
-                        [:name :logo-url :logo-width :logo-height])]
+                        [:name :logo-url :logo-width :logo-height])
+            fixed-first-team (merge first-team with-email-domain)]
         (dis/dispatch!
-         [:input
+         [:update
           [:org-editing]
-          first-team])
+          #(merge % fixed-first-team)])
         (when (and (not (zero? (count (:logo-url first-team))))
                    (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
@@ -271,7 +278,11 @@
                    :logo-height (.-height img)})])
                (gdom/removeNode img)))
             (gdom/append (.-body js/document) img)
-            (set! (.-src img) (:logo-url first-team))))))))
+            (set! (.-src img) (:logo-url first-team)))))
+      (dis/dispatch!
+       [:update
+        [:org-editing]
+        #(merge % with-email-domain)]))))
 
 (rum/defcs lander-team < rum/reactive
                          (drv/drv :teams-data)
@@ -279,9 +290,10 @@
                          (rum/local false ::saving)
                          {:will-mount (fn [s]
                            (dis/dispatch! [:input [:org-editing :name] ""])
+                           (dis/dispatch! [:input [:org-editing :email-domain] ""])
                            s)
                           :did-mount (fn [s]
-                           (setup-team-data s)
+                           (setup-team-data s true)
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
@@ -290,34 +302,39 @@
   [s]
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        continue-disabled (or
+                           (< (count (clean-org-name (:name org-editing))) 3)
+                           (:domain-error org-editing))
+        continue-fn #(when-not continue-disabled
+                       (let [org-name (clean-org-name (:name org-editing))]
+                         (dis/dispatch! [:input [:org-editing :name] org-name])
+                         (if (and (seq org-name)
+                                  (> (count org-name) 2))
+                           ;; Create org and show setup screen
+                           (org-actions/create-or-update-org @(drv/get-ref s :org-editing))
+                           (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
       [:div.main-cta
-        [:div.title.company-setup
-          "Your company"]
-        (let [top-continue-disabled (< (count (clean-org-name (:name org-editing))) 3)]
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
           [:button.mlb-reset.top-continue
-            {:class (when top-continue-disabled "disabled")
+            {:class (when continue-disabled "disabled")
              :on-touch-start identity
-             :on-click #(when-not top-continue-disabled
-                          (let [org-name (clean-org-name (:name org-editing))]
-                            (dis/dispatch! [:input [:org-editing :name] org-name])
-                            (if (and (seq org-name)
-                                     (> (count org-name) 2))
-                              ;; Create org and show setup screen
-                              (org-actions/org-create @(drv/get-ref s :org-editing))
-                              (dis/dispatch! [:input [:org-editing :error] true]))))
-             :aria-label "Done"}
-           "Done"])]
+             :on-click continue-fn
+             :aria-label "Continue"}
+           "Continue"]]
+        [:div.title.company-setup
+          "Set up your company"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
           (when-not is-mobile?
-            [:div.logo-upload-container.org-logo.group
+            [:div.logo-upload-container.org-logo.group.fs-hide
               {:on-click (fn [_]
                           (if (empty? (:logo-url org-editing))
-                            (iu/upload! {:accept "image/*"}
+                            (iu/upload! org-utils/org-avatar-filestack-config
                               (fn [res]
                                 (let [url (gobj/get res "url")
                                       img (gdom/createDom "img")]
@@ -343,50 +360,285 @@
               (org-avatar org-editing false :never)
               [:div.add-picture-link
                 (if (empty? (:logo-url org-editing))
-                  "+ Upload your company logo"
-                  "+ Change your company logo")]
+                  "Add company logo"
+                  "Change company logo")]
               [:div.add-picture-link-subtitle
-                "A transparent background PNG works best"]])
+                "A 160x160 transparent Gif or PNG works best."]])
           [:div.field-label
-            "Team name"
+            "Company name"
             (when (:error org-editing)
               [:span.error "Must be at least 3 characters"])]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :ref "org-name"
              :class (when (:error org-editing) "error")
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing]
-                          (merge org-editing {:error nil :name (.. % -target -value)})])}]
+               (merge org-editing {:error nil :name (.. % -target -value)})])}]
+                 ;; Email domains row
+          [:div.org-email-domains-row.group
+            [:div.field-label
+              "Allowed email domain " [:span.info "(optional)"]
+              (when (:error org-editing)
+                [:label.error
+                   "Only company email domains are allowed."])]
+            [:div.org-email-domain-field
+              {:class (when (:domain-error org-editing) "error")}
+              [:input.um-invite-field.email
+                {:name "um-domain-invite"
+                 :ref "um-domain-invite"
+                 :type "text"
+                 :auto-capitalize "none"
+                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :value (:email-domain org-editing)
+                 :on-change #(let [domain (.. % -target -value)]
+                               (dis/dispatch! [:input [:org-editing :email-domain] domain])
+                               (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
+                                                                                        (not (utils/valid-domain? domain)))]))
+                 :placeholder "Domain, e.g. acme.com"}]]
+            [:div.field-label.info "Anyone with this email domain can automatically join your team."]]
           [:button.continue
-            {:class (when (< (count (clean-org-name (:name org-editing))) 3) "disabled")
+            {:class (when continue-disabled "disabled")
              :on-touch-start identity
-             :on-click #(let [org-name (clean-org-name (:name org-editing))]
-                          (dis/dispatch! [:input [:org-editing :name] org-name])
-                          (if (and (seq org-name)
-                                   (> (count org-name) 2))
-                           (org-actions/org-create @(drv/get-ref s :org-editing))
-                           (dis/dispatch! [:input [:org-editing :error] true])))}
-            "All set!"]]]]))
+             :on-click continue-fn}
+            "Continue"]]]]))
+
+(rum/defcs lander-sections < rum/reactive
+                             (drv/drv :org-data)
+                             (drv/drv :sections-setup)
+  [s]
+  (let [sections-list (drv/react s :sections-setup)
+        org-data (drv/react s :org-data)
+        continue-fn (fn []
+                     (org-actions/update-org-sections (:slug org-data) sections-list))]
+    [:div.onboard-lander.lander-sections
+      [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :aria-label "Start using Carrot"}
+           "Start"]]
+        [:div.title
+          "Topics that matter"]
+        [:div.subtitle
+          "What do you commonly share with your team to keep them on the same page?"]]
+      [:div.onboard-form
+        [:div.sections-list
+          (if (seq sections-list)
+            (for [idx (range (count sections-list))
+                  :let [section (get sections-list idx)]]
+              [:div.section
+                {:key (str "sections-list-" (:name section))
+                 :class (when (:selected section) "selected")
+                 :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
+                (:name section)])
+            (small-loading))]
+        [:button.continue.start-using-carrot
+          {:on-touch-start identity
+           :on-click continue-fn}
+          "✨ Start using Carrot ✨"]]]))
+
+(def default-invite-row
+  {:user ""
+   :type "email"
+   :role :author
+   :error false})
+
+(defn- check-invite-row [invite]
+  (assoc invite :error (and (seq (:user invite)) (not (utils/valid-email? (:user invite))))))
+
+(defn- check-invites [s]
+  (reset! (::invite-rows s) (vec (map check-invite-row @(::invite-rows s)))))
+
+(def default-invite-note
+  (str
+    "Hey there, let's explore Carrot together. It's a place to make sure important "
+    "announcements, updates, and decisions don't get lost in the noise."))
+
+(rum/defcs lander-invite < rum/reactive
+                           (drv/drv :org-data)
+                           (drv/drv :invite-users)
+                           (rum/local false ::inviting)
+                           (rum/local nil ::invite-error)
+                           (rum/local (rand 3) ::invite-rand)
+                           (rum/local [] ::invite-rows)
+                           (rum/local default-invite-note ::invite-note)
+                           {:will-mount (fn [s]
+                             (let [rows (if (responsive/is-tablet-or-mobile?) 2 3)]
+                               (reset! (::invite-rows s) (vec (repeat rows default-invite-row))))
+                             s)
+                            :did-mount (fn [s]
+                             ;; Load the list of teams if it's not already
+                             (team-actions/teams-get-if-needed)
+                             (utils/after 500
+                              #(ui-utils/resize-textarea (rum/ref-node s "personal-note")))
+                             s)
+                            :did-remount (fn [_ s]
+                             (ui-utils/resize-textarea (rum/ref-node s "personal-note"))
+                             s)
+                            :will-update (fn [s]
+                             ;; Load the list of teams if it's not already
+                             (team-actions/teams-get-if-needed)
+                             (when @(::inviting s)
+                               (let [invite-users @(drv/get-ref s :invite-users)
+                                     invite-errors (filter :error invite-users)
+                                     to-send (filter #(not (:error %)) invite-users)]
+                                 (when (zero? (count to-send))
+                                   (reset! (::inviting s) false)
+                                   (if (pos? (count invite-errors))
+                                     ;; There were errors inviting users, show them and let the user retry
+                                     (do
+                                       (reset! (::invite-rand s) (rand 3))
+                                       (reset! (::invite-error s) "An error occurred inviting the following users, please try again.")
+                                       (reset! (::invite-rows s) (vec invite-errors)))
+                                     ;; All invites sent, redirect to dashboard
+                                     (org-actions/signup-invite-completed @(drv/get-ref s :org-data))))))
+                             s)}
+  [s]
+  (let [_ (drv/react s :invite-users)
+        org-data (drv/react s :org-data)
+        valid-rows (filter #(and (seq (:user %))
+                                 (not (:error %))) @(::invite-rows s))
+        error-rows (filter #(and (seq (:user %))
+                                 (:error %)) @(::invite-rows s))
+        continue-fn (fn []
+                     (let [_ (check-invites s)
+                           errors (filter :error @(::invite-rows s))]
+                       (when (zero? (count errors))
+                         (reset! (::inviting s) true)
+                         (reset! (::invite-error s) nil)
+                         (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
+                           (team-actions/invite-users not-empty-invites (.-value (rum/ref-node s "personal-note")))))))
+        continue-disabled (not (zero? (count error-rows)))]
+    [:div.onboard-lander.lander-invite
+      [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]
+          [:button.mlb-reset.top-continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :class (when continue-disabled "disabled")
+             :aria-label "Continue"}
+           "Continue"]]
+        [:div.title
+          "Invite your team"]]
+      [:div.onboard-form
+        [:div.subtitle
+          "Invite other people to explore Carrot with you."]]
+      [:div.onboard-form
+        [:form
+          {:on-submit (fn [e]
+                        (.preventDefault e))}
+          [:div.field-label.invite-teammates
+            "Invite teammates " [:span.info "(optional)"]
+            [:button.mlb-reset.add-another-invite-row
+              {:on-click #(reset! (::invite-rows s) (vec (conj @(::invite-rows s) default-invite-row)))}
+              "+ add another invitation"]]
+          (when @(::invite-error s)
+            [:div.error @(::invite-error s)])
+          [:div.invite-rows.fs-hide
+            (for [idx (range (count @(::invite-rows s)))
+                  :let [invite (get @(::invite-rows s) idx)]]
+              [:div.invite-row
+                {:class (when (:error invite) "error")
+                 :key (str "invite-row-" @(::invite-rand s) "-" idx)}
+                [:input
+                  {:type "text"
+                   :placeholder "name@example.com"
+                   :on-change (fn [e]
+                               (reset! (::invite-rows s)
+                                (vec
+                                 (assoc-in @(::invite-rows s) [idx]
+                                  (assoc invite :user (.. e -target -value)))))
+                               (check-invites s))
+                   :value (:user invite)}]])]
+          [:div.field-label
+            "Personal note "
+            [:span.info "(optional)"]]
+          [:textarea.field
+            {:default-value @(::invite-note s)
+             :ref "personal-note"
+             :on-input #(let [target (.-target %)]
+                          (ui-utils/resize-textarea target)
+                          (reset! (::invite-note s) (.-innerText target)))
+             :class (when (pos? (count valid-rows)) "has-value")}]
+          [:button.continue
+            {:on-touch-start identity
+             :on-click continue-fn
+             :class (when (or @(::inviting s)
+                              continue-disabled) "disabled")}
+            "Continue"]
+          [:div.skip-container
+            "Want to do this later? "
+            [:button.mlb-reset.skip-for-now
+              {:on-click #(org-actions/signup-invite-completed org-data)}
+              "Skip for now"]]]]]))
+
+(defn dots-animation [s]
+  (when-let [dots-node (rum/ref-node s :dots)]
+    (let [dots (.-innerText dots-node)
+          next-dots (case dots
+                      "." ".."
+                      ".." "..."
+                      ".")]
+      (set! (.-innerText dots-node) next-dots)
+      (utils/after 800 #(dots-animation s)))))
+
+(defn confirm-invitation-when-ready [s]
+  (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]
+    (when (and (:auth-settings confirm-invitation)
+               (not @(::exchange-started s)))
+      (reset! (::exchange-started s) true)
+      (user-actions/confirm-invitation (:token confirm-invitation)))))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
-                            (rum/local false ::password-error)
-                            {:did-mount (fn [s]
-                              (delay-focus-field-with-ref s "password")
+                            (rum/local false ::exchange-started)
+                            {:will-mount (fn [s]
+                              (confirm-invitation-when-ready s)
+                              s)
+                             :did-mount (fn [s]
+                              (dots-animation s)
+                              (confirm-invitation-when-ready s)
+                              s)
+                             :did-update (fn [s]
+                              (confirm-invitation-when-ready s)
                               s)}
   [s]
-  (let [confirm-invitation (drv/react s :confirm-invitation)
-        jwt (:jwt confirm-invitation)
-        collect-pswd (:collect-pswd confirm-invitation)
-        collect-pswd-error (:collect-pswd-error confirm-invitation)
-        invitation-confirmed (:invitation-confirmed confirm-invitation)]
+  (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-lander.invitee-lander
       [:div.main-cta
         [:div.title
           "Join your team on Carrot"]
+        [:div.mobile-logo.mobile-only]
+        (if (:invitation-error confirm-invitation)
+          [:div.subtitle
+            "An error occurred while confirming your invitation, please try again."]
+          [:div.subtitle
+            "Please wait" [:span.dots {:ref :dots} "."]])]]))
+
+(rum/defcs invitee-lander-password < rum/reactive
+                                     (drv/drv :collect-password)
+                                     (rum/local false ::password-error)
+                                     {:did-mount (fn [s]
+                                       (delay-focus-field-with-ref s "password")
+                                       s)}
+  [s]
+  (let [collect-password (drv/react s :collect-password)
+        jwt (:jwt collect-password)
+        collect-pswd (:collect-pswd collect-password)
+        collect-pswd-error (:collect-pswd-error collect-password)
+        invitation-confirmed (:invitation-confirmed collect-password)]
+    [:div.onboard-lander.invitee-lander-password
+      [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
+        [:div.title
+          "Join your team on Carrot"]
         [:div.subtitle
-          "Signing up as " [:span.email-address (:email jwt)]]]
+          "Signing up as " [:span.email-address.fs-hide (:email jwt)]]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -432,8 +684,9 @@
                                     (rum/local false ::saving)
                                     (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
-                                      (reset! (::temp-user-avatar s) (utils/cdn user-store/default-avatar-url true))
-                                       (utils/after 100 #(dis/dispatch! [:user-profile-reset]))
+                                      (user-actions/user-profile-reset)
+                                      (let [avatar-with-cdn (:avatar-url (:user-data @(drv/get-ref s :edit-user-profile)))]
+                                        (reset! (::temp-user-avatar s) avatar-with-cdn))
                                       s)
                                      :did-mount (fn [s]
                                       (delay-focus-field-with-ref s "first-name")
@@ -453,11 +706,14 @@
         temp-user-avatar @(::temp-user-avatar s)
         fixed-user-data (if (empty? (:avatar-url user-data))
                           (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)]
+                          user-data)
+        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
         [:div.title.about-yourself
-          "Tell us a bit about yourself…"]
+          "Tell us a bit about you"]
         [:div.subtitle
           "This information will be visible to your team"]
         (when (:error edit-user-profile)
@@ -467,34 +723,33 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container
+          [:div.logo-upload-container.group.fs-hide
             {:on-click (fn []
                         (when (not= (:avatar-url user-data) temp-user-avatar)
                           (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! {:accept "image/*"
-                                     :transformations {
-                                       :crop {
-                                         :aspectRatio 1}}}
+                        (iu/upload! user-utils/user-avatar-filestack-config
                           (fn [res]
                             (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
                           nil
                           (fn [_])
                           nil))}
-            (user-avatar-image fixed-user-data)
+            (if is-jelly-head-avatar
+              [:div.empty-user-avatar-placeholder]
+              (user-avatar-image fixed-user-data))
             [:div.add-picture-link
               "+ Upload a profile photo"]
             [:div.add-picture-link-subtitle
               "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :ref "first-name"
              :value (:first-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
-          [:input.field
+          [:input.field.fs-hide
             {:type "text"
              :value (:last-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
@@ -506,7 +761,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/user-profile-save current-user-data edit-user-profile))}
-            "That’s me"]]]]))
+            "Continue"]]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]
@@ -532,7 +787,7 @@
           ":"
           " ")
         (if (seq email)
-          [:div.email-address email]
+          [:div.email-address.fs-hide email]
           "your email address")
         "."]]))
 
@@ -542,16 +797,6 @@
                (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"}))
       (reset! (::exchange-started s) true)
       (user-actions/auth-with-token :email-verification))))
-
-(defn dots-animation [s]
-  (when-let [dots-node (rum/ref-node s :dots)]
-    (let [dots (.-innerText dots-node)
-          next-dots (case dots
-                      "." ".."
-                      ".." "..."
-                      ".")]
-      (set! (.-innerText dots-node) next-dots)
-      (utils/after 800 #(dots-animation s)))))
 
 (rum/defcs email-verified < rum/reactive
                             (drv/drv :email-verification)
@@ -587,10 +832,7 @@
                           (if (and (empty? (jwt/get-key :first-name))
                                    (empty? (jwt/get-key :last-name)))
                             (do
-                              (cook/set-cookie!
-                               (router/show-nux-cookie (jwt/user-id))
-                               (:new-user router/nux-cookie-values)
-                               (* 60 60 24 7))
+                              (nux-actions/new-user-registered "email")
                               (router/nav! oc-urls/confirm-invitation-profile))
                             (router/nav! (oc-urls/org (:slug org))))
                           (router/nav! oc-urls/login)))
@@ -639,7 +881,10 @@
     :lander (lander)
     :lander-profile (lander-profile)
     :lander-team (lander-team)
+    :lander-sections (lander-sections)
+    :lander-invite (lander-invite)
     :invitee-lander (invitee-lander)
+    :invitee-lander-password (invitee-lander-password)
     :invitee-lander-profile (invitee-lander-profile)
     :email-wall (email-wall)
     :email-verified (email-verified)
@@ -653,6 +898,7 @@
       {:class (str "onboard-" (name component))}
       [:div.onboard-wrapper-left
         [:div.onboard-wrapper-logo]
-        [:div.onboard-wrapper-box]]
+        [:div.onboard-wrapper-left-inner
+          [:div.onboard-wrapper-box]]]
       [:div.onboard-wrapper-right
         (get-component component)]]])

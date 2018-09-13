@@ -1,4 +1,4 @@
-div.org-settings-main {
+div.org-settings div.org-settings-inner div.org-settings-main {
   div.org-settings-panel-row.org-logo-row {
     cursor: pointer;
 
@@ -61,14 +61,19 @@ div.org-settings-main {
     div.org-settings-label {
       i.mdi.mdi-information-outline {
         margin-left: 8px;
+        color: $light_ui_grey;
 
         &:before {
-          font-size: 14px;
+          font-size: 16px;
         }
       }
 
       div.tooltip {
         width: 160px;
+      }
+
+      label.error {
+        margin-left: 0px !important;
       }
     }
 
@@ -82,32 +87,74 @@ div.org-settings-main {
           color: $carrot_dark_gray;
         }
       }
-
     }
 
-    div.org-settings-field {
-      float: left;
-      width: 307px !important;
-      margin-right: 26px;
+    div.org-settings-list.org-settings-email-domains-list {
+      margin-top: 16px;
+      margin-bottom: 0px;
+
+      div.org-settings-list-item {
+        display: inline-block;
+        padding: 6px 13px;
+        background-color: $feint_emerald;
+        height: 32px;
+        border-radius: 100px;
+        margin-right: 8px;
+        color: $carrot_green;
+        border: none;
+        outline: none;
+        box-shadow: none;
+
+        span.org-settings-list-item-name {
+          color: $carrot_green;
+          @include avenir_H();
+          font-size: 14px;
+        }
+
+        button.remove-team-btn {
+          width: 20px;
+          height: 28px;
+          margin-left: 4px;
+          margin-top: -5px;
+          background-image: cdnUrl("/img/ML/remove_email_domain.svg");
+          background-size: 8px 8px;
+          background-position: 6px 10px;
+          background-repeat: no-repeat;
+        }
+      }
+    }
+
+    div.org-settings-field.org-settings-email-domain-field {
+      width: 100%;
       height: 40px;
+      border-radius: 6px;
+      border: 1px solid $light_ui_grey;
 
       @include mobile() {
         width: 70% !important;
       }
 
       input {
+        float: left;
+        width: 390px;
+
         @include placeholder(){
           @include avenir_R();
-          color: $carrot_light_gray;
+          color: $ui_grey;
           font-size: 16px;
         }
       }
-    }
 
-    button.add-email-domain-bt {
-      float: left;
-      width: 61px;
-      height: 40px;
+      button.add-email-domain-bt {
+        height: 20px;
+        padding: 0px 8px;
+        color: $carrot_green;
+        @include avenir_H();
+        font-size: 14px;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+        float: right;
+      }
     }
   }
 
@@ -117,24 +164,14 @@ div.org-settings-main {
     }
   }
 
-  button.remove-team-btn {
-    @include avenir_R();
-    font-size: 14px;
-    color: $carrot_light_gray;
-    margin-left: 16px;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
   div.org-settings-panel-row.slack-teams-row {
     div.org-settings-label {
       i.mdi.mdi-information-outline {
         margin-left: 8px;
+        color: $light_ui_grey;
 
         &:before {
-          font-size: 14px;
+          font-size: 16px;
         }
       }
 
@@ -144,51 +181,112 @@ div.org-settings-main {
     }
 
     button.add-slack-team-bt {
-      @include avenir_R();
-      font-size: 16px;
-      color: $carrot_light_gray;
-      margin-top: 16px;
-      position: relative;
-      padding-right: 28px;
-
-      &:after {
-        display: block;
-        width: 20px;
-        height: 20px;
-        border-radius: 4px;
-        background-color: rgba(#52DE95, 0.25);
-        color: $carrot_green;
-        content: "+";
-        font-size: 16px;
-        text-decoration: none;
-        position: absolute;
-        top: 0px;
-        right: 0px;
-      }
+      margin-top: 8px;
+      opacity: 0.9;
+      padding: 0px;
 
       &:hover{
-        text-decoration: underline;
-        &:after {
-          color: white;
-          background-color: $carrot_green_1;
-          text-decoration: none;
-        }
+        opacity: 1;
       }
     }
 
     div.org-settings-list {
       div.org-settings-list-item {
-        label.org-settings-list-item-name{
-          @include avenir_R();
-          font-size: 16px;
-          color: $carrot_dark_gray;
+        height: 90px !important;
+        border-top: 1px solid rgba($deep_tan, 0.3);
+        padding-top: 32px;
+        margin-top: 32px;
+
+        div.logo-container {
+          float: left;
+          width: 46px;
+          height: 46px;
+          border: 1px solid #D8DBDF;
+          border-radius: 4px;
+          margin-right: 16px;
 
           img.slack-logo {
-            width: 16px;
-            height: 16px;
-            margin-top: 3px;
-            margin-right: 8px;
-            float: left;
+            width: 40px;
+            height: 40px;
+            padding: 3px;
+
+            &.no-logo {
+              width: 20px;
+              margin-left: 10px;
+              margin-top: 10px;
+              height: 20px;
+            }
+          }
+        }
+
+        div.org-settings-list-item-slack-org {
+          padding-left: 64px;
+
+          div.org-settings-list-item-name{
+            @include avenir_M();
+            font-size: 15px;
+            color: $deep_navy;
+            float: none !important;
+            width: 100%;
+            line-height: 20px;
+
+            button.org-settings-list-item-btn {
+              float: right;
+              color: $carrot_green;
+              @include avenir_M();
+              font-size: 12px;
+
+              i.mdi.mdi-information-outline {
+                color: $light_ui_grey;
+                margin-left: 6px;
+
+                &:before {
+                  font-size: 16px;
+                }
+              }
+            }
+          }
+
+          div.org-settings-list-item-desc {
+            @include avenir_M();
+            font-size: 14px;
+            color: $deep_navy;
+            line-height: 20px;
+            height: 20px;
+            float: none;
+
+            div.slack-domain-label {
+              float: left;
+              width: 470px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+
+              span.slack-domain {
+                @include avenir_H();
+              }
+            }
+          }
+
+          div.slack-org-self-join {
+            @include avenir_M();
+            font-size: 12px;
+            color: $light_ui_grey;
+            line-height: 14px;
+            margin-top: 8px;
+
+            span.self-join {
+              @include avenir_H();
+            } 
+          }
+
+          button.remove-team-btn {
+            float: none;
+            color: $carrot_orange;
+            @include avenir_M();
+            font-size: 12px;
+            margin-left: 0px !important;
+            padding: 0px !important;
+            margin-top: 8px;
           }
         }
       }

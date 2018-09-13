@@ -1,47 +1,45 @@
 div.menu {
-  top: 70px;
-  right: 20px !important;
+  top: 48px;
+  right: 14px !important;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2), 0 10px 25px 1px rgba(0, 0, 0, 0.1);
   border: 0px;
   border-radius: 5px;
-  width: 288px;
+  width: 240px;
   position: absolute;
   overflow: visible;
-  padding-top: 0px;
+  padding: 24px;
   text-transform: none;
+  background-color: white;
 
-  div.top-arrow {
-    @include triangle(top, $carrot_dark_bg_gray, 10px);
-    top: -15px;
-    right: 10px;
-    position: absolute;
-
-    @include mobile(){
-      right: 30px;
-    }
+  &.dropdown-menu {
+    letter-spacing: 0em;
   }
 
   div.menu-header {
-    height: 40px;
     width: 100%;
-    background-color: $carrot_dark_bg_gray;
-    padding-top: 10px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    padding: 10px 20px;
+
+    @include mobile() {
+      display: none;
+    }
+
+    @include user-profile(32);
+
+    div.user-avatar-img-container {
+      float: left;
+      margin-right: 16px;
+    }
 
     div.user-name {
       @include avenir_H();
-      font-size: 14px;
-      color: $carrot_dark_gray;
-      float: left;
+      font-size: 15px;
+      color: $deep_navy;
+      line-height: 18px;
     }
 
     div.user-type {
-      float: right;
-      color: $carrot_light_gray;
+      color: $light_ui_grey;
       @include avenir_R();
-      font-size: 14px;
+      font-size: 13px;
     }
   }
 
@@ -68,49 +66,204 @@ div.menu {
     }
   }
 
+  div.oc-menu-separator {
+    width: calc(100% + 48px);
+    height: 1px;
+    background-color: rgba($deep_tan, 0.6);
+    margin-left: -24px;
+    margin-top: 20px;
+
+    @include mobile() {
+      display: none;
+    }
+  }
+
+  a {
+    display: block;
+    background-color: transparent;
+    padding: 0px;
+    @include avenir_R();
+    font-size: 14px;
+    color: $deep_navy;
+    text-align: left;
+
+    @include mobile() {
+      font-size: 21px;
+    }
+
+    &:hover {
+      color: $carrot_green;
+    }
+  }
+
+  div.org-item {
+    padding: 24px 0px 3px 0px;
+
+    @include mobile() {
+      display: none;
+    }
+
+    div.org-avatar-border {
+      border: 1px solid #D8DBDF;
+      border-radius: 6px;
+      padding: 6px;
+      float: left;
+      margin-right: 16px;
+      width: 32px;
+      height: 32px;
+
+      div.org-avatar {
+        @include org-avatar(20);
+
+        div.org-avatar-container {
+          span.org-name {
+            display: none !important;
+          }
+        }
+      }
+    }
+
+    div.org-name {
+      @include avenir_H();
+      font-size: 15px;
+      color: $deep_navy;
+      width: calc(100% - 48px);
+      line-height: 18px;
+      height: 18px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    div.org-url {
+      @include avenir_R();
+      font-size: 13px;
+      width: calc(100% - 48px);
+      height: 15px;
+      color: $light_ui_grey;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 15px;
+    }
+  }
+
+  a:hover {
+    div.oc-menu-item {
+      &.personal-profile {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_personal_profile_hover.svg");
+        }
+      }
+
+      &.user-notifications {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_user_notifications_hover.svg");
+        }
+      }
+
+      &.invite-people {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_invite_people_hover.svg");
+        }
+      }
+
+      &.digest-settings {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_digest_settings_hover.svg");
+        }
+      }
+
+      &.whats-new {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_whats_new_hover.svg");
+        }
+      }
+
+      &.support {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_support_hover.svg");
+        }
+      }
+
+      &.logout {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_logout_hover.svg");
+        }
+      }
+    }
+  }
+
   div.oc-menu-item {
     opacity: 0.9;
-    padding: 12px 20px;
+    padding: 14px 0px 0px 48px;
+    position: relative;
 
     &.divider-item {
       box-shadow: inset 0 -1px 0 0 $carrot_dark_bg_gray;
     }
 
-    &:last-child {
-      border-bottom-left-radius: 5px;
-      border-bottom-right-radius: 5px;
-    }
-
-    @include big_web(){
-      &.menu-separator {
-        padding-bottom: 10px;
-        border-bottom: 1px solid rgba(78,90,107,0.3);
-        margin-bottom: 10px;
-      }
-    }
-
-    a {
-      display: block;
-      background-color: transparent;
-      padding: 0px;
-      @include avenir_R();
-      font-size: 16px;
-      line-height: 1.0;
-      color: $carrot_dark_gray;
-      text-align: left;
+    &:before {
+      content: "";
+      position: absolute;
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 16px;
+      height: 16px;
+      top: 15px;
+      left: 8px;
 
       @include mobile() {
-        font-size: 21px;
-        color: $oc_gray_7;
-      }
-
-      &:hover {
-        text-decoration: underline;
+        top: 20px;
       }
     }
 
-    a.sign-out {
-      color: $carrot_orange;
+    &.personal-profile {
+      @include preload_image(cdnUrl("/img/ML/menu_personal_profile_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_personal_profile.svg");
+      }
+    }
+
+    &.user-notifications {
+      @include preload_image(cdnUrl("/img/ML/menu_user_notifications_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_user_notifications.svg");
+      }
+    }
+
+    &.invite-people {
+      @include preload_image(cdnUrl("/img/ML/menu_invite_people_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_invite_people.svg");
+      }
+    }
+
+    &.digest-settings {
+      @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_digest_settings.svg");
+      }
+    }
+
+    &.whats-new {
+      @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_whats_new.svg");
+      }
+    }
+
+    &.support {
+      @include preload_image(cdnUrl("/img/ML/menu_support_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_support.svg");
+      }
+    }
+
+    &.logout {
+      @include preload_image(cdnUrl("/img/ML/menu_logout_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_logout.svg");
+      }
     }
   }
 }

@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="8px" height="10px" viewBox="0 0 8 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
-    <title>ic_lock copy</title>
+<svg width="10px" height="12px" viewBox="0 0 10 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 27</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="➡️-Boards-&amp;-Posts" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Grid" transform="translate(-40.000000, -650.000000)">
-            <g id="ic_lock-copy" transform="translate(40.000000, 650.000000)">
-                <rect id="Rectangle-19" fill="#3FBD7C" x="0" y="3.33333333" width="8" height="6.66666667" rx="1.5"></rect>
-                <rect id="Rectangle-18" stroke="#3FBD7C" stroke-width="1.5" x="1.89285714" y="0.75" width="4.21428571" height="5.34444444" rx="2"></rect>
+    <g id="Nav-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-140.000000, -455.000000)" id="Group" stroke="#3FBD7C" stroke-width="1.5">
+            <g transform="translate(120.000000, 107.000000)">
+                <g id="Group-15">
+                    <g id="Group-19" transform="translate(0.000000, 170.000000)">
+                        <g id="Group-27" transform="translate(20.000000, 178.000000)">
+                            <rect id="Rectangle-18" x="1.75" y="0.75" width="6.5" height="6.5" rx="2"></rect>
+                            <rect id="Rectangle-19" fill="#E4FAEF" x="0.75" y="4.75" width="8.5" height="6.5" rx="1.5"></rect>
+                        </g>
+                    </g>
+                </g>
             </g>
         </g>
     </g>

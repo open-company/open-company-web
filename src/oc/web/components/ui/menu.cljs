@@ -2,15 +2,19 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel sel1)]
-            [oc.web.dispatcher :as dis]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.user :as user-actions]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
+            [oc.web.stores.user :as user-store]
+            [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.org-settings :as org-settings]))
+            [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.user-profile :as user-profile]
+            [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn mobile-menu-toggle []
   (when (responsive/is-mobile-size?)
@@ -27,24 +31,21 @@
 (defn user-profile-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(router/nav! oc-urls/user-profile)))
+  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+
+(defn user-notifications-click [e]
+  (utils/event-stop e)
+  (mobile-menu-toggle)
+  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
 (defn team-settings-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings)))
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
-
-(defn um-click [e]
-  (utils/event-stop e)
-  (mobile-menu-toggle)
-  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-team))))
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
 
 (defn invite-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
-  ; (utils/after (+ utils/oc-animation-duration 100) #(router/nav! (oc-urls/org-settings-invite))))
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 
 (defn sign-in-sign-up-click [e]
@@ -54,55 +55,87 @@
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
+                  (drv/drv :current-user-data)
   [s]
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
-        is-admin? (jwt/is-admin? (:team-id org-data))
-        is-author? (utils/link-for (:links org-data) "create")]
+        current-user-data (drv/react s :current-user-data)
+        user-role (user-store/user-role org-data current-user-data)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.menu
       {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
                                 :mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})
-       :aria-labelledby "dropdown-toggle-menu"}
-      [:div.top-arrow]
+       :aria-labelledby "dropdown-toggle-menu"
+       :aria-expanded true}
       [:div.menu-header
-        [:div.user-name
+        (user-avatar-image current-user-data)
+        [:div.user-name.fs-hide
           (str "Hi " (jwt/get-key :first-name) "!")]
         [:div.user-type
-          (cond
-            is-admin?
-            "You're an Admin"
-            is-author?
-            "You're a Contributor")]]
-      (when (and is-admin?
+          (case user-role
+            :admin
+            "Admin"
+            :author
+            "Contributor"
+            :viewer
+            "Viewer")]]
+      (when (jwt/jwt)
+        [:a
+          {:href "#"
+           :on-click user-profile-click}
+          [:div.oc-menu-item.personal-profile
+            "Personal Profile"]])
+      (when (jwt/jwt)
+        [:a
+          {:href "#"
+           :on-click user-notifications-click}
+          [:div.oc-menu-item.user-notifications
+            "Notification Settings"]])
+      [:div.oc-menu-separator]
+      (when org-data
+        [:div.org-item
+          [:div.org-avatar-border
+            (org-avatar org-data false false true)]
+          [:div.org-name (:name org-data)]
+          [:div.org-url (str ls/web-server "/" (:slug org-data))]])
+      (when (and (not is-mobile?)
                  (router/current-org-slug)
-                 (not (responsive/is-mobile-size?)))
-        [:div.oc-menu-item
-          [:a {:href (oc-urls/org-settings) :on-click team-settings-click} "Team Settings"]])
-      (when (and (router/current-org-slug)
-                 is-admin?
-                 (not (responsive/is-mobile-size?)))
-        [:div.oc-menu-item
-          [:a {:href (oc-urls/org-settings-team) :on-click um-click} "Manage Members"]])
-      (when (and (router/current-org-slug)
-                 is-admin?
-                 (not (responsive/is-mobile-size?)))
-        [:div.oc-menu-item.divider-item
-          [:a {:href (oc-urls/org-settings-invite) :on-click invite-click} "Invite People"]])
+                 (or (= user-role :admin)
+                     (= user-role :author)))
+        [:a
+          {:href "#"
+           :on-click invite-click}
+          [:div.oc-menu-item.invite-people
+            "Invite People"]])
+      (when (and (not is-mobile?)
+                 (= user-role :admin)
+                 (router/current-org-slug))
+        [:a
+          {:href "#"
+           :on-click team-settings-click}
+          [:div.oc-menu-item.digest-settings
+            "Settings"]])
+      ; TODO: need a better experience for these links.
+      ; [:a
+      ;   {:href oc-urls/what-s-new
+      ;    :target "_blank"}
+      ;   [:div.oc-menu-item.whats-new
+      ;     "What’s New"]]
+      ; [:a
+      ;   {:href oc-urls/help
+      ;    :target "_blank"}
+      ;   [:div.oc-menu-item.support
+      ;     "Support"]]
       ; (when (and (router/current-org-slug)
-      ;            is-admin?)
-      ;   [:div.oc-menu-item.divider-item
+      ;            (= user-role :admin))
+      ;   [:div.oc-menu-item
       ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
-      ; (when (and (jwt/jwt)
-      ;            (or is-admin?
-      ;                is-author?))
-      ;   [:div.oc-menu-item.divider-item
-      ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Archive"]])
-      (when (and (jwt/jwt)
-                 (not (responsive/is-mobile-size?)))
-        [:div.oc-menu-item.divider-item
-          [:a {:href oc-urls/user-profile :on-click user-profile-click} "User Profile"]])
+      [:div.oc-menu-separator]
       (if (jwt/jwt)
-        [:div.oc-menu-item
-          [:a.sign-out {:href oc-urls/logout :on-click logout-click} "Sign Out"]]
-        [:div.oc-menu-item
-          [:a {:href "" :on-click sign-in-sign-up-click} "Sign In / Sign Up"]])]))
+        [:a.sign-out
+          {:href oc-urls/logout :on-click logout-click} 
+          [:div.oc-menu-item.logout
+            "Sign Out"]]
+        [:a {:href "" :on-click sign-in-sign-up-click} 
+          [:div.oc-menu-item
+            "Sign In / Sign Up"]])]))

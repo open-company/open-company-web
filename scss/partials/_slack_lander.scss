@@ -1,0 +1,184 @@
+
+div.slack-lander-wrap {
+  background-color: #FFFDF9;
+
+  div.main.slack-lander {
+    text-align: center;
+    width: 100%;
+
+    @include mobile() {
+      padding: 0 0px;
+    }
+
+    section {
+      @include mobile(){
+        padding: 0 24px;
+      }
+    }
+
+    section.cta {
+      padding-top: 128px;
+      padding-bottom: 120px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+
+      @include tablet(){
+        overflow: visible;
+        padding: 148px 24px 80px;
+      }
+
+      div.balloon {
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 1;
+
+        @include mobile() {
+          display: none;
+        }
+
+        &.big-blue {
+          @include image-2x("/img/ML/balloon_big_blue");
+          background-size: 145px 145px;
+          width: 145px;
+          height: 145px;
+          top: -94px;
+          left: 231px;
+        }
+
+        &.small-green {
+          @include image-2x("/img/ML/balloon_small_green");
+          background-size: 15px 15px;
+          width: 15px;
+          height: 15px;
+          top: 46px;
+          left: 232px;
+        }
+
+        &.big-green {
+          @include image-2x("/img/ML/balloon_big_green");
+          background-size: 226px 209px;
+          width: 226px;
+          height: 209px;
+          top: 134px;
+          right: -108px;
+        }
+
+        &.small-purple-face {
+          @include image-2x("/img/ML/balloon_small_purple_face");
+          background-size: 48px 48px;
+          width: 48px;
+          height: 48px;
+          top: 298px;
+          right: 124px;
+        }
+
+        &.big-yellow {
+          @include image-2x("/img/ML/balloon_big_yellow");
+          background-size: 400px 380px;
+          width: 400px;
+          height: 380px;
+          top: 370px;
+          left: 50%;
+          margin-left: -590px;
+        }
+
+        &.small-purple {
+          @include image-2x("/img/ML/balloon_small_purple");
+          background-size: 136px 115px;
+          width: 136px;
+          height: 115px;
+          top: 850px;
+          left: 50%;
+          margin-left: 432px;
+        }
+      }
+
+      h1.headline {
+        @include avenir_H();
+        font-size: 48px;
+        line-height: 60px;
+        color: $deep_navy;
+        margin: 0px auto;
+        padding: 0px 16px;
+
+        @include mobile() {
+          @include avenir_H();
+          font-size: 34px;
+          line-height: 40px;
+          padding: 0px;
+          max-width: 270px;
+        }
+      }
+
+      div.subheadline {
+        margin-top: 16px;
+        @include avenir_R();
+        font-size: 24px;
+        line-height: 30px;
+        color: $ui_grey;
+        max-width: 690px;
+        margin: 8px auto 0px;
+        text-align: center;
+
+        @include tablet(){
+          width: 100%;
+          margin: 24px auto 0;
+          padding: 0px;
+          font-size: 18px;
+          line-height: 23px;
+        }
+      }
+    }
+
+    button.get-started-button {
+      width: 440px;
+      padding: 6px 12px;
+
+      @include mobile() {
+        width: 100%;
+      }
+
+      span.slack-white-icon {
+        width: 24px;
+        height: 24px;
+        @include image-2x("/img/ML/slack_white_icon");
+        background-repeat: no-repeat;
+        background-size: 24px 24px;
+        margin-right: 8px;
+        position: relative;
+      }
+    }
+
+    section.keep-aligned {
+      text-align: center;
+      margin: 0px auto;
+      background-color: #F8F7F3;
+      padding: 120px 0;
+
+      @include mobile() {
+        padding: 80px 24px;
+      }
+
+      div.keep-aligned-title {
+        @include avenir_H();
+        font-size: 28px;
+        color: $deep_navy;
+      }
+
+      div.no-credit-card {
+        @include avenir_R();
+        color: $ui_grey;
+        font-size: 14px;
+        margin-top: 24px;
+        text-align: center;
+
+        @include mobile() {
+          font-size: 12px;
+          margin-top: 0px;
+        }
+      }
+    }
+  }
+}

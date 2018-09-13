@@ -1,8 +1,8 @@
 div.empty-board {
-  margin: 4px 130px;
+  margin: 4px auto;
   float: left;
   text-align: center;
-  width: 600px;
+  width: 100%;
 
   @include mobile() {
     float: unset;
@@ -11,60 +11,72 @@ div.empty-board {
     padding: 0px 24px;
   }
 
-  div.empty-board-headline {
-    @include avenir_M();
-    font-size: 18px;
-    color: $ui_grey;
-    margin: 32px auto;
-
-    button {
-      color: $carrot_text_blue;
-      margin: 0;
-      padding: 0;
-    }
-  }
-
-  img.empty-board-image {
-    margin: 0px auto;
-    -webkit-filter: grayscale(100%);
-    filter: grayscale(100%);
+  div.empty-board-grey-box {
+    width: 100%;
+    background-image: cdnUrl("/img/ML/empty_state_background.svg");
+    background-position: center;
+    background-size: 720px 400px;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    height: 400px;
+    padding: 80px 100px;
+    text-align: center;
+    border-collapse: collapse;
+    margin: 8px auto 0;
 
     @include mobile() {
-      margin: 40px auto 20px;
+      width: 100%;
+      height: auto;
+      background-image: none;
+      border: none;
+      padding: 40px 0;
+      margin: 100px auto 0;
     }
-  }
 
-  div.empty-board-footer {
-    @include avenir_M();
-    font-size: 18px;
-    color: $ui_grey;
-  }
-
-  button.empty-board-create-first-post {
-    width: 100%;
-    height: 64px;
-    background-color: $carrot_orange;
-    padding: 20px 0px;
-    margin-top: 55px;
-    border-radius: 100px;
-    text-align: center;
-
-    div.empty-board-first-post-container {
-      color: white;
-      @include avenir_H();
-      font-size: 18px;
-      width: 200px;
+    div.empty-board-illustration {
+      width: 56px;
+      height: 56px;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 56px 56px;
       margin: 0 auto;
 
-      div.empty-board-first-post-pencil {
-        background-image: cdnUrl("/img/ML/add_to_board_pencil_white.svg");
-        background-size: 14px 14px;
-        width: 14px;
-        height: 14px;
-        margin: 4px 6px 0px 0px;
-        padding: 0;
-        float: left;
+      &.ap-section {
+        background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
       }
+
+      &.must-see {
+        background-image: cdnUrl("/img/ML/empty_state_ms.svg");
+      }
+
+      &.drafts {
+        background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
+      }
+    }
+
+    div.empty-board-title {
+      @include avenir_H();
+      font-size: 16px;
+      color: $deep_navy;
+      margin: 16px auto 0;
+    }
+
+    div.empty-board-subtitle {
+      @include avenir_M();
+      font-size: 14px;
+      color: $ui_grey;
+      margin: 4px auto 0;
+    }
+
+    button.create-new-post-bt {
+      width: 168px;
+      height: 40px;
+      background-color: $coral;
+      color: $carrot_orange;
+      @include avenir_H();
+      font-size: 14px;
+      border-radius: 100px;
+      margin: 20px auto 0;
     }
   }
 }

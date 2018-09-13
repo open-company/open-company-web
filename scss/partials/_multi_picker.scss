@@ -1,78 +1,59 @@
 div.multi-picker-container {
   position: relative;
-  width: 20px;
+  width: auto;
+  float: left;
   height: 20px;
+    
+  button.multi-picker-choice {
+    @include avenir_M();
+    font-size: 14px;
+    color: $deep_navy;
+    position: relative;
+    margin-left: 16px;
+    float: left;
+    width: 22px;
+    height: 21px;
+    opacity: 0.4;
 
-  button.multi-picker-btn {
-    width: 20px;
-    height: 20px;
-    @include image-2x("/img/ML/new_post_picker_button");
-    background-size: 20px 20px;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 0px;
-    margin: 0px;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-  }
+    &:hover {
+      opacity: 1;
+    }
 
-  div.multi-picker {
-    position: absolute;
-    border: 1px solid rgba($deep_tan, 0.7);
-    box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
-    border-radius: 6px;
-    background-color: white;
-    width: 182px;
-    height: auto;
-    left: -4px;
-    bottom: calc(100% + 8px);
-    padding: 24px;
+    &:first-child {
+      margin-left: 0px;
+    }
 
-    button.multi-picker-choice {
-      @include avenir_M();
-      font-size: 14px;
-      color: $deep_navy;
-      position: relative;
-      padding-left: 34px;
-      margin-bottom: 4px;
+    div.multi-picker-choice-icon {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 22px;
+      height: 21px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
 
-      &:last-child {
-        margin-bottom: 0px;
-      }
-
+    &.choice-images {
       div.multi-picker-choice-icon {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        width: 22px;
-        height: 21px;
-        background-repeat: no-repeat;
-        background-position: center;
+        background-image: cdnUrl("/img/ML/multi_picker_image_icon.svg");
+        background-size: 22px 18px;
+        top: -1px;
       }
+    }
 
-      &.choice-images {
-        div.multi-picker-choice-icon {
-          @include image-2x("/img/ML/multi_picker_image_icon");
-          background-size: 22px 18px;
-          top: -1px;
-        }
+    &.choice-media {
+      div.multi-picker-choice-icon {
+        @include image-2x("/img/ML/multi_picker_video_icon");
+        background-size: 22px 18px;
+        top: -1px;
       }
+    }
 
-      &.choice-media {
-        div.multi-picker-choice-icon {
-          @include image-2x("/img/ML/multi_picker_video_icon");
-          background-size: 22px 18px;
-          top: -1px;
-        }
-      }
-
-      &.choice-attachment {
-        div.multi-picker-choice-icon {
-          @include image-2x("/img/ML/multi_picker_attachment_icon");
-          background-size: 19px 21px;
-          left: -1px;
-        }
+    &.choice-attachment {
+      div.multi-picker-choice-icon {
+        background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+        background-size: 19px 21px;
+        left: -1px;
       }
     }
   }

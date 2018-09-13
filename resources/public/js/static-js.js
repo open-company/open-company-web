@@ -1,3 +1,8 @@
+/***********************************************************************************************
+ * When updating this library please update also cljsjs/jwt-decode package in build.boot file. *
+ ***********************************************************************************************/
+!function a(b,c,d){function e(g,h){if(!c[g]){if(!b[g]){var i="function"==typeof require&&require;if(!h&&i)return i(g,!0);if(f)return f(g,!0);var j=new Error("Cannot find module '"+g+"'");throw j.code="MODULE_NOT_FOUND",j}var k=c[g]={exports:{}};b[g][0].call(k.exports,function(a){var c=b[g][1][a];return e(c?c:a)},k,k.exports,a,b,c,d)}return c[g].exports}for(var f="function"==typeof require&&require,g=0;g<d.length;g++)e(d[g]);return e}({1:[function(a,b,c){function d(a){this.message=a}function e(a){var b=String(a).replace(/=+$/,"");if(b.length%4==1)throw new d("'atob' failed: The string to be decoded is not correctly encoded.");for(var c,e,g=0,h=0,i="";e=b.charAt(h++);~e&&(c=g%4?64*c+e:e,g++%4)?i+=String.fromCharCode(255&c>>(-2*g&6)):0)e=f.indexOf(e);return i}var f="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";d.prototype=new Error,d.prototype.name="InvalidCharacterError",b.exports="undefined"!=typeof window&&window.atob&&window.atob.bind(window)||e},{}],2:[function(a,b,c){function d(a){return decodeURIComponent(e(a).replace(/(.)/g,function(a,b){var c=b.charCodeAt(0).toString(16).toUpperCase();return c.length<2&&(c="0"+c),"%"+c}))}var e=a("./atob");b.exports=function(a){var b=a.replace(/-/g,"+").replace(/_/g,"/");switch(b.length%4){case 0:break;case 2:b+="==";break;case 3:b+="=";break;default:throw"Illegal base64url string!"}try{return d(b)}catch(c){return e(b)}}},{"./atob":1}],3:[function(a,b,c){"use strict";function d(a){this.message=a}var e=a("./base64_url_decode");d.prototype=new Error,d.prototype.name="InvalidTokenError",b.exports=function(a,b){if("string"!=typeof a)throw new d("Invalid token specified");b=b||{};var c=b.header===!0?0:1;try{return JSON.parse(e(a.split(".")[c]))}catch(f){throw new d("Invalid token specified: "+f.message)}},b.exports.InvalidTokenError=d},{"./base64_url_decode":2}],4:[function(a,b,c){(function(b){var c=a("./lib/index");"function"==typeof b.window.define&&b.window.define.amd?b.window.define("jwt_decode",function(){return c}):b.window&&(b.window.jwt_decode=c)}).call(this,"undefined"!=typeof global?global:"undefined"!=typeof self?self:"undefined"!=typeof window?window:{})},{"./lib/index":3}]},{},[4]);
+
 
 function OCStaticMailchimpApiSubmit(e, form, success, fail){
   e.preventDefault();
@@ -52,14 +57,14 @@ function OCStaticGetDecodedJWT(jwt) {
   return null;
 }
 
-function OCStaticGetYourBoardsUrl (decoded_jwt) {
-  var your_board_url = "/login";
-  if ( decoded_jwt ) {
+function OCStaticGetYourBoardsUrl (jwt_data) {
+  var url = "/login";
+  if ( jwt_data ) {
     var user_id,
         org_slug,
         board_slug;
-    if (decoded_jwt) {
-      user_id = decoded_jwt["user-id"];
+    if (jwt_data) {
+      user_id = jwt_data["user-id"];
       if ( user_id ) {
         org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id));
         if ( org_slug ) {
@@ -67,27 +72,50 @@ function OCStaticGetYourBoardsUrl (decoded_jwt) {
           // Replace all-posts above withe the following to go back to the last visited board
           // OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
           if ( board_slug ){
-            your_board_url = "/" + org_slug + "/" + board_slug;
+            url = "/" + org_slug + "/" + board_slug;
           } else {
-            your_board_url = "/" + org_slug;
+            url = "/" + org_slug;
           }
         }
       }
     }
   }
-  return your_board_url;
+  return url;
+}
+
+// Get the jwt cookie to know if the user is logged in
+var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
+if (jwt) {
+  var decoded_jwt = OCStaticGetDecodedJWT(jwt),
+      your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
+  if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
+    window.location = your_board_url;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
-  // Get the jwt cookie to know if the user is logged in
-  var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
-  if (jwt) {
-    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
-        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
-    if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
-      window.location = your_board_url;
-    }
+  // Sticky header for marketing site
+  if ( $("nav.site-navbar").length > 0) {
+    $(window).on("scroll", function(){
+      if ($(window).scrollTop() === 0) {
+        $("nav.site-navbar").removeClass("sticky");
+      }else{
+        $("nav.site-navbar").addClass("sticky");
+      }
+    });
+  }
 
+  $(".faq-row").each(function(){
+    $(this).on("click", function(){
+      var wasOpen = $(this).hasClass("expanded");
+      $(".faq-row").each(function(){$(this).removeClass("expanded");});
+      if (!wasOpen) {
+        $(this).addClass("expanded");
+      }
+    });
+  });
+
+  if (jwt) {
     $("#site-header-login-item").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
@@ -129,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
     $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $(".signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner signup button
     $("#site-header-signup-item").attr("href", "/sign-up");

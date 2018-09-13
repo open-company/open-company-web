@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Rectangle Copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Misc-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Grid-data-update" transform="translate(-730.000000, -555.000000)" fill="#FFFFFF">
+            <g id="Group-14" transform="translate(710.000000, 350.000000)">
+                <g id="Rectangle-Copy" transform="translate(17.000000, 204.000000)">
+                    <rect fill-rule="evenodd" opacity="0" x="0" y="0" width="16" height="16"></rect>
+                    <path d="M9.80382911,6.28929896 L12.3480674,6.28929896 C13.011915,6.28929896 13.2003232,6.75268882 12.766558,7.32739758 L7.37158575,14.4753604 C6.72242205,15.3354572 6.19617089,15.1160675 6.19617089,13.9782836 L6.19617089,9.71070104 L3.65193264,9.71070104 C2.98808503,9.71070104 2.79967677,9.24731118 3.23344201,8.67260242 L8.62841425,1.52463958 C9.27757795,0.664542842 9.80382911,0.883932501 9.80382911,2.02171645 L9.80382911,6.28929896 Z" id="Combined-Shape" fill-rule="nonzero"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

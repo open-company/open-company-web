@@ -30,6 +30,7 @@ var trackCustomDimensions = function() {
   ga(function(tracker) {
     var params = {};
     params[CarrotGA.dimensions.TRACKING_VERSION] = TRACKING_VERSION;
+    CarrotGA.clientid = tracker.get('clientId');
     params[CarrotGA.dimensions.CLIENT_ID] = tracker.get('clientId');
     params[CarrotGA.dimensions.WINDOW_ID] = uuid();
     tracker.set(params);

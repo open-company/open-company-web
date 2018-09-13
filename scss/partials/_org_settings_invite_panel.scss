@@ -1,48 +1,57 @@
 div.org-settings div.org-settings-inner {
   div.org-settings-panel.org-settings-invite-panel {
     div.org-settings-panel-row.invite-from {
+      margin-bottom: 16px;
 
       div.invite-from-label {
         float: left;
-        @include avenir_H();
-        font-size: 16px;
-        color: $carrot_dark_gray;
-        width: 100px;
+        @include avenir_M();
+        font-size: 15px;
+        color: $ui_grey;
       }
 
       div.org-settings-panel-choice {
-        width: 68px;
         float: left;
         margin-left: 16px;
+        cursor: pointer;
+        @include avenir_H();
+        font-size: 15px;
+        color: $ui_grey;
 
-        label {
-          @include avenir_M();
-          font-size: 16px;
-          color: $carrot_dark_gray;
-          margin-left: 8px;
+        &.disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+
+        &:not(.disabled).active {
+          color: $carrot_orange;
         }
       }
     }
 
-    div.org-settings-invite-table {
+    div.org-setings-invite-personal-note {
+      background-color: #FDFCFB;
+      width: calc(100% + 48px);
+      margin-left: -24px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba($deep_tan, 0.3);
+    }
+
+    div.org-settings-invite-table-container {
       margin-top: 0px;
       margin-bottom: 0px;
-      min-height: calc(100vh - 352px);
+      background-color: #FDFCFB;
+      width: calc(100% + 48px);
+      margin-left: -24px;
+      padding: 16px 24px;
+      border-top: 1px solid rgba($deep_tan, 0.3);
 
       button.add-button {
-        width: 32px;
-        height: 32px;
-        border-radius: 16px;
-        color: $carrot_green_1;
-        background-color: $carrot_green_3;
-        @include avenir_H();
-        font-size: 14px;
+        color: $carrot_green;
+        @include avenir_M();
+        font-size: 13px;
         padding: 0px;
-
-        &:hover {
-          background-color: $carrot_green_2;
-          color: white;
-        }
       }
 
       div.user-input {
@@ -50,42 +59,107 @@ div.org-settings div.org-settings-inner {
         height: 40px;
       }
 
-      th.role {
-        i.mdi:before {
-          font-size: 14px;
-        }
+      table.org-settings-invite-table {
 
-        div.tooltip {
-          width: 160px;
-        }
-      }
+        tbody, thead {
 
-      td.user-field {
-        width: 365px;
-        padding-right: 12px !important;
+          tr th {
+            @include avenir_M();
+            font-size: 15px;
+            color: $deep_navy;
+          }
 
-        div.user-avatar-img-container {
-          margin-right: 16px;
-          float: left;
-        }
+          td {
+            border-bottom: none;
+            padding-top: 8px;
+            padding-bottom: 0px;
+          }
 
-        @include user-profile(32);
+          th.role {
+            i.mdi:before {
+              font-size: 14px;
+            }
 
-        div.slack-users-dropdown div.slack-users-dropdown-list div.user {
-          @include user-profile(24);
-        }
-      }
+            div.tooltip {
+              width: 160px;
+            }
+          }
 
-      td.user-type-field {
-        width: 180px;
-      }
+          td.user-field {
+            width: 365px;
+            padding-right: 12px;
 
-      td.user-remove {
-        width: 53px;
+            input.email-field {
+              height: 40px;
+            }
 
-        button.remove-user {
-          padding-top: 8px;
-          color: $carrot_light_gray;
+            div.user-avatar-img-container {
+              margin-right: 16px;
+              float: left;
+            }
+
+            @include user-profile(32);
+
+            div.slack-users-dropdown div.slack-users-dropdown-list div.user {
+              @include user-profile(24);
+              @include avenir_M();
+              font-size: 15px;
+              color: $deep_navy;
+
+              @include placeholder() {
+                color: $light_ui_grey;
+              }
+            }
+          }
+
+          td.user-type-field {
+            width: 150px;
+
+            div.user-type-dropdown {
+              div.dropdown {
+                height: 40px;
+                text-align: left;
+                border: 1px solid rgba($carrot_light_gray_1, 0.5);
+                border-radius: 4px;
+                @include avenir_M();
+                font-size: 15px;
+                color: $deep_navy;
+                background-color: white;
+
+                button.user-type-btn {
+                  width: 100%;
+                  text-align: left;
+                  height: 40px;
+                  padding-top: 3px;
+
+                  &:after {
+                    top: 4px;
+                  }
+                }
+
+                ul.user-type-dropdown-menu {
+                  left: 0px;
+                  top: 40px;
+                  width: 100%;
+
+                  li {
+                    color: $deep_navy;
+                    text-align: left;
+                    padding: 7px 12px;
+                  }
+                }
+              }
+            }
+          }
+
+          td.user-remove {
+            width: 53px;
+
+            button.remove-user {
+              padding-top: 8px;
+              color: $light_ui_grey;
+            }
+          }
         }
       }
 
@@ -118,16 +192,6 @@ div.org-settings div.org-settings-inner {
         color: $carrot_light_gray;
         text-align: center;
         padding-top: 6px;
-      }
-
-      div.user-type-dropdown {
-        div.dropdown {
-          height: 40px;
-          text-align: center;
-          padding-top: 7px;
-          border: 1px solid rgba($carrot_light_gray_1, 0.5);
-          border-radius: 4px;
-        }
       }
     }
 

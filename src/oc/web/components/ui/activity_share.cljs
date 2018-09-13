@@ -1,5 +1,7 @@
 (ns oc.web.components.ui.activity-share
   (:require [rum.core :as rum]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
@@ -46,10 +48,10 @@
                             (drv/drv :org-data)
                             (drv/drv :activity-share)
                             (drv/drv :activity-shared-data)
+                            (drv/drv :activity-share-medium)
                             ;; Locals
                             (rum/local nil ::email-data)
                             (rum/local {:note ""} ::slack-data)
-                            (rum/local :url ::medium)
                             (rum/local false ::dismiss)
                             (rum/local false ::copied)
                             (rum/local false ::sharing)
@@ -57,24 +59,25 @@
                             (rum/local "" ::email-subject)
                             (rum/local (rand 1000) ::item-input-key)
                             (rum/local (rand 1000) ::slack-channels-dropdown-key)
+                            (rum/local nil ::window-click-listener)
+                            (rum/local :team ::url-audience)
                             ;; Mixins
-                            mixins/no-scroll-mixin
                             mixins/first-render-mixin
                             {:will-mount (fn [s]
                               (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
                                     org-data @(drv/get-ref s :org-data)
-                                    subject (str
-                                             (:name org-data)
-                                             (when (seq (:board-name activity-data))
-                                              (str " " (:board-name activity-data)))
-                                             ": "
-                                             (.text (.html (js/$ "<div />") (:headline activity-data))))]
+                                    subject (.text (.html (js/$ "<div />") (:headline activity-data)))]
                                (reset! (::email-subject s) subject)
                                (reset! (::email-data s) {:subject subject
                                                          :note ""})
-                               (when (has-bot? org-data)
-                                 (reset! (::medium s) :slack)))
+                               (when (and (not @(drv/get-ref s :activity-share-medium))
+                                          (has-bot? org-data))
+                                 (dis/dispatch! [:input [:activity-share-medium] :slack])))
+                              (reset! (::window-click-listener s)
+                               (events/listen js/window EventType/CLICK
+                                #(when-not (utils/event-inside? % (rum/dom-node s))
+                                   (close-clicked s))))
                              s)
                              :did-mount (fn [s]
                               (let [slack-button (rum/ref-node s "slack-button")
@@ -93,21 +96,27 @@
                                    (if (:error shared-data) :error :shared))
                                   ;; If share succeeded reset share fields
                                   (when-not (:error shared-data)
-                                    (cond
-                                      (= @(::medium s) :email)
-                                      (do
-                                        (reset! (::item-input-key s) (rand 1000))
-                                        (reset! (::email-data s) {:subject @(::email-subject s)
-                                                                  :note ""}))
-                                      (= @(::medium s) :slack)
-                                      (do
-                                        (reset! (::slack-channels-dropdown-key s) (rand 1000))
-                                        (reset! (::slack-data s) {:note ""}))))
+                                    (let [medium @(drv/get-ref s :activity-share-medium)]
+                                      (cond
+                                        (= medium :email)
+                                        (do
+                                          (reset! (::item-input-key s) (rand 1000))
+                                          (reset! (::email-data s) {:subject @(::email-subject s)
+                                                                    :note ""}))
+                                        (= medium :slack)
+                                        (do
+                                          (reset! (::slack-channels-dropdown-key s) (rand 1000))
+                                          (reset! (::slack-data s) {:note ""})))))
                                   (utils/after
                                    2000
                                    (fn []
                                     (reset! (::shared s) false)
                                     (activity-actions/activity-share-reset)))))
+                              s)
+                             :will-unmount (fn [s]
+                              (when @(::window-click-listener s)
+                                (events/unlistenByKey @(::window-click-listener s))
+                                (reset! (::window-click-listener s) nil))
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
@@ -117,163 +126,165 @@
         secure-uuid (:secure-uuid activity-data)
         ;; Make sure it gets remounted when share request finishes
         _ (drv/react s :activity-shared-data)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        medium (drv/react s :activity-share-medium)]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})
-       :on-click (fn [e]
-                  (when-not (utils/event-inside? e (rum/ref-node s "activity-share-modal-wrapper"))
-                    (close-clicked s)))}
-      [:div.modal-wrapper
-        {:ref "activity-share-modal-wrapper"}
-        (when-not is-mobile?
-          [:button.carrot-modal-close.mlb-reset
-            {:on-click #(close-clicked s)}])
-        [:div.activity-share-modal
-          (if is-mobile?
-            [:div.activity-share-main-cta
-              [:button.mobile-modal-close-bt.mlb-reset
-                {:on-click #(close-clicked s)}]
-              [:span "Share post via..."]]
-            [:div.activity-share-main-cta
-              [:span "Share "]
-              [:span.activity-share-post-title
-                {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]])
-          (when-not is-mobile?
-            [:div.activity-share-divider-line])
-          (when-not is-mobile?
-            [:div.activity-share-subheadline
-              "People outside your Carrot team will not see comments."])
-          [:div.activity-share-medium-selector-container
-            (let [slack-disabled (not (has-bot? org-data))
-                  show-slack-tooltip? (show-slack-tooltip? org-data)]
-              [:div.activity-share-medium-selector
-                {:class (utils/class-set {:selected (= @(::medium s) :slack)
-                                          :medium-selector-disabled slack-disabled})
-                 :data-placement "top"
-                 :data-container "body"
-                 :title "Enable the Slack bot in Settings"
-                 :ref "slack-button"
-                 :on-click (fn [e]
-                             (utils/event-stop e)
-                             (when-not @(::sharing s)
-                               (if slack-disabled
-                                 (when show-slack-tooltip?
-                                   (let [$this (js/$ (rum/ref-node s "slack-button"))]
-                                     (.tooltip $this "show")
-                                     (utils/after
-                                      2000
-                                      #(.tooltip $this "hide"))))
-                                 (reset! (::medium s) :slack))))}
-                "Slack"])
-            [:div.activity-share-medium-selector
-              {:class (when (= @(::medium s) :url) "selected")
-               :on-click (fn [_]
-                          (when-not @(::sharing s)
-                            (reset! (::medium s) :url)
-                            (utils/after
-                             500
-                             #(highlight-url s))))}
-              "URL"]
-            [:div.activity-share-medium-selector
-              {:class (when (= @(::medium s) :email) "selected")
-               :on-click #(when-not @(::sharing s)
-                           (reset! (::medium s) :email))}
-              "Email"]
-            ]
+                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
+      [:div.activity-share-modal
+        [:div.activity-share-main-cta
           (when is-mobile?
-            [:div.activity-share-subheadline
-              "People outside your Carrot team will not see comments."])
-          [:div.activity-share-divider-line]
-          (when (= @(::medium s) :email)
-            [:div.activity-share-share
-              [:div.mediums-box
-                [:div.medium
-                  [:div.email-medium.group
-                    [:div.medium-row.group
-                      [:div.labels
-                        "TO"]
-                      [:div.fields
-                        {:class (when (:to-error email-data) "error")
-                         ;; Set the key to force remount a new component with empty value
-                         :key (str "email-share-item-input-" @(::item-input-key s))}
-                        (item-input {:item-render email-item
-                                     :match-ptn #"(\S+)[,|\s]+"
-                                     :split-ptn #"[,|\s]+"
-                                     :container-node :div.email-field
-                                     :valid-item? utils/valid-email?
-                                     :items (:to email-data)
-                                     :input-type "email"
-                                     :on-intermediate-change #(reset!
-                                                               (::email-data s)
-                                                               (merge email-data {:to-error false}))
-                                     :on-change (fn [v]
-                                                 (reset!
-                                                  (::email-data s)
-                                                  (merge email-data {:to v
-                                                                     :to-error false})))})]]
-                    [:div.medium-row.subject.group
-                      [:div.labels
-                        "SUBJECT"]
-                      [:div.fields
-                        {:class (when (:subject-error email-data) "error")}
-                        [:input
-                          {:type "text"
-                           :value (:subject email-data)
-                           :on-change #(reset! (::email-data s) (merge email-data {:subject (.. % -target -value)
-                                                                                   :subject-error false}))}]]]
-                    [:div.medium-row.note.group
-                      [:div.labels
-                        "ADD A NOTE"
-                        [:span.optional " (optional)"]]
-                      [:div.fields
-                        [:textarea
-                          {:value (:note email-data)
-                           :on-change #(reset! (::email-data s) (merge email-data {:note (.. % -target -value)}))}]]]]]]
-              [:div.share-footer.group
-                [:div.left-buttons
-                  [:button.mlb-reset.mlb-black-link
-                    {:on-click #(close-clicked s)}
-                    "Cancel"]]
-                [:div.right-buttons
-                  [:button.mlb-reset.mlb-default
-                    {:on-click #(let [email-share {:medium :email
-                                                   :note (:note email-data)
-                                                   :subject (:subject email-data)
-                                                   :to (:to email-data)}]
-                                  (if (empty? (:to email-data))
-                                    (reset! (::email-data s) (merge email-data {:to-error true}))
-                                    (do
-                                      (reset! (::sharing s) true)
-                                      (activity-actions/activity-share activity-data [email-share]))))
-                     :class (when (empty? (:to email-data)) "disabled")}
-                    (if @(::shared s)
-                      (if (= @(::shared s) :shared)
-                        "Shared!"
-                        "Ops...")
-                      [(when @(::sharing s)
-                        (small-loading))
-                       "Share"])]]]])
-          (when (= @(::medium s) :url)
-            [:div.activity-share-modal-shared.group
-              [:form
-                {:on-submit #(utils/event-stop %)}
-                (let [share-url (str
-                                 "http"
-                                 (when ls/jwt-cookie-secure
-                                  "s")
-                                 "://"
-                                 ls/web-server
-                                 (oc-urls/secure-activity (router/current-org-slug) secure-uuid))]
+            [:button.mobile-modal-close-bt.mlb-reset
+              {:on-click #(close-clicked s)}])
+          "Share post"]
+        [:div.activity-share-medium-selector-container
+          [:div.activity-share-medium-selector
+            {:class (when (= medium :url) "selected")
+             :on-click (fn [_]
+                        (when-not @(::sharing s)
+                          (dis/dispatch! [:input [:activity-share-medium] :url])
+                          (utils/after
+                           500
+                           #(highlight-url s))))}
+            "URL"]
+          (let [slack-disabled (not (has-bot? org-data))
+                show-slack-tooltip? (show-slack-tooltip? org-data)]
+            [:div.activity-share-medium-selector
+              {:class (utils/class-set {:selected (= medium :slack)
+                                        :medium-selector-disabled slack-disabled})
+               :data-placement "top"
+               :data-container "body"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Enable the Slack bot in Settings"
+               :ref "slack-button"
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (when-not @(::sharing s)
+                             (if slack-disabled
+                               (when show-slack-tooltip?
+                                 (let [$this (js/$ (rum/ref-node s "slack-button"))]
+                                   (.tooltip $this "show")
+                                   (utils/after
+                                    2000
+                                    #(.tooltip $this "hide"))))
+                               (dis/dispatch! [:input [:activity-share-medium] :slack]))))}
+              "Slack"])
+          [:div.activity-share-medium-selector
+            {:class (when (= medium :email) "selected")
+             :on-click #(when-not @(::sharing s)
+                         (dis/dispatch! [:input [:activity-share-medium] :email]))}
+            "Email"]]
+        [:div.activity-share-divider-line]
+        (when (= medium :email)
+          [:div.activity-share-share.fs-hide
+            [:div.mediums-box
+              [:div.medium
+                [:div.email-medium.group
+                  [:div.medium-row.group
+                    [:div.labels
+                      "To"]
+                    [:div.fields
+                      {:class (when (:to-error email-data) "error")
+                       ;; Set the key to force remount a new component with empty value
+                       :key (str "email-share-item-input-" @(::item-input-key s))}
+                      (item-input {:item-render email-item
+                                   :match-ptn #"(\S+)[,|\s]+"
+                                   :split-ptn #"[,|\s]+"
+                                   :container-node :div.email-field
+                                   :valid-item? utils/valid-email?
+                                   :items (:to email-data)
+                                   :input-type "email"
+                                   :on-intermediate-change #(reset!
+                                                             (::email-data s)
+                                                             (merge email-data {:to-error false}))
+                                   :on-change (fn [v]
+                                               (reset!
+                                                (::email-data s)
+                                                (merge email-data {:to v
+                                                                   :to-error false})))})]]
+                  [:div.medium-row.subject.group
+                    [:div.labels
+                      "Subject"]
+                    [:div.fields
+                      {:class (when (:subject-error email-data) "error")}
+                      [:input
+                        {:type "text"
+                         :value (:subject email-data)
+                         :on-change #(reset! (::email-data s) (merge email-data {:subject (.. % -target -value)
+                                                                                 :subject-error false}))}]]]
+                  [:div.medium-row.note.group
+                    [:div.labels
+                      "Personal note (optional)"]
+                    [:div.fields
+                      [:textarea
+                        {:value (:note email-data)
+                         :on-change #(reset! (::email-data s) (merge email-data {:note (.. % -target -value)}))}]]]]]]
+            [:div.share-footer.group
+              [:div.right-buttons
+                [:button.mlb-reset.mlb-black-link
+                  {:on-click #(close-clicked s)}
+                  "Cancel"]
+                [:button.mlb-reset.share-button
+                  {:on-click #(let [email-share {:medium :email
+                                                 :note (:note email-data)
+                                                 :subject (:subject email-data)
+                                                 :to (:to email-data)}]
+                                (if (empty? (:to email-data))
+                                  (reset! (::email-data s) (merge email-data {:to-error true}))
+                                  (do
+                                    (reset! (::sharing s) true)
+                                    (activity-actions/activity-share activity-data [email-share]))))
+                   :class (when (empty? (:to email-data)) "disabled")}
+                  (if @(::shared s)
+                    (if (= @(::shared s) :shared)
+                      "Shared!"
+                      "Ops...")
+                    [(when @(::sharing s)
+                      (small-loading))
+                     "Share"])]]]])
+        (when (= medium :url)
+          [:div.activity-share-modal-shared.group
+            [:form
+              {:on-submit #(utils/event-stop %)}
+              [:div.medium-row.group
+                [:div.labels
+                  "Who can view this post?"]
+                [:div.fields
+                  [:select.mlb-reset.url-audience
+                    {:value @(::url-audience s)
+                     :on-change #(reset! (::url-audience s) (keyword (.. % -target -value)))}
+                    [:option
+                      {:value :team}
+                      "Logged in team only"]
+                    [:option
+                      {:value :all}
+                      "Public read only"]]
+                  [:div.chevron]]]
+              [:div.url-audience-description
+                (if (= @(::url-audience s) :team)
+                  (str "Sharing this URL will allow your team members to access the post and comments.")
+                  (str
+                   "Sharing this URL will allow non-team members to view the post. "
+                   "Comments will not be visible."))]
+              [:div.medium-row.url-field-row.group
+                [:div.labels
+                  "Share post URL"]
+                (let [url-protocol (str "http" (when ls/jwt-cookie-secure "s") "://")
+                      secure-url (oc-urls/secure-activity (router/current-org-slug) secure-uuid)
+                      post-url (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
+                      share-url (str url-protocol ls/web-server
+                                  (if (= @(::url-audience s) :team)
+                                    post-url
+                                    secure-url))]
                   [:div.shared-url-container.group
                     [:input
                       {:value share-url
+                       :key share-url
                        :read-only true
                        :content-editable false
                        :on-click #(highlight-url s)
-                       :ref "activity-share-url-field"
-                       :data-placement "top"}]])
-                [:button.mlb-reset.mlb-default.copy-btn
+                       :ref "activity-share-url-field"}]])
+                [:button.mlb-reset.copy-btn
                   {:ref "activity-share-url-copy-btn"
                    :on-click (fn [e]
                               (utils/event-stop e)
@@ -284,61 +295,59 @@
                                   (utils/after 2000 #(reset! (::copied s) false)))))}
                   (if @(::copied s)
                     "Copied!"
-                    "Copy URL")]]])
-          (when (= @(::medium s) :slack)
-            [:div.activity-share-share
-              [:div.mediums-box
-                [:div.medium
-                  [:div.slack-medium.group
-                    [:div.medium-row.group
-                      [:div.labels "TO"]
-                      [:div.fields
-                        {:class (when (:channel-error slack-data) "error")
-                         :key (str "slack-share-channels-dropdown-" @(::slack-channels-dropdown-key s))}
-                        (slack-channels-dropdown
-                         {:on-change (fn [team channel]
-                                       (reset! (::slack-data s)
-                                        (merge slack-data (merge slack-data
-                                                           {:channel {:channel-id (:id channel)
-                                                                      :channel-name (:name channel)
-                                                                      :slack-org-id (:slack-org-id team)}
-                                                            :channel-error false}))))
-                          :on-intermediate-change (fn [_]
-                                                   (reset! (::slack-data s)
-                                                    (merge slack-data (merge slack-data {:channel-error false}))))
-                          :initial-value ""
-                          :disabled false})]]
-                    [:div.medium-row.note.group
-                      [:div.labels
-                        "ADD A NOTE"
-                        [:span.optional " (optional)"]]
-                      [:div.fields
-                        [:textarea
-                          {:value (:note slack-data)
-                           :on-change (fn [e]
-                                       (reset! (::slack-data s)
-                                        (merge slack-data {:note (.. e -target -value)})))}]]]]]]
-              [:div.share-footer.group
-                [:div.left-buttons
-                  [:button.mlb-reset.mlb-black-link
-                    {:on-click #(close-clicked s)}
-                    "Cancel"]]
-                [:div.right-buttons
-                  [:button.mlb-reset.mlb-default
-                    {:on-click #(let [slack-share {:medium :slack
-                                                   :note (:note slack-data)
-                                                   :channel (:channel slack-data)}]
-                                  (if (empty? (:channel slack-data))
-                                    (when (empty? (:channel slack-data))
-                                      (reset! (::slack-data s) (merge slack-data {:channel-error true})))
-                                    (do
-                                      (reset! (::sharing s) true)
-                                      (activity-actions/activity-share activity-data [slack-share]))))
-                     :class (when (empty? (:channel slack-data)) "disabled")}
-                    (if @(::shared s)
-                      (if (= @(::shared s) :shared)
-                        "Shared!"
-                        "Ops...")
-                      [(when @(::sharing s)
-                        (small-loading))
-                       "Share"])]]]])]]]))
+                    "Copy")]]]])
+        (when (= medium :slack)
+          [:div.activity-share-share.fs-hide
+            [:div.mediums-box
+              [:div.medium
+                [:div.slack-medium.group
+                  [:div.medium-row.group
+                    [:div.labels "Publish link to which channel?"]
+                    [:div.fields
+                      {:class (when (:channel-error slack-data) "error")
+                       :key (str "slack-share-channels-dropdown-" @(::slack-channels-dropdown-key s))}
+                      (slack-channels-dropdown
+                       {:on-change (fn [team channel]
+                                     (reset! (::slack-data s)
+                                      (merge slack-data (merge slack-data
+                                                         {:channel {:channel-id (:id channel)
+                                                                    :channel-name (:name channel)
+                                                                    :slack-org-id (:slack-org-id team)}
+                                                          :channel-error false}))))
+                        :on-intermediate-change (fn [_]
+                                                 (reset! (::slack-data s)
+                                                  (merge slack-data (merge slack-data {:channel-error false}))))
+                        :initial-value ""
+                        :disabled false})]]
+                  [:div.medium-row.note.group
+                    [:div.labels
+                      "Personal note (optional)"]
+                    [:div.fields
+                      [:textarea
+                        {:value (:note slack-data)
+                         :on-change (fn [e]
+                                     (reset! (::slack-data s)
+                                      (merge slack-data {:note (.. e -target -value)})))}]]]]]]
+            [:div.share-footer.group
+              [:div.right-buttons
+                [:button.mlb-reset.mlb-black-link
+                  {:on-click #(close-clicked s)}
+                  "Cancel"]
+                [:button.mlb-reset.share-button
+                  {:on-click #(let [slack-share {:medium :slack
+                                                 :note (:note slack-data)
+                                                 :channel (:channel slack-data)}]
+                                (if (empty? (:channel slack-data))
+                                  (when (empty? (:channel slack-data))
+                                    (reset! (::slack-data s) (merge slack-data {:channel-error true})))
+                                  (do
+                                    (reset! (::sharing s) true)
+                                    (activity-actions/activity-share activity-data [slack-share]))))
+                   :class (when (empty? (:channel slack-data)) "disabled")}
+                  (if @(::shared s)
+                    (if (= @(::shared s) :shared)
+                      "Sent!"
+                      "Ops...")
+                    [(when @(::sharing s)
+                      (small-loading))
+                     "Send"])]]]])]]))

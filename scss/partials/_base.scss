@@ -43,42 +43,22 @@ html, body {
   }
 
   // Change Bootstrap tooltip style
-  &.top .tooltip-arrow {
-    border-top-color: $carrot_dark_gray;
-  }
-  &.top-left .tooltip-arrow {
-    border-top-color: $carrot_dark_gray;
-  }
-  &.top-right .tooltip-arrow {
-    border-top-color: $carrot_dark_gray;
-  }
-  &.right .tooltip-arrow {
-    border-right-color: $carrot_dark_gray;
-  }
-  &.left .tooltip-arrow {
-    border-left-color: $carrot_dark_gray;
-  }
-  &.bottom .tooltip-arrow {
-    border-bottom-color: $carrot_dark_gray;
-  }
-  &.bottom-left .tooltip-arrow {
-    border-bottom-color: $carrot_dark_gray;
-  }
-  &.bottom-right .tooltip-arrow {
-    border-bottom-color: $carrot_dark_gray;
+  .tooltip-arrow {
+    display: none;
   }
 
   .tooltip-inner {
-    background-color: $carrot_dark_gray;
+    background-color: $deep_navy;
     white-space:pre-wrap;
     max-width: none;
     text-align: left;
     opacity: 1;
     @include avenir_H();
-    font-size: 12px;
+    font-size: 14px;
     color: white;
-    line-height: 16px;
-    letter-spacing: 0.5;
+    line-height: 18px;
+    padding: 14px 18px;
+    corner-radius: 6px;
   }
 }
 
@@ -162,7 +142,7 @@ span.num.red {
 
 div#wrap {
   min-height: 100vh;
-  background-color: white;
+  background-color: #FFFDF9;
 }
 
 button.slack-button {

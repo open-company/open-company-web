@@ -28,6 +28,8 @@
          (get-author-name (second authors)) " and "
          (- (count authors) 2) " others commented")))
 
+(def max-face-pile 3)
+
 (rum/defcs comments-summary < rum/static
                               rum/reactive
                               (drv/drv :comments-data)
@@ -44,21 +46,25 @@
                              (vals
                               (group-by :user-id (map :author (sort-by :created-at comments-data))))))
                            (reverse (:authors comments-link)))
-        comments-count (max (count comments-data) (:count comments-link))]
+        comments-count (max (count comments-data) (:count comments-link))
+        face-pile-count (min max-face-pile (count comments-authors))]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))
       [:div.is-comments
         ; Comments authors heads
         [:div.is-comments-authors.group
-          {:style {:width (str (if (pos? (count comments-authors)) (+ 9 (* 15 (count comments-authors))) 0) "px")}}
-          (for [user-data (take 4 comments-authors)]
+          {:style {:width (str (if (pos? face-pile-count) (+ 9 (* 15 face-pile-count)) 0) "px")}}
+          (for [user-data (take max-face-pile comments-authors)]
             [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
         ; Comments count
-        [:div.is-comments-summary
-          {:class (str "comments-count-" (:uuid entry-data))}
+        [:div.is-comments-summary.fs-hide
+          {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
+                                    :add-a-comment (not (pos? comments-count))})}
           (if (responsive/is-tablet-or-mobile?)
             (comment-summary-string comments-authors)
-            (str comments-count " comment" (when (> comments-count 1) "s")))]])))
+            (if (pos? comments-count)
+              (str comments-count " comment" (when (not= comments-count 1) "s"))
+              [:span.add-a-comment "Add a comment"]))]])))

@@ -8,6 +8,7 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/print_ascii.js \
 --js lib/autotrack/autotrack.js \
 --js lib/autotrack/google-analytics.js \
+--js lib/fullstory.js \
 --js lib/truncate/jquery.dotdotdot.js \
 --js lib/scrollTo/scrollTo.min.js \
 --js js/emojione/autocomplete.js \
@@ -19,7 +20,6 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
 --js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
 --js lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js \
---js lib/jwt_decode/jwt-decode.min.js \
 --output_wrapper "%output%
 //# sourceMappingURL=$3/oc_assets.js.map"
 

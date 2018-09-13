@@ -1,63 +1,115 @@
-div.org-settings-panel {
-  div.org-settings-team.org-settings-panel-row {
-    th.role {
-      padding-right: 16px;
-    }
+div.org-settings {
+  div.org-settings-inner {
+    div.org-settings-panel {
+      padding-top: 24px;
+      div.org-settings-team.org-settings-panel-row {
+        div.org-settings-team-search.org-settings-field {
+          margin-bottom: 24px;
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
 
-    th.role, td.role {
-      text-align: right;
-      width: 144px;
-    }
+          input.org-settings-team-search-field {
+            @include avenir_M();
+            font-size: 15px;
+            color: $deep_navy;
 
-    td.status-column{
-      max-width: 220px;
-
-      div.status-column-inner {
-        max-width: 220px;
-        height: 25px;
-
-        div.status-label {
-          float: left;
+            @include placeholder(){
+              color: $light_ui_grey;
+            }
+          }
         }
 
-        button {
-          float: left;
-          font-size: 14px;
-          @include avenir_H();
-          margin-left: 8px;
+        table.org-settings-table.org-settings-team-table {
+          thead tr {
+            th {
+              @include avenir_B();
+              font-size: 13px;
+              color: $light_ui_grey;
+            }
+            th.role {
+              padding-right: 16px;
+            }
+
+            th.status {
+              text-align: right;
+            }
+
+            th.role {
+              text-align: right;
+              width: 144px;
+            }
+          }
+
+          tbody tr {
+            border-top: 1px solid rgba($deep_tan, 0.5);
+
+            td {
+              color: $ui_grey;
+              font-size: 14px;
+            }
+
+            td.user-name {
+              &.has-pending {
+                max-width: 202px;
+              }
+
+              div.user-avatar-img-container {
+                margin-right: 16px;
+                float: left;
+              }
+
+              @include user-profile(32);
+
+              div.user-name-label {
+                float: left;
+                max-width: calc(100% - 78px);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 6px;
+                @include avenir_H();
+                font-size: 14px;
+                color: $deep_navy;
+              }
+            }
+
+            td.status-column{
+              max-width: 220px;
+              text-align: right;
+
+              div.status-column-inner {
+                max-width: 220px;
+                height: 25px;
+
+                div.status-label {
+                  float: right;
+                }
+
+                button {
+                  float: left;
+                  font-size: 14px;
+                  @include avenir_H();
+                  padding: 0px 8px;
+                  margin-left: 0px;
+                }
+              }
+            }
+
+            td.role {
+              text-align: right;
+              width: 144px;
+            }
+
+            td {
+              &:last-child {
+                text-align: right;
+              }
+
+              ul.user-type-dropdown-menu {
+                right: 0px;
+                left: unset;
+              }
+            }
+          }
         }
-      }
-    }
-
-    td.user-name {
-      &.has-pending {
-        max-width: 306px;
-      }
-
-      div.user-avatar-img-container {
-        margin-right: 16px;
-        float: left;
-      }
-
-      @include user-profile(32);
-
-      div.user-name-label {
-        float: left;
-        max-width: calc(100% - 78px);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-top: 4px;
-      }
-    }
-
-    td {
-      &:last-child {
-        text-align: right;
-      }
-
-      ul.user-type-dropdown-menu {
-        right: 0px;
-        left: unset;
       }
     }
   }

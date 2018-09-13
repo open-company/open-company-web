@@ -19,16 +19,14 @@ div.login-overlay-container {
     background-color: white;
   }
 
-  button.carrot-modal-close {
+  button.settings-modal-close {
     position: absolute;
+    top: 64px;
     left: 50%;
-    margin-left: -282px;
-    top: 90px;
+    margin-left: 268px;
 
     @include mobile(){
-      top: 20px;
-      left: 30px;
-      z-index: 99;
+      display: none;
     }
   }
 
@@ -141,37 +139,45 @@ div.login-overlay-container {
       }
     }
 
-    button.signin-with-slack {
+    button.signin-with-google {
+      margin-top: 16px !important;
+    }
+
+    button.signin-with-slack, button.signin-with-google {
       width: 340px;
-      height: 48px;
-      margin-top: 52px;
-      border: 2px solid $chalk_blue;
-      color: $sea_blue;
+      height: 40px;
+      border: 1px solid #D8DBDF;
+      color: $light_ui_grey;
       background-color: white;
       border-radius: 100px;
       text-align: center;
 
-      div.signin-with-slack-content {
-        div.slack-blue-icon {
-          @include image-2x("/img/ML/slack_blue_icon");
-        }
-      }
-
-      div.signin-with-slack-content {
+      div.signin-with-slack-content, div.signin-with-google-content {
         @include avenir_H();
-        font-size: 18px;
-        color: $carrot_text_blue;
-        width: 184px;
-        margin: 0px auto;
+        font-size: 14px;
+        color: $deep_navy;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-        div.slack-blue-icon {
-          width: 70px;
+        div.slack-icon {
+          width: 21px;
           height: 21px;
-          @include image-2x("/img/ML/slack_blue_icon");
+          background-image: cdnUrl("/img/ML/slack_normal.svg");
           background-repeat: no-repeat;
-          background-size: 70px 21px;
-          float: right;
-          margin-left: 4px;
+          background-size: 21px 21px;
+          float: left;
+          margin-right: 16px;
+        }
+
+        div.google-icon {
+          width: 21px;
+          height: 21px;
+          background-image: cdnUrl("/img/ML/google_signin.svg");
+          background-repeat: no-repeat;
+          float: left;
+          margin-right: 16px;
         }
       }
 
@@ -205,9 +211,9 @@ div.login-overlay-container {
         top: 0px;
         left: 71px;
         text-align: center;
-        @include avenir_H();
-        font-size: 16px;
-        color: rgba($oc_gray_7, 0.7);
+        @include avenir_R();
+        font-size: 14px;
+        color: $light_ui_grey;
         margin: 0 auto;
         width: 196px;
         background-color: white;
@@ -228,8 +234,8 @@ div.login-overlay-container {
           margin: 0px;
           padding: 0px;
           @include avenir_H();
-          font-size: 15px;
-          color: #8C9096;
+          font-size: 12px;
+          color: $deep_navy;
         }
       }
 
@@ -276,7 +282,7 @@ div.login-overlay-container {
             font-size: 12px;
             line-height: 1.5;
             letter-spacing: 1px;
-            color: $oc_gray_7;
+            color: $light_ui_grey;
             @include avenir_H();
             text-decoration: underline;
             &:hover {
@@ -314,15 +320,18 @@ div.login-overlay-container {
         margin-top: 20px;
         @include avenir_R();
         font-size: 14px;
-        color: $oc_gray_7;
+        color: $deep_navy;
         text-align: center;
 
         a {
-          display: block;
-          @include avenir_H();
-          font-size: 16px;
-          color: $oc_gray_7;
-          text-decoration: underline;
+          @include avenir_R();
+          font-size: 14px;
+          color: $carrot_green;
+          margin-left: 8px;
+
+          &:hover {
+            text-decoration: underline;
+          }
         }
       }
     }
@@ -340,12 +349,9 @@ div.login-overlay-container {
         margin-top: 20px;
 
         label.password-reset-label {
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 1.5;
-          letter-spacing: 1px;
-          color: $oc_gray_7;
-          @include avenir_R();
+          font-size: 12px;
+          color: $deep_navy;
+          @include avenir_H();
           margin: 0px;
           padding: 0px;
         }

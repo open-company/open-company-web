@@ -70,6 +70,7 @@
 
 (defn add-attachment [s editable]
   (let [editable (or editable (get-media-picker-extension s))]
+    (.saveSelection editable)
     (reset! (::media-attachment s) true)
     (iu/upload!
      nil
@@ -79,37 +80,11 @@
      (fn []
        (utils/after 400 #(media-attachment-dismiss-picker s editable))))))
 
-;; Chart
-
-(defn add-chart [s]
-  (dis/dispatch! [:input [:media-input :media-chart] true])
-  (reset! (::media-chart s) true))
-
-(defn get-chart-thumbnail [chart-id oid]
-  (str
-   "https://docs.google.com/spreadsheets/d/"
-   chart-id
-   "/embed/oimg?id="
-   chart-id
-   "&oid="
-   oid
-   "&disposition=ATTACHMENT&bo=false&zx=sohupy30u1p"))
-
-(defn media-chart-add [s editable chart-url]
-  (if (nil? chart-url)
-    (.addChart editable nil nil nil)
-    (let [url-fragment (last (clojure.string/split chart-url #"/spreadsheets/d/"))
-          chart-proxy-uri (str "/_/sheets-proxy/spreadsheets/d/" url-fragment)
-          parsed-uri (guri/parse chart-url)
-          oid (.get (.getQueryData parsed-uri) "oid")
-          splitted-path (clojure.string/split (.getPath parsed-uri) #"/")
-          chart-id (nth splitted-path (- (count splitted-path) 2))
-          chart-thumbnail (get-chart-thumbnail chart-id oid)]
-      (.addChart editable chart-proxy-uri chart-id chart-thumbnail))))
-
 ;; Video
 
-(defn add-video [s]
+(defn add-video [s editable]
+  (let [editable (or editable (get-media-picker-extension s))]
+    (.saveSelection editable))
   (dis/dispatch! [:input [:media-input :media-video] true])
   (reset! (::media-video s) true))
 
@@ -183,6 +158,7 @@
 
 (defn add-photo [s editable]
   (let [editable (or editable (get-media-picker-extension s))]
+    (.saveSelection editable)
     (reset! (::media-photo s) true)
     (let [props (first (:rum/args s))
           upload-progress-cb (:upload-progress-cb props)]
@@ -240,9 +216,7 @@
     (= type "photo")
     (add-photo s editable)
     (= type "video")
-    (add-video s)
-    (= type "chart")
-    (add-chart s)
+    (add-video s editable)
     (= type "attachment")
     (add-attachment s editable)))
 
@@ -290,6 +264,7 @@
         mobile-editor (responsive/is-tablet-or-mobile?)
         show-subtitle (:show-h2 options)
         media-config (:media-config options)
+        placeholder (or (:placeholder options) "What would you like to share?")
         body-el (rum/ref-node s "body")
         media-picker-opts {:buttons (clj->js media-config)
                            :useInlinePlusButton (:use-inline-media-picker options)
@@ -323,11 +298,12 @@
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
                              :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
-                             :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure"]
+                             :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input" "textarea"]
                              :unwrapTags (clj->js (remove nil? ["div" "span" "label" "font" "h1"
                                                    (when-not show-subtitle "h2") "h3" "h4" "h5"
-                                                   "h6" "strong" "section" "time" "em" "main"]))}
-                 :placeholder #js {:text "What would you like to share?"
+                                                   "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
+                                                   "details" "summary" "nav" "abbr"]))}
+                 :placeholder #js {:text placeholder
                                    :hideOnClick true}
                  :keyboardCommands #js {:commands #js [
                                     #js {
@@ -371,7 +347,6 @@
                                (rum/local nil ::media-picker-ext)
                                (rum/local false ::media-photo)
                                (rum/local false ::media-video)
-                               (rum/local false ::media-chart)
                                (rum/local false ::media-attachment)
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
@@ -389,8 +364,7 @@
                                  s)
                                 :will-update (fn [s]
                                  (let [data @(drv/get-ref s :media-input)
-                                       video-data (:media-video data)
-                                       chart-data (:media-chart data)]
+                                       video-data (:media-video data)]
                                     (when (and @(::media-video s)
                                                (or (= video-data :dismiss)
                                                    (map? video-data)))
@@ -400,17 +374,7 @@
                                         (dis/dispatch! [:input [:media-input :media-video] nil]))
                                       (if (map? video-data)
                                         (media-video-add s @(::media-picker-ext s) video-data)
-                                        (media-video-add s @(::media-picker-ext s) nil)))
-                                    (when (and @(::media-chart s)
-                                               (or (= chart-data :dismiss)
-                                                   (string? chart-data)))
-                                      (when (or (= chart-data :dismiss)
-                                                (string? chart-data))
-                                        (reset! (::media-chart s) false)
-                                        (dis/dispatch! [:input [:media-input :media-chart] nil]))
-                                      (if (string? chart-data)
-                                        (media-chart-add s @(::media-picker-ext s) chart-data)
-                                        (media-chart-add s @(::media-picker-ext s) nil))))
+                                        (media-video-add s @(::media-picker-ext s) nil))))
                                  s)
                                 :will-unmount (fn [s]
                                  (when @(::editor s)
@@ -431,7 +395,7 @@
          (multi-picker
           {:toggle-button-id default-mutli-picker-button-id
            :add-photo-cb #(add-photo s nil)
-           :add-video-cb #(add-video s)
+           :add-video-cb #(add-video s nil)
            :add-attachment-cb #(add-attachment s nil)})
          multi-picker-container)))
     [:div.rich-body-editor

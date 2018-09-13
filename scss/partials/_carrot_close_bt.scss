@@ -33,3 +33,18 @@ button.carrot-modal-close {
     opacity: 1;
   }
 }
+
+button.settings-modal-close {
+  width: 40px;
+  height: 40px;
+  background-image: cdnUrl("/img/ML/modal_close_x.svg");
+  background-size: 40px;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  opacity: 0.7;
+  position: absolute;
+
+  &:hover {
+    opacity: 1;
+  }
+}

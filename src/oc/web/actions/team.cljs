@@ -16,7 +16,14 @@
    (fn [{:keys [success body status]}]
      (let [fixed-body (when success (json->cljs body))]
        (if success
-         (dis/dispatch! [:team-roster-loaded fixed-body]))))))
+         (let [fixed-roster-data {:team-id (:team-id fixed-body)
+                             :links (-> fixed-body :collection :links)
+                             :users (-> fixed-body :collection :items)}]
+           (dis/dispatch! [:team-roster-loaded fixed-roster-data])
+           ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
+           (let [activities-read (dis/activities-read-data)]
+             (doseq [read-data activities-read]
+               (dis/dispatch! [:activity-reads (:item-id read-data) (:reads read-data) fixed-roster-data])))))))))
 
 (defn enumerate-channels-cb [team-id {:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))
@@ -37,6 +44,7 @@
       (let [team-data (when success (json->cljs body))]
         (when success
           (dis/dispatch! [:team-loaded team-data])
+          (utils/after 100 org-actions/maybe-show-bot-added-notification?)
           (enumerate-channels team-data))))))
 
 (defn force-team-refresh [team-id]
@@ -84,7 +92,7 @@
 
 ;; Invite users
 
-;; Authords
+;; Authors
 
 (defn author-change-cb [{:keys [success]}]
   (when success
@@ -166,7 +174,7 @@
       (invite-user-success invite-data))
     (invite-user-failed invite-data)))
 
-(defn invite-user [org-data team-data invite-data]
+(defn invite-user [org-data team-data invite-data note]
   (let [invite-from (:type invite-data)
         email (:user invite-data)
         slack-user (:user invite-data)
@@ -202,7 +210,7 @@
         (when (and user
                   (not= old-user-type user-type))
           (switch-user-type invite-data old-user-type user-type user))
-        (api/send-invitation invite-data user-value invite-from user-type first-name last-name
+        (api/send-invitation invite-data user-value invite-from user-type first-name last-name note
          (partial send-invitation-cb invite-data user-type))))))
 
 ;; Invite user helpers
@@ -228,7 +236,7 @@
 
 ;; Invite users
 
-(defn invite-users [inviting-users]
+(defn invite-users [inviting-users note]
   (let [org-data (dis/org-data)
         team-data (dis/team-data (:team-id org-data))
         filter-empty (filterv #(seq (:user %)) inviting-users)
@@ -248,7 +256,7 @@
         cleaned-inviting-users (filterv #(not (:error %)) checked-users)]
     (when (<= (count cleaned-inviting-users) (count filter-empty))
       (doseq [user cleaned-inviting-users]
-        (invite-user org-data team-data user)))
+        (invite-user org-data team-data user note)))
     (dis/dispatch! [:invite-users (vec checked-users)])))
 
 ;; User actions
@@ -277,16 +285,17 @@
 
 ;; Slack team add
 
-(defn slack-team-add [current-user-data]
+(defn slack-team-add [current-user-data & [redirect-to]]
   (let [org-data (dis/org-data)
         team-id (:team-id org-data)
         team-data (dis/team-data team-id)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+        redirect (or redirect-to (router/get-token))
         fixed-add-slack-team-link (utils/slack-link-with-state
                                    (:href add-slack-team-link)
                                    (:user-id current-user-data)
                                    team-id
-                                   (router/get-token))]
+                                   redirect)]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link))))
 

@@ -20,7 +20,9 @@
 
 (def contact "/contact")
 
-(def help "http://help.carrot.io")
+(def help "https://beta.carrot.io/carrot-support/all-posts")
+
+(def what-s-new "https://beta.carrot.io/carrot-support/what-s-new")
 
 (def home-try-it-focus (str home "?tif"))
 
@@ -29,10 +31,31 @@
 
 (def login "/login")
 (def sign-up "/sign-up")
+(def sign-up-slack "/sign-up/slack")
 (def sign-up-profile "/sign-up/profile")
 (def sign-up-team "/sign-up/team")
 
+(defn sign-up-update-team
+  ([]
+    (sign-up-update-team (router/current-org-slug)))
+  ([org-slug]
+    (str sign-up "/" (name org-slug) "/team")))
+
+(defn sign-up-invite
+  ([]
+    (sign-up-invite (router/current-org-slug)))
+  ([org-slug]
+    (str sign-up "/" (name org-slug) "/invite")))
+
+(defn sign-up-setup-sections
+  ([]
+    (sign-up-setup-sections (router/current-org-slug)))
+  ([org-slug]
+    (str sign-up "/" (name org-slug) "/sections")))
+
 (def slack-lander-check "/slack-lander/check")
+
+(def google-lander-check "/google/lander")
 
 (def logout "/logout")
 
@@ -58,6 +81,7 @@
 (def email-confirmation "/verify")
 
 (def confirm-invitation "/invite")
+(def confirm-invitation-password "/invite/password")
 (def confirm-invitation-profile "/invite/profile")
 
 (def password-reset "/reset")
@@ -67,6 +91,7 @@
 ;; User
 
 (def user-profile "/profile")
+(def user-notifications "/profile/notifications")
 
 ;; Organizations
 
@@ -84,26 +109,12 @@
   ([org-slug]
     (str (org org-slug) "/all-posts")))
 
-(defn org-settings
-  "Org settings url"
+(defn must-see
+  "Org must see url"
   ([]
-    (org-settings (router/current-org-slug)))
+    (must-see (router/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/settings")))
-
-(defn org-settings-team
-  "Team settings url"
-  ([]
-    (org-settings-team (router/current-org-slug)))
-  ([org-slug]
-    (str (org-settings org-slug) "/team")))
-
-(defn org-settings-invite
-  "Invite people to team url"
-  ([]
-    (org-settings-invite (router/current-org-slug)))
-  ([org-slug]
-    (str (org-settings org-slug) "/invite")))
+    (str (org org-slug) "/must-see")))
 
 ;; Boards
 
@@ -136,7 +147,7 @@
 ;; Secure activities
 
 (defn secure-activity
-  "Secure url for activity to show readonly view."
+  "Secure url for activity to show read only view."
   ([] (secure-activity (router/current-org-slug) (router/current-activity-id)))
   ([secure-id] (secure-activity (router/current-org-slug) secure-id))
   ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))

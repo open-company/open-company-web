@@ -1,4 +1,5 @@
 (ns oc.web.actions.org
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -13,29 +14,62 @@
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]))
+            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.actions.notifications :as notification-actions]))
+
+;; User related functions
+;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
+
+(defn bot-auth [team-data user-data & [redirect-to]]
+  (let [redirect (or redirect-to (router/get-token))
+        auth-link (utils/link-for (:links team-data) "bot")
+        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
+                        redirect)]
+    (router/redirect! fixed-auth-url)))
+
+(defn maybe-show-bot-added-notification? []
+  ;; Do we need to show the add bot banner?
+  (when-let* [org-data (dis/org-data)
+              bot-access (dis/bot-access)]
+    (when (= bot-access :slack-bot-success-notification)
+      (notification-actions/show-notification {:title "Slack integration successful"
+                                               :slack-icon true
+                                               :id "slack-bot-integration-succesful"}))
+    (dis/dispatch! [:input [:bot-access] nil])))
 
 ;; Org get
+(defn check-org-404 []
+  (let [orgs (dis/orgs-data)]
+    ;; avoid infinite loop of the Go to digest button
+    ;; by changing the value of the last visited slug
+    (if (pos? (count orgs))
+      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+      (cook/remove-cookie! (router/last-org-cookie)))
+    (router/redirect-404!)))
 
-(defn org-loaded [org-data saved?]
+(defn org-loaded [org-data saved? & [email-domain]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
-        boards (:boards org-data)]
+        boards (:boards org-data)
+        activity-link (utils/link-for (:links org-data) "activity")]
+    (sa/load-other-sections (:boards org-data))
+    (when activity-link
+      ;; Preload all posts data
+      (aa/all-posts-get org-data ap-initial-at)
+      ;; Preload must see data
+      (aa/must-see-get org-data))
     (cond
-      ;; If it's all posts page, loads all posts for the current org
+      ;; If it's all posts page or must see, loads AP and must see for the current org
       (or (= (router/current-board-slug) "all-posts")
-          ap-initial-at)
-      (if (utils/link-for (:links org-data) "activity")
-        ;; Load all posts only if not coming from a digest url
-        ;; in that case do not load since we already have the results we need
-        (do
-           (aa/all-posts-get org-data ap-initial-at)
-           (sa/load-other-sections (:boards org-data)))
-        (router/redirect-404!))
+          ap-initial-at
+          (= (router/current-board-slug) "must-see"))
+      (when-not activity-link
+        (check-org-404))
+
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
@@ -45,7 +79,8 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
-          (router/nav! (oc-urls/org (router/current-org-slug)))))
+          (when-not (router/current-activity-id) ;; user is not asking for a specific post
+            (router/redirect-404!))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
            (not (utils/in? (:route @router/path) "org-settings-team"))
@@ -69,8 +104,9 @@
   ;; Interaction service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
-      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))  
-  (dis/dispatch! [:org-loaded org-data saved?]))
+      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+  (dis/dispatch! [:org-loaded org-data saved? email-domain])
+  (utils/after 100 maybe-show-bot-added-notification?))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
@@ -83,38 +119,71 @@
 ;; Org redirect
 
 (defn org-redirect [org-data]
-  ;; Show NUX for first ever user when the dashboard is loaded
-  (cook/set-cookie!
-   (router/show-nux-cookie (jwt/user-id))
-   (:first-ever-user router/nux-cookie-values)
-   (* 60 60 24 7))
   (when org-data
     (let [org-slug (:slug org-data)]
       (utils/after 100 #(router/redirect! (oc-urls/all-posts org-slug))))))
 
 ;; Org create
 
+(defn- org-created [org-data]
+  (router/nav! (oc-urls/sign-up-invite (:slug org-data))))
+
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
-    (org-redirect org-data)))
+    (org-created org-data)))
 
-(defn org-create-cb [{:keys [success status body]}]
-  (when-let [org-data (when success (json->cljs body))]
-    (org-loaded org-data false)
-    (let [team-data (dis/team-data (:team-id org-data))]
-      (if (and (empty? (:name team-data))
-               (utils/link-for (:links team-data) "partial-update"))
-        ; if the current team has no name and
-        ; the user has write permission on it
-        ; use the org name
-        ; for it and patch it back
-        (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
-        ; if not redirect the user to the slug)
-        (org-redirect org-data)))))
+(defn- handle-org-redirect [team-data org-data email-domain]
+  (if (and (empty? (:name team-data))
+           (utils/link-for (:links team-data) "partial-update"))
+    ;; if the current team has no name and
+    ;; the user has write permission on it
+    ;; use the org name
+    ;; for it and patch it back
+    (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
+    ;; if not redirect the user to the invite page
+    (org-created org-data)))
 
-(defn org-create [org-data]
-  (when-not (empty? (:name org-data))
-    (api/create-org (:name org-data) (:logo-url org-data) (:logo-width org-data) (:logo-height org-data) org-create-cb)))
+(defn update-email-domains [email-domain org-data]
+  (let [team-data (dis/team-data (:team-id org-data))
+        redirect-cb #(handle-org-redirect team-data org-data email-domain)]
+    (if (seq email-domain)
+      (api/add-email-domain email-domain redirect-cb team-data)
+      (redirect-cb))))
+
+(defn org-create-check-errors [status]
+  (when (= status 409)
+    ;; Redirect to the already available org
+    (router/nav! (oc-urls/org (:slug (first (dis/orgs-data)))))))
+
+(defn org-create-cb [email-domain {:keys [success status body]}]
+  (if success
+    (when-let [org-data (when success (json->cljs body))]
+      ;; rewrite history so when user come back here we load org data and patch them
+      ;; instead of creating them
+      (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
+      (org-loaded org-data false email-domain)
+      (update-email-domains email-domain org-data))
+    (org-create-check-errors status)))
+
+(defn org-update-cb [email-domain {:keys [success status body]}]
+  (if success
+    (when-let [org-data (when success (json->cljs body))]
+      (org-loaded org-data false email-domain)
+      (update-email-domains email-domain org-data))
+    (org-create-check-errors status)))
+
+(defn create-or-update-org [org-data]
+  (when (seq (:name org-data))
+    (let [email-domain (:email-domain org-data)
+          fixed-email-domain (if (.startsWith email-domain "@") (subs email-domain 1) email-domain)
+          existing-org (dis/org-data)]
+      (if (seq (:slug existing-org))
+        (api/patch-org org-data (partial org-update-cb fixed-email-domain))
+        (api/create-org (:name org-data)
+                        (:logo-url org-data)
+                        (:logo-width org-data)
+                        (:logo-height org-data)
+                        (partial org-create-cb fixed-email-domain))))))
 
 ;; Org edit
 
@@ -127,14 +196,43 @@
 (defn org-edit-save [org-data]
   (api/patch-org org-data org-edit-save-cb))
 
-(defn org-change [data]
+(defn org-change [data org-data]
   (let [change-data (:data data)
         container-id (:container-id change-data)
         user-id (:user-id change-data)]
     (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
-      (when (= container-id (:uuid (dis/org-data)))
-        (utils/after 1000 (fn [] (get-org)))))))
+      (when (= container-id (:uuid org-data))
+        (utils/after 1000 get-org)))))
 
 ;; subscribe to websocket events
 (defn subscribe []
-  (ws-cc/subscribe :container/change org-change))
+  (ws-cc/subscribe :org/status
+    (fn [data]
+      (get-org)))
+  (ws-cc/subscribe :container/change
+    (fn [data]
+      (let [change-data (:data data)
+            change-type (:change-type change-data)
+            org-data (dis/org-data)]
+        ;; Handle section changes
+        (org-change data org-data)
+        ;; Nav away of the current section
+        ;; if it's being deleted
+        (when (and (= change-type :delete)
+                   (= (:container-id change-data) (:uuid org-data)))
+          (let [current-board-data (dis/board-data)]
+            (when (= (:item-id change-data) (:uuid current-board-data))
+              (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
+
+(defn update-org-sections [org-slug all-sections]
+  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
+        patch-payload {:boards (conj selected-sections "General")
+                       :samples true}]
+    (api/patch-org-sections patch-payload
+     (fn [{:keys [success status body]}]
+       (when success
+         (org-loaded (json->cljs body) false))
+       (router/nav! (oc-urls/all-posts org-slug))))))
+
+(defn signup-invite-completed [org-data]
+  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
