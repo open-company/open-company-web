@@ -5,7 +5,7 @@ nav.oc-navbar {
   width: 100%;
   background-color: white;
   transition: height 230ms;
-  box-shadow: 0px 2px 6px 0px rgba($deep_tan, 0.5);
+  border-bottom: 1px solid #ECECEC;
 
   &.not-fixed {
     @include mobile() {

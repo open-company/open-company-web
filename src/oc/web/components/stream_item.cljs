@@ -145,11 +145,10 @@
         [:div.stream-header-head-author
           (user-avatar-image publisher)
           [:div.name.fs-hide
-            (str (:name publisher)
-              (when (or is-all-posts is-must-see is-drafts-board)
-                " in ")
-              (when (or is-all-posts is-must-see is-drafts-board)
-                (:board-name activity-data)))
+            (str
+             (:name publisher)
+             " in "
+             (:board-name activity-data))
             [:div.new-tag "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
