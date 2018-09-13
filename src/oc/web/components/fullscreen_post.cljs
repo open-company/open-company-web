@@ -288,7 +288,7 @@
 
 (defn calc-video-height [s]
   (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (* (win-width) (/ 377 640)))))
+    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (rum/defcs fullscreen-post < rum/reactive
                              ;; Derivatives
@@ -429,7 +429,7 @@
                      {:width (win-width)
                       :height @(::mobile-video-height s)}
                      {:width 640
-                      :height 377})]
+                      :height (utils/calc-video-height 640)})]
     [:div.fullscreen-post-container.group
       {:class (utils/class-set {:will-appear (or @(::dismiss s)
                                                  (and @(::animate s)
