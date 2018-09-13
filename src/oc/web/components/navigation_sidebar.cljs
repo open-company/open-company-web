@@ -131,6 +131,7 @@
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
+              {:class (utils/class-set {:new (seq (apply concat (map :unseen (vals change-data))))})}
               "All posts"]])
         (when show-all-posts
            [:a.must-see.hover-item.group

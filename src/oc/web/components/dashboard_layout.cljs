@@ -85,11 +85,12 @@
 (defn- update-tooltips [s]
   (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
     (.tooltip $compose-button (.attr $compose-button "data-viewer")))
-  (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
-    (.tooltip $board-switcher)
-    (doto $board-switcher
-     (.tooltip "hide")
-     (.tooltip "fixTitle"))))
+  ; (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
+  ;   (.tooltip $board-switcher)
+  ;   (doto $board-switcher
+  ;    (.tooltip "hide")
+  ;    (.tooltip "fixTitle")))
+  )
 
 (defn compose [s]
   (utils/remove-tooltips)
@@ -120,7 +121,7 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
-                              (rum/local nil ::board-switch)
+                              ; (rum/local nil ::board-switch)
                               ;; Mixins
                               (ui-mixins/render-on-resize win-width)
                               {:before-render (fn [s]
@@ -129,14 +130,14 @@
                                 s)
                                :will-mount (fn [s]
                                 (win-width s)
-                                (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
-                                      cookie-value (cook/get-cookie board-view-cookie)
-                                      board-view (or (keyword cookie-value) :stream)
-                                      fixed-board-view (if (or (responsive/is-tablet-or-mobile?)
-                                                               (not (nil? @(drv/get-ref s :ap-initial-at))))
-                                                        :stream
-                                                        board-view)]
-                                  (reset! (::board-switch s) fixed-board-view))
+                                ; (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
+                                ;       cookie-value (cook/get-cookie board-view-cookie)
+                                ;       board-view (or (keyword cookie-value) :stream)
+                                ;       fixed-board-view (if (or (responsive/is-tablet-or-mobile?)
+                                ;                                (not (nil? @(drv/get-ref s :ap-initial-at))))
+                                ;                         :stream
+                                ;                         board-view)]
+                                ;   (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
                                 (when-not (utils/is-test-env?)
@@ -174,7 +175,7 @@
         show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        board-switch (::board-switch s)
+        ; board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         can-compose (pos? (count all-boards))
@@ -286,21 +287,22 @@
                                      (reset! (::show-top-boards-dropdown s) false)
                                      (activity-actions/activity-edit {:board-slug (:value item)
                                                                       :board-name (:label item)}))}))])
-                (when-not is-mobile?
-                  [:div.board-switcher.group
-                    (let [grid-view? (= @board-switch :grid)]
-                      [:button.mlb-reset.board-switcher-bt
-                        {:class (if grid-view? "stream-view" "grid-view")
-                         :ref "board-switcher"
-                         :on-click #(do
-                                      (reset! board-switch (if grid-view? :stream :grid))
-                                      (cook/set-cookie! board-view-cookie (if grid-view? "stream" "grid")
-                                       (* 60 60 24 365)))
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title (if grid-view? "Stream view" "Grid view")}])])]
+                ; (when-not is-mobile?
+                ;   [:div.board-switcher.group
+                ;     (let [grid-view? (= @board-switch :grid)]
+                ;       [:button.mlb-reset.board-switcher-bt
+                ;         {:class (if grid-view? "stream-view" "grid-view")
+                ;          :ref "board-switcher"
+                ;          :on-click #(do
+                ;                       (reset! board-switch (if grid-view? :stream :grid))
+                ;                       (cook/set-cookie! board-view-cookie (if grid-view? "stream" "grid")
+                ;                        (* 60 60 24 365)))
+                ;          :data-toggle "tooltip"
+                ;          :data-placement "top"
+                ;          :data-container "body"
+                ;          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                ;          :title (if grid-view? "Stream view" "Grid view")}])])
+                ]
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
                 (when (and (not is-drafts-board)
                            add-post-tooltip)
@@ -374,15 +376,16 @@
                 ;; All Posts
                 (and (or is-all-posts
                          is-must-see)
-                     (= @board-switch :stream))
+                     ; (= @board-switch :stream)
+                     )
                 (rum/with-key (all-posts)
                  (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
                 ;; Layout boards activities
                 :else
                 (cond
                   ;; Entries grid view
-                  (= @board-switch :grid)
-                  (entries-layout)
+                  ; (= @board-switch :grid)
+                  ; (entries-layout)
                   ;; Entries stream view
                   :else
                   (section-stream)))

@@ -40,7 +40,7 @@ div.is-comments {
     text-overflow: ellipsis;
 
     &.add-a-comment {
-      opacity: 0.3;
+      opacity: 0.5;
     }
 
     @include mobile() {
