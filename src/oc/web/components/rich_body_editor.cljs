@@ -276,7 +276,7 @@
         media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
         file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
         buttons (if show-subtitle
-                  ["bold" "italic" "h2" "unorderedlist" "anchor"]
+                  ["bold" "italic" "unorderedlist" "anchor" "h2"]
                   ["bold" "italic" "unorderedlist" "anchor"])
         users-list (:mention-users @(drv/get-ref s :team-roster))
         extensions (if mobile-editor
