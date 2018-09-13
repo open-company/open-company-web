@@ -25,15 +25,20 @@ div.add-comment-box-container {
       div.add-comment-internal {
         min-height: unset;
         box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
-        border: 2px solid $light_ui_grey;
+        border: 1px solid $light_ui_grey;
+        padding: 9px 16px 32px 16px;
 
         div.add-comment {
-          min-height: 58px;
+          min-height: 29px;
 
           @include tablet() {
             height: auto;
             width: auto;
           }
+        }
+
+        div.emoji-picker {
+          display: block;
         }
       }
     }
@@ -42,12 +47,13 @@ div.add-comment-box-container {
       min-height: 24px;
       width: 100%;
       background-color: white;
-      border-radius: 6px;
-      border: 2px solid $deep_tan;
+      border-radius: 4px;
+      border: 1px solid #D8DBDF;
       padding: 9px 16px;
+      position: relative;
 
       &:hover {
-        border: 2px solid #D8DBDF;
+        border: 1px solid $light_ui_grey;
       }
 
       div.add-comment {
@@ -86,6 +92,24 @@ div.add-comment-box-container {
           @include emoji-size(13);
         }
       }
+
+      div.emoji-picker {
+        position: absolute;
+        top: unset;
+        bottom: 0px;
+        right: 0px;
+        display: none;
+
+        div.picker-container {
+          left: unset;
+          right: -5px;
+          top: 24px;
+        }
+
+        @include tablet() {
+          display: none;
+        }
+      }
     }
 
     div.add-comment-footer {
@@ -122,26 +146,6 @@ div.add-comment-box-container {
 
         &:disabled {
           background-color: $light_ui_grey;
-        }
-      }
-
-      div.emoji-picker {
-        position: absolute;
-        top: 8px;
-        left: 0px;
-        right: unset;
-
-        div.picker-container {
-          left: 0px;
-        }
-
-        button.emoji-button {
-          background-size: 20px 20px;
-          background-position: 0% 0%;
-        }
-
-        @include tablet() {
-          display: none;
         }
       }
     }

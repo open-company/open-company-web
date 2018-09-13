@@ -147,33 +147,33 @@
                            500
                            #(highlight-url s))))}
             "URL"]
-          (let [slack-disabled (not (has-bot? org-data))
-                show-slack-tooltip? (show-slack-tooltip? org-data)]
-            [:div.activity-share-medium-selector
-              {:class (utils/class-set {:selected (= medium :slack)
-                                        :medium-selector-disabled slack-disabled})
-               :data-placement "top"
-               :data-container "body"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Enable the Slack bot in Settings"
-               :ref "slack-button"
-               :on-click (fn [e]
-                           (utils/event-stop e)
-                           (when-not @(::sharing s)
-                             (if slack-disabled
-                               (when show-slack-tooltip?
-                                 (let [$this (js/$ (rum/ref-node s "slack-button"))]
-                                   (.tooltip $this "show")
-                                   (utils/after
-                                    2000
-                                    #(.tooltip $this "hide"))))
-                               (dis/dispatch! [:input [:activity-share-medium] :slack]))))}
-              "Slack"])
           [:div.activity-share-medium-selector
             {:class (when (= medium :email) "selected")
              :on-click #(when-not @(::sharing s)
                          (dis/dispatch! [:input [:activity-share-medium] :email]))}
-            "Email"]]
+            "Email"]
+          (let [is-slack-org? (jwt/is-slack-org?)
+                has-bot? (has-bot? org-data)]
+            (when is-slack-org?
+              [:div.activity-share-medium-selector
+                {:class (utils/class-set {:selected (= medium :slack)
+                                          :medium-selector-disabled (not has-bot?)})
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title "Enable the Slack bot in Settings"
+                 :ref "slack-button"
+                 :on-click (fn [e]
+                             (utils/event-stop e)
+                             (when-not @(::sharing s)
+                               (if has-bot?
+                                 (dis/dispatch! [:input [:activity-share-medium] :slack])
+                                 (let [$this (js/$ (rum/ref-node s "slack-button"))]
+                                   (.tooltip $this "show")
+                                   (utils/after
+                                    2000
+                                    #(.tooltip $this "hide"))))))}
+                "Slack"]))]
         [:div.activity-share-divider-line]
         (when (= medium :email)
           [:div.activity-share-share.fs-hide

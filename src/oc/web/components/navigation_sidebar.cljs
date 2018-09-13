@@ -52,6 +52,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
+                                (drv/drv :show-section-add)
                                 (drv/drv :change-cache-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
@@ -160,6 +161,7 @@
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
+            {:class (when (drv/react s :show-section-add) "show-section-add")}
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:span
@@ -167,6 +169,7 @@
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
+                   :class (when (drv/react s :show-section-add) "active")
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
