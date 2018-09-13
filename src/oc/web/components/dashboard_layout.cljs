@@ -85,6 +85,7 @@
 (defn- update-tooltips [s]
   (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
     (.tooltip $compose-button (.attr $compose-button "data-viewer")))
+  ;; Commenting out grid view switcher for now
   ; (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
   ;   (.tooltip $board-switcher)
   ;   (doto $board-switcher
@@ -121,6 +122,7 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
+                              ;; Commenting out grid view switcher for now
                               ; (rum/local nil ::board-switch)
                               ;; Mixins
                               (ui-mixins/render-on-resize win-width)
@@ -130,6 +132,7 @@
                                 s)
                                :will-mount (fn [s]
                                 (win-width s)
+                                ;; Commenting out grid view switcher for now
                                 ; (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
                                 ;       cookie-value (cook/get-cookie board-view-cookie)
                                 ;       board-view (or (keyword cookie-value) :stream)
@@ -287,6 +290,7 @@
                                      (reset! (::show-top-boards-dropdown s) false)
                                      (activity-actions/activity-edit {:board-slug (:value item)
                                                                       :board-name (:label item)}))}))])
+                ;; Commenting out grid view switcher for now
                 ; (when-not is-mobile?
                 ;   [:div.board-switcher.group
                 ;     (let [grid-view? (= @board-switch :grid)]
@@ -376,6 +380,7 @@
                 ;; All Posts
                 (and (or is-all-posts
                          is-must-see)
+                     ;; Commenting out grid view switcher for now
                      ; (= @board-switch :stream)
                      )
                 (rum/with-key (all-posts)
@@ -383,6 +388,7 @@
                 ;; Layout boards activities
                 :else
                 (cond
+                  ;; Commenting out grid view switcher for now
                   ;; Entries grid view
                   ; (= @board-switch :grid)
                   ; (entries-layout)
