@@ -15,6 +15,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -257,6 +258,7 @@
                         ;; Mixins
                         mixins/no-scroll-mixin
                         mixins/first-render-mixin
+                        (mention-mixins/oc-mentions-hover)
                         (mixins/render-on-resize calc-video-height)
 
                         {:will-mount (fn [s]

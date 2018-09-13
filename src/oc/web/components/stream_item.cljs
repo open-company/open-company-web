@@ -16,6 +16,7 @@
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.events.expand-event :as expand-event]
             [oc.web.actions.activity :as activity-actions]
@@ -81,6 +82,7 @@
                          (ui-mixins/render-on-resize calc-video-height)
                          (am/truncate-element-mixin "activity-body" (* 30 3))
                          am/truncate-comments-mixin
+                         (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
@@ -193,14 +195,14 @@
               [:div.stream-item-body
                 {:class (utils/class-set {:expanded expanded?
                                           :wrt-item-ready @(::item-ready s)})}
-                [:div.stream-item-body-inner.to-truncate
+                [:div.stream-item-body-inner.to-truncate.oc-mentions.oc-mentions-hover
                   {:ref "activity-body"
                    :data-itemuuid (:uuid activity-data)
                    :class (utils/class-set {:hide-images (and truncated? (not expanded?))
                                             :wrt-truncated truncated?
                                             :wrt-expanded expanded?})
                    :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
-                [:div.stream-item-body-inner.no-truncate
+                [:div.stream-item-body-inner.no-truncate.oc-mentions.oc-mentions-hover
                   {:ref "full-activity-body"
                    :data-itemuuid (:uuid activity-data)
                    :class (utils/class-set {:wrt-truncated truncated?

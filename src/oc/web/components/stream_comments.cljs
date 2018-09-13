@@ -6,6 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -40,7 +41,8 @@
 
 (defn start-editing [s comment-data]
   (let [comment-node (rum/ref-node s (str "comment-body-" (:uuid comment-data)))
-        medium-editor (cu/setup-medium-editor comment-node)]
+        users-list (:mention-users @(drv/get-ref s :team-roster))
+        medium-editor (cu/setup-medium-editor comment-node users-list)]
     (reset! (::esc-key-listener s)
      (events/listen
       js/window
@@ -76,6 +78,7 @@
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
+                             (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local false ::showing-menu)
                              (rum/local nil ::click-listener)
@@ -83,6 +86,8 @@
                              (rum/local false ::medium-editor)
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
+                             ;; Mixins
+                             (mention-mixins/oc-mentions-hover)
                              {:will-mount (fn [s]
                                (reset! (::click-listener s)
                                  (events/listen js/window EventType/CLICK
@@ -127,7 +132,7 @@
                   [:div.stream-comment-author-timestamp
                     (utils/time-since (:created-at comment-data))]]]
               [:div.stream-comment-content
-                [:div.stream-comment-body.fs-hide
+                [:div.stream-comment-body.oc-mentions.oc-mentions-hover.fs-hide
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                    :ref (str "comment-body-" (:uuid comment-data))
                    :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]

@@ -33,7 +33,7 @@
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
 
-(defn user-notifications-click [e]
+(defn notifications-settings-click [e]
   (utils/event-stop e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
@@ -62,11 +62,8 @@
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)]
     [:div.menu
-      {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
-                                :mobile-menu-open (and (responsive/is-mobile-size?)
-                                                       mobile-menu-open)})
-       :aria-labelledby "dropdown-toggle-menu"
-       :aria-expanded true}
+      {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
+                                                       mobile-menu-open)})}
       [:div.menu-header
         (user-avatar-image current-user-data)
         [:div.user-name.fs-hide
@@ -88,8 +85,8 @@
       (when (jwt/jwt)
         [:a
           {:href "#"
-           :on-click user-notifications-click}
-          [:div.oc-menu-item.user-notifications
+           :on-click notifications-settings-click}
+          [:div.oc-menu-item.notifications-settings
             "Notification Settings"]])
       [:div.oc-menu-separator]
       (when org-data

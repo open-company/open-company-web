@@ -8,11 +8,13 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local_settings :as ls]
+            [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
+            [oc.web.lib.ws-notify-client :as ws-nc]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; Logout
@@ -368,6 +370,34 @@
 
 (defn change-user-profile-panel [panel]
   (dis/dispatch! [:input [:user-settings] panel]))
+
+;; User notifications
+
+(defn read-notifications []
+  (dis/dispatch! [:user-notifications/read (router/current-org-slug)]))
+
+;; subscribe to websocket events
+(defn subscribe []
+  (ws-nc/subscribe :user/notifications
+    (fn [{:keys [_ data]}]
+      (let [fixed-notifications (user-utils/fix-notifications (:notifications data))]
+        (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
+  (ws-nc/subscribe :user/notification
+    (fn [{:keys [_ data]}]
+      (when-let [fixed-notification (user-utils/fix-notification data true)]
+        (dis/dispatch! [:user-notification (router/current-org-slug) fixed-notification])
+        (notification-actions/show-notification
+         {:title (:title fixed-notification)
+          :mention true
+          :dismiss true
+          :click #(router/nav! (oc-urls/entry (:board-slug fixed-notification) (:uuid fixed-notification)))
+          :mention-author (:author fixed-notification)
+          :description (:body fixed-notification)
+          :id (str "notif-" (:created-at fixed-notification))
+          :expire 5})))))
+
+(defn read-notification [notification]
+  (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
 
 ;; Debug
 

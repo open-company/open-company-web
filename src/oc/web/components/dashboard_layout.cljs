@@ -84,7 +84,8 @@
 
 (defn- update-tooltips [s]
   (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
-    (.tooltip $compose-button (.attr $compose-button "data-viewer")))
+    (when (.attr $compose-button "data-original-title")
+      (.tooltip $compose-button (.attr $compose-button "data-viewer"))))
   (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
     (.tooltip $board-switcher)
     (doto $board-switcher

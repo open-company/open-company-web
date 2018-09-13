@@ -55,6 +55,14 @@
     }
   }
 
+  &:active, &:focus {
+    text-decoration: none;
+
+    div.all-posts-label, div.must-see-label, div.drafts-label {
+      text-decoration: none;
+    }
+  }
+
   div.all-posts-label {
     @include avenir_H();
     font-size: 14px;
@@ -64,6 +72,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
   }
 
   div.must-see-label {
@@ -75,6 +87,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
   }
 }
 
@@ -113,9 +129,21 @@
     text-decoration: none;
   }
 
+  &:active, &:focus {
+    text-decoration: none;
+
+    div.all-posts-label, div.must-see-label, div.drafts-label {
+      text-decoration: none;
+    }
+  }
+
   div.all-posts-label, div.must-see-label {
     @include avenir_H();
     text-decoration: none;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
   }
 }
 
@@ -145,11 +173,23 @@
     }
   }
 
+  &:active, &:focus {
+    text-decoration: none;
+
+    div.all-posts-label, div.must-see-label, div.drafts-label {
+      text-decoration: none;
+    }
+  }
+
   div.all-posts-label {
     color: $deep_navy;
     font-size: 14px;
     line-height: 25px;
     text-decoration: none;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
   }
 
   div.drafts-label, div.must-see-label {
@@ -157,6 +197,10 @@
     font-size: 14px;
     line-height: 25px;
     text-decoration: none;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
   }
 }
 

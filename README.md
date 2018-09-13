@@ -108,11 +108,21 @@ script/compile_assets.sh <compiler version> ~/path/to/open-company-web localhost
 cp ~/path/to/open-company-web/target/public/oc_assets.js* ~/path/to/open-company-way/resources/public/
 ```
 
+#### TCMention development
+
+The extention for MediumEditor called TCMention is based on [this](https://github.com/tomchentw/medium-editor-tc-mention). To make changes to the extention itself clone [our fork](https://github.com/open-company/medium-editor-tc-mention) of that repo, change what you need, then run `npm run build` and run:
+`cp  lib/* ../open-company-web/resources/public/lib/MediumEditorExtensions/MediumEditorTCMention/`.
+Commit the changes back to our fork to make sure we have the latest.
+
+If you need to change the mentions popup panels you can write the JSX code in resources/public/lib/MediumEditorExtensions/MediumEditorTCMention/CustomizedTagComponent.jsx or the JS code in CustomizedTagComponent.js. Better if keep them in sync so we can use both.
+
+
 #### Ziggeo media player and recorder development
 
 To change the Ziggeo video player and recorder you need to change [our fork](https://github.com/open-company/betajs-media-components) of [betajs/betajs-media-components](https://github.com/betajs/betajs-media-components).
 Once you changed everything you need you only need to run this `source script/local_ziggeo_dev.sh` to compile the ziggeo sdk and copy it here.
 Do not forget to commit the changes made to betajs-media-compoentns and the changed files here in oc-web.
+
 
 ### Project REPL
 

@@ -412,7 +412,7 @@
       (get-ampm-time js-date)
       (get-24h-time js-date))))
 
-(defn activity-date-string [js-date hide-time]
+(defn activity-date-string [js-date & [hide-time]]
   (let [time-string (format-time-string js-date)]
     (str
      (full-month-string (inc (.getMonth js-date)))
@@ -426,40 +426,42 @@
 (defn activity-date
   "Get a string representing the elapsed time from a date in the past"
   [past-js-date & [hide-time]]
-  (let [past (.getTime past-js-date)
-        now (.getTime (js-date))
-        seconds (.floor js/Math (/ (- now past) 1000))
-        years-interval (.floor js/Math (/ seconds 31536000))
-        months-interval (.floor js/Math (/ seconds 2592000))
-        days-interval (.floor js/Math (/ seconds 86400))
-        hours-interval (.floor js/Math (/ seconds 3600))
-        minutes-interval (.floor js/Math (/ seconds 60))]
-    (cond
-      (pos? years-interval)
-      (str "on " (activity-date-string past-js-date hide-time))
+  (when past-js-date
+    (let [past (.getTime past-js-date)
+          now (.getTime (js-date))
+          seconds (.floor js/Math (/ (- now past) 1000))
+          years-interval (.floor js/Math (/ seconds 31536000))
+          months-interval (.floor js/Math (/ seconds 2592000))
+          days-interval (.floor js/Math (/ seconds 86400))
+          hours-interval (.floor js/Math (/ seconds 3600))
+          minutes-interval (.floor js/Math (/ seconds 60))]
+      (cond
+        (pos? years-interval)
+        (str "on " (activity-date-string past-js-date hide-time))
 
-      (or (pos? months-interval)
-          (> days-interval 7))
-      (str "on " (activity-date-string past-js-date hide-time))
+        (or (pos? months-interval)
+            (> days-interval 7))
+        (str "on " (activity-date-string past-js-date hide-time))
 
-      (pos? days-interval)
-      (str days-interval " " (pluralize "day" days-interval) " ago")
+        (pos? days-interval)
+        (str days-interval " " (pluralize "day" days-interval) " ago")
 
-      (pos? hours-interval)
-      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+        (pos? hours-interval)
+        (str hours-interval " " (pluralize "hour" hours-interval) " ago")
 
-      (pos? minutes-interval)
-      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
+        (pos? minutes-interval)
+        (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
 
-      :else
-      "Just now")))
+        :else
+        "Just now"))))
 
 (defn entry-date-tooltip [entry-data]
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
-        updated-at (js-date (:updated-at entry-data))
+        updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)]
-    (if (= (:created-at entry-data) (:updated-at entry-data))
+    (if (or (= (:created-at entry-data) (:updated-at entry-data))
+            (not (:updated-at entry-data)))
       (str "Posted " created-str)
       (str "Posted " created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
 
