@@ -22,13 +22,13 @@ div.search-box {
   }
 
   input.search {
-    margin: 5px 0px 0px 0px;
+    margin: 5px 0 0;
     outline: none;
     border: none;
     caret-color: $carrot_text_blue_3;
     background-image: cdnUrl("/img/ML/spyglass.svg");
     background-repeat: no-repeat;
-    padding: 2px 0px 0px 31px;
+    padding: 1px 0 0 31px;
     @include avenir_M();
     color: $carrot_dark_brown_1;
 

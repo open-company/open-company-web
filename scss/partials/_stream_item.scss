@@ -249,7 +249,7 @@ div.stream-item {
 
     div.stream-item-footer {
       height: 32px;
-      margin-top: 32px;
+      margin-top: 8px;
 
       @include mobile() {
         margin-top: 16px;
