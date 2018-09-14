@@ -197,6 +197,11 @@ div.stream-item {
               @include avenir_R();
               line-height: 22px;
 
+              @include mobile() {
+                @include activity-body(18, 24, 24, $ui_grey); 
+                line-height: 24px;
+              }
+
               &.hide-images {
                 img {
                   display: none;
@@ -210,6 +215,11 @@ div.stream-item {
               @include avenir_R();
               line-height: 22px;
               display: none;
+
+              @include mobile() {
+                @include activity-body(18, 24, 24, $ui_grey); 
+                line-height: 24px;
+              }
             }
 
             &>*:first-child {

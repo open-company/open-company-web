@@ -384,11 +384,11 @@ div.entry-edit-modal-container {
             outline: none;
             margin: 8px 0px 0px;
             cursor: text;
-            @include activity-body(16, 22, 22, $deep_navy);
+            @include activity-body(18, 24, 24, $deep_navy);
             color: $deep_navy;
             @include avenir_R();
-            font-size: 16px;
-            line-height: 22px;
+            font-size: 18px;
+            line-height: 24px;
             height: auto;
             overflow-y: auto;
             overflow-x: hidden;
