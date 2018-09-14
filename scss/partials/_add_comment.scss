@@ -43,7 +43,7 @@ div.add-comment-box-container {
     }
 
     div.add-comment-internal{
-      min-height: 24px;
+      min-height: 49px;
       width: 100%;
       background-color: white;
       border-radius: 4px;
@@ -63,13 +63,14 @@ div.add-comment-box-container {
         color: $deep_navy;
         font-size: 16px;
         cursor: text;
-        height: 24px;
+        height: 27px;
         min-height: initial;
         white-space: pre-wrap;
         word-wrap: break-word;
         padding: 4px 0px 0px 0px;
         margin: 0px;
         height: auto;
+        min-height: 27px;
 
         &.medium-editor-placeholder:after {
           @include avenir_R();
