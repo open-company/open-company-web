@@ -254,6 +254,9 @@
               {:on-click #(do
                             (utils/event-stop %)
                             (reset! (::show-access-list s) false)
+                            (when show-slack-channels?
+                              (reset! (::slack-enabled s) false)
+                              (dis/dispatch! [:input [:section-editing :slack-mirror] nil]))
                             (dis/dispatch! [:input [:section-editing :access] "private"]))}
               private-access]
             [:div.access-list-row
