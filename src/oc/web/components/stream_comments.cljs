@@ -113,9 +113,11 @@
         (for [idx (range (count comments-data))
               :let [comment-data (nth comments-data idx)
                     is-editing? (= @(::editing? s) (:uuid comment-data))
-                    reaction-data (first (:reactions comment-data))]]
+                    reaction-data (first (:reactions comment-data))
+                    showing-more-menu (= @(::showing-menu s) (:uuid comment-data))]]
           [:div.stream-comment
-            {:key (str "stream-comment-" (:created-at comment-data) "-" (:updated-at comment-data))}
+            {:key (str "stream-comment-" (:created-at comment-data) "-" (:updated-at comment-data))
+             :class (when showing-more-menu "showing-more-menu")}
             [:div.stream-comment-author-avatar
               (user-avatar-image (:author comment-data))]
 
@@ -125,7 +127,33 @@
                   [:div.stream-comment-author-name
                     (:name (:author comment-data))]
                   [:div.stream-comment-author-timestamp
-                    (utils/time-since (:created-at comment-data))]]]
+                    (utils/time-since (:created-at comment-data))]]
+                (when (and (not is-editing?)
+                           (or (and (:can-edit comment-data)
+                                    (not (:is-emoji comment-data)))
+                               (:can-delete comment-data)))
+                  [:div.stream-comment-more-menu-container
+                    {:ref (str "comment-more-menu-" (:uuid comment-data))}
+                    [:button.comment-more-menu.mlb-reset
+                      {:class (when showing-more-menu "active")
+                       :on-click (fn [e]
+                                  (utils/event-stop e)
+                                  (reset! (::showing-menu s) (:uuid comment-data)))}]
+                    (when showing-more-menu
+                      [:div.stream-comment-more-menu
+                        (when (and (:can-edit comment-data)
+                                   (not (:is-emoji comment-data)))
+                          [:div.stream-comment-more-menu-item.edit
+                            {:on-click #(do
+                                          (reset! (::showing-menu s) false)
+                                          (start-editing s comment-data))}
+                            "Edit"])
+                        (when (:can-delete comment-data)
+                          [:div.stream-comment-more-menu-item.delete
+                            {:on-click #(do
+                                         (reset! (::showing-menu s) false)
+                                         (delete-clicked % activity-data comment-data))}
+                            "Delete"])])])]
               [:div.stream-comment-content
                 [:div.stream-comment-body.fs-hide
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
@@ -135,7 +163,27 @@
                                   (.restore (.data $body "dotdotdot"))
                                   (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
                    :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
-                                            :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))})}]]
+                                            :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
+                                            :editing is-editing?})}]
+                (when (and (not is-editing?)
+                           (not (:is-emoji comment-data))
+                           (or (:can-react comment-data)
+                               (pos? (:count reaction-data))))
+                  [:button.mlb-reset.stream-comment-reaction
+                    {:class (utils/class-set {:reacted (:reacted reaction-data)
+                                              :can-react (:can-react comment-data)})
+                     :title "Agree with this comment"
+                     :data-toggle "tooltip"
+                     :data-placement "top"
+                     :data-contaner "body"
+                     :on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
+                                 reaction-data (not (:reacted reaction-data)))}
+                      (when (or (pos? (:count reaction-data))
+                                (:can-react comment-data))
+                        [:div.stream-comment-reaction-icon])
+                      (when (pos? (:count reaction-data))
+                        [:div.stream-comment-reaction-count
+                          (:count reaction-data)])])]
               (when (or is-editing?
                         (and (not is-editing?)
                              (or (and (:can-edit comment-data)
@@ -146,52 +194,6 @@
                              (or (:can-react comment-data)
                                  (pos? (:count reaction-data)))))
                 [:div.stream-comment-footer.group
-                  (when (and (not is-editing?)
-                             (not (:is-emoji comment-data))
-                             (or (:can-react comment-data)
-                                 (pos? (:count reaction-data))))
-                    [:button.mlb-reset.stream-comment-reaction
-                      {:class (utils/class-set {:reacted (:reacted reaction-data)
-                                                :can-react (:can-react comment-data)})
-                       :title "Agree with this comment"
-                       :data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-contaner "body"
-                       :on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
-                                   reaction-data (not (:reacted reaction-data)))}
-                        (when (or (pos? (:count reaction-data))
-                                  (:can-react comment-data))
-                          [:div.stream-comment-reaction-icon])
-                        (when (pos? (:count reaction-data))
-                          [:div.stream-comment-reaction-count
-                            (:count reaction-data)])])
-                  (when (and (not is-editing?)
-                             (or (and (:can-edit comment-data)
-                                      (not (:is-emoji comment-data)))
-                                 (:can-delete comment-data)))
-                    (let [showing-more-menu (= @(::showing-menu s) (:uuid comment-data))]
-                      [:div.stream-comment-more-menu-container
-                        {:ref (str "comment-more-menu-" (:uuid comment-data))}
-                        [:button.comment-more-menu.mlb-reset
-                          {:class (when showing-more-menu "active")
-                           :on-click (fn [e]
-                                      (utils/event-stop e)
-                                      (reset! (::showing-menu s) (:uuid comment-data)))}]
-                        (when showing-more-menu
-                          [:div.stream-comment-more-menu
-                            (when (and (:can-edit comment-data)
-                                       (not (:is-emoji comment-data)))
-                              [:div.stream-comment-more-menu-item.edit
-                                {:on-click #(do
-                                              (reset! (::showing-menu s) false)
-                                              (start-editing s comment-data))}
-                                "Edit"])
-                            (when (:can-delete comment-data)
-                              [:div.stream-comment-more-menu-item.delete
-                                {:on-click #(do
-                                             (reset! (::showing-menu s) false)
-                                             (delete-clicked % activity-data comment-data))}
-                                "Delete"])])]))
                   (when is-editing?
                     [:div.save-cancel-edit-buttons
                       [:button.mlb-reset.mlb-link-green
