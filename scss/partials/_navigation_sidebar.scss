@@ -4,23 +4,21 @@
   @include mobile() {
     height: 56px;
     padding: 16px 32px;
-    border-top: 1px solid #ECECEC;
+    position: relative;
 
-    &:last-child {
-      border-bottom: 1px solid #ECECEC;
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0px;
+      left: 65px;
+      height: 1px;
+      width: calc(100% - 65px);
+      background-color: #ECECEC;
     }
 
-    &:not(:last-child) {
-      position: relative;
-      &:after {
-        content: "";
-        position: absolute;
-        width: calc(100% - 48px);
-        left: 24px;
-        bottom: 0px;
-        height: 1px;
-        background-color: $light_tan;
-      }
+    &:first-child:before {
+      width: 100%;
+      left: 0px;
     }
   }
 
@@ -202,7 +200,7 @@ div.left-navigation-sidebar {
       padding: 15px;
       background-color: white;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-      border-top: 1px solid $light_tan;
+      // border-top: 1px solid $light_tan;
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
