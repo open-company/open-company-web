@@ -327,7 +327,7 @@
         [:div.cmail-container
           [:div.cmail-header
             {:class (when (:must-see cmail-data) "must-see-on")}
-            [:div.must-see-toogle-container
+            [:div.must-see-toggle-container
               {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle
                 {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
@@ -341,9 +341,7 @@
               (if (seq (:headline cmail-data))
                 (:headline cmail-data)
                 utils/default-headline)]
-            (let [long-tooltip (and (not= (:status cmail-data) "published")
-                                    (or (:has-changes cmail-data)
-                                        (:auto-saving cmail-data)))]
+            (let [long-tooltip (not= (:status cmail-data) "published")]
               [:div.close-bt-container
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
