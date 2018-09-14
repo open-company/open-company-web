@@ -202,6 +202,21 @@ div.dashboard-layout {
           margin: 32px 24px;
         }
 
+        div.post-added-tooltip-box-mobile {
+            display: none;
+
+            @include mobile() {
+              display: block;
+              width: 122px;
+              height: 120px;
+              @include image-2x("/img/ML/post_added_tooltip_box");
+              background-size: 122px 120px;
+              background-repeat: no-repeat;
+              background-position: center;
+              margin: 0 auto 20px;
+            }
+          }
+
         button.post-added-tooltip-dismiss {
           position: absolute;
           top: 16px;
@@ -215,7 +230,7 @@ div.dashboard-layout {
         }
 
         div.post-added-tooltips {
-          width: 444px;
+          width: 464px;
           float: left;
 
           @include tablet() {
@@ -257,11 +272,11 @@ div.dashboard-layout {
           div.post-added-tooltip-box {
             position: absolute;
             bottom: 0px;
-            right: 60px;
-            width: 151px;
-            height: 118px;
+            right: 70px;
+            width: 122px;
+            height: 120px;
             @include image-2x("/img/ML/post_added_tooltip_box");
-            background-size: 151px 118px;
+            background-size: 122px 120px;
             background-repeat: no-repeat;
             background-position: center;
 
