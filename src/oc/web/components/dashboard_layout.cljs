@@ -343,18 +343,15 @@
                   [:button.mlb-reset.post-added-tooltip-dismiss
                     {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
                   [:div.post-added-tooltips
+                    [:div.post-added-tooltip-box-mobile]
                     [:div.post-added-tooltip-title
-                      "Post success!"]
+                      "Well done!"]
                     [:div.post-added-tooltip
-                      (str
-                       "Carrot shows who’s seen your post, and makes "
-                       "it easy to remind anyone that hasn’t. ")
-                      (when is-admin-or-author
-                        [:button.mlb-reset.post-added-bt
-                          {:on-click #(nav-actions/show-invite)}
-                          "Invite your team"])
-                      (when is-admin-or-author
-                        " to get started.")]
+                      "You are on your way "
+                      [:button.mlb-reset.post-added-bt
+                        {:on-click #(nav-actions/show-invite)}
+                        "Invite your team"]
+                      " to spark better follow-on discussions adn to keep everyone in sync."]
                     [:div.post-added-tooltip-box]]])
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
