@@ -123,8 +123,8 @@
             [:button.mlb-reset.reply-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                 comment-body (cu/add-comment-content add-comment-div)]
-                            (comment-actions/add-comment activity-data comment-body)
-                            (set! (.-innerHTML add-comment-div) ""))
+                            (set! (.-innerHTML add-comment-div) "")
+                            (comment-actions/add-comment activity-data comment-body))
                :disabled @(::add-button-disabled s)}
               "Comment"]
             [:button.mlb-reset.cancel-btn
