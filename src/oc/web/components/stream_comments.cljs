@@ -184,24 +184,15 @@
                       (when (pos? (:count reaction-data))
                         [:div.stream-comment-reaction-count
                           (:count reaction-data)])])]
-              (when (or is-editing?
-                        (and (not is-editing?)
-                             (or (and (:can-edit comment-data)
-                                      (not (:is-emoji comment-data)))
-                                 (:can-delete comment-data)))
-                        (and (not is-editing?)
-                             (not (:is-emoji comment-data))
-                             (or (:can-react comment-data)
-                                 (pos? (:count reaction-data)))))
+              (when is-editing?
                 [:div.stream-comment-footer.group
-                  (when is-editing?
-                    [:div.save-cancel-edit-buttons
-                      [:button.mlb-reset.mlb-link-green
-                        {:on-click #(edit-finished % s comment-data)
-                         :title "Save edit"}
-                        "Save"]
-                      [:button.mlb-reset.mlb-link-black
-                        {:on-click #(cancel-edit % s comment-data)
-                         :title "Cancel edit"}
-                        "Cancel"]])])]])]
+                  [:div.save-cancel-edit-buttons
+                    [:button.mlb-reset.mlb-link-green
+                      {:on-click #(edit-finished % s comment-data)
+                       :title "Save edit"}
+                      "Save"]
+                    [:button.mlb-reset.mlb-link-black
+                      {:on-click #(cancel-edit % s comment-data)
+                       :title "Cancel edit"}
+                      "Cancel"]]])]])]
       [:div.stream-comments-empty])])

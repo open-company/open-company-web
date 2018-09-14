@@ -156,7 +156,11 @@ div.stream-comments {
           display: inline;
 
           & > *:last-child {
-            display: inline-block;
+            display: inline;
+          }
+
+          & > *:not(:last-child) {
+            display: block;
           }
 
           &.editing {
