@@ -354,16 +354,24 @@
                    :data-trigger "hover"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                    :title (if long-tooltip
-                        "Save & Close"
-                        "Close")}]])
+                            "Save & Close"
+                            "Close")}]])
             [:div.fullscreen-bt-container
               [:button.mlb-reset.fullscreen-bt
-                {:on-click #(activity-actions/cmail-toggle-fullscreen)
+                {:on-click #(if (:collapse cmail-state)
+                              (do
+                                (activity-actions/cmail-toggle-collapse)
+                                (when-not (:fullscreen cmail-state)
+                                  (activity-actions/cmail-toggle-fullscreen)))
+                              (activity-actions/cmail-toggle-fullscreen))
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if (:fullscreen cmail-state) "Exit fullscreen" "Fullscreen")}]]
+                 :title (if (and (:fullscreen cmail-state)
+                                 (not (:collapse cmail-state)))
+                          "Shrink"
+                          "Expand")}]]
             [:div.collapse-bt-container
               [:button.mlb-reset.collapse-bt
                 {:on-click #(activity-actions/cmail-toggle-collapse)
@@ -371,7 +379,7 @@
                  :data-placement "top"
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if (:collapse cmail-state) "Expand" "Collapse")}]]]
+                 :title (if (:collapse cmail-state) "Show" "Collapse")}]]]
           [:div.cmail-section
             [:div.board-name
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
