@@ -130,7 +130,7 @@
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
                                    (dismiss))))
                               s)
-                             :did-remount (fn [_ s]
+                             :will-update (fn [s]
                               (let [section-editing @(drv/get-ref s :section-editing)]
                                 (when @(::pre-flight-check s)
                                   (when-not (:pre-flight-loading section-editing)
