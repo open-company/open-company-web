@@ -14,7 +14,7 @@
     ;; NB: Can't go past Clojure Alpha 19 to Alpha 20 due to ##NaN issues w/ doo library
     ;;     discussed here: https://groups.google.com/forum/#!msg/clojure/IB2CaORBMnM/NjN24lQLDQAJ
     ;;     These are apparently fixed with ClojureScript 1.9.946+
-    [org.clojure/clojure "1.10.0-alpha4"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojure "1.10.0-alpha7"] ; Lisp on the JVM http://clojure.org/documentation
     ;; NB: Can't go past ClojureScript 1.9.908 right now due to issues w/ React
     [org.clojure/clojurescript "1.10.238"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 

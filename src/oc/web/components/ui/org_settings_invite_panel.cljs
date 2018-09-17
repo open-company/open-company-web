@@ -118,10 +118,17 @@
             {:on-click #(user-type-did-change s invite-users "email")
              :class (utils/class-set {:active (= "email" @(::inviting-from s))})}
             "Email"]
-          (let [slack-enabled? (:can-slack-invite team-data)]
+          (let [has-slack-org? (:has-slack-org team-data)
+                slack-enabled? (:can-slack-invite team-data)]
             [:div.org-settings-panel-choice
               {:on-click #(when slack-enabled?
                             (user-type-did-change s invite-users "slack"))
+               :data-toggle (when-not slack-enabled? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title (if has-slack-org?
+                        "Enable Carrot bot for Slack"
+                        "Enable Slack for Carrot")
                :class (utils/class-set {:disabled (not slack-enabled?)
                                         :active (= "slack" @(::inviting-from s))})}
               "Slack"])]
