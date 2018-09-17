@@ -3,19 +3,6 @@ div.activity-move {
   height: 166px;
   z-index: 1000;
 
-  div.triangle {
-    position: absolute;
-    top: -7px;
-    left: calc(100% - 30px);
-    background-color: white;
-    border-top: 1px solid rgba(177,184,192,0.50);
-    border-left: 1px solid rgba(177,184,192,0.50);
-    transform: rotate(45deg);
-    width: 15px;
-    height: 15px;
-    z-index: 1001
-  }
-
   div.move-post-inner {
     background-color: white;
     border: 1px solid rgba(177,184,192,0.50);

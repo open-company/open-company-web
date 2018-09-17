@@ -44,7 +44,6 @@
                     (utils/event-stop %)
                     (when @(::show-boards-list s)
                       (reset! (::show-boards-list s) false)))}
-      [:div.triangle]
       [:div.move-post-inner
         [:div.move-post-title
           "Move"]
