@@ -23,6 +23,10 @@
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (rum/ref-node s "emoji-picker"))
     (remove-markers s)
+    (when @(::visible s)
+      (let [will-close-picker (:will-close-picker (first (:rum/args s)))]
+        (when (fn? will-close-picker)
+          (will-close-picker))))
     (reset! (::visible s) false)))
 
 (defn save-caret-position [s]
@@ -107,7 +111,8 @@
                           ::focusout-listener
                           ::ff-window-click
                           ::ff-keypress))}
-  [s {:keys [add-emoji-cb position width height container-selector force-enabled default-field-selector]
+  [s {:keys [add-emoji-cb position width height container-selector force-enabled default-field-selector
+             will-open-picker will-close-picker]
       :as arg
       :or {position "top"
            width 25
@@ -129,11 +134,16 @@
          :disabled (and (not default-field-selector) (not force-enabled) @(::disabled s))
          :on-mouse-down #(when (or default-field-selector force-enabled (not @(::disabled s)))
                            (save-caret-position s)
-                             (let [vis (and (or default-field-selector
-                                                force-enabled
-                                                @caret-pos)
-                                            (not @visible))]
-                               (reset! visible vis)))}]
+                           (let [vis (and (or default-field-selector
+                                              force-enabled
+                                              @caret-pos)
+                                          (not @visible))]
+                             (if vis
+                               (when (fn? will-open-picker)
+                                 (will-open-picker vis))
+                               (when (fn? will-close-picker)
+                                 (will-close-picker vis)))
+                             (reset! visible vis)))}]
      (when @visible
        [:div.picker-container
          {:class (utils/class-set {position true})}
@@ -150,6 +160,8 @@
                              (replace-with-emoji caret-pos emoji)
                              (remove-markers s)
                              (.focus @last-active-element))
+                           (when (fn? will-close-picker)
+                             (will-close-picker))
                            (reset! visible false)
                            (when (fn? add-emoji-cb)
                              (add-emoji-cb @last-active-element emoji add-emoji?))))}))])]))
