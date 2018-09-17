@@ -251,7 +251,7 @@ $h2_top_margin: 24;
 
   h2 {
     @include avenir_H();
-    font-size: #{$font-size}px;
+    font-size: #{$font-size + 2}px;
     line-height: #{$separator}px
   }
 
