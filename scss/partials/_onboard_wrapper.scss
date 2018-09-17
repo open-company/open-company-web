@@ -238,7 +238,7 @@ div.onboard-lander {
     div.title {
       @include avenir_H();
       font-size: 32px;
-      margin-top: 80px;
+      margin-top: 56px;
 
       @include mobile() {
         margin-top: 0px;
