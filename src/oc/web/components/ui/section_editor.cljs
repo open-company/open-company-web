@@ -82,11 +82,10 @@
         (when (:section-name-error section-editing)
           (dis/dispatch! [:input [:section-editing :section-name-error] nil]))
         (if (>= (count sec-name) section-actions/min-section-name-length)
-          (if (not= (:slug section-editing) utils/default-section-slug)
-            (do
-              (section-actions/pre-flight-check sec-name)
-              (reset! (::pre-flight-check s) true))
-            (reset! (::pre-flight-check s) false))
+          (do
+            (section-actions/pre-flight-check (when @(::editing-existing-section s) (:slug section-editing))
+             sec-name)
+            (reset! (::pre-flight-check s) true))
           (reset! (::pre-flight-check s) false))))))
 
 (rum/defcs section-editor < rum/reactive
@@ -130,7 +129,7 @@
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
                                    (dismiss))))
                               s)
-                             :did-remount (fn [_ s]
+                             :will-update (fn [s]
                               (let [section-editing @(drv/get-ref s :section-editing)]
                                 (when @(::pre-flight-check s)
                                   (when-not (:pre-flight-loading section-editing)
