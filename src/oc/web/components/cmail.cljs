@@ -266,41 +266,34 @@
                     ;; Handle saving/publishing states to dismiss the component
                     (let [cmail-data @(drv/get-ref s :cmail-data)]
                       ;; Entry is saving
-                      (when @(::saving s)
-                        ;: Save request finished
-                        (when-not (:loading cmail-data)
-                          (reset! (::saving s) false)
-                          (when-not (:error cmail-data)
-                            (real-close)
-                            (let [to-draft? (not= (:status cmail-data) "published")]
-                              ;; If it's not published already redirect to drafts board
-                              (utils/after 180
-                               #(router/nav!
-                                 (if to-draft?
-                                   (oc-urls/drafts (router/current-org-slug))
-                                   (oc-urls/board (:board-slug cmail-data)))))))))
-                      (when @(::publishing s)
-                        (when-not (:publishing cmail-data)
-                          (reset! (::publishing s) false)
-                          (when-not (:error cmail-data)
-                            (let [redirect? (seq (:board-slug cmail-data))]
-                              ;; Redirect to the publishing board if the slug is available
-                              (when redirect?
-                                (real-close)
-                                (utils/after
-                                 180
-                                 #(let [from-ap (or (:from-all-posts @router/path)
-                                                    (= (router/current-board-slug) "all-posts"))
-                                        go-to-ap (and (not (:new-section cmail-data))
-                                                      from-ap)]
-                                    ;; Show the first post added tooltip if needed
-                                    (nux-actions/show-post-added-tooltip)
-                                    ;; Redirect to AP if coming from it or if the post is not published
-                                    (router/nav!
-                                      (if go-to-ap
-                                        (oc-urls/all-posts (router/current-org-slug))
-                                        (oc-urls/board (router/current-org-slug)
-                                         (:board-slug cmail-data))))))))))))
+                      ;: and save request finished
+                      (when (and @(::saving s)
+                                 (not (:loading cmail-data)))
+                        (reset! (::saving s) false)
+                        (when-not (:error cmail-data)
+                          (real-close)))
+                      (when (and @(::publishing s)
+                                 (not (:publishing cmail-data)))
+                        (reset! (::publishing s) false)
+                        (when-not (:error cmail-data)
+                          (let [redirect? (seq (:board-slug cmail-data))]
+                            ;; Redirect to the publishing board if the slug is available
+                            (when redirect?
+                              (real-close)
+                              (utils/after
+                               180
+                               #(let [from-ap (or (:from-all-posts @router/path)
+                                                  (= (router/current-board-slug) "all-posts"))
+                                      go-to-ap (and (not (:new-section cmail-data))
+                                                    from-ap)]
+                                  ;; Show the first post added tooltip if needed
+                                  (nux-actions/show-post-added-tooltip)
+                                  ;; Redirect to AP if coming from it or if the post is not published
+                                  (router/nav!
+                                    (if go-to-ap
+                                      (oc-urls/all-posts (router/current-org-slug))
+                                      (oc-urls/board (router/current-org-slug)
+                                       (:board-slug cmail-data)))))))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)
