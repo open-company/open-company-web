@@ -771,6 +771,9 @@
 
 (defn activity-edit
   [activity-data]
-  (if (responsive/is-tablet-or-mobile?)
-    (entry-edit activity-data)
-    (cmail-show activity-data)))
+  (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
+                              (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
+                              activity-data)]
+    (if (responsive/is-tablet-or-mobile?)
+      (entry-edit fixed-activity-data)
+      (cmail-show fixed-activity-data))))
