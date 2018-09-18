@@ -56,11 +56,15 @@
       (fn [status body success]
         (section-get-finish (json->cljs body))))))
 
+(declare refresh-org-data)
+
 (defn section-change
   [section-uuid]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)]
+      (when (= section-uuid (:uuid utils/default-drafts-board))
+        (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
         (api/get-board (utils/link-for (:links current-section-data) "self")

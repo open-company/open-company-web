@@ -9,6 +9,9 @@ div.stream-item {
   @include mobile() {
     width: 100%;
     padding: 24px 16px;
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid #ECECEC;
   }
 
   &.new-item {
