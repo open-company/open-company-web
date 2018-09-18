@@ -67,6 +67,13 @@
       (alert-modal/show-alert alert-data))
     (real-close-cb current-user-data)))
 
+(defn error-cb [res error]
+  (notification-actions/show-notification
+    {:title "Image upload error"
+     :description "An error occurred while processing your image. Please retry."
+     :expire 5
+     :dismiss true}))
+
 (defn success-cb
   [res]
   (let [url    (googobj/get res "url")
@@ -77,19 +84,13 @@
          :description "An error occurred while processing the image URL. Please try again."
          :expire 5})
       (do
+        (set! (.-onerror node) #(error-cb nil nil))
         (set! (.-onload node) #(img-on-load url node))
         (set! (.-className node) "hidden")
         (gdom/append (.-body js/document) node)
         (set! (.-src node) url)))))
 
 (defn progress-cb [res progress])
-
-(defn error-cb [res error]
-  (notification-actions/show-notification
-    {:title "Image upload error"
-     :description "An error occurred while processing your image. Please retry."
-     :expire 5
-     :dismiss true}))
 
 (defn upload-user-profile-pictuer-clicked []
   (iu/upload! user-utils/user-avatar-filestack-config success-cb progress-cb error-cb))
