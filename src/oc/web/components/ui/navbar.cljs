@@ -6,8 +6,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
@@ -76,9 +76,13 @@
                                 (dis/dispatch! [:input [:org-settings] nil]))
                               (when mobile-menu-open
                                 (dis/dispatch! [:input [:mobile-menu-open] (not mobile-menu-open)]))))}]
-           (search-box)]
+           (if is-mobile?
+             (search-box)
+             (orgs-dropdown))]
           [:div.navbar-center
-            (orgs-dropdown)]
+            (if is-mobile?
+             (orgs-dropdown)
+             (search-box))]
           [:div.navbar-right
             (if is-mobile?
               [:button.btn-reset.mobile-menu.group

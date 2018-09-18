@@ -23,7 +23,7 @@
      {:on-click (fn [s]
                   (search/result-clicked activity-url)
                   s)}
-     [:div.author
+     [:div.search-result-box
       (user-avatar-image {:user-id (first (:author-id result))
                           :name author
                           :avatar-url (first (:author-url result))} false)
@@ -50,7 +50,7 @@
 
 (rum/defcs results-header < rum/static
   [s search-results]
-  [:div.header
+  [:div.header.group
    [:span "SEARCH RESULTS"]
    (when (pos? (:count search-results))
      [:span.count (str "(" (:count search-results) ")")])])
@@ -135,16 +135,22 @@
   (when (store/should-display)
     (let [search-active? (drv/react s store/search-active?)]
       [:div.search-box {:class (when @(::search-clicked? s) "active")}
-        [:button.search-close {:class (when-not @(::search-clicked? s)
-                                        "inactive")
-                               :on-click #(search-inactive s)}]
+        [:button.search-close
+          {:on-click #(search-inactive s)}]
+        [:div.spyglass-icon
+          {:on-click #(reset! (::search-clicked? s) true)}]
         [:input.search
           {:class (when-not @(::search-clicked? s) "inactive")
            :ref "search-input"
-           :placeholder (when-not (responsive/is-mobile-size?) "Search")
+           :placeholder (when-not (responsive/is-mobile-size?) "Search posts…")
            :on-click #(reset! (::search-clicked? s) true)
-           :on-blur #(when (responsive/is-mobile-size?)
-                       (set! (.-placehoder (.-target %)) ""))
+           :on-blur #(do
+                       (when (responsive/is-mobile-size?)
+                        (set! (.-placehoder (.-target %)) ""))
+                       (let [search-input (.-target %)
+                             search-query (.-value search-input)]
+                        (when-not (seq (utils/trim search-query))
+                          (search-inactive s))))
            :on-focus #(let [search-input (.-target %)
                             search-query (.-value search-input)]
                         (reset! (::search-clicked? s) true)
@@ -153,5 +159,4 @@
                           (set! (.-placeholder search-input) "Search"))
                         (search/query search-query))
            :on-change #(search/query (.-value (.-target %)))}]
-       [:div.triangle {:class (when-not search-active? "inactive")}]
        (when-not (responsive/is-mobile-size?)(search-results-view))])))

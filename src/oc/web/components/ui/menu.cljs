@@ -94,8 +94,7 @@
       [:div.oc-menu-separator]
       (when org-data
         [:div.org-item
-          [:div.org-avatar-border
-            (org-avatar org-data false false true)]
+          (org-avatar org-data false false true)
           [:div.org-name (:name org-data)]
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
       (when (and (not is-mobile?)
