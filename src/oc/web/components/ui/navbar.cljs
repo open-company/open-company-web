@@ -92,9 +92,13 @@
                                 (dis/dispatch! [:input [:org-settings] nil]))
                               (when mobile-menu-open
                                 (dis/dispatch! [:input [:mobile-menu-open] (not mobile-menu-open)]))))}]
-           (search-box)]
+           (if is-mobile?
+             (search-box)
+             (orgs-dropdown))]
           [:div.navbar-center
-            (orgs-dropdown)]
+            (if is-mobile?
+             (orgs-dropdown)
+             (search-box))]
           [:div.navbar-right
             (if is-mobile?
               [:button.btn-reset.mobile-menu.group

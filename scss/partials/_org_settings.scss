@@ -56,8 +56,6 @@ div.org-settings {
 
       div.org-settings-header-avatar {
         float: left;
-        border: 1px solid #D8DBDF;
-        border-radius: 4px;
         width: 48px;
         height: 48px;
         padding: 3px;
@@ -67,6 +65,8 @@ div.org-settings {
         }
 
         &.missing-logo {
+          border: 1px solid #D8DBDF;
+          border-radius: 4px;
           &:hover {
             background-color: $carrot_green;
 
@@ -89,7 +89,17 @@ div.org-settings {
           }
         }
 
-        @include org-avatar(40);
+        @include org-avatar(48);
+
+        div.org-avatar-container img.org-avatar-img {
+          padding: 4px;
+        }
+
+        &:hover {
+          div.org-avatar-container img.org-avatar-img {
+            border: 1px solid $carrot_green;
+          }
+        }
 
         div.org-avatar.missing-logo {
           div.org-avatar-container.no-avatar.force-label {
@@ -102,10 +112,6 @@ div.org-settings {
 
         div.org-avatar * {
           border-radius: 4px;
-        }
-
-        &.main-panel:hover {
-          border: 1px solid $carrot_green;
         }
       }
 

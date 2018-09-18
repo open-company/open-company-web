@@ -103,8 +103,7 @@ nav.oc-navbar {
 
       div.navbar-left {
         float: left;
-        margin-top: 3px;
-        height: 24px;
+        height: 32px;
 
         @include mobile() {
           width: 40%;
@@ -126,7 +125,9 @@ nav.oc-navbar {
             background-repeat: no-repeat;
             background-size: 19px 19px;
             background-position: center;
-            display: inline;
+            float: left;
+            display: block;
+            margin-top: 4px;
 
             &.close-bt {
               background-image: cdnUrl("/img/ML/black_close.svg");

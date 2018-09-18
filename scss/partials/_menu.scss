@@ -103,22 +103,14 @@ div.menu {
       display: none;
     }
 
-    div.org-avatar-border {
-      border: 1px solid #D8DBDF;
-      border-radius: 6px;
-      padding: 6px;
-      float: left;
+    div.org-avatar {
+      @include org-avatar(32);
       margin-right: 16px;
-      width: 32px;
-      height: 32px;
+      float: left;
 
-      div.org-avatar {
-        @include org-avatar(20);
-
-        div.org-avatar-container {
-          span.org-name {
-            display: none !important;
-          }
+      div.org-avatar-container {
+        span.org-name {
+          display: none !important;
         }
       }
     }
