@@ -243,6 +243,8 @@
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
+   :org-avatar-editing  [[:base]
+                          (fn [base] (:org-avatar-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]
