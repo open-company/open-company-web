@@ -432,13 +432,15 @@ div.cmail-outer {
           background-color: #FDF6E4;
           border-radius: 6px;
           padding: 24px 24px;
-          margin: 32px 0px;
+          margin: 8px 0px;
           position: relative;
-           @include tablet() {
+
+          @include tablet() {
             width: calc(100% - 48px);
             margin: 32px 24px;
           }
-           button.edit-tooltip-dismiss {
+
+          button.edit-tooltip-dismiss {
             position: absolute;
             top: 16px;
             right: 16px;
@@ -449,26 +451,31 @@ div.cmail-outer {
             background-position: center;
             background-repeat: no-repeat;
           }
-           div.edit-tooltips {
+
+          div.edit-tooltips {
             width: 100%;
-             div.edit-tooltip-title {
+
+            div.edit-tooltip-title {
               @include avenir_H();
               font-size: 18px;
               color: $deep_navy;
               line-height: 20px;
             }
-             div.edit-tooltip {
+
+            div.edit-tooltip {
               @include avenir_R();
               font-size: 14px;
               color: $deep_navy;
               line-height: 18px;
               margin-top: 8px;
-               @include tablet() {
+
+              @include tablet() {
                 float: unset;
                 margin: 24px auto 0px;
                 width: 100%;
               }
-               button.edit-tooltip-record-video-bt {
+
+              button.edit-tooltip-record-video-bt {
                 display: inline;
                 background-color: transparent;
                 padding: 0;
