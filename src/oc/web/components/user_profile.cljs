@@ -1,6 +1,5 @@
 (ns oc.web.components.user-profile
   (:require [rum.core :as rum]
-            [goog.dom :as gdom]
             [goog.object :as googobj]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
@@ -46,11 +45,6 @@
                                       :container "body"})
         (.tooltip $header-avatar "destroy")))))
 
-(defn- img-on-load [url img]
-  (dis/dispatch! [:input [:edit-user-profile-avatar] url])
-  (gdom/removeNode img)
-  (user-actions/user-avatar-save url))
-
 (defn close-cb [current-user-data]
   (dis/dispatch! [:input [:latest-entry-point] 0])
   (if (:has-changes current-user-data)
@@ -76,19 +70,15 @@
 
 (defn success-cb
   [res]
-  (let [url    (googobj/get res "url")
-        node   (gdom/createDom "img")]
+  (let [url    (googobj/get res "url")]
     (if-not url
       (notification-actions/show-notification
         {:title "Image upload error"
          :description "An error occurred while processing the image URL. Please try again."
          :expire 5})
       (do
-        (set! (.-onerror node) #(error-cb nil nil))
-        (set! (.-onload node) #(img-on-load url node))
-        (set! (.-className node) "hidden")
-        (gdom/append (.-body js/document) node)
-        (set! (.-src node) url)))))
+        (dis/dispatch! [:input [:edit-user-profile-avatar] url])
+        (user-actions/user-avatar-save url)))))
 
 (defn progress-cb [res progress])
 
