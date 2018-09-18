@@ -86,6 +86,7 @@
   (let [editable (or editable (get-media-picker-extension s))]
     (.saveSelection editable))
   (dis/dispatch! [:input [:media-input :media-video] true])
+  (dis/dispatch! [:input [:cmail-data :has-changes] true])
   (reset! (::media-video s) true))
 
 (defn get-video-thumbnail [video]
