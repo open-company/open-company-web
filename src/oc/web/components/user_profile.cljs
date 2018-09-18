@@ -34,8 +34,8 @@
   (utils/after 100
    #(let [header-avatar (rum/ref-node s "user-profile-header-avatar")
           $header-avatar (js/$ header-avatar)
-          current-user-data (:user-data @(drv/get-ref s :edit-user-profile))
-          title (if (empty? (:avatar-url current-user-data))
+          edit-user-profile-avatar @(drv/get-ref s :edit-user-profile-avatar)
+          title (if (empty? edit-user-profile-avatar)
                   "Add a photo"
                   "Change photo")
           profile-tab? (.hasClass $header-avatar "profile-tab")]
@@ -47,9 +47,9 @@
         (.tooltip $header-avatar "destroy")))))
 
 (defn- img-on-load [url img]
-  (dis/dispatch! [:input [:edit-user-profile :avatar-url] url])
-  (dis/dispatch! [:input [:edit-user-profile :has-changes] true])
-  (gdom/removeNode img))
+  (dis/dispatch! [:input [:edit-user-profile-avatar] url])
+  (gdom/removeNode img)
+  (user-actions/user-avatar-save url))
 
 (defn close-cb [current-user-data]
   (dis/dispatch! [:input [:latest-entry-point] 0])
@@ -100,6 +100,7 @@
                           (drv/drv :alert-modal)
                           (drv/drv :edit-user-profile)
                           (drv/drv :user-settings)
+                          (drv/drv :edit-user-profile-avatar)
                           ;; Mixins
                           no-scroll-mixin
                           {:will-mount (fn [s]
@@ -118,7 +119,9 @@
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         tab (drv/react s :user-settings)
-        org-data (drv/react s :org-data)]
+        org-data (drv/react s :org-data)
+        edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
+        user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})]
     [:div.user-profile.fullscreen-page
       [:div.user-profile-inner
         [:button.mlb-reset.settings-modal-close
@@ -128,7 +131,7 @@
             {:ref "user-profile-header-avatar"
              :class (utils/class-set {:profile-tab (= tab :profile)})
              :on-click #(upload-user-profile-pictuer-clicked)}
-            (user-avatar-image current-user-data)]
+            (user-avatar-image user-for-avatar)]
           [:div.user-profile-header-name
             (clojure.string/trim
              (str (:first-name current-user-data) " " (:last-name current-user-data)))]

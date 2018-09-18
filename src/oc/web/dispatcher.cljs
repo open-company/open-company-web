@@ -224,6 +224,7 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
+   :edit-user-profile-avatar [[:base] (fn [base] (:edit-user-profile-avatar base))]
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
