@@ -72,10 +72,7 @@
   [res]
   (let [url    (googobj/get res "url")]
     (if-not url
-      (notification-actions/show-notification
-        {:title "Image upload error"
-         :description "An error occurred while processing the image URL. Please try again."
-         :expire 5})
+      (error-cb nil nil)
       (do
         (dis/dispatch! [:input [:edit-user-profile-avatar] url])
         (user-actions/user-avatar-save url)))))
