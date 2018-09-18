@@ -269,41 +269,34 @@
                       (when (:delete cmail-data)
                         (real-close))
                       ;; Entry is saving
-                      (when @(::saving s)
-                        ;: Save request finished
-                        (when-not (:loading cmail-data)
-                          (reset! (::saving s) false)
-                          (when-not (:error cmail-data)
-                            (real-close)
-                            (let [to-draft? (not= (:status cmail-data) "published")]
-                              ;; If it's not published already redirect to drafts board
-                              (utils/after 180
-                               #(router/nav!
-                                 (if to-draft?
-                                   (oc-urls/drafts (router/current-org-slug))
-                                   (oc-urls/board (:board-slug cmail-data)))))))))
-                      (when @(::publishing s)
-                        (when-not (:publishing cmail-data)
-                          (reset! (::publishing s) false)
-                          (when-not (:error cmail-data)
-                            (let [redirect? (seq (:board-slug cmail-data))]
-                              ;; Redirect to the publishing board if the slug is available
-                              (when redirect?
-                                (real-close)
-                                (utils/after
-                                 180
-                                 #(let [from-ap (or (:from-all-posts @router/path)
-                                                    (= (router/current-board-slug) "all-posts"))
-                                        go-to-ap (and (not (:new-section cmail-data))
-                                                      from-ap)]
-                                    ;; Show the first post added tooltip if needed
-                                    (nux-actions/show-post-added-tooltip)
-                                    ;; Redirect to AP if coming from it or if the post is not published
-                                    (router/nav!
-                                      (if go-to-ap
-                                        (oc-urls/all-posts (router/current-org-slug))
-                                        (oc-urls/board (router/current-org-slug)
-                                         (:board-slug cmail-data))))))))))))
+                      ;: and save request finished
+                      (when (and @(::saving s)
+                                 (not (:loading cmail-data)))
+                        (reset! (::saving s) false)
+                        (when-not (:error cmail-data)
+                          (real-close)))
+                      (when (and @(::publishing s)
+                                 (not (:publishing cmail-data)))
+                        (reset! (::publishing s) false)
+                        (when-not (:error cmail-data)
+                          (let [redirect? (seq (:board-slug cmail-data))]
+                            ;; Redirect to the publishing board if the slug is available
+                            (when redirect?
+                              (real-close)
+                              (utils/after
+                               180
+                               #(let [from-ap (or (:from-all-posts @router/path)
+                                                  (= (router/current-board-slug) "all-posts"))
+                                      go-to-ap (and (not (:new-section cmail-data))
+                                                    from-ap)]
+                                  ;; Show the first post added tooltip if needed
+                                  (nux-actions/show-post-added-tooltip)
+                                  ;; Redirect to AP if coming from it or if the post is not published
+                                  (router/nav!
+                                    (if go-to-ap
+                                      (oc-urls/all-posts (router/current-org-slug))
+                                      (oc-urls/board (router/current-org-slug)
+                                       (:board-slug cmail-data)))))))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)
@@ -321,7 +314,7 @@
         show-sections-picker (drv/react s :show-sections-picker)
         published? (= (:status cmail-data) "published")
         video-size {:width 548
-                    :height 322}]
+                    :height (utils/calc-video-height 548)}]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
                                                  (:fullscreen cmail-state))
@@ -330,7 +323,7 @@
         [:div.cmail-container
           [:div.cmail-header
             {:class (when (:must-see cmail-data) "must-see-on")}
-            [:div.must-see-toogle-container
+            [:div.must-see-toggle-container
               {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle
                 {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
@@ -344,9 +337,7 @@
               (if (seq (:headline cmail-data))
                 (:headline cmail-data)
                 utils/default-headline)]
-            (let [long-tooltip (and (not= (:status cmail-data) "published")
-                                    (or (:has-changes cmail-data)
-                                        (:auto-saving cmail-data)))]
+            (let [long-tooltip (not= (:status cmail-data) "published")]
               [:div.close-bt-container
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
@@ -359,16 +350,24 @@
                    :data-trigger "hover"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                    :title (if long-tooltip
-                        "Save & Close"
-                        "Close")}]])
+                            "Save & Close"
+                            "Close")}]])
             [:div.fullscreen-bt-container
               [:button.mlb-reset.fullscreen-bt
-                {:on-click #(activity-actions/cmail-toggle-fullscreen)
+                {:on-click #(if (:collapse cmail-state)
+                              (do
+                                (activity-actions/cmail-toggle-collapse)
+                                (when-not (:fullscreen cmail-state)
+                                  (activity-actions/cmail-toggle-fullscreen)))
+                              (activity-actions/cmail-toggle-fullscreen))
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if (:fullscreen cmail-state) "Exit fullscreen" "Fullscreen")}]]
+                 :title (if (and (:fullscreen cmail-state)
+                                 (not (:collapse cmail-state)))
+                          "Shrink"
+                          "Expand")}]]
             [:div.collapse-bt-container
               [:button.mlb-reset.collapse-bt
                 {:on-click #(activity-actions/cmail-toggle-collapse)
@@ -376,7 +375,7 @@
                  :data-placement "top"
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if (:collapse cmail-state) "Expand" "Collapse")}]]]
+                 :title (if (:collapse cmail-state) "Show" "Collapse")}]]]
           [:div.cmail-section
             [:div.board-name
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))

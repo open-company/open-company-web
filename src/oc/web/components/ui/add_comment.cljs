@@ -22,6 +22,17 @@
 (defn editable-input-change [s editable event]
   (enable-add-comment? s))
 
+(defn add-comment-focus [s]
+  (enable-add-comment? s)
+  (comment-actions/add-comment-focus (:uuid (first (:rum/args s)))))
+
+(defn disable-add-comment-if-needed [s]
+  (let [add-comment-node (rum/ref-node s "add-comment")]
+    (enable-add-comment? s)
+    (when (and (zero? (count (.-innerText add-comment-node)))
+               (not @(::emoji-picker-open s)))
+      (comment-actions/add-comment-blur))))
+
 (rum/defcs add-comment < rum/reactive
                          rum/static
                          ;; Mixins
@@ -34,6 +45,7 @@
                          (rum/local nil ::esc-key-listener)
                          (rum/local nil ::focus-listener)
                          (rum/local nil ::blur-listener)
+                         (rum/local false ::emoji-picker-open)
                          {:did-mount (fn [s]
                            (utils/after 2500 #(js/emojiAutocomplete))
                            (let [add-comment-node (rum/ref-node s "add-comment")
@@ -44,15 +56,10 @@
                               (partial editable-input-change s))
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
-                               (fn [e]
-                                 (enable-add-comment? s)
-                                 (comment-actions/add-comment-focus (:uuid (first (:rum/args s)))))))
+                               #(add-comment-focus s)))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
-                               (fn [e]
-                                 (enable-add-comment? s)
-                                 (when (zero? (count (.-innerText add-comment-node)))
-                                   (comment-actions/add-comment-blur)))))
+                               #(disable-add-comment-if-needed s)))
                              (reset! (::esc-key-listener s)
                                (events/listen
                                 js/window
@@ -105,19 +112,24 @@
                                                     false))
                                                  (enable-add-comment? s)))))
                            :force-enabled true
+                           :will-open-picker #(reset! (::emoji-picker-open s) true)
+                           :will-close-picker #(do
+                                                 (reset! (::emoji-picker-open s) false)
+                                                 (when-not add-comment-focus
+                                                   (disable-add-comment-if-needed s)))
                            :container-selector "div.add-comment-box"}))]
         (when add-comment-focus
           [:div.add-comment-footer.group
             [:button.mlb-reset.reply-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                 comment-body (cu/add-comment-content add-comment-div)]
-                            (comment-actions/add-comment activity-data comment-body)
-                            (set! (.-innerHTML add-comment-div) ""))
+                            (set! (.-innerHTML add-comment-div) "")
+                            (comment-actions/add-comment activity-data comment-body))
                :disabled @(::add-button-disabled s)}
               "Comment"]
             [:button.mlb-reset.cancel-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                 comment-body (cu/add-comment-content add-comment-div)]
                             (set! (.-innerHTML add-comment-div) "")
-                            (comment-actions/add-comment-focus nil))}
+                            (comment-actions/add-comment-blur))}
               "Cancel"]])]]))

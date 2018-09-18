@@ -249,10 +249,16 @@ $h2_top_margin: 24;
     margin-top: #{$separator}px;
   }
 
+  h2 + p {
+    margin-top: 0px !important;
+  }
+
   h2 {
     @include avenir_H();
-    font-size: #{$font-size}px;
-    line-height: #{$separator}px
+    font-size: #{$font-size + 2}px;
+    line-height: #{$separator}px;
+    padding-bottom: 0px;
+    margin-bottom: 0px !important;
   }
 
   a, span[data-auto-link] {

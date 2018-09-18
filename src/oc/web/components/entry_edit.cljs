@@ -176,7 +176,7 @@
 
 (defn calc-video-height [s]
   (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (* (win-width) (/ 377 640)))))
+    (reset! (::mobile-video-height s) (* (win-width) (/ 3 4)))))
 
 (defn show-post-error [s message]
   (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
@@ -355,7 +355,7 @@
                      {:width (win-width)
                       :height @(::mobile-video-height s)}
                      {:width 640
-                      :height 377})]
+                      :height 480})]
     [:div.entry-edit-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}

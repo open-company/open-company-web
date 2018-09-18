@@ -4,7 +4,9 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.actions.user :as user-actions]
+            [oc.web.actions.routing :as routing-actions]))
 
 (def default-max-logo-height 42)
 
@@ -58,16 +60,18 @@
                                ;; else
                                (not show-org-avatar?))
               avatar-link (when should-show-link
-                            (if (and (= org-slug (router/current-org-slug))
-                                     (router/current-board-slug))
-                              (oc-urls/board org-slug (router/current-board-slug))
-                              (oc-urls/org org-slug)))]
+                            (oc-urls/all-posts org-slug))]
           (if should-show-link
             [:a.org-link
               {:href avatar-link
                :on-click (fn [e]
                            (.preventDefault e)
                            (when should-show-link
-                             (router/redirect! avatar-link)))}
+                             (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
+                              (if (= current-path avatar-link)
+                                (do
+                                  (routing-actions/routing @router/path)
+                                  (user-actions/initial-loading true))
+                                (router/nav! avatar-link)))))}
               (internal-org-avatar s org-data show-org-avatar? show-org-name? force-label)]
             (internal-org-avatar s org-data show-org-avatar? show-org-name? force-label))))]))
