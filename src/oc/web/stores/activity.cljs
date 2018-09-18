@@ -148,7 +148,11 @@
                                     (filter #(not= % (:uuid activity-data)) posts-list)))))
                                db
                                (keys (get-in db containers-key)))]
-    (assoc-in with-fixed-containers posts-key next-posts)))
+    (if (= (:uuid (get-in db [:cmail-data])) (:uuid activity-data))
+      (-> with-fixed-containers
+          (assoc-in [:cmail-data] {:delete true})
+          (assoc-in posts-key next-posts))
+      (assoc-in with-fixed-containers posts-key next-posts))))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
