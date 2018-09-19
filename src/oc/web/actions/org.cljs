@@ -196,6 +196,27 @@
 (defn org-edit-save [org-data]
   (api/patch-org org-data org-edit-save-cb))
 
+(defn org-avatar-edit-save-cb [{:keys [success body status]}]
+  (if success
+    (do
+      (notification-actions/show-notification
+        {:title "Image update succeeded"
+         :description "Your image was succesfully updated."
+         :expire 5
+         :dismiss true})
+      (org-loaded (json->cljs body) false))
+    (do
+      (dis/dispatch! [:org-avatar-update/failed])
+      (notification-actions/show-notification
+       {:title "Image upload error"
+        :description "An error occurred while processing your company avatar. Please retry."
+        :expire 5
+        :id :org-avatar-upload-failed
+        :dismiss true}))))
+
+(defn org-avatar-edit-save [org-avatar-data]
+  (api/patch-org org-avatar-data org-avatar-edit-save-cb))
+
 (defn org-change [data org-data]
   (let [change-data (:data data)
         container-id (:container-id change-data)
