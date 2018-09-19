@@ -55,7 +55,7 @@
     img.org-avatar-img{
       @if $show-border == true {
         border: 1px solid #ECECEC;
-        padding: 2px;
+        padding: 4px;
       }
 
       width: #{$max_logo_height}px;
