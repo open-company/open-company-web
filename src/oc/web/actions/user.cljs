@@ -326,10 +326,10 @@
                             (utils/valid-email? new-email))
                      (assoc with-pswd :email new-email)
                      (assoc with-pswd :email (:email current-user-data)))
-        without-has-changes (dissoc with-email :has-changes :loading)]
+        user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
     (api/patch-user-profile
-     current-user-data
-     without-has-changes
+     user-profile-link
+     with-email
      (fn [status body success]
        (if (= status 422)
          (dis/dispatch! [:user-profile-update/failed])
@@ -337,6 +337,32 @@
            (utils/after 1000 jwt-refresh)
            (dis/dispatch! [:user-data (json->cljs body)])))))
     (dis/dispatch! [:user-profile-save])))
+
+(defn user-avatar-save [avatar-url]
+  (let [user-avatar-data {:avatar-url avatar-url}
+        current-user-data (dis/current-user-data)
+        user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
+    (api/patch-user-profile
+     user-profile-link
+     user-avatar-data
+     (fn [status body success]
+       (if-not success
+         (do
+           (dis/dispatch! [:user-profile-avatar-update/failed])
+           (notification-actions/show-notification
+            {:title "Image upload error"
+             :description "An error occurred while processing your image. Please retry."
+             :expire 5
+             :id :user-avatar-upload-failed
+             :dismiss true}))
+         (do
+           (utils/after 1000 jwt-refresh)
+           (dis/dispatch! [:user-data (json->cljs body)])
+           (notification-actions/show-notification
+            {:title "Image update succeeded"
+             :description "Your image was succesfully updated."
+             :expire 5
+             :dismiss true})))))))
 
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
