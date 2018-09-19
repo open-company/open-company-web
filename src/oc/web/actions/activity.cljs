@@ -252,7 +252,17 @@
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
-                 (let [entry-saved (merge (json->cljs body) {:auto-saving false :has-changes false})]
+                 (let [json-body (json->cljs body)
+                       board-data (if (:slug json-body)
+                                    (au/fix-board json-body)
+                                    false)
+                       entry-pre-merge (if (:fixed-items json-body)
+                                         ;; board creation
+                                         (first (:fixed-items json-body))
+                                         json-body)
+                       entry-saved (merge entry-pre-merge
+                                          {:auto-saving false
+                                           :has-changes false})]
                    (cook/set-cookie! (edit-open-cookie) (:uuid entry-saved) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
@@ -263,10 +273,12 @@
                    ;; this is used to revert if user decides to lose the changes
                    (when (nil? (get @initial-revision (:uuid entry-saved)))
                      (swap! initial-revision assoc (:uuid entry-saved)
-                      (or (:revision-id entry-map) -1)))
+                            (or (:revision-id entry-map) -1)))
+                   (when board-data
+                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key])))))
+                   (dis/dispatch! [:entry-auto-save/finish (merge entry-data-saved entry-saved) edit-key])))))
            (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
 
 (defn entry-toggle-save-on-exit
