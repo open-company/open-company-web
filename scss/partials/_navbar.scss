@@ -123,10 +123,6 @@ nav.oc-navbar {
           height: 32px;
           margin-left: -40px;
           transition: margin-left 0ms ease-in, width 0ms ease-in;
-
-          &.search-active {
-            width: 80px;
-          }
         }
 
         button.orgs-dropdown div.org-avatar {
