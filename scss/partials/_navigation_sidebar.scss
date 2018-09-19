@@ -462,12 +462,6 @@ div.left-navigation-sidebar {
       }
     }
 
-    &:hover, &.show-section-add {
-      button.left-navigation-sidebar-top-title-button {
-        display: block;
-      }      
-    }
-
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
@@ -484,7 +478,6 @@ div.left-navigation-sidebar {
       background-size: 8px 8px;
       border-radius: 10px;
       @include avenir_H();
-      display: none;
 
       @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
 
