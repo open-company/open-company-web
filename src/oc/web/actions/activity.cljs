@@ -239,7 +239,9 @@
   [edit-key activity-data entry-body section-editing]
   (let [entry-map (assoc activity-data :body entry-body)
         cache-key (get-entry-cache-key (:uuid activity-data))]
-    (uc/set-item cache-key entry-map
+    ;; Save the entry in the local cache without auto-saving or
+    ;; we it will be picked up it won't be autosaved
+    (uc/set-item cache-key (dissoc entry-map :auto-saving)
      (fn [err]
        (when-not err
          ;; auto save on drafts that have changes
@@ -247,23 +249,21 @@
                     (:has-changes entry-map)
                     (not (:auto-saving entry-map)))
            ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key]
-                           #(merge % entry-map {:auto-saving true})])
+           (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving true :has-changes false})])
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
-               (when success
+               (if-not success
+                 ;; If save fails let's make sure save will be retried on next call
+                 (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving false :has-changes true})])
                  (let [json-body (json->cljs body)
                        board-data (if (:entries json-body)
                                     (au/fix-board json-body)
                                     false)
                        fixed-items (:fixed-items board-data)
-                       entry-pre-merge (if fixed-items
+                       entry-saved (if fixed-items
                                          ;; board creation
                                          (first (vals fixed-items))
-                                         json-body)
-                       entry-saved (merge entry-pre-merge
-                                          {:auto-saving false
-                                           :has-changes false})]
+                                         json-body)]
                    (cook/set-cookie! (edit-open-cookie) (:uuid entry-saved) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
