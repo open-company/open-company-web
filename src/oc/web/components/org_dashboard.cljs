@@ -145,7 +145,8 @@
                                        entry-not-found))
         is-loading (and (not show-activity-not-found)
                         (not show-activity-removed)
-                        loading?)]
+                        loading?)
+        is-showing-mobile-search (and is-mobile? search-active? (not (router/current-activity-id)))]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -209,7 +210,7 @@
                is-sharing-activity)
           (activity-share)
           ;; Search results
-          (and is-mobile? search-active? (not (router/current-activity-id)))
+          is-showing-mobile-search
           (search-box)
           ;; Show mobile navigation
           (and is-mobile?
@@ -255,5 +256,6 @@
                                   mobile-navigation-sidebar
                                   org-settings-data
                                   user-settings
-                                  mobile-menu-open))
+                                  mobile-menu-open
+                                  is-showing-mobile-search))
                  (dashboard-layout))]]])])))
