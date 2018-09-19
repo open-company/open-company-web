@@ -40,10 +40,6 @@ nav.oc-navbar {
     &.mobile-menu-open {
       height: 100vh;
     }
-
-    &.search-active {
-      height: 100vh;
-    }
   }
 
   z-index: $navbar_zindex;
