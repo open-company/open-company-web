@@ -204,7 +204,7 @@
          :description "Your image was succesfully updated."
          :expire 5
          :dismiss true})
-      (org-loaded (json->cljs body) true))
+      (org-loaded (json->cljs body) false))
     (do
       (dis/dispatch! [:org-avatar-update/failed])
       (notification-actions/show-notification
