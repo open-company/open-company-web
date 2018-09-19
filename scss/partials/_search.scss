@@ -5,6 +5,7 @@ div.search-box {
   border-radius: 4px;
   color: $ui_grey;
   position: relative;
+  transition: width 320ms ease-in, background-color 320ms ease-in;
 
   @include mobile() {
     position: absolute;
@@ -18,6 +19,7 @@ div.search-box {
     padding: 16px 24px 0px;
     border: none;
     box-shadow: none;
+    transition: width 0ms ease-in, background-color 0ms ease-in;
 
     &.active {
       border: none;

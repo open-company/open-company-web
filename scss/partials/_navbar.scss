@@ -111,11 +111,22 @@ nav.oc-navbar {
         margin-left: -160px;
         @include avenir_H();
         font-size: 26px;
+        transition: margin-left 320ms ease-in, width 320ms ease-in;
+
+        &.search-active {
+          width: 430px;
+          margin-left: -215px;
+        }
 
         @include mobile() {
           width: 80px;
           height: 32px;
           margin-left: -40px;
+          transition: margin-left 0ms ease-in, width 0ms ease-in;
+
+          &.search-active {
+            width: 80px;
+          }
         }
 
         button.orgs-dropdown div.org-avatar {

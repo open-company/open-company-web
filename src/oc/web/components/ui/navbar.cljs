@@ -86,6 +86,7 @@
                 :class (when search-active "active")}]
              (orgs-dropdown))]
           [:div.navbar-center
+            {:class (when search-active "search-active")}
             (if is-mobile?
              (orgs-dropdown)
              (search-box))]
