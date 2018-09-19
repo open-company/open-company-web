@@ -53,8 +53,7 @@
                                                (utils/in? (:route @router/path) "dashboard"))
                                 :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
-                                                     (not (:read-only org-data)))
-                                :search-active search-active})}
+                                                     (not (:read-only org-data)))})}
       [:div.mobile-bottom-line
         {:class (utils/class-set {:search search-active
                                   :user-menu (or mobile-menu-open
