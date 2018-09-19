@@ -9,10 +9,10 @@ div.search-box {
 
   @include mobile() {
     position: absolute;
-    top: 59px;
+    top: 57px;
     left: 0px;
     width: 100vw;
-    height: calc(100vh - 59px);
+    height: calc(100vh - 57px);
     background-color: white;
     border-radius: unset;
     z-index: 1081;
