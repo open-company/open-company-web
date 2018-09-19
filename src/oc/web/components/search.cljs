@@ -90,7 +90,7 @@
         [:div.show-more
           {:on-click (fn [e] (reset! (::page-size s)
                                      (+ @(::page-size s) 15)))}
-          [:button] "Show More"])]))
+          [:button.mlb-reset "Show More"]])]))
 
 (defn search-inactive [s]
   (set! (.-value (rum/ref-node s "search-input")) "")
@@ -138,9 +138,14 @@
     (let [search-active? (drv/react s store/search-active?)]
       [:div.search-box
         {:class (when @(::search-clicked? s) "active")
-         :on-click #(reset! (::search-clicked? s) true)}
-        [:button.search-close
-          {:on-click #(search-inactive s)}]
+         :on-click (fn [e]
+                    (when (and (not @(::search-clicked? s))
+                               (not (utils/event-inside? e (rum/ref-node s :search-close))))
+                      (reset! (::search-clicked? s) true)
+                      (utils/after 100 #(.focus (rum/ref-node s "search-input")))))}
+        [:button.mlb-reset.search-close
+          {:ref :search-close
+           :on-click #(search-inactive s)}]
         [:div.spyglass-icon
           {:on-click #(reset! (::search-clicked? s) true)}]
         [:input.search

@@ -29,6 +29,7 @@ div.search-box {
     background-color: white;
     border: 1px solid $light_ui_grey;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
+    width: 430px;
 
     @include mobile() {
       border: 0px solid white;
@@ -41,7 +42,7 @@ div.search-box {
     }
 
     input.search {
-      width: calc(100% - 32px);
+      width: calc(100% - 42px);
       left: 8px;
 
       &:before {
@@ -115,10 +116,10 @@ div.search-box {
     height: 24px;
     background-color: transparent;
     background-image: cdnUrl("/img/ML/black_close.svg");
-    background-size: 15px 15px;
-    background-position: 50%;
+    background-size: 10px 10px;
+    background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.5;
+    opacity: 0.4;
     border: none;
     margin: 0;
     padding: 0;
@@ -133,7 +134,7 @@ div.search-box {
     }
 
     &:hover {
-      opacity: 0.6;
+      opacity: 0.5;
     }
   }
 }
@@ -147,7 +148,7 @@ div.search-results {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   border-radius: 5px;
   margin: 48px 0px 0px 0px;
-  width: 320px;
+  width: 430px;
   text-align: left;
   background-color: white;
   max-height: calc(100vh - 108px);
@@ -165,7 +166,7 @@ div.search-results {
   }
 
   div.header {
-    padding: 20px 16px 10px 16px;
+    padding: 16px 16px 6px 16px;
     color: $deep_navy;
 
     @include mobile() {
@@ -178,10 +179,7 @@ div.search-results {
       line-height: 12px;
       text-transform: uppercase;
       float: left;
-
-      @include mobile() {
-        color: $light_ui_grey;
-      }
+      color: $light_ui_grey;
     }
 
     span.count {
@@ -208,9 +206,13 @@ div.search-results {
 
       div.search-result-box {
         @include avenir_H();
-        padding: 10px 20px 10px 20px;
+        padding: 5px 16px 5px 16px;
 
         @include activity-author();
+
+        div.user-avatar-img-container {
+          margin-right: 16px;
+        }
 
         div.name {
           font-size: 11px;
@@ -220,12 +222,10 @@ div.search-results {
           overflow: hidden;
           text-overflow: ellipsis;
           color: $deep_navy;
-          @include avenir_H();
+          @include avenir_M();
           font-size: 14px;
-
-          @include mobile() {
-            @include avenir_M();
-          }
+          max-width: 100%;
+          white-space: nowrap;
         }
 
         div.time-since {
@@ -252,26 +252,36 @@ div.search-results {
   div.show-more {
     color: $carrot_green_2;
     font-size: 14px;
-    padding: 5px 0px 10px 30px;
+    padding: 5px 16px 10px 16px;
     cursor: pointer;
+    text-align: center;
+    width: 100%;
 
     button {
-      float: left;
       font-size: 14px;
       line-height: 1;
-      width: 15px;
-      height: 15px;
       margin-top: 4px;
-      border: 0px solid transparent;
-      background-color: transparent;
-      background-repeat: no-repeat;
-      background-image: cdnUrl('/img/ML/show_more_arrow.svg');
+      padding-left: 22px;
+      position: relative;
+
+      &:before {
+        position: absolute;
+        content: "";
+        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+        background-size: 14px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 14px;
+        height: 8px;
+        top: 4px;
+        left: 0px;
+      }
     }
   }
 
   div.empty-result {
     width: 100%;
-    padding: 20px;
+    padding: 0px 16px 16px;
     font-size: 16px;
 
     @include mobile() {
@@ -287,13 +297,9 @@ div.search-results {
     div.message {
       margin: auto;
       width: 100%;
-      color: rgba($carrot_light_gray_3, 0.4);
-
-      @include mobile() {
-        @include avenir_R();
-        font-size: 14px;
-        color: $deep_navy;
-      }
+      @include avenir_R();
+      font-size: 14px;
+      color: $deep_navy;
     }
   }
 }

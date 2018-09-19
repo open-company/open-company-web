@@ -45,6 +45,10 @@
         display: inline-block;
         float: left;
         margin: -#{($max_logo_height / 2) + ($max_logo_height / 4)}px 0 0 #{$max_logo_height + 8}px;
+
+        @include mobile() {
+          display: none;
+        }
       }
     }
 
@@ -71,6 +75,10 @@
       text-overflow: ellipsis;
       overflow: hidden;
       width: 100%;
+
+      @include mobile() {
+        display: none;
+      }
 
       &.no-logo {
         @include mobile(){
