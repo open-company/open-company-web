@@ -7,6 +7,14 @@ div.search-box {
   position: relative;
   transition: width 320ms ease-in, background-color 320ms ease-in;
 
+  &:not(.active) {
+    cursor: pointer;
+
+    input.search {
+      cursor: pointer;
+    }
+  }
+
   @include mobile() {
     position: absolute;
     top: 57px;
