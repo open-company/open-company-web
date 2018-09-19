@@ -116,10 +116,10 @@ div.search-box {
     height: 24px;
     background-color: transparent;
     background-image: cdnUrl("/img/ML/black_close.svg");
-    background-size: 15px 15px;
-    background-position: 50%;
+    background-size: 10px 10px;
+    background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.2;
+    opacity: 0.4;
     border: none;
     margin: 0;
     padding: 0;
@@ -134,7 +134,7 @@ div.search-box {
     }
 
     &:hover {
-      opacity: 0.3;
+      opacity: 0.5;
     }
   }
 }
