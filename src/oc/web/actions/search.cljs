@@ -22,11 +22,9 @@
 (defn query
   "Use the search service to query for results."
   [search-query]
-  (if (> (count search-query) 1)
-    (do
-      (active)
-      (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
-    (reset)))
+  (when (> (count search-query) 1)
+    (active)
+    (api/query (:uuid (dispatcher/org-data)) search-query query-finished)))
 
 (defn result-clicked [url]
   (dispatcher/dispatch! [:search-result-clicked])

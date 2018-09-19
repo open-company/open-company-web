@@ -7,25 +7,21 @@ div.search-box {
   position: relative;
 
   @include mobile() {
-    float: left;
-    margin-left: 24px;
-    width: auto;
-    background-color: transparent;
+    position: absolute;
+    top: 59px;
+    left: 0px;
+    width: 100vw;
+    height: calc(100vh - 59px);
+    background-color: white;
     border-radius: unset;
-    position: relative;
+    z-index: 1081;
+    padding: 16px 24px 0px;
+    border: none;
+    box-shadow: none;
 
     &.active {
-      min-height: 40px;
-      margin-left: 0px;
-      position: absolute;
-      min-width: 160px;
-      width: 100vw;
-      height: 100vh;
-      top: 0px;
-      left: 0px;
-      background-color: white;
-      z-index: 1081;
-      padding: 14px 24px;
+      border: none;
+      box-shadow: none;
     }
   }
 
@@ -34,27 +30,19 @@ div.search-box {
     border: 1px solid $light_ui_grey;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
 
+    @include mobile() {
+      border: 0px solid white;
+      box-shadow: none;
+    }
+
     div.spyglass-icon {
       left: 8px;
       opacity: 0.5;
-
-      @include mobile() {
-        left: 26px;
-        top: 24px;
-      }
     }
 
     input.search {
       width: calc(100% - 32px);
       left: 8px;
-
-      @include mobile() {
-        margin: 0;
-        padding: 0 0 0 40px;
-        top: 20px;
-        left: 24px;
-        width: calc(100% - 84px);
-      }
 
       &:before {
         opacity: 0.4;
@@ -62,19 +50,6 @@ div.search-box {
 
       &::placeholder {
         color: $deep_navy;
-      }
-    }
-  }
-
-  &:not(.active) {
-    input.search {
-      @include mobile() {
-        position: relative;
-        left: unset;
-        top: unset;
-        padding: 6px 0px 0px 31px;
-        width: 20px;
-        height: 20px;
       }
     }
   }
@@ -91,9 +66,7 @@ div.search-box {
     top: 8px;
 
     @include mobile() {
-      position: absolute;
-      left: 8vw;
-      top: 8px;
+      display: none;
     }
   }
 
@@ -117,15 +90,23 @@ div.search-box {
     }
 
     @include mobile() {
-      margin: 5px 0px 0px 26px;
-      padding: 2px 0px 0px 31px;
-      width: auto;
+      position: relative;
+      left: unset;
+      top: unset;
+      width: calc(100% - 24px);
+      height: 24px;
+      padding: 0;
+      margin: 0 0 12px 0;
     }
   }
 
   &:not(.active) {
     button.search-close {
       display: none;
+
+      @include mobile() {
+        display: block;
+      }
     }
   }
 
@@ -148,7 +129,7 @@ div.search-box {
 
     @include mobile() {
       right: 24px;
-      top: 20px;
+      top: 16px;
     }
 
     &:hover {
@@ -172,22 +153,24 @@ div.search-results {
   max-height: calc(100vh - 108px);
 
   @include mobile() {
-    position: absolute;
-    top: 56px;
-    left: 0px;
+    position: relative;
+    box-shadow: none;
     width: 100vw;
-    background-color: white;
-    z-index: 1081;
-    margin: -1px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     border-radius: 0;
-    max-height: initial;
-    height: calc(100vh - 56px);
+    border: none;
+    margin-left: -24px;
+    border-top: 1px solid #ECECEC;
   }
 
   div.header {
     padding: 20px 16px 10px 16px;
     color: $deep_navy;
+
+    @include mobile() {
+      padding: 20px 24px 10px 24px;
+    }
 
     span {
       @include avenir_H();
@@ -195,6 +178,10 @@ div.search-results {
       line-height: 12px;
       text-transform: uppercase;
       float: left;
+
+      @include mobile() {
+        color: $light_ui_grey;
+      }
     }
 
     span.count {
@@ -207,7 +194,7 @@ div.search-results {
     max-height: calc(100vh - 180px - 47px);
 
     @include mobile() {
-      max-height: calc(100vh - 80px - 47px);
+      max-height: calc(100vh - 80px - 33px);
     }
 
     div.search-result {
@@ -235,6 +222,10 @@ div.search-results {
           color: $deep_navy;
           @include avenir_H();
           font-size: 14px;
+
+          @include mobile() {
+            @include avenir_M();
+          }
         }
 
         div.time-since {
@@ -283,6 +274,11 @@ div.search-results {
     padding: 20px;
     font-size: 16px;
 
+    @include mobile() {
+      padding: 6px 24px;
+      width: auto;
+    }
+
     img {
       margin: auto;
       display: block;
@@ -292,6 +288,12 @@ div.search-results {
       margin: auto;
       width: 100%;
       color: rgba($carrot_light_gray_3, 0.4);
+
+      @include mobile() {
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+      }
     }
   }
 }

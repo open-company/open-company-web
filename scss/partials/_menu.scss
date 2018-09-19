@@ -45,7 +45,7 @@ div.menu {
 
   @include mobile() {
     position: relative;
-    top: 0px;
+    top: 1px;
     left: 0px;
     width: 100%;
     height: calc(100vh - 64px);
