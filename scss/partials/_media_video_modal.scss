@@ -5,7 +5,7 @@ div.media-video-modal-container {
   top: 0px;
   left: 0px;
   background-color: $carrot_modal_bg;
-  z-index: #{$navbar_zindex + 106};
+  z-index: #{$navbar_zindex + 126};
   transition: opacity 180ms ease-in;
 
   &.will-appear {

@@ -52,6 +52,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
+                                (drv/drv :show-section-add)
                                 (drv/drv :change-cache-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
@@ -130,6 +131,7 @@
             [:div.all-posts-icon
               {:class (when is-all-posts "selected")}]
             [:div.all-posts-label
+              {:class (utils/class-set {:new (seq (apply concat (map :unseen (vals change-data))))})}
               "All posts"]])
         (when show-all-posts
            [:a.must-see.hover-item.group
@@ -143,7 +145,8 @@
                "Must see"]])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
-                draft-posts (dis/draft-posts-data)]
+                draft-posts (dis/draft-posts-data)
+                draft-count (or (count draft-posts) (:count drafts-link))]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-all-posts)
                                  (= (router/current-board-slug) (:slug drafts-board)))
@@ -154,12 +157,12 @@
                :on-click #(nav-actions/nav-to-url! % board-url)}
               [:div.drafts-label.group
                 "Drafts "
-                (when (or (pos? (count draft-posts))
-                          (pos? (:count drafts-link)))
-                  [:span.count "(" (or (count draft-posts) (:count drafts-link)) ")"])]]))
+                (when (pos? draft-count)
+                  [:span.count "(" draft-count ")"])]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
+            {:class (when (drv/react s :show-section-add) "show-section-add")}
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:span
@@ -167,6 +170,7 @@
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
+                   :class (when (drv/react s :show-section-add) "active")
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")

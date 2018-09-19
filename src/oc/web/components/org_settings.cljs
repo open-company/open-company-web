@@ -16,6 +16,7 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
@@ -78,39 +79,50 @@
         (alert-modal/show-alert alert-data))
       (dismiss-modal))))
 
-(defn logo-on-load [org-data url img]
-  (dis/dispatch! [:input [:org-editing] (merge org-data {:has-changes true
-                                                         :logo-url url
-                                                         :logo-width (.-width img)
-                                                         :logo-height (.-height img)})])
+(defn logo-on-load [org-avatar-editing url img]
+  (org-actions/org-avatar-edit-save {:logo-url url
+                                     :logo-width (.-width img)
+                                     :logo-height (.-height img)})
   (gdom/removeNode img))
 
 (defn logo-add-error
   "Show an error alert view for failed uploads."
-  []
-  (let [alert-data {:icon "/img/ML/error_icon.png"
-                    :action "org-settings-main-logo-upload-error"
-                    :title "Sorry!"
-                    :message "An error occurred with your image."
-                    :solid-button-title "OK"
-                    :solid-button-cb #(alert-modal/hide-alert)}]
-    (alert-modal/show-alert alert-data)))
+  [img]
+  (notification-actions/show-notification
+   {:title "Image upload error"
+    :description "An error occurred while processing your company avatar. Please retry."
+    :expire 5
+    :id :org-avatar-upload-failed
+    :dismiss true})
+  (when img
+    (gdom/removeNode img)))
 
 (defn- update-tooltip [s]
   (utils/after 100
    #(let [header-logo (rum/ref-node s "org-settings-header-logo")
           $header-logo (js/$ header-logo)
-          org-editing @(drv/get-ref s :org-editing)
-          title (if (empty? (:logo-url org-editing))
+          org-avatar-editing @(drv/get-ref s :org-avatar-editing)
+          title (if (empty? (:logo-url org-avatar-editing))
                   "Add a logo"
-                  "Change logo")
-          main-tab? (.hasClass $header-logo "main-panel")]
-      (if main-tab?
-        (.tooltip $header-logo #js {:title title
-                                    :trigger "hover focus"
-                                    :position "top"
-                                    :container "body"})
-        (.tooltip $header-logo "destroy")))))
+                  "Change logo")]
+      (.tooltip $header-logo #js {:title title
+                                  :trigger "hover focus"
+                                  :position "top"
+                                  :container "body"}))))
+
+(defn logo-on-click [org-avatar-editing]
+  (iu/upload! org-utils/org-avatar-filestack-config
+    (fn [res]
+      (let [url (gobj/get res "url")
+            img (gdom/createDom "img")]
+        (set! (.-onerror img) #(logo-add-error img))
+        (set! (.-onload img) #(logo-on-load org-avatar-editing url img))
+        (set! (.-className img) "hidden")
+        (gdom/append (.-body js/document) img)
+        (set! (.-src img) url)))
+    nil
+    (fn [err]
+      (logo-add-error nil))))
 
 (rum/defcs org-settings
   "Org settings main component. It handles the data loading/reset and the tab logic."
@@ -123,6 +135,7 @@
     (drv/drv :alert-modal)
     (drv/drv :org-editing)
     (drv/drv :invite-data)
+    (drv/drv :org-avatar-editing)
     ;; Mixins
     no-scroll-mixin
 
@@ -142,7 +155,9 @@
         settings-tab (drv/react s :org-settings)
         org-data (drv/react s :org-data)
         alert-modal-data (drv/react s :alert-modal)
-        main-tab? (= settings-tab :main)]
+        main-tab? (= settings-tab :main)
+        org-avatar-editing (drv/react s :org-avatar-editing)
+        org-data-for-avatar (merge org-data org-avatar-editing)]
     (when (:read-only org-data)
       (utils/after 100 dismiss-modal))
     (if org-data
@@ -154,24 +169,12 @@
           [:div.org-settings-header
             [:div.org-settings-header-avatar.fs-hide
               {:ref "org-settings-header-logo"
-               :class (utils/class-set {:missing-logo (and main-tab? (empty? (:logo-url org-editing)))
+               :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
                                         :main-panel main-tab?})
-               :on-click (fn [_]
-                          (when main-tab?
-                            (iu/upload! org-utils/org-avatar-filestack-config
-                              (fn [res]
-                                (let [url (gobj/get res "url")
-                                      img (gdom/createDom "img")]
-                                  (set! (.-onload img) #(logo-on-load org-editing url img))
-                                  (set! (.-className img) "hidden")
-                                  (gdom/append (.-body js/document) img)
-                                  (set! (.-src img) url)))
-                              nil
-                              (fn [err]
-                                (logo-add-error)))))}
-              (if (and main-tab? (empty? (:logo-url org-editing)))
+               :on-click logo-on-click}
+              (if (empty? (:logo-url org-avatar-editing))
                 [:div.org-avatar-img-empty]
-                (org-avatar (if main-tab? org-editing org-data) false false true))]
+                (org-avatar org-data-for-avatar false false true))]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
           (org-settings-tabs org-data settings-tab)

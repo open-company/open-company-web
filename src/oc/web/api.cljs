@@ -389,10 +389,10 @@
 
 (def user-profile-keys [:first-name :last-name :password :avatar-url :timezone :digest-frequency :digest-medium])
 
-(defn patch-user-profile [old-user-data new-user-data cb]
-  (when (and (:links old-user-data)
+(defn patch-user-profile [user-update-link new-user-data cb]
+  (when (and user-update-link
              (map? new-user-data))
-    (let [user-update-link (utils/link-for (:links old-user-data) "partial-update" "PATCH")
+    (let [user-update-link user-update-link
           without-email (dissoc new-user-data :email)
           safe-new-user-data (select-keys without-email user-profile-keys)]
       (auth-http (method-for-link user-update-link) (relative-href user-update-link)
@@ -463,12 +463,13 @@
          :json-params (cljs->json with-personal-note)}
         callback))))
 
-(defn pre-flight-section-check [pre-flight-link section-name callback]
+(defn pre-flight-section-check [pre-flight-link section-slug section-name callback]
   (when (and pre-flight-link
              section-name)
     (storage-http (method-for-link pre-flight-link) (relative-href pre-flight-link)
      {:headers (headers-for-link pre-flight-link)
       :json-params (cljs->json {:name section-name
+                                :exclude (vec (remove nil? [section-slug]))
                                 :pre-flight true})}
      callback)))
 

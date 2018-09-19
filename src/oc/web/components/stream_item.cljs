@@ -60,7 +60,7 @@
 
 (defn calc-video-height [s]
   (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (* (win-width) (/ 480 640)))))
+    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
@@ -130,8 +130,8 @@
                      (if is-mobile?
                        {:width (win-width)
                         :height @(::mobile-video-height s)}
-                       {:width (if expanded? 640 180)
-                        :height (if expanded? 377 106)}))]
+                       {:width (if expanded? 638 136)
+                        :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
@@ -145,11 +145,10 @@
         [:div.stream-header-head-author
           (user-avatar-image publisher)
           [:div.name.fs-hide
-            (str (:name publisher)
-              (when (or is-all-posts is-must-see is-drafts-board)
-                " in ")
-              (when (or is-all-posts is-must-see is-drafts-board)
-                (:board-name activity-data)))
+            (str
+             (:name publisher)
+             " in "
+             (:board-name activity-data))
             [:div.new-tag "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]

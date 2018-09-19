@@ -43,7 +43,6 @@
       [:div.ziggeo-player-not-processed
         {:style {:width (str (or width 640) "px")
                  :height (str (or height 480) "px")}}
-        [:div.refresh-icon]
         [:span "Preparing video…"]]
       [:div.ziggeo-player-embed
         {:ref :ziggeo-player}])])

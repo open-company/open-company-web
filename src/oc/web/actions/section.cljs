@@ -56,11 +56,15 @@
       (fn [status body success]
         (section-get-finish (json->cljs body))))))
 
+(declare refresh-org-data)
+
 (defn section-change
   [section-uuid]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)]
+      (when (= section-uuid (:uuid utils/default-drafts-board))
+        (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
         (api/get-board (utils/link-for (:links current-section-data) "self")
@@ -228,11 +232,11 @@
       (dispatcher/dispatch! [:input [:section-editing] next-section-editing])
       (success-cb next-section-editing))))
 
-(defn pre-flight-check [section-name]
+(defn pre-flight-check [section-slug section-name]
   (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] true])
   (let [org-data (dispatcher/org-data)
         pre-flight-link (utils/link-for (:links org-data) "pre-flight-create")]
-    (api/pre-flight-section-check pre-flight-link section-name
+    (api/pre-flight-section-check pre-flight-link section-slug section-name
      (fn [{:keys [success body status]}]
        (when-not success
          (section-name-error status))

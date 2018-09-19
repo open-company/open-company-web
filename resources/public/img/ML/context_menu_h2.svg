@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Post-creation" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Create-(bottom-full)" transform="translate(-730.000000, -339.000000)">
+            <g id="Group-13" transform="translate(605.000000, 330.000000)">
+                <g id="Combined-Shape" transform="translate(125.000000, 9.000000)">
+                    <path d="M0,2.66011906 C0,1.19097587 0.978049764,0 2.18280545,0 L21.8171945,0 C23.0227247,0 24,1.19016373 24,2.66011906 L24,21.3398809 C24,22.8090241 23.0219502,24 21.8171945,24 L2.18280545,24 C0.977275288,24 0,22.8098363 0,21.3398809 L0,2.66011906 Z" fill="#34414F" fill-rule="nonzero"></path>
+                    <text id="H1" font-family="Avenir-Heavy, Avenir" font-size="16" font-weight="600" fill="#FFFFFF">
+                        <tspan x="3.612" y="18">H</tspan>
+                        <tspan x="15.468" y="18" font-size="10">1</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

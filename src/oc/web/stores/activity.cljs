@@ -9,18 +9,13 @@
   [db [_ activity-data editing dismiss-on-editing-end]]
   (if (get-in db [:search-active])
     db
-    (-> db
-      (assoc :activity-modal-fade-in (:uuid activity-data))
-      (assoc :dismiss-modal-on-editing-stop (and editing dismiss-on-editing-end)))))
+    (assoc db :activity-modal-fade-in (:uuid activity-data))))
 
 (defmethod dispatcher/action :activity-modal-fade-out
   [db [_ board-slug]]
   (if (get-in db [:search-active])
     db
-    (-> db
-      (dissoc :activity-modal-fade-in)
-      (dissoc :modal-editing)
-      (dissoc :dismiss-modal-on-editing-stop))))
+    (dissoc db :activity-modal-fade-in)))
 
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
@@ -153,7 +148,11 @@
                                     (filter #(not= % (:uuid activity-data)) posts-list)))))
                                db
                                (keys (get-in db containers-key)))]
-    (assoc-in with-fixed-containers posts-key next-posts)))
+    (if (= (:uuid (get-in db [:cmail-data])) (:uuid activity-data))
+      (-> with-fixed-containers
+          (assoc-in [:cmail-data] {:delete true})
+          (assoc-in posts-key next-posts))
+      (assoc-in with-fixed-containers posts-key next-posts))))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]

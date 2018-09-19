@@ -86,7 +86,12 @@
     (-> db
         (assoc :current-user-data fixed-user-data)
         (assoc :edit-user-profile (fix-user-values fixed-user-data))
+        (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))
         (dissoc :edit-user-profile-failed))))
+
+(defmethod dispatcher/action :user-profile-avatar-update/failed
+  [db [_]]
+  (assoc db :edit-user-profile-avatar (:avatar-url (:current-user-data db))))
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]

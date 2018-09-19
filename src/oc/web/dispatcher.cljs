@@ -229,6 +229,7 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
+   :edit-user-profile-avatar [[:base] (fn [base] (:edit-user-profile-avatar base))]
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
@@ -247,6 +248,8 @@
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
+   :org-avatar-editing  [[:base]
+                          (fn [base] (:org-avatar-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]
@@ -264,16 +267,9 @@
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-modal-fade-in (:activity-modal-fade-in base)
-                             :modal-editing-data (:modal-editing-data base)
-                             :modal-editing (:modal-editing base)
-                             :dismiss-modal-on-editing-stop (:dismiss-modal-on-editing-stop base)
                              :activity-share activity-share
-                             :entry-save-on-exit (:entry-save-on-exit base)
                              :add-comment-focus add-comment-focus
                              :comments-data comments-data
-                             :ap-initial-at ap-initial-at
-                             :show-sections-picker show-sections-picker
-                             :section-editing section-editing
                              :read-data (get activities-read (router/current-activity-id))})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]

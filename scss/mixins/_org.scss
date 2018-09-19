@@ -44,9 +44,10 @@
     }
 
     img.org-avatar-img{
-      max-width: #{$max_logo_height * 8}px;
-      max-height: #{$max_logo_height}px;
-      vertical-align: top;
+      width: #{$max_logo_height}px;
+      height: #{$max_logo_height}px;
+      object-fit: contain;
+      vertical-align: middle;
       border-radius: 8px;
     }
 

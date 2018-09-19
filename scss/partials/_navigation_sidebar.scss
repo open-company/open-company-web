@@ -4,23 +4,21 @@
   @include mobile() {
     height: 56px;
     padding: 16px 32px;
-    border-top: 1px solid #ECECEC;
+    position: relative;
 
-    &:last-child {
-      border-bottom: 1px solid #ECECEC;
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0px;
+      left: 65px;
+      height: 1px;
+      width: calc(100% - 65px);
+      background-color: #ECECEC;
     }
 
-    &:not(:last-child) {
-      position: relative;
-      &:after {
-        content: "";
-        position: absolute;
-        width: calc(100% - 48px);
-        left: 24px;
-        bottom: 0px;
-        height: 1px;
-        background-color: $light_tan;
-      }
+    &:first-child:before {
+      width: 100%;
+      left: 0px;
     }
   }
 
@@ -64,10 +62,10 @@
   }
 
   div.all-posts-label {
-    @include avenir_H();
+    @include avenir_R();
     font-size: 14px;
     line-height: 25px;
-    color: $deep_navy;
+    color: $ui_grey;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
@@ -75,6 +73,11 @@
 
     &:active, &:focus {
       text-decoration: none;
+    }
+
+    &.new {
+      @include avenir_H();
+      color: $deep_navy;
     }
   }
 
@@ -91,11 +94,16 @@
     &:active, &:focus {
       text-decoration: none;
     }
+
+    &.new {
+      @include avenir_H();
+      color: $deep_navy;
+    }
   }
 }
 
 @mixin item-selected() {
-  background-color: #E4FAEF;
+  background-color: #D4F6E4;
   border-radius: 6px;
 
   @include mobile() {
@@ -173,6 +181,7 @@
     }
   }
 
+
   &:active, &:focus {
     text-decoration: none;
 
@@ -181,18 +190,8 @@
     }
   }
 
-  div.all-posts-label {
-    color: $deep_navy;
-    font-size: 14px;
-    line-height: 25px;
-    text-decoration: none;
+  div.all-posts-label, div.drafts-label, div.must-see-label {
 
-    &:active, &:focus {
-      text-decoration: none;
-    }
-  }
-
-  div.drafts-label, div.must-see-label {
     color: $ui_grey;
     font-size: 14px;
     line-height: 25px;
@@ -200,6 +199,11 @@
 
     &:active, &:focus {
       text-decoration: none;
+    }
+
+    &.new {
+      @include avenir_H();
+      color: $deep_navy;
     }
   }
 }
@@ -246,7 +250,7 @@ div.left-navigation-sidebar {
       padding: 15px;
       background-color: white;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-      border-top: 1px solid $light_tan;
+      // border-top: 1px solid $light_tan;
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
@@ -353,7 +357,7 @@ div.left-navigation-sidebar {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
       background-size: 16px 16px;
       background-repeat: no-repeat;
-      background-position: center 4px;
+      background-position: center 6px;
       width: 16px;
       height: 28px;
       float: left;
@@ -361,7 +365,7 @@ div.left-navigation-sidebar {
       @include mobile() {
         margin-left: 0px;
         margin-top: 0px;
-        background-position: center 2px;
+        background-position: center 4px;
         opacity: 1;
       }
       
@@ -376,7 +380,7 @@ div.left-navigation-sidebar {
     div.must-see-icon {
       background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
       background-size: 13px 16px;
-      background-position: center 4px;
+      background-position: center 6px;
       background-repeat: no-repeat;
       width: 16px;
       height: 28px;
@@ -387,7 +391,7 @@ div.left-navigation-sidebar {
       @include mobile() {
         margin-left: 0px;
         margin-top: 0px;
-        background-position: center 2px;
+        background-position: center 4px;
         opacity: 1;
       }
 
@@ -415,9 +419,11 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
+    height: 20px;
 
     @include mobile() {
       border-top: 1px solid #ECECEC;
+      height: 56px;
     }
 
     .left-navigation-sidebar-top-title {
@@ -458,6 +464,12 @@ div.left-navigation-sidebar {
       }
     }
 
+    &:hover, &.show-section-add {
+      button.left-navigation-sidebar-top-title-button {
+        display: block;
+      }      
+    }
+
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
@@ -474,6 +486,7 @@ div.left-navigation-sidebar {
       background-size: 8px 8px;
       border-radius: 10px;
       @include avenir_H();
+      display: none;
 
       @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
 
@@ -756,7 +769,7 @@ div.left-navigation-sidebar {
 
       div.invite-people-icon {
         background-image: cdnUrl("/img/ML/invite_people.svg");
-        background-size: 16px auto;
+        background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center 5px;
         width: 16px;

@@ -14,7 +14,7 @@ div.reactions {
       position: relative;
       height: 26px;
       cursor: default;
-      padding: 4px;
+      padding: 4px 3px;
       @include avenir_H();
       border: 1px solid #E2E3E4;
       box-shadow: none;
@@ -71,6 +71,10 @@ div.reactions {
       &.reaction-picker {
         box-shadow: none;
 
+        span.reaction, div.count {
+          opacity: .5;
+        }
+
         div.count {
           color: $ui_grey;
         }
@@ -82,6 +86,10 @@ div.reactions {
 
             div.count {
               color: $ui_grey;
+            }
+
+            span.reaction, div.count {
+              opacity: 1;
             }
           }
         }
