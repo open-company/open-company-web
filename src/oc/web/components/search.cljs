@@ -141,8 +141,7 @@
          :on-click (fn [e]
                     (when (and (not @(::search-clicked? s))
                                (not (utils/event-inside? e (rum/ref-node s :search-close))))
-                      (reset! (::search-clicked? s) true)
-                      (utils/after 100 #(.focus (rum/ref-node s "search-input")))))}
+                      (.focus (rum/ref-node s "search-input"))))}
         [:button.mlb-reset.search-close
           {:ref :search-close
            :on-click #(search-inactive s)}]
@@ -152,7 +151,6 @@
           {:class (when-not @(::search-clicked? s) "inactive")
            :ref "search-input"
            :placeholder (when-not (responsive/is-mobile-size?) "Search posts…")
-           :on-click #(reset! (::search-clicked? s) true)
            :on-blur #(do
                        (when (responsive/is-mobile-size?)
                         (set! (.-placehoder (.-target %)) ""))
@@ -163,6 +161,7 @@
            :on-focus #(let [search-input (.-target %)
                             search-query (.-value search-input)]
                         (reset! (::search-clicked? s) true)
+                        (search/active)
                         (search/focus)
                         (search/query search-query))
            :on-change #(search/query (.-value (.-target %)))}]
