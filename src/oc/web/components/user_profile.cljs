@@ -89,10 +89,14 @@
                           (drv/drv :edit-user-profile)
                           (drv/drv :user-settings)
                           (drv/drv :edit-user-profile-avatar)
+                          ;; Locals
+                          (rum/local nil ::temp-user-avatar)
                           ;; Mixins
                           no-scroll-mixin
                           {:will-mount (fn [s]
                             (user-actions/user-profile-reset)
+                            (let [avatar-with-cdn (:avatar-url (:user-data @(drv/get-ref s :edit-user-profile)))]
+                              (reset! (::temp-user-avatar s) avatar-with-cdn))
                             s)
                            :did-remount (fn [_ s]
                             (update-tooltip s)
@@ -109,7 +113,9 @@
         tab (drv/react s :user-settings)
         org-data (drv/react s :org-data)
         edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
-        user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})]
+        user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
+        temp-user-avatar @(::temp-user-avatar s)
+        is-jelly-head-avatar (= (:avatar-url user-for-avatar) temp-user-avatar)]
     [:div.user-profile.fullscreen-page
       [:div.user-profile-inner
         [:button.mlb-reset.settings-modal-close
@@ -119,7 +125,9 @@
             {:ref "user-profile-header-avatar"
              :class (utils/class-set {:profile-tab (= tab :profile)})
              :on-click #(upload-user-profile-pictuer-clicked)}
-            (user-avatar-image user-for-avatar)]
+            (if is-jelly-head-avatar
+              [:div.empty-user-avatar-placeholder]
+              (user-avatar-image user-for-avatar))]
           [:div.user-profile-header-name
             (clojure.string/trim
              (str (:first-name current-user-data) " " (:last-name current-user-data)))]
