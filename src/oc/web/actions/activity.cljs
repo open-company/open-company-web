@@ -253,12 +253,13 @@
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (when success
                  (let [json-body (json->cljs body)
-                       board-data (if (:slug json-body)
+                       board-data (if (:entries json-body)
                                     (au/fix-board json-body)
                                     false)
-                       entry-pre-merge (if (:fixed-items json-body)
+                       fixed-items (:fixed-items board-data)
+                       entry-pre-merge (if fixed-items
                                          ;; board creation
-                                         (first (:fixed-items json-body))
+                                         (first (vals fixed-items))
                                          json-body)
                        entry-saved (merge entry-pre-merge
                                           {:auto-saving false
