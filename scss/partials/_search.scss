@@ -29,6 +29,7 @@ div.search-box {
     background-color: white;
     border: 1px solid $light_ui_grey;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
+    width: 430px;
 
     @include mobile() {
       border: 0px solid white;
@@ -41,7 +42,7 @@ div.search-box {
     }
 
     input.search {
-      width: calc(100% - 32px);
+      width: calc(100% - 42px);
       left: 8px;
 
       &:before {
@@ -147,7 +148,7 @@ div.search-results {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   border-radius: 5px;
   margin: 48px 0px 0px 0px;
-  width: 320px;
+  width: 430px;
   text-align: left;
   background-color: white;
   max-height: calc(100vh - 108px);

@@ -138,9 +138,14 @@
     (let [search-active? (drv/react s store/search-active?)]
       [:div.search-box
         {:class (when @(::search-clicked? s) "active")
-         :on-click #(reset! (::search-clicked? s) true)}
+         :on-click (fn [e]
+                    (when (and (not @(::search-clicked? s))
+                               (not (utils/event-inside? e (rum/ref-node s :search-close))))
+                      (reset! (::search-clicked? s) true)
+                      (utils/after 100 #(.focus (rum/ref-node s "search-input")))))}
         [:button.mlb-reset.search-close
-          {:on-click #(search-inactive s)}]
+          {:ref :search-close
+           :on-click #(search-inactive s)}]
         [:div.spyglass-icon
           {:on-click #(reset! (::search-clicked? s) true)}]
         [:input.search
