@@ -165,10 +165,10 @@
                         (search/active)
                         (search/focus)
                         (search/query search-query))
-           :on-change (fn [_]
+           :on-change (fn [e]
                         (when @(::search-timeout s)
                           (.clearTimeout @(::search-timeout s)))
                         (reset! (::search-timeout s)
                          (utils/after 500
-                          #(search/query (.-value (.-target %))))))}]
+                          #(search/query (.-value (.-target e))))))}]
        (search-results-view)])))
