@@ -166,9 +166,10 @@
                         (search/focus)
                         (search/query search-query))
            :on-change (fn [e]
-                        (when @(::search-timeout s)
-                          (.clearTimeout @(::search-timeout s)))
-                        (reset! (::search-timeout s)
-                         (utils/after 500
-                          #(search/query (.-value (.-target e))))))}]
+                        (let [v (.-value (.-target e))]
+                          (when @(::search-timeout s)
+                            (.clearTimeout js/window @(::search-timeout s)))
+                          (reset! (::search-timeout s)
+                           (utils/after 500
+                            #(search/query v)))))}]
        (search-results-view)])))
