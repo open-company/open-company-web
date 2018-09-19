@@ -30,8 +30,10 @@
 
 (defn user-profile-click [e]
   (utils/event-stop e)
-  (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+  (if (responsive/is-tablet-or-mobile?)
+    (user-profile/show-modal :profile)
+    (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+  (mobile-menu-toggle))
 
 (defn user-notifications-click [e]
   (utils/event-stop e)

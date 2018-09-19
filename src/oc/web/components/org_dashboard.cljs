@@ -21,7 +21,7 @@
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.search :refer (search-results-view)]
+            [oc.web.components.search :refer (search-box)]
             [oc.web.components.fullscreen-post :refer (fullscreen-post)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -202,7 +202,7 @@
           (activity-share)
           ;; Search results
           (and is-mobile? search-active? (not (router/current-activity-id)))
-          (search-results-view)
+          (search-box)
           ;; Show mobile navigation
           (and is-mobile?
                mobile-navigation-sidebar)

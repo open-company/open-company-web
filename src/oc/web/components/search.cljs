@@ -114,13 +114,15 @@
                               (.focus search-input)))
                             s)
                          :will-mount (fn [s]
-                          (search/inactive)
+                          (when-not (responsive/is-tablet-or-mobile?)
+                            (search/inactive))
                           (reset! (::window-click s)
                             (events/listen
                              js/window
                              EventType/CLICK
                              (fn [e]
-                               (when (and @(::search-clicked? s)
+                               (when (and (not (responsive/is-tablet-or-mobile?))
+                                          @(::search-clicked? s)
                                           (not
                                            (utils/event-inside? e
                                              (sel1 [:div.search-box]))))
@@ -155,8 +157,6 @@
                             search-query (.-value search-input)]
                         (reset! (::search-clicked? s) true)
                         (search/focus)
-                        (when (and (responsive/is-mobile-size?) (zero? (count search-query)))
-                          (set! (.-placeholder search-input) "Search"))
                         (search/query search-query))
            :on-change #(search/query (.-value (.-target %)))}]
-       (when-not (responsive/is-mobile-size?)(search-results-view))])))
+       (search-results-view)])))

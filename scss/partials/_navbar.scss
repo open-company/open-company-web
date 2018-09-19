@@ -18,12 +18,6 @@ nav.oc-navbar {
     overflow: visible;
   }
 
-  @include mobile(){
-    &.show-login-overlay {
-      height: 100vh !important;
-    }
-  }
-
   @include big_web(){
     height: #{$navbar_height}px;
   }
@@ -31,20 +25,67 @@ nav.oc-navbar {
   @include mobile(){
     transition: 230ms;
     overflow: hidden;
-    height: 100vh;
+    height: #{$navbar_height + 1}px;
+    padding-bottom: 1px;
+    border-bottom: none;
+
+    &.show-login-overlay {
+      height: 100vh !important;
+    }
 
     &.showing-orgs-dropdown {
       overflow: visible;
     }
 
-    &:not(.mobile-menu-open) {
-      height: #{$navbar_height}px;
+    &.mobile-menu-open {
+      height: 100vh;
+    }
+
+    &.search-active {
+      height: 100vh;
     }
   }
 
   z-index: $navbar_zindex;
   background-color: white;
   margin: 0px;
+
+  div.mobile-bottom-line {
+    display: none;
+
+    @include mobile() {
+      display: block;
+      width: 100vw;
+      height: 1px;
+      background-color: #ECECEC;
+      position: absolute;
+      top: #{$navbar_height}px;
+      left: 0px;
+
+      &.search {
+        div.orange-active-tab {
+          margin-left: 20%;
+        }
+      }
+
+      &.user-menu {
+        div.orange-active-tab {
+          margin-left: 80%;
+        }
+      }
+
+      div.orange-active-tab {
+        width: 20vw;
+        height: 1px;
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-left: 0;
+        transition: margin-left 230ms ease-in;
+        background-color: $carrot_orange;
+      }
+    }
+  }
 
   div.oc-navbar-header {
     padding-top: 10px;
@@ -63,20 +104,6 @@ nav.oc-navbar {
 
     div.oc-navbar-header-container{
       height: 32px;
-
-      div.mobile-underline {
-        display: none;
-
-        @include mobile() {
-          display: block;
-          position: absolute;
-          top: 55px;
-          left: 0px;
-          width: 18%;
-          height: 1px;
-          background-color: $carrot_orange;
-        }
-      }
 
       div.navbar-center {
         text-align: center;
@@ -128,19 +155,33 @@ nav.oc-navbar {
             float: left;
             display: block;
             margin-top: 4px;
+          }
+        }
 
-            &.close-bt {
-              background-image: cdnUrl("/img/ML/black_close.svg");
-              background-size: 15px 15px;
-              background-position: center;
-            }
+        button.search-bt {
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/spyglass.svg");
+          background-size: 18px 18px;
+          background-repeat: no-repeat;
+          background-position: 0px center;
+          position: absolute;
+          margin: 0;
+          padding: 0;
+          left: calc(30vw - 12px);
+          top: 16px;
+
+          @include preload_image(cdnUlr("/img/ML/spyglass_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/spyglass_active.svg");
           }
         }
       }
 
       div.navbar-right {
         float: right;
-        margin-right: 0px;
+        margin-right: -16px;
 
         div.user-menu {
           width: 48px;
@@ -150,7 +191,6 @@ nav.oc-navbar {
         button.mobile-menu {
           font-size: 24px;
           padding: 0px 16px 0px 0px;
-          margin-top: 2px;
           position: relative;
 
           &:after {
