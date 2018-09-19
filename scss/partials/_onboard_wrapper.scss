@@ -495,6 +495,10 @@ div.onboard-lander {
 
       @include user-profile(72);
 
+      div.user-avatar-img-container {
+        float: left;
+      }
+
       div.empty-user-avatar-placeholder {
         float: left;
         width: 72px;
