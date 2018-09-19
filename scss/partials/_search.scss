@@ -45,7 +45,7 @@ div.search-box {
     }
 
     input.search {
-      width: calc(100vw - 42px);
+      width: 390px;
       left: 8px;
 
       @include mobile() {
