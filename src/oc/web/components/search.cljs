@@ -103,6 +103,7 @@
                         rum/static
                         (rum/local nil ::window-click)
                         (rum/local false ::search-clicked?)
+                        (rum/local nil ::search-timeout)
                         {:after-render (fn [s]
                           (let [search-input (rum/ref-node s "search-input")]
                             (when (and
@@ -164,5 +165,10 @@
                         (search/active)
                         (search/focus)
                         (search/query search-query))
-           :on-change #(search/query (.-value (.-target %)))}]
+           :on-change (fn [_]
+                        (when @(::search-timeout s)
+                          (.clearTimeout @(::search-timeout s)))
+                        (reset! (::search-timeout s)
+                         (utils/after 500
+                          #(search/query (.-value (.-target %))))))}]
        (search-results-view)])))
