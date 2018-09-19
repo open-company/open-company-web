@@ -90,7 +90,7 @@
         [:div.show-more
           {:on-click (fn [e] (reset! (::page-size s)
                                      (+ @(::page-size s) 15)))}
-          [:button] "Show More"])]))
+          [:button.mlb-reset "Show More"]])]))
 
 (defn search-inactive [s]
   (set! (.-value (rum/ref-node s "search-input")) "")
@@ -139,7 +139,7 @@
       [:div.search-box
         {:class (when @(::search-clicked? s) "active")
          :on-click #(reset! (::search-clicked? s) true)}
-        [:button.search-close
+        [:button.mlb-reset.search-close
           {:on-click #(search-inactive s)}]
         [:div.spyglass-icon
           {:on-click #(reset! (::search-clicked? s) true)}]
