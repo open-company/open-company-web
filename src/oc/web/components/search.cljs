@@ -136,7 +136,9 @@
   [s]
   (when (store/should-display)
     (let [search-active? (drv/react s store/search-active?)]
-      [:div.search-box {:class (when @(::search-clicked? s) "active")}
+      [:div.search-box
+        {:class (when @(::search-clicked? s) "active")
+         :on-click #(reset! (::search-clicked? s) true)}
         [:button.search-close
           {:on-click #(search-inactive s)}]
         [:div.spyglass-icon
