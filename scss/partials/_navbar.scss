@@ -181,7 +181,11 @@ nav.oc-navbar {
 
       div.navbar-right {
         float: right;
-        margin-right: -16px;
+        margin-right: 0px;
+
+        @include mobile() {
+          margin-right: -16px;  
+        }
 
         div.user-menu {
           width: 48px;
