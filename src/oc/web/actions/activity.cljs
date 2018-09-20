@@ -279,7 +279,7 @@
                      (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish (merge entry-data-saved entry-saved) edit-key])))))
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
            (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
 
 (defn entry-toggle-save-on-exit
