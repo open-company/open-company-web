@@ -24,29 +24,34 @@
   (dis/dispatch! [:input [:mobile-menu-open] false]))
 
 (defn logout-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (user-actions/logout))
 
 (defn user-profile-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (if (responsive/is-tablet-or-mobile?)
     (user-profile/show-modal :profile)
     (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
   (mobile-menu-toggle))
 
 (defn notifications-settings-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
 (defn team-settings-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
 (defn invite-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 

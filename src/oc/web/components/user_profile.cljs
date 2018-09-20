@@ -116,7 +116,7 @@
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         temp-user-avatar @(::temp-user-avatar s)
         is-jelly-head-avatar (= (:avatar-url user-for-avatar) temp-user-avatar)]
-    [:div.user-profile.fullscreen-page
+    [:div.user-profile
       [:div.user-profile-inner
         [:button.mlb-reset.settings-modal-close
           {:on-click #(close-cb current-user-data)}]

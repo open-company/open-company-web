@@ -44,7 +44,7 @@
                       (close-tray s)
                       (reset! (::tray-open s) true))}]
       [:div.user-notifications-tray
-        {:class (utils/class-set {:hidden (not @(::tray-open s))})}
+        {:class (utils/class-set {:hidden-tray (not @(::tray-open s))})}
         [:div.user-notifications-tray-header.group
           [:div.title "Notifications"]
           (when has-new-content
@@ -58,10 +58,12 @@
             (for [n user-notifications-data]
               [:div.user-notification.group
                 {:class (utils/class-set {:unread (:unread n)})
-                 :on-click #(when (and (:uuid n)
-                                       (:board-slug n)
-                                       (not (utils/event-inside? % (rum/ref-node s :read-bt))))
-                              (router/nav! (oc-urls/entry (:board-slug n) (:uuid n))))
+                 :on-click #(do
+                              (when (and (:uuid n)
+                                         (:board-slug n)
+                                         (not (utils/event-inside? % (rum/ref-node s :read-bt))))
+                                (router/nav! (oc-urls/entry (:board-slug n) (:uuid n))))
+                              (user-actions/hide-mobile-user-notifications))
                  :key (str "user-notification-" (:created-at n))}
                 (user-avatar-image (:author n))
                 [:div.user-notification-title
