@@ -85,6 +85,8 @@
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
+                           (let [single-post-view (boolean (seq (router/current-activity-id)))]
+                             (reset! (::expanded s) single-post-view))
                            s)
                           :did-mount (fn [s]
                            (should-show-continue-reading? s)
@@ -105,7 +107,8 @@
                                (reset! (::should-scroll-to-comments s) false)))
                            s)}
   [s activity-data read-data]
-  (let [org-data (drv/react s :org-data)
+  (let [single-post-view (boolean (seq (router/current-activity-id)))
+        org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         truncated? @(::truncated s)
         expanded? @(::expanded s)
@@ -131,12 +134,14 @@
                        {:width (win-width)
                         :height @(::mobile-video-height s)}
                        {:width (if expanded? 638 136)
-                        :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))]
+                        :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board
-                                :new-item (:new activity-data)})
+                                :new-item (:new activity-data)
+                                :single-post-view single-post-view})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
        :id dom-element-id}
@@ -159,9 +164,11 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
-          [:div.separator]
-          [:div.stream-item-wrt
-            (wrt activity-data read-data)]]
+          (when user-is-part-of-the-team
+            [:div.separator])
+          (when user-is-part-of-the-team
+            [:div.stream-item-wrt
+              (wrt activity-data read-data)])]
         (when (and (not is-drafts-board)
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)
