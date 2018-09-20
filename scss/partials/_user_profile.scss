@@ -9,6 +9,7 @@ div.user-profile {
   z-index: 1000;
   overflow-x: hidden;
   overflow-y: auto;
+  width: 100vw;
   height: 100vh;
 
   button.settings-modal-close {
@@ -18,8 +19,8 @@ div.user-profile {
 
   @include mobile() {
     background-color: white;
-    height: calc(100vh - 65px);
-    top: 65px;
+    height: calc(100vh - #{$navbar_height}px);
+    top: #{$navbar_height}px;
     position: absolute;
   }
 

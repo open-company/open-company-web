@@ -402,6 +402,12 @@
 (defn read-notifications []
   (dis/dispatch! [:user-notifications/read (router/current-org-slug)]))
 
+(defn show-mobile-user-notifications []
+  (dis/dispatch! [:input [:mobile-user-notifications] true]))
+
+(defn hide-mobile-user-notifications []
+  (dis/dispatch! [:input [:mobile-user-notifications] false]))
+
 ;; subscribe to websocket events
 (defn subscribe []
   (ws-nc/subscribe :user/notifications
