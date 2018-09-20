@@ -378,7 +378,7 @@
     (-> db
       (assoc-in activity-key fixed-activity-data)
       (dissoc :entry-toggle-save-on-exit)
-      (assoc-in [edit-key] (assoc activity-data :auto-saving false)))))
+      (assoc-in [edit-key :auto-saving] false))))
 
 (defmethod dispatcher/action :entry-revert/finish
   [db [_ activity-data]]
