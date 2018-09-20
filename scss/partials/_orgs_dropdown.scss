@@ -57,10 +57,6 @@ div.orgs-dropdown {
     background-color: white;
     width: 152px;
 
-    @include mobile() {
-      top: 32px;
-    }
-
     div.triangle {
       position: absolute;
       top: -8px;
