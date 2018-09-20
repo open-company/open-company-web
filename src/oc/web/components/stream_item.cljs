@@ -83,6 +83,8 @@
                          am/truncate-comments-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
+                           (let [single-post-view (boolean (seq (router/current-activity-id)))]
+                             (reset! (::expanded s) single-post-view))
                            s)
                           :did-mount (fn [s]
                            (should-show-continue-reading? s)
@@ -103,7 +105,8 @@
                                (reset! (::should-scroll-to-comments s) false)))
                            s)}
   [s activity-data read-data]
-  (let [org-data (drv/react s :org-data)
+  (let [single-post-view (boolean (seq (router/current-activity-id)))
+        org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         truncated? @(::truncated s)
         expanded? @(::expanded s)
@@ -135,7 +138,8 @@
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board
-                                :new-item (:new activity-data)})
+                                :new-item (:new activity-data)
+                                :single-post-view single-post-view})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
        :id dom-element-id}
