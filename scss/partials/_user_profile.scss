@@ -58,6 +58,18 @@ div.user-profile {
         }
 
         @include user-profile(48);
+
+        div.empty-user-avatar-placeholder {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background-color: #F8FCFA;
+          border: 1px dashed $carrot_green;
+          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
       }
 
       div.user-profile-header-name {

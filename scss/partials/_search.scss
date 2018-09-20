@@ -1,77 +1,156 @@
 div.search-box {
-  width: 400px;
+  width: 320px;
+  height: 32px;
+  background-color: rgba($light_ui_grey, 0.2);
+  border-radius: 4px;
+  color: $ui_grey;
+  position: relative;
+  transition: width 320ms ease-in, background-color 320ms ease-in;
+
+  &:not(.active) {
+    cursor: pointer;
+
+    input.search {
+      cursor: pointer;
+    }
+  }
 
   @include mobile() {
-    display: inline;
-    width: auto;
-    min-height: 40px;
-    margin-left: 24px;
+    position: absolute;
+    top: 57px;
+    left: 0px;
+    width: 100vw;
+    height: calc(100vh - 57px);
+    background-color: white;
+    border-radius: unset;
+    z-index: 1081;
+    padding: 16px 24px 0px;
+    border: none;
+    box-shadow: none;
+    transition: width 0ms ease-in, background-color 0ms ease-in;
 
     &.active {
-      margin-left: 0px;
-      position: absolute;
-      min-width: 160px;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  &.active {
+    background-color: white;
+    border: 1px solid $light_ui_grey;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
+    width: 430px;
+
+    @include mobile() {
+      border: 0px solid white;
+      box-shadow: none;
       width: 100vw;
-      height: 100vh;
-      top: 0px;
-      left: 0px;
-      background-color: white;
-      z-index: 1081;
-      padding: 14px 24px;
+    }
+
+    div.spyglass-icon {
+      left: 8px;
+      opacity: 0.5;
+    }
+
+    input.search {
+      width: 390px;
+      left: 8px;
+
+      @include mobile() {
+        width: calc(100% - 16px);
+        left: unset;
+      }
+
+      &:before {
+        opacity: 0.4;
+      }
+
+      &::placeholder {
+        color: $deep_navy;
+      }
+    }
+  }
+
+  div.spyglass-icon {
+    background-image: cdnUrl("/img/ML/spyglass.svg");
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: 0px center;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    left: 101px;
+    top: 8px;
+
+    @include mobile() {
+      display: none;
     }
   }
 
   input.search {
-    margin: 5px 0 0;
+    position: absolute;
+    top: 4px;
+    left: 101px;
     outline: none;
     border: none;
-    caret-color: $carrot_text_blue_3;
-    background-image: cdnUrl("/img/ML/spyglass.svg");
-    background-repeat: no-repeat;
-    padding: 1px 0 0 31px;
-    @include avenir_M();
-    color: $carrot_dark_brown_1;
+    background-color: transparent;
+    text-align: left;
+    padding: 0 0 0 24px;
+    @include avenir_R();
+    font-size: 14px;
+    color: $deep_navy;
+    width: 118px;
+    height: 24px;
 
-    &::placeholder {
-      color: $carrot_light_gray_10;
+    &:placeholder, &::placeholder {
+      color: $ui_grey;
     }
-    &:focus::placeholder {
-      color: $carrot_dark_brown_1;
-    }
+
     @include mobile() {
-      margin: 5px 0px 0px 26px;
-      padding: 2px 0px 0px 31px;
-      &.inactive {
-        padding: 6px 0px 0px 31px;
-        width: 20px;
-        height: 20px;
+      position: relative;
+      left: unset;
+      top: unset;
+      width: calc(100% - 16px);
+      height: 24px;
+      padding: 0;
+      margin: 0 0 12px 0;
+    }
+  }
+
+  &:not(.active) {
+    button.search-close {
+      display: none;
+
+      @include mobile() {
+        display: block;
       }
     }
   }
 
   button.search-close {
-    width: 15px;
-    height: 15px;
-    background-color: white;
+    width: 24px;
+    height: 24px;
+    background-color: transparent;
     background-image: cdnUrl("/img/ML/black_close.svg");
-    background-size: 15px;
-    background-position: 50%;
+    background-size: 10px 10px;
+    background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.7;
+    opacity: 0.4;
     border: none;
-    margin: 0px 24px 0px 0px;
-    padding: 12px 0px 0px 0px;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    position: absolute;
+    top: 3px;
+    right: 8px;
 
     @include mobile() {
-      margin: 0px;
+      right: 13px;
+      top: 16px;
     }
 
     &:hover {
-      opacity: 1;
-    }
-
-    &.inactive {
-      display: none;
+      opacity: 0.5;
     }
   }
 }
@@ -80,54 +159,43 @@ div.search-results.inactive {
   display: none;
 }
 
-div.triangle {
-  position: absolute;
-  top: 67px;
-  left: 96px;
-  background-color: white;
-  border-top: 1px solid rgba(177,184,192,0.50);
-  border-left: 1px solid rgba(177,184,192,0.50);
-  transform: rotate(45deg);
-  width: 12px;
-  height: 12px;
-
-  &.inactive {
-    display: none;
-  }
-  @include mobile() {
-    display: none;
-  }
-}
-
 div.search-results {
-  border: 1px solid rgba(177,184,192,0.50);
+  border: 1px solid $light_ui_grey;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   border-radius: 5px;
-
-  margin: 31px 0px 0px 45px;
-  width: 450px;
-  box-shadow: 0 4px 6px 0 rgba(0,0,0,0.07);
+  margin: 48px 0px 0px 0px;
+  width: 430px;
+  text-align: left;
+  background-color: white;
+  max-height: calc(100vh - 108px);
 
   @include mobile() {
-    position: absolute;
-    top: 63px;
-    left: 0px;
-    height: 100vh;
-    widght: 100vh;
-    background-color: white;
-    z-index: 1081;
-    margin: -1px;
-    padding: 0px;
+    position: relative;
+    box-shadow: none;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
     border-radius: 0;
+    border: none;
+    margin-left: -24px;
+    border-top: 1px solid #ECECEC;
   }
 
   div.header {
-    background-color: white;
-    padding: 20px 0px 10px 15px;
-    height: 47px;
+    padding: 16px 16px 6px 16px;
+    color: $deep_navy;
+
+    @include mobile() {
+      padding: 20px 24px 10px 24px;
+    }
 
     span {
       @include avenir_H();
       font-size: 12px;
+      line-height: 12px;
+      text-transform: uppercase;
+      float: left;
+      color: $light_ui_grey;
     }
 
     span.count {
@@ -140,20 +208,27 @@ div.search-results {
     max-height: calc(100vh - 180px - 47px);
 
     @include mobile() {
-      max-height: calc(100vh - 80px - 47px);
+      max-height: calc(100vh - 80px - 33px);
     }
 
     div.search-result {
       width: 100%;
-      background-color: white;
       font-size: 14px;
+      cursor: pointer;
 
-      div.author {
+      * {
+        cursor: pointer;
+      }
+
+      div.search-result-box {
         @include avenir_H();
-
-        padding: 10px 20px 10px 20px;
+        padding: 5px 16px 5px 16px;
 
         @include activity-author();
+
+        div.user-avatar-img-container {
+          margin-right: 16px;
+        }
 
         div.name {
           font-size: 11px;
@@ -161,17 +236,25 @@ div.search-results {
 
         div.title {
           overflow: hidden;
+          text-overflow: ellipsis;
+          color: $deep_navy;
+          @include avenir_M();
+          font-size: 14px;
+          max-width: 100%;
+          white-space: nowrap;
+        }
+
+        div.time-since {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: $ui_grey;
+          @include avenir_R();
+          font-size: 12px;
         }
 
         &:hover {
-          background-color: rgba($carrot_light_blue, 0.3);
-
           div.title {
-            color: $carrot_text_blue_3;
-          }
-
-          div.time-since {
-            color: rgba($carrot_text_blue_3, 0.3);
+            color: $carrot_green;
           }
         }
       }
@@ -183,31 +266,44 @@ div.search-results {
   }
 
   div.show-more {
-    background: white;
     color: $carrot_green_2;
     font-size: 14px;
-    padding: 5px 0px 10px 30px;
+    padding: 5px 16px 10px 16px;
     cursor: pointer;
+    text-align: center;
+    width: 100%;
 
     button {
-      float: left;
       font-size: 14px;
       line-height: 1;
-      width: 15px;
-      height: 15px;
       margin-top: 4px;
-      border: 0px solid transparent;
-      background-color: transparent;
-      background-repeat: no-repeat;
-      background-image: cdnUrl('/img/ML/show_more_arrow.svg');
+      padding-left: 22px;
+      position: relative;
+
+      &:before {
+        position: absolute;
+        content: "";
+        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+        background-size: 14px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 14px;
+        height: 8px;
+        top: 4px;
+        left: 0px;
+      }
     }
   }
 
   div.empty-result {
     width: 100%;
-    background-color: white;
-    padding: 20px;
+    padding: 0px 16px 16px;
     font-size: 16px;
+
+    @include mobile() {
+      padding: 6px 24px;
+      width: auto;
+    }
 
     img {
       margin: auto;
@@ -217,7 +313,9 @@ div.search-results {
     div.message {
       margin: auto;
       width: 100%;
-      color: rgba($carrot_light_gray_3, 0.4);
+      @include avenir_R();
+      font-size: 14px;
+      color: $deep_navy;
     }
   }
 }

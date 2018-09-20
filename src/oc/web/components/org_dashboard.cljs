@@ -21,7 +21,7 @@
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.search :refer (search-results-view)]
+            [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -136,7 +136,8 @@
                                        entry-not-found))
         is-loading (and (not show-activity-not-found)
                         (not show-activity-removed)
-                        loading?)]
+                        loading?)
+        is-showing-mobile-search (and is-mobile? search-active? (not (router/current-activity-id)))]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -197,8 +198,8 @@
                is-sharing-activity)
           (activity-share)
           ;; Search results
-          (and is-mobile? search-active? (not (router/current-activity-id)))
-          (search-results-view)
+          is-showing-mobile-search
+          (search-box)
           ;; Show mobile navigation
           (and is-mobile?
                mobile-navigation-sidebar)
@@ -239,5 +240,6 @@
                                   mobile-navigation-sidebar
                                   org-settings-data
                                   user-settings
-                                  mobile-menu-open))
+                                  mobile-menu-open
+                                  is-showing-mobile-search))
                  (dashboard-layout))]]])])))
