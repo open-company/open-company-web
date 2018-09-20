@@ -30,8 +30,10 @@
 
 (defn user-profile-click [e]
   (utils/event-stop e)
-  (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+  (if (responsive/is-tablet-or-mobile?)
+    (user-profile/show-modal :profile)
+    (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+  (mobile-menu-toggle))
 
 (defn user-notifications-click [e]
   (utils/event-stop e)
@@ -94,8 +96,7 @@
       [:div.oc-menu-separator]
       (when org-data
         [:div.org-item
-          [:div.org-avatar-border
-            (org-avatar org-data false false true)]
+          (org-avatar org-data false false true)
           [:div.org-name (:name org-data)]
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
       (when (and (not is-mobile?)

@@ -1,13 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <svg width="15px" height="16px" viewBox="0 0 15 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>icon</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Search" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Search-B" transform="translate(-83.000000, -24.000000)">
-            <g id="Group-12" transform="translate(83.000000, 24.000000)">
-                <g id="icon">
-                    <rect id="Rectangle-4" fill="#C4C6C7" transform="translate(12.351801, 13.000000) rotate(-45.000000) translate(-12.351801, -13.000000) " x="11.401662" y="10" width="1.90027701" height="6" rx="0.950138504"></rect>
-                    <circle id="Oval" stroke="#C4C6C7" stroke-width="2" cx="7" cy="7" r="6"></circle>
+    <g id="Active-search" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Search" transform="translate(-481.000000, -20.000000)">
+            <g id="Group-7">
+                <g id="Group-9">
+                    <g id="Group-30" transform="translate(380.000000, 12.000000)">
+                        <g id="Group" transform="translate(101.000000, 7.000000)">
+                            <g id="icon" transform="translate(0.000000, 1.000000)">
+                                <rect id="Rectangle-4" fill="#898D93" transform="translate(12.351801, 13.000000) rotate(-45.000000) translate(-12.351801, -13.000000) " x="11.401662" y="10" width="1.90027701" height="6" rx="0.950138504"></rect>
+                                <circle id="Oval" stroke="#898D93" stroke-width="2" cx="7" cy="7" r="6"></circle>
+                            </g>
+                        </g>
+                    </g>
                 </g>
             </g>
         </g>
