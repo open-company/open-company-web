@@ -82,7 +82,17 @@ div.org-settings {
           padding: 4px;
         }
 
-        @include org-avatar(40);
+        @include org-avatar(48);
+
+        div.org-avatar-container img.org-avatar-img {
+          padding: 4px;
+        }
+
+        &:hover {
+          div.org-avatar-container img.org-avatar-img {
+            border: 1px solid $carrot_green;
+          }
+        }
 
         div.org-avatar.missing-logo {
           div.org-avatar-container.no-avatar.force-label {

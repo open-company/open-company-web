@@ -10,6 +10,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.menu :as menu]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.search :as search-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
@@ -64,41 +65,52 @@
                                                          (:count
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
                                 :not-fixed (or (utils/in? (:route @router/path) "all-posts")
+                                               (utils/in? (:route @router/path) "must-see")
                                                (utils/in? (:route @router/path) "dashboard"))
                                 :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
-                                                     (not (:read-only org-data)))
-                                :jwt (jwt/jwt)})}
+                                                     (not (:read-only org-data)))})}
+      [:div.mobile-bottom-line
+        {:class (utils/class-set {:search search-active
+                                  :user-menu (or mobile-menu-open
+                                                 (and is-mobile?
+                                                      (or user-settings
+                                                          org-settings)))})}
+        [:div.orange-active-tab]]
       (when-not (utils/is-test-env?)
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
-          (when active?
-            [:div.mobile-underline])
           [:div.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:class (utils/class-set {:close-bt (or mobile-menu-open
-                                                      (and is-mobile?
-                                                           (or user-settings
-                                                               org-settings)))
-                                        :active active?})
+              {:class (utils/class-set {:active active?})
                :on-click #(do
+                            (search-actions/inactive)
                             (menu/mobile-menu-close)
                             (if (and is-mobile?
                                      (or org-settings
                                          user-settings))
                               (do
                                 (dis/dispatch! [:input [:user-settings] nil])
-                                (dis/dispatch! [:input [:org-settings] nil]))
-                              (when mobile-menu-open
-                                (dis/dispatch! [:input [:mobile-menu-open] (not mobile-menu-open)]))))}]
-           (search-box)]
+                                (dis/dispatch! [:input [:org-settings] nil]))))}]
+           (if is-mobile?
+             [:button.mlb-reset.search-bt
+               {:on-click #(do
+                             (menu/mobile-menu-close)
+                             (search-actions/active)
+                             (utils/after 500 search-actions/focus))
+                :class (when search-active "active")}]
+             (orgs-dropdown))]
           [:div.navbar-center
-            (orgs-dropdown)]
+            {:class (when search-active "search-active")}
+            (if is-mobile?
+             (orgs-dropdown)
+             (search-box))]
           [:div.navbar-right
             (if is-mobile?
               [:button.btn-reset.mobile-menu.group
                 {:on-click #(do
+                             (search-actions/inactive)
                              (when is-mobile?
                                (dis/dispatch! [:input [:user-settings] nil])
                                (dis/dispatch! [:input [:org-settings] nil]))

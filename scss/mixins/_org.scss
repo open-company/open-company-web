@@ -1,4 +1,4 @@
-@mixin oc-letter($max_logo_height) {
+@mixin carrot-fallback($max_logo_height) {
   position: relative;
   width: #{$max_logo_height}px;
   height: #{$max_logo_height}px;
@@ -25,44 +25,60 @@
   }
 }
 
-@mixin org-avatar($max_logo_height: 42){
+@mixin org-avatar($max_logo_height: 42, $show-border: true){
   div.org-avatar-container {
     line-height: 0;
 
     &.no-avatar {
       @include mobile() {
-        @include oc-letter($max_logo_height);
+        @include carrot-fallback($max_logo_height);
+      }
+    }
+
+    &.force-label {
+      img.org-avatar-img {
+        display: inline-block;
+        float: left;
       }
 
-      &.force-label {
-        @include oc-letter($max_logo_height);
+      span.org-name {
+        display: inline-block;
+        float: left;
+        margin: -#{($max_logo_height / 2) + ($max_logo_height / 4)}px 0 0 #{$max_logo_height + 8}px;
 
-        span.org-name {
-          display: block;
+        @include mobile() {
+          display: none;
         }
       }
     }
 
     img.org-avatar-img{
+      @if $show-border == true {
+        border: 1px solid #ECECEC;
+        padding: 4px;
+      }
+
       width: #{$max_logo_height}px;
       height: #{$max_logo_height}px;
       object-fit: contain;
+      border-radius: 4px;
       vertical-align: middle;
-      border-radius: 8px;
     }
 
     span.org-name {
-      @include avenir_B();
-      font-size: 18px;
-      line-height: 1;
+      @include avenir_H();
+      font-size: 16px;
+      line-height: 22px;
       color: $deep_navy;
-      // margin-top: -34px;
-      // margin-left: 54px;
-      float: left;
+      text-align: left;
       white-space: pre;
       text-overflow: ellipsis;
       overflow: hidden;
       width: 100%;
+
+      @include mobile() {
+        display: none;
+      }
 
       &.no-logo {
         @include mobile(){
