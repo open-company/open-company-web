@@ -186,14 +186,14 @@ nav.oc-navbar {
         float: right;
         margin-right: 0px;
 
-        @include mobile() {
-          margin-right: -16px;  
-        }
-
         div.user-notifications {
           float: left;
           margin-right: 16px;
           margin-top: 4px;
+        }
+
+        @include mobile() {
+          margin-right: -16px;
         }
 
         div.user-menu {
