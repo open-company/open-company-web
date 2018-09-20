@@ -27,7 +27,7 @@
         with-entries (:entries section-data)
         org-slug (utils/section-org-slug section-data)
         fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
-        old-section-data (get-in db (dispatcher/board-data-key org-slug (keyword (:slug section-data))))
+        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data)))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
                             old-section-data
@@ -41,7 +41,7 @@
     (assoc-in with-merged-items
               (dispatcher/board-data-key
                org-slug
-               (keyword (:slug section-data)))
+               (:slug section-data))
               (dissoc with-current-edit :fixed-items))))
 
 (defn new?

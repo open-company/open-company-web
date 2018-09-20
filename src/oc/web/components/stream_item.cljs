@@ -129,7 +129,8 @@
                        {:width (win-width)
                         :height @(::mobile-video-height s)}
                        {:width (if expanded? 638 136)
-                        :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))]
+                        :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
@@ -157,9 +158,11 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
-          [:div.separator]
-          [:div.stream-item-wrt
-            (wrt activity-data read-data)]]
+          (when user-is-part-of-the-team
+            [:div.separator])
+          (when user-is-part-of-the-team
+            [:div.stream-item-wrt
+              (wrt activity-data read-data)])]
         (when (and (not is-drafts-board)
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)
