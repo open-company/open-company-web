@@ -374,11 +374,15 @@
         board-slug (:board-slug activity-data)
         activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
         activity-board-data (dispatcher/board-data db org-slug board-slug)
-        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))]
+        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))
+        ;; these are the data we need to move from the saved post to the editing map
+        ;; we don't have to override the keys that the user could have changed during the PATCH/POST request
+        keys-for-edit [:uuid :board-name :board-slug :board-uuid :links :revision-id :secure-uuid :status]
+        map-for-edit (assoc (select-keys activity-data keys-for-edit) :auto-saving false)]
     (-> db
       (assoc-in activity-key fixed-activity-data)
       (dissoc :entry-toggle-save-on-exit)
-      (assoc-in [edit-key :auto-saving] false))))
+      (update-in [edit-key] merge map-for-edit))))
 
 (defmethod dispatcher/action :entry-revert/finish
   [db [_ activity-data]]
