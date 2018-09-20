@@ -172,9 +172,7 @@
                :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
                                         :main-panel main-tab?})
                :on-click logo-on-click}
-              (if (empty? (:logo-url org-avatar-editing))
-                [:div.org-avatar-img-empty]
-                (org-avatar org-data-for-avatar false false true))]
+              (org-avatar org-data-for-avatar false :never)]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
           (org-settings-tabs org-data settings-tab)

@@ -503,7 +503,8 @@
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
           (when (not= (:status cmail-data) "published")
-            (if (:has-changes cmail-data)
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
               [:div.saving-saved "Saving..."]
               (when (false? (:auto-saving cmail-data))
                 [:div.saving-saved "Saved"])))
