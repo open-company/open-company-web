@@ -330,7 +330,6 @@
                                :org-settings-data (:org-settings base)
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
-                               :is-entry-editing (boolean (:entry-editing base))
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
