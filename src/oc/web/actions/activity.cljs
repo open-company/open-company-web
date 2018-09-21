@@ -352,11 +352,11 @@
 
 (defn add-attachment [dispatch-input-key attachment-data]
   (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data])
-  (dis/dispatch! [:input [:cmail-data :has-changes] true]))
+  (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
 (defn remove-attachment [dispatch-input-key attachment-data]
   (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data])
-  (dis/dispatch! [:input [:cmail-data :has-changes] true]))
+  (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
 (defn get-entry [entry-data]
   (api/get-entry entry-data
