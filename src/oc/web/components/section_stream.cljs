@@ -2,6 +2,8 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -26,6 +28,8 @@
                             ;; Derivatives
                             (drv/drv :filtered-posts)
                             (drv/drv :activities-read)
+                            (drv/drv :board-data)
+                            (drv/drv :org-data)
                             ;; Mixins
                             mixins/first-render-mixin
                             (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner"
@@ -35,7 +39,9 @@
   [s]
   (let [section-data (drv/react s :filtered-posts)
         items (activity-utils/get-sorted-activities section-data)
-        activities-read (drv/react s :activities-read)]
+        activities-read (drv/react s :activities-read)
+        org-data (drv/react s :org-data)
+        board-data (drv/react s :board-data)]
     [:div.section-stream.group
       [:div.section-stream-cards
         [:div.section-stream-cards-inner.group
@@ -43,5 +49,16 @@
                 :let [reads-data (get activities-read (:uuid e))]]
             (rum/with-key (stream-item e reads-data)
              (str "section-stream-item-" (:uuid e) "-" (:updated-at e))))]
-        (when (responsive/is-mobile-size?)
-          (all-caught-up))]]))
+        (when (and (responsive/is-mobile-size?)
+                   (not (router/current-activity-id)))
+          (all-caught-up))
+        (when (and (router/current-activity-id)
+                   (jwt/user-is-part-of-the-team (:team-id org-data))
+                   (map? board-data)
+                   (:entry-count board-data)
+                   (> (:entry-count board-data) 1))
+          [:div.back-to-board-container
+            [:button.mlb-reset.back-to-board
+              {:on-click #(router/nav! (oc-urls/board))
+               :dangerouslySetInnerHTML #js {:__html
+                (str "Show all " (:entry-count board-data) " posts in " (:name board-data))}}]])]]))

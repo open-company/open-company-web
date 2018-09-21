@@ -1,6 +1,8 @@
 (ns oc.web.components.ui.login-button
   (:require-macros [dommy.core :refer (sel1)])
   (:require [rum.core :as rum]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.actions.user :as user]
             [oc.web.lib.utils :as utils]))
 
@@ -12,14 +14,20 @@
                                         s)}
   [s {:keys [button-classes]}]
   [:div.login-button
-    [:button
-      {:class (str "btn-reset signup-signin " (when button-classes button-classes))
-       :on-click #(user/show-login :login-with-slack)
+    [:a.signup-signin
+      {:class (when button-classes button-classes)
+       :href oc-urls/sign-up
+       :on-click (fn [e]
+                   (utils/event-stop e)
+                   (router/nav! oc-urls/sign-up))
        :on-touch-start identity}
-      "Sign In"]
-    [:span.signup-signin " / "]
-    [:button
-      {:class (str "btn-reset signup-signin " (when button-classes button-classes))
-       :on-click #(user/show-login :signup-with-slack)
+      "Get started"]
+    [:span.signup-signin]
+    [:a.signup-signin
+      {:class (when button-classes button-classes)
+       :href oc-urls/login
+       :on-click (fn [e]
+                   (utils/event-stop e)
+                   (router/nav! oc-urls/login))
        :on-touch-start identity}
-      "Sign Up"]])
+      "Login"]])
