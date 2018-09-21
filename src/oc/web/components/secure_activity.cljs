@@ -20,8 +20,8 @@
             [goog.events.EventType :as EventType]))
 
 (defn win-width []
-  (or (.-innerWidth js/window)
-      (.-clientWidth (.-documentElement js/document))))
+  (or (.-clientWidth (.-documentElement js/document))
+      (.-innerWidth js/window)))
 
 (defn save-win-height [s]
   (reset! (::win-height s) (.-innerHeight js/window))
