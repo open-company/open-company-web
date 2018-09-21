@@ -582,7 +582,7 @@ div.cmail-outer {
             }
 
             @include tablet() {
-              min-height: calc(100vh - 196px);
+              min-height: 50vh;
               max-height: initial;
               @include activity-body(18, 24, 24, $deep_navy);
               font-size: 18px;
