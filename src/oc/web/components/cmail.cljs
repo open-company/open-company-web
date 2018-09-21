@@ -222,8 +222,8 @@
     (alert-modal/show-alert alert-data)))
 
 (defn win-width []
-  (or (.-innerWidth js/window)
-      (.-clientWidth (.-documentElement js/document))))
+  (or (.-clientWidth (.-documentElement js/document))
+      (.-innerWidth js/window)))
 
 (defn calc-video-height [s]
   (when (responsive/is-tablet-or-mobile?)
