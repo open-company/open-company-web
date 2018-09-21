@@ -13,8 +13,8 @@ div.cmail-outer {
     position: relative;
     bottom: unset;
     right: unset;
-    border-top-left-radius: none;
-    border-top-right-radius: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     height: initial;
     min-height: 100vh;
     background-color: white;
@@ -81,8 +81,8 @@ div.cmail-outer {
       top: unset;
       left: unset;
       background-color: white;
-      border-bottom-left-radius: none;
-      border-bottom-right-radius: none;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
       box-shadow: none;
     }
 
@@ -111,7 +111,7 @@ div.cmail-outer {
           width: 100%;
           height: initial;
           top: unset;
-          border-radius: none;
+          border-radius: 0;
         }
 
         div.cmail-header {
@@ -162,8 +162,8 @@ div.cmail-outer {
           left: 0;
           width: 100vw;
           height: 56px;
-          border-top-left-radius: none;
-          border-top-right-radius: none;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
           padding: 16px 14px;
           z-index: 100;
         }
@@ -582,7 +582,7 @@ div.cmail-outer {
             }
 
             @include tablet() {
-              min-height: calc(100vh - 196px);
+              min-height: 50vh;
               max-height: initial;
               @include activity-body(18, 24, 24, $deep_navy);
               font-size: 18px;
