@@ -1,14 +1,20 @@
 div.login-button{
-  button.signup-signin, span.signup-signin {
-    opacity: 0.4;
-    color: $oc_gray_5;
-    @include avenir_H();
-    font-size: 14px;
-    padding-top: 0px;
-    margin-top: 15px;
+  margin-top: 10px;
 
-    &:hover {
-      opacity: 0.6;
-    }
+  a.signup-signin {
+    color: $ui_grey;
+    @include avenir_R();
+    font-size: 12px;
+    float: left;
+  }
+
+  span.signup-signin {
+    display: block;
+    width: 3px;
+    height: 3px;
+    background-color: $ui_grey;
+    margin: 6px 6px 0;
+    float: left;
+    border-radius: 50%;
   }
 }

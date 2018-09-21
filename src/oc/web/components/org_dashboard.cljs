@@ -22,7 +22,6 @@
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.components.fullscreen-post :refer (fullscreen-post)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -145,12 +144,9 @@
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
-                                  :modal-activity-view (router/current-activity-id)
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
-                                  :activity-removed show-activity-removed
-                                  :no-scroll (and (not is-mobile?)
-                                                  (router/current-activity-id))})}
+                                  :activity-removed show-activity-removed})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
@@ -207,11 +203,7 @@
           ;; Show mobile navigation
           (and is-mobile?
                mobile-navigation-sidebar)
-          (navigation-sidebar)
-          ;; Activity modal
-          (and (router/current-activity-id)
-               (not entry-edit-dissmissing))
-          (fullscreen-post))
+          (navigation-sidebar))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -234,7 +226,7 @@
         (when is-showing-alert
           (alert-modal))
         (when-not (and is-mobile?
-                       (or (router/current-activity-id)
+                       (or ; (router/current-activity-id)
                            is-entry-editing
                            is-sharing-activity
                            show-section-add
