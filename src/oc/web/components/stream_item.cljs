@@ -176,7 +176,7 @@
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
-            :external-share true}))]
+            :external-share (not is-mobile?)}))]
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.group
