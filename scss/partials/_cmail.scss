@@ -9,6 +9,19 @@ div.cmail-outer {
   border-top-right-radius: 8px;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
 
+  @include tablet() {
+    position: relative;
+    bottom: unset;
+    right: unset;
+    border-top-left-radius: none;
+    border-top-right-radius: none;
+    height: initial;
+    min-height: 100vh;
+    background-color: white;
+    width: 100%;
+    box-shadow: none;
+  }
+
   &.collapse, &.collapse.fullscreen {
     display: block;
     position: fixed;
@@ -16,6 +29,15 @@ div.cmail-outer {
     bottom: 0px;
     height: 48px;
     width: 330px;
+
+    @include tablet() {
+      position: relative;
+      right: unset;
+      bottom: unset;
+      height: initial;
+      min-height: 100vh;
+      width: 100%;
+    }
 
     div.cmail-middle {
       div.cmail-container {
@@ -51,9 +73,28 @@ div.cmail-outer {
     border-bottom-right-radius: 8px;
     box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.1);
 
+    @include tablet() {
+      position: relative;
+      height: initial;
+      min-height: 100vh;
+      display: block;
+      top: unset;
+      left: unset;
+      background-color: white;
+      border-bottom-left-radius: none;
+      border-bottom-right-radius: none;
+      box-shadow: none;
+    }
+
     div.cmail-middle {
       display: table-cell;
       vertical-align: middle;
+
+      @include tablet() {
+        display: block;
+        width: 100%;
+        height: initial;
+      }
 
       div.cmail-container {
         margin-left: auto;
@@ -63,6 +104,15 @@ div.cmail-outer {
         top: 50%;
         background-color: white;
         border-radius: 8px;
+
+        @include tablet() {
+          margin-left: 0;
+          margin-right: 0;
+          width: 100%;
+          height: initial;
+          top: unset;
+          border-radius: none;
+        }
 
         div.cmail-header {
 
@@ -82,9 +132,19 @@ div.cmail-outer {
     width: 100%;
     height: 100%;
 
+    @include tablet() {
+      width: 100vw;
+      height: 100vh;
+    }
+
     div.cmail-container {
       width: 100%;
       height: 100%;
+
+      @include tablet() {
+        width: 100vw;
+        height: 100vh;
+      }
 
       div.cmail-header {
         background-color: $deep_navy;
@@ -96,6 +156,18 @@ div.cmail-outer {
 
         @include no-user-select();
 
+        @include tablet() {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 56px;
+          border-top-left-radius: none;
+          border-top-right-radius: none;
+          padding: 16px 14px;
+          z-index: 100;
+        }
+
         div.cmail-header-title {
           color: white;
           @include avenir_H();
@@ -105,6 +177,26 @@ div.cmail-outer {
           text-overflow: ellipsis;
           white-space: nowrap;
           float: left;
+
+          @include tablet() {
+            display: none;
+          }
+        }
+
+        div.mobile-saving-saved {
+          position: absolute;
+          top: 18px;
+          left: 50%;
+          margin-left: -20px;
+          display: inline-block;
+          width: 40px;
+          height: 20px;
+          @include avenir_M();
+          color: white;
+          font-size: 12px;
+          line-height: 20px;
+          text-align: center;
+          opacity: 0.5;
         }
 
         &.must-see-on {
@@ -117,6 +209,10 @@ div.cmail-outer {
           height: 20px;
           margin-right: 16px;
           position: relative;
+
+          @include tablet() {
+            display: none;
+          }
 
           .tooltip {
             margin-top: -16px;
@@ -170,6 +266,10 @@ div.cmail-outer {
         div.collapse-bt-container {
           float: right;
 
+          @include tablet() {
+            display: none;
+          }
+
           button.collapse-bt {
             width: 24px;
             height: 24px;
@@ -186,6 +286,10 @@ div.cmail-outer {
 
         div.fullscreen-bt-container {
           float: right;
+
+          @include tablet() {
+            display: none;
+          }
 
           button.fullscreen-bt {
             width: 24px;
@@ -205,6 +309,10 @@ div.cmail-outer {
         div.close-bt-container {
           float: right;
 
+          @include tablet() {
+            float: left;
+          }
+
           button.close-bt {
             width: 24px;
             height: 24px;
@@ -213,6 +321,11 @@ div.cmail-outer {
             background-position: center;
             background-repeat: no-repeat;
             margin-left: 8px;
+
+            @include tablet() {
+              margin-left: 0;
+              background-size: 14px 14px;
+            }
           }
 
           &.long-tooltip {
@@ -226,6 +339,38 @@ div.cmail-outer {
             margin-top: -16px;
           }
         }
+
+        button.mobile-post-button {
+          display: none;
+
+          @include tablet() {
+            display: block;
+            color: white;
+            width: 40px;
+            height: 24px;
+            @include avenir_B();
+            font-size: 14px;
+            float: right;
+            margin: 0 2px 0 0 ;
+            padding: 0;
+            position: relative;
+
+            &.loading {
+              padding-left: 24px;
+              width: 64px;
+
+              div.small-loading {
+                position: absolute;
+                top: 2px;
+                left: 0px;
+              }
+            }
+
+            &.disabled {
+              opacity: 0.4;
+            }
+          }
+        }
       }
 
       div.cmail-section {
@@ -233,6 +378,12 @@ div.cmail-outer {
         border-bottom: 1px solid #ECECEC;
         padding: 16px;
         position: relative;
+
+        @include tablet() {
+          height: 56px;
+          margin-top: 56px;
+          padding: 20px 24px;
+        }
 
         div.board-name {
           margin-top: 2px;
@@ -244,6 +395,13 @@ div.cmail-outer {
           font-size: 14px;
           color: $deep_navy;
           line-height: 16px;
+
+          @include tablet() {
+            margin-left: 0;
+            margin-top: 0;
+            @include avenir_M();
+            font-size: 14px;
+          }
 
           &:after {
             float: right;
@@ -271,7 +429,7 @@ div.cmail-outer {
           max-height: 370px;
           overflow: auto;
 
-          @include mobile(){
+          @include tablet(){
             max-height: initial;
           }
         }
@@ -287,22 +445,33 @@ div.cmail-outer {
             position: relative;
             padding-left: 26px;
 
+            @include tablet() {
+              padding-left: 0;
+              width: 24px;
+              height: 24px;
+            }
+
             &.remove-video-bt {
               &:before {
                 background-image: cdnUrl("/img/ML/remove_video_icon.svg");
               }
-              &:hover {
-                &:before {
-                  background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+
+              @include big_web() {
+                &:hover {
+                  &:before {
+                    background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+                  }
                 }
               }
             }
 
-            &:hover {
-              color: $ui_grey;
+            @include big_web() {
+              &:hover {
+                color: $ui_grey;
 
-              &:before {
-                background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+                &:before {
+                  background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+                }
               }
             }
 
@@ -317,6 +486,10 @@ div.cmail-outer {
               background-size: 20px 12px;
               background-repeat: no-repeat;
               background-position: center;
+
+              @include tablet() {
+                background-image: cdnUrl("/img/ML/mobile_capture_video_icon.svg");
+              }
             }
           }
         }
@@ -330,11 +503,27 @@ div.cmail-outer {
         overflow-x: hidden;
         height: auto;
 
+        @include tablet() {
+          padding: 24px;
+          min-height: calc(100vh - 112px);
+          max-height: initial;
+          overflow-x: visible;
+          overflow-y: visible;
+        }
+
         div.ziggeo-player, div.ziggeo-recorder {
           margin: 0px auto 24px;
 
+          @include tablet() {
+            margin-left: -24px;
+          }
+
           div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
             margin: 0px auto;
+
+            @include tablet() {
+              margin-left: -24px;
+            }
           }
         }
 
@@ -375,18 +564,31 @@ div.cmail-outer {
             outline: none;
             margin: 8px 0px 0px;
             cursor: text;
-            @include activity-body(16, 22, 22, $deep_navy);
             color: $deep_navy;
             @include avenir_R();
-            font-size: 16px;
-            line-height: 22px;
             height: auto;
-            overflow-y: auto;
-            overflow-x: hidden;
+
+            @include big_web() {
+              @include activity-body(16, 22, 22, $deep_navy);
+              font-size: 16px;
+              line-height: 22px;
+              overflow-y: auto;
+              overflow-x: hidden;
+            }
 
             @media screen and (min-height: 556px) {
               min-height: 240px;
               max-height: calc(100vh - 315px);
+            }
+
+            @include tablet() {
+              min-height: calc(100vh - 196px);
+              max-height: initial;
+              @include activity-body(18, 24, 24, $deep_navy);
+              font-size: 18px;
+              line-height: 24px;
+              overflow-y: auto;
+              overflow-x: visible;
             }
 
             & > *:first-child {
@@ -496,6 +698,10 @@ div.cmail-outer {
         padding: 0px 16px 12px;
         background-color: white;
 
+        @include tablet() {
+          display: none;
+        }
+
         button.post-button {
           background-color: $coral;
           color: $carrot_orange;
@@ -555,7 +761,7 @@ div.cmail-outer {
             cursor: pointer;
           }
 
-          @include mobile() {
+          @include tablet() {
             display: none;
           }
 

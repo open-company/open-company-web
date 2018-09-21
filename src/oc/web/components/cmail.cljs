@@ -8,13 +8,16 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
@@ -143,22 +146,24 @@
       (start-recording-fn))))
 
 (defn show-post-error [s message]
-  (when-let [$post-btn (js/$ (rum/ref-node s "mobile-post-btn"))]
-    (if-not (.data $post-btn "bs.tooltip")
-      (.tooltip $post-btn
-       (clj->js {:container "body"
-                 :placement "top"
-                 :trigger "manual"
-                 :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                  "<div class=\"tooltip-arrow\"></div>"
-                                  "<div class=\"tooltip-inner\"></div>"
-                                "</div>")
-                 :title message}))
-      (doto $post-btn
-        (.attr "data-original-title" message)
-        (.tooltip "fixTitle")))
-    (utils/after 10 #(.tooltip $post-btn "show"))
-    (utils/after 5000 #(.tooltip $post-btn "hide"))))
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        post-bt-ref (if is-mobile? "mobile-post-btn" "post-btn")]
+    (when-let [$post-btn (js/$ (rum/ref-node s post-bt-ref))]
+      (if-not (.data $post-btn "bs.tooltip")
+        (.tooltip $post-btn
+         (clj->js {:container "body"
+                   :placement (if is-mobile? "bottom" "top")
+                   :trigger "manual"
+                   :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                    "<div class=\"tooltip-arrow\"></div>"
+                                    "<div class=\"tooltip-inner\"></div>"
+                                  "</div>")
+                   :title message}))
+        (doto $post-btn
+          (.attr "data-original-title" message)
+          (.tooltip "fixTitle")))
+      (utils/after 10 #(.tooltip $post-btn "show"))
+      (utils/after 5000 #(.tooltip $post-btn "hide")))))
 
 (defn post-clicked [s]
   (clean-body s)
@@ -216,7 +221,16 @@
                     }]
     (alert-modal/show-alert alert-data)))
 
+(defn win-width []
+  (or (.-innerWidth js/window)
+      (.-clientWidth (.-documentElement js/document))))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
+
 (rum/defcs cmail < rum/reactive
+                   ;; Derivatives
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
                    (drv/drv :show-sections-picker)
@@ -234,6 +248,10 @@
                    (rum/local false ::record-video)
                    (rum/local false ::video-uploading)
                    (rum/local false ::video-picking-cover)
+                   (rum/local 0 ::mobile-video-height)
+                   ;; Mixins
+                   (mixins/render-on-resize calc-video-height)
+
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
                           initial-body (if (seq (:body cmail-data))
@@ -250,6 +268,7 @@
                       (reset! (::initial-uuid s) (:uuid cmail-data)))
                     s)
                    :did-mount (fn [s]
+                    (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (when-let [headline-el (rum/ref-node s "headline")]
                       (utils/to-end-of-content-editable headline-el))
@@ -309,12 +328,16 @@
                     (remove-autosave s)
                     s)}
   [s]
-  (let [cmail-state (drv/react s :cmail-state)
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
         show-sections-picker (drv/react s :show-sections-picker)
         published? (= (:status cmail-data) "published")
-        video-size {:width 548
-                    :height (utils/calc-video-height 548)}]
+        video-size (if is-mobile?
+                     {:width (win-width)
+                      :height @(::mobile-video-height s)}
+                     {:width 548
+                      :height (utils/calc-video-height 548)})]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
                                                  (:fullscreen cmail-state))
@@ -337,6 +360,13 @@
               (if (seq (:headline cmail-data))
                 (:headline cmail-data)
                 utils/default-headline)]
+            (when (and (not= (:status cmail-data) "published")
+                       is-mobile?)
+              (if (or (:has-changes cmail-data)
+                      (:auto-saving cmail-data))
+                [:div.mobile-saving-saved "Saving..."]
+                (when (false? (:auto-saving cmail-data))
+                  [:div.mobile-saving-saved "Saved"])))
             (let [long-tooltip (not= (:status cmail-data) "published")]
               [:div.close-bt-container
                 {:class (when long-tooltip "long-tooltip")}
@@ -345,7 +375,7 @@
                                        (:has-changes cmail-data))
                                (cancel-clicked s)
                                (activity-actions/cmail-hide))
-                   :data-toggle "tooltip"
+                   :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement "top"
                    :data-trigger "hover"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -375,7 +405,23 @@
                  :data-placement "top"
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if (:collapse cmail-state) "Show" "Collapse")}]]]
+                 :title (if (:collapse cmail-state) "Show" "Collapse")}]]
+            (let [disabled? (or @(::publishing s)
+                                (not (is-publishable? s cmail-data)))
+                  working? (or (and published?
+                                    @(::saving s))
+                               (and (not published?)
+                                    @(::publishing s)))]
+              [:button.mlb-reset.mobile-post-button
+                {:ref "mobile-post-btn"
+                 :on-click #(post-clicked s)
+                 :class (utils/class-set {:disabled disabled?
+                                          :loading working?})}
+                (when working?
+                  (small-loading))
+                (if (= (:status cmail-data) "published")
+                  "SAVE"
+                  "POST")])]
           [:div.cmail-section
             [:div.board-name
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
@@ -400,10 +446,11 @@
                  :class (when (or (:fixed-video-id cmail-data)
                                   @(::record-video s))
                           "remove-video-bt")}
-                (if (or (:fixed-video-id cmail-data)
-                        @(::record-video s))
-                  "Remove video"
-                  "Record video")]]]
+                (when-not is-mobile?
+                  (if (or (:fixed-video-id cmail-data)
+                          @(::record-video s))
+                    "Remove video"
+                    "Record video"))]]]
           [:div.cmail-content
             ;; Video elements
             (when (and (:fixed-video-id cmail-data)
@@ -486,7 +533,7 @@
                              (and (not published?)
                                   @(::publishing s)))]
             [:button.mlb-reset.post-button
-              {:ref "mobile-post-btn"
+              {:ref "post-btn"
                :on-click #(post-clicked s)
                :class (utils/class-set {:disabled disabled?
                                         :loading working?})}
@@ -502,7 +549,8 @@
                          :position "top"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
-          (when (not= (:status cmail-data) "published")
+          (when (and (not= (:status cmail-data) "published")
+                     (not is-mobile?))
             (if (or (:has-changes cmail-data)
                     (:auto-saving cmail-data))
               [:div.saving-saved "Saving..."]
