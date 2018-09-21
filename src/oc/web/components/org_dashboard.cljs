@@ -225,7 +225,10 @@
               (rum/portal (activity-share) portal-element)
               (activity-share))))
         ;; cmail editor
-        (when show-cmail
+        (when (and show-cmail
+                   (or (not is-mobile?)
+                       (and is-mobile?
+                            (not show-sections-picker))))
           (cmail))
         ;; Media video modal for entry editing
         (when (and media-input
