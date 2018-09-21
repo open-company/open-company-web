@@ -17,7 +17,6 @@
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.cmail :refer (cmail)]
-            [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -77,7 +76,6 @@
                 user-settings
                 org-settings-data
                 made-with-carrot-modal-data
-                is-entry-editing
                 is-sharing-activity
                 entry-edit-dissmissing
                 is-showing-alert
@@ -190,9 +188,6 @@
                #(merge % {:board-slug (:slug board-data)
                           :board-name (:name board-data)
                           :invite-note note})]))))
-          ;; Entry editing
-          is-entry-editing
-          (entry-edit)
           ;; Activity share for mobile
           (and is-mobile?
                is-sharing-activity)
@@ -227,7 +222,6 @@
           (alert-modal))
         (when-not (and is-mobile?
                        (or ; (router/current-activity-id)
-                           is-entry-editing
                            is-sharing-activity
                            show-section-add
                            show-section-editor
