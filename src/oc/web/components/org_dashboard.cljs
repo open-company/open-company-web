@@ -238,7 +238,8 @@
                            is-entry-editing
                            is-sharing-activity
                            show-section-add
-                           show-section-editor))
+                           show-section-editor
+                           show-cmail))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
