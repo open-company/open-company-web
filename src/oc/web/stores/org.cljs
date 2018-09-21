@@ -25,15 +25,22 @@
         next-boards (into {} (filter filter-board old-boards))
         section-names (:default-board-names org-data)
         selected-sections (map :name (:boards org-data))
-        sections (vec (map #(hash-map :name % :selected (utils/in? selected-sections %)) section-names))]
+        sections (vec (map #(hash-map :name % :selected (utils/in? selected-sections %)) section-names))
+        fixed-org-data (fix-org org-data)]
     (-> db
-      (assoc-in (dispatcher/org-data-key (:slug org-data)) (fix-org org-data))
+      (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
       (assoc :org-editing (-> org-data
                               (assoc :saved saved?)
                               (assoc :email-domain email-domain)
                               (dissoc :has-changes)))
+      (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
       (assoc :sections-setup sections)
       (assoc-in boards-key next-boards))))
+
+(defmethod dispatcher/action :org-avatar-update/failed
+  [db [_]]
+  (let [org-data (dispatcher/org-data db)]
+    (assoc db :org-avatar-editing (select-keys org-data [:logo-url :logo-width :logo-height]))))
 
 (defmethod dispatcher/action :org-create
   [db [_]]

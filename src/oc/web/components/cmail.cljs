@@ -265,6 +265,9 @@
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
                     (let [cmail-data @(drv/get-ref s :cmail-data)]
+                      ;; Did activity get removed in another client?
+                      (when (:delete cmail-data)
+                        (real-close))
                       ;; Entry is saving
                       ;: and save request finished
                       (when (and @(::saving s)
@@ -502,7 +505,8 @@
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
           (when (not= (:status cmail-data) "published")
-            (if (:has-changes cmail-data)
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
               [:div.saving-saved "Saving..."]
               (when (false? (:auto-saving cmail-data))
                 [:div.saving-saved "Saved"])))

@@ -239,6 +239,7 @@ $h2_top_margin: 24;
     @include avenir_R();
     color: $color;
     font-weight: 700;
+    letter-spacing: normal !important;
   }
 
   *:first-child {

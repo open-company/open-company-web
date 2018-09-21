@@ -28,24 +28,28 @@
 
 (defn section-get-finish
   [section]
-  (let [is-currently-shown (is-currently-shown? section)]
+  (let [is-currently-shown (is-currently-shown? section)
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
     (when is-currently-shown
-      ;; Tell the container service that we are seeing this board,
-      ;; and update change-data to reflect that we are seeing this board
-      (when-let [section-uuid (:uuid section)]
-        (utils/after 10 #(section-seen section-uuid)))
-      ;; only watch the currently visible board.
-      (when (jwt/jwt) ; only for logged in users
-        (watch-single-section section)))
+
+      (when user-is-part-of-the-team
+        ;; Tell the container service that we are seeing this board,
+        ;; and update change-data to reflect that we are seeing this board
+        (when-let [section-uuid (:uuid section)]
+          (utils/after 10 #(section-seen section-uuid)))
+        ;; only watch the currently visible board.
+        ; only for logged in users
+        (when (jwt/jwt)
+          (watch-single-section section))))
 
     ;; Retrieve reads count if there are items in the loaded section
-    (when (and (not= (:slug section) utils/default-drafts-board-slug)
+    (when (and user-is-part-of-the-team
+               (not= (:slug section) utils/default-drafts-board-slug)
                (seq (:entries section)))
       (let [item-ids (map :uuid (:entries section))
             cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activities-read-data))]
         (when (seq cleaned-ids)
           (api/request-reads-count cleaned-ids))))
-
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
@@ -56,11 +60,15 @@
       (fn [status body success]
         (section-get-finish (json->cljs body))))))
 
+(declare refresh-org-data)
+
 (defn section-change
   [section-uuid]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)]
+      (when (= section-uuid (:uuid utils/default-drafts-board))
+        (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
         (api/get-board (utils/link-for (:links current-section-data) "self")
@@ -228,11 +236,11 @@
       (dispatcher/dispatch! [:input [:section-editing] next-section-editing])
       (success-cb next-section-editing))))
 
-(defn pre-flight-check [section-name]
+(defn pre-flight-check [section-slug section-name]
   (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] true])
   (let [org-data (dispatcher/org-data)
         pre-flight-link (utils/link-for (:links org-data) "pre-flight-create")]
-    (api/pre-flight-section-check pre-flight-link section-name
+    (api/pre-flight-section-check pre-flight-link section-slug section-name
      (fn [{:keys [success body status]}]
        (when-not success
          (section-name-error status))

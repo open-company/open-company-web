@@ -5,12 +5,13 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
 (rum/defc org-dropdown-item < rum/static
-  [current-slug org]
+  [current-slug org is-mobile?]
   [:li
     {:class (when (= (:slug org) current-slug) "active")
      :on-click #(do
@@ -41,7 +42,8 @@
         org-data (drv/react s :org-data)
         current-org-slug (:slug org-data)
         should-show-dropdown? (> (count orgs) 1)
-        orgs-dropdown-visible (drv/react s :orgs-dropdown-visible)]
+        orgs-dropdown-visible (drv/react s :orgs-dropdown-visible)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.orgs-dropdown
       {:class (utils/class-set {:dropdown should-show-dropdown?
                                 :org-has-logo (seq (:logo-url org-data))})}
@@ -54,12 +56,12 @@
                      (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
                      (when should-show-dropdown?
                        (dis/dispatch! [:input [:orgs-dropdown-visible] (not orgs-dropdown-visible)])))}
-        (org-avatar org-data (not should-show-dropdown?))]
+        (org-avatar org-data (not should-show-dropdown?) (if is-mobile? :never :always) (not is-mobile?))]
       (when orgs-dropdown-visible
         [:div.orgs-dropdown-container
           [:div.triangle]
           [:ul.orgs-dropdown-menu
             (for [org orgs]
               (rum/with-key
-               (org-dropdown-item current-org-slug org)
+               (org-dropdown-item current-org-slug org is-mobile?)
                (str "org-dropdown-" (:slug org))))]])]))

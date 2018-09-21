@@ -116,8 +116,7 @@
             (when (:headline activity-data)
               [:div.activity-title.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
-            (when (and video-id
-                       (not @(::record-video s)))
+            (when video-id
               (ziggeo-player {:video-id video-id
                               :width (:width video-size)
                               :height (:height video-size)

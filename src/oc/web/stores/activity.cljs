@@ -148,7 +148,11 @@
                                     (filter #(not= % (:uuid activity-data)) posts-list)))))
                                db
                                (keys (get-in db containers-key)))]
-    (assoc-in with-fixed-containers posts-key next-posts)))
+    (if (= (:uuid (get-in db [:cmail-data])) (:uuid activity-data))
+      (-> with-fixed-containers
+          (assoc-in [:cmail-data] {:delete true})
+          (assoc-in posts-key next-posts))
+      (assoc-in with-fixed-containers posts-key next-posts))))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
@@ -365,16 +369,36 @@
     (assoc-in db uploading-video-key true)))
 
 (defmethod dispatcher/action :entry-auto-save/finish
-  [db [_ activity-data edit-key]]
+  [db [_ activity-data edit-key initial-entry-map]]
   (let [org-slug (utils/post-org-slug activity-data)
         board-slug (:board-slug activity-data)
         activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
         activity-board-data (dispatcher/board-data db org-slug board-slug)
-        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))]
+        fixed-activity-data (au/fix-entry activity-data activity-board-data (dispatcher/change-data db))
+        ;; these are the data we need to move from the saved post to the editing map
+        ;; we don't have to override the keys that the user could have changed during the PATCH/POST request
+        keys-for-edit [:uuid :board-uuid :links :revision-id :secure-uuid :status]
+        current-edit (get db edit-key)
+        ;; if it's still the same board let's get the updated data from the autosave request
+        with-board-keys (if (= (:board-name current-edit) (:board-name initial-entry-map))
+                          (concat keys-for-edit [:board-slug :board-uuid])
+                          keys-for-edit)
+        is-same-video?(= (:video-id current-edit) (:video-id initial-entry-map))
+        ;; if it's the same video-id let's get video-processed from the server
+        with-video-keys (if is-same-video?
+                          (concat with-board-keys [:video-processed])
+                          with-board-keys)
+        ;; and set video-error to true if one of the 2 is tue
+        video-error (if is-same-video?
+                      (or (:video-error current-edit) (:video-error activity-data))
+                      (:video-error current-edit))
+        map-for-edit (merge (select-keys activity-data with-video-keys)
+                        {:auto-saving false
+                         :video-error video-error})]
     (-> db
       (assoc-in activity-key fixed-activity-data)
       (dissoc :entry-toggle-save-on-exit)
-      (assoc-in [edit-key] (assoc activity-data :auto-saving false)))))
+      (update-in [edit-key] merge map-for-edit))))
 
 (defmethod dispatcher/action :entry-revert/finish
   [db [_ activity-data]]

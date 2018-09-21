@@ -56,8 +56,6 @@ div.org-settings {
 
       div.org-settings-header-avatar {
         float: left;
-        border: 1px solid #D8DBDF;
-        border-radius: 4px;
         width: 48px;
         height: 48px;
 
@@ -65,30 +63,36 @@ div.org-settings {
           cursor: pointer;
         }
 
-        &.missing-logo {
-          &:hover {
-            background-color: $carrot_green;
-
-            @include preload_image(cdnUrl("/img/ML/upload_avatar_placeholder.svg"));
-            @include preload_image(cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg"));
-
-            div.org-avatar-img-empty {
-              background-image: cdnUrl("/img/ML/upload_avatar_placeholder_hover.svg");
-            }
-          }
-
-          div.org-avatar-img-empty {
-            width: 22px;
-            height: 19px;
-            margin: 14px auto;
-            background-image: cdnUrl("/img/ML/upload_avatar_placeholder.svg");
-            background-size: 22px 19px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
+        div.org-avatar.missing-logo {
+          position: relative;
+          width: 48px;
+          height: 48px;
+          background-color: #F8FCFA;
+          border: 1px dashed $carrot_green;
+          border-radius: 8px;
+          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
         }
 
-        @include org-avatar(40);
+        div.org-avatar:not(.missing-logo) {
+          border: 1px solid #D8DBDF;
+          border-radius: 4px;
+          padding: 4px;
+        }
+
+        @include org-avatar(48);
+
+        div.org-avatar-container img.org-avatar-img {
+          padding: 4px;
+        }
+
+        &:hover {
+          div.org-avatar-container img.org-avatar-img {
+            border: 1px solid $carrot_green;
+          }
+        }
 
         div.org-avatar.missing-logo {
           div.org-avatar-container.no-avatar.force-label {
@@ -101,10 +105,6 @@ div.org-settings {
 
         div.org-avatar * {
           border-radius: 4px;
-        }
-
-        &.main-panel:hover {
-          border: 1px solid $carrot_green;
         }
       }
 

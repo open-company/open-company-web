@@ -239,7 +239,9 @@
   [edit-key activity-data entry-body section-editing]
   (let [entry-map (assoc activity-data :body entry-body)
         cache-key (get-entry-cache-key (:uuid activity-data))]
-    (uc/set-item cache-key entry-map
+    ;; Save the entry in the local cache without auto-saving or
+    ;; we it will be picked up it won't be autosaved
+    (uc/set-item cache-key (dissoc entry-map :auto-saving)
      (fn [err]
        (when-not err
          ;; auto save on drafts that have changes
@@ -247,12 +249,21 @@
                     (:has-changes entry-map)
                     (not (:auto-saving entry-map)))
            ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key]
-                           #(merge % entry-map {:auto-saving true})])
+           (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving true :has-changes false})])
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
-               (when success
-                 (let [entry-saved (merge (json->cljs body) {:auto-saving false :has-changes false})]
+               (if-not success
+                 ;; If save fails let's make sure save will be retried on next call
+                 (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving false :has-changes true})])
+                 (let [json-body (json->cljs body)
+                       board-data (if (:entries json-body)
+                                    (au/fix-board json-body)
+                                    false)
+                       fixed-items (:fixed-items board-data)
+                       entry-saved (if fixed-items
+                                         ;; board creation
+                                         (first (vals fixed-items))
+                                         json-body)]
                    (cook/set-cookie! (edit-open-cookie) (:uuid entry-saved) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
@@ -263,10 +274,12 @@
                    ;; this is used to revert if user decides to lose the changes
                    (when (nil? (get @initial-revision (:uuid entry-saved)))
                      (swap! initial-revision assoc (:uuid entry-saved)
-                      (or (:revision-id entry-map) -1)))
+                            (or (:revision-id entry-map) -1)))
+                   (when board-data
+                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key])))))
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
            (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
 
 (defn entry-toggle-save-on-exit
@@ -739,8 +752,10 @@
 (defn cmail-show [initial-entry-data & [cmail-state]]
   (let [cmail-default-state {:collapse false
                              :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
-        fixed-cmail-state (merge cmail-default-state cmail-state)]
-    (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365))
+        cleaned-cmail-state (dissoc cmail-state :auto)
+        fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
+    (when-not (:auto cmail-state)
+      (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
     (load-cached-item initial-entry-data :cmail-data
      #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
 
@@ -775,7 +790,8 @@
   [activity-data]
   (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
                               (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
-                              activity-data)]
+                              activity-data)
+        is-published? (= (:status fixed-activity-data) "published")]
     (if (responsive/is-tablet-or-mobile?)
       (entry-edit fixed-activity-data)
-      (cmail-show fixed-activity-data))))
+      (cmail-show fixed-activity-data (if is-published? {:fullscreen true :auto true} {})))))

@@ -87,12 +87,14 @@
 (def activities-read-key
   [:activities-read])
 
-(defn get-posts-for-board [posts-data board-slug]
+(defn get-posts-for-board [activity-id posts-data board-slug]
   (let [posts-list (vals posts-data)
-        filter-fn (if (= board-slug utils/default-drafts-board-slug)
-                    #(not= (:status %) "published")
-                    #(and (= (:board-slug %) board-slug)
-                                                 (= (:status %) "published")))
+        filter-fn (if (seq activity-id)
+                    #(= (:uuid %) activity-id)
+                    (if (= board-slug utils/default-drafts-board-slug)
+                      #(not= (:status %) "published")
+                      #(and (= (:board-slug %) board-slug)
+                                                   (= (:status %) "published"))))
         board-posts (map :uuid (filter filter-fn posts-list))]
     (select-keys posts-data board-posts)))
 
@@ -177,9 +179,10 @@
                              (let [org-slug (:slug org-data)
                                    all-boards-slug (map :slug (:boards org-data))
                                    container-slug (:board route)
+                                   activity-id (:activity route)
                                    is-board? ((set all-boards-slug) container-slug)]
                               (if is-board?
-                                (get-posts-for-board posts-data container-slug)
+                                (get-posts-for-board activity-id posts-data container-slug)
                                 (let [container-key (container-key org-slug container-slug)
                                       items-list (:posts-list (get-in base container-key))]
                                   (zipmap items-list (map #(get posts-data %) items-list)))))))]
@@ -224,6 +227,7 @@
                           (fn [base]
                             {:user-data (:edit-user-profile base)
                              :error (:edit-user-profile-failed base)})]
+   :edit-user-profile-avatar [[:base] (fn [base] (:edit-user-profile-avatar base))]
    :entry-editing       [[:base]
                           (fn [base]
                             (:entry-editing base))]
@@ -242,6 +246,8 @@
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
+   :org-avatar-editing  [[:base]
+                          (fn [base] (:org-avatar-editing base))]
    :alert-modal         [[:base]
                           (fn [base]
                             (:alert-modal base))]
@@ -456,7 +462,17 @@
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
      (if is-board?
-       (get-posts-for-board posts-data posts-filter)
+       (get-posts-for-board nil posts-data posts-filter)
+       (let [container-key (container-key org-slug posts-filter)
+             items-list (:posts-list (get-in data container-key))]
+        (zipmap items-list (map #(get posts-data %) items-list))))))
+  ([data org-slug posts-filter activity-id]
+    (let [org-data (org-data data org-slug)
+          all-boards-slug (map :slug (:boards org-data))
+          is-board? ((set all-boards-slug) posts-filter)
+          posts-data (get-in data (posts-data-key org-slug))]
+     (if is-board?
+       (get-posts-for-board activity-id posts-data posts-filter)
        (let [container-key (container-key org-slug posts-filter)
              items-list (:posts-list (get-in data container-key))]
         (zipmap items-list (map #(get posts-data %) items-list)))))))

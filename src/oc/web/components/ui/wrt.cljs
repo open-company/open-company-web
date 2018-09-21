@@ -108,7 +108,7 @@
         {:ref :wrt-count}
         (if read-count
           (str read-count " view" (when (not= read-count 1) "s"))
-          "Views")]
+          "0 Views")]
       (when (and @(::showing-popup s)
                  (:reads read-data))
         [:div.wrt-popup
