@@ -750,8 +750,10 @@
 (defn cmail-show [initial-entry-data & [cmail-state]]
   (let [cmail-default-state {:collapse false
                              :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
-        fixed-cmail-state (merge cmail-default-state cmail-state)]
-    (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365))
+        cleaned-cmail-state (dissoc cmail-state :auto)
+        fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
+    (when-not (:auto cmail-state)
+      (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
     (load-cached-item initial-entry-data :cmail-data
      #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
 
@@ -786,7 +788,8 @@
   [activity-data]
   (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
                               (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
-                              activity-data)]
+                              activity-data)
+        is-published? (= (:status fixed-activity-data) "published")]
     (if (responsive/is-tablet-or-mobile?)
       (entry-edit fixed-activity-data)
-      (cmail-show fixed-activity-data))))
+      (cmail-show fixed-activity-data (if is-published? {:fullscreen true :auto true} {})))))
