@@ -46,9 +46,6 @@ div.cmail-outer {
         }
 
         div.cmail-header {
-          div.must-see-toggle-container, div.must-see-toggle-container.on {
-            display: none;
-          }
 
           div.collapse-bt-container {
             button.collapse-bt {
@@ -181,6 +178,29 @@ div.cmail-outer {
           @include tablet() {
             display: none;
           }
+
+          div.cmail-header-title-inner {
+            padding-left: 22px;
+            position: relative;
+            @include avenir_B();
+            font-size: 13px;
+            line-height: 22px;
+            color: white;
+            text-transform: uppercase;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 14px;
+              background-image: cdnUlr("/img/ML/edit_pencil_icon_white.svg");
+              background-size: 14px 14px;
+              background-repeat: no-repeat;
+              background-position: center;
+              position: absolute;
+              top: 4px;
+              left: 0;
+            }
+          }
         }
 
         div.mobile-saving-saved {
@@ -201,62 +221,6 @@ div.cmail-outer {
 
         &.must-see-on {
           background-color: $sea_blue;
-        }
-
-        div.must-see-toggle-container {
-          float: left;
-          width: 32px;
-          height: 20px;
-          margin-right: 16px;
-          position: relative;
-
-          @include tablet() {
-            display: none;
-          }
-
-          .tooltip {
-            margin-top: -16px;
-            width: 168px;
-          }
-
-          &.on {
-            div.must-see-toggle {
-              background-color: #4D6DCD;
-
-              span.must-see-toggle-circle {
-                margin-left: 12px;
-                background-color: white;
-                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_on.svg");
-              }
-            }
-          }
-
-          div.must-see-toggle {
-            width: 32px;
-            height: 16px;
-            position: absolute;
-            top: 2px;
-            left: 0px;
-            background-color: #1F262F;
-            border-radius: 100px;
-            cursor: pointer;
-
-            span.must-see-toggle-circle {
-              display: block;
-              width: 20px;
-              height: 20px;
-              position: absolute;
-              top: -2px;
-              left: 0px;
-              border-radius: 50%;
-              background-color: #617487;
-              background-image: cdnUrl("/img/ML/cmail_must_see_bolt.svg");
-              background-size: 8px 10px;
-              background-position: center;
-              background-repeat: no-repeat;
-              transition: margin-left 180ms ease-in, background-color 180ms ease-in;
-            }
-          }
         }
 
         button.right-button {
@@ -438,57 +402,36 @@ div.cmail-outer {
           float: right;
 
           button.video-record-bt {
-            @include avenir_M();
-            color: $light_ui_grey;
-            font-size: 14px;
-            height: 20px;
-            position: relative;
-            padding-left: 26px;
+            display: none;
 
             @include tablet() {
+              @include avenir_M();
+              color: $light_ui_grey;
+              font-size: 14px;
+              height: 20px;
+              position: relative;
               padding-left: 0;
               width: 24px;
               height: 24px;
-            }
+              display: block;
 
-            &.remove-video-bt {
-              &:before {
-                background-image: cdnUrl("/img/ML/remove_video_icon.svg");
-              }
-
-              @include big_web() {
-                &:hover {
-                  &:before {
-                    background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
-                  }
-                }
-              }
-            }
-
-            @include big_web() {
-              &:hover {
-                color: $ui_grey;
-
+              &.remove-video-bt {
                 &:before {
-                  background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+                  background-image: cdnUrl("/img/ML/remove_video_icon.svg");
                 }
               }
-            }
 
-            &:before {
-              content: "";
-              left: 0px;
-              top: 3px;
-              position: absolute;
-              height: 12px;
-              width: 20px;
-              background-image: cdnUrl("/img/ML/capture_video_icon.svg");
-              background-size: 20px 12px;
-              background-repeat: no-repeat;
-              background-position: center;
-
-              @include tablet() {
+              &:before {
+                content: "";
+                left: 0px;
+                top: 3px;
+                position: absolute;
+                height: 12px;
+                width: 20px;
                 background-image: cdnUrl("/img/ML/mobile_capture_video_icon.svg");
+                background-size: 20px 12px;
+                background-repeat: no-repeat;
+                background-position: center;
               }
             }
           }
@@ -748,12 +691,14 @@ div.cmail-outer {
         div.emoji-picker {
           float: left;
           margin-left: 16px;
-          margin-top: 10px;
+          margin-right: 16px;
+          margin-top: 8px;
 
           button.emoji-button {
-            width: 20px;
-            height: 20px;
-            background-position: 0px 0px;
+            width: 24px;
+            height: 24px;
+            background-position: center;
+            background-size: 16px 16px;
             padding: 0px;
             position: absolute;
             top: 0px;
@@ -767,6 +712,73 @@ div.cmail-outer {
 
           div.picker-container {
             left: -8px;
+          }
+        }
+
+        button.cmail-must-see-bt {
+          float: left;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/cmail_footer_must_see_icon.svg");
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: 13px 16px;
+          margin-right: 16px;
+          margin-left: -5px;
+          margin-top: 8px;
+          padding: 0;
+
+          &:not(.on) {
+            opacity: 0.4;
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+
+          @include preload_image(cdnUlr("/img/ML/cmail_footer_must_see_icon_on.svg"));
+
+          &.on {
+            opacity: 1;
+            background-image: cdnUrl("/img/ML/cmail_footer_must_see_icon_on.svg");
+          }
+        }
+
+        button.video-record-bt {
+          width: 24px;
+          height: 24px;
+          margin-right: 16px;
+          margin-top: 8px;
+          padding: 0;
+          position: relative;
+          float: left;
+
+          @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"), "after");
+
+          &.remove-video-bt {
+            &:before {
+              background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+            }
+          }
+
+          &:hover {
+            &:before {
+              opacity: 1;
+            }
+          }
+
+          &:before {
+            content: "";
+            left: 0px;
+            top: 3px;
+            position: absolute;
+            height: 24px;
+            width: 24px;
+            background-image: cdnUrl("/img/ML/cmail_capture_video_icon.svg");
+            background-size: 18px 12px;
+            background-repeat: no-repeat;
+            background-position: 50% 3px;
+            opacity: 0.4;
           }
         }
 

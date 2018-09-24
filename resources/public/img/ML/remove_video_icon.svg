@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="20px" height="12px" viewBox="0 0 20 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
-    <title>Group 2</title>
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>remove_video_icon</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Video" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Video-2.0-(empty-with-new-video)" transform="translate(-710.000000, -86.000000)">
-            <g id="Group-8" transform="translate(710.000000, 84.000000)">
-                <g id="Group-2" transform="translate(0.000000, 2.000000)">
-                    <g id="Group-6" fill="#C4C6C9">
-                        <rect id="Rectangle-2" x="0" y="0" width="14" height="12" rx="2"></rect>
-                        <path d="M18,2 L20,2 L20,10 L18,10 L14,8.66666667 L14,3.33333333 L18,2 Z" id="Combined-Shape"></path>
-                    </g>
-                    <path d="M7.66666667,2.66656909 C7.66666667,2.29663086 7.36818983,2 7,2 C6.62924321,2 6.33333333,2.29843315 6.33333333,2.66656909 L6.33333333,5.33333333 L3.66656909,5.33333333 C3.29663086,5.33333333 3,5.63181017 3,6 C3,6.37075679 3.29843315,6.66666667 3.66656909,6.66666667 L6.33333333,6.66666667 L6.33333333,9.33343091 C6.33333333,9.70336914 6.63181017,10 7,10 C7.37075679,10 7.66666667,9.70156685 7.66666667,9.33343091 L7.66666667,6.66666667 L10.3334309,6.66666667 C10.7033691,6.66666667 11,6.36818983 11,6 C11,5.62924321 10.7015669,5.33333333 10.3334309,5.33333333 L7.66666667,5.33333333 L7.66666667,2.66656909 Z" id="Combined-Shape" fill="#FFFFFF" transform="translate(7.000000, 6.000000) rotate(45.000000) translate(-7.000000, -6.000000) "></path>
-                </g>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="remove_video_icon" fill-rule="nonzero">
+            <g id="Group-6" fill="#34414F">
+                <rect id="Rectangle-2" x="0" y="0" width="14" height="12" rx="2"></rect>
+                <polygon id="Combined-Shape" points="18 2 20 2 20 10 18 10 14 8.66666667 14 3.33333333"></polygon>
             </g>
+            <path d="M7.66666667,2.66656909 C7.66666667,2.29663086 7.36818983,2 7,2 C6.62924321,2 6.33333333,2.29843315 6.33333333,2.66656909 L6.33333333,5.33333333 L3.66656909,5.33333333 C3.29663086,5.33333333 3,5.63181017 3,6 C3,6.37075679 3.29843315,6.66666667 3.66656909,6.66666667 L6.33333333,6.66666667 L6.33333333,9.33343091 C6.33333333,9.70336914 6.63181017,10 7,10 C7.37075679,10 7.66666667,9.70156685 7.66666667,9.33343091 L7.66666667,6.66666667 L10.3334309,6.66666667 C10.7033691,6.66666667 11,6.36818983 11,6 C11,5.62924321 10.7015669,5.33333333 10.3334309,5.33333333 L7.66666667,5.33333333 L7.66666667,2.66656909 Z" id="Combined-Shape" fill="#FFFFFF" transform="translate(7.000000, 6.000000) rotate(45.000000) translate(-7.000000, -6.000000) "></path>
         </g>
     </g>
 </svg>
