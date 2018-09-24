@@ -346,20 +346,13 @@
         [:div.cmail-container
           [:div.cmail-header
             {:class (when (:must-see cmail-data) "must-see-on")}
-            [:div.must-see-toggle-container
-              {:class (when (:must-see cmail-data) "on")}
-              [:div.must-see-toggle
-                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-trigger "hover"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
-                [:span.must-see-toggle-circle]]]
             [:div.cmail-header-title
-              (if (seq (:headline cmail-data))
+              (if (:collapse cmail-state)
                 (:headline cmail-data)
-                utils/default-headline)]
+                [:div.cmail-header-title-inner
+                  (if (= (:status cmail-data) "published")
+                    "Edit post"
+                    "New post")])]
             (when (and (not= (:status cmail-data) "published")
                        is-mobile?)
               (if (or (:has-changes cmail-data)
@@ -375,8 +368,8 @@
                                 (autosave s)
                                 (if (and (= (:status cmail-data) "published")
                                          (:has-changes cmail-data))
-                                 (cancel-clicked s)
-                                 (activity-actions/cmail-hide)))
+                                  (cancel-clicked s)
+                                  (activity-actions/cmail-hide)))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement "top"
                    :data-trigger "hover"
@@ -450,12 +443,7 @@
                               (video-record-clicked s))
                  :class (when (or (:fixed-video-id cmail-data)
                                   @(::record-video s))
-                          "remove-video-bt")}
-                (when-not is-mobile?
-                  (if (or (:fixed-video-id cmail-data)
-                          @(::record-video s))
-                    "Remove video"
-                    "Record video"))]]]
+                          "remove-video-bt")}]]]
           [:div.cmail-content
             ;; Video elements
             (when (and (:fixed-video-id cmail-data)
@@ -549,11 +537,36 @@
           [:div.cmail-footer-multi-picker
             {:id "cmail-footer-multi-picker"}]
           (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                         :width 20
-                         :height 20
+                         :width 24
+                         :height 24
                          :position "top"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
+          [:div.footer-separator]
+          [:button.mlb-reset.cmail-must-see-bt
+            {:class (when (:must-see cmail-data) "on")
+             :on-click #(activity-actions/cmail-toggle-must-see)
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-trigger "hover"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}]
+          [:button.mlb-reset.video-record-bt
+            {:on-click #(do
+                          ; (when is-mobile?
+                          ;   (js/alert (str "Video size is:" (:width video-size) "x" (:height video-size) ". Screen width is:" (win-width))))
+                          (video-record-clicked s))
+             :class (when (or (:fixed-video-id cmail-data)
+                              @(::record-video s))
+                      "remove-video-bt")
+             :title (if (or (:fixed-video-id cmail-data)
+                            @(::record-video s))
+                      "Remove video"
+                      "Record video")
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-trigger "hover"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
           (when (and (not= (:status cmail-data) "published")
                      (not is-mobile?))
             (if (or (:has-changes cmail-data)
