@@ -8,7 +8,4 @@
     {:on-click #(did-change-cb (not selected))
      :class (utils/class-set {:selected selected
                               :disabeld disabled})}
-    [:span.dot]
-    (if selected
-      "ON"
-      "OFF")])
+    [:span.dot]])
