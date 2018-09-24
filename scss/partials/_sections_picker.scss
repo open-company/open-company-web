@@ -58,20 +58,42 @@ div.sections-picker {
           border-bottom: none;
         }
 
-        &.active, &:hover {
-          div.sections-picker-circle {
-            border: 1px solid $carrot_orange_2;
-            position: relative;
+        @include big_web() {
+          &.active, &:hover {
+            div.sections-picker-circle {
+              border: 1px solid $carrot_orange_2;
+              position: relative;
 
-            &:after {
-              content: "";
-              background-color: $carrot_orange_2;
-              border-radius: 50%;
-              width: 8px;
-              height: 8px;
-              position: absolute;
-              left: 3px;
-              top: 3px;
+              &:after {
+                content: "";
+                background-color: $carrot_orange_2;
+                border-radius: 50%;
+                width: 8px;
+                height: 8px;
+                position: absolute;
+                left: 3px;
+                top: 3px;
+              }
+            }
+          }
+        }
+
+        @include mobile() {
+          &.active {
+            div.sections-picker-circle {
+              border: 1px solid $carrot_orange_2;
+              position: relative;
+
+              &:after {
+                content: "";
+                background-color: $carrot_orange_2;
+                border-radius: 50%;
+                width: 8px;
+                height: 8px;
+                position: absolute;
+                left: 3px;
+                top: 3px;
+              }
             }
           }
         }

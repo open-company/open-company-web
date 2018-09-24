@@ -47,9 +47,7 @@ div.cmail-outer {
     top: 0px;
     left: 0px;
     background-color: rgba($deep_navy, 0.4);
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 0;
 
     div.cmail-middle {
       display: table-cell;
@@ -73,6 +71,11 @@ div.cmail-outer {
 
         div.cmail-content {
           max-height: calc(100vh - 228px);
+        }
+
+        div.cmail-footer {
+          border-bottom-left-radius: 8px;
+          border-bottom-right-radius: 8px;
         }
       }
     }

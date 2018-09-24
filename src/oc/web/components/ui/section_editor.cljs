@@ -12,7 +12,6 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -182,18 +181,13 @@
                  "New section"))}]]
         [:div.section-editor-add
           [:div.section-editor-add-label
-            [:span.section-name "Section name"]
-            (when @(::pre-flight-ok s)
-              [:span.checkmark " ✓"])
-            (when @(::pre-flight-check s)
-              (small-loading))]
-          (when (:section-name-error section-editing)
-            [:div.section-editor-error-label
-              (:section-name-error section-editing)])
+            [:span.section-name "Section name"]]
           [:div.section-editor-add-name
             {:content-editable true
              :placeholder "Section name"
              :ref "section-name"
+             :class  (utils/class-set {:preflight-ok @(::pre-flight-ok s)
+                                       :preflight-error (:section-name-error section-editing)})
              :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "section-name") %)
              :on-key-up (fn [e]
                           (let [next-section-name (clojure.string/trim (.. e -target -innerText))]
@@ -210,6 +204,9 @@
                                       (= (.-key e) "Enter"))
                               (utils/event-stop e)))
              :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
+          (when (:section-name-error section-editing)
+            [:div.section-editor-error-label
+              (:section-name-error section-editing)])
           (when show-slack-channels?
             [:div.section-editor-add-label
               "Auto-share to Slack"
@@ -223,8 +220,8 @@
                                                       [:section-editing :slack-mirror]
                                                       nil])))})])
           (when show-slack-channels?
-          [:div.section-editor-add-slack-channel.group
-            (when @(::slack-enabled s)
+            [:div.section-editor-add-slack-channel.group
+              {:class (when-not @(::slack-enabled s) "disabled")}
               (slack-channels-dropdown {:initial-value (when channel-name (str "#" channel-name))
                                         :on-change (fn [team channel]
                                                      (dis/dispatch!
@@ -232,7 +229,7 @@
                                                        [:section-editing :slack-mirror]
                                                        {:channel-id (:id channel)
                                                         :channel-name (:name channel)
-                                                        :slack-org-id (:slack-org-id team)}]))}))])
+                                                        :slack-org-id (:slack-org-id team)}]))})])
           [:div.section-editor-add-label
             "Who can view this section?"]
           [:div.section-editor-add-access
@@ -468,6 +465,7 @@
                  :class (when disable-bt "disabled")}
                 (if @(::editing-existing-section s)
                   "Save"
-                  (if from-section-picker
-                    "Done"
-                    "Create"))])]]]]))
+                  "Done")])
+            [:button.mlb-reset.cancel-bt
+              {:on-click #(on-change nil)}
+              "Cancel"]]]]]))
