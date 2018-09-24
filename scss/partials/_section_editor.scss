@@ -12,8 +12,7 @@ div.section-editor-container {
     background-color: white;
     border-radius: 6px;
     border: 1px solid $deep_tan;
-    box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
-    padding: 32px 24px;
+    padding: 20px 24px;
     width: 360px;
     z-index: 1000;
     cursor: default;
@@ -42,29 +41,39 @@ div.section-editor-container {
       top: 0;
 
       @include mobile() {
-        display: none;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/section_add_mobile_close.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+        top: 15px;
+        left: 19px;
+        padding: 0;
+        right: unset;
+        z-index: 2;
       }
     }
 
     div.section-editor-header {
-      height: 46px;
+      height: 30px;
       border-bottom: 1px solid $deep_tan;
-      padding-bottom: 24px;
+      padding-bottom: 8px;
 
       @include mobile() {
-        height: 64px;
+        height: 56px;
         border-bottom: 0px;
         position: absolute;
         top: 0px;
         left: 0px;
         width: 100vw;
         padding-bottom: 0px;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
       }
 
       div.section-editor-header-left {
         float: left;
-        @include avenir_M();
+        @include avenir_H();
         font-size: 16px;
         color: $deep_navy;
         white-space: nowrap;
@@ -90,13 +99,13 @@ div.section-editor-container {
 
       div.section-editor-error-label {
         margin-top: 8px;
-        @include avenir_M();
-        font-size: 13px;
-        color: $carrot_orange;
+        @include avenir_R();
+        font-size: 12px;
+        color: $carrot_orange_2;
       }
 
       div.section-editor-add-label {
-        margin-top: 24px;
+        margin-top: 16px;
         @include avenir_H();
         font-size: 15px;
         color: $deep_navy;
@@ -108,21 +117,6 @@ div.section-editor-container {
 
         span.section-name {
           float: left;
-        }
-
-        span.checkmark {
-          float: left;
-          margin-left: 6px;
-          font-size: 18px;
-          color: $carrot_green;
-        }
-
-        div.small-loading {
-          margin-right: 0px;
-          margin-top: 0px;
-          margin-left: 6px;
-          float: left;
-          display: block;
         }
 
         span.role-header {
@@ -145,13 +139,30 @@ div.section-editor-container {
         @include avenir_R();
         font-size: 14px;
         color: $deep_navy;
-        padding: 10px 16px;
+        padding: 10px 29px 10px 16px;
         position: relative;
         cursor: text;
         outline: none;
         margin-top: 8px;
         overflow-y: auto;
         overflow-x: hidden;
+
+        &.preflight-error {
+          border: 1px solid $carrot_orange_2;
+        }
+
+        &.preflight-ok:after {
+          content: "";
+          width: 13px;
+          height: 10px;
+          position: absolute;
+          bottom: 14px;
+          right: 16px;
+          background-image: cdnUrl("/img/ML/section_preflight_checkmark.svg");
+          background-position: center;
+          background-size: 13px 10px;
+          background-repeat: no-repeat;
+        }
 
         &:empty:before {
           padding: 10px 16px;
@@ -197,14 +208,17 @@ div.section-editor-container {
 
         div.section-editor-private-users-results {
           position: absolute;
-          top: 40px;
+          top: 38px;
           left: 0px;
           border-radius: 4px;
           border: 1px solid rgba($carrot_light_gray_1, .5);
-          width: 100%;
+          width: calc(100% + 2px);
+          margin-left: -1px;
           background-color: white;
           padding: 10px 16px;
           z-index: 10;
+          max-height: 200px;
+          overflow-y: auto;
 
           div.section-editor-private-users-result {
             height: 40px;
@@ -244,6 +258,13 @@ div.section-editor-container {
 
       div.section-editor-add-slack-channel {
         margin-top: 8px;
+
+        &.disabled {
+          opacity: 0.5;
+          div.slack-channels-dropdown {
+            pointer-events: none;
+          }
+        }
 
         div.slack-channels-dropdown {
           input.board-edit-slack-channel {
@@ -528,12 +549,25 @@ div.section-editor-container {
           }
         }
 
-        button.mlb-reset.create-bt {
-          height: 24px;
+        button.cancel-bt {
           float: right;
-          color: $carrot_green;
+          height: 32px;
+          margin-right: 16px;
+          @include avenir_R();
+          font-size: 14px;
+          color: $ui_grey;
+        }
+
+        button.mlb-reset.create-bt {
+          width: 64px;
+          height: 32px;
+          text-align: center;
+          float: right;
+          color: white;
+          background-color: $carrot_green;
+          border-radius: 6px;
           @include avenir_H();
-          font-size: 15px;
+          font-size: 14px;
 
           &.disabled {
             opacity: 0.5;
