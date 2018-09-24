@@ -184,20 +184,22 @@ div.cmail-outer {
             position: relative;
             @include avenir_B();
             font-size: 13px;
-            line-height: 22px;
+            line-height: 18px;
+            height: 18px;
             color: white;
             text-transform: uppercase;
+            margin-top: 4px;
 
             &:before {
               content: "";
               width: 14px;
-              height: 14px;
-              background-image: cdnUlr("/img/ML/edit_pencil_icon_white.svg");
+              height: 18px;
+              background-image: cdnUrl("/img/ML/edit_pencil_icon_white.svg");
               background-size: 14px 14px;
               background-repeat: no-repeat;
               background-position: center;
               position: absolute;
-              top: 4px;
+              top: -3px;
               left: 0;
             }
           }
@@ -729,7 +731,7 @@ div.cmail-outer {
           padding: 0;
 
           &:not(.on) {
-            opacity: 0.4;
+            opacity: 0.3;
           }
 
           &:hover {
@@ -752,19 +754,16 @@ div.cmail-outer {
           padding: 0;
           position: relative;
           float: left;
+          opacity: 0.3;
 
           @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"), "after");
 
-          &.remove-video-bt {
-            &:before {
-              background-image: cdnUrl("/img/ML/remove_video_icon.svg");
-            }
+          &.remove-video-bt:before {
+            background-image: cdnUrl("/img/ML/remove_video_icon.svg");
           }
 
           &:hover {
-            &:before {
-              opacity: 1;
-            }
+            opacity: 1;
           }
 
           &:before {
@@ -778,7 +777,6 @@ div.cmail-outer {
             background-size: 18px 12px;
             background-repeat: no-repeat;
             background-position: 50% 3px;
-            opacity: 0.4;
           }
         }
 
