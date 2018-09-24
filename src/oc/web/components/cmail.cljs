@@ -371,10 +371,12 @@
               [:div.close-bt-container
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
-                  {:on-click #(if (and (= (:status cmail-data) "published")
-                                       (:has-changes cmail-data))
-                               (cancel-clicked s)
-                               (activity-actions/cmail-hide))
+                  {:on-click #(do
+                                (autosave s)
+                                (if (and (= (:status cmail-data) "published")
+                                         (:has-changes cmail-data))
+                                 (cancel-clicked s)
+                                 (activity-actions/cmail-hide)))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement "top"
                    :data-trigger "hover"
