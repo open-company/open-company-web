@@ -263,17 +263,13 @@ div.cmail-outer {
           }
         }
 
-        div.sections-picker-container {
+        div.sections-picker {
           position: absolute;
-          top: 32px;
+          top: 36px;
           left: 16px;
           z-index: 1000;
           max-height: 370px;
           overflow: auto;
-
-          @include mobile(){
-            max-height: initial;
-          }
         }
 
         div.cmail-section-right {
