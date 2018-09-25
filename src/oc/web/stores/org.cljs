@@ -26,8 +26,11 @@
         section-names (:default-board-names org-data)
         selected-sections (map :name (:boards org-data))
         sections (vec (map #(hash-map :name % :selected (utils/in? selected-sections %)) section-names))
-        fixed-org-data (fix-org org-data)]
+        fixed-org-data (fix-org org-data)
+        current-orgs (dispatcher/orgs-data)
+        new-orgs (distinct (conj current-orgs org-data))]
     (-> db
+      (assoc dispatcher/orgs-key new-orgs)
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
       (assoc :org-editing (-> org-data
                               (assoc :saved saved?)
