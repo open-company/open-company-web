@@ -6,6 +6,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.section-editor :refer (section-editor)]))
 
@@ -59,7 +60,8 @@
                           {})
         scroller-style  (if @(::container-max-height s)
                           {:max-height (str (- @(::container-max-height s) 55) "px")}
-                          {})]
+                          {})
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.sections-picker.group
       {:style container-style}
       [:div.sections-picker-header
@@ -69,7 +71,14 @@
             "Post to")]
         [:div.sections-picker-header-right
           [:button.mlb-reset.add-new-section-bt
-            {:on-click #(section-actions/show-section-add-with-callback on-change)}]]]
+            {:on-click #(section-actions/show-section-add-with-callback on-change)
+             :title "Create a new section"
+             :aria-label "Create a new section"
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-trigger "hover"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
       [:div.sections-picker-content
         {:style scroller-style}
         [:div.sections-picker-group
