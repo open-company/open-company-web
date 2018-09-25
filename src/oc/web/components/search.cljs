@@ -50,10 +50,13 @@
 
 (rum/defcs results-header < rum/static
   [s search-results]
-  [:div.header.group
-   [:span "SEARCH RESULTS"]
-   (when (pos? (:count search-results))
-     [:span.count (str "(" (:count search-results) ")")])])
+  (let [result-count (if (< store/search-limit (:count search-results))
+                       store/search-limit
+                       (:count search-results))]
+    [:div.header.group
+      [:span "SEARCH RESULTS"]
+      (when (pos? result-count)
+        [:span.count (str "(" result-count ")")])]))
 
 (def default-page-size
   (if (responsive/is-mobile-size?) 300 5))
@@ -70,14 +73,17 @@
                                   s)}
   [s]
   (let [search-results (drv/react s store/search-key)
-        search-active? (drv/react s store/search-active?)]
+        search-active? (drv/react s store/search-active?)
+        result-count (if (< store/search-limit (:count search-results))
+                       store/search-limit
+                       (:count search-results))]
     [:div.search-results {:ref "results"
                           :class (when-not search-active? "inactive")}
       (when-not (responsive/is-mobile-size?) (results-header search-results))
       [:div.search-results-container
         (when (responsive/is-mobile-size?)
           (results-header search-results))
-        (if (pos? (:count search-results))
+        (if (pos? result-count)
           (let [results (reverse (:results search-results))]
             (for [sr (take @(::page-size s) results)]
               (let [key (str "result-" (:uuid (:_source sr)))]
@@ -86,7 +92,7 @@
                   "board" (rum/with-key (board-display sr) key)))))
           [:div.empty-result
             [:div.message "No matching results..."]])]
-      (when (< @(::page-size s) (:count search-results))
+      (when (< @(::page-size s) result-count)
         [:div.show-more
           {:on-click (fn [e] (reset! (::page-size s)
                                      (+ @(::page-size s) 15)))}
