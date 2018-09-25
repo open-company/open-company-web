@@ -273,3 +273,13 @@ function OCStaticStartFixFixedPositioning(sel) {
     blur: resetFixedPosition
   });
 }
+
+function OCStaticShowAnimationLightbox() {
+  $(document.body).addClass('show-animation-lightbox no-scroll');
+  document.getElementById("carrot-animation").contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+}
+
+function OCStaticHideAnimationLightbox() {
+  document.getElementById("carrot-animation").contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+  $(document.body).removeClass('show-animation-lightbox no-scroll');
+}
