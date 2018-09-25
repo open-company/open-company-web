@@ -231,7 +231,7 @@
                                                         :channel-name (:name channel)
                                                         :slack-org-id (:slack-org-id team)}]))})])
           [:div.section-editor-add-label
-            "Add members to this private section"]
+            "Who can view this section?"]
           [:div.section-editor-add-access
             {:class (when @(::show-access-list s) "expanded")
              :on-click #(do
