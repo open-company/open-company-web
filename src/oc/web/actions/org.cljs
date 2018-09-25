@@ -246,6 +246,7 @@
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
 
 (defn update-org-sections [org-slug all-sections]
+  (dis/dispatch! [:input [:ap-loading] true])
   (let [selected-sections (vec (map :name (filterv :selected all-sections)))
         patch-payload {:boards (conj selected-sections "General")
                        :samples true}]

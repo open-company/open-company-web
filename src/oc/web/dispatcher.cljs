@@ -137,6 +137,7 @@
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
+   :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
