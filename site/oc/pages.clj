@@ -337,14 +337,15 @@
 (def animation-lightbox
   [:div.animation-lightbox-container
     {:onClick "OCStaticHideAnimationLightbox();"}
-    [:iframe
-      {:width 720 ; 1280
-       :height 405 ; 720
-       :src "https://www.youtube.com/embed/tAJnbC9_i7s?rel=0&enablejsapi=1"
-       :frameborder 0
-       :id "carrot-animation"
-       :allow "autoplay; encrypted-media"
-       :allowfullscreen true}]])
+    [:div..animation-lightbox
+      [:iframe
+        {:width 720 ; 1280
+         :height 405 ; 720
+         :src "https://www.youtube.com/embed/tAJnbC9_i7s?rel=0&enablejsapi=1"
+         :frameborder 0
+         :id "carrot-animation"
+         :allow "autoplay; encrypted-media"
+         :allowfullscreen true}]]])
 
 (defn index [options]
   [:div.home-wrap

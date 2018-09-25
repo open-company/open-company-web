@@ -25,9 +25,16 @@ div.home-wrap {
       z-index: 1000;
       display: none;
 
-      iframe {
-        margin: 80px auto;
+      div.animation-lightbox {
+        width: 720px;
+        height: 405px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -360px;
+        margin-top: -202px;
         border-radius: 6px;
+        overflow: hidden;
       }
     }
 
