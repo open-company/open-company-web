@@ -13,7 +13,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -782,16 +781,15 @@
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
     (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
-      (if (responsive/is-tablet-or-mobile?)
-        (entry-edit (dis/activity-data activity-uuid))
-        (cmail-show (dis/activity-data activity-uuid))))))
+      (cmail-show (dis/activity-data activity-uuid)))))
 
 (defn activity-edit
   [activity-data]
   (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
                               (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                               activity-data)
-        is-published? (= (:status fixed-activity-data) "published")]
-    (if (responsive/is-tablet-or-mobile?)
-      (entry-edit fixed-activity-data)
-      (cmail-show fixed-activity-data (if is-published? {:fullscreen true :auto true} {})))))
+        is-published? (= (:status fixed-activity-data) "published")
+        initial-cmail-state (if is-published?
+                              {:fullscreen true :auto true}
+                              {})]
+    (cmail-show fixed-activity-data initial-cmail-state)))

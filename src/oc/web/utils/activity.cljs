@@ -253,10 +253,10 @@
         zero-pos? #(or (zero? %)
                        (pos? %))
         doc-element (.-documentElement js/document)
-        win-height (or (.-innerHeight js/window)
-                       (.-clientHeight doc-element))
-        win-width (or (.-innerWidth js/window)
-                      (.-clientWidth doc-element))]
+        win-height (or (.-clientHeight doc-element)
+                       (.-innerHeight js/window))
+        win-width (or (.-clientWidth doc-element)
+                      (.-innerWidth js/window))]
     (and ;; Item starts below the navbar
          (>= (.-top rect) responsive/navbar-height)
          ;; Item left is not out of the screen
