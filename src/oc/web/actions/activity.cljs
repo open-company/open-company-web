@@ -13,7 +13,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
-            ; [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
