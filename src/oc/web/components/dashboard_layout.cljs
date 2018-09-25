@@ -13,8 +13,6 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.section :as section-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
@@ -22,7 +20,6 @@
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -109,8 +106,6 @@
                               (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
-                              (drv/drv :show-section-editor)
-                              (drv/drv :show-section-add)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :show-post-added-tooltip)
                               (drv/drv :show-draft-post-tooltip)
@@ -174,8 +169,6 @@
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
-        show-section-editor (drv/react s :show-section-editor)
-        show-section-add (drv/react s :show-section-add)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
         ; board-switch (::board-switch s)
@@ -187,15 +180,6 @@
         is-admin-or-author (utils/is-admin-or-author? org-data)]
       ;; Entries list
       [:div.dashboard-layout.group
-        ;; Show create new section for desktop
-        (when (and show-section-add
-                   (not (responsive/is-tablet-or-mobile?)))
-          [:div.section-add
-            {:class (when show-drafts "has-drafts")}
-           (section-editor nil (fn [board-data note]
-                                  (when board-data
-                                    (section-actions/section-save board-data note
-                                     #(dis/dispatch! [:input [:show-section-add] false])))))])
         [:div.dashboard-layout-container.group
           (when-not is-mobile?
             (navigation-sidebar))
@@ -233,15 +217,7 @@
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (str (:name board-data) " settings")
-                         :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
-                      ;; Show section settings for desktop
-                      (when (and show-section-editor
-                                 (not (responsive/is-tablet-or-mobile?)))
-                        (section-editor board-data
-                         (fn [section-data note]
-                           (when section-data
-                             (section-actions/section-save section-data note
-                               #(dis/dispatch! [:input [:show-section-editor] false]))))))])
+                         :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]])
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"

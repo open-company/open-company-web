@@ -1,260 +1,136 @@
-div.sections-picker-container {
+div.sections-picker {
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid $deep_tan;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  padding: 16px 0 4px;
+  width: 200px;
+  max-height: 100vh;
+  cursor: default;
 
-  button.mobile-modal-close-bt {
-    @include image-2x("/img/ML/mobile_modal_close");
-    width: 24px;
-    height: 24px;
-    background-repeat: no-repeat;
-    background-size: 14px 14px;
-    background-position: 5px 5px;
-    position: absolute;
-    top: 20px;
-    left: 18px;
-    display: none;
+  div.sections-picker-header {
+    height: 33px;
+    border-bottom: 1px solid #ECECEC;
+    padding: 0 16px 9px;
 
-    @include mobile() {
-      display: block;
-      z-index: 1001;
+    div.sections-picker-header-left {
+      float: left;
+      @include avenir_B();
+      font-size: 13px;
+      color: $ui_grey;
+      text-transform: uppercase;
+      white-space: nowrap;
+      max-width: 80%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    div.sections-picker-header-right {
+      float: right;
+      width: 20%;
+
+      button.add-new-section-bt {
+        height: 24px;
+        width: 24px;
+        background-image: cdnUrl("/img/ML/sections_picker_add_section.svg");
+        background-size: 16px 16px;
+        background-position: 8px center;
+        background-repeat: no-repeat;
+        padding: 0;
+        float: right;
+      }
     }
   }
 
-  div.sections-picker {
-    background-color: white;
-    border-radius: 6px;
-    border: 1px solid $deep_tan;
-    box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
-    padding: 32px 24px 12px;
-    width: 360px;
-    cursor: default;
+  div.sections-picker-content {
+    padding: 0 16px;
+    overflow-y: auto;
 
-    &.show-headers {
-      div.sections-picker-header {
-        border-bottom: none;
-      }
+    div.sections-picker-group {
 
-      div.sections-picker-content {
-        div.sections-picker-group {
-          div.sections-picker-section {
-            &:last-child {
-              border-bottom: none;
-            }
-          }
-        }
-      }
-    }
+      div.sections-picker-section {
+        height: 60px;
+        border-bottom: 1px solid #ECECEC;
+        padding: 16px 0px;
+        cursor: pointer;
 
-    @include mobile() {
-      width: 100vw;
-      min-height: 100vh;
-      padding: 20px 24px 16px;
-      border-radius: 0px;
-    }
-
-    &.sections-list {
-      overflow-y: auto;
-    }
-
-    div.sections-picker-header {
-      height: 46px;
-      border-bottom: 1px solid $deep_tan;
-      padding-bottom: 24px;
-
-      @include mobile() {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        height: 112px;
-        border-bottom: none;
-        padding-bottom: 0px;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-        width: 100vw;
-      }
-
-      div.sections-picker-header-left {
-        float: left;
-        @include avenir_M();
-        font-size: 16px;
-        color: $deep_navy;
-        white-space: nowrap;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        @include mobile() {
-          float: none;
-          text-align: center;
-          @include avenir_H();
-          font-size: 18px;
-          height: 64px;
-          padding-top: 20px;
-        }
-      }
-
-      div.sections-picker-header-right {
-        float: right;
-        width: 50%;
-
-        @include mobile() {
-          float: unset;
-          width: 100%;
-          height: 48px;
-          border-top: 1px solid $light_tan;
+        &:last-child {
+          border-bottom: none;
         }
 
-        button.add-new-section-bt {
-          height: 34px;
-          width: 140px;
-          margin-top: -6px;
-          position: relative;
-          padding: 0px 0px 0px 16px;
-          @include avenir_M();
-          font-size: 15px;
-          color: $carrot_green;
-          text-align: right;
-          float: right;
-
-          @include mobile() {
-            margin-top: 8px;
-            float: unset;
-            left: 50%;
-            margin-left: -70px;
-          }
-
-          &:before {
-            content: "";
-            background-image: cdnUrl("/img/ML/add_section_plus.svg");
-            background-size: 8px 8px;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 8px;
-            height: 8px;
-            position: absolute;
-            top: 12px;
-            left: 0px;
-          }
-        }
-      }
-    }
-
-    div.sections-picker-content {
-      @include mobile() {
-        margin-top: 112px;
-      }
-
-      div.sections-picker-group {
-        div.sections-picker-group-header {
-          height: 40px;
-          width: calc(100% + 48px);
-          margin-left: -24px;
-          @include avenir_H();
-          font-size: 12px;
-          color: $ui_grey;
-          padding: 12px 24px;
-          background-color: $oc_gray_8;
-        }
-
-        div.sections-picker-section {
-          height: 60px;
-          border-bottom: 1px solid rgba($deep_tan, 0.3);
-          padding: 20px 0px;
-          cursor: pointer;
-
-          &:hover {
+        @include big_web() {
+          &.active, &:hover {
             div.sections-picker-circle {
-              background-image: cdnUrl("/img/ML/board_circle_active.svg");
+              border: 1px solid $carrot_orange_2;
+              position: relative;
+
+              &:after {
+                content: "";
+                background-color: $carrot_orange_2;
+                border-radius: 50%;
+                width: 8px;
+                height: 8px;
+                position: absolute;
+                left: 3px;
+                top: 3px;
+              }
             }
           }
+        }
 
+        @include mobile() {
           &.active {
             div.sections-picker-circle {
-              background-image: cdnUrl("/img/ML/board_circle_active.svg");
-            }
+              border: 1px solid $carrot_orange_2;
+              position: relative;
 
-            div.sections-picker-section-name {
-              color: $deep_navy;
-            }
-
-            div.sections-picker-section-posts {
-              color: $deep_navy;
+              &:after {
+                content: "";
+                background-color: $carrot_orange_2;
+                border-radius: 50%;
+                width: 8px;
+                height: 8px;
+                position: absolute;
+                left: 3px;
+                top: 3px;
+              }
             }
           }
+        }
 
-          div.sections-picker-circle {
-            float: left;
-            width: 16px;
-            height: 16px;
-            background-image: cdnUrl("/img/ML/board_circle_empty.svg");
-            background-size: 16px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
-
+        &.active {
           div.sections-picker-section-name {
-            @include avenir_M();
-            font-size: 14px;
-            color: $ui_grey;
-            float: left;
-            width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-left: 16px;
+            @include avenir_H();
+            color: $deep_navy;
+          }
+        }
+
+        div.sections-picker-circle {
+          float: right;
+          width: 16px;
+          height: 16px;
+          border: 1px solid $light_ui_grey;
+          border-radius: 50%;
+        }
+
+        div.sections-picker-section-name {
+          @include avenir_R();
+          font-size: 14px;
+          color: $ui_grey;
+          float: left;
+          width: 150px;
+
+          span.name {
+            max-width: 126px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-
-            @include mobile() {
-              width: 80%;
-            }
           }
 
-          div.sections-picker-section-posts {
-            @include avenir_M();
-            font-size: 14px;
-            color: $ui_grey;
-            float: right;
-            width: 75px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: right;
-
-            @include mobile() {
-              display: none;
-            }
+          @include mobile() {
+            width: 80%;
           }
         }
-      }
-
-      @include mobile() {
-        div.add-section-tooltip-container {
-          display: block !important;
-          width: 100%;
-          text-align: center;
-          margin-top: 32px;
-
-          div.add-section-tooltip-arrow {
-            width: 20px;
-            height: 38px;
-            @include image-2x("/img/ML/section_tooltip_arrow");
-            background-size: 20px 38px;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin: 0 auto;
-          }
-
-          div.add-section-tooltip {
-            width: 100%;
-            margin: 24px auto;
-            @include avenir_M();
-            font-size: 18px;
-            color: $ui_grey;
-            text-align: center;
-            max-width: 311px;
-          }
-        }
-      }
-
-      div.add-section-tooltip-container {
-        display: none;
       }
     }
   }
