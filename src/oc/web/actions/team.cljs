@@ -314,7 +314,7 @@
                                    (:href add-slack-team-link)
                                    (:user-id current-user-data)
                                    team-id
-                                   redirect)]
+                                   (str redirect "%26add=team"))]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link))))
 
