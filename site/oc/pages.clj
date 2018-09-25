@@ -334,10 +334,23 @@
       {:src (cdn "/img/ML/slack_comparison_screenshot_mobile.png")
        :srcSet (str (cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]])
 
+(def animation-lightbox
+  [:div.animation-lightbox-container
+    {:onClick "OCStaticHideAnimationLightbox();"}
+    [:iframe
+      {:width 720 ; 1280
+       :height 405 ; 720
+       :src "https://www.youtube.com/embed/tAJnbC9_i7s?rel=0&enablejsapi=1"
+       :frameborder 0
+       :id "carrot-animation"
+       :allow "autoplay; encrypted-media"
+       :allowfullscreen true}]])
+
 (defn index [options]
   [:div.home-wrap
     {:id "wrap"}
     [:div.main.home-page
+      animation-lightbox
       ; Hope page header
       [:section.cta.group
         [:div.balloon.big-blue]
@@ -367,6 +380,7 @@
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
         [:div.main-animation-container
+          {:onClick "OCStaticShowAnimationLightbox();"}
           [:img.main-animation
             {:src (cdn "/img/ML/homepage_screenshot.png")
              :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]

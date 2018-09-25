@@ -1,8 +1,35 @@
+body.show-animation-lightbox {
+  div.home-wrap {
+    div.main.home-page {
+      div.animation-lightbox-container {
+        display: block;
+      }
+    }
+  }
+}
+
 div.home-wrap {
   background-color: #FFFDF9;
 
   div.main.home-page {
     width: 100%;
+
+    div.animation-lightbox-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: $carrot_modal_bg;
+      text-align: center;
+      z-index: 1000;
+      display: none;
+
+      iframe {
+        margin: 80px auto;
+        border-radius: 6px;
+      }
+    }
 
     @include mobile() {
       padding: 0 0px;
