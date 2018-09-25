@@ -327,6 +327,7 @@
                                :ap-initial-at ap-initial-at
                                :show-section-editor show-section-editor
                                :show-section-add show-section-add
+                               :show-section-add-cb (:show-section-add-cb base)
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)

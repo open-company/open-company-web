@@ -245,3 +245,11 @@
        (when-not success
          (section-name-error status))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
+
+(defn show-section-add-with-callback [callback]
+  (dispatcher/dispatch! [:input [:show-section-add-cb]
+   (fn [sec-data note]
+     (callback sec-data note)
+     (dispatcher/dispatch! [:input [:show-section-add-cb] nil])
+     (dispatcher/dispatch! [:input [:show-section-add] false]))])
+  (dispatcher/dispatch! [:input [:show-section-add] true]))
