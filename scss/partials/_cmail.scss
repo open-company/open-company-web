@@ -9,6 +9,19 @@ div.cmail-outer {
   border-top-right-radius: 8px;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
 
+  @include tablet() {
+    position: relative;
+    bottom: unset;
+    right: unset;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    height: initial;
+    min-height: 100vh;
+    background-color: white;
+    width: 100%;
+    box-shadow: none;
+  }
+
   &.collapse, &.collapse.fullscreen {
     display: block;
     position: fixed;
@@ -17,6 +30,15 @@ div.cmail-outer {
     height: 48px;
     width: 330px;
 
+    @include tablet() {
+      position: relative;
+      right: unset;
+      bottom: unset;
+      height: initial;
+      min-height: 100vh;
+      width: 100%;
+    }
+
     div.cmail-middle {
       div.cmail-container {
         & > div:not(.cmail-header) {
@@ -24,9 +46,6 @@ div.cmail-outer {
         }
 
         div.cmail-header {
-          div.must-see-toggle-container, div.must-see-toggle-container.on {
-            display: none;
-          }
 
           div.collapse-bt-container {
             button.collapse-bt {
@@ -47,13 +66,30 @@ div.cmail-outer {
     top: 0px;
     left: 0px;
     background-color: rgba($deep_navy, 0.4);
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+
+    @include tablet() {
+      position: relative;
+      height: initial;
+      min-height: 100vh;
+      display: block;
+      top: unset;
+      left: unset;
+      background-color: white;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      box-shadow: none;
+    }
 
     div.cmail-middle {
       display: table-cell;
       vertical-align: middle;
+
+      @include tablet() {
+        display: block;
+        width: 100%;
+        height: initial;
+      }
 
       div.cmail-container {
         margin-left: auto;
@@ -63,6 +99,15 @@ div.cmail-outer {
         top: 50%;
         background-color: white;
         border-radius: 8px;
+
+        @include tablet() {
+          margin-left: 0;
+          margin-right: 0;
+          width: 100%;
+          height: initial;
+          top: unset;
+          border-radius: 0;
+        }
 
         div.cmail-header {
 
@@ -74,6 +119,11 @@ div.cmail-outer {
         div.cmail-content {
           max-height: calc(100vh - 228px);
         }
+
+        div.cmail-footer {
+          border-bottom-left-radius: 8px;
+          border-bottom-right-radius: 8px;
+        }
       }
     }
   }
@@ -82,9 +132,19 @@ div.cmail-outer {
     width: 100%;
     height: 100%;
 
+    @include tablet() {
+      width: 100vw;
+      height: 100vh;
+    }
+
     div.cmail-container {
       width: 100%;
       height: 100%;
+
+      @include tablet() {
+        width: 100vw;
+        height: 100vh;
+      }
 
       div.cmail-header {
         background-color: $deep_navy;
@@ -96,6 +156,18 @@ div.cmail-outer {
 
         @include no-user-select();
 
+        @include tablet() {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 56px;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+          padding: 16px 14px;
+          z-index: 100;
+        }
+
         div.cmail-header-title {
           color: white;
           @include avenir_H();
@@ -105,62 +177,55 @@ div.cmail-outer {
           text-overflow: ellipsis;
           white-space: nowrap;
           float: left;
+
+          @include tablet() {
+            display: none;
+          }
+
+          div.cmail-header-title-inner {
+            padding-left: 22px;
+            position: relative;
+            @include avenir_B();
+            font-size: 13px;
+            line-height: 18px;
+            height: 18px;
+            color: white;
+            text-transform: uppercase;
+            margin-top: 4px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/edit_pencil_icon_white.svg");
+              background-size: 14px 14px;
+              background-repeat: no-repeat;
+              background-position: center;
+              position: absolute;
+              top: -3px;
+              left: 0;
+            }
+          }
+        }
+
+        div.mobile-saving-saved {
+          position: absolute;
+          top: 18px;
+          left: 50%;
+          margin-left: -20px;
+          display: inline-block;
+          width: 40px;
+          height: 20px;
+          @include avenir_M();
+          color: white;
+          font-size: 12px;
+          line-height: 20px;
+          text-align: center;
+          opacity: 0.5;
         }
 
         &.must-see-on {
           background-color: $sea_blue;
-        }
-
-        div.must-see-toggle-container {
-          float: left;
-          width: 32px;
-          height: 20px;
-          margin-right: 16px;
-          position: relative;
-
-          .tooltip {
-            margin-top: -16px;
-            width: 168px;
-          }
-
-          &.on {
-            div.must-see-toggle {
-              background-color: #4D6DCD;
-
-              span.must-see-toggle-circle {
-                margin-left: 12px;
-                background-color: white;
-                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_on.svg");
-              }
-            }
-          }
-
-          div.must-see-toggle {
-            width: 32px;
-            height: 16px;
-            position: absolute;
-            top: 2px;
-            left: 0px;
-            background-color: #1F262F;
-            border-radius: 100px;
-            cursor: pointer;
-
-            span.must-see-toggle-circle {
-              display: block;
-              width: 20px;
-              height: 20px;
-              position: absolute;
-              top: -2px;
-              left: 0px;
-              border-radius: 50%;
-              background-color: #617487;
-              background-image: cdnUrl("/img/ML/cmail_must_see_bolt.svg");
-              background-size: 8px 10px;
-              background-position: center;
-              background-repeat: no-repeat;
-              transition: margin-left 180ms ease-in, background-color 180ms ease-in;
-            }
-          }
         }
 
         button.right-button {
@@ -169,6 +234,10 @@ div.cmail-outer {
 
         div.collapse-bt-container {
           float: right;
+
+          @include tablet() {
+            display: none;
+          }
 
           button.collapse-bt {
             width: 24px;
@@ -186,6 +255,10 @@ div.cmail-outer {
 
         div.fullscreen-bt-container {
           float: right;
+
+          @include tablet() {
+            display: none;
+          }
 
           button.fullscreen-bt {
             width: 24px;
@@ -205,6 +278,10 @@ div.cmail-outer {
         div.close-bt-container {
           float: right;
 
+          @include tablet() {
+            float: left;
+          }
+
           button.close-bt {
             width: 24px;
             height: 24px;
@@ -213,6 +290,11 @@ div.cmail-outer {
             background-position: center;
             background-repeat: no-repeat;
             margin-left: 8px;
+
+            @include tablet() {
+              margin-left: 0;
+              background-size: 14px 14px;
+            }
           }
 
           &.long-tooltip {
@@ -226,6 +308,38 @@ div.cmail-outer {
             margin-top: -16px;
           }
         }
+
+        button.mobile-post-button {
+          display: none;
+
+          @include tablet() {
+            display: block;
+            color: white;
+            width: 40px;
+            height: 24px;
+            @include avenir_B();
+            font-size: 14px;
+            float: right;
+            margin: 0 2px 0 0 ;
+            padding: 0;
+            position: relative;
+
+            &.loading {
+              padding-left: 24px;
+              width: 64px;
+
+              div.small-loading {
+                position: absolute;
+                top: 2px;
+                left: 0px;
+              }
+            }
+
+            &.disabled {
+              opacity: 0.4;
+            }
+          }
+        }
       }
 
       div.cmail-section {
@@ -233,6 +347,12 @@ div.cmail-outer {
         border-bottom: 1px solid #ECECEC;
         padding: 16px;
         position: relative;
+
+        @include tablet() {
+          height: 56px;
+          margin-top: 56px;
+          padding: 20px 24px;
+        }
 
         div.board-name {
           margin-top: 2px;
@@ -244,6 +364,13 @@ div.cmail-outer {
           font-size: 14px;
           color: $deep_navy;
           line-height: 16px;
+
+          @include tablet() {
+            margin-left: 0;
+            margin-top: 0;
+            @include avenir_M();
+            font-size: 14px;
+          }
 
           &:after {
             float: right;
@@ -263,60 +390,52 @@ div.cmail-outer {
           }
         }
 
-        div.sections-picker-container {
+        div.sections-picker {
           position: absolute;
-          top: 32px;
+          top: 36px;
           left: 16px;
           z-index: 1000;
           max-height: 370px;
           overflow: auto;
-
-          @include mobile(){
-            max-height: initial;
-          }
         }
 
         div.cmail-section-right {
           float: right;
 
           button.video-record-bt {
-            @include avenir_M();
-            color: $light_ui_grey;
-            font-size: 14px;
-            height: 20px;
-            position: relative;
-            padding-left: 26px;
+            display: none;
 
-            &.remove-video-bt {
-              &:before {
-                background-image: cdnUrl("/img/ML/remove_video_icon.svg");
-              }
-              &:hover {
+            @include tablet() {
+              @include avenir_M();
+              color: $light_ui_grey;
+              font-size: 14px;
+              height: 20px;
+              position: relative;
+              padding-left: 0;
+              width: 24px;
+              height: 24px;
+              display: block;
+              // FIXME: disable video on mobile for now
+              display: none;
+
+              &.remove-video-bt {
                 &:before {
-                  background-image: cdnUrl("/img/ML/remove_video_icon_hover.svg");  
+                  background-image: cdnUrl("/img/ML/remove_video_icon.svg");
                 }
               }
-            }
-
-            &:hover {
-              color: $ui_grey;
 
               &:before {
-                background-image: cdnUrl("/img/ML/capture_video_icon_hover.svg");
+                content: "";
+                left: 0px;
+                top: 3px;
+                position: absolute;
+                height: 12px;
+                width: 20px;
+                background-image: cdnUrl("/img/ML/mobile_capture_video_icon.svg");
+                background-size: 20px 12px;
+                background-repeat: no-repeat;
+                background-position: center;
               }
-            }
-
-            &:before {
-              content: "";
-              left: 0px;
-              top: 3px;
-              position: absolute;
-              height: 12px;
-              width: 20px;
-              background-image: cdnUrl("/img/ML/capture_video_icon.svg");
-              background-size: 20px 12px;
-              background-repeat: no-repeat;
-              background-position: center;
             }
           }
         }
@@ -330,11 +449,27 @@ div.cmail-outer {
         overflow-x: hidden;
         height: auto;
 
+        @include tablet() {
+          padding: 24px;
+          min-height: calc(100vh - 112px);
+          max-height: initial;
+          overflow-x: visible;
+          overflow-y: visible;
+        }
+
         div.ziggeo-player, div.ziggeo-recorder {
           margin: 0px auto 24px;
 
+          @include tablet() {
+            margin-left: -24px;
+          }
+
           div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
             margin: 0px auto;
+
+            @include tablet() {
+              margin-left: -24px;
+            }
           }
         }
 
@@ -375,18 +510,31 @@ div.cmail-outer {
             outline: none;
             margin: 8px 0px 0px;
             cursor: text;
-            @include activity-body(16, 22, 22, $deep_navy);
             color: $deep_navy;
             @include avenir_R();
-            font-size: 16px;
-            line-height: 22px;
             height: auto;
-            overflow-y: auto;
-            overflow-x: hidden;
+
+            @include big_web() {
+              @include activity-body(16, 22, 22, $deep_navy);
+              font-size: 16px;
+              line-height: 22px;
+              overflow-y: auto;
+              overflow-x: hidden;
+            }
 
             @media screen and (min-height: 556px) {
               min-height: 240px;
               max-height: calc(100vh - 315px);
+            }
+
+            @include tablet() {
+              min-height: 50vh;
+              max-height: initial;
+              @include activity-body(18, 24, 24, $deep_navy);
+              font-size: 18px;
+              line-height: 24px;
+              overflow-y: auto;
+              overflow-x: visible;
             }
 
             & > *:first-child {
@@ -496,6 +644,10 @@ div.cmail-outer {
         padding: 0px 16px 12px;
         background-color: white;
 
+        @include tablet() {
+          display: none;
+        }
+
         button.post-button {
           background-color: $coral;
           color: $carrot_orange;
@@ -542,12 +694,14 @@ div.cmail-outer {
         div.emoji-picker {
           float: left;
           margin-left: 16px;
-          margin-top: 10px;
+          margin-right: 16px;
+          margin-top: 8px;
 
           button.emoji-button {
-            width: 20px;
-            height: 20px;
-            background-position: 0px 0px;
+            width: 24px;
+            height: 24px;
+            background-position: center;
+            background-size: 16px 16px;
             padding: 0px;
             position: absolute;
             top: 0px;
@@ -555,12 +709,75 @@ div.cmail-outer {
             cursor: pointer;
           }
 
-          @include mobile() {
+          @include tablet() {
             display: none;
           }
 
           div.picker-container {
             left: -8px;
+          }
+        }
+
+        button.cmail-must-see-bt {
+          float: left;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/cmail_footer_must_see_icon.svg");
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: 13px 16px;
+          margin-right: 16px;
+          margin-left: -5px;
+          margin-top: 8px;
+          padding: 0;
+
+          &:not(.on) {
+            opacity: 0.3;
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+
+          @include preload_image(cdnUlr("/img/ML/cmail_footer_must_see_icon_on.svg"));
+
+          &.on {
+            opacity: 1;
+            background-image: cdnUrl("/img/ML/cmail_footer_must_see_icon_on.svg");
+          }
+        }
+
+        button.video-record-bt {
+          width: 24px;
+          height: 24px;
+          margin-right: 16px;
+          margin-top: 8px;
+          padding: 0;
+          position: relative;
+          float: left;
+          opacity: 0.3;
+
+          @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"), "after");
+
+          &.remove-video-bt:before {
+            background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &:before {
+            content: "";
+            left: 0px;
+            top: 3px;
+            position: absolute;
+            height: 24px;
+            width: 24px;
+            background-image: cdnUrl("/img/ML/cmail_capture_video_icon.svg");
+            background-size: 18px 12px;
+            background-repeat: no-repeat;
+            background-position: 50% 3px;
           }
         }
 

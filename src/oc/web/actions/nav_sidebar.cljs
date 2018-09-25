@@ -1,8 +1,9 @@
 (ns oc.web.actions.nav-sidebar
   (:require [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.section :as section-actions]
             [oc.web.components.org-settings :as org-settings]))
 
 (defn close-navigation-sidebar []
@@ -26,6 +27,11 @@
 
 
 (defn show-section-add []
+  (dis/dispatch! [:input [:show-section-add-cb]
+   (fn [sec-data note]
+     (if sec-data
+       (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-add] false]))
+       (dis/dispatch! [:input [:show-section-add] false])))])
   (dis/dispatch! [:input [:show-section-add] true])
   (close-navigation-sidebar))
 

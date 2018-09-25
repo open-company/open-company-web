@@ -181,22 +181,23 @@
 
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."
-  ([board-data] (fix-board board-data {}))
+  ([board-data]
+    (fix-board board-data {}))
 
   ([board-data changes]
-     (let [links (:links board-data)
-           read-only (readonly-board? links)
-           with-read-only (assoc board-data :read-only read-only)
-           with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
-                                        (fix-entry %2 board-data changes))
-                                      with-read-only (:entries board-data))
-           with-entry-count (if (:entries board-data)
-                              (assoc with-fixed-entries
+    (let [links (:links board-data)
+          read-only (readonly-board? links)
+          with-read-only (assoc board-data :read-only read-only)
+          with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
+                                       (fix-entry %2 board-data changes))
+                                       with-read-only (:entries board-data))
+          with-entry-count (if (:entries board-data)
+                             (assoc with-fixed-entries
                               :entry-count
                               (count (:fixed-items with-fixed-entries)))
-                              with-fixed-entries)
-           without-entries (dissoc with-entry-count :entries)]
-       without-entries)))
+                             with-fixed-entries)
+          without-entries (dissoc with-entry-count :entries)]
+      without-entries)))
 
 (defn fix-container
   "Fix container data coming from the API."
@@ -252,10 +253,10 @@
         zero-pos? #(or (zero? %)
                        (pos? %))
         doc-element (.-documentElement js/document)
-        win-height (or (.-innerHeight js/window)
-                       (.-clientHeight doc-element))
-        win-width (or (.-innerWidth js/window)
-                      (.-clientWidth doc-element))]
+        win-height (or (.-clientHeight doc-element)
+                       (.-innerHeight js/window))
+        win-width (or (.-clientWidth doc-element)
+                      (.-innerWidth js/window))]
     (and ;; Item starts below the navbar
          (>= (.-top rect) responsive/navbar-height)
          ;; Item left is not out of the screen

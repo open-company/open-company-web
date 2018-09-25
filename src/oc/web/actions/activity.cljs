@@ -13,7 +13,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -279,7 +278,7 @@
                      (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish (merge entry-data-saved entry-saved) edit-key])))))
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
            (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
 
 (defn entry-toggle-save-on-exit
@@ -351,10 +350,12 @@
   (dis/dispatch! [:entry-modal-save]))
 
 (defn add-attachment [dispatch-input-key attachment-data]
-  (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data]))
+  (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data])
+  (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
 (defn remove-attachment [dispatch-input-key attachment-data]
-  (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data]))
+  (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data])
+  (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
 (defn get-entry [entry-data]
   (api/get-entry entry-data
@@ -750,8 +751,10 @@
 (defn cmail-show [initial-entry-data & [cmail-state]]
   (let [cmail-default-state {:collapse false
                              :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
-        fixed-cmail-state (merge cmail-default-state cmail-state)]
-    (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365))
+        cleaned-cmail-state (dissoc cmail-state :auto)
+        fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
+    (when-not (:auto cmail-state)
+      (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
     (load-cached-item initial-entry-data :cmail-data
      #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
 
@@ -778,15 +781,15 @@
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
     (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
-      (if (responsive/is-tablet-or-mobile?)
-        (entry-edit (dis/activity-data activity-uuid))
-        (cmail-show (dis/activity-data activity-uuid))))))
+      (cmail-show (dis/activity-data activity-uuid)))))
 
 (defn activity-edit
   [activity-data]
   (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
                               (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
-                              activity-data)]
-    (if (responsive/is-tablet-or-mobile?)
-      (entry-edit fixed-activity-data)
-      (cmail-show fixed-activity-data))))
+                              activity-data)
+        is-published? (= (:status fixed-activity-data) "published")
+        initial-cmail-state (if is-published?
+                              {:fullscreen true :auto true}
+                              {})]
+    (cmail-show fixed-activity-data initial-cmail-state)))

@@ -11,7 +11,8 @@ div.stream-item {
     padding: 24px 16px;
     margin: 0;
     border: none;
-    border-bottom: 1px solid #ECECEC;
+    border-bottom: 4px solid #ECECEC;
+    border-radius: 0;
   }
 
   &.new-item {
@@ -24,7 +25,7 @@ div.stream-item {
     }
   }
 
-  &.show-continue-reading {
+  &.show-continue-reading:not(.single-post-view) {
     div.stream-item-body-ext {
       div.stream-item-footer {
         button.expand-button {

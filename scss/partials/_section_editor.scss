@@ -1,534 +1,577 @@
-div.section-editor {
-  background-color: white;
-  border-radius: 6px;
-  border: 1px solid $deep_tan;
-  box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
-  padding: 32px 24px;
-  width: 360px;
-  z-index: 1000;
-  cursor: default;
+div.section-editor-container {
+  background-color: $carrot_modal_bg;
+  width: 100vw;
+  height: 100vh;
+  z-index: #{$navbar_zindex + 186};
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
 
-  @include mobile() {
-    width: 100vw;
-    min-height: 100vh;
-    padding: 20px 24px 16px;
-    border-radius: 0px;
-  }
-
-  button.mobile-modal-close-bt {
-    @include image-2x("/img/ML/mobile_modal_close");
-    width: 24px;
-    height: 24px;
-    background-repeat: no-repeat;
-    background-size: 14px 14px;
-    background-position: 5px 5px;
+  div.section-editor {
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid $deep_tan;
+    padding: 20px 24px;
+    width: 360px;
+    z-index: 1000;
+    cursor: default;
     position: absolute;
-    top: 20px;
-    left: 18px;
-    display: none;
+    top: 0;
+    left: 50%;
+    margin-left: -180px;
+    margin-top: 60px;
+    margin-bottom: 60px;
 
     @include mobile() {
-      display: block;
-      z-index: 1001;
-    }
-  }
-
-  div.section-editor-header {
-    height: 46px;
-    border-bottom: 1px solid $deep_tan;
-    padding-bottom: 24px;
-
-    @include mobile() {
-      height: 64px;
-      border-bottom: 0px;
-      position: absolute;
-      top: 0px;
-      left: 0px;
       width: 100vw;
-      padding-bottom: 0px;
-      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+      min-height: 100vh;
+      padding: 20px 24px 16px;
+      border-radius: 0px;
+      position: relative;
+      top: unset;
+      left: unset;
+      margin-left: 0;
+      margin-top: 0;
+      margin-bottom: 0;
     }
 
-    div.section-editor-header-left {
-      float: left;
-      @include avenir_M();
-      font-size: 16px;
-      color: $deep_navy;
-      white-space: nowrap;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    button.settings-modal-close {
+      right: -56px;
+      top: 0;
 
       @include mobile() {
-        float: none;
-        text-align: center;
-        @include avenir_H();
-        font-size: 18px;
-        height: 64px;
-        padding-top: 20px;
-      }
-    }
-  }
-
-  div.section-editor-add {
-    @include mobile() {
-      margin-top: 64px;
-    }
-
-    div.section-editor-error-label {
-      margin-top: 8px;
-      @include avenir_M();
-      font-size: 13px;
-      color: $carrot_orange;
-    }
-
-    div.section-editor-add-label {
-      margin-top: 24px;
-      @include avenir_H();
-      font-size: 15px;
-      color: $deep_navy;
-      height: 21px;
-
-      span.section-name {
-        float: left;
-      }
-
-      span.checkmark {
-        float: left;
-        margin-left: 6px;
-        font-size: 18px;
-        color: $carrot_green;
-      }
-
-      div.small-loading {
-        margin-right: 0px;
-        margin-top: 0px;
-        margin-left: 6px;
-        float: left;
-        display: block;
-      }
-
-      span.role-header {
-        float: right;
-        @include avenir_R();
-        font-size: 15px;
-        color: $ui_grey;
-      }
-
-      span.main-label {
-        float: left;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/section_add_mobile_close.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+        top: 15px;
+        left: 19px;
+        padding: 0;
+        right: unset;
+        z-index: 2;
       }
     }
 
-    div.section-editor-add-name {
-      border-radius: 4px;
-      border: 1px solid $carrot_light_gray_1;
-      min-height: 40px;
-      width: 100%;
-      @include avenir_M();
-      font-size: 15px;
-      color: $deep_navy;
-      padding: 10px 16px;
-      position: relative;
-      cursor: text;
-      outline: none;
-      margin-top: 8px;
-      overflow-y: auto;
-      overflow-x: hidden;
+    div.section-editor-header {
+      height: 30px;
+      border-bottom: 1px solid $deep_tan;
+      padding-bottom: 8px;
 
-      &:empty:before {
-        padding: 10px 16px;
-        height: 40px;
+      @include mobile() {
+        height: 56px;
+        border-bottom: 0px;
         position: absolute;
         top: 0px;
         left: 0px;
-        content: attr(placeholder);
-        opacity: 0.5;
-        font-style: none;
-        display: block;
+        width: 100vw;
+        padding-bottom: 0px;
+        box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+      }
+
+      div.section-editor-header-left {
+        float: left;
+        @include avenir_H();
+        font-size: 16px;
+        color: $deep_navy;
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        @include mobile() {
+          float: none;
+          text-align: center;
+          @include avenir_H();
+          font-size: 18px;
+          height: 64px;
+          padding-top: 20px;
+        }
       }
     }
 
-    div.section-editor-private-users-search {
-      border-radius: 4px;
-      border: 1px solid $carrot_light_gray_1;
-      height: 40px;
-      width: 100%;
-      @include avenir_M();
-      font-size: 15px;
-      color: $deep_navy;
-      padding: 10px 16px;
-      position: relative;
-      cursor: text;
-      outline: none;
-      margin-top: 8px;
+    div.section-editor-add {
+      @include mobile() {
+        margin-top: 64px;
+      }
 
-      input {
-        width: 100%;
-        margin: 0px;
-        padding: 0px;
-        border: none;
-        outline: none;
-        @include avenir_M();
+      div.section-editor-error-label {
+        margin-top: 8px;
+        @include avenir_R();
+        font-size: 12px;
+        color: $carrot_orange_2;
+      }
+
+      div.section-editor-add-label {
+        margin-top: 16px;
+        @include avenir_H();
         font-size: 15px;
         color: $deep_navy;
+        height: 21px;
 
-        @include placeholder() {
-          opacity: 0.6;
+        div.carrot-checkbox {
+          float: right;
+        }
+
+        span.section-name {
+          float: left;
+        }
+
+        span.role-header {
+          float: right;
+          @include avenir_R();
+          font-size: 15px;
+          color: $ui_grey;
+        }
+
+        span.main-label {
+          float: left;
         }
       }
 
-      div.section-editor-private-users-results {
-        position: absolute;
-        top: 40px;
-        left: 0px;
+      div.section-editor-add-name {
         border-radius: 4px;
-        border: 1px solid $carrot_light_gray_1;
+        border: 1px solid rgba($carrot_light_gray_1, .5);
+        min-height: 40px;
         width: 100%;
-        background-color: white;
-        padding: 10px 16px;
-        z-index: 10;
-
-        div.section-editor-private-users-result {
-          height: 40px;
-          cursor: pointer;
-          padding: 12px 0px;
-
-          @include user-profile(24);
-
-          &.no-more-invites {
-            height: auto;
-
-            div.name {
-              margin-left: 0px;
-              color: $ui_grey;
-
-              a {
-                color: $carrot_green;
-              }
-            }
-          }
-
-          div.user-avatar-img-container {
-            float: left;
-          }
-
-          div.name {
-            float: left;
-            width: calc(100% - 40px);
-            @include avenir_M();
-            font-size: 15px;
-            color: $deep_navy;
-            margin-left: 16px;
-          }
-        }
-      }
-    }
-
-    div.section-editor-add-slack-channel {
-      margin-top: 8px;
-      height: 40px;
-
-      div.carrot-checkbox {
-        float: left;
-        margin-top: 7px;
-      }
-
-      div.slack-channels-dropdown {
-        float: right;
-        width: 230px;
-
-        input.board-edit-slack-channel {
-          height: 40px;
-        }
-      }
-    }
-
-    div.sectoin-editor-access-public-description {
-      @include avenir_R();
-      font-size: 14px;
-      color: $ui_grey;
-      margin-top: 8px;
-    }
-
-    div.section-editor-add-access {
-      border-radius: 4px;
-      border: 1px solid $carrot_light_gray_1;
-      height: 40px;
-      width: 100%;
-      @include avenir_M();
-      font-size: 15px;
-      color: $deep_navy;
-      padding: 10px 32px 10px 16px;
-      position: relative;
-      cursor: pointer;
-      margin-top: 8px;
-
-      &.expanded:after {
-        transform: rotate(180deg);
-      }
-
-      &:after {
-        content: "";
-        position: absolute;
-        width: 8px;
-        height: 5px;
-        top: 18px;
-        right: 16px;
-        background-image: cdnUrl("/img/ML/section_access_chevron.svg");
-        background-size: 8px 5px;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-
-    }
-
-    div.section-editor-add-access-list {
-      border-radius: 4px;
-      border: 1px solid $carrot_light_gray_1;
-      position: absolute;
-      width: 310px;
-      background-color: white;
-      z-index: 1001;
-
-      div.access-list-row {
-        height: 40px;
-        padding: 10px 16px;
-        border-bottom: 1px solid rgba($deep_tan, 0.3);
-        opacity: 0.6;
-        cursor: pointer;
-
-        &:hover {
-          opacity: 1;
-        }
-
-        &:last-child {
-          border-bottom: none;
-        }
-      }
-    }
-
-    div.access-item {
-      @include avenir_M();
-      font-size: 15px;
-      color: $deep_navy;
-      padding-left: 24px;
-      position: relative;
-      height: 22px;
-      float: left;
-
-      &.private-access:before {
-        background-image: cdnUrl("/img/ML/section_access_private.svg");
-      }
-
-      &.team-access:before {
-        background-image: cdnUrl("/img/ML/section_access_team.svg");
-      }
-
-      &.public-access:before {
-        background-image: cdnUrl("/img/ML/section_access_public.svg");
-      }
-
-      &:before {
-        content: "";
-        position: absolute;
-        width: 16px;
-        height: 16px;
-        top: 1px;
-        left: 0px;
-        background-size: 16px 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-    }
-
-    div.section-editor-add-private-users {
-      margin: 16px 0px 0px;
-      position: relative;
-
-      div.section-editor-add-private-users-dropdown-container {
-        position: absolute;
-        right: 140px;
-        z-index: 3;
-
-        div.dropdown-list-container {
-          top: -4px;
-          left: unset;
-
-          div.triangle {
-            top: unset;
-            bottom: -2px;
-            left: unset;
-            right: 20px;
-            border-top: 0px solid rgba(177,184,192,0.50);
-            border-left: 0px solid rgba(177,184,192,0.50);
-            border-bottom: 1px solid rgba(177,184,192,0.50);
-            border-right: 1px solid rgba(177,184,192,0.50);
-          }
-        }
-      }
-
-      div.section-editor-add-private-users-list {
-        width: 100%;
-        padding: 0px;
-        @include avenir_M();
+        @include avenir_R();
         font-size: 14px;
         color: $deep_navy;
-        max-height: 210px;
+        padding: 10px 29px 10px 16px;
+        position: relative;
+        cursor: text;
+        outline: none;
+        margin-top: 8px;
         overflow-y: auto;
+        overflow-x: hidden;
 
-        div.section-editor-add-private-user {
-          height: 60px;
+        &.preflight-error {
+          border: 1px solid $carrot_orange_2;
+        }
+
+        &.preflight-ok:after {
+          content: "";
+          width: 13px;
+          height: 10px;
+          position: absolute;
+          bottom: 14px;
+          right: 16px;
+          background-image: cdnUrl("/img/ML/section_preflight_checkmark.svg");
+          background-position: center;
+          background-size: 13px 10px;
+          background-repeat: no-repeat;
+        }
+
+        &:empty:before {
+          padding: 10px 16px;
+          height: 40px;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          content: attr(placeholder);
+          opacity: 0.5;
+          font-style: none;
+          display: block;
+        }
+      }
+
+      div.section-editor-private-users-search {
+        border-radius: 4px;
+        border: 1px solid rgba($carrot_light_gray_1, .5);
+        height: 40px;
+        width: 100%;
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        padding: 10px 16px;
+        position: relative;
+        cursor: text;
+        outline: none;
+        margin-top: 8px;
+
+        input {
           width: 100%;
-          padding: 16px 0px;
-          border-bottom: 1px solid rgba($deep_tan, 0.3);
+          margin: 0px;
+          padding: 0px;
+          border: none;
+          outline: none;
+          @include avenir_R();
+          font-size: 14px;
+          color: $deep_navy;
 
-          &:first-child {
-            border-top: 1px solid rgba($deep_tan, 0.3);
+          @include placeholder() {
+            opacity: 0.6;
+          }
+        }
+
+        div.section-editor-private-users-results {
+          position: absolute;
+          top: 38px;
+          left: 0px;
+          border-radius: 4px;
+          border: 1px solid rgba($carrot_light_gray_1, .5);
+          width: calc(100% + 2px);
+          margin-left: -1px;
+          background-color: white;
+          padding: 10px 16px;
+          z-index: 10;
+          max-height: 200px;
+          overflow-y: auto;
+
+          div.section-editor-private-users-result {
+            height: 40px;
+            cursor: pointer;
+            padding: 12px 0px;
+
+            @include user-profile(24);
+
+            &.no-more-invites {
+              height: auto;
+
+              div.name {
+                margin-left: 0px;
+                color: $ui_grey;
+
+                a {
+                  color: $carrot_green;
+                }
+              }
+            }
+
+            div.user-avatar-img-container {
+              float: left;
+            }
+
+            div.name {
+              float: left;
+              width: calc(100% - 40px);
+              @include avenir_R();
+              font-size: 14px;
+              color: $deep_navy;
+              margin-left: 16px;
+            }
+          }
+        }
+      }
+
+      div.section-editor-add-slack-channel {
+        margin-top: 8px;
+
+        &.disabled {
+          opacity: 0.5;
+          div.slack-channels-dropdown {
+            pointer-events: none;
+          }
+        }
+
+        div.slack-channels-dropdown {
+          input.board-edit-slack-channel {
+            height: 40px;
+          }
+        }
+      }
+
+      div.section-editor-access-public-description {
+        @include avenir_R();
+        font-size: 14px;
+        color: $ui_grey;
+        margin-top: 8px;
+      }
+
+      div.section-editor-add-access {
+        border-radius: 4px;
+        border: 1px solid rgba($carrot_light_gray_1, .5);
+        height: 40px;
+        width: 100%;
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        padding: 10px 32px 10px 16px;
+        position: relative;
+        cursor: pointer;
+        margin-top: 8px;
+
+        &.expanded:after {
+          transform: rotate(180deg);
+        }
+
+        &:after {
+          content: "";
+          position: absolute;
+          width: 8px;
+          height: 5px;
+          top: 18px;
+          right: 16px;
+          background-image: cdnUrl("/img/ML/section_access_chevron.svg");
+          background-size: 8px 5px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+      }
+
+      div.section-editor-add-access-list {
+        border-radius: 4px;
+        border: 1px solid rgba($carrot_light_gray_1, .5);
+        position: absolute;
+        width: 310px;
+        background-color: white;
+        z-index: 1001;
+
+        div.access-list-row {
+          height: 40px;
+          padding: 10px 16px;
+          border-bottom: 1px solid rgba($deep_tan, 0.3);
+          opacity: 0.6;
+          cursor: pointer;
+
+          &:hover {
+            opacity: 1;
           }
 
           &:last-child {
             border-bottom: none;
           }
-
-          @include user-profile(24);
-
-          div.user-avatar-img-container {
-            float: left;
-          }
-
-          div.name {
-            float: left;
-            max-width: 50%;
-            margin-left: 16px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-top: 4px;
-          }
-
-          div.user-type {
-            float: right;
-            max-width: calc(50% - 32px - 6px);
-            margin-top: 4px;
-            position: relative;
-            cursor: pointer;
-            @include avenir_R();
-            font-size: 14px;
-            color: $deep_navy;
-            padding-right: 12px;
-            opacity: 0.6;
-
-            &.active {
-              opacity: 1;
-            }
-
-            &.remove-link {
-              text-decoration: underline;
-              color: $carrot_orange;
-              padding-right: 0px;
-
-              &:after {
-                display: none;
-              }
-            }
-
-            &:after {
-              content: "";
-              position: absolute;
-              top: 6px;
-              right: 0px;
-              background-image: cdnUrl("/img/ML/board_settings.svg");
-              background-size: 8px 8px;
-              background-repeat: no-repeat;
-              width: 8px;
-              height: 8px;
-            }
-
-            &.no-dropdown {
-              cursor: default;
-              padding-right: 0px;
-
-              &:after {
-                display: none;
-              }
-            }
-
-            div.dropdown-list-container {
-              top: 24px;
-              left: -68px;
-
-              div.triangle {
-                left: unset;
-                right: 30px;
-              }
-            }
-          }
         }
       }
-    }
 
-    div.section-editor-add-personal-note {
-      border-radius: 4px;
-      border: 1px solid $carrot_light_gray_1;
-      min-height: 80px;
-      width: 100%;
-      @include avenir_M();
-      font-size: 15px;
-      color: $deep_navy;
-      padding: 10px 16px;
-      position: relative;
-      cursor: text;
-      outline: none;
-      margin-top: 8px;
-
-      &:empty:before {
-        padding: 10px 16px;
-        height: 40px;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        content: attr(placeholder);
-        opacity: 0.5;
-        font-style: none;
-        display: block;
-      }
-    }
-
-    div.section-editor-add-footer {
-      margin-top: 24px;
-      height: 24px;
-      border-top: 1px solid rgba($deep_tan, 0.3);
-      padding-top: 24px;
-
-      button.delete-bt {
-        height: 24px;
+      div.access-item {
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        padding-left: 24px;
+        position: relative;
+        height: 22px;
         float: left;
-        width: 120px;
-        color: $ui_grey;
-        @include avenir_M();
-        font-size: 15px;
-        margin-left: 0px;
-        padding-left: 0px;
-        text-align: left;
 
-        &:not(.disabled):hover {
-          color: $deep_navy;
+        &.private-access:before {
+          background-image: cdnUrl("/img/ML/section_access_private.svg");
         }
 
-        &.disabled {
-          color: $light_ui_grey;
+        &.team-access:before {
+          background-image: cdnUrl("/img/ML/section_access_team.svg");
+        }
+
+        &.public-access:before {
+          background-image: cdnUrl("/img/ML/section_access_public.svg");
+        }
+
+        &:before {
+          content: "";
+          position: absolute;
+          width: 16px;
+          height: 16px;
+          top: 1px;
+          left: 0px;
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
         }
       }
 
-      button.mlb-reset.create-bt {
-        height: 24px;
-        float: right;
-        color: $carrot_green;
-        @include avenir_H();
-        font-size: 15px;
+      div.section-editor-add-private-users {
+        margin: 16px 0px 0px;
+        position: relative;
 
-        &.disabled {
+        div.section-editor-add-private-users-dropdown-container {
+          position: absolute;
+          right: 140px;
+          z-index: 3;
+
+          div.dropdown-list-container {
+            top: -4px;
+            left: unset;
+
+            div.triangle {
+              top: unset;
+              bottom: -2px;
+              left: unset;
+              right: 20px;
+              border-top: 0px solid rgba(177,184,192,0.50);
+              border-left: 0px solid rgba(177,184,192,0.50);
+              border-bottom: 1px solid rgba(177,184,192,0.50);
+              border-right: 1px solid rgba(177,184,192,0.50);
+            }
+          }
+        }
+
+        div.section-editor-add-private-users-list {
+          width: 100%;
+          padding: 0px;
+          @include avenir_R();
+          font-size: 14px;
+          color: $deep_navy;
+          max-height: 210px;
+          overflow-y: auto;
+
+          div.section-editor-add-private-user {
+            height: 60px;
+            width: 100%;
+            padding: 16px 0px;
+            border-bottom: 1px solid rgba($deep_tan, 0.3);
+
+            &:first-child {
+              border-top: 1px solid rgba($deep_tan, 0.3);
+            }
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            @include user-profile(24);
+
+            div.user-avatar-img-container {
+              float: left;
+            }
+
+            div.name {
+              float: left;
+              max-width: 50%;
+              margin-left: 16px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              margin-top: 4px;
+            }
+
+            div.user-type {
+              float: right;
+              max-width: calc(50% - 32px - 6px);
+              margin-top: 4px;
+              position: relative;
+              cursor: pointer;
+              @include avenir_R();
+              font-size: 14px;
+              color: $deep_navy;
+              padding-right: 12px;
+              opacity: 0.6;
+
+              &.active {
+                opacity: 1;
+              }
+
+              &.remove-link {
+                text-decoration: underline;
+                color: $carrot_orange;
+                padding-right: 0px;
+
+                &:after {
+                  display: none;
+                }
+              }
+
+              &:after {
+                content: "";
+                position: absolute;
+                top: 6px;
+                right: 0px;
+                background-image: cdnUrl("/img/ML/board_settings.svg");
+                background-size: 8px 8px;
+                background-repeat: no-repeat;
+                width: 8px;
+                height: 8px;
+              }
+
+              &.no-dropdown {
+                cursor: default;
+                padding-right: 0px;
+
+                &:after {
+                  display: none;
+                }
+              }
+
+              div.dropdown-list-container {
+                top: 24px;
+                left: -68px;
+
+                div.triangle {
+                  left: unset;
+                  right: 30px;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      div.section-editor-add-personal-note {
+        border-radius: 4px;
+        border: 1px solid rgba($carrot_light_gray_1, .5);
+        min-height: 80px;
+        width: 100%;
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        padding: 10px 16px;
+        position: relative;
+        cursor: text;
+        outline: none;
+        margin-top: 8px;
+
+        &:empty:before {
+          padding: 10px 16px;
+          height: 40px;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          content: attr(placeholder);
           opacity: 0.5;
+          font-style: none;
+          display: block;
+        }
+      }
+
+      div.section-editor-add-footer {
+        margin-top: 24px;
+        height: 24px;
+        border-top: 1px solid rgba($deep_tan, 0.3);
+        padding-top: 24px;
+
+        button.delete-bt {
+          height: 24px;
+          float: left;
+          width: 120px;
+          color: $ui_grey;
+          @include avenir_R();
+          font-size: 14px;
+          margin-left: 0px;
+          padding-left: 0px;
+          text-align: left;
+
+          &:not(.disabled):hover {
+            color: $deep_navy;
+          }
+
+          &.disabled {
+            color: $light_ui_grey;
+          }
+        }
+
+        button.cancel-bt {
+          float: right;
+          height: 32px;
+          margin-right: 16px;
+          @include avenir_R();
+          font-size: 14px;
+          color: $ui_grey;
+        }
+
+        button.mlb-reset.create-bt {
+          width: 64px;
+          height: 32px;
+          text-align: center;
+          float: right;
+          color: white;
+          background-color: $carrot_green;
+          border-radius: 6px;
+          @include avenir_H();
+          font-size: 14px;
+
+          &.disabled {
+            opacity: 0.5;
+          }
         }
       }
     }

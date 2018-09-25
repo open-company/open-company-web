@@ -17,16 +17,13 @@
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.cmail :refer (cmail)]
-            [oc.web.components.entry-edit :refer (entry-edit)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.components.fullscreen-post :refer (fullscreen-post)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
-            [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -79,14 +76,13 @@
                 user-settings
                 org-settings-data
                 made-with-carrot-modal-data
-                is-entry-editing
                 is-sharing-activity
                 entry-edit-dissmissing
                 is-showing-alert
                 media-input
                 show-section-editor
                 show-section-add
-                show-sections-picker
+                show-section-add-cb
                 entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
@@ -147,12 +143,9 @@
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
-                                  :modal-activity-view (router/current-activity-id)
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
-                                  :activity-removed show-activity-removed
-                                  :no-scroll (and (not is-mobile?)
-                                                  (router/current-activity-id))})}
+                                  :activity-removed show-activity-removed})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
@@ -172,33 +165,15 @@
           made-with-carrot-modal-data
           (made-with-carrot-modal)
           ;; Mobile create a new section
-          (and is-mobile?
-               show-section-editor)
+          show-section-editor
           (section-editor board-data
            (fn [sec-data note]
-            (when sec-data
-              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-editor] false])))))
+            (if sec-data
+              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-editor] false]))
+              (dis/dispatch! [:input [:show-section-editor] false]))))
           ;; Mobile edit current section data
-          (and is-mobile?
-               show-section-add)
-          (section-editor nil
-           (fn [sec-data note]
-            (when sec-data
-              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-add] false])))))
-          ;; Mobile sections picker
-          (and is-mobile?
-               show-sections-picker)
-          (sections-picker entry-editing-board-slug
-            (fn [board-data note]
-             (dis/dispatch! [:input [:show-sections-picker] false])
-             (when board-data
-              (dis/dispatch! [:update [:entry-editing]
-               #(merge % {:board-slug (:slug board-data)
-                          :board-name (:name board-data)
-                          :invite-note note})]))))
-          ;; Entry editing
-          is-entry-editing
-          (entry-edit)
+          show-section-add
+          (section-editor nil show-section-add-cb)
           ;; Activity share for mobile
           (and is-mobile?
                is-sharing-activity)
@@ -213,11 +188,7 @@
           ;; Show mobile navigation
           (and is-mobile?
                mobile-navigation-sidebar)
-          (navigation-sidebar)
-          ;; Activity modal
-          (and (router/current-activity-id)
-               (not entry-edit-dissmissing))
-          (fullscreen-post))
+          (navigation-sidebar))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -239,22 +210,22 @@
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
-        (when-not (and is-mobile?
-                       (or (router/current-activity-id)
-                           is-entry-editing
-                           is-sharing-activity
-                           show-section-add
-                           show-section-editor))
+        (when (or (not is-mobile?)
+                  (and ; (router/current-activity-id)
+                       (not is-sharing-activity)
+                       (not show-section-add)
+                       (not show-section-editor)
+                       (not show-cmail)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
-               (when-not (and is-mobile?
-                              (or (and search-active? search-results?)
-                                  mobile-navigation-sidebar
-                                  org-settings-data
-                                  user-settings
-                                  mobile-menu-open
-                                  is-showing-mobile-search
-                                  showing-mobile-user-notifications))
+               (when (or (not is-mobile?)
+                         (and (or (not search-active?) (not search-results?))
+                              (not mobile-navigation-sidebar)
+                              (not org-settings-data)
+                              (not user-settings)
+                              (not mobile-menu-open)
+                              (not is-showing-mobile-search)
+                              (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]])])))

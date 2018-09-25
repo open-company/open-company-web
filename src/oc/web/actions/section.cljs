@@ -28,24 +28,28 @@
 
 (defn section-get-finish
   [section]
-  (let [is-currently-shown (is-currently-shown? section)]
+  (let [is-currently-shown (is-currently-shown? section)
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
     (when is-currently-shown
-      ;; Tell the container service that we are seeing this board,
-      ;; and update change-data to reflect that we are seeing this board
-      (when-let [section-uuid (:uuid section)]
-        (utils/after 10 #(section-seen section-uuid)))
-      ;; only watch the currently visible board.
-      (when (jwt/jwt) ; only for logged in users
-        (watch-single-section section)))
+
+      (when user-is-part-of-the-team
+        ;; Tell the container service that we are seeing this board,
+        ;; and update change-data to reflect that we are seeing this board
+        (when-let [section-uuid (:uuid section)]
+          (utils/after 10 #(section-seen section-uuid)))
+        ;; only watch the currently visible board.
+        ; only for logged in users
+        (when (jwt/jwt)
+          (watch-single-section section))))
 
     ;; Retrieve reads count if there are items in the loaded section
-    (when (and (not= (:slug section) utils/default-drafts-board-slug)
+    (when (and user-is-part-of-the-team
+               (not= (:slug section) utils/default-drafts-board-slug)
                (seq (:entries section)))
       (let [item-ids (map :uuid (:entries section))
             cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activities-read-data))]
         (when (seq cleaned-ids)
           (api/request-reads-count cleaned-ids))))
-
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
@@ -241,3 +245,11 @@
        (when-not success
          (section-name-error status))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
+
+(defn show-section-add-with-callback [callback]
+  (dispatcher/dispatch! [:input [:show-section-add-cb]
+   (fn [sec-data note]
+     (callback sec-data note)
+     (dispatcher/dispatch! [:input [:show-section-add-cb] nil])
+     (dispatcher/dispatch! [:input [:show-section-add] false]))])
+  (dispatcher/dispatch! [:input [:show-section-add] true]))

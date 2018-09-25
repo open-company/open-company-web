@@ -20,8 +20,8 @@
             [goog.events.EventType :as EventType]))
 
 (defn win-width []
-  (or (.-innerWidth js/window)
-      (.-clientWidth (.-documentElement js/document))))
+  (or (.-clientWidth (.-documentElement js/document))
+      (.-innerWidth js/window)))
 
 (defn save-win-height [s]
   (reset! (::win-height s) (.-innerHeight js/window))
@@ -116,8 +116,7 @@
             (when (:headline activity-data)
               [:div.activity-title.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
-            (when (and video-id
-                       (not @(::record-video s)))
+            (when video-id
               (ziggeo-player {:video-id video-id
                               :width (:width video-size)
                               :height (:height video-size)

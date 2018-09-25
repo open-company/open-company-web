@@ -28,7 +28,7 @@
                                     :drafts is-drafts-board?})}]
         [:div.empty-board-title
           (cond
-           is-all-posts? "Catch up with your team"
+           is-all-posts? "Stay up to date"
            is-must-see? "Highlight what's important"
            is-drafts-board? "Jot down your ideas and notes"
            :else "This section is empty")]
