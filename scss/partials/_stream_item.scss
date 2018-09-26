@@ -134,6 +134,10 @@ div.stream-item {
         @include tablet(){
           width: auto;
           height: auto;
+
+          @include mobile() {
+            max-height: calc(100vw * 0.75);
+          }
         }
       }
     }
