@@ -29,14 +29,11 @@
 (rum/defcs user-avatar < rum/static
                          rum/reactive
                          (drv/drv :current-user-data)
-  [s {:keys [classes click-cb disable-menu]}]
+  [s {:keys [click-cb]}]
   (let [not-mobile? (not (responsive/is-tablet-or-mobile?))]
-    [:button.user-avatar-button.group
+    [:button.mlb-reset.user-avatar-button.group
       {:type "button"
-       :class (str classes)
-       :id "dropdown-toggle-menu"
-       :data-toggle (when (or not-mobile? (not disable-menu)) "dropdown")
-       :on-click (when (fn? click-cb) (click-cb))
+       :on-click #(when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
       (user-avatar-image (drv/react s :current-user-data) not-mobile?)]))

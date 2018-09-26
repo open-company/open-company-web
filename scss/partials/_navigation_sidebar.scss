@@ -53,6 +53,14 @@
     }
   }
 
+  &:active, &:focus {
+    text-decoration: none;
+
+    div.all-posts-label, div.must-see-label, div.drafts-label {
+      text-decoration: none;
+    }
+  }
+
   div.all-posts-label {
     @include avenir_R();
     font-size: 14px;
@@ -62,6 +70,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
 
     &.new {
       @include avenir_H();
@@ -78,6 +90,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
 
     &.new {
       @include avenir_H();
@@ -121,9 +137,21 @@
     text-decoration: none;
   }
 
+  &:active, &:focus {
+    text-decoration: none;
+
+    div.all-posts-label, div.must-see-label, div.drafts-label {
+      text-decoration: none;
+    }
+  }
+
   div.all-posts-label, div.must-see-label {
     @include avenir_H();
     text-decoration: none;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
   }
 }
 
@@ -153,11 +181,25 @@
     }
   }
 
+
+  &:active, &:focus {
+    text-decoration: none;
+
+    div.all-posts-label, div.must-see-label, div.drafts-label {
+      text-decoration: none;
+    }
+  }
+
   div.all-posts-label, div.drafts-label, div.must-see-label {
+
     color: $ui_grey;
     font-size: 14px;
     line-height: 25px;
     text-decoration: none;
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
 
     &.new {
       @include avenir_H();

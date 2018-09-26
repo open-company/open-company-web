@@ -76,6 +76,11 @@
         board-slug (router/current-board-slug)]
      (board-data-key org-slug board-slug)))
 
+;; User notifications
+
+(defn user-notifications-key [org-slug]
+  (vec (conj (org-key org-slug) :user-notifications)))
+
 ;; Change related keys
 
 (defn change-data-key [org-slug]
@@ -278,7 +283,8 @@
                                                                  :orgs-dropdown-visible
                                                                  :user-settings
                                                                  :org-settings
-                                                                 :search-active])]
+                                                                 :search-active
+                                                                 :mobile-user-notifications])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
@@ -305,6 +311,10 @@
                               (:media-input base))]
    :search-active         [[:base] (fn [base] (:search-active base))]
    :search-results        [[:base] (fn [base] (:search-results base))]
+   :user-notifications    [[:base :org-slug]
+                            (fn [base org-slug]
+                              (when (and base org-slug)
+                                (get-in base (user-notifications-key org-slug))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :jwt]
@@ -333,7 +343,8 @@
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
                                :mobile-menu-open mobile-menu-open
-                               :show-cmail (boolean (:cmail-state base))})]
+                               :show-cmail (boolean (:cmail-state base))
+                               :showing-mobile-user-notifications (:mobile-user-notifications base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-add-comment-tooltip   [[:nux] (fn [nux] (:show-add-comment-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
@@ -558,6 +569,17 @@
     (let [uv-key (uploading-video-key org-slug video-id)]
       (get-in data uv-key))))
 
+;; User notifications
+
+(defn user-notifications-data
+  "Get user notifications data"
+  ([]
+    (user-notifications-data (router/current-org-slug) @app-state))
+  ([org-slug]
+    (user-notifications-data org-slug @app-state))
+  ([org-slug data]
+    (get-in data (user-notifications-key org-slug))))
+
 ;; Change related
 
 (defn change-data
@@ -662,6 +684,9 @@
 (defn print-filtered-posts []
   (js/console.log (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter))))
 
+(defn print-user-notifications []
+  (js/console.log (user-notifications-data (router/current-org-slug) @app-state)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -679,3 +704,4 @@
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
+(set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)

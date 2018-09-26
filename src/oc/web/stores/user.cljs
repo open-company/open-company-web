@@ -3,7 +3,8 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as user-utils]))
 
 (def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images
@@ -258,3 +259,30 @@
 
 (defn has-slack-bot? [org-data]
   (j/team-has-bot? (:team-id org-data)))
+
+;; User notifications
+(defmethod dispatcher/action :user-notifications
+  [db [_ org-slug notifications]]
+  (assoc-in db (dispatcher/user-notifications-key org-slug) notifications))
+
+;; User notifications
+(defmethod dispatcher/action :user-notification
+  [db [_ org-slug notification]]
+  (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
+        old-notifications (get-in db user-notifications-key)
+        new-notifications (user-utils/sorted-notifications (concat [notification] old-notifications))]
+    (assoc-in db user-notifications-key new-notifications)))
+
+(defmethod dispatcher/action :user-notifications/read
+  [db [_ org-slug]]
+  (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
+        old-notifications (get-in db user-notifications-key)
+        read-notifications (map #(assoc % :unread false) old-notifications)]
+    (assoc-in db user-notifications-key read-notifications)))
+
+(defmethod dispatcher/action :user-notification/read
+  [db [_ org-slug notification]]
+  (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
+        old-notifications (get-in db user-notifications-key)
+        read-notifications (map #(if (= (:created-at %) (:created-at notification)) (assoc % :unread false) %) old-notifications)]
+    (assoc-in db user-notifications-key read-notifications)))

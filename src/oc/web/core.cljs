@@ -635,6 +635,7 @@
   (oa/subscribe)
   (ra/subscribe)
   (ca/subscribe)
+  (user-actions/subscribe)
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))

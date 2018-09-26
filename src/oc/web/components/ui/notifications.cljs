@@ -3,23 +3,17 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.notifications :as notification-actions]))
 
-(defn description-wrapper [desc]
-  (cond
-   (string? desc)
-   {:dangerouslySetInnerHTML #js {"__html" desc}}
-
-   (sequential? desc)
-   desc))
-
-(defn button-wrapper [s bt-cb bt-title bt-style bt-dismiss]
+(defn button-wrapper [s bt-ref bt-cb bt-title bt-style bt-dismiss]
   (let [has-html (string? bt-title)
         button-base-map {:on-click (fn [e]
                                      (when bt-dismiss
                                        (notification-actions/remove-notification (first (:rum/args s))))
                                      (when (fn? bt-cb)
                                        (bt-cb e)))
+                         :ref bt-ref
                          :class (utils/class-set {:solid-green (= bt-style :solid-green)
                                                   :default-link (= bt-style :default-link)})}
         button-map (if has-html
@@ -30,10 +24,13 @@
       (when-not has-html
         bt-title)]))
 
-(defn setup-timeout [s]
+(defn clear-timeout [s]
   (when @(::timeout s)
     (js/clearTimeout @(::timeout s))
-    (reset! (::timeout s) nil))
+    (reset! (::timeout s) nil)))
+
+(defn setup-timeout [s]
+  (clear-timeout s)
   (let [n-data (first (:rum/args s))]
     (reset! (::old-expire s) (:expire n-data))
     (when (pos? (:expire n-data))
@@ -64,18 +61,22 @@
   [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss
-             app-update slack-bot] :as notification-data}]
-  [:div.notification
+             app-update slack-bot mention mention-author click] :as notification-data}]
+  [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update app-update
                               :slack-bot slack-bot
                               :opac opac
+                              :mention-notification (and mention mention-author)
                               :dismiss-button dismiss-bt})
+     :on-mouse-enter #(clear-timeout s)
+     :on-mouse-leave #(setup-timeout s)
+     :on-click #(when (and (fn? click)
+                           (not (utils/event-inside? % (rum/ref-node s :dismiss-bt)))
+                           (not (utils/event-inside? % (rum/ref-node s :first-bt)))
+                           (not (utils/event-inside? % (rum/ref-node s :second-bt))))
+                  (click %))
      :data-notificationid id}
-    [:div.notification-title.group
-      (when slack-icon
-        [:span.slack-icon])
-      title]
     (when dismiss
       [:button.mlb-reset.notification-dismiss-bt
         {:on-click #(do
@@ -83,14 +84,23 @@
                       (js/clearTimeout @(::timeout s))
                       (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
-                        (dismiss %)))}])
+                        (dismiss %)))
+         :ref :dismiss-bt}])
+    (when mention-author
+      [:div.mention-author
+        (user-avatar-image mention-author)])
+    [:div.notification-title.group
+      (when slack-icon
+        [:span.slack-icon])
+      title]
     (when (seq description)
       [:div.notification-description
-        (description-wrapper description)])
+        {:dangerouslySetInnerHTML #js {"__html" description}
+         :class (when mention "oc-mentions")}])
     (when (seq secondary-bt-title)
-      (button-wrapper s secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
+      (button-wrapper s :second-bt secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
     (when (seq primary-bt-title)
-      (button-wrapper s primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss))])
+      (button-wrapper s :first-bt primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss))])
 
 (rum/defcs notifications < rum/static
                            rum/reactive
