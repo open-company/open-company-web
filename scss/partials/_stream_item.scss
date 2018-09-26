@@ -128,16 +128,12 @@ div.stream-item {
         height: 480px;
 
         video {
-          max-height: 480px;
+          max-height: 408px;
         }
 
         @include tablet(){
           width: auto;
           height: auto;
-
-          @include mobile() {
-            max-height: calc(100vw * 0.75);
-          }
         }
       }
     }
@@ -148,12 +144,20 @@ div.stream-item {
       height: 102px;
       float: right;
 
+      video {
+        max-height: 102px;
+      }
+
       @include tablet(){
         margin-top: 16px;
         float: unset;
         width: auto;
         height: auto;
         margin-left: -16px;
+
+        video {
+          max-height: calc(100vw * 0.75);
+        }
       }
     }
 
