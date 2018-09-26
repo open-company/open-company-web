@@ -146,11 +146,11 @@
              "Key information stays organized and visible so your team can get caught "
              "up anytime without worrying they missed something in fast-moving conversations.")]
           [:img.keep-aligned-section-copy-values-list
-            {:src (cdn "/img/ML/homepage_vertical_values_list.png")
-             :srcSet (str (cdn "/img/ML/homepage_vertical_values_list@2x.png") " 2x")}]]
+            {:src (utils/cdn "/img/ML/homepage_vertical_values_list.png")
+             :srcSet (str (utils/cdn "/img/ML/homepage_vertical_values_list@2x.png") " 2x")}]]
         [:img.keep-aligned-section-screenshot.screenshot-1
-          {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
-           :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]
+          {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
+           :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]
 
       [:div.keep-aligned-section-row.second-row.group
         [:div.keep-aligned-section-copy
@@ -170,8 +170,8 @@
              "Your team can join the discussion from Slack, "
              "too -- Carrot keeps it all in sync.")]]
         [:img.keep-aligned-section-screenshot.screenshot-2
-          {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
-           :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]]
+          {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
+           :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]]
 
       [:div.keep-aligned-section-row.third-row.group
         [:div.keep-aligned-section-copy
@@ -189,8 +189,8 @@
              "Carrot AI works in the background to keep everyone "
              "on your team looped in to what matters.")]]
         [:img.keep-aligned-section-screenshot.screenshot-3
-          {:src (cdn "/img/ML/homepage_screenshots_third_row.png")
-           :srcSet (str (cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]]
+          {:src (utils/cdn "/img/ML/homepage_screenshots_third_row.png")
+           :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]]
 
       [:div.keep-aligned-section-row.fourth-row.group
         [:div.keep-aligned-section-copy
@@ -207,8 +207,8 @@
              "communication that builds transparency and "
              "trust. Set up recurring updates, too.")]]
         [:img.keep-aligned-section-screenshot.screenshot-4
-          {:src (cdn "/img/ML/homepage_screenshots_fourth_row.png")
-           :srcSet (str (cdn "/img/ML/homepage_screenshots_fourth_row@2x.png") " 2x")}]]
+          {:src (utils/cdn "/img/ML/homepage_screenshots_fourth_row.png")
+           :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_fourth_row@2x.png") " 2x")}]]
 
       [:div.keep-aligned-section-row.fifth-row.group
         [:div.keep-aligned-section-copy
@@ -225,8 +225,8 @@
           [:button.mlb-reset.keep-aligned-section-copy-button
             {:onClick ""}]]
         [:img.keep-aligned-section-screenshot.screenshot-5
-          {:src (cdn "/img/ML/homepage_screenshots_fifth_row.png")
-           :srcSet (str (cdn "/img/ML/homepage_screenshots_fifth_row@2x.png") " 2x")}]]]])
+          {:src (utils/cdn "/img/ML/homepage_screenshots_fifth_row.png")
+           :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_fifth_row@2x.png") " 2x")}]]]])
 
 (def animation-lightbox
   [:div.animation-lightbox-container
