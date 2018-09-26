@@ -463,6 +463,7 @@ div.cmail-outer {
           }
 
           @include tablet() {
+            margin-top: -24px;
             margin-left: -24px;
 
             video {
@@ -474,6 +475,7 @@ div.cmail-outer {
             margin: 0px auto;
 
             @include tablet() {
+              margin-top: -24px;
               margin-left: -24px;
             }
           }
