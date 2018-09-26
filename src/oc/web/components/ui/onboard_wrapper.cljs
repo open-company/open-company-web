@@ -414,6 +414,8 @@
         disabled @(::patching-sections s)
         continue-fn (fn []
                       (reset! (::patching-sections s) true)
+                      ;; refresh user api data after org creation
+                      (user-actions/entry-point-get (:slug org-data))
                       (org-actions/update-org-sections (:slug org-data) sections-list))]
     [:div.onboard-lander.lander-sections
       [:div.main-cta
