@@ -19,7 +19,7 @@
                                       config {:element player-el
                                               :attrs #js {:width width
                                                           :height height
-                                                          :theme "carrot"
+                                                          :theme "modern"
                                                           :themecolor "white"
                                                           :video video-id}}
                                       Player (.. js/ZiggeoApi -V2 -Player)
@@ -69,7 +69,7 @@
                                      recorder-el (rum/ref-node s :ziggeo-recorder)]
                                  (let [attrs {:width width
                                               :height height
-                                              :theme "carrot"
+                                              :theme "modern"
                                               :themecolor "white"
                                               :localplayback true
                                               :meta-profile ls/oc-ziggeo-profiles}
