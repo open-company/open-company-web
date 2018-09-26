@@ -28,7 +28,10 @@
         sections (vec (map #(hash-map :name % :selected (utils/in? selected-sections %)) section-names))
         fixed-org-data (fix-org org-data)
         current-orgs (dispatcher/orgs-data)
-        new-orgs (distinct (conj current-orgs org-data))]
+        new-orgs (if (seq (filterv #(= (:slug org-data) (:slug %))
+                                   current-orgs))
+                   current-orgs
+                   (conj current-orgs org-data))]
     (-> db
       (assoc dispatcher/orgs-key new-orgs)
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
