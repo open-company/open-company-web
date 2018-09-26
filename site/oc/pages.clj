@@ -217,7 +217,6 @@
 
 (def keep-aligned-section
   [:section.home-keep-aligned
-    [:div.scroll-down]
     [:h2.keep-aligned-title
       "Carrot keeps leaders and teams aligned"]
 
@@ -354,19 +353,17 @@
       animation-lightbox
       ; Hope page header
       [:section.cta.group
-        [:div.balloon.big-blue]
-        [:div.balloon.small-green]
-        [:div.balloon.big-green]
-        [:div.balloon.small-purple-face]
-        [:div.balloon.big-yellow]
-        [:div.balloon.small-purple]
+
+        [:a.carrot-logo]
 
         [:h1.headline
-          "Where leadership finds its voice"]
+          "Communicate"
+          [:br]
+          "what matters."]
         [:div.subheadline
-          (str
-           "Rise above the noise of chat and email to "
-           "keep your growing and distributed teams aligned.")]
+          "Rise above the noise of chat and email"
+          [:br]
+          "to keep your distributed team aligned."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container
           [:button.mlb-reset.get-started-button
@@ -381,12 +378,14 @@
             [:div.thanks-subheadline "Thank you for subscribing."]]]
 
         [:div.main-animation-container
-          {:onClick "OCStaticShowAnimationLightbox();"}
           [:img.main-animation
             {:src (cdn "/img/ML/homepage_screenshot.png")
              :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-        core-values-list]
+        [:div.cta-lightbox-starter
+          [:h2 "Carrot keeps leaders and teams aligned."]
+          [:button.mlb-reset.watch-video-bt
+            {:onClick "OCStaticShowAnimationLightbox();"}]]]
 
       keep-aligned-section
 

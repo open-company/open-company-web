@@ -38,31 +38,30 @@ div.home-wrap {
       }
     }
 
-    @include mobile() {
-      padding: 0 0px;
-    }
-
     section {
-
-      &:nth-child(odd) {
-        background-color: #FFFDF9;
-      }
-
-      &:nth-child(even) {
-        background-color: #FAF8F4;
-      }
-
-      @include mobile(){
-        padding: 0 24px;
-      }
+      background-color: #FFFDF9;
     }
 
     section.cta {
-      padding-top: 184px;
+      padding-top: 120px;
       padding-bottom: 120px;
       text-align: center;
       position: relative;
       overflow: hidden;
+
+      &:after {
+        background: #F8F7F3;
+        content: "";
+        width: 100%;
+        height: 54%;
+        display: block;
+        border-bottom-left-radius: 200px;
+        position: absolute;
+        // top: 320px;
+        // left: 0;
+        bottom: 0;
+        right: 0;
+      }
 
       @include mobile() {
         width: 100%;
@@ -72,78 +71,25 @@ div.home-wrap {
         padding-bottom: 0px;
       }
 
-      div.balloon {
-        position: absolute;
-        background-position: center;
+      a.carrot-logo {
+        // margin: 6px auto 0px;
+        width: 160px;
+        height: 39px;
+        background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
+        background-size: 160px 39px;
         background-repeat: no-repeat;
-        z-index: 1;
-
-        @media screen and (max-width: 1100px) {
-          display: none;
-        }
-
-        &.big-blue {
-          @include image-2x("/img/ML/balloon_big_blue");
-          background-size: 145px 145px;
-          width: 145px;
-          height: 145px;
-          top: -94px;
-          left: 231px;
-        }
-
-        &.small-green {
-          @include image-2x("/img/ML/balloon_small_green");
-          background-size: 15px 15px;
-          width: 15px;
-          height: 15px;
-          top: 46px;
-          left: 232px;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/balloon_big_green");
-          background-size: 226px 209px;
-          width: 226px;
-          height: 209px;
-          top: 134px;
-          right: -108px;
-        }
-
-        &.small-purple-face {
-          @include image-2x("/img/ML/balloon_small_purple_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 298px;
-          right: 124px;
-        }
-
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow");
-          background-size: 400px 380px;
-          width: 400px;
-          height: 380px;
-          top: 460px;
-          left: 50%;
-          margin-left: -590px;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/balloon_small_purple");
-          background-size: 136px 115px;
-          width: 136px;
-          height: 115px;
-          top: 1000px;
-          left: 50%;
-          margin-left: 432px;
-        }
+        background-position: center;
+        padding: 0;
+        display: inline-block;
+        margin-left: -1045px;
+        margin-bottom: 80px;
       }
 
       h1.headline {
-        font-size: 40px;
-        @include avenir_H();
+        font-size: 80px;
+        font-family: "PT Serif";
+        font-weight: 700;
         color: $deep_navy;
-        max-width: 640px;
         margin: 0 auto;
         z-index: 2;
         position: relative;
@@ -157,10 +103,9 @@ div.home-wrap {
 
       div.subheadline {
         color: $ui_grey;
-        font-size: 24px;
-        line-height: 32px;
+        font-size: 30px;
+        line-height: 38px;
         @include avenir_R();
-        max-width: 510px;
         margin: 4px auto 0px;
         z-index: 2;
         position: relative;
@@ -193,6 +138,31 @@ div.home-wrap {
         margin: 0 auto;
 
         button.get-started-button {
+          margin-top: 24px;
+        }
+      }
+
+      div.cta-lightbox-starter {
+        position: relative;
+        z-index: 2;
+        margin: 90px auto 0;
+
+        h2 {
+          font-family: "PT Serif";
+          font-weight: 700;
+          font-size: 40px;
+          color: $deep_navy;
+        }
+
+        button.watch-video-bt {
+          background-color: $feint_emerald;
+          border-radius: 8px;
+          width: 360px;
+          height: 56px;
+          background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
+          background-size: 287px 19px;
+          background-position: center;
+          background-repeat: no-repeat;
           margin-top: 24px;
         }
       }
