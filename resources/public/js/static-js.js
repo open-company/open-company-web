@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
   // Sticky header for marketing site
   if ( $("nav.site-navbar").length > 0) {
     $(window).on("scroll", function(){
-      if ($(window).scrollTop() === 0) {
+      if ($(window).scrollTop() < 100) {
         $("nav.site-navbar").removeClass("sticky");
       }else{
         $("nav.site-navbar").addClass("sticky");

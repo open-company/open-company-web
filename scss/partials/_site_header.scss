@@ -43,8 +43,8 @@ nav.site-navbar {
   width: 100vw;
   z-index: 100;
   background-color: transparent;
-  box-shadow: 0px 0px 0px 0px tranparent;
-  transform: background-color 180ms, box-shadow 180ms;
+  border-bottom: 1px solid transparent;
+  transform: background-color 180ms, border-bottom 180ms;
 
   @include mobile() {
     height: 72px;
@@ -52,15 +52,16 @@ nav.site-navbar {
 
   &.sticky {
     background-color: white;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba($ui_grey, 0.2);
     height: 56px;
 
     div.site-navbar-container {
-      padding: 12px 40px;
+      padding: 12px 0px;
       height: 56px;
 
       @include mobile() {
         padding: 14px 24px;
+        width: 100%;
       }
 
       div.mobile-ham-menu {
@@ -72,10 +73,12 @@ nav.site-navbar {
       }
 
       a.navbar-brand-left {
+        display: block;
         margin: 4px 0px 0px;
         width: 99px;
         height: 24px;
         background-size: 99px 24px;
+        display: block;
 
         @include mobile() {
           margin: 2px 0px 0px -50px;
@@ -87,8 +90,8 @@ nav.site-navbar {
       }
 
       div.site-navbar-right {
-        top: 12px;
-        height: 32px;
+        top: 8px;
+        height: 40px;
 
         @include mobile() {
           top: 16px;
@@ -101,20 +104,21 @@ nav.site-navbar {
         }
 
         a.login {
-          height: 32px;
-          padding: 6px 24px;
+          height: 40px;
+          padding: 10px 24px;
 
           @include mobile() {
-            height: 24px;
-            padding: 2px 12px;
+            height: 30px;
+            padding: 5px 12px;
           }
         }
 
         a.start {
-          background-color: $carrot_orange;
-          color: white;
-          height: 32px;
-          padding: 6px 24px;
+          border-radius: 8px;
+          background-color: $coral;
+          color: $carrot_orange;
+          height: 40px;
+          padding: 10px 24px;
 
           @include mobile() {
             height: 24px;
@@ -143,8 +147,10 @@ nav.site-navbar {
 
   div.site-navbar-container {
     height: 64px;
-    padding: 24px 40px 0px;
+    padding: 24px 0px 0px;
     position: relative;
+    width: 1209px;
+    margin: 0 auto;
 
     @include mobile() {
       padding: 22px 24px;
@@ -190,7 +196,7 @@ nav.site-navbar {
     div.site-navbar-right {
       position: absolute;
       top: 24px;
-      right: 40px;
+      right: 0px;
 
       @include mobile() {
         top: 22px;
@@ -235,7 +241,7 @@ nav.site-navbar {
       a.start {
         min-width: 84px;
         height: 40px;
-        border-radius: 100px;
+        border-radius: 8px;
         @include avenir_H();
         font-size: 16px;
         color: $carrot_orange;
@@ -318,7 +324,7 @@ nav.site-navbar {
       background-size: 115px 28px;
       background-repeat: no-repeat;
       padding: 0;
-      display: block;
+      display: none;
 
       @include mobile() {
         position: absolute;
@@ -354,17 +360,18 @@ nav.site-navbar {
       }
 
       a {
-        @include avenir_M();
-        padding: 4px 12px;
+        @include avenir_R();
+        padding: 0px 12px;
         display: inline-block;
-        font-size: 16px;
-        line-height: 20px;
+        font-size: 18px;
+        line-height: 28px;
         color: $ui_grey;
         margin: 0px;
         height: 28px;
 
         &.active {
-          color: #373F4F;
+          @include avenir_H();
+          color: $deep_navy;
         }
       }
     }

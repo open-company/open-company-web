@@ -7,7 +7,7 @@ div.main-animation-container {
   }
 
   img.main-animation {
-    max-width: 1280px;
+    max-width: 1480px;
     width: calc(100% - 48px);
     margin: 120px auto 0px;
     padding: 0;
@@ -556,25 +556,6 @@ section.home-keep-aligned {
 
   @include mobile() {
     padding: 40px 24px 80px !important;
-  }
-
-  div.scroll-down {
-    width: 48px;
-    height: 48px;
-    @include image-2x("/img/ML/homepage_scroll_down");
-    background-size: 22px 22px;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 0 auto;
-    position: relative;
-    top: -142px;
-    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    background-color: white;
-
-    @include mobile() {
-      top: -62px;
-    }
   }
 
   h2.keep-aligned-title {
