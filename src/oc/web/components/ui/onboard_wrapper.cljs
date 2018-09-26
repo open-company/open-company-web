@@ -398,11 +398,15 @@
                                                                                         (not (utils/valid-domain? domain)))]))
                  :placeholder "Domain, e.g. acme.com"}]]
             [:div.field-label.info "Anyone with this email domain can automatically join your team."]]
-          [:button.continue
-            {:class (when continue-disabled "disabled")
-             :on-touch-start identity
-             :on-click continue-fn}
-            "Continue"]]]]))
+         [:button.continue
+           {:class (when continue-disabled "disabled")
+            :on-touch-start identity
+            :on-click continue-fn}
+           "Continue"]
+         [:div.logout-cancel
+          [:button.mlb-reset.logout-cancel
+           {:on-click #(user-actions/logout)}
+              "Cancel sign up"]]]]]))
 
 (rum/defcs lander-sections < rum/reactive
                              (drv/drv :org-data)
