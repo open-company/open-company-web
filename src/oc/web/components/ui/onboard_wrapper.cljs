@@ -19,6 +19,7 @@
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -406,11 +407,14 @@
 (rum/defcs lander-sections < rum/reactive
                              (drv/drv :org-data)
                              (drv/drv :sections-setup)
+                             (rum/local false ::patching-sections)
   [s]
   (let [sections-list (drv/react s :sections-setup)
         org-data (drv/react s :org-data)
+        disabled @(::patching-sections s)
         continue-fn (fn []
-                     (org-actions/update-org-sections (:slug org-data) sections-list))]
+                      (reset! (::patching-sections s) true)
+                      (org-actions/update-org-sections (:slug org-data) sections-list))]
     [:div.onboard-lander.lander-sections
       [:div.main-cta
         [:div.mobile-header.mobile-only
@@ -418,6 +422,7 @@
           [:button.mlb-reset.top-continue
             {:on-touch-start identity
              :on-click continue-fn
+             :disabled disabled
              :aria-label "Start using Carrot"}
            "Start"]]
         [:div.title
@@ -437,7 +442,8 @@
             (small-loading))]
         [:button.continue.start-using-carrot
           {:on-touch-start identity
-           :on-click continue-fn}
+           :on-click continue-fn
+           :disabled disabled}
           "✨ Start using Carrot ✨"]]]))
 
 (def default-invite-row
@@ -891,9 +897,11 @@
     :password-reset-lander (password-reset-lander)
     [:div]))
 
-(rum/defc onboard-wrapper < rum/static
-  [component]
+(rum/defcs onboard-wrapper < rum/reactive
+                             (drv/drv :ap-loading)
+  [s component]
   [:div.onboard-wrapper-container
+    (loading {:loading (drv/react s :ap-loading)})
     [:div.onboard-wrapper
       {:class (str "onboard-" (name component))}
       [:div.onboard-wrapper-left
