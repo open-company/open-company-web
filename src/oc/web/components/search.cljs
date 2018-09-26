@@ -49,14 +49,11 @@
      ]))
 
 (rum/defcs results-header < rum/static
-  [s search-results]
-  (let [result-count (if (< store/search-limit (:count search-results))
-                       store/search-limit
-                       (:count search-results))]
-    [:div.header.group
-      [:span "SEARCH RESULTS"]
+  [s result-count]
+  [:div.header.group
+    [:span "SEARCH RESULTS"]
       (when (pos? result-count)
-        [:span.count (str "(" result-count ")")])]))
+        [:span.count (str "(" result-count ")")])])
 
 (def default-page-size
   (if (responsive/is-mobile-size?) 300 5))
@@ -79,10 +76,10 @@
                        (:count search-results))]
     [:div.search-results {:ref "results"
                           :class (when-not search-active? "inactive")}
-      (when-not (responsive/is-mobile-size?) (results-header search-results))
+      (when-not (responsive/is-mobile-size?) (results-header result-count))
       [:div.search-results-container
         (when (responsive/is-mobile-size?)
-          (results-header search-results))
+          (results-header result-count))
         (if (pos? result-count)
           (let [results (reverse (:results search-results))]
             (for [sr (take @(::page-size s) results)]

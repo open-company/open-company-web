@@ -127,6 +127,10 @@ div.stream-item {
         width: 638px;
         height: 480px;
 
+        video {
+          max-height: 480px;
+        }
+
         @include tablet(){
           width: auto;
           height: auto;
