@@ -273,7 +273,7 @@
               "Add members to this private section"])
           (when (= (:access section-editing) "private")
             (let [query  (::query s)
-                  available-users (filter :user-id (:users roster))
+                  available-users (:mention-users roster)
                   addable-users (get-addable-users section-editing available-users)
                   filtered-users (filter-users addable-users @query)]
               (when can-change

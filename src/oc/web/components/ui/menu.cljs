@@ -24,29 +24,34 @@
   (dis/dispatch! [:input [:mobile-menu-open] false]))
 
 (defn logout-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (user-actions/logout))
 
 (defn user-profile-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (if (responsive/is-tablet-or-mobile?)
     (user-profile/show-modal :profile)
     (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
   (mobile-menu-toggle))
 
-(defn user-notifications-click [e]
-  (utils/event-stop e)
+(defn notifications-settings-click [e]
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
 (defn team-settings-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
 (defn invite-click [e]
-  (utils/event-stop e)
+  ; (utils/event-stop e)
+  (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 
@@ -64,11 +69,8 @@
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)]
     [:div.menu
-      {:class (utils/class-set {:dropdown-menu (not (responsive/is-mobile-size?))
-                                :mobile-menu-open (and (responsive/is-mobile-size?)
-                                                       mobile-menu-open)})
-       :aria-labelledby "dropdown-toggle-menu"
-       :aria-expanded true}
+      {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
+                                                       mobile-menu-open)})}
       [:div.menu-header
         (user-avatar-image current-user-data)
         [:div.user-name.fs-hide
@@ -90,8 +92,8 @@
       (when (jwt/jwt)
         [:a
           {:href "#"
-           :on-click user-notifications-click}
-          [:div.oc-menu-item.user-notifications
+           :on-click notifications-settings-click}
+          [:div.oc-menu-item.notifications-settings
             "Notification Settings"]])
       [:div.oc-menu-separator]
       (when org-data

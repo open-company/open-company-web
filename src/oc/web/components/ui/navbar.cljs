@@ -1,29 +1,46 @@
 (ns oc.web.components.ui.navbar
   (:require [rum.core :as rum]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.dispatcher :as dis]
-            [oc.web.router :as router]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
+            [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]))
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
                     (ui-mixins/render-on-resize nil)
-                    {:did-mount (fn [s]
+                    (rum/local false ::expanded-user-menu)
+                    (rum/local nil ::window-click)
+                    {:will-mount (fn [s]
+                      (reset! (::window-click s)
+                       (events/listen js/window EventType/CLICK
+                        #(when-not (utils/event-inside? % (rum/ref-node s "user-menu"))
+                           (reset! (::expanded-user-menu s) false))))
+                      s)
+                     :did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
-                     s)}
-  [s disabled-user-menu]
+                     s)
+                     :will-unmount (fn [s]
+                      (when @(::window-click s)
+                        (events/unlistenByKey @(::window-click s))
+                        (reset! (::window-click s) nil))
+                      s)}
+  [s]
   (let [{:keys [current-user-data
                 org-data
                 board-data
@@ -33,14 +50,16 @@
                 orgs-dropdown-visible
                 user-settings
                 org-settings
-                search-active]
+                search-active
+                mobile-user-notifications]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
-         active? (and (not mobile-menu-open)
-                      (not orgs-dropdown-visible)
-                      (not org-settings)
-                      (not user-settings)
-                      (not search-active))]
+         mobile-ap-active? (and (not mobile-menu-open)
+                                (not orgs-dropdown-visible)
+                                (not org-settings)
+                                (not user-settings)
+                                (not search-active)
+                                (not mobile-user-notifications))]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -56,6 +75,7 @@
                                                      (not (:read-only org-data)))})}
       [:div.mobile-bottom-line
         {:class (utils/class-set {:search search-active
+                                  :user-notifications mobile-user-notifications
                                   :user-menu (or mobile-menu-open
                                                  (and is-mobile?
                                                       (or user-settings
@@ -67,10 +87,11 @@
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:class (utils/class-set {:active active?})
+              {:class (utils/class-set {:active mobile-ap-active?})
                :on-click #(do
                             (search-actions/inactive)
                             (menu/mobile-menu-close)
+                            (user-actions/hide-mobile-user-notifications)
                             (if (and is-mobile?
                                      (or org-settings
                                          user-settings))
@@ -82,6 +103,7 @@
                {:on-click #(do
                              (menu/mobile-menu-close)
                              (search-actions/active)
+                             (user-actions/hide-mobile-user-notifications)
                              (utils/after 500 search-actions/focus))
                 :class (when search-active "active")}]
              (orgs-dropdown))]
@@ -92,22 +114,37 @@
              (search-box))]
           [:div.navbar-right
             (if is-mobile?
-              [:button.btn-reset.mobile-menu.group
-                {:on-click #(do
-                             (search-actions/inactive)
-                             (when is-mobile?
-                               (dis/dispatch! [:input [:user-settings] nil])
-                               (dis/dispatch! [:input [:org-settings] nil]))
-                             (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                             (menu/mobile-menu-toggle))}
-                (user-avatar-image current-user-data)]
+              [:div.mobile-right-nav
+                (when (jwt/user-is-part-of-the-team (:team-id org-data))
+                  [:button.mlb-reset.mobile-notification-bell
+                    {:class (utils/class-set {:active mobile-user-notifications})
+                     :on-click #(do
+                                  (search-actions/inactive)
+                                  (menu/mobile-menu-close)
+                                  (when (or org-settings
+                                          user-settings)
+                                    (dis/dispatch! [:input [:user-settings] nil])
+                                    (dis/dispatch! [:input [:org-settings] nil]))
+                                  (user-actions/show-mobile-user-notifications))}])
+                [:button.btn-reset.mobile-menu.group
+                  {:on-click #(do
+                               (search-actions/inactive)
+                               (when is-mobile?
+                                 (dis/dispatch! [:input [:user-settings] nil])
+                                 (dis/dispatch! [:input [:org-settings] nil]))
+                               (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                               (user-actions/hide-mobile-user-notifications)
+                               (menu/mobile-menu-toggle))}
+                  (user-avatar-image current-user-data)]]
               (if (jwt/jwt)
-                [:div.user-menu
-                  (user-avatar
-                   {:classes (str "mlb-reset" (if disabled-user-menu " disabled-user-menu" " dropdown-toggle"))
-                    :disable-menu disabled-user-menu})
-                  (when-not disabled-user-menu
-                    (menu/menu))]
+                [:div.group
+                  (user-notifications)
+                  [:div.user-menu
+                    {:ref "user-menu"}
+                    (user-avatar
+                     {:click-cb #(swap! (::expanded-user-menu s) not)})
+                    (when @(::expanded-user-menu s)
+                      (menu/menu))]]
                 (login-button)))]]]
       (when is-mobile?
         ;; Render the menu here only on mobile so it can expand the navbar

@@ -9,6 +9,8 @@
             [oc.web.utils.activity :as au]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.mention :as mention-utils]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]
@@ -276,9 +278,12 @@
         buttons (if show-subtitle
                   ["bold" "italic" "unorderedlist" "anchor" "h2"]
                   ["bold" "italic" "unorderedlist" "anchor"])
+        users-list (:mention-users @(drv/get-ref s :team-roster))
         extensions (if mobile-editor
-                      #js {"autolist" (js/AutoList.)}
                       #js {"autolist" (js/AutoList.)
+                           "mention" (mention-utils/mention-ext users-list)}
+                      #js {"autolist" (js/AutoList.)
+                           "mention" (mention-utils/mention-ext users-list)
                            "media-picker" media-picker-ext
                            "fileDragging" false
                            "carrotFileDragging" file-dragging-ext})
@@ -297,9 +302,9 @@
                               :targetCheckboxText "Open in new window"}
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
-                             :cleanAttrs #js ["class" "style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
+                             :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
                              :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input" "textarea"]
-                             :unwrapTags (clj->js (remove nil? ["div" "span" "label" "font" "h1"
+                             :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
                                                    (when-not show-subtitle "h2") "h3" "h4" "h5"
                                                    "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                                    "details" "summary" "nav" "abbr"]))}
@@ -353,6 +358,8 @@
                                ;; Image upload lock
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
+                               (drv/drv :team-roster)
+                               (mention-mixins/oc-mentions-hover)
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)
@@ -398,7 +405,7 @@
            :add-video-cb #(add-video s nil)
            :add-attachment-cb #(add-attachment s nil)})
          multi-picker-container)))
-    [:div.rich-body-editor
+    [:div.rich-body-editor.oc-mentions.oc-mentions-hover
       {:ref "body"
        :content-editable (not nux)
        :class (str classes

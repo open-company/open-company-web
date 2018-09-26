@@ -26,6 +26,7 @@
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
+            [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
@@ -86,7 +87,8 @@
                 mobile-navigation-sidebar
                 activity-share-container
                 mobile-menu-open
-                show-cmail]} (drv/react s :org-dashboard-data)
+                show-cmail
+                showing-mobile-user-notifications]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -179,6 +181,10 @@
           ;; Search results
           is-showing-mobile-search
           (search-box)
+          ;; Mobile notifications
+          (and is-mobile?
+               showing-mobile-user-notifications)
+          (user-notifications)
           ;; Show mobile navigation
           (and is-mobile?
                mobile-navigation-sidebar)
@@ -220,5 +226,6 @@
                               (not org-settings-data)
                               (not user-settings)
                               (not mobile-menu-open)
-                              (not is-showing-mobile-search)))
+                              (not is-showing-mobile-search)
+                              (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]])])))

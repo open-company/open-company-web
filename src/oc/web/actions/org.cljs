@@ -13,6 +13,7 @@
             [oc.web.actions.activity :as aa]
             [oc.web.actions.section :as sa]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.ws-notify-client :as ws-nc]
             [oc.web.lib.ws-change-client :as ws-cc]
             [oc.web.lib.ws-interaction-client :as ws-ic]
             [oc.web.actions.notifications :as notification-actions]))
@@ -99,12 +100,18 @@
   ;; Change service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/get-key :user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
+      (ws-cc/reconnect ws-link (jwt/user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
 
   ;; Interaction service connection
   (when (jwt/jwt) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
-      (ws-ic/reconnect ws-link (jwt/get-key :user-id))))
+      (ws-ic/reconnect ws-link (jwt/user-id))))
+
+  ;; Notify client
+  (when (jwt/jwt)
+    (when-let [ws-link (utils/link-for (:links org-data) "notifications")]
+      (ws-nc/reconnect ws-link (jwt/user-id))))
+
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-bot-added-notification?))
 
@@ -246,6 +253,7 @@
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
 
 (defn update-org-sections [org-slug all-sections]
+  (dis/dispatch! [:input [:ap-loading] true])
   (let [selected-sections (vec (map :name (filterv :selected all-sections)))
         patch-payload {:boards (conj selected-sections "General")
                        :samples true}]

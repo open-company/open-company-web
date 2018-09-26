@@ -77,6 +77,33 @@ div.notifications {
       }
     }
 
+    &.mention-notification {
+      div.notification-title {
+        float: left;
+        margin-left: 8px;
+        max-width: 80%;
+      }
+
+      div.notification-description {
+        float: right;
+        width: calc(100% - 32px);
+        text-align: left;
+
+        p {
+          margin: 0;
+          padding: 0;
+        }
+      }
+    }
+
+    div.mention-author {
+      @include user-profile(24);
+
+      div.user-avatar-img-container {
+        float: left;
+      }
+    }
+
     span.slack-icon {
       width: 16px;
       height: 16px;
@@ -110,6 +137,10 @@ div.notifications {
       font-size: 14px;
       color: white;
       margin-top: 4px;
+
+      &.oc-mentions span.oc-mention[data-found="true"] {
+        background-color: transparent !important;
+      }
     }
 
     button.notification-button {
