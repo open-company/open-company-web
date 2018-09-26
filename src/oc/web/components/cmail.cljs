@@ -437,10 +437,7 @@
                                         :invite-note note})]))))])
             [:div.cmail-section-right
               [:button.mlb-reset.video-record-bt
-                {:on-click #(do
-                              (when is-mobile?
-                                (js/alert (str "Video size is:" (:width video-size) "x" (:height video-size) ". Screen width is:" (win-width))))
-                              (video-record-clicked s))
+                {:on-click #(video-record-clicked s)
                  :class (when (or (:fixed-video-id cmail-data)
                                   @(::record-video s))
                           "remove-video-bt")}]]]
