@@ -232,7 +232,7 @@ section.testimonials-section {
   }
 
   div.testimonials-cards-container {
-    width: 1254px;
+    width: 1194px;
     margin: 55px auto 0px;
     position: relative;
 
@@ -243,7 +243,7 @@ section.testimonials-section {
 
     div.testimonial-card {
       float: left;
-      width: 382px;
+      width: 362px;
       padding-left: 32px;
       margin-left: 48px;
       text-align: left;
@@ -641,15 +641,14 @@ section.home-keep-aligned {
       }
 
       &.first-row {
-        height: 826px;
+        height: 688px;
 
         div.keep-aligned-section-copy {
           width: 485px;
           height: 564px;
-          position: absolute;
-          left: 50%;
-          top: 130px;
+          // top: 130px;
           margin-left: -560px;
+          margin-top: -282px;
 
           @include mobile() {
             width: 100%;
@@ -668,7 +667,7 @@ section.home-keep-aligned {
       }
 
       &.second-row {
-        height: 738px;
+        height: 582px;
 
         &:before {
           content: "";
@@ -692,11 +691,10 @@ section.home-keep-aligned {
 
         div.keep-aligned-section-copy {
           width: 489px;
-          height: 466px;
-          position: absolute;
-          left: 50%;
-          top: 136px;
-          margin-left: 130px;
+          height: 476px;
+          // top: 136px;
+          margin-left: 110px;
+          margin-top: -238px;
 
           @include mobile() {
             width: 100%;
@@ -720,10 +718,9 @@ section.home-keep-aligned {
         div.keep-aligned-section-copy {
           width: 586px;
           height: 393px;
-          position: absolute;
-          left: 50%;
-          top: 77px;
+          // top: 77px;
           margin-left: -580px;
+          margin-top: -196px;
 
           @include mobile() {
             width: 100%;
@@ -742,7 +739,7 @@ section.home-keep-aligned {
       }
 
       &.fourth-row {
-        height: 692px;
+        height: 670px;
 
         &:before {
           content: "";
@@ -767,10 +764,9 @@ section.home-keep-aligned {
         div.keep-aligned-section-copy {
           width: 489px;
           height: 402px;
-          position: absolute;
-          left: 50%;
-          top: 153px;
-          margin-left: 130px;
+          // top: 153px;
+          margin-left: 110px;
+          margin-top: -201px;
 
           @include mobile() {
             width: 100%;
@@ -789,14 +785,13 @@ section.home-keep-aligned {
       }
 
       &.fifth-row {
-        height: 396px;
+        height: 477px;
         div.keep-aligned-section-copy {
           width: 483px;
           height: 396px;
-          position: absolute;
-          left: 50%;
-          top: 68px;
+          // top: 68px;
           margin-left: -580px;
+          margin-top: -198px;
 
           @include mobile() {
             width: 100%;
@@ -831,9 +826,9 @@ section.home-keep-aligned {
         }
 
         &.screenshot-1 {
-          width: 720px;
-          height: 826px;
-          margin-left: 30px;
+          width: 600px;
+          height: 688px;
+          margin-left: 0;
 
           @include mobile() {
             width: auto;
@@ -843,9 +838,9 @@ section.home-keep-aligned {
         }
 
         &.screenshot-2 {
-          width: 760px;
-          height: 738px;
-          margin-left: -720px;
+          width: 600px;
+          height: 582px;
+          margin-left: -600px;
 
           @include mobile() {
             width: auto;
@@ -857,7 +852,7 @@ section.home-keep-aligned {
         &.screenshot-3 {
           width: 484px;
           height: 546px;
-          margin-left: 128px;
+          margin-left: 98px;
 
           @include mobile() {
             width: auto;
@@ -867,9 +862,9 @@ section.home-keep-aligned {
         }
 
         &.screenshot-4 {
-          width: 620px;
-          height: 692px;
-          margin-left: -592px;
+          width: 600px;
+          height: 670px;
+          margin-left: -600px;
 
           @include mobile() {
             width: auto;
@@ -879,9 +874,9 @@ section.home-keep-aligned {
         }
 
         &.screenshot-5 {
-          width: 640px;
-          height: 607px;
-          margin-left: 15px;
+          width: 600px;
+          height: 477px;
+          margin-left: 0px;
 
           @include mobile() {
             width: auto;
@@ -893,6 +888,11 @@ section.home-keep-aligned {
 
       div.keep-aligned-section-copy {
         text-align: left;
+        // display: table-cell;
+        // vertical-align: middle;
+        position: absolute;
+        left: 50%;
+        top: 50%;
 
         @include mobile() {
           width: 100%;
