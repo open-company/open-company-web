@@ -390,7 +390,7 @@ section.keep-aligned {
   div.no-credit-card {
     @include avenir_R();
     color: $ui_grey;
-    font-size: 14px;
+    font-size: 12px;
     margin-top: 24px;
     text-align: center;
 
@@ -527,20 +527,21 @@ div.core-values-list {
 }
 
 button.get-started-button {
-  width: 255px;
-  height: 48px;
-  border-radius: 100px;
+  width: 320px;
+  height: 64px;
+  border-radius: 8px;
   background-color: $carrot_orange;
   color: white;
-  @include avenir_H();
-  font-size: 20px;
+  @include avenir_B();
+  font-size: 16px;
   margin: 48px auto 0;
+  text-transform: uppercase;
   position: relative;
   text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px;
+  padding: 2px 12px 0;
 
   @include mobile(){
     width: 100%;
