@@ -153,6 +153,7 @@ nav.site-navbar {
     margin: 0 auto;
 
     @include mobile() {
+      width: 100vw;
       padding: 22px 24px;
       height: 72px;
     }
@@ -254,6 +255,10 @@ nav.site-navbar {
         margin-top: 0px;
         opacity: 0.8;
 
+        &:active, &:focus {
+          text-decoration: none;
+        }
+
         @include mobile() {
           height: 28px;
           width: auto;
@@ -302,7 +307,8 @@ nav.site-navbar {
         &.your-digest {
           height: unset;
           border: none;
-          border-radius: none;
+          border-radius: 8px;
+          background-color: $carrot_green;
           padding: 0px;
           margin-top: 0px;
           opacity: 1;
@@ -327,6 +333,7 @@ nav.site-navbar {
       display: none;
 
       @include mobile() {
+        display: block;
         position: absolute;
         float: unset;
         left: 50%;

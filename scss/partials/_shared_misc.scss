@@ -170,15 +170,32 @@ div.cards-container {
 
 section.testimonials-section {
   text-align: center;
-  padding: 72px 0px !important;
+  padding: 160px 0px !important;
   position: relative;
+
+  &:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #F8F7F3;
+    border-bottom-right-radius: 200px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    @include mobile() {
+      border-bottom-right-radius: 100px;
+    }
+  }
 
   @include mobile() {
     width: 100%;
     padding: 80px 24px !important;
     padding-top: 80px !important;
     padding-bottom: 80px !important;
-    text-align: left;
+    text-align: center;
   }
 
   @include tablet() {
@@ -187,73 +204,92 @@ section.testimonials-section {
   }
 
   div.testimonials-section-title {
-    @include avenir_H();
+    font-family: "PT Serif", serif;
+    font-weight: 700;
     color: $deep_navy;
-    font-size: 38px;
-    line-height: 44px;
+    font-size: 40px;
+    line-height: 38px;
+    position: relative;
 
     @include mobile(){
-      font-size: 24px;
-      line-height: 30px;
+      font-size: 20px;
+      line-height: 26px;
     }
   }
 
   div.testimonials-section-subtitle {
     @include avenir_R();
-    font-size: 20px;
-    line-height: 26px;
+    font-size: 24px;
+    line-height: 32px;
     color: $ui_grey;
-    margin-top: 11px;
+    margin-top: 16px;
+    position: relative;
 
     @include mobile(){
-      font-size: 16px;
-      line-height: 22px;
+      font-size: 20px;
+      line-height: 26px;
     }
   }
 
   div.testimonials-cards-container {
-    width: 1080px;
-    margin: 50px auto 0px;
+    width: 1254px;
+    margin: 55px auto 0px;
+    position: relative;
 
     @include tablet() {
       width: 100%;
-      margin: 16px auto 0px;
+      margin: 42px auto 0px;
     }
 
     div.testimonial-card {
       float: left;
-      width: 340px;
-      border-radius: 8px;
-      background-color: $deep_navy;
-      padding: 24px;
+      width: 382px;
+      padding-left: 32px;
+      margin-left: 48px;
       text-align: left;
+      position: relative;
+
+      &:before {
+        content: "";
+        width: 8px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 100px;
+        background-color: rgba(#54C58C, 0.2);
+      }
 
       &:first-child {
-        div.testimonial-image {
-          @include image-2x("/img/ML/testimonial_1_image");
+        div.testimonial-header {
+          div.testimonial-logo {
+            width: 112px;
+            height: 24px;
+            @include image-2x("/img/ML/testimonial_1_logo");
+            background-size: 112px 24px;
+          }
         }
 
         div.testimonial-footer {
-          div.testimonial-logo {
-            width: 84px;
-            height: 18px;
-            @include image-2x("/img/ML/testimonial_1_logo");
-            background-size: 84px 18px;
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_1_image");
           }
         }
       }
 
       &:nth-child(2) {
-        div.testimonial-image {
-          @include image-2x("/img/ML/testimonial_2_image");
+        div.testimonial-header {
+          div.testimonial-logo {
+            width: 11px;
+            height: 32px;
+            @include image-2x("/img/ML/testimonial_2_logo");
+            background-size: 11px 32px;
+          }
         }
 
         div.testimonial-footer {
-          div.testimonial-logo {
-            width: 120px;
-            height: 18px;
-            @include image-2x("/img/ML/testimonial_2_logo");
-            background-size: 120px 18px;
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_2_image");
           }
         }
       }
@@ -261,55 +297,39 @@ section.testimonials-section {
       &:nth-child(3) {
         float: right;
 
-        div.testimonial-image {
-          @include image-2x("/img/ML/testimonial_3_image");
+        div.testimonial-header {
+          div.testimonial-logo {
+            width: 234px;
+            height: 24px;
+            @include image-2x("/img/ML/testimonial_3_logo");
+            background-size: 234px 24px;
+          }
         }
 
         div.testimonial-footer {
-          div.testimonial-logo {
-            width: 196px;
-            height: 20px;
-            @include image-2x("/img/ML/testimonial_3_logo");
-            background-size: 196px 20px;
-          }
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_3_image");
+          } 
         }
       }
 
-      div.testimonial-image {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-position: center;
-        background-size: 40px 40px;
-        background-repeat: no-repeat;
-        margin-right: 16px;
-        float: left;
-      }
+      div.testimonial-header {
+        a, a:active, a:focus {
+          text-decoration: none;
+        }
 
-      div.testimonial-name {
-        @include avenir_B();
-        font-size: 15px;
-        color: white;
-        text-transform: uppercase;
-        line-height: 24px;
-      }
-
-      div.testimonial-role {
-        @include avenir_M();
-        font-size: 14px;
-        color: rgba(white, 0.6);
-        line-height: 19px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        div.testimonial-logo {
+          float: left;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
       }
 
       div.testimonial-quote {
         @include avenir_M();
         font-size: 16px;
-        color: white;
+        color: $deep_navy;
         line-height: 20px;
-        height: 96px;
 
         @include mobile() {
           min-height: 80px;
@@ -323,20 +343,40 @@ section.testimonials-section {
       div.testimonial-footer {
         margin-top: 16px;
 
-        a, a:active, a:focus {
-          text-decoration: none;
+        div.testimonial-image {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-position: center;
+          background-size: 40px 40px;
+          background-repeat: no-repeat;
+          margin-right: 16px;
+          float: left;
         }
 
-        div.testimonial-logo {
-          float: right;
-          background-position: center;
-          background-repeat: no-repeat;
+        div.testimonial-name {
+          font-family: "PT Serif", serif;
+          font-weight: 700;
+          font-size: 16px;
+          color: $deep_navy;
+          line-height: 20px;
+        }
+
+        div.testimonial-role {
+          @include avenir_R();
+          font-size: 14px;
+          color: rgba($ui_grey, 0.6);
+          line-height: 19px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          margin-top: 4px;
         }
       }
 
       @include tablet() {
         float: unset;
-        margin: 20px 0px 0px;
+        margin: 40px 0 0;
         width: 100%;
       }
 
@@ -344,7 +384,7 @@ section.testimonials-section {
         margin-left: 30px;
 
         @include tablet() {
-          margin: 20px 0px 0px;
+          margin: 40px 0 0;
         }
       }
     }
@@ -368,18 +408,17 @@ section.keep-aligned {
   }
 
   div.keep-aligned-title {
-    @include avenir_H();
-    font-size: 28px;
-    line-height: 38px;
+    font-family: "PT Serif", serif;
+    font-size: 60px;
+    line-height: 70px;
     color: $deep_navy;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    text-align: center;
 
     @include mobile() {
-      @include avenir_H();
-      font-size: 22px;
-      line-height: 26px;
+      font-size: 36px;
+      line-height: 40px;
       margin-bottom: 24px;
-      text-align: center;
     }
   }
 
@@ -390,7 +429,7 @@ section.keep-aligned {
   div.no-credit-card {
     @include avenir_R();
     color: $ui_grey;
-    font-size: 12px;
+    font-size: 16px;
     margin-top: 24px;
     text-align: center;
 
@@ -552,7 +591,7 @@ button.get-started-button {
 }
 
 section.home-keep-aligned {
-  padding: 120px 24px 160px;
+  padding: 0;
   text-align: center;
 
   @include mobile() {
@@ -578,22 +617,47 @@ section.home-keep-aligned {
     margin: 0px auto;
 
     div.keep-aligned-section-row {
-      width: 1176px;
-      height: 354px;
-      margin: 120px auto 0px;
+      margin: 320px auto;
+      position: relative;
+
+      @include mobile() {
+        margin: 0 auto;
+        padding-top: 80px;
+        padding-bottom: 80px;
+      }
+
+      &:first-child {
+        margin-top: 160px;
+
+        @include mobile() {
+          margin: 0 auto;
+        }
+      }
+
+      @include mobile() {
+        width: 100%;
+        height: auto;
+        margin: 80px auto;
+      }
 
       &.first-row {
-        width: 1127px;
-        height: 386px;
-        margin: 80px auto 0px;
+        height: 826px;
 
         div.keep-aligned-section-copy {
-          width: 426px;
-          height: 200px;
+          width: 485px;
+          height: 564px;
+          position: absolute;
+          left: 50%;
+          top: 130px;
+          margin-left: -560px;
 
           @include mobile() {
             width: 100%;
             height: auto;
+            position: relative;
+            left: unset;
+            top: unset;
+            margin-left: unset;
           }
         }
 
@@ -604,16 +668,43 @@ section.home-keep-aligned {
       }
 
       &.second-row {
-        width: 1112px;
-        height: 400px;
+        height: 738px;
+
+        &:before {
+          content: "";
+          display: block;
+          background-color: #F8F7F3;
+          border-top-right-radius: 200px;
+          width: calc(50vw + 293px);
+          height: calc(100% + 320px);
+          position: absolute;
+          left: 0px;
+          top: -160px;
+
+          @include mobile() {
+            width: calc(100% + 48px);
+            left: -24px;
+            top: 0;
+            height: 100%;
+            border-top-right-radius: 100px;
+          }
+        }
 
         div.keep-aligned-section-copy {
-          width: 400px;
-          height: 200px;
+          width: 489px;
+          height: 466px;
+          position: absolute;
+          left: 50%;
+          top: 136px;
+          margin-left: 130px;
 
           @include mobile() {
             width: 100%;
             height: auto;
+            position: relative;
+            left: unset;
+            top: unset;
+            margin-left: unset;
           }
         }
 
@@ -624,16 +715,23 @@ section.home-keep-aligned {
       }
 
       &.third-row {
-        width: 1178px;
-        height: 330px;
+        height: 546px;
 
         div.keep-aligned-section-copy {
-          width: 467px;
-          height: 160px;
+          width: 586px;
+          height: 393px;
+          position: absolute;
+          left: 50%;
+          top: 77px;
+          margin-left: -580px;
 
           @include mobile() {
             width: 100%;
             height: auto;
+            position: relative;
+            left: unset;
+            top: unset;
+            margin-left: unset;
           }
         }
 
@@ -644,16 +742,43 @@ section.home-keep-aligned {
       }
 
       &.fourth-row {
-        width: 1120px;
-        height: 406px;
+        height: 692px;
+
+        &:before {
+          content: "";
+          display: block;
+          background-color: #F8F7F3;
+          border-bottom-left-radius: 200px;
+          width: calc(50vw + 397px);
+          height: calc(100% + 320px);
+          position: absolute;
+          right: 0px;
+          top: -160px;
+
+          @include mobile() {
+            width: calc(100% + 48px);
+            left: -24px;
+            top: 0;
+            height: 100%;
+            border-bottom-left-radius: 100px;
+          }
+        }
 
         div.keep-aligned-section-copy {
-          width: 400px;
-          height: 200px;
+          width: 489px;
+          height: 402px;
+          position: absolute;
+          left: 50%;
+          top: 153px;
+          margin-left: 130px;
 
           @include mobile() {
             width: 100%;
             height: auto;
+            position: relative;
+            left: unset;
+            top: unset;
+            margin-left: unset;
           }
         }
 
@@ -663,239 +788,164 @@ section.home-keep-aligned {
         }
       }
 
-      @include mobile() {
-        width: 100%;
-        height: auto;
-        margin: 80px auto 0px;
+      &.fifth-row {
+        height: 396px;
+        div.keep-aligned-section-copy {
+          width: 483px;
+          height: 396px;
+          position: absolute;
+          left: 50%;
+          top: 68px;
+          margin-left: -580px;
+
+          @include mobile() {
+            width: 100%;
+            height: auto;
+            position: relative;
+            left: unset;
+            top: unset;
+            margin-left: unset;
+          }
+        }
+
+        @include mobile() {
+          width: 100%;
+          height: auto;
+        }
       }
 
       img.keep-aligned-section-screenshot {
         width: auto;
         height: auto;
+        position: absolute;
+        top: 0;
+        left: 50%;
 
         @include mobile() {
           margin: 0 auto;
           max-width: 100%;
+          position: relative;
+          left: unset;
+          top: unset;
+          margin-top: 32px;
         }
 
         &.screenshot-1 {
-          width: 665px;
-          height: 386px;
+          width: 720px;
+          height: 826px;
+          margin-left: 30px;
 
           @include mobile() {
             width: auto;
             height: auto;
+            margin-left: auto;
           }
         }
 
         &.screenshot-2 {
-          width: 672px;
-          height: 439px;
+          width: 760px;
+          height: 738px;
+          margin-left: -720px;
 
           @include mobile() {
             width: auto;
             height: auto;
+            margin-left: auto;
           }
         }
 
         &.screenshot-3 {
-          width: 695px;
-          height: 370px;
+          width: 484px;
+          height: 546px;
+          margin-left: 128px;
 
           @include mobile() {
             width: auto;
             height: auto;
+            margin-left: auto;
           }
         }
 
         &.screenshot-4 {
-          width: 710px;
-          height: 444px;
+          width: 620px;
+          height: 692px;
+          margin-left: -592px;
 
           @include mobile() {
             width: auto;
             height: auto;
+            margin-left: auto;
+          }
+        }
+
+        &.screenshot-5 {
+          width: 640px;
+          height: 607px;
+          margin-left: 15px;
+
+          @include mobile() {
+            width: auto;
+            height: auto;
+            margin-left: auto;
           }
         }
       }
 
       div.keep-aligned-section-copy {
-        margin-top: 82px;
         text-align: left;
 
         @include mobile() {
           width: 100%;
-          margin-top: 40px;
         }
 
         div.keep-aligned-section-copy-title {
-          @include avenir_H();
-          font-size: 24px;
+          font-family: "PT Serif", serif;
+          font-weight: 700;
+          font-size: 80px;
           color: $deep_navy;
-          line-height: 42px;
+          line-height: 78px;
 
           @include mobile() {
-            font-size: 22px;
-            line-height: 32px;
+            font-size: 36px;
+            line-height: 40px;
           }
         }
 
-        div.keep-aligned-section-list-item {
-          position: relative;
+        div.keep-aligned-section-copy-subtitle {
           @include avenir_R();
-          font-size: 18px;
-          line-height: 22px;
-          color: $deep_navy;
-          margin-top: 12px;
-          padding-left: 36px;
+          font-size: 24px;
+          color: $ui_grey;
+          line-height: 34px;
+          margin-top: 40px;
 
           @include mobile() {
-            padding-top: 20px;
-            padding-bottom: 8px;
-            border-top: 1px solid #E3E4E2;
-          }
-
-          &:before {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            background-size: 24px 24px;
-            background-position: center;
-            background-repeat: no-repeat;
-            content: "";
-            width: 24px;
-            height: 24px;
-
-            @include mobile() {
-              top: 14px;
-            }
-          }
-
-          &.purple-checkmark:before {
-            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_purple.svg");
-          }
-
-          &.green-checkmark:before {
-            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_green.svg");
-          }
-
-          &.red-checkmark:before {
-            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_red.svg");
-          }
-
-          &.blue-checkmark:before {
-            background-image: cdnUrl("/img/ML/keep_aligned_checkmark_blue.svg");
-          }
-        }
-      }
-
-      @include big_web() {
-        &:nth-child(odd) {
-          img.keep-aligned-section-screenshot {
-            float: left;
-          }
-
-          div.keep-aligned-section-copy {
-            float: right;
+            font-size: 20px;
+            line-height: 26px;
           }
         }
 
-        &:nth-child(even) {
-          img.keep-aligned-section-screenshot {
-            float: right;
-          }
-
-          div.keep-aligned-section-copy {
-            float: left;
-          }
+        img.keep-aligned-section-copy-values-list {
+          margin-top: 32px;
+          width: 193px;
+          height: 208px;
         }
-      }
-    }
-  }
-}
 
-section.access-anywhere-section {
-  height: 460px;
+        button.keep-aligned-section-copy-button {
+          width: 200px;
+          height: 48px;
+          box-shadow: 0 2px 6px 0 rgba(0,0,0,0.07);
+          @include image-2x("/img/ML/homepage_add_to_slack_bt");
+          background-size: 140px 24px;
+          background-repeat: no-repeat;
+          background-position: center;
+          margin-top: 24px;
+          border-radius: 6px;
+          background-color: white;
+          border: 1px solid #C8CACD;
 
-  @include mobile() {
-    width: 100%;
-    height: auto;
-    padding: 80px 24px !important;
-  }
-
-  div.access-anywhere-section-container {
-    width: 1080px;
-    margin: 0px auto;
-    position: relative;
-
-    @include mobile() {
-      width: 100%;
-    }
-
-    div.access-anywhere-screenshot {
-      width: 235px;
-      height: 300px;
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      margin-left: -335px;
-      @include image-2x("/img/ML/access_anywhere_screenshot");
-      background-size: 235px 300px;
-      background-repeat: no-repeat;
-      background-position: center;
-
-      @include mobile() {
-        position: relative;
-        top: unset;
-        left: unset;
-        width: 235px;
-        height: 309px;
-        margin: 40px auto 0px;
-        background-size: 235px 309px;
-      }
-    }
-
-    div.access-anywhere-copy {
-      width: 406px;
-      height: 98px;
-      position: absolute;
-      top: 181px;
-      left: 50%;
-      margin-left: -60px;
-      text-align: left;
-
-      @include mobile() {
-        position: relative;
-        top: unset;
-        left: unset;
-        margin-left: 0px;
-        width: 100%;
-        height: auto;
-      }
-
-      div.access-anywhere-copy-title {
-        @include avenir_H();
-        font-size: 28px;
-        line-height: 32px;
-        color: $deep_navy;
-
-        @include mobile(){
-          font-size: 24px;
-          line-height: 30px;
-          text-align: center;
-        }
-      }
-
-      div.access-anywhere-copy-subtitle {
-        @include avenir_R();
-        font-size: 18px;
-        line-height: 26px;
-        color: $deep_navy;
-
-        @include mobile(){
-          text-align: center;
-          max-width: 294px;
-          margin: 6px auto 0px;
+          @include mobile() {
+            width: 100%;
+          }
         }
       }
     }

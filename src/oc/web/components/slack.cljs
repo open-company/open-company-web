@@ -72,8 +72,6 @@
 
             shared-misc/core-values-list]
 
-          (shared-misc/slack-comparison-section true)
-
           shared-misc/keep-aligned-section
 
           shared-misc/testimonials-section
