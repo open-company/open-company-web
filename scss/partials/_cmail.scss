@@ -415,8 +415,6 @@ div.cmail-outer {
               width: 24px;
               height: 24px;
               display: block;
-              // FIXME: disable video on mobile for now
-              display: none;
 
               &.remove-video-bt {
                 &:before {
@@ -460,8 +458,16 @@ div.cmail-outer {
         div.ziggeo-player, div.ziggeo-recorder {
           margin: 0px auto 24px;
 
+          video {
+            max-height: calc(548px * 0.75);
+          }
+
           @include tablet() {
             margin-left: -24px;
+
+            video {
+              max-height: calc(100vw * 0.75);
+            }
           }
 
           div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
