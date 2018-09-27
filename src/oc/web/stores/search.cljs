@@ -63,7 +63,7 @@
 (defmethod dispatcher/action :search-result-clicked
   [db [_]]
   (reset! savedsearch @lastsearch)
-  db)
+  (assoc db search-active? false))
 
 (defmethod dispatcher/action :search-focus
   [db [_]]
