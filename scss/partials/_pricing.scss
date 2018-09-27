@@ -14,18 +14,11 @@ div.pricing-wrap {
     }
 
     section {
-
-      &:nth-child(odd) {
-        background-color: #FFFDF9;
-      }
-
-      &:nth-child(even) {
-        background-color: #FAF8F4;
-      }
+      background-color: #FFFDF9;
     }
 
     section.pricing-header {
-      padding: 239px 0 80px;
+      padding: 239px 0 0;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -54,7 +47,7 @@ div.pricing-wrap {
 
         div.pricing-column {
           width: 382px;
-          min-height: 910px;
+          min-height: 943px;
           background-color: #F8F7F3;
           float: left;
           margin-left: 32px;
@@ -92,7 +85,7 @@ div.pricing-wrap {
           }
 
           button.tear-start-bt {
-            margin: 32px auto 40px;
+            margin: 32px auto 24px;
             width: 200px;
             height: 40px;
             background-color: $carrot_orange;
@@ -111,12 +104,13 @@ div.pricing-wrap {
           }
 
           div.tear-feature {
-            max-width: 200px;
+            max-width: 220px;
             @include avenir_R();
             font-size: 20px;
             color: $ui_grey;
             text-align: center;
             margin: 16px auto 0;
+            cursor: pointer;
 
             span.heavy {
               @include avenir_H();
@@ -163,270 +157,68 @@ div.pricing-wrap {
           }
         }
       }
-
-      div.pricing-faq {
-        width: 940px;
-        margin: 120px auto 0;
-
-        @include mobile() {
-          width: 100%;
-          margin-top: 80px;
-        }
-
-        h2.faq-header {
-          @include avenir_M();
-          font-size: 34px;
-          color: $deep_navy;
-          text-align: center;
-          margin-bottom: 24px;
-
-          @include mobile() {
-            @include avenir_H();
-            font-size: 24px;
-            text-align: left;
-          }
-        }
-
-        div.faq-row {
-          margin-top: 16px;
-          border-radius: 8px;
-          background-color: $oc_gray_8;
-          border: 1px solid #EAE9E4;
-          padding: 24px;
-          cursor: pointer;
-
-          &.expanded {
-            div.faq-question:before {
-              position: absolute;
-              top: 10px;
-              left: 0px;
-              width: 10px;
-              height: 2px;
-              background-image: cdnUrl("/img/ML/pricing_faq_expanded.svg");
-              background-size: 10px 2px;
-            }
-
-            div.faq-response {
-              display: block;
-            }
-          }
-
-          div.faq-question {
-            position: relative;
-            padding-left: 32px;
-            @include avenir_H();
-            font-size: 16px;
-            color: $deep_navy;
-            text-align: left;
-            @include no-user-select();
-
-            &:before {
-              content: "";
-              position: absolute;
-              top: 6px;
-              left: 0px;
-              width: 10px;
-              height: 10px;
-              background-image: cdnUrl("/img/ML/pricing_faq_collapsed.svg");
-              background-size: 10px 10px;
-              background-position: center;
-              background-repeat: no-repeat;
-            }
-          }
-
-          div.faq-response {
-            display: none;
-            position: relative;
-            padding-left: 32px;
-            @include avenir_BOOK();
-            font-size: 18px;
-            color: $deep_navy;
-            margin-top: 16px;
-            text-align: left;
-          }
-        }
-
-        div.contact-us-row {
-          @include avenir_M();
-          font-size: 16px;
-          color: $deep_navy;
-          max-width: 1080px;
-          text-align: center;
-          margin: 32px auto 0;
-
-          a.contact {
-            color: $carrot_green;
-          }
-        }
-      }
     }
 
-    section.second-section {
-      h1.compare-plans {
-        margin: 64px auto 32px;
-        text-align: center;
-        @include avenir_M();
-        font-size: 34px;
-        color: $deep_navy;
+    section.pricing-faq {
+      width: 795px;
+      margin: 160px auto 160px;
+      text-align: left;
+
+      @include mobile() {
+        width: 100%;
+        margin-top: 80px;
       }
 
-      div.pricing-table {
-        margin: 32px auto 120px;
-        padding: 0px;
-        width: 940px;
+      h2.faq-header {
+        font-family: "PT Serif";
+        font-weight: 700;
+        font-size: 80px;
+        color: $deep_navy;
+        margin-bottom: 80px;
 
         @include mobile() {
-          width: calc(100% + 64px);
-          margin-left: -32px;
-          overflow-x: auto;
+          font-size: 36px;
         }
+      }
 
-        div.check {
-          margin: 0px auto;
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/pricing_table_check.svg");
-          background-position: center;
-          background-size: 24px 24px;
-          background-repeat: no-repeat;
-        }
+      div.faq-row {
+        border-top: 1px solid #E7E6E5;
+        margin-top: 40px;
 
-        div.more-info {
-          @include avenir_R();
-          font-size: 16px;
+        div.faq-row-question {
+          font-family: "PT Serif";
+          font-weight: 700;
+          font-size: 20px;
           color: $deep_navy;
-          position: relative;
+          line-height: 28px;
+          margin-top: 40px;
 
-          span.more-info-icon {
-            display: inline-block;
-            background-image: cdnUrl("/img/ML/pricing_more_info.svg");
-            background-size: 16px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 16px;
-            height: 16px;
-            margin-left: 8px;
-            margin-top: 2px;
-            //////////////
-            // Remove this to show the info icons
-            display: none;
-            //////////////
-          }
+          a.chat-with-us {
+            float: right;
+            color: $carrot_green;
+            @include avenir_B();
+            font-size: 14px;
+            line-height: 28px;
+            text-transform: uppercase;
+            letter-spacing: 0.5;
 
-          ////////////////
-          // Uncomment to show the info bubbles
-          // &:hover {
-          //   div.more-info-bubble {
-          //     display: block;
-          //   }
-          // }
-          ////////////////
-
-          div.more-info-bubble {
-            display: none;
-            width: 260px;
-            padding: 24px;
-            background-color: white;
-            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba($deep_tan, 0.7);
-            border-radius: 4px;
-            position: absolute;
-            top: 20px;
-            right: -100%;
-
-            div.more-info-title {
-              @include avenir_H();
-              font-size: 14px;
-              color: $deep_navy;
-            }
-
-            div.more-info-desc {
-              margin-top: 16px;
-              @include avenir_BOOK();
-              font-size: 14px;
-              color: $deep_navy;
+            &:hover {
+              text-decoration: underline;
             }
           }
         }
 
-        table {
-          margin: 0px;
-          padding: 0px;
-          border: none;
-          width: 100%;
-          text-align: center;
-          border-top: 2px solid $deep_tan;
-          border-bottom: 2px solid $deep_tan;
-          
-          @include mobile() {
-            margin: 0px 32px;
-            width: 820px;
-          }
+        div.faq-row-answer {
+          @include avenir_R();
+          font-size: 20px;
+          color: $ui_grey;
+          margin-top: 8px;
 
-          thead {
-            padding: 0px;
-            margin: 0px;
+          a {
+            color: $carrot_green;
 
-            tr {
-              padding: 0px;
-              margin: 0px;
-              height: 75px;
-              border-bottom: 1px solid $deep_tan;
-
-              th {
-                padding: 0px;
-                margin: 0px;
-                width: 25%;
-                text-align: center;
-
-                &:not(:first-child):not(:last-child) {
-                  border-left: 1px solid $deep_tan;
-                  border-right: 1px solid $deep_tan;
-                }
-              }
-            }
-          }
-
-          tbody {
-            padding: 0px;
-            margin: 0px;
-
-            tr {
-              padding: 0px;
-              margin: 0px;
-              height: 75px;
-
-              &:nth-child(odd) {
-                background-color: transparent;
-              }
-
-              &:nth-child(even) {
-                background-color: rgba($deep_tan, 0.2);
-              }
-
-              td {
-                padding: 0px;
-                margin: 0px;
-                width: 25%;
-                @include avenir_H();
-                font-size: 16px;
-                color: $deep_navy;
-                text-align: center;
-
-                & > div {
-                  padding: 0px 24px;
-                }
-
-                &:first-child {
-                  @include avenir_R();
-                  text-align: left;
-                }
-
-                &:not(:first-child):not(:last-child) {
-                  border-left: 1px solid $deep_tan;
-                  border-right: 1px solid $deep_tan;
-                }
-              }
+            &:hover {
+              text-decoration: underline;
             }
           }
         }
