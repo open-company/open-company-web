@@ -230,7 +230,6 @@
               {:href "mailto:hello@carrot.io"
                :target "_blank"}
               "Chat with us."]]]]
-        ]
 
         shared-misc/testimonials-section
 
