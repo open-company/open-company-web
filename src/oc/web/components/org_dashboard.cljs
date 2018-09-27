@@ -144,7 +144,7 @@
         is-loading (and (not show-activity-not-found)
                         (not show-activity-removed)
                         loading?)
-        is-showing-mobile-search (and is-mobile? search-active? (not (router/current-activity-id)))]
+        is-showing-mobile-search (and is-mobile? search-active?)]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
