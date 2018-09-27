@@ -57,7 +57,7 @@
                       {:width (win-width)
                        :height @(::mobile-video-height s)}
                       {:width 640
-                       :height (utils/calc-video-height 480)}))
+                       :height (utils/calc-video-height 640)}))
         video-id (:fixed-video-id activity-data)]
     [:div.secure-activity-container
       {:style {:min-height (when is-mobile?

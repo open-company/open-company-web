@@ -3,6 +3,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]))
 
+(def search-limit 20)
 (def lastsearch (atom ""))
 (def savedsearch (atom ""))
 
