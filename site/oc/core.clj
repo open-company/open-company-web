@@ -150,8 +150,6 @@
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
-      [:div.footer-balloon.big-green]
-      [:div.footer-balloon.small-purple]
       [:div.right-column.group
 
         [:div.column.column-company
