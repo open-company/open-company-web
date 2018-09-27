@@ -56,7 +56,7 @@ nav.site-navbar {
     height: 56px;
 
     div.site-navbar-container {
-      padding: 12px 0px;
+      padding: 12px 16px;
       height: 56px;
 
       @include mobile() {
@@ -90,15 +90,15 @@ nav.site-navbar {
       }
 
       div.site-navbar-right {
-        top: 8px;
         height: 40px;
+        margin-top: -34px;
 
         @include mobile() {
-          top: 16px;
+          margin-top: 0;
           height: 24px;
 
           a.your-digest {
-            margin-top: 0px;
+            margin-top: 0;
             height: 32px;
           }
         }
@@ -147,9 +147,9 @@ nav.site-navbar {
 
   div.site-navbar-container {
     height: 64px;
-    padding: 24px 0px 0px;
+    padding: 24px 16px 0px;
     position: relative;
-    width: 1209px;
+    max-width: 1209px;
     margin: 0 auto;
 
     @include mobile() {
@@ -195,14 +195,13 @@ nav.site-navbar {
     }
 
     div.site-navbar-right {
-      position: absolute;
-      top: 24px;
-      right: 0px;
+      float: right;
+      margin-top: -41px;
+      height: 40px;
 
       @include mobile() {
-        top: 22px;
-        right: 24px;
         height: 28px;
+        margin-top: 0;
       }
 
       a {
@@ -217,7 +216,7 @@ nav.site-navbar {
         font-size: 16px;
         padding: 10px 24px;
         text-align: center;
-        margin-top: 0px;
+        margin-top: 0;
         border-radius: 100px;
         opacity: 0.8;
         float: left;
@@ -252,7 +251,7 @@ nav.site-navbar {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 0px;
+        margin-top: 0;
         opacity: 0.8;
 
         &:active, &:focus {
@@ -310,7 +309,7 @@ nav.site-navbar {
           border-radius: 8px;
           background-color: $carrot_green;
           padding: 0px;
-          margin-top: 0px;
+          margin-top: 0;
           opacity: 1;
         }
 
