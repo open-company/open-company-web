@@ -25,7 +25,7 @@ div.pricing-wrap {
     }
 
     section.pricing-header {
-      padding: 184px 0 120px;
+      padding: 239px 0 80px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -35,70 +35,10 @@ div.pricing-wrap {
         padding: 148px 0 80px;
       }
 
-      div.balloon {
-        position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
-
-        @include mobile() {
-          display: none;
-        }
-
-        &.big-red {
-          @include image-2x("/img/ML/pricing_balloon_big_red");
-          background-size: 111px 103px;
-          width: 111px;
-          height: 103px;
-          top: 0px;
-          left: 50%;
-          margin-left: -600px;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/slack_balloon_big_green");
-          background-size: 172px 172px;
-          width: 172px;
-          height: 172px;
-          top: 6px;
-          right: -50px;
-        }
-
-        &.small-blue {
-          @include image-2x("/img/ML/pricing_balloon_small_blue");
-          background-size: 25px 25px;
-          width: 25px;
-          height: 25px;
-          top: 105px;
-          right: 159px;
-        }
-
-        &.big-purple {
-          @include image-2x("/img/ML/pricing_balloon_big_purple");
-          background-size: 256px 222px;
-          width: 256px;
-          height: 222px;
-          top: 225px;
-          // transform: rotate(160deg);
-          left: 50%;
-          margin-left: -558px;
-        }
-
-        &.small-blue-1 {
-          @include image-2x("/img/ML/balloon_small_blue_1");
-          background-size: 50px 44px;
-          width: 50px;
-          height: 44px;
-          top: 1540px;
-          left: 50%;
-          margin-left: -356px;
-          z-index: 2;
-        }
-      }
-
       h1.pricing-headline {
-        font-size: 48px;
-        @include avenir_H();
+        font-size: 80px;
+        font-family: "PT Serif";
+        font-weight: 700;
         color: $deep_navy;
         min-width: 300px;
         margin: 0 auto;
@@ -108,171 +48,117 @@ div.pricing-wrap {
         }
       }
 
-      table.pricing-table {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        width: 1080px;
+      div.pricing-three-columns{
         margin: 80px auto 0;
+        width: 1210px;
 
-        @include mobile() {
-          width: 100%;
-          margin: 40px auto 0;
-        }
-
-        th {
-          padding: 40px;
-
-          @include mobile(){
-            padding: 32px;
-          }
-        }
-
-        th, td {
-          padding: 24px;
-          border-right: 1px solid #EFEEEB;
-
-          @include mobile(){
-            padding: 16px;
-          }
-
-          &:last-child {
-            border-right: none;
-          }
-        }
-
-        tr {
-          border-bottom: 1px solid #EFEEEB;
-
-          &:last-child {
-            border-right: none;
-          }
-        }
-
-        thead tr th {
+        div.pricing-column {
+          width: 382px;
+          min-height: 910px;
+          background-color: #F8F7F3;
+          float: left;
+          margin-left: 32px;
+          padding: 40px 26px;
           text-align: center;
 
-          div.tire-title {
-            @include avenir_H();
-            font-size: 22px;
+          h2.tear-title {
+            font-family: "PT Serif";
+            font-weight: 700;
+            font-size: 40px;
             color: $deep_navy;
           }
 
-          div.tire-price {
-            margin: 24px auto 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            @include avenir_H();
-            font-size: 30px;
+          h3.tear-price {
+            font-family: "PT Serif";
+            font-size: 60px;
             color: $deep_navy;
-
-            @include mobile() {
-              margin: 16px auto;
-              display: block;
-              justify-content: unset;
-              align-items: unset;
-            }
-
-            span.dollar {
-              color: $ui_grey;
-              @include avenir_R();
-              font-size: 14px;
-              text-align: left;
-              line-height: 15px;
-              margin-right: 8px;
-              position: relative;
-              top: -10px;
-            }
-
-            span.per-month {
-              color: $ui_grey;
-              @include avenir_R();
-              font-size: 14px;
-              max-width: 48px;
-              text-align: left;
-              line-height: 15px;
-              margin-left: 8px;
-              margin-top: -5px;
-
-              @include mobile() {
-                max-width: unset;
-                text-align: center;
-                display: block;
-              }
-            }
-
-            div.mobile-per-month {
-
-            }
+            line-height: 90px;
+            margin-top: 16px;
           }
 
-          button.price-button {
-            background-color: $carrot_orange;
-            border-radius: 100px;
-            @include avenir_H();
-            font-size: 16px;
-            color: white;
-            margin: 24px auto 0;
-            width: 152px;
+          h5.tear-period {
+            @include avenir_B();
+            font-size: 14px;
+            color: $ui_grey;
+            text-transform: uppercase;
+          }
+
+          div.tear-subtitle {
+            @include avenir_R();
+            font-size: 20px;
+            color: $deep_navy;
+            line-height: 26px;
+            margin: 32px auto 0;
+          }
+
+          button.tear-start-bt {
+            margin: 32px auto 40px;
+            width: 200px;
             height: 40px;
+            background-color: $carrot_orange;
+            border-radius: 8px;
+            color: white;
+            text-transform: uppercase;
+            @include avenir_B();
+            font-size: 14px;
+          }
 
-            @include mobile() {
-              margin: 16px auto;
-              width: 200px;
+          div.tear-feature-separator {
+            height: 1px;
+            width: 100%;
+            background-color: #E7E6E5;
+            margin-top: 16px;
+          }
+
+          div.tear-feature {
+            max-width: 200px;
+            @include avenir_R();
+            font-size: 20px;
+            color: $ui_grey;
+            text-align: center;
+            margin: 16px auto 0;
+
+            span.heavy {
+              @include avenir_H();
+            }
+
+            &:hover {
+              color: $deep_navy;
             }
           }
-        }
 
-        tbody {
-          tr {
+          &.free-column {
+            border-bottom-left-radius: 40px;
+            margin-left: 0;
 
-            &:nth-child(even) {
-              background-color: rgba(#E4E3DE, 0.2);
+            div.tear-subtitle {
+              max-width: 182px;
+            }
+          }
+
+          &.team-column {
+            div.tear-subtitle {
+              max-width: 251px;
+            }
+          }
+
+          &.enterprise-column {
+            border-bottom-right-radius: 40px;
+
+            div.tear-price {
+              width: 101px;
+              height: 101px;
+              border-radius: 50%;
+              background-color: white;
+              background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
+              background-size: 30px 52px;
+              background-position: center;
+              background-repeat: no-repeat;
+              margin: 28px auto 0;
             }
 
-            td {
-              &.pricing-description {
-                @include avenir_R();
-                font-size: 16px;
-                color: $deep_navy;
-                text-align: left;
-
-                span.strong {
-                  @include avenir_H();
-                }
-
-                span.info {
-                  // display: inline-block;
-                  // Hide for now
-                  display: none;
-                  width: 16px;
-                  height: 16px;
-                  margin-left: 8px;
-                  background-image: cdnUrl("/img/ML/pricing_more_info.svg");
-                  background-size: 16px 16px;
-                  background-repeat: no-repeat;
-                  background-position: center;
-                }
-              }
-
-              &.pricing-value {
-                @include avenir_H();
-                font-size: 16px;
-                color: $deep_navy;
-                text-align: center;
-
-                div.price-checkmark {
-                  width: 24px;
-                  height: 24px;
-                  background-size: 24px 24px;
-                  background-image: cdnUrl("/img/ML/green_checkmark.svg");
-                  background-repeat: no-repeat;
-                  background-position: center;
-                  margin: 0 auto;
-                }
-              }
+            div.tear-subtitle {
+              max-width: 241px;
             }
           }
         }

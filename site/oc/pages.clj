@@ -38,6 +38,10 @@
   [:script {:src "/lib/ziggeo/ziggeo.js"}])
   ; [:script {:src "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.js"}])
 
+(def google-fonts
+  ;; Google fonts Muli
+  [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif" :rel "stylesheet"}])
+
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")
@@ -390,405 +394,93 @@
     {:id "wrap"}
     [:div.main.pricing
       [:section.pricing-header
+
+        [:a.carrot-logo]
+
         [:h1.pricing-headline
-          "Pricing guide"]
+          "Pricing"]
 
-        [:table.pricing-table.big-web-only
-          [:thead
-            [:tr
-              [:th]
-              [:th
-                [:div.tire-title
-                  "Free"]
-                [:div.tire-price
-                  "$0"]
-                [:button.mlb-reset.price-button
-                  "Get started"]]
-              [:th
-                [:div.tire-title
-                  "Team"]
-                [:div.tire-price
-                  "$45"
-                  [:span.per-month
-                    "per month"]]
-                [:button.mlb-reset.price-button
-                  "Try for free"]]
-              [:th
-                [:div.tire-title
-                  "Enterprise"]
-                [:div.tire-price
-                  "$125"
-                  [:span.per-month
-                    "per month"]]
-                [:button.mlb-reset.price-button
-                  "Try for free"]]]]
-          [:tbody
-            [:tr
-              [:td.pricing-description
-                "Number of users included"]
-              [:td.pricing-value
-                "10"]
-              [:td.pricing-value
-                "25"]
-              [:td.pricing-value
-                "50"]]
-
-            [:tr
-              [:td.pricing-description
-                "Additional users"]
-              [:td.pricing-value
-                "—"]
-              [:td.pricing-value
-                "—"]
-              [:td.pricing-value
-                "$2 per user"]]
-
-            [:tr
-              [:td.pricing-description
-                "Number of new posts"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Number of new posts"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-              [:td.pricing-value
-                "50"]
-              [:td.pricing-value
-                "Unlimited"]
-              [:td.pricing-value
-                "Unlimited"]]
-
-            [:tr
-              [:td.pricing-description
-                "History retained"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "History retained"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-              [:td.pricing-value
-                "6 months"]
-              [:td.pricing-value
-                "Unlimited"]
-              [:td.pricing-value
-                "Unlimited"]]
-
-            [:tr
-              [:td.pricing-description
-                "File upload"]
-              [:td.pricing-value
-                "25 MB"]
-              [:td.pricing-value
-                "Unlimited"]
-              [:td.pricing-value
-                "Unlimited"]]
-
-            [:tr
-              [:td.pricing-description
-                "File storage"]
-              [:td.pricing-value
-                "500 MB"]
-              [:td.pricing-value
-                "5 TB"]
-              [:td.pricing-value
-                "Unlimited"]]
-
-            [:tr
-              [:td.pricing-description
-                "G suite single sign-on"]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "Slack single sign-on"]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "Sync with Slack"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Sync with Slack"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "Dropbox, Google Drive and other integrations"]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "Advanced permissions"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Advanced permissions"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-              [:td.pricing-value]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "Priority support"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Priority support"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-              [:td.pricing-value]
-              [:td.pricing-value
-                [:div.price-checkmark]]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "Analytics"]
-              [:td.pricing-value]
-              [:td.pricing-value]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "Uptime SLA"]
-              [:td.pricing-value]
-              [:td.pricing-value]
-              [:td.pricing-value
-                [:div.price-checkmark]]]
-
-            [:tr
-              [:td.pricing-description
-                "On premise"]
-              [:td.pricing-value]
-              [:td.pricing-value]
-              [:td.pricing-value
-                [:div.price-checkmark]]]]
-          [:thead
-            [:tr
-              [:th]
-              [:th
-                [:div.tire-title
-                  "Free"]
-                [:button.mlb-reset.price-button
-                  "Get started"]]
-              [:th
-                [:div.tire-title
-                  "Team"]
-                [:button.mlb-reset.price-button
-                  "Try for free"]]
-              [:th
-                [:div.tire-title
-                  "Enterprise"]
-                [:button.mlb-reset.price-button
-                  "Try for free"]]]]]
-
-        [:table.pricing-table.mobile-only
-          [:thead
-            [:tr
-              [:th
-                [:div.tire-title
-                  "FREE"]
-                [:div.tire-price
-                  [:span.dollar "$"]
-                  "0"]
-                [:button.mlb-reset.price-button
-                  "Get started"]]]]
-          [:tbody
-            [:tr
-              [:td.pricing-description
-                "Up to 10 users"]]
-            [:tr
-              [:td.pricing-description
-                "50 new post cap"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "50 new post cap"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "6 months of history retained"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "6 months of history retained"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "25 MB upload limit"]]
-            [:tr
-              [:td.pricing-description
-                "500 MB file storage"]]
-            [:tr
-              [:td.pricing-description
-                "G suite single sign-on"]]
-            [:tr
-              [:td.pricing-description
-                "Slack single sign-on"]]
-            [:tr
-              [:td.pricing-description
-                "Sync with Slack"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Sync with Slack"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "Dropbox, Google Drive, and other integrations"]]]]
-
-        [:table.pricing-table.mobile-only
-          [:thead
-            [:tr
-              [:th
-                [:div.tire-title
-                  "TEAM"]
-                [:div.tire-price
-                  [:span.dollar "$"]
-                  "45"
-                  [:span.per-month\
-                    "per month"]]
-                [:button.mlb-reset.price-button
-                  "Get started"]]]]
-          [:tbody
-            [:tr
-              [:td.pricing-description
-                "Up to 25 users"]]
-            [:tr
-              [:td.pricing-description
-                "Unlimited posts"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Unlimited posts"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "No history limit"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "No history limit"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "No file size upload limit"]]
-            [:tr
-              [:td.pricing-description
-                "5 TB file storage"]]
-            [:tr
-              [:td.pricing-description
-                "G suite single sign-on"]]
-            [:tr
-              [:td.pricing-description
-                "Slack single sign-on"]]
-            [:tr
-              [:td.pricing-description
-                "Sync with Slack"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Sync with Slack"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "Dropbox, Google Drive, and other integrations"]]
-            [:tr
-              [:td.pricing-description
-                "Advanced permissions"]]
-            [:tr
-              [:td.pricing-description
-                "Priority support"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Priority support"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]]]
-
-        [:table.pricing-table.mobile-only
-          [:thead
-            [:tr
-              [:th
-                [:div.tire-title
-                  "ENTERPRISE"]
-                [:div.tire-price
-                  [:span.dollar "$"]
-                  "125"
-                  [:span.per-month\
-                    "per month"]]
-                [:button.mlb-reset.price-button
-                  "Get started"]]]]
-          [:tbody
-            [:tr
-              [:td.pricing-description
-                "Includes everthing in "
-                [:span.strong "team"]
-                " and:"]]
-            [:tr
-              [:td.pricing-description
-                "Up to 50 users"]]
-            [:tr
-              [:td.pricing-description
-                "$2 per additional user "]]
-            [:tr
-              [:td.pricing-description
-                "Analytics"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Analytics"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "Uptime SLA"
-                [:span.info
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Uptime SLA"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-            [:tr
-              [:td.pricing-description
-                "On premise"]]]]
+        [:div.pricing-three-columns
+          ;; Free
+          [:div.pricing-column.free-column
+            [:h2.tear-title
+              "Free"]
+            [:h3.tear-price
+              "$0"]
+            [:h5.tear-period
+              "/month"]
+            [:div.tear-subtitle
+              "Free for small teams up to 10 users."]
+            [:button.mlb-reset.tear-start-bt
+              "Get Started"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "5MB upload max"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "500 MB storage"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "6 months history"]]
+          ;; Team
+          [:div.pricing-column.team-column
+            [:h2.tear-title
+              "Team"]
+            [:h3.tear-price
+              "$65"]
+            [:h5.tear-period
+              "/month"]
+            [:div.tear-subtitle
+              "Includes 15 users, additional users are $4 /mo."]
+            [:button.mlb-reset.tear-start-bt
+              "Try for Free"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "No file upload limit"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Unlimited storage"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Unlimited history"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Priority support"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Video updates"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Recurring updates"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Advanced permissions"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Team viewership"]]
+          ;; Enterprise
+          [:div.pricing-column.enterprise-column
+            [:h2.tear-title
+              "Enterprise"]
+            [:div.tear-price]
+            [:div.tear-subtitle
+              "A team of more than 100? Let's create a custom plan."]
+            [:button.mlb-reset.tear-start-bt
+              "Contact Us"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Includes everything in the "
+              [:span.heavy "Team plan"]
+              ", plus:"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "On premise option"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Uptime SLA"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              "Premium support"]]]
 
         ; [:div.pricing-faq
         ;   [:h2.faq-header
@@ -1099,8 +791,7 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
-          ;; Google fonts Muli
-          [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif" :rel "stylesheet"}]
+          google-fonts
           ;;  Medium Editor css
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css"}]
@@ -1202,8 +893,7 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
-          ;; Google fonts Muli
-          [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
+          google-fonts
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript
