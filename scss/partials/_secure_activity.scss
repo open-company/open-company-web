@@ -159,6 +159,9 @@ div.secure-activity-container {
 
       div.ziggeo-player {
         margin-top: 16px;
+        video {
+          max-height: 480px;
+        }
         @include tablet(){
           margin-left: -24px;
         }
