@@ -38,6 +38,10 @@
   [:script {:src "/lib/ziggeo/ziggeo.js"}])
   ; [:script {:src "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.js"}])
 
+(def google-fonts
+  ;; Google fonts Muli
+  [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif" :rel "stylesheet"}])
+
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")
@@ -1099,8 +1103,7 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
-          ;; Google fonts Muli
-          [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif" :rel "stylesheet"}]
+          google-fonts
           ;;  Medium Editor css
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css"}]
@@ -1196,8 +1199,7 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
-          ;; Google fonts Muli
-          [:link {:href "https://fonts.googleapis.com/css?family=Muli" :rel "stylesheet"}]
+          google-fonts
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript
