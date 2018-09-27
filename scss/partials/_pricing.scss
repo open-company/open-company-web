@@ -23,9 +23,11 @@ div.pricing-wrap {
       position: relative;
       overflow: hidden;
 
-      @include mobile() {
+      @include tablet() {
         overflow: visible;
-        padding: 148px 0 80px;
+        padding: 131px 0 0;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
       }
 
       h1.pricing-headline {
@@ -38,12 +40,18 @@ div.pricing-wrap {
 
         @include mobile() {
           margin: 0 auto;
+          font-size: 36px;
+          max-width: initial;
         }
       }
 
       div.pricing-three-columns{
         margin: 80px auto 0;
         width: 1210px;
+
+        @include tablet() {
+          width: 100%;
+        }
 
         div.pricing-column {
           width: 382px;
@@ -53,6 +61,15 @@ div.pricing-wrap {
           margin-left: 32px;
           padding: 40px 26px;
           text-align: center;
+
+          @include tablet() {
+            width: 100%;
+            min-height: initial;
+            float: unset;
+            margin-left: 0;
+            padding: 40px 26px;
+            margin-top: 32px;
+          }
 
           h2.tear-title {
             font-family: "PT Serif";
@@ -112,6 +129,10 @@ div.pricing-wrap {
             margin: 16px auto 0;
             cursor: pointer;
 
+            @include tablet() {
+              max-width: initial;
+            }
+
             span.heavy {
               @include avenir_H();
             }
@@ -133,6 +154,10 @@ div.pricing-wrap {
           &.team-column {
             div.tear-subtitle {
               max-width: 251px;
+
+              @include tablet() {
+                max-width: initial;
+              }
             }
           }
 
@@ -153,6 +178,10 @@ div.pricing-wrap {
 
             div.tear-subtitle {
               max-width: 241px;
+
+              @include tablet() {
+                max-width: initial;
+              }
             }
           }
         }
@@ -164,9 +193,9 @@ div.pricing-wrap {
       margin: 160px auto 160px;
       text-align: left;
 
-      @include mobile() {
+      @include tablet() {
         width: 100%;
-        margin-top: 80px;
+        margin: 80px auto;
       }
 
       h2.faq-header {
@@ -178,6 +207,7 @@ div.pricing-wrap {
 
         @include mobile() {
           font-size: 36px;
+          margin-bottom: 40px;
         }
       }
 
