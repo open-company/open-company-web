@@ -82,8 +82,8 @@ div.home-wrap {
         position: relative;
 
         @include mobile(){
-          font-size: 31px;
-          line-height: 40px;
+          font-size: 50px;
+          line-height: 56px;
         }
       }
 
@@ -140,7 +140,8 @@ div.home-wrap {
           margin: 0;
 
           @include mobile() {
-            font-size: 20px;
+            font-size: 26px;
+            line-height: auto;
           }
         }
 

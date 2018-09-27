@@ -6,8 +6,8 @@ span.go-to-digest {
   border-radius: 100px;
   background-color: $carrot_green;
   color: white;
-  @include avenir_H();
-  font-size: 16px;
+  @include avenir_B();
+  font-size: 14px;
   position: relative;
   display: block;
   text-align: right;
@@ -26,8 +26,8 @@ span.go-to-digest {
   &:before {
     content: "";
     position: absolute;
-    left: 26px;
-    top: 12px;
+    left: 22px;
+    top: 11px;
     width: 18px;
     height: 16px;
     background-image: cdnUrl("/img/ML/digest_white.svg");
@@ -196,7 +196,7 @@ nav.site-navbar {
 
     div.site-navbar-right {
       float: right;
-      margin-top: -41px;
+      margin-top: -34px;
       height: 40px;
 
       @include mobile() {
@@ -206,14 +206,15 @@ nav.site-navbar {
 
       a {
         margin: 0px 0px 0px 8px;
+        text-transform: uppercase;
       }
 
       a.login {
         min-width: 96px;
         height: 40px;
-        color: $carrot_light_gray_3;
-        @include avenir_M();
-        font-size: 16px;
+        color: $ui_grey;
+        @include avenir_B();
+        font-size: 14px;
         padding: 10px 24px;
         text-align: center;
         margin-top: 0;
@@ -242,8 +243,8 @@ nav.site-navbar {
         min-width: 84px;
         height: 40px;
         border-radius: 8px;
-        @include avenir_H();
-        font-size: 16px;
+        @include avenir_B();
+        font-size: 14px;
         color: $carrot_orange;
         background-color: $coral;
         padding: 10px 24px;

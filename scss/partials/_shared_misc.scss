@@ -212,8 +212,8 @@ section.testimonials-section {
     position: relative;
 
     @include mobile(){
-      font-size: 20px;
-      line-height: 26px;
+      font-size: 26px;
+      line-height: auto;
     }
   }
 
@@ -409,6 +409,7 @@ section.keep-aligned {
 
   div.keep-aligned-title {
     font-family: "PT Serif", serif;
+    font-weight: 700;
     font-size: 60px;
     line-height: 70px;
     color: $deep_navy;
@@ -911,8 +912,8 @@ section.home-keep-aligned {
           line-height: 78px;
 
           @include mobile() {
-            font-size: 36px;
-            line-height: 40px;
+            font-size: 50px;
+            line-height: 56px;
           }
         }
 
