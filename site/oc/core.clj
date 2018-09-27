@@ -87,7 +87,12 @@
         "Login"]
       [:button.mlb-reset.get-started-button
         {:id "site-mobile-menu-getstarted"}
-        "Get started for free"]]])
+        "Get started for free"]
+      [:div.no-credit-card
+        {:id "site-mobile-menu-nocreditcard"}
+        "No credit card required  "
+        [:span.dot "•"]
+        "  Works with Slack"]]])
 
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header

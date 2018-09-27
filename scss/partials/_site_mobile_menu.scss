@@ -16,7 +16,7 @@ div.site-mobile-menu {
   padding: 0px 16px;
 
   div.site-mobile-menu-container {
-    margin: 64px 0px;
+    margin: 64px 0 0;
 
     div.site-mobile-menu-item {
       width: 100%;
@@ -24,12 +24,19 @@ div.site-mobile-menu {
       padding: 16px 0px;
 
       a {
-        @include avenir_M();
-        font-size: 24px;
-        color: $carrot_dark_gray;
+        @include avenir_R();
+        font-size: 28px;
+        color: $ui_grey;
+        
+        &:focus, &:active {
+          text-decoration: none;
+        }
 
         &.active {
-          text-decoration: underline;
+          @include avenir_H();
+          font-size: 28px;
+          color: $deep_navy;
+          text-decoration: none;
         }
       }
     }
@@ -42,13 +49,17 @@ div.site-mobile-menu {
     left: 0px;
     padding: 16px;
 
+    button {
+      text-transform: uppercase;
+    }
+
     button.login-btn {
       background-color: white;
-      border-radius: 100px;
-      border: 2px solid $carrot_light_blue_2;
-      @include avenir_H();
+      border-radius: 8px;
+      @include avenir_B();
       font-size: 16px;
-      color: $carrot_text_blue_3;
+      color: $carrot_orange;
+      background-color: $coral;
     }
 
     button, button.get-started-button {
@@ -56,6 +67,19 @@ div.site-mobile-menu {
       height: 48px;
       width: 100%;
       margin: 16px 0px 0px;
+    }
+
+    div.no-credit-card {
+      width: 100%;
+      text-align: center;
+      margin: 16px auto 0;
+      @include avenir_R();
+      font-size: 14px;
+      color: $ui_grey;
+
+      span.dot {
+        font-size: 10px;
+      }
     }
   }
 }
