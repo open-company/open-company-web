@@ -3,7 +3,7 @@
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
-  padding: 60px 120px;
+  padding: 60px 0;
   overflow: hidden;
 
   &.light-background {
@@ -26,6 +26,10 @@
 
   div.container-fluid {
     position: relative;
+    max-width: 1209px;
+    width: 100%;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
 
     @include mobile(){
       padding-left: 32px;
