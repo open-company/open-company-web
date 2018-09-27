@@ -43,7 +43,7 @@ div.home-wrap {
     }
 
     section.cta {
-      padding-top: 240px;
+      padding-top: 239px;
       padding-bottom: 120px;
       text-align: center;
       position: relative;
@@ -70,28 +70,6 @@ div.home-wrap {
         width: 100%;
         overflow: visible;
         padding: 131px 24px 80px;
-      }
-
-      a.carrot-logo {
-        width: 160px;
-        height: 39px;
-        background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
-        background-size: 160px 39px;
-        background-repeat: no-repeat;
-        background-position: center;
-        padding: 0;
-        position: absolute;
-        left: 16px;
-        top: 120px;
-
-        @media screen and (min-width: 1200px) {
-          left: 50%;
-          margin-left: -587px;
-        }
-
-        @include mobile() {
-          display: none;
-        }
       }
 
       h1.headline {

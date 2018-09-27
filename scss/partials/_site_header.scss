@@ -384,6 +384,30 @@ nav.site-navbar {
   }
 }
 
+section {
+  a.carrot-logo {
+    width: 160px;
+    height: 39px;
+    background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
+    background-size: 160px 39px;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 0;
+    position: absolute;
+    left: 16px;
+    top: 120px;
+
+    @media screen and (min-width: 1200px) {
+      left: 50%;
+      margin-left: -587px;
+    }
+
+    @include mobile() {
+      display: none;
+    }
+  }
+}
+
 @include mobile() {
   body.mobile-menu-expanded {
     nav.site-navbar {
