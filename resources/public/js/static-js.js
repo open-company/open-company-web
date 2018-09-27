@@ -126,6 +126,9 @@ document.addEventListener("DOMContentLoaded", function(_) {
     var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
     siteMobileMenuGetStarted.text( "Your digest" );
     siteMobileMenuGetStarted.addClass("your-digest");
+    // No credit card copy below the buttons
+    var siteMobileMenuNoCreditCard = $("button#site-mobile-menu-nocreditcard");
+    siteMobileMenuNoCreditCard.css({"display": "none"});
     // Top right corner became Your digest
     var signupButton = $("#site-header-signup-item");
     signupButton.addClass("your-digest");

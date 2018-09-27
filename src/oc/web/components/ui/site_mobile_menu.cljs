@@ -98,4 +98,9 @@
                           (router/nav! oc-urls/sign-up))))}
           (if (jwt/jwt)
             "Your digest"
-            "Get started for free")]]]))
+            "Get started for free")]
+        (when-not (jwt/jwt)
+          [:div.no-credit-card
+            "No credit card required  "
+            [:span.dot "•"]
+            "  Works with Slack"])]]))
