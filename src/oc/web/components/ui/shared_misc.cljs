@@ -233,8 +233,8 @@
     {:onClick "OCStaticHideAnimationLightbox();"}
     [:div..animation-lightbox
       [:iframe
-        {:width 1280 ; 1280
-         :height 720 ; 720
+        {:width 1080 ; 1280
+         :height 607 ; 720
          :src "https://www.youtube.com/embed/tAJnbC9_i7s?rel=0&amp;showinfo=00&enablejsapi=1"
          :frameborder 0
          :id "carrot-animation"
