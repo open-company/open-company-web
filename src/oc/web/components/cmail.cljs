@@ -469,7 +469,8 @@
                                   :width (:width video-size)
                                   :height (:height video-size)
                                   :remove-recorder-cb (fn []
-                                    (activity-actions/remove-video :cmail-data)
+                                    (when (:video-id cmail-data)
+                                      (activity-actions/remove-video :cmail-data))
                                     (reset! (::record-video s) false))})))
             ; Headline element
             [:div.cmail-content-headline.emoji-autocomplete.emojiable.group.fs-hide
