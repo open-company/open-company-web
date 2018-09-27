@@ -94,6 +94,8 @@ if (jwt) {
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
+  // Initialize tooltips
+  $('[data-toggle="tooltip"]').tooltip();
   // Sticky header for marketing site
   if ( $("nav.site-navbar").length > 0) {
     $(window).on("scroll", function(){
@@ -104,16 +106,6 @@ document.addEventListener("DOMContentLoaded", function(_) {
       }
     });
   }
-
-  $(".faq-row").each(function(){
-    $(this).on("click", function(){
-      var wasOpen = $(this).hasClass("expanded");
-      $(".faq-row").each(function(){$(this).removeClass("expanded");});
-      if (!wasOpen) {
-        $(this).addClass("expanded");
-      }
-    });
-  });
 
   if (jwt) {
     $("#site-header-login-item").hide();

@@ -400,7 +400,7 @@
         [:h1.pricing-headline
           "Pricing"]
 
-        [:div.pricing-three-columns
+        [:div.pricing-three-columns.group
           ;; Free
           [:div.pricing-column.free-column
             [:h2.tear-title
@@ -415,12 +415,20 @@
               "Get Started"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "5MB upload max"]
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Attachments up to 20MB"}
+              "20MB upload max"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "500 MB storage"]
+              "1TB storage"]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Browse and search posts from the previous 6 months"}
               "6 months history"]]
           ;; Team
           [:div.pricing-column.team-column
@@ -436,27 +444,55 @@
               "Try for Free"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "No file upload limit"]
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Attachments up to 100MB"}
+              "100MB file upload"]
             [:div.tear-feature-separator]
             [:div.tear-feature
               "Unlimited storage"]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "No limits on history maintained in Carrot"}
               "Unlimited history"]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Support via chat and email"}
               "Priority support"]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Don’t feel like writing? Record a quick video"}
               "Video updates"]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Schedule and assign weekly and monthly updates to build consistency."}
               "Recurring updates"]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Add private sections for invited team members only"}
               "Advanced permissions"]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Make sure you’re being heard, and know who’s seen your post"}
               "Team viewership"]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
@@ -480,73 +516,86 @@
               "Uptime SLA"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "Premium support"]]]
+              "Premium support"]]]]
 
-        ; [:div.pricing-faq
-        ;   [:h2.faq-header
-        ;     "Frequently asked questions"]
+      [:section.pricing-faq
+        [:h2.faq-header
+          "Frequently asked questions."]
 
-        ;   [:div.faq-row
-        ;     [:div.faq-question
-        ;       "What are my payment options (credit card and/or invoicing)?"]
-        ;     [:div.faq-response
-        ;       (str
-        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-        ;   [:div.faq-row
-        ;     [:div.faq-question
-        ;       "My team has credits. How do we use them?"]
-        ;     [:div.faq-response
-        ;       (str
-        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-        ;   [:div.faq-row
-        ;     [:div.faq-question
-        ;       "We need to add new users to our team. How will that be billed?"]
-        ;     [:div.faq-response
-        ;       (str
-        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-        ;   [:div.faq-row
-        ;     [:div.faq-question
-        ;       "My team wasnts to cancel its subscription. How do we do that? Can we get a refund?"]
-        ;     [:div.faq-response
-        ;       (str
-        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-        ;   [:div.faq-row
-        ;     [:div.faq-question
-        ;       "What are my payment options (credit card and/or invoicing)?"]
-        ;     [:div.faq-response
-        ;       (str
-        ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-        ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-        ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-        ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-        ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-        ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-        ;   [:div.contact-us-row
-        ;     "If you have more questions, don’t hesitate to "
-        ;     [:a.contact
-        ;       {:href oc-urls/contact-mail-to}
-        ;       "contact us"]]]
-        ]
+        [:div.faq-row
+          [:div.faq-row-question
+            "Can I use Carrot for free?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Carrot is free for teams of up to 10 people. "
+             "The Free plan has a storage limit, but includes most features. "
+             "It’s fast to sign up, and no credit card is required.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "How is the Team plan different from the Free plan?"]
+          [:div.faq-row-answer
+            "The Team plan doesn’t limit file sizes or storage, and includes some premium features, such as:"
+            [:ul
+              [:li "In-app video recording: Don’t feel like writing? Record a quick video instead."]
+              [:li "Recurring updates: Schedule weekly and monthly updates to build consistency."]
+              [:li "Advanced permissions: Add private sections for invited members only."]
+              [:li "Viewership: Make sure you’re being heard, and know who’s seen your post."]]]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "Do I need a credit card to sign up?"]
+          [:div.faq-row-answer
+            "No! You can use Carrot right away without a credit card."]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "What happens if we go over our storage limit in the Free plan?"]
+          [:div.faq-row-answer
+            (str
+             "You can still read, write, edit, and organize existing content, "
+             "but you won't be able to add new attachments and videos.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "How is pricing calculated for the Team plan?"]
+          [:div.faq-row-answer
+            (str
+             "When you upgrade to the Team plan, you will be charged a base fee of $65 per "
+             "month that includes up to 15 team members. Beyond the initial 15 members, you "
+             "will be charged a fee of $4 per additional member per month.")
+            [:br]
+            [:br]
+            (str
+             "For example, if you have 25 team members, you would pay $65 for the first 15 "
+             "members, and $4 for each of the additional 10 members, for a total of $105 per month.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "How is the payment being processed?"]
+          [:div.faq-row-answer
+            (str
+             "We use Stripe to process your payment. It's the same payment provider used in products "
+             "such as Slack, Pinterest, and Lyft. We do not handle your credit card information directly.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "Are discounts available for nonprofits?"]
+          [:div.faq-row-answer
+            "Yes! We offer eligible nonprofit organizations a 50% discount. "
+            [:a
+              {:href "mailto:hello@carrot.io"
+               :target "_blank"}
+              "Contact us"]
+            " to see if your organization is eligible."]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "Still have more questions?"
+            [:a.chat-with-us
+              {:href "mailto:hello@carrot.io"
+               :target "_blank"}
+              "Chat with us."]]]]
 
       testimonials-section
 
