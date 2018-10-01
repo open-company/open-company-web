@@ -105,7 +105,7 @@
               [:span.slack-orange-icon])
             (if logged-in
               [:span.go-to-digest
-                "Go to digest"]
+                "Launch Carrot"]
               [:span.start-copy
                 (if use-slack-signup-button
                   (if is-slack-lander?

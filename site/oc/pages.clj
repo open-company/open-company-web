@@ -326,6 +326,8 @@
   [:div.animation-lightbox-container
     {:onClick "OCStaticHideAnimationLightbox();"}
     [:div..animation-lightbox
+      [:button.settings-modal-close.mlb-reset
+        {:onClick "OCStaticHideAnimationLightbox();"}]
       [:iframe
         {:width 1080 ; 1280
          :height 607 ; 720
@@ -373,7 +375,10 @@
 
         [:div.cta-lightbox-starter
           [:h2 "Carrot keeps leaders and teams aligned."]
-          [:button.mlb-reset.watch-video-bt
+          [:a.mobile-watch-video-bt.mobile-only
+            {:href "http://www.youtube.com/embed/tAJnbC9_i7s?rel=0&autoplay=1"
+             :target "_self"}]
+          [:button.mlb-reset.watch-video-bt.big-web-only
             {:onClick "OCStaticShowAnimationLightbox();"}]]]
 
       keep-aligned-section
