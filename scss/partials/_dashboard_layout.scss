@@ -71,6 +71,7 @@ div.dashboard-layout {
               text-overflow: ellipsis;
               overflow: hidden;
               white-space: nowrap;
+              width: auto;
 
               @include mobile() {
                 margin: 0 auto;
@@ -361,24 +362,6 @@ div.dashboard-layout {
         padding: 0px 0px 8px;
         position: relative;
 
-        &:before {
-          display: none;
-
-          @include mobile() {
-            display: block;
-            content: "";
-            width: 14px;
-            height: 8px;
-            background-image: cdnUrl("/img/ML/section_chevron.svg");
-            background-size: 14px 8px;
-            background-repeat: no-repeat;
-            background-position: center;
-            position: absolute;
-            top: 21px;
-            left: 28px;
-          }
-        }
-
         @include mobile() {
           width: 100%;
           height: 48px;
@@ -399,6 +382,8 @@ div.dashboard-layout {
           
         div.board-name {
           float: left;
+          position: relative;
+
           @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
           @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
 
@@ -416,6 +401,27 @@ div.dashboard-layout {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            width: auto;
+            display: inline-block;
+            padding-left: 24px;
+
+            &:before {
+              display: none;
+
+              @include mobile() {
+                display: block;
+                content: "";
+                width: 14px;
+                height: 8px;
+                background-image: cdnUrl("/img/ML/section_chevron.svg");
+                background-size: 14px 8px;
+                background-repeat: no-repeat;
+                background-position: center;
+                position: absolute;
+                top: 6px;
+                left: 0px;
+              }
+            }
 
             @include mobile() {
               @include avenir_H();
