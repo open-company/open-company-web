@@ -60,13 +60,9 @@
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
-; var HW_config = {
-;     selector: ".whats-new", // CSS selector where to inject the badge
-;     account:  "xGYD6J"
-; }
-; Headway.init(HW_config);
-;  ZiggeoApplication (.. js/ZiggeoApi -V2 -Application)]
-; (ZiggeoApplication. (clj->js config))))
+(defn whats-new-click [e]
+  (.preventDefault e)
+  (.show js/Headway))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
@@ -76,9 +72,10 @@
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
-        headway-config {:selector ".whats-new" :account "xGYD6J"}
-        ;_Headway (.. js/Headway (clj->js headway-config))
-        ]
+        headway-config (clj->js {
+          :selector ".whats-new"
+          :account "xGYD6J"})]
+    (.init js/Headway headway-config)
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})}
@@ -129,8 +126,10 @@
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
             "Settings"]])
-        [:div.oc-menu-item.whats-new
-          "What’s New"]
+        [:a
+          {:on-click whats-new-click}
+          [:div.oc-menu-item.whats-new
+            "What’s New"]]
         ; [:a
         ;   {:href oc-urls/what-s-new
         ;    :target "_blank"}

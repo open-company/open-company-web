@@ -242,6 +242,12 @@ div.menu {
       &:before {
         background-image: cdnUrl("/img/ML/menu_whats_new.svg");
       }
+      #HW_badge_cont {
+        display: inline;
+      }
+      #HW_badge {
+        top: -1px;
+      }
     }
 
     &.support {

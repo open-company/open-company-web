@@ -161,3 +161,4 @@ ZiggeoApi.V2.Player.get = function(){};
 // Headway (What's New)
 var Headway = function(){};
 Headway.init = function(){};
+Headway.show = function(){};
