@@ -21,7 +21,7 @@
 
 (defn logout
   ([]
-     (logout "/"))
+     (logout oc-urls/home))
   ([location]
      (cook/remove-cookie! :jwt)
      (router/redirect! location)

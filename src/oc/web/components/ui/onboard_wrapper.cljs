@@ -405,7 +405,7 @@
            "Continue"]
          [:div.logout-cancel
           [:button.mlb-reset.logout-cancel
-           {:on-click #(user-actions/logout "/sign-up")}
+           {:on-click #(user-actions/logout oc-urls/sign-up)}
               "Cancel sign up"]]]]]))
 
 (rum/defcs lander-sections < rum/reactive
