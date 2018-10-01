@@ -60,6 +60,14 @@
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
+; var HW_config = {
+;     selector: ".whats-new", // CSS selector where to inject the badge
+;     account:  "xGYD6J"
+; }
+; Headway.init(HW_config);
+;  ZiggeoApplication (.. js/ZiggeoApi -V2 -Application)]
+; (ZiggeoApplication. (clj->js config))))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
@@ -67,7 +75,10 @@
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        headway-config {:selector ".whats-new" :account "xGYD6J"}
+        ;_Headway (.. js/Headway (clj->js headway-config))
+        ]
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})}
@@ -118,12 +129,13 @@
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
             "Settings"]])
-      ; TODO: need a better experience for these links.
-      ; [:a
-      ;   {:href oc-urls/what-s-new
-      ;    :target "_blank"}
-      ;   [:div.oc-menu-item.whats-new
-      ;     "What’s New"]]
+        [:div.oc-menu-item.whats-new
+          "What’s New"]
+        ; [:a
+        ;   {:href oc-urls/what-s-new
+        ;    :target "_blank"}
+        ;   [:div.oc-menu-item.whats-new
+        ;     "What’s New"]]
       ; [:a
       ;   {:href oc-urls/help
       ;    :target "_blank"}
