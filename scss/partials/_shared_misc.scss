@@ -236,7 +236,7 @@ section.testimonials-section {
     margin: 55px auto 0px;
     position: relative;
 
-    @include homepage-breakpoint() {
+    @media screen and (max-width: 1193px) {
       width: 100%;
       margin: 42px auto 0px;
     }
@@ -374,17 +374,23 @@ section.testimonials-section {
         }
       }
 
-      @include homepage-breakpoint() {
+      @media screen and (max-width: 1193px) {
         float: unset;
-        margin: 40px 0 0;
+        margin: 40px auto 0;
         width: 100%;
+        max-width: 440px;
+        float: unset;
+
+        &:nth-child(3) {
+          float: unset;
+        }
       }
 
       &:not(:first-child) {
         margin-left: 30px;
 
-        @include homepage-breakpoint() {
-          margin: 40px 0 0;
+        @media screen and (max-width: 1193px) {
+          margin: 40px auto 0;
         }
       }
     }

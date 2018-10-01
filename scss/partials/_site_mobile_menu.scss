@@ -1,4 +1,4 @@
-@include mobile(){
+@include homepage-breakpoint(){
   body.mobile-menu-expanded {
     overflow: hidden;
     height: 100vh;
@@ -6,6 +6,7 @@
 }
 
 div.site-mobile-menu {
+  display:none;
   position: absolute;
   width: 100vw;
   height: calc(100vh - 64px);
@@ -14,6 +15,10 @@ div.site-mobile-menu {
   background-color: #FFFDF9;
   z-index: 1081;
   padding: 0px 16px;
+
+  @include homepage-breakpoint() {
+    display: block;
+  }
 
   div.site-mobile-menu-container {
     margin: 64px 0 0;
@@ -62,13 +67,15 @@ div.site-mobile-menu {
       font-size: 16px;
       color: $carrot_orange;
       background-color: $coral;
+      margin: 16px auto 0px;
     }
 
     button, button.get-started-button {
-      max-width: none;
+      display: block;
       height: 48px;
       width: 100%;
-      margin: 16px 0px 0px;
+      margin: 16px auto 0px;
+      max-width: 320px;
     }
 
     div.no-credit-card {
