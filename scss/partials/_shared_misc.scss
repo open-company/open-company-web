@@ -636,6 +636,10 @@ section.home-keep-aligned {
       &:nth-child(even) {
         div.keep-aligned-section-row-inner div.keep-aligned-section-copy {
           left: 50%;
+
+          @include keep-aligned-breakpoint() {
+            left: unset;
+          }
         }
       }
 
