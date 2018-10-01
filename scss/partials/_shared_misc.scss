@@ -591,11 +591,17 @@ button.get-started-button {
   }
 }
 
+@mixin keep-aligned-breakpoint(){
+  @media screen and (max-width: 960px) {
+    @content;
+  }
+}
+
 section.home-keep-aligned {
   padding: 0;
   text-align: center;
 
-  @include mobile() {
+  @include keep-aligned-breakpoint() {
     padding: 40px 24px 80px !important;
   }
 
@@ -607,7 +613,7 @@ section.home-keep-aligned {
     text-align: center;
     margin: 0px;
 
-    @include mobile() {
+    @include keep-aligned-breakpoint() {
       text-align: left;
       font-size: 24px;
       line-height: 30px;
@@ -621,56 +627,39 @@ section.home-keep-aligned {
       margin: 320px auto;
       position: relative;
 
-      @include mobile() {
+      @include keep-aligned-breakpoint() {
         margin: 0 auto;
         padding-top: 80px;
         padding-bottom: 80px;
       }
 
+      &:nth-child(even) {
+        div.keep-aligned-section-row-inner div.keep-aligned-section-copy {
+          left: 50%;
+        }
+      }
+
+      div.keep-aligned-section-row-inner {
+        max-width: 1340px;
+        margin: 0 auto;
+        position: relative;
+      }
+
       &:first-child {
         margin-top: 160px;
 
-        @include mobile() {
+        @include keep-aligned-breakpoint() {
           margin: 0 auto;
         }
       }
 
-      @include mobile() {
+      @include keep-aligned-breakpoint() {
         width: 100%;
         height: auto;
         margin: 80px auto;
       }
 
-      &.first-row {
-        height: 688px;
-
-        div.keep-aligned-section-copy {
-          width: 485px;
-          height: 564px;
-          // top: 130px;
-          margin-left: -560px;
-          margin-top: -282px;
-
-          @include mobile() {
-            width: 100%;
-            height: auto;
-            position: relative;
-            left: unset;
-            top: unset;
-            margin-left: unset;
-            margin-top: unset;
-          }
-        }
-
-        @include mobile() {
-          width: 100%;
-          height: auto;
-        }
-      }
-
       &.second-row {
-        height: 582px;
-
         &:before {
           content: "";
           display: block;
@@ -682,7 +671,7 @@ section.home-keep-aligned {
           left: 0px;
           top: -160px;
 
-          @include mobile() {
+          @include keep-aligned-breakpoint() {
             width: calc(100% + 48px);
             left: -24px;
             top: 0;
@@ -690,61 +679,9 @@ section.home-keep-aligned {
             border-top-right-radius: 100px;
           }
         }
-
-        div.keep-aligned-section-copy {
-          width: 489px;
-          height: 476px;
-          // top: 136px;
-          margin-left: 110px;
-          margin-top: -238px;
-
-          @include mobile() {
-            width: 100%;
-            height: auto;
-            position: relative;
-            left: unset;
-            top: unset;
-            margin-left: unset;
-            margin-top: unset;
-          }
-        }
-
-        @include mobile() {
-          width: 100%;
-          height: auto;
-        }
-      }
-
-      &.third-row {
-        height: 546px;
-
-        div.keep-aligned-section-copy {
-          width: 586px;
-          height: 393px;
-          // top: 77px;
-          margin-left: -580px;
-          margin-top: -196px;
-
-          @include mobile() {
-            width: 100%;
-            height: auto;
-            position: relative;
-            left: unset;
-            top: unset;
-            margin-left: unset;
-            margin-top: unset;
-          }
-        }
-
-        @include mobile() {
-          width: 100%;
-          height: auto;
-        }
       }
 
       &.fourth-row {
-        height: 670px;
-
         &:before {
           content: "";
           display: block;
@@ -756,7 +693,7 @@ section.home-keep-aligned {
           right: 0px;
           top: -160px;
 
-          @include mobile() {
+          @include keep-aligned-breakpoint() {
             width: calc(100% + 48px);
             left: -24px;
             top: 0;
@@ -764,169 +701,83 @@ section.home-keep-aligned {
             border-bottom-left-radius: 100px;
           }
         }
-
-        div.keep-aligned-section-copy {
-          width: 489px;
-          height: 402px;
-          // top: 153px;
-          margin-left: 110px;
-          margin-top: -201px;
-
-          @include mobile() {
-            width: 100%;
-            height: auto;
-            position: relative;
-            left: unset;
-            top: unset;
-            margin-left: unset;
-            margin-top: unset;
-          }
-        }
-
-        @include mobile() {
-          width: 100%;
-          height: auto;
-        }
-      }
-
-      &.fifth-row {
-        height: 477px;
-        div.keep-aligned-section-copy {
-          width: 483px;
-          height: 396px;
-          // top: 68px;
-          margin-left: -580px;
-          margin-top: -198px;
-
-          @include mobile() {
-            width: 100%;
-            height: auto;
-            position: relative;
-            left: unset;
-            top: unset;
-            margin-left: unset;
-            margin-top: unset;
-          }
-        }
-
-        @include mobile() {
-          width: 100%;
-          height: auto;
-        }
       }
 
       img.keep-aligned-section-screenshot {
-        width: auto;
+        width: 100%;
         height: auto;
-        position: absolute;
-        top: 0;
-        left: 50%;
 
-        @include mobile() {
+        @include keep-aligned-breakpoint() {
           margin: 0 auto;
           max-width: 100%;
-          position: relative;
-          left: unset;
-          top: unset;
           margin-top: 32px;
         }
+      }
 
-        &.screenshot-1 {
-          width: 600px;
-          height: 688px;
-          margin-left: 0;
+      div.keep-aligned-section-row-right {
+        float: right;
+        width: 50%;
+        position: relative;
+        padding: 24px;
+        text-align: left;
 
-          @include mobile() {
-            width: auto;
-            height: auto;
-            margin-left: auto;
-          }
+        @include keep-aligned-breakpoint() {
+          float: unset;
+          width: 100%;
+          padding: 0;
         }
+      }
 
-        &.screenshot-2 {
-          width: 600px;
-          height: 582px;
-          margin-left: -600px;
+      div.keep-aligned-section-row-left {
+        float: left;
+        width: 50%;
+        position: relative;
+        padding: 24px;
+        text-align: left;
 
-          @include mobile() {
-            width: auto;
-            height: auto;
-            margin-left: auto;
-          }
-        }
-
-        &.screenshot-3 {
-          width: 484px;
-          height: 546px;
-          margin-left: 98px;
-
-          @include mobile() {
-            width: auto;
-            height: auto;
-            margin-left: auto;
-          }
-        }
-
-        &.screenshot-4 {
-          width: 600px;
-          height: 670px;
-          margin-left: -600px;
-
-          @include mobile() {
-            width: auto;
-            height: auto;
-            margin-left: auto;
-          }
-        }
-
-        &.screenshot-5 {
-          width: 600px;
-          height: 477px;
-          margin-left: 0px;
-
-          @include mobile() {
-            width: auto;
-            height: auto;
-            margin-left: auto;
-          }
+        @include keep-aligned-breakpoint() {
+          float: unset;
+          width: 100%;
+          padding: 0;
         }
       }
 
       div.keep-aligned-section-copy {
         text-align: left;
-        // display: table-cell;
-        // vertical-align: middle;
         position: absolute;
-        left: 50%;
         top: 50%;
+        transform: translateY(-50%);
 
-        @include mobile() {
+        @include keep-aligned-breakpoint() {
           width: 100%;
+          top: unset;
+          position: relative;
+          transform: translateY(0%);
         }
 
         div.keep-aligned-section-copy-title {
           font-family: "PT Serif", serif;
           font-weight: 700;
-          font-size: 80px;
+          font-size: calc(100vw * 0.0476); // 80px;
           color: $deep_navy;
-          line-height: 78px;
+          line-height: calc(100vw * 0.0464); // 78px;
 
-          @include mobile() {
-            font-size: 50px;
-            line-height: 56px;
+          @include keep-aligned-breakpoint() {
+            font-size: calc(100vw * 0.0298); // 50px;
+            line-height: calc(100vw * 0.0333); // 56px;
           }
         }
 
         div.keep-aligned-section-copy-subtitle {
           @include avenir_R();
-          font-size: 24px;
+          font-size: calc(100vw * 0.0143); // 24px;
           color: $ui_grey;
-          line-height: 34px;
+          line-height: calc(100vw * 0.0202); // 34px;
           margin-top: 40px;
 
           @include mobile() {
-            font-size: 20px;
-            line-height: 26px;
+            font-size: calc(100vw * 0.012); // 20px;
+            line-height: calc(100vw * 0.0155); // 26px;
           }
         }
 
@@ -949,7 +800,7 @@ section.home-keep-aligned {
           background-color: white;
           border: 1px solid #C8CACD;
 
-          @include mobile() {
+          @include keep-aligned-breakpoint() {
             width: 100%;
           }
         }
