@@ -48,6 +48,8 @@ $.closest = function(){};
 $.restore = function(){};
 $.after = function(){};
 $.closest = function(){};
+$.scrollLeft = function(){};
+$.scrollTop = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -103,6 +105,7 @@ var OCWebPrintChangeCacheData = function(){};
 var OCWebForceRefreshToken = function(){};
 var OCWebPrintFilteredPostsData = function(){};
 var OCWebPrintPostsData = function(){};
+var OCWebPrintUserNotifications = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
@@ -134,6 +137,9 @@ CarrotGA.NULL_VALUE = {};
 CarrotGA.clientid = '';
 var init_fullstory = function(){};
 var FS = function(){};
+// TCMention
+var CustomizedTagComponent = function(){};
+var TCMention = function(){};
 // Ziggeo
 var ZiggeoApi = function(){};
 ZiggeoApi.Events = {};

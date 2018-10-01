@@ -3,6 +3,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]))
 
+(def search-limit 20)
 (def lastsearch (atom ""))
 (def savedsearch (atom ""))
 
@@ -62,7 +63,7 @@
 (defmethod dispatcher/action :search-result-clicked
   [db [_]]
   (reset! savedsearch @lastsearch)
-  db)
+  (assoc db search-active? false))
 
 (defmethod dispatcher/action :search-focus
   [db [_]]

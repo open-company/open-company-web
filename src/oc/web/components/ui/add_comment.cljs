@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -37,8 +38,10 @@
                          rum/static
                          ;; Mixins
                          first-render-mixin
+                         (mention-mixins/oc-mentions-hover)
                          ;; Derivatives
                          (drv/drv :add-comment-focus)
+                         (drv/drv :team-roster)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
                          (rum/local false ::medium-editor)
@@ -49,7 +52,8 @@
                          {:did-mount (fn [s]
                            (utils/after 2500 #(js/emojiAutocomplete))
                            (let [add-comment-node (rum/ref-node s "add-comment")
-                                 medium-editor (cu/setup-medium-editor add-comment-node)]
+                                 users-list (:mention-users @(drv/get-ref s :team-roster))
+                                 medium-editor (cu/setup-medium-editor add-comment-node users-list)]
                              (reset! (::medium-editor s) medium-editor)
                              (.subscribe medium-editor
                               "editableInput"
@@ -92,7 +96,7 @@
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
         [:div.add-comment-internal
-          [:div.add-comment.emoji-autocomplete.emojiable.fs-hide
+          [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.fs-hide
            {:ref "add-comment"
             :content-editable true}]
           (when (and (not (js/isIE))
