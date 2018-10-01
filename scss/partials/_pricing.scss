@@ -21,7 +21,6 @@ div.pricing-wrap {
       padding: 239px 0 0;
       text-align: center;
       position: relative;
-      overflow: hidden;
 
       @include tablet() {
         overflow: visible;
@@ -131,9 +130,12 @@ div.pricing-wrap {
 
             @include big_web() {
               &[data-toggle="tooltip"] {
-                &:hover span{
-                  // text-decoration: underline;
+                span{
                   border-bottom: 1px dotted $deep_navy;
+                }
+
+                &:hover {
+                  color: $deep_navy;
                 }
               }
             }
@@ -144,10 +146,6 @@ div.pricing-wrap {
 
             span.heavy {
               @include avenir_H();
-            }
-
-            &:hover {
-              color: $deep_navy;
             }
           }
 
