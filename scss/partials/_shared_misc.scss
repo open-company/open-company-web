@@ -633,6 +633,12 @@ section.home-keep-aligned {
         padding-bottom: 80px;
       }
 
+      &.third-row {
+        div.keep-aligned-section-row-right {
+          padding: 24px 94px;
+        }  
+      }
+
       &:nth-child(even) {
         div.keep-aligned-section-row-inner div.keep-aligned-section-copy {
           left: 50%;
