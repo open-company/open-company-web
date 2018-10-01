@@ -135,5 +135,5 @@
                :href "/sign-up"}
                 [:span.copy "START"]])]
         (when-not is-slack-lander?
-          [:div.mobile-ham-menu.mobile-only
+          [:div.mobile-ham-menu
             {:on-click #(site-mobile-menu/site-menu-toggle)}])]]))

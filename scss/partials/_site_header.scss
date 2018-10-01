@@ -13,10 +13,10 @@ span.go-to-digest {
   text-align: right;
   padding: 11px 26px 11px 26px;
 
-  @include mobile() {
+  @include homepage-breakpoint() {
     padding: 11px 16px 11px 16px;
     text-align: center;
-    width: 154px;
+    width: 164px;
 
     &:before {
       display: none;
@@ -46,7 +46,7 @@ nav.site-navbar {
   border-bottom: 1px solid transparent;
   transform: background-color 180ms, border-bottom 180ms;
 
-  @include mobile() {
+  @include homepage-breakpoint() {
     height: 72px;
   }
 
@@ -59,13 +59,16 @@ nav.site-navbar {
       padding: 12px 16px;
       height: 56px;
 
-      @include mobile() {
+      @include homepage-breakpoint() {
         padding: 14px 24px;
         width: 100%;
       }
 
       div.mobile-ham-menu {
-        @include mobile() {
+        display: none;
+
+        @include homepage-breakpoint() {
+          display: block;
           position: absolute;
           height: 24px;
           top: 16px;
@@ -80,7 +83,7 @@ nav.site-navbar {
         background-size: 99px 24px;
         display: block;
 
-        @include mobile() {
+        @include homepage-breakpoint() {
           margin: 2px 0px 0px -50px;
         }
       }
@@ -107,7 +110,7 @@ nav.site-navbar {
           height: 40px;
           padding: 10px 24px;
 
-          @include mobile() {
+          @include homepage-breakpoint() {
             height: 30px;
             padding: 5px 12px;
           }
@@ -120,7 +123,7 @@ nav.site-navbar {
           height: 40px;
           padding: 10px 24px;
 
-          @include mobile() {
+          @include homepage-breakpoint() {
             height: 24px;
             padding: 2px 12px;
           }
@@ -152,14 +155,17 @@ nav.site-navbar {
     max-width: 1209px;
     margin: 0 auto;
 
-    @include mobile() {
+    @include homepage-breakpoint() {
       width: 100vw;
       padding: 22px 24px;
       height: 72px;
     }
 
     div.mobile-ham-menu {
-      @include mobile() {
+      display: none;
+
+      @include homepage-breakpoint() {
+        display: block;
         position: absolute;
         width: 32px;
         height: 28px;
@@ -259,7 +265,7 @@ nav.site-navbar {
           text-decoration: none;
         }
 
-        @include mobile() {
+        @include homepage-breakpoint() {
           height: 28px;
           width: auto;
           text-align: center;
@@ -332,7 +338,7 @@ nav.site-navbar {
       padding: 0;
       display: none;
 
-      @include mobile() {
+      @include homepage-breakpoint() {
         display: block;
         position: absolute;
         float: unset;
@@ -403,13 +409,13 @@ section {
       margin-left: -587px;
     }
 
-    @include mobile() {
+    @include homepage-breakpoint() {
       display: none;
     }
   }
 }
 
-@include mobile() {
+@include homepage-breakpoint() {
   body.mobile-menu-expanded {
     nav.site-navbar {
       div.site-navbar-container {

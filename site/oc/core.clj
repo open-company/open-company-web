@@ -59,7 +59,7 @@
 (defn mobile-menu
   "Mobile menu used to show the collapsable menu in the marketing site."
   [active-page]
-  [:div.site-mobile-menu.mobile-only.hidden
+  [:div.site-mobile-menu.hidden
     [:div.site-mobile-menu-container
       [:div.site-mobile-menu-item
         [:a
@@ -145,7 +145,7 @@
               (if (= active-page "slack")
                 "ADD"
                 "START")]]]
-      [:div.mobile-ham-menu.mobile-only
+      [:div.mobile-ham-menu
         {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
 
 (defn footer
