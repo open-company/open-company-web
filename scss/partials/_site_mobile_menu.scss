@@ -8,8 +8,8 @@
 div.site-mobile-menu {
   position: absolute;
   width: 100vw;
-  height: calc(100vh - 73px);
-  top: 73px;
+  height: calc(100vh - 64px);
+  top: 64px;
   left: 0px;
   background-color: #FFFDF9;
   z-index: 1081;
@@ -21,7 +21,7 @@ div.site-mobile-menu {
     div.site-mobile-menu-item {
       width: 100%;
       text-align: center;
-      padding: 16px 0px;
+      padding: 12px 0px;
 
       a {
         @include avenir_R();
@@ -43,11 +43,9 @@ div.site-mobile-menu {
   }
 
   div.site-mobile-menu-footer {
-    position: absolute;
     width: 100%;
-    bottom: 80px;
-    left: 0px;
-    padding: 16px;
+    margin: 0;
+    padding: 16px 0;
 
     button {
       text-transform: uppercase;
