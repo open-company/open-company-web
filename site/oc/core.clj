@@ -54,6 +54,8 @@
     (when (= (env :fullstory) "true")
       [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
     (when (= (env :fullstory) "true") (pages/fullstory-init))
+    ;; Headway (What's New)
+    [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
     pages/bootstrap-js])
 
 (defn mobile-menu
