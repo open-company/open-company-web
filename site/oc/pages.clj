@@ -330,12 +330,18 @@
         {:onClick "OCStaticHideAnimationLightbox();"}]
       [:iframe
         {:width 1080 ; 1280
-         :height 607 ; 720
-         :src "https://www.youtube.com/embed/tAJnbC9_i7s?rel=0&amp;showinfo=00&enablejsapi=1"
+         :height 608 ; 720
+         :src "https://www.youtube.com/embed/dMWpnHxQMP4?rel=0&showinfo=0&enablejsapi=1"
          :frameborder 0
          :id "carrot-animation"
          :allow "autoplay; encrypted-media"
          :allowfullscreen true}]]])
+
+(def animation-section
+  [:div.cta-lightbox-starter
+    [:h2 "Carrot keeps leaders and teams aligned."]
+    [:button.mlb-reset.watch-video-bt
+      {:onClick "OCStaticShowAnimationLightbox();"}]])
 
 (defn index [options]
   [:div.home-wrap
@@ -373,13 +379,7 @@
             {:src (cdn "/img/ML/homepage_screenshot.png")
              :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-        [:div.cta-lightbox-starter
-          [:h2 "Carrot keeps leaders and teams aligned."]
-          [:a.mobile-watch-video-bt.mobile-only
-            {:href "http://www.youtube.com/embed/tAJnbC9_i7s?rel=0&autoplay=1"
-             :target "_self"}]
-          [:button.mlb-reset.watch-video-bt.big-web-only
-            {:onClick "OCStaticShowAnimationLightbox();"}]]]
+        animation-section]
 
       keep-aligned-section
 
@@ -613,32 +613,21 @@
     [:div.main.slack
       ; Hope page header
       [:section.carrot-plus-slack.group
-        [:div.balloon.big-blue]
-        [:div.balloon.small-green]
-        [:div.balloon.big-green]
-        [:div.balloon.small-purple-face]
-        [:div.balloon.big-yellow]
-        [:div.balloon.small-purple]
+        animation-lightbox
 
-        [:div.carrot-plus-slack]
-
-        [:h3.slack
-          "Slack keeps your team connected in the moment."]
+        [:a.carrot-logo]
 
         [:h1.slack
-          "Carrot keeps it aligned over time."]
+          "Designed for Slack teams."]
 
         [:div.slack-subline
           (str
-           "Key updates and announcements get lost in fast-moving chat and stuffed inboxes. "
-           "Carrot makes it simple for Slack teams to stay aligned around what matters most.")]
+           "Carrot makes sure key leadership communication "
+           "doesn't get lost in fast-moving conversations.")]
 
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-        [:div.get-started-button-container
-          [:button.mlb-reset.signin-with-slack
-            {:id "get-started-centred-bt"}
-            [:span.slack-white-icon]
-            [:span.slack-copy "Add to Slack"]]]
+        [:button.mlb-reset.add-to-slack-button
+            {:id "get-started-centred-bt"}]
         no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -652,7 +641,7 @@
             {:src (cdn "/img/ML/slack_screenshot.png")
              :srcSet (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
-        core-values-list]
+        animation-section]
 
       keep-aligned-section
 
