@@ -3,7 +3,7 @@
 span.go-to-digest {
   width: 194px;
   height: 40px;
-  border-radius: 100px;
+  border-radius: 8px;
   background-color: $carrot_green;
   color: white;
   @include avenir_B();
@@ -224,7 +224,7 @@ nav.site-navbar {
         padding: 10px 24px;
         text-align: center;
         margin-top: 0;
-        border-radius: 100px;
+        border-radius: 8px;
         opacity: 0.8;
         float: left;
 
