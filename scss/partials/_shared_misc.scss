@@ -798,7 +798,7 @@ section.home-keep-aligned {
           background-color: white;
           border: 1px solid #C8CACD;
 
-          @include homepage-breakpoint() {
+          @include mobile() {
             width: 100%;
           }
         }
