@@ -128,12 +128,14 @@ div.pricing-wrap {
             margin: 16px auto 0;
             cursor: pointer;
 
+            &[data-toggle="tooltip"] {
+              span{
+                border-bottom: 1px dotted $deep_navy;
+              }
+            }
+
             @include big_web() {
               &[data-toggle="tooltip"] {
-                span{
-                  border-bottom: 1px dotted $deep_navy;
-                }
-
                 &:hover {
                   color: $deep_navy;
                 }
