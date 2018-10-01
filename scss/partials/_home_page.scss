@@ -34,7 +34,10 @@ div.home-wrap {
         margin-left: -540px;
         margin-top: -303px;
         border-radius: 6px;
-        overflow: hidden;
+
+        button.settings-modal-close {
+          right: -56px;
+        }
       }
     }
 
@@ -143,6 +146,17 @@ div.home-wrap {
             font-size: 26px;
             line-height: auto;
           }
+        }
+
+        a.mobile-watch-video-bt {
+          display: block;
+          background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
+          background-size: 287px 19px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 287px;
+          height: 19px;
+          margin: 24px auto 0;
         }
 
         button.watch-video-bt {

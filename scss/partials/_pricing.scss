@@ -129,6 +129,15 @@ div.pricing-wrap {
             margin: 16px auto 0;
             cursor: pointer;
 
+            @include big_web() {
+              &[data-toggle="tooltip"] {
+                &:hover span{
+                  // text-decoration: underline;
+                  border-bottom: 1px dotted $deep_navy;
+                }
+              }
+            }
+
             @include tablet() {
               max-width: initial;
             }

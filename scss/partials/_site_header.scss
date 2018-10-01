@@ -1,7 +1,7 @@
 /* Header */
 
 span.go-to-digest {
-  width: 174px;
+  width: 194px;
   height: 40px;
   border-radius: 100px;
   background-color: $carrot_green;
@@ -16,7 +16,7 @@ span.go-to-digest {
   @include mobile() {
     padding: 11px 16px 11px 16px;
     text-align: center;
-    width: 134px;
+    width: 154px;
 
     &:before {
       display: none;

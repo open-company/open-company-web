@@ -133,12 +133,12 @@ document.addEventListener("DOMContentLoaded", function(_) {
     var signupButton = $("#site-header-signup-item");
     signupButton.addClass("your-digest");
     signupButton.attr("href", your_board_url);
-    signupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
+    signupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
 
     var mobileSignupButton = $("#site-header-mobile-signup-item");
     mobileSignupButton.removeClass("start");
     mobileSignupButton.attr("href", your_board_url);
-    mobileSignupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
+    mobileSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
     // Set the action of the site mobile menu's Get started button

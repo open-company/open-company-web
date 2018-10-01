@@ -326,6 +326,8 @@
   [:div.animation-lightbox-container
     {:onClick "OCStaticHideAnimationLightbox();"}
     [:div..animation-lightbox
+      [:button.settings-modal-close.mlb-reset
+        {:onClick "OCStaticHideAnimationLightbox();"}]
       [:iframe
         {:width 1080 ; 1280
          :height 607 ; 720
@@ -373,7 +375,10 @@
 
         [:div.cta-lightbox-starter
           [:h2 "Carrot keeps leaders and teams aligned."]
-          [:button.mlb-reset.watch-video-bt
+          [:a.mobile-watch-video-bt.mobile-only
+            {:href "http://www.youtube.com/embed/tAJnbC9_i7s?rel=0&autoplay=1"
+             :target "_self"}]
+          [:button.mlb-reset.watch-video-bt.big-web-only
             {:onClick "OCStaticShowAnimationLightbox();"}]]]
 
       keep-aligned-section
@@ -415,17 +420,17 @@
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Attachments up to 20MB"}
-              "20MB upload max"]
+              [:span "20MB upload max"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "1TB storage"]
+              [:span "1TB storage"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Browse and search posts from the previous 6 months"}
-              "6 months history"]]
+              [:span "6 months history"]]]
           ;; Team
           [:div.pricing-column.team-column
             [:h2.tear-title
@@ -444,52 +449,52 @@
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Attachments up to 100MB"}
-              "100MB file upload"]
+              [:span "100MB file upload"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "Unlimited storage"]
+              [:span "Unlimited storage"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "No limits on history maintained in Carrot"}
-              "Unlimited history"]
+              [:span "Unlimited history"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Support via chat and email"}
-              "Priority support"]
+              [:span "Priority support"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Don’t feel like writing? Record a quick video"}
-              "Video updates"]
+              [:span "Video updates"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Schedule and assign weekly and monthly updates to build consistency."}
-              "Recurring updates"]
+              [:span "Recurring updates"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Add private sections for invited team members only"}
-              "Advanced permissions"]
+              [:span "Advanced permissions"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Make sure you’re being heard, and know who’s seen your post"}
-              "Team viewership"]]
+              [:span "Team viewership"]]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
             [:h2.tear-title
@@ -501,18 +506,19 @@
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "Includes everything in the "
-              [:span.heavy "Team plan"]
-              ", plus:"]
+              [:span
+                "Includes everything in the "
+                [:span.heavy "Team plan"]
+                ", plus:"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "On premise option"]
+              [:span "On premise option"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "Uptime SLA"]
+              [:span "Uptime SLA"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              "Premium support"]]]]
+              [:span "Premium support"]]]]]
 
       [:section.pricing-faq
         [:h2.faq-header
@@ -591,7 +597,7 @@
             [:a.chat-with-us
               {:href "mailto:hello@carrot.io"
                :target "_blank"}
-              "Chat with us."]]]]
+              "Chat with us"]]]]
 
       testimonials-section
 
