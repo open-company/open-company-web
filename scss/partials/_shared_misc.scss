@@ -916,21 +916,15 @@ div.animation-lightbox-container {
         width:100%;
         height:100%;
       }
-
-      button.settings-modal-close {
-        position: fixed;
-        top: 24px;
-        right: 24px;
-        left: unset;
-        bottom: unset;
-        z-index: 1001;
-      }
     }
 
-    @media screen and (min-width: 1081px) {
-      button.settings-modal-close {
-        right: -56px;
-      }
+    button.settings-modal-close {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      left: unset;
+      bottom: unset;
+      z-index: 1001;
     }
   }
 }
