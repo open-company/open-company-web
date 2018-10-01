@@ -1,7 +1,7 @@
 div.main-animation-container {
   position: relative;
 
-  @include mobile() {
+  @include homepage-breakpoint() {
     width: 100%;
     margin: 80px 0px 0px;
   }
@@ -14,11 +14,10 @@ div.main-animation-container {
     z-index: 10;
     position: relative;
 
-    @include mobile() {
+    @include homepage-breakpoint() {
       width: 100%;
       height: auto;
       margin: 0px auto;
-      max-width: 327px;
     }
   }
 }
@@ -442,7 +441,6 @@ section.keep-aligned {
 
     @include homepage-breakpoint() {
       font-size: 12px;
-      margin-top: 0px;
     }
   }
 }
@@ -870,6 +868,86 @@ section.slack-comparison {
 
     @include mobile() {
       width: 100%;
+    }
+  }
+}
+
+body.show-animation-lightbox {
+  div.main div.animation-lightbox-container {
+    display: block;
+  }
+}
+
+div.animation-lightbox-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: $carrot_modal_bg;
+  text-align: center;
+  z-index: 1000;
+  display: none;
+
+  div.animation-lightbox {
+    width: 1080px;
+    height: 608px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -540px;
+    margin-top: -303px;
+    border-radius: 6px;
+
+    button.settings-modal-close {
+      right: -56px;
+
+      @include mobile() {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        left: unset;
+        bottom: unset;
+        z-index: 1001;
+      }
+    }
+  }
+}
+
+ div.cta-lightbox-starter {
+  position: relative;
+  z-index: 2;
+  margin: 90px auto 0;
+
+  h2 {
+    font-family: "PT Serif", serif;
+    font-weight: 700;
+    font-size: 40px;
+    color: $deep_navy;
+    margin: 0;
+
+    @include mobile() {
+      font-size: 26px;
+      line-height: auto;
+    }
+  }
+
+  button.watch-video-bt {
+    background-color: $feint_emerald;
+    border-radius: 8px;
+    width: 360px;
+    height: 56px;
+    background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
+    background-size: 287px 19px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 24px auto 0;
+
+    @include mobile() {
+      width: 287px;
+      height: 19px;
+      background-color: transparent;
+      border-radius: 0;
     }
   }
 }

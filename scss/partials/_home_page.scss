@@ -1,45 +1,10 @@
-body.show-animation-lightbox {
-  div.home-wrap {
-    div.main.home-page {
-      div.animation-lightbox-container {
-        display: block;
-      }
-    }
-  }
-}
+
 
 div.home-wrap {
   background-color: #FFFDF9;
 
   div.main.home-page {
     width: 100%;
-
-    div.animation-lightbox-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: $carrot_modal_bg;
-      text-align: center;
-      z-index: 1000;
-      display: none;
-
-      div.animation-lightbox {
-        width: 1080px;
-        height: 607px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-left: -540px;
-        margin-top: -303px;
-        border-radius: 6px;
-
-        button.settings-modal-close {
-          right: -56px;
-        }
-      }
-    }
 
     section {
       background-color: #FFFDF9;
@@ -127,55 +92,6 @@ div.home-wrap {
 
         button.get-started-button {
           margin-top: 32px;
-        }
-      }
-
-      div.cta-lightbox-starter {
-        position: relative;
-        z-index: 2;
-        margin: 90px auto 0;
-
-        h2 {
-          font-family: "PT Serif", serif;
-          font-weight: 700;
-          font-size: 40px;
-          color: $deep_navy;
-          margin: 0;
-
-          @include mobile() {
-            font-size: 26px;
-            line-height: auto;
-          }
-        }
-
-        a.mobile-watch-video-bt {
-          display: block;
-          background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
-          background-size: 287px 19px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 287px;
-          height: 19px;
-          margin: 24px auto 0;
-        }
-
-        button.watch-video-bt {
-          background-color: $feint_emerald;
-          border-radius: 8px;
-          width: 360px;
-          height: 56px;
-          background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
-          background-size: 287px 19px;
-          background-position: center;
-          background-repeat: no-repeat;
-          margin-top: 24px;
-
-          @include mobile() {
-            width: 287px;
-            height: 19px;
-            background-color: transparent;
-            border-radius: 0;
-          }
         }
       }
     }

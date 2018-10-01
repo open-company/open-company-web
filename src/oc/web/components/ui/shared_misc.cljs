@@ -236,3 +236,9 @@
          :id "carrot-animation"
          :allow "autoplay; encrypted-media"
          :allowfullscreen true}]]])
+
+(def animation-section
+  [:div.cta-lightbox-starter
+    [:h2 "Carrot keeps leaders and teams aligned."]
+    [:button.mlb-reset.watch-video-bt
+      {:onClick "OCStaticShowAnimationLightbox();"}]])
