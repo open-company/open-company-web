@@ -93,8 +93,8 @@ nav.site-navbar {
         height: 40px;
         margin-top: -34px;
 
-        @include mobile() {
-          margin-top: 0;
+        @include homepage-breakpoint() {
+          margin-top: -5px;
           height: 24px;
 
           a.your-digest {
@@ -199,9 +199,9 @@ nav.site-navbar {
       margin-top: -34px;
       height: 40px;
 
-      @include mobile() {
+      @include homepage-breakpoint() {
         height: 28px;
-        margin-top: 0;
+        margin-top: -5px;
       }
 
       a {
@@ -362,7 +362,7 @@ nav.site-navbar {
       margin: 6px auto 0px;
       text-align: center;
 
-      @include tablet() {
+      @include homepage-breakpoint() {
         display: none;
       }
 

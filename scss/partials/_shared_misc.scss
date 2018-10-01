@@ -185,12 +185,12 @@ section.testimonials-section {
     bottom: 0;
     right: 0;
 
-    @include mobile() {
+    @include homepage-breakpoint() {
       border-bottom-right-radius: 100px;
     }
   }
 
-  @include mobile() {
+  @include homepage-breakpoint() {
     width: 100%;
     padding: 80px 24px !important;
     padding-top: 80px !important;
@@ -198,7 +198,7 @@ section.testimonials-section {
     text-align: center;
   }
 
-  @include tablet() {
+  @include homepage-breakpoint() {
     width: 100%;
     padding: 80px 24px;
   }
@@ -211,7 +211,7 @@ section.testimonials-section {
     line-height: 38px;
     position: relative;
 
-    @include mobile(){
+    @include homepage-breakpoint(){
       font-size: 26px;
       line-height: auto;
     }
@@ -225,7 +225,7 @@ section.testimonials-section {
     margin-top: 16px;
     position: relative;
 
-    @include mobile(){
+    @include homepage-breakpoint(){
       font-size: 20px;
       line-height: 26px;
     }
@@ -236,7 +236,7 @@ section.testimonials-section {
     margin: 55px auto 0px;
     position: relative;
 
-    @include tablet() {
+    @include homepage-breakpoint() {
       width: 100%;
       margin: 42px auto 0px;
     }
@@ -331,7 +331,7 @@ section.testimonials-section {
         color: $deep_navy;
         line-height: 20px;
 
-        @include mobile() {
+        @include homepage-breakpoint() {
           min-height: 80px;
         }
 
@@ -374,7 +374,7 @@ section.testimonials-section {
         }
       }
 
-      @include tablet() {
+      @include homepage-breakpoint() {
         float: unset;
         margin: 40px 0 0;
         width: 100%;
@@ -383,7 +383,7 @@ section.testimonials-section {
       &:not(:first-child) {
         margin-left: 30px;
 
-        @include tablet() {
+        @include homepage-breakpoint() {
           margin: 40px 0 0;
         }
       }
@@ -395,7 +395,7 @@ section.keep-aligned {
   padding: 120px 0px;
   text-align: center;
 
-  @include mobile() {
+  @include homepage-breakpoint() {
     width: 100%;
     padding: 72px 32px;
     padding-top: 72px !important;
@@ -416,7 +416,7 @@ section.keep-aligned {
     margin-bottom: 40px;
     text-align: center;
 
-    @include mobile() {
+    @include homepage-breakpoint() {
       font-size: 36px;
       line-height: 40px;
       margin-bottom: 24px;
@@ -434,7 +434,7 @@ section.keep-aligned {
     margin-top: 24px;
     text-align: center;
 
-    @include mobile() {
+    @include homepage-breakpoint() {
       font-size: 12px;
       margin-top: 0px;
     }
@@ -449,7 +449,7 @@ div.core-values-list {
   justify-content: center;
   align-items: center;
 
-  @include mobile() {
+  @include homepage-breakpoint() {
     width: 251px;
     height: auto;
     display: block;
@@ -466,7 +466,7 @@ div.core-values-list {
       justify-content: center;
       align-items: center;
 
-      @include mobile(){
+      @include homepage-breakpoint(){
         margin-top: 24px;
       }
 
@@ -485,7 +485,7 @@ div.core-values-list {
         line-height: 19px;
         text-transform: uppercase;
 
-        @include mobile(){
+        @include homepage-breakpoint(){
           font-size: 16px;
           line-height: 18px;
         }
@@ -500,7 +500,7 @@ div.core-values-list {
       text-align: left;
       margin-top: 16px;
 
-      @include tablet() {
+      @include homepage-breakpoint() {
         display: none;
       }
 
@@ -591,17 +591,11 @@ button.get-started-button {
   }
 }
 
-@mixin keep-aligned-breakpoint(){
-  @media screen and (max-width: 960px) {
-    @content;
-  }
-}
-
 section.home-keep-aligned {
   padding: 0;
   text-align: center;
 
-  @include keep-aligned-breakpoint() {
+  @include homepage-breakpoint() {
     padding: 40px 24px 80px !important;
   }
 
@@ -613,7 +607,7 @@ section.home-keep-aligned {
     text-align: center;
     margin: 0px;
 
-    @include keep-aligned-breakpoint() {
+    @include homepage-breakpoint() {
       text-align: left;
       font-size: 24px;
       line-height: 30px;
@@ -627,7 +621,7 @@ section.home-keep-aligned {
       margin: 320px auto;
       position: relative;
 
-      @include keep-aligned-breakpoint() {
+      @include homepage-breakpoint() {
         margin: 0 auto;
         padding-top: 80px;
         padding-bottom: 80px;
@@ -636,6 +630,10 @@ section.home-keep-aligned {
       &:nth-child(even) {
         div.keep-aligned-section-row-inner div.keep-aligned-section-copy {
           left: 50%;
+
+          @include homepage-breakpoint() {
+            left: unset;
+          }
         }
       }
 
@@ -648,12 +646,12 @@ section.home-keep-aligned {
       &:first-child {
         margin-top: 160px;
 
-        @include keep-aligned-breakpoint() {
+        @include homepage-breakpoint() {
           margin: 0 auto;
         }
       }
 
-      @include keep-aligned-breakpoint() {
+      @include homepage-breakpoint() {
         width: 100%;
         height: auto;
         margin: 80px auto;
@@ -671,7 +669,7 @@ section.home-keep-aligned {
           left: 0px;
           top: -160px;
 
-          @include keep-aligned-breakpoint() {
+          @include homepage-breakpoint() {
             width: calc(100% + 48px);
             left: -24px;
             top: 0;
@@ -693,7 +691,7 @@ section.home-keep-aligned {
           right: 0px;
           top: -160px;
 
-          @include keep-aligned-breakpoint() {
+          @include homepage-breakpoint() {
             width: calc(100% + 48px);
             left: -24px;
             top: 0;
@@ -707,7 +705,7 @@ section.home-keep-aligned {
         width: 100%;
         height: auto;
 
-        @include keep-aligned-breakpoint() {
+        @include homepage-breakpoint() {
           margin: 0 auto;
           max-width: 100%;
           margin-top: 32px;
@@ -721,7 +719,7 @@ section.home-keep-aligned {
         padding: 24px;
         text-align: left;
 
-        @include keep-aligned-breakpoint() {
+        @include homepage-breakpoint() {
           float: unset;
           width: 100%;
           padding: 0;
@@ -735,7 +733,7 @@ section.home-keep-aligned {
         padding: 24px;
         text-align: left;
 
-        @include keep-aligned-breakpoint() {
+        @include homepage-breakpoint() {
           float: unset;
           width: 100%;
           padding: 0;
@@ -748,7 +746,7 @@ section.home-keep-aligned {
         top: 50%;
         transform: translateY(-50%);
 
-        @include keep-aligned-breakpoint() {
+        @include homepage-breakpoint() {
           width: 100%;
           top: unset;
           position: relative;
@@ -762,7 +760,7 @@ section.home-keep-aligned {
           color: $deep_navy;
           line-height: calc(100vw * 0.0464); // 78px;
 
-          @include keep-aligned-breakpoint() {
+          @include homepage-breakpoint() {
             font-size: calc(100vw * 0.0298); // 50px;
             line-height: calc(100vw * 0.0333); // 56px;
           }
@@ -800,7 +798,7 @@ section.home-keep-aligned {
           background-color: white;
           border: 1px solid #C8CACD;
 
-          @include keep-aligned-breakpoint() {
+          @include homepage-breakpoint() {
             width: 100%;
           }
         }
