@@ -397,14 +397,14 @@ section.keep-aligned {
 
   @include homepage-breakpoint() {
     width: 100%;
-    padding: 72px 32px;
+    padding: 72px 24px;
     padding-top: 72px !important;
     padding-bottom: 72px !important;
     text-align: left;
   }
 
   @include mobile_to_tablet(){
-    padding: 0 32px;
+    padding: 0 24px;
   }
 
   div.keep-aligned-title {
