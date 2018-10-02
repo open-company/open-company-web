@@ -325,17 +325,12 @@
 (def animation-lightbox
   [:div.animation-lightbox-container
     {:onClick "OCStaticHideAnimationLightbox();"}
-    [:div..animation-lightbox
+    [:div.animation-lightbox
+      [:div {:id "youtube-player"}]
       [:button.settings-modal-close.mlb-reset
-        {:onClick "OCStaticHideAnimationLightbox();"}]
-      [:iframe
-        {:width 1080 ; 1280
-         :height 608 ; 720
-         :src "https://www.youtube.com/embed/dMWpnHxQMP4?rel=0&showinfo=0&enablejsapi=1"
-         :frameborder 0
-         :id "carrot-animation"
-         :allow "autoplay; encrypted-media"
-         :allowfullscreen true}]]])
+        {;:onClick "OCStaticHideAnimationLightbox();"
+         :onMouseDown "OCStaticHideAnimationLightbox();"
+         :ontouchstart "OCStaticHideAnimationLightbox();"}]]])
 
 (def show-animation-button
   [:button.mlb-reset.show-animation-bt

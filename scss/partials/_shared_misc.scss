@@ -906,42 +906,24 @@ div.animation-lightbox-container {
   display: none;
 
   div.animation-lightbox {
-    width: 1080px;
-    height: 608px;
+    width: 100vw;
+    height: 100vh;
+    max-width: 1080px;
+    max-height: 608px;
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-left: -540px;
-    margin-top: -303px;
+    transform: translate(-50%, -50%);
     border-radius: 6px;
+  }
 
-    @media screen and (max-width: 1080px) {
-      width: 100%;
-      height: 100%;
-      margin-left: 0;
-      margin-top: 0;
-      border-radius: 0;
-      position: absolute;
-      top: 0;
-      left: 0;
-
-      iframe, object, embed {
-        position:absolute;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-      }
-    }
-
-    button.settings-modal-close {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      left: unset;
-      bottom: unset;
-      z-index: 1001;
-    }
+  button.settings-modal-close {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    left: unset;
+    bottom: unset;
+    z-index: 1001;
   }
 }
 
