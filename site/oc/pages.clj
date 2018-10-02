@@ -337,11 +337,9 @@
          :allow "autoplay; encrypted-media"
          :allowfullscreen true}]]])
 
-(def animation-section
-  [:div.cta-lightbox-starter
-    [:h2 "Carrot keeps leaders and teams aligned."]
-    [:button.mlb-reset.watch-video-bt
-      {:onClick "OCStaticShowAnimationLightbox();"}]])
+(def show-animation-button
+  [:button.mlb-reset.show-animation-bt
+    {:onClick "OCStaticShowAnimationLightbox();"}])
 
 (defn index [options]
   [:div.home-wrap
@@ -362,7 +360,8 @@
           [:br.big-web-only]
           "to keep distributed teams focused and up to date."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-        [:div.get-started-button-container
+        [:div.get-started-button-container.group
+          show-animation-button
           [:button.mlb-reset.get-started-button
             {:id "get-started-centred-bt"}
             "Get started for free"]]
@@ -377,9 +376,7 @@
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/homepage_screenshot.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
-
-        animation-section]
+             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
 
       keep-aligned-section
 
@@ -626,8 +623,10 @@
            "doesn't get lost in fast-moving conversations.")]
 
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-        [:button.mlb-reset.add-to-slack-button
-            {:id "get-started-centred-bt"}]
+        [:div.slack-button-container.group
+            show-animation-button
+            [:button.mlb-reset.add-to-slack-button
+              {:id "get-started-centred-bt"}]]
         no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
@@ -639,9 +638,7 @@
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/slack_screenshot.png")
-             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
-
-        animation-section]
+             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]
 
       keep-aligned-section
 

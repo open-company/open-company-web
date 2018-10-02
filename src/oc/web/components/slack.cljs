@@ -55,8 +55,14 @@
                "doesn't get lost in fast-moving conversations.")]
 
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-            [:button.mlb-reset.add-to-slack-button
-                {:id "get-started-centred-bt"}]
+            [:div.slack-button-container.group
+              shared-misc/show-animation-button
+              [:button.mlb-reset.add-to-slack-button
+                {:on-click #(do
+                             (.preventDefault %)
+                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                   {:auth-source "slack"})]
+                               (user-actions/login-with-slack auth-link)))}]]
             shared-misc/no-credit-card
             (carrot-box-thanks "carrot-box-thanks-top")
             [:div.carrot-box-container.confirm-thanks.group
@@ -68,9 +74,7 @@
             [:div.main-animation-container
               [:img.main-animation
                 {:src (utils/cdn "/img/ML/slack_screenshot.png")
-                 :srcSet (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
-
-            shared-misc/animation-section]
+                 :srcSet (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]
 
           shared-misc/keep-aligned-section
 
