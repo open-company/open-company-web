@@ -96,6 +96,10 @@ nav.site-navbar {
         height: 40px;
         margin-top: -34px;
 
+        &.is-slack-header {
+          margin-top: 0px;
+        }
+
         @include tablet() {
           margin-top: 0;
           height: 24px;
@@ -204,6 +208,10 @@ nav.site-navbar {
       float: right;
       margin-top: -34px;
       height: 40px;
+
+      &.is-slack-header {
+        margin-top: 0px;
+      }
 
       @include tablet() {
         height: 28px;
