@@ -742,7 +742,7 @@ section.home-keep-aligned {
         float: right;
         width: 50%;
         position: relative;
-        padding: 24px;
+        padding: 24px 54px 24px 24px;
         text-align: left;
 
         @include tablet() {
@@ -756,7 +756,7 @@ section.home-keep-aligned {
         float: left;
         width: 50%;
         position: relative;
-        padding: 24px;
+        padding: 24px 24px 24px 54px;
         text-align: left;
 
         @include tablet() {
