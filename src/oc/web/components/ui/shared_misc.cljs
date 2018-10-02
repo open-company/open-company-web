@@ -165,7 +165,7 @@
               [:br][:br]
               (str
                "Your team can join the discussion from Slack, "
-               "too -- Carrot keeps it all in sync.")]]
+               "-- Carrot keeps it all in sync.")]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2
               {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")

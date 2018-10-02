@@ -263,7 +263,7 @@
               [:br][:br]
               (str
                "Your team can join the discussion from Slack, "
-               "too -- Carrot keeps it all in sync.")]]
+               "-- Carrot keeps it all in sync.")]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2
               {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
@@ -394,6 +394,9 @@
           {:href "/?no_redirect=1"}]
 
         [:h1.pricing-headline
+          "Pricing"]
+
+        [:div.pricing-subheadline
           "Keep everyone aligned around what matters most"]
 
         [:div.pricing-three-columns.group
@@ -407,8 +410,9 @@
               "/month"]
             [:div.tear-subtitle
               "Free for small teams up to 10 users."]
-            [:button.mlb-reset.tear-start-bt
-              "Get Started"]
+            [:a.tear-start-bt
+              {:href "/sign-up"}
+              "Start Free"]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
@@ -436,8 +440,9 @@
               "/month"]
             [:div.tear-subtitle
               "Includes 15 users, additional users are $4 /mo."]
-            [:button.mlb-reset.tear-start-bt
-              "Try for Free"]
+            [:a.tear-start-bt
+              {:href "/sign-up"}
+              "Start Free"]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
@@ -497,7 +502,8 @@
             [:div.tear-price]
             [:div.tear-subtitle
               "A team of more than 100? Let's create a custom plan."]
-            [:button.mlb-reset.tear-start-bt
+            [:a.tear-start-bt
+              {:href "mailto:hello@carrot.io"}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -527,20 +533,22 @@
             "Can I use Carrot for free?"]
           [:div.faq-row-answer
             (str
-             "Absolutely! Carrot is free for teams of up to 10 people. "
-             "The Free plan has a storage limit, but includes most features. "
-             "It’s fast to sign up, and no credit card is required.")]]
+             "Absolutely! You can use Carrot for free with teams of up to 10 people. "
+             "The storage limit is 1TB and there’s a maximum upload of 20mbs. When you "
+             "sign up for the free plan you’ll get to try a fully-featured Team plan "
+             "(incl in-app video recording, recurring updates and advanced permissions) for "
+             "30 days. It’s fast to sign up, and no credit card is required.")]]
 
         [:div.faq-row
           [:div.faq-row-question
             "How is the Team plan different from the Free plan?"]
           [:div.faq-row-answer
-            "The Team plan doesn’t limit file sizes or storage, and includes some premium features, such as:"
+            "With the Team plan you get unlimited  upload file size and storage, and premium features, like:"
             [:ul
-              [:li "In-app video recording: Don’t feel like writing? Record a quick video instead."]
-              [:li "Recurring updates: Schedule weekly and monthly updates to build consistency."]
-              [:li "Advanced permissions: Add private sections for invited members only."]
-              [:li "Viewership: Make sure you’re being heard, and know who’s seen your post."]]]]
+              [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
+              [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
+              [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
+              [:li [:span.heavy "Viewership: Make sure"] " you’re being heard, and know who’s seen your post."]]]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -598,8 +606,6 @@
               "Chat with us about carrot"]]]]
 
       testimonials-section
-
-      keep-aligned-bottom
     ]])
 
 (defn slack
@@ -616,8 +622,8 @@
         [:a.carrot-logo
           {:href "/?no_redirect=1"}]
 
-        [:h1.slack
-          "Designed for Slack teams."]
+        [:h1.slack-headline
+          "Clarity for Slack teams"]
 
         [:div.slack-subline
           (str

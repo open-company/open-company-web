@@ -47,8 +47,8 @@
             [:a.carrot-logo
               {:href "/?no_redirect=1"}]
 
-            [:h1.slack
-              "Designed for Slack teams."]
+            [:h1.slack-headline
+              "Clarity for Slack teams"]
 
             [:div.slack-subline
               (str
