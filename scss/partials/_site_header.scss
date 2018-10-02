@@ -13,7 +13,7 @@ span.go-to-digest {
   text-align: right;
   padding: 11px 26px 11px 26px;
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     padding: 11px 16px 11px 16px;
     text-align: center;
     width: 164px;
@@ -46,7 +46,7 @@ nav.site-navbar {
   border-bottom: 1px solid transparent;
   transform: background-color 180ms, border-bottom 180ms;
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     height: 72px;
   }
 
@@ -59,7 +59,7 @@ nav.site-navbar {
       padding: 12px 16px;
       height: 56px;
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         padding: 14px 24px;
         width: 100%;
       }
@@ -67,7 +67,7 @@ nav.site-navbar {
       div.mobile-ham-menu {
         display: none;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           display: block;
           position: absolute;
           height: 24px;
@@ -83,7 +83,7 @@ nav.site-navbar {
         background-size: 99px 24px;
         display: block;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           margin: 2px 0px 0px -50px;
         }
       }
@@ -96,7 +96,7 @@ nav.site-navbar {
         height: 40px;
         margin-top: -34px;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           margin-top: -5px;
           height: 24px;
 
@@ -110,7 +110,7 @@ nav.site-navbar {
           height: 40px;
           padding: 10px 24px;
 
-          @include homepage-breakpoint() {
+          @include tablet() {
             height: 30px;
             padding: 5px 12px;
           }
@@ -123,7 +123,7 @@ nav.site-navbar {
           height: 40px;
           padding: 10px 24px;
 
-          @include homepage-breakpoint() {
+          @include tablet() {
             height: 24px;
             padding: 2px 12px;
           }
@@ -155,7 +155,7 @@ nav.site-navbar {
     max-width: 1209px;
     margin: 0 auto;
 
-    @include homepage-breakpoint() {
+    @include tablet() {
       width: 100vw;
       padding: 22px 24px;
       height: 72px;
@@ -164,7 +164,7 @@ nav.site-navbar {
     div.mobile-ham-menu {
       display: none;
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         display: block;
         position: absolute;
         width: 32px;
@@ -205,7 +205,7 @@ nav.site-navbar {
       margin-top: -34px;
       height: 40px;
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         height: 28px;
         margin-top: -5px;
       }
@@ -265,7 +265,7 @@ nav.site-navbar {
           text-decoration: none;
         }
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           height: 28px;
           width: auto;
           text-align: center;
@@ -338,7 +338,7 @@ nav.site-navbar {
       padding: 0;
       display: none;
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         display: block;
         position: absolute;
         float: unset;
@@ -368,7 +368,7 @@ nav.site-navbar {
       margin: 6px auto 0px;
       text-align: center;
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         display: none;
       }
 
@@ -409,13 +409,13 @@ section {
       margin-left: -587px;
     }
 
-    @include homepage-breakpoint() {
+    @include tablet() {
       display: none;
     }
   }
 }
 
-@include homepage-breakpoint() {
+@include tablet() {
   body.mobile-menu-expanded {
     nav.site-navbar {
       div.site-navbar-container {

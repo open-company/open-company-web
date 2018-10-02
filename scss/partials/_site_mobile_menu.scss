@@ -1,4 +1,4 @@
-@include homepage-breakpoint(){
+@include tablet(){
   body.mobile-menu-expanded {
     overflow: hidden;
     height: 100vh;
@@ -16,7 +16,7 @@ div.site-mobile-menu {
   z-index: 1081;
   padding: 0px 16px;
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     display: block;
   }
 

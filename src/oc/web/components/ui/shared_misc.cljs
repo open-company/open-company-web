@@ -139,7 +139,7 @@
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Keep it visible."]
+              "Provide clarity."]
             [:div.keep-aligned-section-copy-subtitle
               (str
                "Key information stays organized and visible so your team can get caught "
@@ -237,8 +237,6 @@
          :allow "autoplay; encrypted-media"
          :allowfullscreen true}]]])
 
-(def animation-section
-  [:div.cta-lightbox-starter
-    [:h2 "Carrot keeps leaders and teams aligned."]
-    [:button.mlb-reset.watch-video-bt
-      {:onClick "OCStaticShowAnimationLightbox();"}]])
+(def show-animation-button
+  [:button.mlb-reset.show-animation-bt
+    {:onClick "OCStaticShowAnimationLightbox();"}])

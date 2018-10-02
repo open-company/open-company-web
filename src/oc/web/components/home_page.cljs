@@ -49,9 +49,11 @@
             [:br.big-web-only]
             "to keep distributed teams focused and up to date."]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-          [:div.get-started-button-container
+          [:div.get-started-button-container.group
+            shared-misc/show-animation-button
             [:button.mlb-reset.get-started-button
-              {:id "get-started-centred-bt"}
+              {:id "get-started-centred-bt"
+               :on-click #(router/nav! oc-urls/sign-up)}
               "Get started for free"]]
           shared-misc/no-credit-card
           (carrot-box-thanks "carrot-box-thanks-top")
@@ -64,9 +66,7 @@
           [:div.main-animation-container
             [:img.main-animation
               {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
-
-          shared-misc/animation-section]
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
 
         shared-misc/keep-aligned-section
 

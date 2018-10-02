@@ -1,5 +1,3 @@
-
-
 div.home-wrap {
   background-color: #FFFDF9;
 
@@ -21,7 +19,7 @@ div.home-wrap {
         background-color: #F8F7F3;
         content: "";
         width: 100%;
-        height: 54%;
+        height: 41%;
         display: block;
         border-bottom-left-radius: 200px;
         position: absolute;
@@ -29,7 +27,6 @@ div.home-wrap {
         right: 0;
 
         @include mobile() {
-          height: 50%;
           border-bottom-left-radius: 100px; 
         }
       }
@@ -88,10 +85,42 @@ div.home-wrap {
       }
 
       div.get-started-button-container {
-        margin: 0 auto;
+        margin: 40px auto 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        @include mobile() {
+          width: 100%;
+          display: block;
+          justify-content: initial;
+          align-items: initial;
+        }
+
+        button {
+          width: 320px;
+          margin: 0 12px;
+          float: left;
+          height: 64px;
+
+          @include tablet() {
+            max-width: calc(50% - 16px);
+            margin: 0 8px;
+          }
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            height: 48px;
+          }
+        }
 
         button.get-started-button {
-          margin-top: 32px;
+          @include mobile() {
+            margin-top: 16px;
+          }
         }
       }
     }

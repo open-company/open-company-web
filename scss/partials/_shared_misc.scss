@@ -1,7 +1,7 @@
 div.main-animation-container {
   position: relative;
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     width: 100%;
     margin: 80px 0px 0px;
   }
@@ -14,7 +14,11 @@ div.main-animation-container {
     z-index: 10;
     position: relative;
 
-    @include homepage-breakpoint() {
+    @include tablet() {
+      margin: 0 auto;
+    }
+
+    @include mobile() {
       width: 100%;
       height: auto;
       margin: 0px auto;
@@ -184,12 +188,12 @@ section.testimonials-section {
     bottom: 0;
     right: 0;
 
-    @include homepage-breakpoint() {
+    @include tablet() {
       border-bottom-right-radius: 100px;
     }
   }
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     width: 100%;
     padding: 80px 24px !important;
     padding-top: 80px !important;
@@ -197,7 +201,7 @@ section.testimonials-section {
     text-align: center;
   }
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     width: 100%;
     padding: 80px 24px;
   }
@@ -210,7 +214,7 @@ section.testimonials-section {
     line-height: 38px;
     position: relative;
 
-    @include homepage-breakpoint(){
+    @include tablet(){
       font-size: 26px;
       line-height: auto;
     }
@@ -224,7 +228,7 @@ section.testimonials-section {
     margin-top: 16px;
     position: relative;
 
-    @include homepage-breakpoint(){
+    @include tablet(){
       font-size: 20px;
       line-height: 26px;
     }
@@ -330,7 +334,7 @@ section.testimonials-section {
         color: $deep_navy;
         line-height: 20px;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           min-height: 80px;
         }
 
@@ -400,7 +404,7 @@ section.keep-aligned {
   padding: 120px 0px;
   text-align: center;
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     width: 100%;
     padding: 72px 24px;
     padding-top: 72px !important;
@@ -421,7 +425,7 @@ section.keep-aligned {
     margin-bottom: 40px;
     text-align: center;
 
-    @include homepage-breakpoint() {
+    @include tablet() {
       font-size: 36px;
       line-height: 40px;
       margin-bottom: 24px;
@@ -439,7 +443,7 @@ section.keep-aligned {
     margin-top: 24px;
     text-align: center;
 
-    @include homepage-breakpoint() {
+    @include tablet() {
       font-size: 12px;
     }
   }
@@ -453,7 +457,7 @@ div.core-values-list {
   justify-content: center;
   align-items: center;
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     width: 251px;
     height: auto;
     display: block;
@@ -470,7 +474,7 @@ div.core-values-list {
       justify-content: center;
       align-items: center;
 
-      @include homepage-breakpoint(){
+      @include tablet(){
         margin-top: 24px;
       }
 
@@ -489,7 +493,7 @@ div.core-values-list {
         line-height: 19px;
         text-transform: uppercase;
 
-        @include homepage-breakpoint(){
+        @include tablet(){
           font-size: 16px;
           line-height: 18px;
         }
@@ -504,7 +508,7 @@ div.core-values-list {
       text-align: left;
       margin-top: 16px;
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         display: none;
       }
 
@@ -599,7 +603,7 @@ section.home-keep-aligned {
   padding: 0;
   text-align: center;
 
-  @include homepage-breakpoint() {
+  @include tablet() {
     padding: 40px 24px 80px !important;
   }
 
@@ -611,7 +615,7 @@ section.home-keep-aligned {
     text-align: center;
     margin: 0px;
 
-    @include homepage-breakpoint() {
+    @include tablet() {
       text-align: left;
       font-size: 24px;
       line-height: 30px;
@@ -625,7 +629,7 @@ section.home-keep-aligned {
       margin: 320px auto;
       position: relative;
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         margin: 0 auto;
         padding-top: 80px;
         padding-bottom: 80px;
@@ -634,6 +638,10 @@ section.home-keep-aligned {
       &.third-row {
         div.keep-aligned-section-row-right {
           padding: 24px 94px;
+
+          @include tablet() {
+            padding: 24px 0;
+          }
         }  
       }
 
@@ -641,7 +649,7 @@ section.home-keep-aligned {
         div.keep-aligned-section-row-inner div.keep-aligned-section-copy {
           left: 50%;
 
-          @include homepage-breakpoint() {
+          @include tablet() {
             left: unset;
           }
         }
@@ -651,17 +659,25 @@ section.home-keep-aligned {
         max-width: 1340px;
         margin: 0 auto;
         position: relative;
+
+        @include tablet() {
+          max-width: 595px;
+        }
+
+        @include mobile() {
+          max-width: initial;
+        }
       }
 
       &:first-child {
         margin-top: 160px;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           margin: 0 auto;
         }
       }
 
-      @include homepage-breakpoint() {
+      @include tablet() {
         width: 100%;
         height: auto;
         margin: 80px auto;
@@ -679,7 +695,7 @@ section.home-keep-aligned {
           left: 0px;
           top: -160px;
 
-          @include homepage-breakpoint() {
+          @include tablet() {
             width: calc(100% + 48px);
             left: -24px;
             top: 0;
@@ -701,7 +717,7 @@ section.home-keep-aligned {
           right: 0px;
           top: -160px;
 
-          @include homepage-breakpoint() {
+          @include tablet() {
             width: calc(100% + 48px);
             left: -24px;
             top: 0;
@@ -715,7 +731,7 @@ section.home-keep-aligned {
         width: 100%;
         height: auto;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           margin: 0 auto;
           max-width: 100%;
           margin-top: 32px;
@@ -729,7 +745,7 @@ section.home-keep-aligned {
         padding: 24px;
         text-align: left;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           float: unset;
           width: 100%;
           padding: 0;
@@ -743,7 +759,7 @@ section.home-keep-aligned {
         padding: 24px;
         text-align: left;
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           float: unset;
           width: 100%;
           padding: 0;
@@ -756,7 +772,7 @@ section.home-keep-aligned {
         top: 50%;
         transform: translateY(-50%);
 
-        @include homepage-breakpoint() {
+        @include tablet() {
           width: 100%;
           top: unset;
           position: relative;
@@ -766,26 +782,26 @@ section.home-keep-aligned {
         div.keep-aligned-section-copy-title {
           font-family: "PT Serif", serif;
           font-weight: 700;
-          font-size: calc(100vw * 0.0476); // 80px;
+          font-size: 80px;
           color: $deep_navy;
-          line-height: calc(100vw * 0.0464); // 78px;
+          line-height: 78px;
 
-          @include homepage-breakpoint() {
-            font-size: calc(100vw * 0.0298); // 50px;
-            line-height: calc(100vw * 0.0333); // 56px;
+          @include mobile() {
+            font-size: 36px;
+            line-height: 40px;
           }
         }
 
         div.keep-aligned-section-copy-subtitle {
           @include avenir_R();
-          font-size: calc(100vw * 0.0143); // 24px;
+          font-size: 24px;
           color: $ui_grey;
-          line-height: calc(100vw * 0.0202); // 34px;
+          line-height: 32px;
           margin-top: 40px;
 
           @include mobile() {
-            font-size: calc(100vw * 0.012); // 20px;
-            line-height: calc(100vw * 0.0155); // 26px;
+            font-size: 20px;
+            line-height: 26px;
           }
         }
 
@@ -929,40 +945,13 @@ div.animation-lightbox-container {
   }
 }
 
- div.cta-lightbox-starter {
-  position: relative;
-  z-index: 2;
-  margin: 90px auto 0;
-
-  h2 {
-    font-family: "PT Serif", serif;
-    font-weight: 700;
-    font-size: 40px;
-    color: $deep_navy;
-    margin: 0;
-
-    @include mobile() {
-      font-size: 26px;
-      line-height: auto;
-    }
-  }
-
-  button.watch-video-bt {
-    background-color: $feint_emerald;
-    border-radius: 8px;
-    width: 360px;
-    height: 56px;
-    background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
-    background-size: 287px 19px;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 24px auto 0;
-
-    @include mobile() {
-      width: 287px;
-      height: 19px;
-      background-color: transparent;
-      border-radius: 0;
-    }
-  }
+button.show-animation-bt {
+  background-color: $feint_emerald;
+  border-radius: 8px;
+  width: 320px;
+  height: 64px;
+  background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
+  background-size: 214px 19px;
+  background-position: center;
+  background-repeat: no-repeat;
 }

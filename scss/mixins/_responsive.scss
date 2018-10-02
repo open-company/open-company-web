@@ -27,9 +27,3 @@
     @content;
   } 
 }
-
-@mixin homepage-breakpoint(){
-  @media screen and (max-width: 960px) {
-    @content;
-  }
-}
