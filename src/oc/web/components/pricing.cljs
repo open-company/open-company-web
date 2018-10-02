@@ -145,6 +145,9 @@
                 ", plus:"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              [:span "Carrot AI"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
               [:span "On premise option"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
