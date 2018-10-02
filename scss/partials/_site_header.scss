@@ -301,6 +301,11 @@ nav.site-navbar {
           background-size: 16px 16px;
           margin-right: 6px;
           position: relative;
+          margin-top: -4px;
+
+          @include tablet() {
+            display: none;
+          }
         }
 
         &:not(.your-digest).slack-get-started {
@@ -312,6 +317,10 @@ nav.site-navbar {
           text-align: left;
           border: 2px solid $carrot_orange_light;
           padding: 9px 24px;
+
+          &.slack {
+            padding: 5px 24px 0;
+          }
 
           @media screen and (max-width: 320px) {
             display: none;
