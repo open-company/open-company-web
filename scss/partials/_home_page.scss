@@ -60,6 +60,7 @@ div.home-wrap {
         margin: 24px auto 0px;
         z-index: 2;
         position: relative;
+        max-width: 800px;
 
         @include mobile(){
           margin-top: 16px;
@@ -67,6 +68,7 @@ div.home-wrap {
           line-height: 23px;
           padding: 0px;
           color: $deep_navy;
+          max-width: initial;
         }
       }
 
