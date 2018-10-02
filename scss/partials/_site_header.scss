@@ -97,7 +97,7 @@ nav.site-navbar {
         margin-top: -34px;
 
         @include tablet() {
-          margin-top: -5px;
+          margin-top: 0;
           height: 24px;
 
           a.your-digest {
@@ -207,7 +207,7 @@ nav.site-navbar {
 
       @include tablet() {
         height: 28px;
-        margin-top: -5px;
+        margin-top: 0;
       }
 
       a {

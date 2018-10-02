@@ -31,6 +31,10 @@ div.about-wrap {
           padding: 0 24px;
           max-width: 690px;
         }
+
+        @include mobile() {
+          max-width: 380px;
+        }
       }
 
       div.team-container{
