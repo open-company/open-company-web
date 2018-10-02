@@ -1,5 +1,11 @@
 /***** Pricing ******/
 
+@mixin pricing-tablet(){
+  @media screen and (max-width: 1257px) {
+    @content; 
+  }
+}
+
 div.pricing-wrap {
   background-color: $oc_gray_8;
 
@@ -46,9 +52,10 @@ div.pricing-wrap {
 
       div.pricing-three-columns{
         margin: 80px auto 0;
-        width: 1210px;
+        width: 1258px;
+        padding: 0 24px;
 
-        @include tablet() {
+        @include pricing-tablet() {
           width: 100%;
         }
 
@@ -61,13 +68,15 @@ div.pricing-wrap {
           padding: 40px 26px;
           text-align: center;
 
-          @include tablet() {
-            width: 100%;
+          @include pricing-tablet() {
             min-height: initial;
             float: unset;
-            margin-left: 0;
             padding: 40px 26px;
-            margin-top: 32px;
+            margin: 32px auto 0;
+          }
+
+          @include mobile() {
+            width: 100%;
           }
 
           h2.tear-title {
@@ -143,7 +152,7 @@ div.pricing-wrap {
               }
             }
 
-            @include tablet() {
+            @include pricing-tablet() {
               max-width: initial;
             }
 
@@ -156,6 +165,10 @@ div.pricing-wrap {
             border-bottom-left-radius: 40px;
             margin-left: 0;
 
+            @include pricing-tablet() {
+              margin: 32px auto 0;
+            }
+
             div.tear-subtitle {
               max-width: 182px;
             }
@@ -165,7 +178,7 @@ div.pricing-wrap {
             div.tear-subtitle {
               max-width: 251px;
 
-              @include tablet() {
+              @include pricing-tablet() {
                 max-width: initial;
               }
             }
@@ -189,7 +202,7 @@ div.pricing-wrap {
             div.tear-subtitle {
               max-width: 241px;
 
-              @include tablet() {
+              @include pricing-tablet() {
                 max-width: initial;
               }
             }
