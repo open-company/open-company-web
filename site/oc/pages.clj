@@ -671,7 +671,7 @@
                 "in Livorno, Italy"]
               [:div.user-links
                 [:a.twitter-link
-                  {:href ""
+                  {:href "https://twitter.com/bago2k4"
                    :target "_blank"}]
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/iacopocarraro/"
@@ -686,7 +686,7 @@
                 "in Chapel Hill, USA"]
               [:div.user-links
                 [:a.twitter-link
-                  {:href ""
+                  {:href "https://twitter.com/belucid"
                    :target "_blank"}]
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/snootymonkey/"
@@ -701,7 +701,7 @@
                 "in Montreal, Canada"]
               [:div.user-links
                 [:a.twitter-link
-                  {:href ""
+                  {:href "https://twitter.com/ggiiaa"
                    :target "_blank"}]
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/georgianalaudi/"
@@ -714,9 +714,13 @@
                 "CEO & Founder"
                 [:br]
                 "in Cambridge, USA"]
-              [:a.linkedin-link
-                {:href "https://linkedin.com/in/stuartlevinson/"
-                 :target "_blank"}]]
+              [:div.user-links
+                [:a.twitter-link
+                  {:href "https://twitter.com/stuartlevinson"
+                   :target "_blank"}]
+                [:a.linkedin-link
+                  {:href "https://linkedin.com/in/stuartlevinson/"
+                   :target "_blank"}]]]
             [:div.team-card.ryan-le-roux
               [:div.user-avatar]
               [:div.user-name
@@ -727,7 +731,7 @@
                 "in Vancouver, Canada"]
               [:div.user-links
                 [:a.twitter-link
-                  {:href ""
+                  {:href "https://twitter.com/ryanleroux"
                    :target "_blank"}]
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/ryanleroux/"
@@ -742,7 +746,7 @@
                 "in Charleston, USA"]
               [:div.user-links
                 [:a.twitter-link
-                  {:href ""
+                  {:href "https://twitter.com/thepug"
                    :target "_blank"}]
                 [:a.linkedin-link
                   {:href "https://linkedin.com/in/nathanzorn/"
