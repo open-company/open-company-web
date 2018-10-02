@@ -365,14 +365,9 @@
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
                   {:on-click #(do
-                                (if (and (nil? (:video-id cmail-data))
-                                         (empty? (:attachments cmail-data))
-                                         (clojure.string/blank?
-                                          (:headline cmail-data))
-                                         (clojure.string/blank?
-                                          (:body cmail-data)))
-                                  (activity-actions/activity-delete cmail-data)
-                                  (autosave s))
+                                (if (au/has-content? cmail-data)
+                                  (autosave s)
+                                  (activity-actions/activity-delete cmail-data))
                                 (if (and (= (:status cmail-data) "published")
                                          (:has-changes cmail-data))
                                   (cancel-clicked s)

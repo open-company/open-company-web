@@ -309,3 +309,17 @@
     (if section-slug
       (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))
       (cook/remove-cookie! last-board-cookie))))
+
+(defn has-attachments? [data]
+  (seq (:attachments data)))
+
+(defn has-text? [data]
+  (if (and (clojure.string/blank? (:headline data))
+           (clojure.string/blank? (:body data)))
+    false
+    true))
+
+(defn has-content? [data]
+  (or (some? (:video-id data))
+      (has-attachments? data)
+      (has-text? data)))

@@ -691,11 +691,8 @@
   (dis/dispatch! [:uploading-video (router/current-org-slug) video-id]))
 
 (defn remove-video [edit-key activity-data]
-  (let [has-changes (if (and (empty? (:attachments activity-data))
-                             (clojure.string/blank? (:headline activity-data))
-                             (clojure.string/blank? (:body activity-data)))
-                      false
-                      true)]
+  (let [has-changes (or (au/has-attachments? activity-data)
+                        (au/has-text? activity-data))]
     (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
                                                   :video-id nil
                                                   :video-transcript nil
