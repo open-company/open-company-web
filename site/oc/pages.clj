@@ -494,7 +494,7 @@
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Make sure you’re being heard, and know who’s seen your post"}
-              [:span "Team viewership"]]]
+              [:span "Who Saw That"]]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
             [:h2.tear-title
