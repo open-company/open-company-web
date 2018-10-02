@@ -129,12 +129,12 @@
             [:div.about-copy-inner
               [:div.about-copy-title
                 (str
-                 "In the age of Slack, the lack of clear leadership "
-                 "is the single, greatest problem in the workplace.")]
+                 "In the age of Slack, moving teams from chaos to clarity "
+                 "is one of the most vital functions of leadership")]
               [:p
                 (str
                  "Sure, teams are more connected than ever with chat apps like "
-                 "Slack - and yet, it has become even more difficult for those same "
+                 "Slack - and yet, it’s become even more difficult for those same "
                  "teams to stay aligned around what matters most. ")
                 [:span.oblique "How can that be?"]]
               [:p
@@ -142,21 +142,19 @@
                 [:span.heavy "leadership is getting lost in the noise."]]
               [:p
                 (str
-                 "Leadership in the age of Slack isn’t easy. Sharing key information "
-                 "everyone needs alongside other random chats just increases the likelihood "
-                 "it will scroll by without getting noticed or read. Nor are people motivated "
-                 "to react, comment or ask questions when the conversation is hard to follow. "
-                 "Above all, leaders have no idea if anyone is paying attention to what they’ve said.")]
+                 "Sharing key information everyone needs alongside random chats just increases "
+                 "the likelihood it will scroll by without being noticed. It’s difficult for the "
+                 "team to know what matters, and leaders have no idea if anyone even heard what they said.")]
               [:p
                 (str
-                 "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach to "
-                 "handle leadership communication. We wanted this “non-chat” communication to be "
-                 "as fun, delightful and interactive as chat; but we also wanted it to be asynchronous "
-                 "so people could get caught up on their own time.")]
+                 "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
+                 "to handle leadership communication. We wanted this “non-chat” communication "
+                 "to be as fun, delightful and interactive as chat; but we also wanted it to be "
+                 "asynchronous so people could get caught up on their own time.")]
               [:p
                 (str
-                 "The result is Carrot - a platform for leadership communication that keeps everyone "
-                 "focused on what matters to build transparency, trust, and stronger teams.")]]
+                 "The result is Carrot - a platform for leadership communication that keeps "
+                 "everyone focused on what matters to build transparency, trust, and stronger teams.")]]
 
             [:div.about-bottom-copy
               [:div.about-bottom-copy-row.group

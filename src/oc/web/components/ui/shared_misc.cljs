@@ -164,7 +164,7 @@
                "what’s happening and why.")
               [:br][:br]
               (str
-               "Your team can join the discussion from Slack, "
+               "Your team can join the discussion from Slack "
                "-- Carrot keeps it all in sync.")]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2
@@ -217,8 +217,8 @@
                "appropriate Slack channel. Join the "
                "discussion right from Slack — Carrot keeps "
                "it all in sync.")]
-            [:button.mlb-reset.keep-aligned-section-copy-button
-              {:onClick "window.location='/slack';"}]]
+            [:a.keep-aligned-section-copy-button
+              {:href oc-urls/sign-up}]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-5
               {:src (utils/cdn "/img/ML/homepage_screenshots_fifth_row.png")

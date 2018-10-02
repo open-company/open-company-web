@@ -811,7 +811,8 @@ section.home-keep-aligned {
           height: 208px;
         }
 
-        button.keep-aligned-section-copy-button {
+        a.keep-aligned-section-copy-button {
+          display: block;
           width: 200px;
           height: 48px;
           box-shadow: 0 2px 6px 0 rgba(0,0,0,0.07);

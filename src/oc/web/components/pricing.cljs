@@ -238,7 +238,8 @@
 
         [:div.faq-row
           [:div.faq-row-question
-            "Still have more questions?"
+            "Still have more questions?"]
+          [:div.faq-row-answer
             [:a.chat-with-us
               {:href "mailto:hello@carrot.io"
                :target "_blank"}
