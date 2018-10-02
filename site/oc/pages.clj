@@ -778,9 +778,36 @@
             [:p
               (str
                "The result is Carrot - a platform for leadership communication that keeps everyone "
-               "focused on what matters to build transparency, trust, and stronger teams.")]]]
+               "focused on what matters to build transparency, trust, and stronger teams.")]]
 
-        keep-aligned-bottom]
+          [:div.about-bottom-copy
+            [:div.about-bottom-copy-row.group
+              [:div.about-bottom-copy-left
+                "Distributed by design."]
+              [:div.about-bottom-copy-right
+                [:div.about-bottom-copy-description
+                  (str
+                   "Want to join us? We are always looking for "
+                   "amazing people regardless of where they "
+                   "call home.")]
+                [:a
+                  {:href "mailto:hello@carrot.io"
+                   :target "_blank"}
+                  "Say hello"]]]
+            [:div.about-bottom-copy-row.group
+              [:div.about-bottom-copy-left
+                "Crazy for open source."]
+              [:div.about-bottom-copy-right
+                [:div.about-bottom-copy-description
+                  (str
+                   "Have an idea you’d like to contribute? A "
+                   "new integration you’d like to see?")]
+                [:a
+                  {:href "https://github.com/open-company"
+                   :target "_blank"}
+                  "Build with us on git"]]]]]]
+
+      keep-aligned-bottom
     ] ;<!-- main -->
   ])
 

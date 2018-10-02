@@ -29,6 +29,7 @@ div.about-wrap {
           font-size: 36px;
           line-height: 40px;
           padding: 0 24px;
+          max-width: 690px;
         }
       }
 
@@ -36,27 +37,35 @@ div.about-wrap {
         margin: 80px 0 160px;
 
         @include tablet() {
-          margin: 48px 0 80px;
+          margin: 28px 0 60px;
           padding: 0 24px;
         }
 
         div.team-row {
-          margin: 0px auto;
+          margin: 0 auto;
           width: 1210px;
 
-          @include tablet() {
+          @media screen and (max-width: 1258px) {
+            width: 605px;
+
+            div.team-card:nth-child(4) {
+              margin: 20px 0 20px 0;
+            }
+          }
+
+          @include mobile() {
             width: 100%;
           }
 
           div.team-card {
             display: inline-block;
-            margin-left: 30px;
             text-align: left;
             width: 176px;
             position: relative;
             z-index: 2;
+            margin: 20px 0 20px 30px;
 
-            @include tablet() {
+            @include mobile() {
               display: block;
               width: 100%;
               margin-top: 32px;
@@ -101,7 +110,7 @@ div.about-wrap {
               background-position: center;
               margin: 0px auto;
 
-              @include tablet() {
+              @include mobile() {
                 float: left;
                 width: 80px;
                 height: 80px;
@@ -117,7 +126,7 @@ div.about-wrap {
               color: $deep_navy;
               margin-top: 24px;
 
-              @include tablet() {
+              @include mobile() {
                 margin-top: 0;
               }
             }
@@ -133,7 +142,7 @@ div.about-wrap {
               margin-top: 16px;
               height: 20px;
 
-              @include tablet() {
+              @include mobile() {
                 margin-left: 104px;
               }
 
@@ -241,6 +250,70 @@ div.about-wrap {
 
             @include tablet() {
               font-size: 20px;
+            }
+          }
+        }
+
+        div.about-bottom-copy {
+          width: 795px;
+          margin: 80px auto 0;
+          position: relative;
+          z-index: 3;
+
+          @include tablet() {
+            margin: 40px auto 0;
+            width: 100%;
+          }
+
+          div.about-bottom-copy-row {
+            border-top: 1px solid #E7E6E5;
+            padding: 40px 0;
+
+            div.about-bottom-copy-left {
+              float: left;
+              width: 45%;
+              font-family: "PT Serif";
+              font-weight: 700;
+              font-size: 30px;
+              line-height: 40px;
+              color: $deep_navy;
+
+              @include tablet() {
+                float: unset;
+                width: 100%;
+                font-size: 20px;
+                line-height: 26px;
+              }
+            }
+
+            div.about-bottom-copy-right {
+              float: right;
+              width: 45%;
+
+              @include tablet() {
+                float: unset;
+                width: 100%;
+                margin-top: 8px;
+              }
+
+              div.about-bottom-copy-description {
+                @include avenir_R();
+                font-size: 20px;
+                line-height: 26px;
+                color: $ui_grey;
+                width: 100%;
+                display: block;
+                margin: 0 0 16px 0;
+              }
+
+              a {
+                margin-top: 16px;
+                color: $carrot_green;
+                text-transform: uppercase;
+                @include avenir_B();
+                font-size: 14px;
+                letter-spacing: 0.5;
+              }
             }
           }
         }
