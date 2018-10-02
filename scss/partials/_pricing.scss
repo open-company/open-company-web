@@ -47,6 +47,7 @@ div.pricing-wrap {
           margin: 0 auto;
           font-size: 36px;
           max-width: initial;
+          padding: 0 24px;
         }
       }
 
@@ -57,6 +58,10 @@ div.pricing-wrap {
 
         @include pricing-tablet() {
           width: 100%;
+        }
+
+        @include mobile() {
+          padding: 0;
         }
 
         div.pricing-column {
@@ -250,6 +255,10 @@ div.pricing-wrap {
             line-height: 28px;
             text-transform: uppercase;
             letter-spacing: 0.5;
+
+            @include mobile() {
+              float: left;
+            }
 
             &:hover {
               text-decoration: underline;

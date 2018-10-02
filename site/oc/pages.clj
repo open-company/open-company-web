@@ -595,7 +595,7 @@
             [:a.chat-with-us
               {:href "mailto:hello@carrot.io"
                :target "_blank"}
-              "Chat with us"]]]]
+              "Chat with us about carrot"]]]]
 
       testimonials-section
 
