@@ -27,7 +27,8 @@
 
       [:div.main.about
         [:section.about-header
-          [:a.carrot-logo]
+          [:a.carrot-logo
+            {:href "/?no_redirect=1"}]
           [:h1.about "The team behind the magic"]
 
           [:div.team-container

@@ -38,7 +38,8 @@
         ; Hope page header
         [:section.cta.group
 
-          [:a.carrot-logo]
+          [:a.carrot-logo
+            {:href "/?no_redirect=1"}]
 
           [:h1.headline
             "Communicate"
