@@ -127,7 +127,10 @@
             "Login"]
         [:a.start
           {:id "site-header-signup-item"
-           :href "/sign-up"
+           :data-page active-page
+           :href (if (= active-page "slack")
+                    (env :slack-signup-url)
+                    "/sign-up")
            :class (when (= active-page "slack")
                     "slack-get-started")}
           (when (= active-page "slack")
@@ -140,7 +143,9 @@
         [:a.start
           {:id "site-header-mobile-signup-item"
            :class (when (= active-page "slack") "slack")
-           :href "/sign-up"}
+           :href (if (= active-page "slack")
+                   (env :slack-signup-url)
+                   "/sign-up")}
             [:span.copy
               (if (= active-page "slack")
                 "ADD"

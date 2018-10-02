@@ -147,7 +147,7 @@ div.slack-wrap {
         align-items: initial;
       }
 
-      button {
+      a, button {
         width: 320px;
         margin: 0 12px;
         float: left;
@@ -167,7 +167,8 @@ div.slack-wrap {
         }
       }
 
-      button.add-to-slack-button {
+      a.add-to-slack-button {
+        display: block;
         box-shadow: 0 2px 6px 0 rgba(0,0,0,0.07);
         @include image-2x("/img/ML/slack_add_to_slack");
         background-size: 155px 25px;
