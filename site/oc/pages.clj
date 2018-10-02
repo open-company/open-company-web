@@ -356,9 +356,10 @@
           [:br]
           "what matters."]
         [:div.subheadline
-          "With Carrot, leaders rise above the noise"
-          [:br.big-web-only]
-          "to keep distributed teams focused and up to date."]
+          (str
+           "Leaders struggle to communicate a clear direction that keeps everyone "
+           "aligned because chat and email are noisy and overwhelming. Carrot rises "
+           "above the noise to keep distributed teams up to date and focused.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container.group
           show-animation-button
