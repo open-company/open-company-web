@@ -177,10 +177,6 @@ div.pricing-wrap {
           &.team-column {
             div.tear-subtitle {
               max-width: 251px;
-
-              @include pricing-tablet() {
-                max-width: initial;
-              }
             }
           }
 
