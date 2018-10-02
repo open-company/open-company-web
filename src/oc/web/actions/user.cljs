@@ -19,10 +19,13 @@
 
 ;; Logout
 
-(defn logout []
-  (cook/remove-cookie! :jwt)
-  (router/redirect! "/")
-  (dis/dispatch! [:logout]))
+(defn logout
+  ([]
+     (logout oc-urls/home))
+  ([location]
+     (cook/remove-cookie! :jwt)
+     (router/redirect! location)
+     (dis/dispatch! [:logout])))
 
 ;; JWT
 
