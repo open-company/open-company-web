@@ -60,6 +60,11 @@ div.home-wrap {
           font-size: 50px;
           line-height: 56px;
         }
+
+        @media screen and (max-width: 380px) {
+          font-size: 40px;
+          line-height: 46px;
+        }
       }
 
       div.subheadline {
