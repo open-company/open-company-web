@@ -237,7 +237,7 @@
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Keep it visible."]
+              "Provide clarity."]
             [:div.keep-aligned-section-copy-subtitle
               (str
                "Key information stays organized and visible so your team can get caught "
