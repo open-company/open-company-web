@@ -139,7 +139,7 @@
                               (reset! (::video-uploading s) false))]
     (cond
       (:fixed-video-id cmail-data)
-      (activity-actions/prompt-remove-video :cmail-data)
+      (activity-actions/prompt-remove-video :cmail-data cmail-data)
       @(::record-video s)
       (reset! (::record-video s) false)
       :else
@@ -365,7 +365,14 @@
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
                   {:on-click #(do
-                                (autosave s)
+                                (if (and (nil? (:video-id cmail-data))
+                                         (empty? (:attachments cmail-data))
+                                         (clojure.string/blank?
+                                          (:headline cmail-data))
+                                         (clojure.string/blank?
+                                          (:body cmail-data)))
+                                  (activity-actions/activity-delete cmail-data)
+                                  (autosave s))
                                 (if (and (= (:status cmail-data) "published")
                                          (:has-changes cmail-data))
                                   (cancel-clicked s)
@@ -451,7 +458,7 @@
               (when (and (:fixed-video-id cmail-data)
                          (not @(::record-video s)))
                 (ziggeo-player {:video-id (:fixed-video-id cmail-data)
-                                :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data)
+                                :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
@@ -460,7 +467,7 @@
               (when @(::record-video s)
                 (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
                                   :upload-started-cb #(do
-                                                        (activity-actions/uploading-video %)
+                                                        (activity-actions/uploading-video % :cmail-data)
                                                         (reset! (::video-picking-cover s) false)
                                                         (reset! (::video-uploading s) true))
                                   :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
@@ -470,7 +477,7 @@
                                   :height (:height video-size)
                                   :remove-recorder-cb (fn []
                                     (when (:video-id cmail-data)
-                                      (activity-actions/remove-video :cmail-data))
+                                      (activity-actions/remove-video :cmail-data cmail-data))
                                     (reset! (::record-video s) false))})))
             ; Headline element
             [:div.cmail-content-headline.emoji-autocomplete.emojiable.group.fs-hide
