@@ -915,6 +915,8 @@
           ;; Ziggeo
           ziggeo-css
           ziggeo-js
+          ;; Drift (Support)
+          [:script {:src (cdn "/js/drift.js")}]
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
    :body [:body
@@ -1029,6 +1031,8 @@
           bootstrap-js
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
+          ;; Drift (Support)
+          [:script {:src (cdn "/js/drift.js")}]
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Compiled oc.min.js from our CDN
