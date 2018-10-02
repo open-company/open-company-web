@@ -1,7 +1,7 @@
 /***** Pricing ******/
 
 @mixin pricing-tablet(){
-  @media screen and (max-width: 1257px) {
+  @media screen and (max-width: 1072px) {
     @content; 
   }
 }
@@ -259,24 +259,6 @@ div.pricing-wrap {
           color: $deep_navy;
           line-height: 28px;
           margin-top: 40px;
-
-          a.chat-with-us {
-            float: right;
-            color: $carrot_green;
-            @include avenir_B();
-            font-size: 14px;
-            line-height: 28px;
-            text-transform: uppercase;
-            letter-spacing: 0.5;
-
-            @include mobile() {
-              float: left;
-            }
-
-            &:hover {
-              text-decoration: underline;
-            }
-          }
         }
 
         div.faq-row-answer {
@@ -287,6 +269,20 @@ div.pricing-wrap {
 
           span.heavy {
             @include avenir_H();
+          }
+
+          a.chat-with-us {
+            float: left;
+            color: $carrot_green;
+            @include avenir_B();
+            font-size: 14px;
+            line-height: 28px;
+            text-transform: uppercase;
+            letter-spacing: 0.5;
+
+            &:hover {
+              text-decoration: underline;
+            }
           }
 
           a {
