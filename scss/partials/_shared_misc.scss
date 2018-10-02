@@ -920,10 +920,14 @@ div.animation-lightbox-container {
   button.settings-modal-close {
     position: fixed;
     top: 24px;
-    right: 24px;
+    right: -54px;
     left: unset;
     bottom: unset;
     z-index: 1001;
+
+    @media screen and (max-width: 1080px) {
+      right: 24px;
+    }
   }
 }
 
