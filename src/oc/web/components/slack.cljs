@@ -48,7 +48,7 @@
               {:href "/?no_redirect=1"}]
 
             [:h1.slack
-              "Designed for Slack teams."]
+              "Keep meaningful team communication in sync"]
 
             [:div.slack-subline
               (str

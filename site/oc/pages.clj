@@ -263,7 +263,7 @@
               [:br][:br]
               (str
                "Your team can join the discussion from Slack, "
-               "too -- Carrot keeps it all in sync.")]]
+               "-- Carrot keeps it all in sync.")]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2
               {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
@@ -623,7 +623,7 @@
           {:href "/?no_redirect=1"}]
 
         [:h1.slack
-          "Designed for Slack teams."]
+          "Keep meaningful team communication in sync"]
 
         [:div.slack-subline
           (str
