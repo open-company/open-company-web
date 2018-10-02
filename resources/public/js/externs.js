@@ -158,3 +158,7 @@ ZiggeoApi.V2.Player = function(){};
 ZiggeoApi.V2.Player.activate = function(){};
 ZiggeoApi.V2.Player.destroy = function(){};
 ZiggeoApi.V2.Player.get = function(){};
+// Headway (What's New)
+var Headway = function(){};
+Headway.init = function(){};
+Headway.show = function(){};
