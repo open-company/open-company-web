@@ -47,31 +47,36 @@ div.pricing-wrap {
           margin: 0 auto;
           font-size: 36px;
           max-width: initial;
+          padding: 0 24px;
         }
       }
 
       div.pricing-three-columns{
         margin: 80px auto 0;
-        width: 1258px;
+        width: 1072px;
         padding: 0 24px;
 
         @include pricing-tablet() {
           width: 100%;
         }
 
+        @include mobile() {
+          padding: 0;
+        }
+
         div.pricing-column {
-          width: 382px;
+          width: 320px;
           min-height: 943px;
           background-color: #F8F7F3;
           float: left;
           margin-left: 32px;
-          padding: 40px 26px;
+          padding: 40px 32px;
           text-align: center;
 
           @include pricing-tablet() {
             min-height: initial;
             float: unset;
-            padding: 40px 26px;
+            padding: 40px 32px;
             margin: 32px auto 0;
           }
 
@@ -250,6 +255,10 @@ div.pricing-wrap {
             line-height: 28px;
             text-transform: uppercase;
             letter-spacing: 0.5;
+
+            @include mobile() {
+              float: left;
+            }
 
             &:hover {
               text-decoration: underline;
