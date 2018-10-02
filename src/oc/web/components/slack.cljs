@@ -15,18 +15,6 @@
             [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(defn get-started-button [auth-settings]
-  (when-not (jwt/jwt)
-    [:div
-      [:button.signin-with-slack.mlb-reset
-        {:on-click #(do
-                     (.preventDefault %)
-                     (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                           {:auth-source "slack"})]
-                       (user-actions/login-with-slack auth-link)))}
-        [:span.slack-white-icon]
-        [:span.slack-copy "Add to Slack"]]]))
-
 (rum/defcs slack < rum/static
                    rum/reactive
                    (drv/drv :auth-settings)
@@ -58,7 +46,7 @@
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
               shared-misc/show-animation-button
-              [:button.mlb-reset.add-to-slack-button
+              [:a.add-to-slack-button
                 {:on-click #(do
                              (.preventDefault %)
                              (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"

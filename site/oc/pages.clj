@@ -316,7 +316,7 @@
                "discussion right from Slack — Carrot keeps "
                "it all in sync.")]
             [:a.keep-aligned-section-copy-button
-              {:href "/sign-up"}]]
+              {:href (env :slack-signup-url)}]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-5
               {:src (cdn "/img/ML/homepage_screenshots_fifth_row.png")
@@ -634,8 +634,9 @@
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.slack-button-container.group
             show-animation-button
-            [:button.mlb-reset.add-to-slack-button
-              {:id "get-started-centred-bt"}]]
+            [:a.add-to-slack-button
+              {:id "get-started-centred-bt"
+               :href (env :slack-signup-url)}]]
         no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
