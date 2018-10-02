@@ -349,7 +349,8 @@
       ; Hope page header
       [:section.cta.group
 
-        [:a.carrot-logo]
+        [:a.carrot-logo
+          {:href "/?no_redirect=1"}]
 
         [:h1.headline
           "Communicate"
@@ -394,7 +395,8 @@
     [:div.main.pricing
       [:section.pricing-header
 
-        [:a.carrot-logo]
+        [:a.carrot-logo
+          {:href "/?no_redirect=1"}]
 
         [:h1.pricing-headline
           "Pricing"]
@@ -616,7 +618,8 @@
       [:section.carrot-plus-slack.group
         animation-lightbox
 
-        [:a.carrot-logo]
+        [:a.carrot-logo
+          {:href "/?no_redirect=1"}]
 
         [:h1.slack
           "Designed for Slack teams."]
@@ -659,7 +662,8 @@
     {:id "wrap"}
     [:div.main.about
       [:section.about-header
-        [:a.carrot-logo]
+        [:a.carrot-logo
+          {:href "/?no_redirect=1"}]
         [:h1.about "The team behind the magic"]
 
         [:div.team-container

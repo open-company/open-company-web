@@ -44,7 +44,8 @@
           [:section.carrot-plus-slack.group
             shared-misc/animation-lightbox
 
-            [:a.carrot-logo]
+            [:a.carrot-logo
+              {:href "/?no_redirect=1"}]
 
             [:h1.slack
               "Designed for Slack teams."]
