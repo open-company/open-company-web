@@ -67,6 +67,10 @@ div.slack-wrap {
         @include tablet() {
           border-bottom-left-radius: 100px; 
         }
+
+        @media screen and (max-width: 440px) {
+          height: 25%;
+        }
       }
 
       @include tablet() {
