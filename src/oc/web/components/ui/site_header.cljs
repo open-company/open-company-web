@@ -110,7 +110,11 @@
               [:span.start-copy
                 (if use-slack-signup-button
                   (if is-slack-lander?
-                    "Sign in with Slack"
+                    (if (responsive/is-tablet-or-mobile?)
+                      (if (responsive/is-mobile-size?)
+                        "Start"
+                        "Start free")
+                      "Continue with Slack")
                     "Add to Slack")
                   "Get started")])]]
         [:div.site-navbar-right.mobile-only
@@ -126,7 +130,12 @@
                                   (user-actions/login-with-slack slack-auth-link)
                                   (nav! oc-urls/sign-up %))))}
                 [:span.slack-orange-icon]
-                [:span.slack-copy "SIGN IN"]]
+                [:span.slack-copy
+                  (if (responsive/is-tablet-or-mobile?)
+                    (if (responsive/is-mobile-size?)
+                      "Start"
+                      "Start free")
+                    "Continue with Slack")]]
               [:a.start
                 {:id "site-header-mobile-signup-item"
                  :href "/sign-up"}
