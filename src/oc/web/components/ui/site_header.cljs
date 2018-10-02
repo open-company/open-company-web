@@ -74,6 +74,7 @@
                :target "_blank"}
               "Blog"]])
         [:div.site-navbar-right.big-web-only
+          {:class (when is-slack-lander? "is-slack-header")}
           (when-not logged-in
             [:a.login
               {:href (utils/your-digest-url)

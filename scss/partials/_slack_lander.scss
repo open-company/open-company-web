@@ -6,148 +6,103 @@ div.slack-lander-wrap {
     text-align: center;
     width: 100%;
 
-    @include mobile() {
-      padding: 0 0px;
-    }
-
-    section {
-      @include mobile(){
-        padding: 0 24px;
-      }
-    }
-
     section.cta {
-      padding-top: 128px;
+      padding-top: 239px;
       padding-bottom: 120px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
-      @include tablet(){
+      @include mobile() {
+        width: 100%;
         overflow: visible;
-        padding: 148px 24px 80px;
+        padding: 131px 24px 80px;
       }
 
-      div.balloon {
+      * {
+        position: relative;
+        z-index: 3;
+      }
+
+      &:after {
+        background-color: #F8F7F3;
+        content: "";
+        width: 100%;
+        height: 41%;
+        display: block;
+        border-bottom-left-radius: 200px;
         position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
+        bottom: 0;
+        right: 0;
+        z-index: 2;
 
         @include mobile() {
-          display: none;
+          border-bottom-left-radius: 100px; 
         }
 
-        &.big-blue {
-          @include image-2x("/img/ML/balloon_big_blue");
-          background-size: 145px 145px;
-          width: 145px;
-          height: 145px;
-          top: -94px;
-          left: 231px;
-        }
-
-        &.small-green {
-          @include image-2x("/img/ML/balloon_small_green");
-          background-size: 15px 15px;
-          width: 15px;
-          height: 15px;
-          top: 46px;
-          left: 232px;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/balloon_big_green");
-          background-size: 226px 209px;
-          width: 226px;
-          height: 209px;
-          top: 134px;
-          right: -108px;
-        }
-
-        &.small-purple-face {
-          @include image-2x("/img/ML/balloon_small_purple_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 298px;
-          right: 124px;
-        }
-
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow");
-          background-size: 400px 380px;
-          width: 400px;
-          height: 380px;
-          top: 370px;
-          left: 50%;
-          margin-left: -590px;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/balloon_small_purple");
-          background-size: 136px 115px;
-          width: 136px;
-          height: 115px;
-          top: 850px;
-          left: 50%;
-          margin-left: 432px;
+        @media screen and (max-width: 440px) {
+          height: 25%;
         }
       }
 
       h1.headline {
-        @include avenir_H();
-        font-size: 48px;
-        line-height: 60px;
+        font-size: 80px;
+        font-family: "PT Serif", serif;
+        font-weight: 700;
         color: $deep_navy;
-        margin: 0px auto;
-        padding: 0px 16px;
+        margin: 0 auto;
+        z-index: 2;
+        position: relative;
+        padding: 0 24px;
 
-        @include mobile() {
-          @include avenir_H();
-          font-size: 34px;
-          line-height: 40px;
-          padding: 0px;
-          max-width: 270px;
+        @include mobile(){
+          font-size: 50px;
+          line-height: 56px;
+          padding: 0;
+        }
+
+        @media screen and (max-width: 380px) {
+          font-size: 40px;
+          line-height: 46px;
         }
       }
 
       div.subheadline {
-        margin-top: 16px;
-        @include avenir_R();
-        font-size: 24px;
-        line-height: 30px;
         color: $ui_grey;
-        max-width: 690px;
-        margin: 8px auto 0px;
-        text-align: center;
+        font-size: 30px;
+        line-height: 38px;
+        @include avenir_R();
+        margin: 24px auto 0px;
+        z-index: 2;
+        position: relative;
+        max-width: 800px;
+        padding: 0 24px;
 
-        @include tablet(){
-          width: 100%;
-          margin: 24px auto 0;
-          padding: 0px;
+        @include mobile(){
+          margin-top: 16px;
           font-size: 18px;
           line-height: 23px;
+          padding: 0px;
+          color: $deep_navy;
+          max-width: initial;
+          padding: 0;
         }
       }
     }
 
-    button.get-started-button {
-      width: 440px;
-      padding: 6px 12px;
+    button.continue-with-slack-bt {
+      width: 320px;
+      height: 64px;
+      background-image: cdnUrl("/img/ML/continue_with_slack.svg");
+      background-size: 241px 24px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: $carrot_orange;
+      margin: 32px auto 0;
+      border-radius: 8px;
 
       @include mobile() {
-        width: 100%;
-      }
-
-      span.slack-white-icon {
-        width: 24px;
-        height: 24px;
-        @include image-2x("/img/ML/slack_white_icon");
-        background-repeat: no-repeat;
-        background-size: 24px 24px;
-        margin-right: 8px;
-        position: relative;
+        margin: 40px auto 0;        
       }
     }
 
