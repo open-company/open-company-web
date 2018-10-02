@@ -1128,7 +1128,9 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js]
+          ziggeo-js
+          ;; Headway (What's New)
+          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -1242,6 +1244,8 @@
           bootstrap-js
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
+          ;; Headway (What's New)
+          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Compiled oc.min.js from our CDN
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
