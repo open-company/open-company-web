@@ -394,7 +394,7 @@
           {:href "/?no_redirect=1"}]
 
         [:h1.pricing-headline
-          "Pricing"]
+          "Keep everyone aligned around what matters most"]
 
         [:div.pricing-three-columns.group
           ;; Free
