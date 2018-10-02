@@ -354,7 +354,7 @@
 
         [:h1.headline
           "Communicate"
-          [:br]
+          [:br.big-web-only]
           "what matters."]
         [:div.subheadline
           (str
