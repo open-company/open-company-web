@@ -17,8 +17,7 @@ div.about-wrap {
       }
 
       h1.about {
-        font-family: "PT Serif";
-        font-weight: 700;
+        @include PTSerif()
         font-size: 80px;
         line-height: 90px;
         color: $deep_navy;
@@ -124,8 +123,7 @@ div.about-wrap {
             }
 
             div.user-name {
-              font-family: "PT Serif";
-              font-weight: 700;
+              @include PTSerif()
               font-size: 20px;
               color: $deep_navy;
               margin-top: 24px;
@@ -219,8 +217,7 @@ div.about-wrap {
           }
 
           h3.about-copy-header {
-            font-family: "PT Serif";
-            font-weight: 700;
+            @include PTSerif()
             color: $deep_navy;
             font-size: 80px;
             line-height: 78px;
@@ -291,8 +288,7 @@ div.about-wrap {
             div.about-bottom-copy-left {
               float: left;
               width: 45%;
-              font-family: "PT Serif";
-              font-weight: 700;
+              @include PTSerif()
               font-size: 30px;
               line-height: 40px;
               color: $deep_navy;

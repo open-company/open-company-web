@@ -207,8 +207,7 @@ section.testimonials-section {
   }
 
   div.testimonials-section-title {
-    font-family: "PT Serif", serif;
-    font-weight: 700;
+    @include PTSerif()
     color: $deep_navy;
     font-size: 40px;
     line-height: 38px;
@@ -358,8 +357,7 @@ section.testimonials-section {
         }
 
         div.testimonial-name {
-          font-family: "PT Serif", serif;
-          font-weight: 700;
+          @include PTSerif()
           font-size: 16px;
           color: $deep_navy;
           line-height: 20px;
@@ -417,8 +415,7 @@ section.keep-aligned {
   }
 
   div.keep-aligned-title {
-    font-family: "PT Serif", serif;
-    font-weight: 700;
+    @include PTSerif()
     font-size: 60px;
     line-height: 70px;
     color: $deep_navy;
@@ -780,8 +777,7 @@ section.home-keep-aligned {
         }
 
         div.keep-aligned-section-copy-title {
-          font-family: "PT Serif", serif;
-          font-weight: 700;
+          @include PTSerif()
           font-size: 80px;
           color: $deep_navy;
           line-height: 78px;

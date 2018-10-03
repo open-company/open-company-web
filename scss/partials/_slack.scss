@@ -84,8 +84,7 @@ div.slack-wrap {
       }
 
       h1.slack-headline {
-        font-family: "PT Serif";
-        font-weight: 700;
+        @include PTSerif()
         font-size: 80px;
         line-height: 90px;
         color: $deep_navy;

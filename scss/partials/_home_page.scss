@@ -54,8 +54,7 @@ div.home-wrap {
 
       h1.headline {
         font-size: 80px;
-        font-family: "PT Serif", serif;
-        font-weight: 700;
+        @include PTSerif()
         color: $deep_navy;
         margin: 0 auto;
         z-index: 2;
