@@ -140,7 +140,8 @@
               [:span.start-copy
                 "Start Free"])]]
         [:div.site-navbar-right.mobile-only
-          (if use-slack-signup-button
+          (if (or is-slack-lander?
+                  is-slack?)
             (if is-slack-lander?
               [:a.start
                 {:href "/sign-up"
@@ -148,7 +149,8 @@
                               (.preventDefault %)
                               (if logged-in
                                 (nav! your-digest %)
-                                (if use-slack-signup-button
+                                (if (or is-slack-lander?
+                                        is-slack?)
                                   (user-actions/login-with-slack slack-auth-link)
                                   (nav! oc-urls/sign-up %))))}
                 [:span.slack-orange-icon]
