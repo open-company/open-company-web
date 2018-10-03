@@ -197,7 +197,7 @@ div.about-wrap {
           width: 86vw;
           z-index: 2;
 
-          @include tablet() {
+          @media screen and (max-width: 1200px) {
             width: 100vw;
             border-top-right-radius: 100px;
           }
