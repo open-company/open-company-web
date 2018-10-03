@@ -170,7 +170,7 @@
                      "call home.")]
                   [:a
                     {:href "#hello"
-                     :target "_blank"}
+                     :name "hello"}
                     "Say hello"]]]
               [:div.about-bottom-copy-row.group
                 [:div.about-bottom-copy-left

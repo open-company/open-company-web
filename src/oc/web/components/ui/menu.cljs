@@ -74,7 +74,8 @@
         is-mobile? (responsive/is-mobile-size?)
         headway-config (clj->js {
           :selector ".whats-new"
-          :account "xGYD6J"})]
+          :account "xGYD6J"
+          :translations {:title "What's New"}})]
     (.init js/Headway headway-config)
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
