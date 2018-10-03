@@ -218,15 +218,30 @@ div.about-wrap {
             width: 100%;
           }
 
-          div.about-copy-title {
+          h3.about-copy-header {
             font-family: "PT Serif";
             font-weight: 700;
-            font-size: 40px;
             color: $deep_navy;
+            font-size: 80px;
+            line-height: 78px;
+          }
+
+          div.about-copy-title {
+            @include avenir_H();
+            font-size: 30px;
+            color: $ui_grey;
+            text-align: left;
+            margin: 40px 0 0;
+            padding: 0;
 
             @include tablet() {
-              font-size: 36px;
-              line-height: 40px;
+              font-size: 20px;
+              line-height: 26px;
+              margin: 32px 0 0;
+            }
+
+            @include mobile() {
+              margin: 24px 0 0;
             }
           }
 
@@ -241,7 +256,11 @@ div.about-wrap {
             @include tablet() {
               font-size: 20px;
               line-height: 26px;
-              margin: 37px 0 0;
+              margin: 32px 0 0;
+            }
+
+            @include mobile() {
+              margin: 24px 0 0;
             }
 
             span.oblique {
@@ -250,10 +269,6 @@ div.about-wrap {
 
             span.heavy {
               @include avenir_H();
-            }
-
-            @include tablet() {
-              font-size: 20px;
             }
           }
         }

@@ -99,59 +99,76 @@
    and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-  [:nav.site-navbar
-    [:div.site-navbar-container
-      [:a.navbar-brand-left
-        {:href "/?no_redirect=1"}]
-      [:div.navbar-brand-center
-        [:a
-          {:href "/"
-           :class (when (= active-page "index") "active")}
-          "Home"]
-        [:a
-          {:href "/about"
-           :class (when (= active-page "about") "active")}
-          "About"]
-        [:a
-          {:href "/pricing"
-           :class (when (= active-page "pricing") "active")}
-          "Pricing"]
-        [:a
-          {:href "https://blog.carrot.io"
-           :target "_blank"}
-          "Blog"]]
-      [:div.site-navbar-right.big-web-only
-        [:a.login
-          {:id "site-header-login-item"
-           :href "/login"}
-            "Login"]
-        [:a.start
-          {:id "site-header-signup-item"
-           :data-page active-page
-           :href (if (= active-page "slack")
-                    (env :slack-signup-url)
-                    "/sign-up")
-           :class (when (= active-page "slack")
-                    "slack-get-started")}
-          (when (= active-page "slack")
-            [:span.slack-orange-icon])
-          [:span.start-copy
-            (if (= active-page "slack")
-              "Add to Slack"
-              "Get Started")]]]
-      [:div.site-navbar-right.mobile-only
-        [:a.start
-          {:id "site-header-mobile-signup-item"
-           :class (when (= active-page "slack") "slack")
-           :href (if (= active-page "slack")
-                   (env :slack-signup-url)
-                   "/sign-up")}
-            [:span.copy
-              (if (= active-page "slack")
-                "ADD"
-                "START")]]]
-      [:div.mobile-ham-menu
-        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
+  (let [is-slack-lander? (= active-page "slack-lander")
+        site-navbar-container (if is-slack-lander?
+                               :div.site-navbar-container.is-slack-header
+                               :div.site-navbar-container)
+        use-slack-url? (or is-slack-lander?
+                           (= active-page "slack"))]
+    [:nav.site-navbar
+      [site-navbar-container
+        [:a.navbar-brand-left
+          {:href "/?no_redirect=1"}]
+        [:div.navbar-brand-center
+          [:a
+            {:href "/"
+             :class (when (= active-page "index") "active")}
+            "Home"]
+          [:a
+            {:href "/about"
+             :class (when (= active-page "about") "active")}
+            "About"]
+          [:a
+            {:href "/pricing"
+             :class (when (= active-page "pricing") "active")}
+            "Pricing"]
+          [:a
+            {:href "https://blog.carrot.io"
+             :target "_blank"}
+            "Blog"]]
+        [:div.site-navbar-right.big-web-only
+          [:a.login
+            {:id "site-header-login-item"
+             :href "/login"}
+              "Login"]
+          [:a.start
+            {:id "site-header-signup-item"
+             :href (if use-slack-url?
+                      (env :slack-signup-url)
+                      "/sign-up")
+             :class (when use-slack-url?
+                      "slack-get-started")}
+            (when use-slack-url?
+              [:span.slack-orange-icon])
+            [:span.start-copy
+              (if is-slack-lander?
+                "Continue with Slack"
+                (if (= active-page "slack")
+                  "Add to Slack"
+                  "Get Started"))]]]
+        [:div.site-navbar-right.tablet-only
+          [:a.login
+            {:id "site-header-tabket-login-item"
+             :href "/login"}
+              "Login"]
+          [:a.start
+            {:id "site-header-tablet-signup-item"
+             :href (if use-slack-url?
+                      (env :slack-signup-url)
+                      "/sign-up")}
+            [:span.start-copy
+              "Start Free"]]]
+        [:div.site-navbar-right.mobile-only
+          [:a.start
+            {:id "site-header-mobile-signup-item"
+             :class (when (= active-page "slack") "slack")
+             :href (if (= active-page "slack")
+                     (env :slack-signup-url)
+                     "/sign-up")}
+              [:span.copy
+                "START"]]]
+        [:div.mobile-ham-menu
+          {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]]))
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
@@ -191,10 +208,10 @@
               (str
                "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
-            "Support"]
+            "#help-bot"]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
           ; [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
+          [:div.column-item [:a {:href "#hello"} "Contact"]]]
 
         [:div.column.column-integrations
           [:div.column-title
@@ -239,6 +256,7 @@
                   :index   (pages/index options)
                   :about   (pages/about options)
                   :slack   (pages/slack options)
+                  :slack-lander   (pages/slack-lander options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)

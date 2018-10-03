@@ -77,6 +77,22 @@ div.home-wrap {
         position: relative;
         max-width: 800px;
 
+        &.for-others {
+          @include mobile() {
+            display: none;
+          }
+        }
+
+        &.for-mobile {
+          @include big-web() {
+            display: none;
+          }
+
+          @include tablet() {
+            display: none;
+          }
+        }
+
         @include mobile(){
           margin-top: 16px;
           font-size: 18px;

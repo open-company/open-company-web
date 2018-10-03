@@ -237,7 +237,7 @@
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Provide clarity."]
+              "Lead with clarity."]
             [:div.keep-aligned-section-copy-subtitle
               (str
                "Key information stays organized and visible so your team can get caught "
@@ -263,7 +263,7 @@
               [:br][:br]
               (str
                "Your team can join the discussion from Slack "
-               "-- Carrot keeps it all in sync.")]]
+               "— Carrot keeps it all in sync.")]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2
               {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
@@ -351,11 +351,13 @@
           "Communicate "
           [:br.big-web-only]
           "what matters."]
-        [:div.subheadline
+        [:div.subheadline.for-others
           (str
-           "Leaders struggle to communicate a clear direction that keeps everyone "
-           "aligned because chat and email are noisy and overwhelming. Carrot rises "
-           "above the noise to keep distributed teams up to date and focused.")]
+           "Leaders struggle to communicate clearly because chat and email are "
+           "noisy and overwhelming. Carrot helps leaders rise above the noise "
+           "to keep distributed teams up to date and aligned.")]
+        [:div.subheadline.for-mobile
+          "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container.group
           show-animation-button
@@ -397,7 +399,7 @@
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Keep everyone aligned around what matters most"]
+          "Keep everyone aligned around what matters"]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -503,7 +505,7 @@
             [:div.tear-subtitle
               "A team of more than 100? Let's create a custom plan."]
             [:a.tear-start-bt
-              {:href "mailto:hello@carrot.io"}
+              {:href "#pricing"}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -548,7 +550,7 @@
               [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
               [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
               [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
-              [:li [:span.heavy "Viewership: Make sure"] " you’re being heard, and know who’s seen your post."]]]]
+              [:li [:span.heavy "Who Saw That:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -592,7 +594,7 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "mailto:hello@carrot.io"
+              {:href "#pricing"
                :target "_blank"}
               "Contact us"]
             " to see if your organization is eligible."]]
@@ -602,9 +604,9 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "mailto:hello@carrot.io"
+              {:href "#pricing"
                :target "_blank"}
-              "Chat with us about carrot"]]]]
+              "Get in touch with us"]]]]
 
       testimonials-section
     ]])
@@ -624,7 +626,7 @@
           {:href "/?no_redirect=1"}]
 
         [:h1.slack-headline
-          "Clarity for Slack teams"]
+          "Rise above the noise"]
 
         [:div.slack-subline
           (str
@@ -656,6 +658,33 @@
 
       keep-aligned-bottom
       ]])
+
+(defn slack-lander
+  "Slack lander page. This is a copy of oc.web.components.slack-lander and
+   every change here should be reflected there and vice versa."
+  [options]
+  [:div.slack-lander-wrap
+    {:id "wrap"}
+    [:div.main.slack-lander
+      ; Hope page header
+      [:section.cta.group
+        
+        [:a.carrot-logo
+          {:href "/?no_redirect=1"}]
+
+        [:h1.headline
+          "Join your team on Carrot"]
+
+        [:div.subheadline
+          "Carrot makes it simple for Slack teams to stay aligned around what matters most."]
+        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+        [:a.continue-with-slack-bt
+          {:href (env :slack-signup-url)}]
+
+        [:div.main-animation-container
+          [:img.main-animation
+            {:src (cdn "/img/ML/slack_screenshot.png")
+             :src-set (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]]])
 
 (defn about
   "About page. This is a copy of oc.web.components.about and
@@ -765,19 +794,21 @@
 
         [:div.about-copy
           [:div.about-copy-inner
+            [:h3.about-copy-header
+              "Why we built Carrot"]
             [:div.about-copy-title
               (str
-               "In the age of Slack, moving teams from chaos to clarity "
-               "is one of the most vital functions of leadership")]
+               "In the age of Slack, the lack of clear leadership "
+               "is the single, greatest problem in the workplace.")]
             [:p
               (str
-               "Sure, teams are more connected than ever with chat apps like "
-               "Slack - and yet, it’s become even more difficult for those same "
-               "teams to stay aligned around what matters most. ")
+               "Sure, teams are more connected than ever with chat apps like Slack - and yet, "
+               "it’s become even more difficult for those same teams to stay focused and aligned "
+               "around what matters most. ")
               [:span.oblique "How can that be?"]]
             [:p
-              "This is the question that led us to build Carrot. What we found is that "
-              [:span.heavy "leadership is getting lost in the noise."]]
+              "This is the question that led us to build Carrot. What we "
+              "found is that leadership is getting lost in the noise."]
             [:p
               (str
                "Sharing key information everyone needs alongside random chats just increases "
@@ -805,7 +836,7 @@
                    "amazing people regardless of where they "
                    "call home.")]
                 [:a
-                  {:href "mailto:hello@carrot.io"
+                  {:href "#hello"
                    :target "_blank"}
                   "Say hello"]]]
             [:div.about-bottom-copy-row.group

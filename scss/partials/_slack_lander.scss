@@ -90,7 +90,8 @@ div.slack-lander-wrap {
       }
     }
 
-    button.continue-with-slack-bt {
+    a.continue-with-slack-bt {
+      display: block;
       width: 320px;
       height: 64px;
       background-image: cdnUrl("/img/ML/continue_with_slack.svg");

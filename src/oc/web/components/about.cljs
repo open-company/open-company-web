@@ -127,24 +127,26 @@
 
           [:div.about-copy
             [:div.about-copy-inner
+              [:h3.about-copy-header
+                "Why we built Carrot"]
               [:div.about-copy-title
                 (str
-                 "In the age of Slack, moving teams from chaos to clarity "
-                 "is one of the most vital functions of leadership")]
+                 "In the age of Slack, the lack of clear leadership "
+                 "is the single, greatest problem in the workplace.")]
               [:p
                 (str
-                 "Sure, teams are more connected than ever with chat apps like "
-                 "Slack - and yet, it’s become even more difficult for those same "
-                 "teams to stay aligned around what matters most. ")
+                 "Sure, teams are more connected than ever with chat apps like Slack - and yet, "
+                 "it’s become even more difficult for those same teams to stay focused and aligned "
+                 "around what matters most. ")
                 [:span.oblique "How can that be?"]]
               [:p
-                "This is the question that led us to build Carrot. What we found is that "
-                [:span.heavy "leadership is getting lost in the noise."]]
+                "This is the question that led us to build Carrot. What we "
+                "found is that leadership is getting lost in the noise."]
               [:p
                 (str
                  "Sharing key information everyone needs alongside random chats just increases "
-                 "the likelihood it will scroll by without being noticed. It’s difficult for the "
-                 "team to know what matters, and leaders have no idea if anyone even heard what they said.")]
+                 "the likelihood it will scroll by without being noticed. "
+                 "And leaders have no idea if anyone even heard what they said.")]
               [:p
                 (str
                  "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
@@ -167,7 +169,7 @@
                      "amazing people regardless of where they "
                      "call home.")]
                   [:a
-                    {:href "mailto:hello@carrot.io"
+                    {:href "#hello"
                      :target "_blank"}
                     "Say hello"]]]
               [:div.about-bottom-copy-row.group

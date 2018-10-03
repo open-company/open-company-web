@@ -23,7 +23,7 @@
     [:div
       [:div.slack-wrap
         {:id "wrap"}
-        (site-header auth-settings true)
+        (site-header auth-settings)
         (site-mobile-menu)
         (login-overlays-handler)
 
@@ -36,7 +36,7 @@
               {:href "/?no_redirect=1"}]
 
             [:h1.slack-headline
-              "Clarity for Slack teams"]
+              "Rise above the noise"]
 
             [:div.slack-subline
               (str

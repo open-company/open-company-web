@@ -92,21 +92,32 @@ nav.site-navbar {
         margin: 2px auto 0px;
       }
 
+      &.is-slack-header {
+        div.navbar-brand-center {
+          display: none;
+        }
+
+        div.site-navbar-right {
+          margin-top: -4px;
+        }
+
+      }
+
       div.site-navbar-right {
         height: 40px;
         margin-top: -34px;
 
-        &.is-slack-header {
-          margin-top: 0px;
+        @include tablet() {
+          margin-top: -6px;
         }
 
-        @include tablet() {
+        @include mobile() {
           margin-top: 0;
-          height: 24px;
+          height: 30px;
 
           a.your-digest {
             margin-top: 0;
-            height: 32px;
+            height: 30px;
           }
         }
 
@@ -114,7 +125,7 @@ nav.site-navbar {
           height: 40px;
           padding: 10px 24px;
 
-          @include tablet() {
+          @include mobile() {
             height: 30px;
             padding: 5px 12px;
           }
@@ -122,13 +133,13 @@ nav.site-navbar {
 
         a.start {
           border-radius: 8px;
-          background-color: $coral;
-          color: $carrot_orange;
+          background-color: $carrot_orange;
+          color: white;
           height: 40px;
           padding: 10px 24px;
 
-          @include tablet() {
-            height: 24px;
+          @include mobile() {
+            height: 30px;
             padding: 2px 12px;
           }
 
@@ -142,10 +153,15 @@ nav.site-navbar {
           }
 
           &:not(.your-digest).slack-get-started {
+            height: 40px;
+            padding: 4px 24px;
             background-color: $carrot_orange;
             color: white;
-            height: 32px;
-            padding: 4px 24px;
+
+            @include mobile() {
+              height: 30px;
+              padding: 2px 12px;
+            }
           }
         }
       }
@@ -204,17 +220,36 @@ nav.site-navbar {
       float: left;
     }
 
+    &.is-slack-header {
+      a.navbar-brand-left {
+        @include tablet() {
+          float: left;
+          position: relative;
+          left: unset;
+          margin: 2px 0px 0px;
+        }
+      }
+
+      div.navbar-brand-center {
+        display: none;
+      }
+
+      div.site-navbar-right {
+        margin-top: 0;
+      } 
+    }
+
     div.site-navbar-right {
       float: right;
       margin-top: -34px;
       height: 40px;
 
-      &.is-slack-header {
-        margin-top: 0px;
+      @include tablet() {
+        margin-top: -6px;
       }
 
-      @include tablet() {
-        height: 28px;
+      @include mobile() {
+        height: 30px;
         margin-top: 0;
       }
 
@@ -235,6 +270,10 @@ nav.site-navbar {
         border-radius: 8px;
         opacity: 0.8;
         float: left;
+
+        @include mobile() {
+          height: 30px;
+        }
 
         &:hover {
           text-decoration: none;
@@ -273,8 +312,8 @@ nav.site-navbar {
           text-decoration: none;
         }
 
-        @include tablet() {
-          height: 28px;
+        @include mobile() {
+          height: 30px;
           width: auto;
           text-align: center;
           padding: 4px 12px;
@@ -364,13 +403,6 @@ nav.site-navbar {
         width: 99px;
         height: 24px;
         background-size: 99px 24px;
-
-        &.is-slack-header {
-          float: left;
-          position: relative;
-          left: unset;
-          margin: 2px 0px 0px;
-        }
       }
 
       @media screen and (max-width: 320px) {

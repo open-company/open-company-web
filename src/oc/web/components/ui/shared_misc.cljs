@@ -139,7 +139,7 @@
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Provide clarity."]
+              "Lead with clarity."]
             [:div.keep-aligned-section-copy-subtitle
               (str
                "Key information stays organized and visible so your team can get caught "
@@ -165,7 +165,7 @@
               [:br][:br]
               (str
                "Your team can join the discussion from Slack "
-               "-- Carrot keeps it all in sync.")]]
+               "— Carrot keeps it all in sync.")]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2
               {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")

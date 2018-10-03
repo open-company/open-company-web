@@ -45,11 +45,13 @@
             "Communicate "
             [:br.big-web-only]
             "what matters."]
-          [:div.subheadline
+          [:div.subheadline.for-others
             (str
-             "Leaders struggle to communicate a clear direction that keeps everyone "
-             "aligned because chat and email are noisy and overwhelming. Carrot rises "
-             "above the noise to keep distributed teams up to date and focused.")]
+             "Leaders struggle to communicate clearly because chat and email are "
+             "noisy and overwhelming. Carrot helps leaders rise above the noise "
+             "to keep distributed teams up to date and aligned.")]
+          [:div.subheadline.for-mobile
+            "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container.group
             shared-misc/show-animation-button

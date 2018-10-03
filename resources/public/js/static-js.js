@@ -140,10 +140,19 @@ document.addEventListener("DOMContentLoaded", function(_) {
     signupButton.attr("href", your_board_url);
     signupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
 
+    var tabletSignupButton = $("#site-header-tablet-signup-item");
+    tabletSignupButton.removeClass("start");
+    tabletSignupButton.attr("href", your_board_url);
+    tabletSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
+
+    var tabletLoginButton = $("#site-header-tablet-login-item");
+    tabletLoginButton.css({"display": "none"});
+
     var mobileSignupButton = $("#site-header-mobile-signup-item");
     mobileSignupButton.removeClass("start");
     mobileSignupButton.attr("href", your_board_url);
     mobileSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
+
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
     // Set the action of the site mobile menu's Get started button
