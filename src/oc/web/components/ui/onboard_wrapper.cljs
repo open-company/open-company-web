@@ -181,8 +181,8 @@
                                    :will-update (fn [s]
                                     (when (and @(::saving s)
                                                (:updated-jwt (:user-data @(drv/get-ref s :edit-user-profile))))
-                                      (if (:error @(drv/get-ref s :edit-user-profile))
-                                        (reset! (::saving s) false)
+                                      (reset! (::saving s) false)
+                                      (when-not (:error @(drv/get-ref s :edit-user-profile))
                                         (org-actions/create-or-update-org @(drv/get-ref s :org-editing))))
                                    s)}
   [s]
