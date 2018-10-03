@@ -442,7 +442,7 @@
              :aria-label "Start using Carrot"}
            "Start"]]
         [:div.title
-          "Topics that matter"]
+          "Start with a few sections"]
         [:div.subtitle
           "What types of communication are shared with your team?"]
         [:div.steps.third-step
