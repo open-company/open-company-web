@@ -334,7 +334,7 @@ nav.site-navbar {
         span.slack-orange-icon {
           width: 16px;
           height: 16px;
-          @include image-2x("/img/ML/slack_orange_icon_1");
+          background-image: cdnUrl("/img/ML/slack_orange_icon_1.svg");
           background-repeat: no-repeat;
           background-size: 16px 16px;
           margin-right: 6px;
