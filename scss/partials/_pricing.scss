@@ -52,13 +52,22 @@ div.pricing-wrap {
       }
 
       div.pricing-subheadline {
-        @include avenir_R();
+        color: $ui_grey;
         font-size: 30px;
         line-height: 38px;
-        color: $deep_navy;
+        @include avenir_R();
+        margin: 24px auto 0px;
+        z-index: 2;
+        position: relative;
+        max-width: 800px;
 
-        @include mobile() {
-          margin: 24px auto 0;
+        @include mobile(){
+          margin-top: 16px;
+          font-size: 18px;
+          line-height: 23px;
+          padding: 0px;
+          color: $deep_navy;
+          max-width: initial;
         }
       }
 
