@@ -246,6 +246,7 @@ div.onboard-lander {
       font-size: 32px;
       line-height: 42px;
       margin-top: 64px;
+      color: $deep_navy;
 
       @include mobile() {
         margin-top: 0px;
