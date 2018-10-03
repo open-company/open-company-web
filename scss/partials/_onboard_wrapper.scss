@@ -46,15 +46,15 @@ div.onboard-wrapper-container {
       }
 
       div.onboard-wrapper-left-inner {
-        display: table-cell;
-        vertical-align: middle;
-        text-align: center;
+        // display: table-cell;
+        // vertical-align: middle;
+        // text-align: center;
 
         div.onboard-wrapper-box {
           margin-left: auto;
           margin-right: auto;
           width: 400px;
-          margin-top: 0px;
+          margin-top: 180px;
           width: 294px;
           height: 301px;
           @include image-2x("/img/ML/carrot_box");
