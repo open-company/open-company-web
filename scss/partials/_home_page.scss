@@ -15,6 +15,17 @@ div.home-wrap {
       position: relative;
       overflow: hidden;
 
+      @include tablet() {
+        padding-top: 131px;
+        padding-bottom: 80px;
+      }
+
+      @include mobile() {
+        width: 100%;
+        overflow: visible;
+        padding: 131px 24px 80px;
+      }
+
       * {
         position: relative;
         z-index: 3;
@@ -39,12 +50,6 @@ div.home-wrap {
         @media screen and (max-width: 440px) {
           height: 25%;
         }
-      }
-
-      @include mobile() {
-        width: 100%;
-        overflow: visible;
-        padding: 131px 24px 80px;
       }
 
       h1.headline {

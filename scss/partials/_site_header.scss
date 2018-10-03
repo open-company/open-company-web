@@ -382,24 +382,30 @@ nav.site-navbar {
 
     a.navbar-brand-left {
       float: left;
-      margin: 6px 0px 0px;
-      width: 115px;
-      height: 28px;
+      margin: 0;
+      width: 164px;
+      height: 40px;
       background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
-      background-size: 115px 28px;
+      background-size: 164px 40px;
       background-repeat: no-repeat;
       padding: 0;
-      display: none;
 
       @include tablet() {
         display: block;
         position: absolute;
         float: unset;
         left: 50%;
-        margin: 2px 0px 0px -50px;
+        margin: 0 0 0 -65px;
+        width: 131px;
+        height: 32px;
+        background-size: 131px 32px;
+      }
+
+      @include mobile() {
         width: 99px;
         height: 24px;
         background-size: 99px 24px;
+        margin: 2px 0 0 -50px;
       }
 
       @media screen and (max-width: 320px) {

@@ -13,6 +13,11 @@ div.slack-lander-wrap {
       position: relative;
       overflow: hidden;
 
+      @include tablet() {
+        padding-top: 131px;
+        padding-bottom: 80px;
+      }
+
       @include mobile() {
         width: 100%;
         overflow: visible;

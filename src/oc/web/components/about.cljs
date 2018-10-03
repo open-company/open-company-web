@@ -27,8 +27,7 @@
 
       [:div.main.about
         [:section.about-header
-          [:a.carrot-logo
-            {:href "/?no_redirect=1"}]
+
           [:h1.about
             "Meet the team"]
 

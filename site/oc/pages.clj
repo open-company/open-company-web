@@ -342,9 +342,6 @@
       ; Hope page header
       [:section.cta.group
 
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
-
         [:h1.headline
           "Communicate "
           [:br.big-web-only]
@@ -389,9 +386,6 @@
     {:id "wrap"}
     [:div.main.pricing
       [:section.pricing-header
-
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
 
         [:h1.pricing-headline
           "Pricing"]
@@ -620,9 +614,6 @@
       [:section.carrot-plus-slack.group
         animation-lightbox
 
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
-
         [:h1.slack-headline
           "Rise above the noise"]
 
@@ -666,9 +657,6 @@
     [:div.main.slack-lander
       ; Hope page header
       [:section.cta.group
-        
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
 
         [:h1.headline
           "Join your team on Carrot"]
@@ -692,8 +680,7 @@
     {:id "wrap"}
     [:div.main.about
       [:section.about-header
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
+
         [:h1.about
           "Meet the team"]
 

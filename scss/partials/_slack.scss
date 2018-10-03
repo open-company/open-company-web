@@ -53,6 +53,11 @@ div.slack-wrap {
       position: relative;
       overflow: hidden;
 
+      @include tablet() {
+        padding-top: 131px;
+        padding-bottom: 80px;
+      }
+
       &:after {
         background-color: #F8F7F3;
         content: "";

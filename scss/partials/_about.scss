@@ -7,7 +7,7 @@ div.about-wrap {
     width: 100%;
 
     section.about-header {
-      padding-top: 159px;
+      padding-top: 239px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -23,7 +23,7 @@ div.about-wrap {
         line-height: 90px;
         color: $deep_navy;
         margin: 0 auto;
-        padding: 80px 16px 0;
+        padding: 0 16px;
 
         @include tablet() {
           font-size: 36px;
