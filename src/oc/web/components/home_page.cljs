@@ -34,29 +34,30 @@
       {:id "wrap"}
       (login-overlays-handler)
       [:div.main.home-page
+        shared-misc/animation-lightbox
         ; Hope page header
         [:section.cta.group
-          [:div.balloon.big-blue]
-          [:div.balloon.small-green]
-          [:div.balloon.big-green]
-          [:div.balloon.small-purple-face]
-          [:div.balloon.big-yellow]
-          [:div.balloon.small-purple]
 
           [:h1.headline
-            "Where leadership finds its voice"]
-          [:div.subheadline
+            "Communicate "
+            [:br.big-web-only]
+            "what matters."]
+          [:div.subheadline.for-others
             (str
-             "Rise above the noise of chat and email to "
-             "keep your growing and distributed teams aligned.")]
+             "Leaders struggle to communicate clearly because chat and email are "
+             "noisy and overwhelming. Carrot helps leaders rise above the noise "
+             "to keep distributed teams up to date and aligned.")]
+          [:div.subheadline.for-mobile
+            "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
-          [:div.get-started-button-container
+          [:div.get-started-button-container.group
+            shared-misc/show-animation-button
             [:button.mlb-reset.get-started-button
               {:id "get-started-centred-bt"
                :on-click #(router/nav! oc-urls/sign-up)}
               "Get started for free"]]
           shared-misc/no-credit-card
-          ; (carrot-box-thanks "carrot-box-thanks-top")
+          (carrot-box-thanks "carrot-box-thanks-top")
           [:div.carrot-box-container.confirm-thanks.group
             {:style {:display "none"}}
             [:div.carrot-box-thanks
@@ -66,18 +67,12 @@
           [:div.main-animation-container
             [:img.main-animation
               {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-               :src-set (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
-
-          shared-misc/core-values-list]
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
 
         shared-misc/keep-aligned-section
 
-        shared-misc/access-anywhere-section
-
-        (shared-misc/slack-comparison-section)
-
         shared-misc/testimonials-section
 
-        shared-misc/keep-aligned]]
+        shared-misc/keep-aligned-bottom]]
 
     (site-footer)])

@@ -6,119 +6,75 @@ div.about-wrap {
   div.main.about {
     width: 100%;
 
-    @include mobile() {
-      padding: 0 32px;
-    }
-
-    section {
-      @include mobile_to_tablet(){
-        padding: 0 32px;
-      }
-    }
-
     section.about-header {
-      padding-top: 72px;
-      padding-bottom: 80px;
+      padding-top: 239px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
+      @include tablet() {
+        padding-top: 131px;
+      }
+
       h1.about {
-        @include avenir_H();
-        font-size: 48px;
-        line-height: 60px;
-        color: $carrot_dark_gray;
-        margin: 88px auto 0px;
-        padding: 0px 16px;
-      }
-
-      div.about-subline {
-        @include avenir_M();
-        font-size: 34px;
+        @include PTSerif()
+        font-size: 80px;
+        line-height: 90px;
         color: $deep_navy;
-        max-width: 700px;
-        margin: 6px auto 32px;
-
-        @include tablet(){
-          width: 100%;
-          margin: 16px auto 32px;
-          padding: 0;
-        }
-      }
-
-      div.about-copy {
-        width: 940px;
-        margin: 60px auto;
-        background-color: white;
-        box-shadow: 0px 4px 6px 0px rgba(black, 0.12);
-        border-radius: 8px;
-        padding: 80px 120px;
-        position: relative;
-        z-index: 1;
+        margin: 0 auto;
+        padding: 0 16px;
 
         @include tablet() {
-          margin: 80px auto;
-          width: 100%;
-          padding: 32px 40px;
+          font-size: 36px;
+          line-height: 40px;
+          padding: 0 24px;
+          max-width: 690px;
         }
 
-        p {
-          @include avenir_R();
-          font-size: 24px;
-          color: $deep_navy;
-          text-align: left;
-
-          @include tablet() {
-            font-size: 20px;
-          }
-
-          &:not(:last-child) {
-            margin-bottom: 32px;
-          }
+        @include mobile() {
+          max-width: 380px;
         }
       }
 
       div.team-container{
+        margin: 80px 0 160px;
 
         @include tablet() {
-          margin-top: 80px;
+          margin: 28px 0 60px;
+          padding: 0 24px;
         }
 
         div.team-row {
-          margin: 0px auto;
-          width: 940px;
+          margin: 0 auto;
+          width: 1210px;
 
-          @include tablet() {
-            width: 100%;
+          @media screen and (max-width: 1258px) {
+            width: 605px;
+
+            div.team-card:nth-child(4) {
+              margin: 20px 0 20px 0;
+            }
           }
 
-          &.two-cards {
-            width: 620px;
-
-            @include tablet() {
-              width: 100%;
-            }
+          @include mobile() {
+            width: 100%;
           }
 
           div.team-card {
             display: inline-block;
-            margin-left: 20px;
-            margin-top: 20px;
-            padding: 40px 50px;
-            background-color: white;
-            box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.07);
-            text-align: center;
-            width: 300px;
-            height: 252px;
+            text-align: left;
+            width: 176px;
             position: relative;
             z-index: 2;
-            border-radius: 8px;
+            margin: 20px 0 20px 30px;
 
-            @include tablet() {
+            @include mobile() {
               display: block;
               width: 100%;
-              margin-left: 0px;
-              margin-top: 20px;
+              margin-top: 32px;
+              padding-top: 24px;
+              border-top: 1px solid #E7E6E5;
+              margin-left: 0;
             }
 
             &:first-child {
@@ -150,138 +106,229 @@ div.about-wrap {
             }
 
             div.user-avatar {
-              background-size: 72px 72px;
-              width: 72px;
-              height: 72px;
+              background-size: 176px 176px;
+              width: 176px;
+              height: 176px;
               background-repeat: no-repeat;
               background-position: center;
               margin: 0px auto;
+
+              @include mobile() {
+                float: left;
+                width: 80px;
+                height: 80px;
+                background-size: 80px 80px;
+                margin-right: 24px;
+              }
             }
 
             div.user-name {
-              @include avenir_M();
+              @include PTSerif()
               font-size: 20px;
-              color: $carrot_dark_gray;
-              margin-top: 16px;
+              color: $deep_navy;
+              margin-top: 24px;
+
+              @include mobile() {
+                margin-top: 0;
+              }
             }
 
             div.user-position {
               @include avenir_R();
-              font-size: 16px;
-              color: rgba($carrot_light_gray_3, 0.8);
-              line-height: 27px;
+              font-size: 14px;
+              color: rgba($ui_grey, 0.6);
+              margin-top: 8px;
             }
 
-            a.linkedin-link {
-              display: block;
-              margin: 0px auto;
-              @include image-2x("/img/ML/about_linkedin_icon");
-              width: 20px;
-              height: 20px;
-              background-size: 20px 20px;
-              background-repeat: no-repeat;
-              background-position: center;
+            div.user-links {
               margin-top: 16px;
+              height: 20px;
+
+              @include mobile() {
+                margin-left: 104px;
+              }
+
+              a.twitter-link {
+                display: block;
+                float: left;
+                background-image: cdnUrl("/img/ML/about_twitter_icon.svg");
+                width: 20px;
+                height: 20px;
+                background-size: 20px 20px;
+                background-repeat: no-repeat;
+                background-position: center;
+              }
+
+              a.linkedin-link {
+                display: block;
+                float: left;
+                background-image: cdnUrl("/img/ML/about_linkedin_icon.svg");
+                width: 22px;
+                height: 20px;
+                background-size: 22px 20px;
+                background-repeat: no-repeat;
+                background-position: center;
+                margin-left: 16px;
+              }
             }
           }
         }
       }
 
-      div.other-cards.group {
-        width: 940px;
-        margin: 80px auto;
+      div.about-copy {
+        width: 100%;
+        margin: 0 auto;
+        border-radius: 8px;
+        padding: 160px 0;
+        position: relative;
+        z-index: 1;
+        text-align: left;
 
-        @include tablet() {
-          margin: 40px auto;
-          width: 100%;
-        }
-
-        div.other-card {
-          margin-left: 40px;
-          background-color: $oc_gray_8;
-          border-radius: 8px;
-          border: 1px solid #EAE9E4;
-          padding: 40px;
-          text-align: center;
-          width: 450px;
-          height: 296px;
-          display: inline-block;
-          position: relative;
+        &:before {
+          content: "";
+          background-color: #F8F7F3;
+          border-top-right-radius: 200px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 86vw;
           z-index: 2;
 
+          @media screen and (max-width: 1200px) {
+            width: 100vw;
+            border-top-right-radius: 100px;
+          }
+        }
+
+        @include tablet() {
+          width: 100%;
+          padding: 80px 24px;
+        }
+
+        div.about-copy-inner {
+          width: 795px;
+          margin: 0 auto;
+          position: relative;
+          z-index: 3;
+
           @include tablet() {
-            display: block;
-            margin-left: 0px;
-            height: auto;
             width: 100%;
-            margin-top: 20px;
           }
 
-          &:first-child {
-            margin-left: 0px;
+          h3.about-copy-header {
+            @include PTSerif()
+            color: $deep_navy;
+            font-size: 80px;
+            line-height: 78px;
           }
 
-          &.heart-card {
-            div.card-icon {
-              width: 40px;
-              height: 37px;
-              background-size: 40px 37px;
-              @include image-2x("/img/ML/about_heart_icon");
-            }
-          }
-
-          &.oss-card {
-            div.card-icon {
-              width: 40px;
-              height: 44px;
-              background-size: 40px 44px;
-              @include image-2x("/img/ML/about_oss_icon");
-            }
-
-            a.card-button {
-              @include tablet(){
-                @include tablet() {
-                  width: calc(100% + 32px);
-                  margin-left: -16px;
-                }
-              }
-            }
-          }
-
-          div.card-icon {
-            background-repeat: no-repeat;
-            background-position: center;
-            margin: 0px auto;
-          }
-
-          div.card-title {
-            @include avenir_M();
-            font-size: 20px;
-            color: $carrot_dark_gray;
-            margin-top: 16px;
-          }
-
-          div.card-content {
-            @include avenir_R();
-            font-size: 18px;
-            color: rgba($carrot_light_gray_3, 0.8);
-            margin-top: 16px;
-          }
-
-          a.card-button {
-            width: 240px;
-            height: 40px;
-            @include avenir_M();
-            font-size: 16px;
-            color: $carrot_green_2;
-            background-color: $carrot_green_3;
-            border-radius: 100px;
-            display: block;
-            padding: 10px 16px;
-            margin: 16px auto 0px;
+          div.about-copy-title {
+            @include avenir_H();
+            font-size: 30px;
+            color: $ui_grey;
+            text-align: left;
+            margin: 40px 0 0;
+            padding: 0;
 
             @include tablet() {
-              width: 100%;
+              font-size: 20px;
+              line-height: 26px;
+              margin: 32px 0 0;
+            }
+
+            @include mobile() {
+              margin: 24px 0 0;
+            }
+          }
+
+          p {
+            @include avenir_R();
+            font-size: 30px;
+            color: $ui_grey;
+            text-align: left;
+            margin: 40px 0 0;
+            padding: 0;
+
+            @include tablet() {
+              font-size: 20px;
+              line-height: 26px;
+              margin: 32px 0 0;
+            }
+
+            @include mobile() {
+              margin: 24px 0 0;
+            }
+
+            span.oblique {
+              @include avenir_O();
+            }
+
+            span.heavy {
+              @include avenir_H();
+            }
+          }
+        }
+
+        div.about-bottom-copy {
+          width: 795px;
+          margin: 80px auto 0;
+          position: relative;
+          z-index: 3;
+
+          @include tablet() {
+            margin: 40px auto 0;
+            width: 100%;
+          }
+
+          div.about-bottom-copy-row {
+            border-top: 1px solid #E7E6E5;
+            padding: 40px 0;
+
+            div.about-bottom-copy-left {
+              float: left;
+              width: 45%;
+              @include PTSerif()
+              font-size: 30px;
+              line-height: 40px;
+              color: $deep_navy;
+
+              @include tablet() {
+                float: unset;
+                width: 100%;
+                font-size: 20px;
+                line-height: 26px;
+              }
+            }
+
+            div.about-bottom-copy-right {
+              float: right;
+              width: 45%;
+
+              @include tablet() {
+                float: unset;
+                width: 100%;
+                margin-top: 8px;
+              }
+
+              div.about-bottom-copy-description {
+                @include avenir_R();
+                font-size: 20px;
+                line-height: 26px;
+                color: $ui_grey;
+                width: 100%;
+                display: block;
+                margin: 0 0 16px 0;
+              }
+
+              a {
+                margin-top: 16px;
+                color: $carrot_green;
+                text-transform: uppercase;
+                @include avenir_B();
+                font-size: 14px;
+                letter-spacing: 0.5;
+              }
             }
           }
         }

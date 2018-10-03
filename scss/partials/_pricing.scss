@@ -1,5 +1,11 @@
 /***** Pricing ******/
 
+@mixin pricing-tablet(){
+  @media screen and (max-width: 1072px) {
+    @content; 
+  }
+}
+
 div.pricing-wrap {
   background-color: $oc_gray_8;
 
@@ -14,533 +20,286 @@ div.pricing-wrap {
     }
 
     section {
-
-      &:nth-child(odd) {
-        background-color: #FFFDF9;
-      }
-
-      &:nth-child(even) {
-        background-color: #FAF8F4;
-      }
+      background-color: #FFFDF9;
     }
 
     section.pricing-header {
-      padding: 184px 0 120px;
+      padding: 239px 0 0;
       text-align: center;
       position: relative;
-      overflow: hidden;
 
-      @include mobile() {
+      @include tablet() {
         overflow: visible;
-        padding: 148px 0 80px;
-      }
-
-      div.balloon {
-        position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
-
-        @include mobile() {
-          display: none;
-        }
-
-        &.big-red {
-          @include image-2x("/img/ML/pricing_balloon_big_red");
-          background-size: 111px 103px;
-          width: 111px;
-          height: 103px;
-          top: 0px;
-          left: 50%;
-          margin-left: -600px;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/slack_balloon_big_green");
-          background-size: 172px 172px;
-          width: 172px;
-          height: 172px;
-          top: 6px;
-          right: -50px;
-        }
-
-        &.small-blue {
-          @include image-2x("/img/ML/pricing_balloon_small_blue");
-          background-size: 25px 25px;
-          width: 25px;
-          height: 25px;
-          top: 105px;
-          right: 159px;
-        }
-
-        &.big-purple {
-          @include image-2x("/img/ML/pricing_balloon_big_purple");
-          background-size: 256px 222px;
-          width: 256px;
-          height: 222px;
-          top: 225px;
-          // transform: rotate(160deg);
-          left: 50%;
-          margin-left: -558px;
-        }
-
-        &.small-blue-1 {
-          @include image-2x("/img/ML/balloon_small_blue_1");
-          background-size: 50px 44px;
-          width: 50px;
-          height: 44px;
-          top: 1540px;
-          left: 50%;
-          margin-left: -356px;
-          z-index: 2;
-        }
+        padding: 131px 0 0;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
       }
 
       h1.pricing-headline {
-        font-size: 48px;
-        @include avenir_H();
+        font-size: 80px;
+        @include PTSerif()
         color: $deep_navy;
         min-width: 300px;
         margin: 0 auto;
 
         @include mobile() {
           margin: 0 auto;
+          font-size: 36px;
+          max-width: initial;
+          padding: 0 24px;
         }
       }
 
-      table.pricing-table {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        width: 1080px;
-        margin: 80px auto 0;
+      div.pricing-subheadline {
+        color: $ui_grey;
+        font-size: 30px;
+        line-height: 38px;
+        @include avenir_R();
+        margin: 24px auto 0px;
+        z-index: 2;
+        position: relative;
+        max-width: 800px;
 
-        @include mobile() {
-          width: 100%;
-          margin: 40px auto 0;
-        }
-
-        th {
-          padding: 40px;
-
-          @include mobile(){
-            padding: 32px;
-          }
-        }
-
-        th, td {
-          padding: 24px;
-          border-right: 1px solid #EFEEEB;
-
-          @include mobile(){
-            padding: 16px;
-          }
-
-          &:last-child {
-            border-right: none;
-          }
-        }
-
-        tr {
-          border-bottom: 1px solid #EFEEEB;
-
-          &:last-child {
-            border-right: none;
-          }
-        }
-
-        thead tr th {
-          text-align: center;
-
-          div.tire-title {
-            @include avenir_H();
-            font-size: 22px;
-            color: $deep_navy;
-          }
-
-          div.tire-price {
-            margin: 24px auto 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            @include avenir_H();
-            font-size: 30px;
-            color: $deep_navy;
-
-            @include mobile() {
-              margin: 16px auto;
-              display: block;
-              justify-content: unset;
-              align-items: unset;
-            }
-
-            span.dollar {
-              color: $ui_grey;
-              @include avenir_R();
-              font-size: 14px;
-              text-align: left;
-              line-height: 15px;
-              margin-right: 8px;
-              position: relative;
-              top: -10px;
-            }
-
-            span.per-month {
-              color: $ui_grey;
-              @include avenir_R();
-              font-size: 14px;
-              max-width: 48px;
-              text-align: left;
-              line-height: 15px;
-              margin-left: 8px;
-              margin-top: -5px;
-
-              @include mobile() {
-                max-width: unset;
-                text-align: center;
-                display: block;
-              }
-            }
-
-            div.mobile-per-month {
-
-            }
-          }
-
-          button.price-button {
-            background-color: $carrot_orange;
-            border-radius: 100px;
-            @include avenir_H();
-            font-size: 16px;
-            color: white;
-            margin: 24px auto 0;
-            width: 152px;
-            height: 40px;
-
-            @include mobile() {
-              margin: 16px auto;
-              width: 200px;
-            }
-          }
-        }
-
-        tbody {
-          tr {
-
-            &:nth-child(even) {
-              background-color: rgba(#E4E3DE, 0.2);
-            }
-
-            td {
-              &.pricing-description {
-                @include avenir_R();
-                font-size: 16px;
-                color: $deep_navy;
-                text-align: left;
-
-                span.strong {
-                  @include avenir_H();
-                }
-
-                span.info {
-                  // display: inline-block;
-                  // Hide for now
-                  display: none;
-                  width: 16px;
-                  height: 16px;
-                  margin-left: 8px;
-                  background-image: cdnUrl("/img/ML/pricing_more_info.svg");
-                  background-size: 16px 16px;
-                  background-repeat: no-repeat;
-                  background-position: center;
-                }
-              }
-
-              &.pricing-value {
-                @include avenir_H();
-                font-size: 16px;
-                color: $deep_navy;
-                text-align: center;
-
-                div.price-checkmark {
-                  width: 24px;
-                  height: 24px;
-                  background-size: 24px 24px;
-                  background-image: cdnUrl("/img/ML/green_checkmark.svg");
-                  background-repeat: no-repeat;
-                  background-position: center;
-                  margin: 0 auto;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      div.pricing-faq {
-        width: 940px;
-        margin: 120px auto 0;
-
-        @include mobile() {
-          width: 100%;
-          margin-top: 80px;
-        }
-
-        h2.faq-header {
-          @include avenir_M();
-          font-size: 34px;
+        @include mobile(){
+          margin-top: 16px;
+          font-size: 20px;
+          line-height: 26px;
+          padding: 0px;
           color: $deep_navy;
+          max-width: initial;
+        }
+      }
+
+      div.pricing-three-columns{
+        margin: 80px auto 0;
+        width: 1072px;
+        padding: 0 24px;
+
+        @include pricing-tablet() {
+          width: 100%;
+        }
+
+        @include mobile() {
+          padding: 0;
+        }
+
+        div.pricing-column {
+          width: 320px;
+          min-height: 943px;
+          background-color: #F8F7F3;
+          float: left;
+          margin-left: 32px;
+          padding: 40px 32px;
           text-align: center;
-          margin-bottom: 24px;
+
+          @include pricing-tablet() {
+            min-height: initial;
+            float: unset;
+            padding: 40px 32px;
+            margin: 32px auto 0;
+          }
 
           @include mobile() {
-            @include avenir_H();
-            font-size: 24px;
-            text-align: left;
-          }
-        }
-
-        div.faq-row {
-          margin-top: 16px;
-          border-radius: 8px;
-          background-color: $oc_gray_8;
-          border: 1px solid #EAE9E4;
-          padding: 24px;
-          cursor: pointer;
-
-          &.expanded {
-            div.faq-question:before {
-              position: absolute;
-              top: 10px;
-              left: 0px;
-              width: 10px;
-              height: 2px;
-              background-image: cdnUrl("/img/ML/pricing_faq_expanded.svg");
-              background-size: 10px 2px;
-            }
-
-            div.faq-response {
-              display: block;
-            }
+            width: 100%;
           }
 
-          div.faq-question {
-            position: relative;
-            padding-left: 32px;
-            @include avenir_H();
-            font-size: 16px;
+          h2.tear-title {
+            @include PTSerif()
+            font-size: 40px;
             color: $deep_navy;
-            text-align: left;
-            @include no-user-select();
+          }
 
-            &:before {
-              content: "";
-              position: absolute;
-              top: 6px;
-              left: 0px;
-              width: 10px;
-              height: 10px;
-              background-image: cdnUrl("/img/ML/pricing_faq_collapsed.svg");
-              background-size: 10px 10px;
+          h3.tear-price {
+            @include PTSerif()
+            font-size: 60px;
+            color: $deep_navy;
+            line-height: 90px;
+            margin-top: 16px;
+          }
+
+          h5.tear-period {
+            @include avenir_B();
+            font-size: 14px;
+            color: $ui_grey;
+            text-transform: uppercase;
+          }
+
+          div.tear-subtitle {
+            @include avenir_R();
+            font-size: 20px;
+            color: $deep_navy;
+            line-height: 26px;
+            margin: 32px auto 0;
+          }
+
+          a.tear-start-bt {
+            display: block;
+            margin: 32px auto 24px;
+            width: 200px;
+            height: 40px;
+            background-color: $carrot_orange;
+            border-radius: 8px;
+            color: white;
+            text-transform: uppercase;
+            @include avenir_B();
+            font-size: 14px;
+            padding: 10px 24px;
+          }
+
+          div.tear-feature-separator {
+            height: 1px;
+            width: 100%;
+            background-color: #E7E6E5;
+            margin-top: 16px;
+          }
+
+          div.tear-feature {
+            max-width: 220px;
+            @include avenir_R();
+            font-size: 20px;
+            color: $ui_grey;
+            text-align: center;
+            margin: 16px auto 0;
+            cursor: pointer;
+
+            &[data-toggle="tooltip"] {
+              span{
+                border-bottom: 1px dotted $deep_navy;
+              }
+            }
+
+            @include big_web() {
+              &[data-toggle="tooltip"] {
+                &:hover {
+                  color: $deep_navy;
+                }
+              }
+            }
+
+            @include pricing-tablet() {
+              max-width: initial;
+            }
+
+            span.heavy {
+              @include avenir_H();
+            }
+          }
+
+          &.free-column {
+            border-bottom-left-radius: 40px;
+            margin-left: 0;
+
+            @include pricing-tablet() {
+              margin: 32px auto 0;
+            }
+
+            div.tear-subtitle {
+              max-width: 182px;
+            }
+          }
+
+          &.team-column {
+            div.tear-subtitle {
+              max-width: 251px;
+            }
+          }
+
+          &.enterprise-column {
+            border-bottom-right-radius: 40px;
+
+            div.tear-price {
+              width: 101px;
+              height: 101px;
+              border-radius: 50%;
+              background-color: white;
+              background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
+              background-size: 30px 52px;
               background-position: center;
               background-repeat: no-repeat;
+              margin: 28px auto 0;
             }
-          }
 
-          div.faq-response {
-            display: none;
-            position: relative;
-            padding-left: 32px;
-            @include avenir_BOOK();
-            font-size: 18px;
-            color: $deep_navy;
-            margin-top: 16px;
-            text-align: left;
-          }
-        }
+            a.tear-start-bt {
+              background-color: transparent;
+              border: 1px solid $coral;
+              color: $carrot_orange;
+            }
 
-        div.contact-us-row {
-          @include avenir_M();
-          font-size: 16px;
-          color: $deep_navy;
-          max-width: 1080px;
-          text-align: center;
-          margin: 32px auto 0;
+            div.tear-subtitle {
+              max-width: 241px;
 
-          a.contact {
-            color: $carrot_green;
+              @include pricing-tablet() {
+                max-width: initial;
+              }
+            }
           }
         }
       }
     }
 
-    section.second-section {
-      h1.compare-plans {
-        margin: 64px auto 32px;
-        text-align: center;
-        @include avenir_M();
-        font-size: 34px;
-        color: $deep_navy;
+    section.pricing-faq {
+      width: 795px;
+      margin: 160px auto 160px;
+      text-align: left;
+
+      @include tablet() {
+        width: 100%;
+        margin: 80px auto;
       }
 
-      div.pricing-table {
-        margin: 32px auto 120px;
-        padding: 0px;
-        width: 940px;
+      h2.faq-header {
+        @include PTSerif()
+        font-size: 80px;
+        color: $deep_navy;
+        margin-bottom: 80px;
 
         @include mobile() {
-          width: calc(100% + 64px);
-          margin-left: -32px;
-          overflow-x: auto;
+          font-size: 36px;
+          margin-bottom: 40px;
         }
+      }
 
-        div.check {
-          margin: 0px auto;
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/pricing_table_check.svg");
-          background-position: center;
-          background-size: 24px 24px;
-          background-repeat: no-repeat;
-        }
+      div.faq-row {
+        border-top: 1px solid #E7E6E5;
+        margin-top: 40px;
 
-        div.more-info {
-          @include avenir_R();
-          font-size: 16px;
+        div.faq-row-question {
+          @include PTSerif()
+          font-size: 20px;
           color: $deep_navy;
-          position: relative;
-
-          span.more-info-icon {
-            display: inline-block;
-            background-image: cdnUrl("/img/ML/pricing_more_info.svg");
-            background-size: 16px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 16px;
-            height: 16px;
-            margin-left: 8px;
-            margin-top: 2px;
-            //////////////
-            // Remove this to show the info icons
-            display: none;
-            //////////////
-          }
-
-          ////////////////
-          // Uncomment to show the info bubbles
-          // &:hover {
-          //   div.more-info-bubble {
-          //     display: block;
-          //   }
-          // }
-          ////////////////
-
-          div.more-info-bubble {
-            display: none;
-            width: 260px;
-            padding: 24px;
-            background-color: white;
-            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba($deep_tan, 0.7);
-            border-radius: 4px;
-            position: absolute;
-            top: 20px;
-            right: -100%;
-
-            div.more-info-title {
-              @include avenir_H();
-              font-size: 14px;
-              color: $deep_navy;
-            }
-
-            div.more-info-desc {
-              margin-top: 16px;
-              @include avenir_BOOK();
-              font-size: 14px;
-              color: $deep_navy;
-            }
-          }
+          line-height: 28px;
+          margin-top: 40px;
         }
 
-        table {
-          margin: 0px;
-          padding: 0px;
-          border: none;
-          width: 100%;
-          text-align: center;
-          border-top: 2px solid $deep_tan;
-          border-bottom: 2px solid $deep_tan;
-          
-          @include mobile() {
-            margin: 0px 32px;
-            width: 820px;
+        div.faq-row-answer {
+          @include avenir_R();
+          font-size: 20px;
+          color: $ui_grey;
+          margin-top: 8px;
+
+          span.heavy {
+            @include avenir_H();
           }
 
-          thead {
-            padding: 0px;
-            margin: 0px;
+          a.chat-with-us {
+            float: left;
+            color: $carrot_green;
+            @include avenir_B();
+            font-size: 18px;
+            line-height: 36px;
+            text-transform: uppercase;
+            letter-spacing: 0.5;
 
-            tr {
-              padding: 0px;
-              margin: 0px;
-              height: 75px;
-              border-bottom: 1px solid $deep_tan;
-
-              th {
-                padding: 0px;
-                margin: 0px;
-                width: 25%;
-                text-align: center;
-
-                &:not(:first-child):not(:last-child) {
-                  border-left: 1px solid $deep_tan;
-                  border-right: 1px solid $deep_tan;
-                }
-              }
+            &:hover {
+              text-decoration: underline;
             }
           }
 
-          tbody {
-            padding: 0px;
-            margin: 0px;
+          a {
+            color: $carrot_green;
 
-            tr {
-              padding: 0px;
-              margin: 0px;
-              height: 75px;
-
-              &:nth-child(odd) {
-                background-color: transparent;
-              }
-
-              &:nth-child(even) {
-                background-color: rgba($deep_tan, 0.2);
-              }
-
-              td {
-                padding: 0px;
-                margin: 0px;
-                width: 25%;
-                @include avenir_H();
-                font-size: 16px;
-                color: $deep_navy;
-                text-align: center;
-
-                & > div {
-                  padding: 0px 24px;
-                }
-
-                &:first-child {
-                  @include avenir_R();
-                  text-align: left;
-                }
-
-                &:not(:first-child):not(:last-child) {
-                  border-left: 1px solid $deep_tan;
-                  border-right: 1px solid $deep_tan;
-                }
-              }
+            &:hover {
+              text-decoration: underline;
             }
           }
         }
