@@ -182,7 +182,9 @@
 (defn create-or-update-org [org-data]
   (when (seq (:name org-data))
     (let [email-domain (:email-domain org-data)
-          fixed-email-domain (if (.startsWith email-domain "@") (subs email-domain 1) email-domain)
+          fixed-email-domain (if (and email-domain (.startsWith email-domain "@"))
+                               (subs email-domain 1)
+                               email-domain)
           existing-org (dis/org-data)]
       (if (seq (:slug existing-org))
         (api/patch-org org-data (partial org-update-cb fixed-email-domain))

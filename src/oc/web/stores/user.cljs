@@ -89,6 +89,10 @@
         (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))
         (dissoc :edit-user-profile-failed))))
 
+(defmethod dispatcher/action :user-profile-save/jwt-updated
+  [db [_]]
+  (assoc-in db [:edit-user-profile :updated-jwt] true))
+
 (defmethod dispatcher/action :user-profile-avatar-update/failed
   [db [_]]
   (assoc db :edit-user-profile-avatar (:avatar-url (:current-user-data db))))
@@ -198,6 +202,7 @@
   (-> db
       ;; Loading user data
       (assoc-in [:edit-user-profile :loading] true)
+      (assoc-in [:edit-user-profile :updated-jwt] false)
       ;; Force a refresh of entry-point and auth-settings
       (dissoc :latest-entry-point :latest-auth-settings)
       ;; Remove the new-slack-user flag to avoid redirecting to the profile again

@@ -45,8 +45,11 @@
     (update-jwt-cookie jbody)
     (dispatch-jwt)))
 
-(defn jwt-refresh []
-  (api/jwt-refresh update-jwt logout))
+(defn jwt-refresh
+  ([]
+    (api/jwt-refresh update-jwt logout))
+  ([success-cb]
+    (api/jwt-refresh #(do (update-jwt %) (success-cb)) logout)))
 
 ;;User walls
 (defn- check-user-walls
@@ -77,7 +80,7 @@
 
         :else
         (when-not has-orgs
-          (router/nav! oc-urls/sign-up-team))))))
+          (router/nav! oc-urls/sign-up-profile))))))
 
 ;; API Entry point
 (defn entry-point-get-finished
@@ -129,7 +132,7 @@
       (entry-point-get-finished success body
         (fn [orgs collection]
           (if (zero? (count orgs))
-            (router/nav! oc-urls/sign-up-team)
+            (router/nav! oc-urls/sign-up-profile)
             (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
 
 ;; Login
@@ -332,6 +335,7 @@
                      (assoc with-pswd :email new-email)
                      (assoc with-pswd :email (:email current-user-data)))
         user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
+    (dis/dispatch! [:user-profile-save])
     (api/patch-user-profile
      user-profile-link
      with-email
@@ -339,9 +343,9 @@
        (if (= status 422)
          (dis/dispatch! [:user-profile-update/failed])
          (when success
-           (utils/after 1000 jwt-refresh)
-           (dis/dispatch! [:user-data (json->cljs body)])))))
-    (dis/dispatch! [:user-profile-save])))
+           (utils/after 100
+            (fn [] (jwt-refresh #(dis/dispatch! [:user-profile-save/jwt-updated]))))
+           (dis/dispatch! [:user-data (json->cljs body)])))))))
 
 (defn user-avatar-save [avatar-url]
   (let [user-avatar-data {:avatar-url avatar-url}

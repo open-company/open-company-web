@@ -84,14 +84,13 @@
               {:aria-label "google"}]
             "Continue with Google "]]
         [:div.or-with-email
-          [:div.or-with-email-line]
           [:div.or-with-email-copy
             "Or, sign up with email"]]
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
           [:div.field-label.email-field
-            "Enter email"
+            "Work email"
             (cond
               (= (:error signup-with-email) 409)
               [:span.error "Email already exists"]
@@ -143,50 +142,64 @@
                             (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))
                           (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
-            "Continue"]]
+            "Sign up"]]
         [:div.footer-link
           "Already have an account?"
           [:a {:href oc-urls/login} "Login here"]]]]))
 
+(defn- profile-setup-team-data
+  ""
+  [s & [setup-email-domain]]
+  ;; Load the list of teams if it's not already
+  (team-actions/teams-get-if-needed)
+  (let [org-editing @(drv/get-ref s :org-editing)
+        teams-data @(drv/get-ref s :teams-data)]
+    (if (and (zero? (count (:name org-editing)))
+             (seq teams-data))
+      (let [first-team (select-keys
+                        (first teams-data)
+                        [:name])]
+        (dis/dispatch!
+         [:update
+          [:org-editing]
+          #(merge % first-team)])))))
+
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
                                   (drv/drv :current-user-data)
-                                  (drv/drv :orgs)
+                                  (drv/drv :teams-data)
+                                  (drv/drv :org-editing)
                                   (rum/local false ::saving)
-                                  (rum/local nil ::temp-user-avatar)
                                   {:will-mount (fn [s]
+                                    (dis/dispatch! [:input [:org-editing :name] ""])
                                     (user-actions/user-profile-reset)
-                                    (let [avatar-with-cdn (:avatar-url (:user-data @(drv/get-ref s :edit-user-profile)))]
-                                      (reset! (::temp-user-avatar s) avatar-with-cdn))
                                     s)
                                    :did-mount (fn [s]
+                                    (profile-setup-team-data s true)
                                     (delay-focus-field-with-ref s "first-name")
                                     s)
                                    :will-update (fn [s]
                                     (when (and @(::saving s)
-                                               (not (:loading (:user-data @(drv/get-ref s :edit-user-profile))))
-                                               (not (:error @(drv/get-ref s :edit-user-profile))))
-                                      (let [orgs @(drv/get-ref s :orgs)]
-                                        (if (pos? (count orgs))
-                                          (utils/after 100 #(router/nav! (oc-urls/org (:slug (first orgs)))))
-                                          (utils/after 100 #(router/nav! oc-urls/sign-up-team)))))
+                                               (:updated-jwt (:user-data @(drv/get-ref s :edit-user-profile))))
+                                      (if (:error @(drv/get-ref s :edit-user-profile))
+                                        (reset! (::saving s) false)
+                                        (org-actions/create-or-update-org @(drv/get-ref s :org-editing))))
                                    s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
         current-user-data (drv/react s :current-user-data)
+        teams-data (drv/react s :teams-data)
+        org-editing (drv/react s :org-editing)
         user-data (:user-data edit-user-profile)
-        temp-user-avatar @(::temp-user-avatar s)
-        fixed-user-data (if (empty? (:avatar-url user-data))
-                          (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)
-        orgs (drv/react s :orgs)
-        continue-disabled (or (and (empty? (:first-name user-data))
-                                   (empty? (:last-name user-data)))
-                              (empty? (:avatar-url user-data)))
+        continue-disabled (or @(::saving s)
+                              (and (empty? (:first-name user-data))
+                                        (empty? (:last-name user-data)))
+                              (<= (count (clean-org-name (:name org-editing))) 1))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
-                       (user-actions/user-profile-save current-user-data edit-user-profile))
-        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
+                       (user-actions/user-profile-save current-user-data edit-user-profile)
+                       (let [org-name (clean-org-name (:name org-editing))]
+                         (dis/dispatch! [:input [:org-editing :name] org-name])))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.mobile-header.mobile-only
@@ -198,7 +211,12 @@
             :aria-label "Continue"}
             "Continue"]]
         [:div.title.about-yourself
-          "Personal details"]]
+          "Tell us about you"]
+        [:div.steps.first-step
+          [:div.step]
+          [:div.step]
+          [:div.step]]
+        [:div.steps-separator]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -206,41 +224,43 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.group.fs-hide
-            {:on-click (fn []
-                        (when (not= (:avatar-url user-data) temp-user-avatar)
-                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! user-utils/user-avatar-filestack-config
-                          (fn [res]
-                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                          nil
-                          (fn [_])
-                          nil))}
-            (if is-jelly-head-avatar
-              [:div.empty-user-avatar-placeholder]
-              (user-avatar-image fixed-user-data))
-            [:div.add-picture-link
-              "+ Upload a profile photo"]
-            [:div.add-picture-link-subtitle
-              "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
           [:input.field.fs-hide
             {:type "text"
              :ref "first-name"
+             :placeholder "First name"
              :value (or (:first-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
           [:input.field.fs-hide
             {:type "text"
+             :placeholder "Last name"
              :value (or (:last-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+          [:div.field-label
+            "Company name"
+            (when (:error org-editing)
+              [:span.error "Must be at least 3 characters"])]
+          [:input.field.fs-hide
+            {:type "text"
+             :ref "org-name"
+             :placeholder "e.g., Acme, or Acme Design"
+             :class (when (:error org-editing) "error")
+             :value (:name org-editing)
+             :on-change #(dis/dispatch! [:input [:org-editing]
+               (merge org-editing {:error nil :name (.. % -target -value)})])}]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
-            "Continue"]]]]))
+            "Create team"]
+          [:div.logout-cancel
+            "Need to start over? "
+            [:button.mlb-reset.logout-cancel
+              {:on-click #(user-actions/logout oc-urls/sign-up)}
+              "Cancel sign up"]]]]]))
 
 (defn- setup-team-data
   ""
@@ -318,13 +338,7 @@
     [:div.onboard-lander.lander-team
       [:div.main-cta
         [:div.mobile-header.mobile-only
-          [:div.mobile-logo]
-          [:button.mlb-reset.top-continue
-            {:class (when continue-disabled "disabled")
-             :on-touch-start identity
-             :on-click continue-fn
-             :aria-label "Continue"}
-           "Continue"]]
+          [:div.mobile-logo]]
         [:div.title.company-setup
           "Set up your company"]]
       [:div.onboard-form
@@ -398,15 +412,11 @@
                                                                                         (not (utils/valid-domain? domain)))]))
                  :placeholder "Domain, e.g. acme.com"}]]
             [:div.field-label.info "Anyone with this email domain can automatically join your team."]]
-         [:button.continue
-           {:class (when continue-disabled "disabled")
-            :on-touch-start identity
-            :on-click continue-fn}
-           "Continue"]
-         [:div.logout-cancel
-          [:button.mlb-reset.logout-cancel
-           {:on-click #(user-actions/logout oc-urls/sign-up)}
-              "Cancel sign up"]]]]]))
+          [:button.continue
+            {:class (when continue-disabled "disabled")
+             :on-touch-start identity
+             :on-click continue-fn}
+            "Continue"]]]]))
 
 (rum/defcs lander-sections < rum/reactive
                              (drv/drv :org-data)
@@ -434,7 +444,12 @@
         [:div.title
           "Topics that matter"]
         [:div.subtitle
-          "What do you commonly share with your team to keep them on the same page?"]]
+          "What types of communication are shared with your team?"]
+        [:div.steps.third-step
+          [:div.step]
+          [:div.step]
+          [:div.step]]
+        [:div.steps-separator]]
       [:div.onboard-form
         [:div.sections-list
           (if (seq sections-list)
@@ -484,11 +499,6 @@
                             :did-mount (fn [s]
                              ;; Load the list of teams if it's not already
                              (team-actions/teams-get-if-needed)
-                             (utils/after 500
-                              #(ui-utils/resize-textarea (rum/ref-node s "personal-note")))
-                             s)
-                            :did-remount (fn [_ s]
-                             (ui-utils/resize-textarea (rum/ref-node s "personal-note"))
                              s)
                             :will-update (fn [s]
                              ;; Load the list of teams if it's not already
@@ -522,23 +532,21 @@
                          (reset! (::inviting s) true)
                          (reset! (::invite-error s) nil)
                          (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
-                           (team-actions/invite-users not-empty-invites (.-value (rum/ref-node s "personal-note")))))))
+                           (team-actions/invite-users not-empty-invites "")))))
         continue-disabled (not (zero? (count error-rows)))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
         [:div.mobile-header.mobile-only
-          [:div.mobile-logo]
-          [:button.mlb-reset.top-continue
-            {:on-touch-start identity
-             :on-click continue-fn
-             :class (when continue-disabled "disabled")
-             :aria-label "Continue"}
-           "Continue"]]
+          [:div.mobile-logo]]
         [:div.title
-          "Invite your team"]]
-      [:div.onboard-form
+          "Invite your team"]
         [:div.subtitle
-          "Invite other people to explore Carrot with you."]]
+          "Invite some colleagues to explore Carrot with you."]
+        [:div.steps.second-step
+          [:div.step]
+          [:div.step]
+          [:div.step]]
+        [:div.steps-separator]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -547,7 +555,7 @@
             "Invite teammates " [:span.info "(optional)"]
             [:button.mlb-reset.add-another-invite-row
               {:on-click #(reset! (::invite-rows s) (vec (conj @(::invite-rows s) default-invite-row)))}
-              "+ add another invitation"]]
+              "+ add more"]]
           (when @(::invite-error s)
             [:div.error @(::invite-error s)])
           [:div.invite-rows.fs-hide
@@ -566,27 +574,15 @@
                                   (assoc invite :user (.. e -target -value)))))
                                (check-invites s))
                    :value (:user invite)}]])]
-          [:div.field-label
-            "Personal note "
-            [:span.info "(optional)"]]
-          [:textarea.field
-            {:default-value @(::invite-note s)
-             :ref "personal-note"
-             :on-input #(let [target (.-target %)]
-                          (ui-utils/resize-textarea target)
-                          (reset! (::invite-note s) (.-innerText target)))
-             :class (when (pos? (count valid-rows)) "has-value")}]
           [:button.continue
             {:on-touch-start identity
              :on-click continue-fn
              :class (when (or @(::inviting s)
                               continue-disabled) "disabled")}
-            "Continue"]
-          [:div.skip-container
-            "Want to do this later? "
-            [:button.mlb-reset.skip-for-now
-              {:on-click #(org-actions/signup-invite-completed org-data)}
-              "Skip for now"]]]]]))
+            "Invite team"]
+          [:button.mlb-reset.skip-for-now
+            {:on-click #(org-actions/signup-invite-completed org-data)}
+            "Skip for now"]]]]))
 
 (defn dots-animation [s]
   (when-let [dots-node (rum/ref-node s :dots)]
