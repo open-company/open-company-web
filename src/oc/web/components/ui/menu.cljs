@@ -131,7 +131,7 @@
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       [:a
-        {:href "#help-bot"}
+        {:href "#help"}
         [:div.oc-menu-item.support
           "Support"]]
       ; (when (and (router/current-org-slug)
