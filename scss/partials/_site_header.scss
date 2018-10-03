@@ -133,7 +133,7 @@ nav.site-navbar {
 
         a.start {
           border-radius: 8px;
-          background-color: $carrot_orange;
+          background-color: #FB5E48;
           color: white;
           height: 40px;
           padding: 10px 24px;
@@ -154,7 +154,7 @@ nav.site-navbar {
 
           &:not(.your-digest).slack-get-started {
             height: 40px;
-            background-color: $carrot_orange;
+            background-color: #FB5E48;
             color: white;
 
             @include mobile() {
@@ -297,7 +297,7 @@ nav.site-navbar {
         border-radius: 8px;
         @include avenir_B();
         font-size: 14px;
-        color: $carrot_orange;
+        color: #FB5E48;
         background-color: $coral;
         padding: 10px 24px;
         text-align: center;
@@ -334,7 +334,7 @@ nav.site-navbar {
         span.slack-orange-icon {
           width: 16px;
           height: 16px;
-          @include image-2x("/img/ML/slack_orange_icon");
+          @include image-2x("/img/ML/slack_orange_icon_1");
           background-repeat: no-repeat;
           background-size: 16px 16px;
           margin-right: 6px;
@@ -350,7 +350,7 @@ nav.site-navbar {
           height: 40px;
           background-color: $coral;
           font-size: 16px;
-          color: $carrot_orange;
+          color: #FB5E48;
           text-align: left;
           padding: 2px 24px 0;
 
