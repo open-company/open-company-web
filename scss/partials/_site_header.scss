@@ -154,7 +154,6 @@ nav.site-navbar {
 
           &:not(.your-digest).slack-get-started {
             height: 40px;
-            padding: 4px 24px;
             background-color: $carrot_orange;
             color: white;
 
@@ -340,7 +339,7 @@ nav.site-navbar {
           background-size: 16px 16px;
           margin-right: 6px;
           position: relative;
-          margin-top: -4px;
+          margin-top: -3px;
 
           @include tablet() {
             display: none;
@@ -350,12 +349,10 @@ nav.site-navbar {
         &:not(.your-digest).slack-get-started {
           height: 40px;
           background-color: $coral;
-          @include avenir_H();
           font-size: 16px;
           color: $carrot_orange;
           text-align: left;
-          border: 2px solid $carrot_orange_light;
-          padding: 9px 24px;
+          padding: 2px 24px 0;
 
           &.slack {
             padding: 5px 24px 0;
