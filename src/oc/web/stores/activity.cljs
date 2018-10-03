@@ -213,7 +213,8 @@
 
 (defn add-remove-item-from-must-see [db org-slug activity-data]
   (let [;; Add/remove item from MS
-        is-ms? (:must-see activity-data)
+        is-ms? (and (:must-see activity-data)
+                    (not= (:status activity-data) "draft"))
         ms-key (dispatcher/container-key org-slug :must-see)
         old-ms-data (get-in db ms-key)
         old-ms-data-posts (get old-ms-data :posts-list)
