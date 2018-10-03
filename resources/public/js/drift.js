@@ -18,5 +18,5 @@
   });
 }();
 drift.SNIPPET_VERSION = '0.3.1';
-drift.load('DRIFT_KEY');
+drift.load('nakaxxccr5f7');
 <!-- End of Async Drift Code -->

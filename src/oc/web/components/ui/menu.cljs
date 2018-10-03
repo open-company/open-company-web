@@ -64,6 +64,9 @@
   (.preventDefault e)
   (.show js/Headway))
 
+(defn chat-click [interaction]
+  (.startInteraction js/drift.api (clj->js {:interactionId interaction})))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
@@ -131,7 +134,7 @@
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       [:a
-        {:href "#help"}
+        {:on-click #(chat-click 42861)}
         [:div.oc-menu-item.support
           "Support"]]
       ; (when (and (router/current-org-slug)
