@@ -4,6 +4,7 @@
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [taoensso.timbre :as timbre]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -23,6 +24,11 @@
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
+(defn- cleaned-body []
+  (let [body-el (sel1 [:div.rich-body-editor])]
+    (when body-el
+      (utils/clean-body-html (.-innerHTML body-el)))))
+
 (defn real-close []
   (utils/after 180 activity-actions/cmail-hide))
 
@@ -35,11 +41,8 @@
 
 (defn autosave [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
-        body-el (sel1 [:div.rich-body-editor])
-        cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerHTML body-el)))
         section-editing @(drv/get-ref s :section-editing)]
-    (activity-actions/entry-save-on-exit :cmail-data cmail-data cleaned-body section-editing)))
+    (activity-actions/entry-save-on-exit :cmail-data cmail-data (cleaned-body) section-editing)))
 
 ;; Close dismiss handling
 
@@ -365,7 +368,9 @@
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
                   {:on-click #(do
-                                (if (au/has-content? cmail-data)
+                                (if (au/has-content? (assoc cmail-data
+                                                       :body
+                                                       (cleaned-body)))
                                   (autosave s)
                                   (activity-actions/activity-delete cmail-data))
                                 (if (and (= (:status cmail-data) "published")
