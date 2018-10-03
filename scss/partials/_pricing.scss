@@ -63,8 +63,8 @@ div.pricing-wrap {
 
         @include mobile(){
           margin-top: 16px;
-          font-size: 18px;
-          line-height: 23px;
+          font-size: 20px;
+          line-height: 26px;
           padding: 0px;
           color: $deep_navy;
           max-width: initial;
@@ -290,8 +290,8 @@ div.pricing-wrap {
             float: left;
             color: $carrot_green;
             @include avenir_B();
-            font-size: 14px;
-            line-height: 28px;
+            font-size: 18px;
+            line-height: 36px;
             text-transform: uppercase;
             letter-spacing: 0.5;
 

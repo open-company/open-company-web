@@ -222,9 +222,7 @@
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "Keep everyone aligned around"
-      [:br]
-      "what matters most."]
+      "Try Carrot with your team for free."]
     [:button.mlb-reset.get-started-button
       "Get started for free"]
     no-credit-card])
@@ -399,7 +397,7 @@
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Keep everyone aligned around what matters"]
+          "Simple plans to stay aligned."]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -808,7 +806,8 @@
               [:span.oblique "How can that be?"]]
             [:p
               "This is the question that led us to build Carrot. What we "
-              "found is that leadership is getting lost in the noise."]
+              "found is that "
+              [:span.heavy "leadership is getting lost in the noise."]]
             [:p
               (str
                "Sharing key information everyone needs alongside random chats just increases "

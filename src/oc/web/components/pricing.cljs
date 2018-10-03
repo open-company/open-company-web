@@ -36,7 +36,7 @@
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Keep everyone aligned around what matters"]
+          "Simple plans to stay aligned."]
 
         [:div.pricing-three-columns.group
           ;; Free
