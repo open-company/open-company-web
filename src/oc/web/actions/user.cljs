@@ -67,23 +67,19 @@
                     (user-store/auth-settings-status?))
             (check-user-walls (dis/auth-settings) (dis/orgs-data))))))
   ([auth-settings orgs]
-    (js/console.log "DBG check-user-walls" auth-settings orgs)
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
-      (js/console.log "DBG    status-response" status-response)
-      (js/console.log "DBG    has-orgs" has-orgs)
       (cond
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
         (status-response :name-required)
         (if has-orgs
-          (do (js/console.log "DBG       redirect invitation profile") (router/nav! oc-urls/confirm-invitation-profile))
-          (do (js/console.log "DBG       redirect profile") (router/nav! oc-urls/sign-up-profile)))
+          (router/nav! oc-urls/confirm-invitation-profile)
+          (router/nav! oc-urls/sign-up-profile))
 
         :else
         (when-not has-orgs
-          (js/console.log "DBG       redirect profile has-orgs")
           (router/nav! oc-urls/sign-up-profile))))))
 
 ;; API Entry point
@@ -91,7 +87,6 @@
   ([success body] (entry-point-get-finished success body nil))
 
   ([success body callback]
-  (js/console.log "DBG entry-point-get-finished")
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
@@ -102,7 +97,6 @@
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug]
-  (js/console.log "DBG entry-point-get")
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (when (= status 404)
@@ -111,7 +105,6 @@
    (fn [success body]
      (entry-point-get-finished success body
        (fn [orgs collection]
-         (js/console.log "DBG    entry-point-get finish" orgs collection)
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (org-actions/get-org org-data)
@@ -136,10 +129,8 @@
 (defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point
     (fn [success body]
-      (js/console.log "DBG lander-check-team-redirect" success)
       (entry-point-get-finished success body
         (fn [orgs collection]
-          (js/console.log "DBG    cb" orgs collection)
           (if (zero? (count orgs))
             (router/nav! oc-urls/sign-up-profile)
             (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
@@ -195,9 +186,7 @@
 (defn auth-settings-get
   "Entry point call for auth service."
   []
-  (js/console.log "DBG auth-settings-get")
   (api/get-auth-settings (fn [body]
-    (js/console.log "DBG    auth-settings-get finish" body)
     (when body
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
@@ -265,7 +254,6 @@
 
 (defn signup-with-email-success
   [user-email status jwt]
-  (js/console.log "DBG signup-with-email-success" user-email status jwt)
   (cond
     (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
     (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
@@ -274,7 +262,6 @@
           (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
           (empty? (:avatar-url jwt)))
       (do
-        (js/console.log "DBG    200")
         (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
         (api/get-entry-point entry-point-get-finished))
       (api/get-entry-point
@@ -287,7 +274,6 @@
     (do
       (update-jwt-cookie jwt)
       (nux-actions/new-user-registered "email")
-      (js/console.log "DBG    valid signup")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
@@ -410,7 +396,6 @@
                                (:latest-auth-settings @dis/app-state))
         now (.getTime (js/Date.))
         reload-time (* 1000 60 20)] ; every 20m
-    (js/console.log "DBG initial-loading")
     (when (or (> (- now latest-entry-point) reload-time)
               (and (router/current-org-slug)
                    (nil? (dis/org-data))))
