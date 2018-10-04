@@ -459,7 +459,6 @@ div.dashboard-layout {
             white-space: nowrap;
             width: auto;
             display: inline-block;
-            padding-left: 24px;
 
             &:before {
               display: none;
@@ -489,6 +488,7 @@ div.dashboard-layout {
               margin: 0 auto;
               position: relative;
               float: unset;
+              padding-left: 24px;
             }
           }
 
