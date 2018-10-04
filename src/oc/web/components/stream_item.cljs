@@ -183,10 +183,13 @@
         [:div.group
           (when has-video
             [:div.video-play-image
-              {:class (when @(::video-image-clicked s) "clicked")
+              {:class (utils/class-set {:clicked @(::video-image-clicked s)
+                                        :loading (not (:video-processed activity-data))})
                :on-click #(reset! (::video-image-clicked s) true)}
-              [:div.play]
+              [:div.play {:class (when (not (:video-processed activity-data))
+                                  "loading")}]
               [:img.video-image {
+                :class (when (not (:video-processed activity-data)) "loading")
                 :src (str "https://" (:video-image activity-data))}]])
           (when (and has-video @(::video-image-clicked s))
             (rum/with-key
