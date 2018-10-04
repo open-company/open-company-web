@@ -179,12 +179,13 @@
                                     (delay-focus-field-with-ref s "first-name")
                                     s)
                                    :will-update (fn [s]
-                                    (when (and @(::saving s)
-                                               (:updated-jwt (:user-data @(drv/get-ref s :edit-user-profile))))
-                                      (reset! (::saving s) false)
-                                      (when-not (:error @(drv/get-ref s :edit-user-profile))
-                                        (org-actions/create-or-update-org @(drv/get-ref s :org-editing))))
-                                   s)}
+                                    (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+                                          org-editing @(drv/get-ref s :org-editing)]
+                                      (when (and @(::saving s)
+                                                 (or (:error edit-user-profile)
+                                                     (:error org-editing)))
+                                        (reset! (::saving s) false)))
+                                    s)}
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
         current-user-data (drv/react s :current-user-data)
@@ -197,7 +198,7 @@
                               (<= (count (clean-org-name (:name org-editing))) 1))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
-                       (user-actions/user-profile-save current-user-data edit-user-profile)
+                       (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])))]
     [:div.onboard-lander.lander-profile

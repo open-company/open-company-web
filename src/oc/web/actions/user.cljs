@@ -329,32 +329,36 @@
 
 ;; User Profile
 
-(defn user-profile-save [current-user-data edit-data]
-  (let [edit-user-profile (or (:user-data edit-data) edit-data)
-        new-password (:password edit-user-profile)
-        password-did-change (pos? (count new-password))
-        with-pswd (if (and password-did-change
-                           (>= (count new-password) 8))
-                    edit-user-profile
-                    (dissoc edit-user-profile :password))
-        new-email (:email edit-user-profile)
-        email-did-change (not= new-email (:email current-user-data))
-        with-email (if (and email-did-change
-                            (utils/valid-email? new-email))
-                     (assoc with-pswd :email new-email)
-                     (assoc with-pswd :email (:email current-user-data)))
-        user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
-    (dis/dispatch! [:user-profile-save])
-    (api/patch-user-profile
-     user-profile-link
-     with-email
-     (fn [status body success]
-       (if (= status 422)
-         (dis/dispatch! [:user-profile-update/failed])
-         (when success
-           (utils/after 100
-            (fn [] (jwt-refresh #(dis/dispatch! [:user-profile-save/jwt-updated]))))
-           (dis/dispatch! [:user-data (json->cljs body)])))))))
+(defn user-profile-save
+  ([current-user-data edit-data]
+   (user-profile-save current-user-data edit-data nil))
+  ([current-user-data edit-data org-editing]
+    (let [edit-user-profile (or (:user-data edit-data) edit-data)
+          new-password (:password edit-user-profile)
+          password-did-change (pos? (count new-password))
+          with-pswd (if (and password-did-change
+                             (>= (count new-password) 8))
+                      edit-user-profile
+                      (dissoc edit-user-profile :password))
+          new-email (:email edit-user-profile)
+          email-did-change (not= new-email (:email current-user-data))
+          with-email (if (and email-did-change
+                              (utils/valid-email? new-email))
+                       (assoc with-pswd :email new-email)
+                       (assoc with-pswd :email (:email current-user-data)))
+          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
+      (dis/dispatch! [:user-profile-save])
+      (api/patch-user-profile
+       user-profile-link
+       with-email
+       (fn [status body success]
+         (if (= status 422)
+           (dis/dispatch! [:user-profile-update/failed])
+           (when success
+             (utils/after 100
+              (fn []
+                (jwt-refresh #(org-actions/create-or-update-org org-editing))))
+             (dis/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn user-avatar-save [avatar-url]
   (let [user-avatar-data {:avatar-url avatar-url}
