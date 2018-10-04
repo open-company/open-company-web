@@ -141,7 +141,8 @@
             [:div.tear-subtitle
               "A team of more than 100? Let's create a custom plan."]
             [:a.tear-start-bt
-              {:href "#pricing"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -234,8 +235,8 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "#pricing"
-               :target "_blank"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43239 }); return false;"}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -244,8 +245,8 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "#pricing"
-               :target "_blank"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
               "Get in touch with us"]]]]
 
         shared-misc/testimonials-section
