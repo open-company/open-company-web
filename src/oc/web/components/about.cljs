@@ -169,8 +169,8 @@
                      "amazing people regardless of where they "
                      "call home.")]
                   [:a
-                    {:href "#hello"
-                     :target "_blank"}
+                    {:href "#"
+                     :on-click "drift.api.startInteraction({ interactionId: 43229 });"}
                     "Say hello"]]]
               [:div.about-bottom-copy-row.group
                 [:div.about-bottom-copy-left

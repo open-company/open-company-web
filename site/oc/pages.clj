@@ -490,7 +490,7 @@
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Make sure you’re being heard, and know who’s seen your post"}
-              [:span "Who Saw That"]]]
+              [:span "Who saw that"]]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
             [:h2.tear-title
@@ -499,7 +499,8 @@
             [:div.tear-subtitle
               "A team of more than 100? Let's create a custom plan."]
             [:a.tear-start-bt
-              {:href "#pricing"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -548,7 +549,7 @@
               [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
               [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
               [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
-              [:li [:span.heavy "Who Saw That:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
+              [:li [:span.heavy "Who saw that:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -592,8 +593,8 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "#pricing"
-               :target "_blank"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43239 }); return false;"}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -602,8 +603,8 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "#pricing"
-               :target "_blank"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
               "Get in touch with us"]]]]
 
       testimonials-section
@@ -828,9 +829,9 @@
                    "amazing people regardless of where they "
                    "call home.")]
                 [:a
-                  {:href "#hello"
-                   :target "_blank"}
-                  "Say hello"]]]
+                  {:href "#"
+                   :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                   "Say hello"]]]
             [:div.about-bottom-copy-row.group
               [:div.about-bottom-copy-left
                 "Crazy for open source."]

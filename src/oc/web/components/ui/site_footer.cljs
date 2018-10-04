@@ -53,8 +53,10 @@
                             (reset! (::expanded s) :support)))}
             "Support"]
           [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
-          ; [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href "#hello"} "Contact"]]]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href "#"
+                                 :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                              "Contact"]]]
 
         [:div.column.column-integrations
           {:class (when (= @(::expanded s) :integrations) "expanded")}
