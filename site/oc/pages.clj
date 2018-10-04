@@ -391,7 +391,9 @@
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Simple plans to stay aligned."]
+          "Simple plans to stay aligned."
+          [:br]
+          "Get started for free."]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -507,6 +509,10 @@
                 ", plus:"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Make sure everyone sees what matters most."}
               [:span "Carrot AI"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -781,15 +787,15 @@
           [:div.about-copy-inner
             [:h3.about-copy-header
               "Why we built Carrot"]
-            [:div.about-copy-title
-              (str
-               "In the age of Slack, the lack of clear leadership "
-               "is the single, greatest problem in the workplace.")]
             [:p
               (str
-               "Sure, teams are more connected than ever with chat apps like Slack - and yet, "
-               "it’s become even more difficult for those same teams to stay focused and aligned "
-               "around what matters most. ")
+               "In the age of Slack and fast-moving conversations, the lack of "
+               "focus and clarity have become a huge problem in the workplace.")]
+            [:p
+              (str
+               "Chat apps keep everyone connected throughout the day, and yet "
+               "it's become even more difficult for teams to stay "
+               "aligned around what matters most. ")
               [:span.oblique "How can that be?"]]
             [:p
               "This is the question that led us to build Carrot. What we "

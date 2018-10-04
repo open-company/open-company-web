@@ -128,15 +128,15 @@
             [:div.about-copy-inner
               [:h3.about-copy-header
                 "Why we built Carrot"]
-              [:div.about-copy-title
-                (str
-                 "In the age of Slack, the lack of clear leadership "
-                 "is the single, greatest problem in the workplace.")]
               [:p
                 (str
-                 "Sure, teams are more connected than ever with chat apps like Slack - and yet, "
-                 "it’s become even more difficult for those same teams to stay focused and aligned "
-                 "around what matters most. ")
+                 "In the age of Slack and fast-moving conversations, the lack of "
+                 "focus and clarity have become a huge problem in the workplace.")]
+              [:p
+                (str
+                 "Chat apps keep everyone connected throughout the day, and yet "
+                 "it's become even more difficult for teams to stay "
+                 "aligned around what matters most. ")
                 [:span.oblique "How can that be?"]]
               [:p
                 "This is the question that led us to build Carrot. What we "
