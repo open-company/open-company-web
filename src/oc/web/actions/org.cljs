@@ -133,7 +133,8 @@
 ;; Org create
 
 (defn- org-created [org-data]
-  (router/nav! (oc-urls/sign-up-invite (:slug org-data))))
+  (utils/after 0
+   #(router/nav! (oc-urls/sign-up-invite (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success

@@ -111,6 +111,7 @@
    (fn [success body]
      (entry-point-get-finished success body
        (fn [orgs collection]
+         (js/console.log "DBG    entry-point-get finish" orgs collection)
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (org-actions/get-org org-data)
@@ -196,6 +197,7 @@
   []
   (js/console.log "DBG auth-settings-get")
   (api/get-auth-settings (fn [body]
+    (js/console.log "DBG    auth-settings-get finish" body)
     (when body
       ;; auth settings loaded
       (api/get-current-user body (fn [data]
