@@ -348,7 +348,10 @@
            (when success
              (utils/after 100
               (fn []
-                (jwt-refresh #(org-actions/create-or-update-org org-editing))))
+                (jwt-refresh
+                 #(if org-editing
+                    (org-actions/create-or-update-org org-editing)
+                    (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn user-avatar-save [avatar-url]
