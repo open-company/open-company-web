@@ -284,7 +284,9 @@
                 ;          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                 ;          :title (if grid-view? "Stream view" "Grid view")}])])
                 ]
-              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
+              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
+                    non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
+                                           "decisions to keep you and your team pulling in the same direction.")]
                 (when (and (not is-drafts-board)
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
@@ -298,13 +300,9 @@
                         [:div.add-post-tooltip
                           (if is-admin-or-author
                             (if (= add-post-tooltip :has-organic-post)
-                              (str
-                                "Carrot is where you’ll find announcements, updates, and "
-                                "decisions that keep your team pulling in the same direction.")
+                              non-admin-tooltip
                               "Create a test post now to see how it works. You can delete it anytime.")
-                            (str
-                             "Carrot is where you’ll find announcements, updates, and decisions "
-                             "that keep your team pulling in the same direction."))
+                            non-admin-tooltip)
                           (when is-admin-or-author
                             [:button.mlb-reset.add-post-bt
                               {:on-click #(when can-compose (compose s))}
