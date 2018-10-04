@@ -176,10 +176,10 @@
           [:div.faq-row-answer
             (str
              "Absolutely! You can use Carrot for free with teams of up to 10 people. "
-             "The storage limit is 1TB and there’s a maximum upload of 20mbs. When you "
-             "sign up for the free plan you’ll get to try a fully-featured Team plan "
-             "(incl in-app video recording, recurring updates and advanced permissions) for "
-             "30 days. It’s fast to sign up, and no credit card is required.")]]
+             "The storage limit is 1TB and there's a maximum upload of 20mb per attachment. "
+             "When you sign up for the free plan you’ll get to try a fully-featured Team plan "
+             "(including in-app video recording, recurring updates, advanced permissions, and "
+             "Who Saw That) for 30 days. It’s fast to sign up, and no credit card is required.")]]
 
         [:div.faq-row
           [:div.faq-row-question
