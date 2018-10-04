@@ -37,8 +37,7 @@ div.pricing-wrap {
 
       h1.pricing-headline {
         font-size: 80px;
-        font-family: "PT Serif";
-        font-weight: 700;
+        @include PTSerif()
         color: $deep_navy;
         min-width: 300px;
         margin: 0 auto;
@@ -63,8 +62,8 @@ div.pricing-wrap {
 
         @include mobile(){
           margin-top: 16px;
-          font-size: 18px;
-          line-height: 23px;
+          font-size: 20px;
+          line-height: 26px;
           padding: 0px;
           color: $deep_navy;
           max-width: initial;
@@ -105,15 +104,13 @@ div.pricing-wrap {
           }
 
           h2.tear-title {
-            font-family: "PT Serif";
-            font-weight: 700;
+            @include PTSerif()
             font-size: 40px;
             color: $deep_navy;
           }
 
           h3.tear-price {
-            font-family: "PT Serif";
-            font-weight: 700;
+            @include PTSerif()
             font-size: 60px;
             color: $deep_navy;
             line-height: 90px;
@@ -251,8 +248,7 @@ div.pricing-wrap {
       }
 
       h2.faq-header {
-        font-family: "PT Serif";
-        font-weight: 700;
+        @include PTSerif()
         font-size: 80px;
         color: $deep_navy;
         margin-bottom: 80px;
@@ -268,8 +264,7 @@ div.pricing-wrap {
         margin-top: 40px;
 
         div.faq-row-question {
-          font-family: "PT Serif";
-          font-weight: 700;
+          @include PTSerif()
           font-size: 20px;
           color: $deep_navy;
           line-height: 28px;
@@ -290,8 +285,8 @@ div.pricing-wrap {
             float: left;
             color: $carrot_green;
             @include avenir_B();
-            font-size: 14px;
-            line-height: 28px;
+            font-size: 18px;
+            line-height: 36px;
             text-transform: uppercase;
             letter-spacing: 0.5;
 

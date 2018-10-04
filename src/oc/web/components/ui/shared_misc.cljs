@@ -126,7 +126,7 @@
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "It’s never been easier to keep everyone on the same page"]
+      "Try Carrot with your team for free."]
     [:button.mlb-reset.get-started-button
       "Get started for free"]
     no-credit-card])

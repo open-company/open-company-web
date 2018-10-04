@@ -7,7 +7,7 @@ div.main-animation-container {
   }
 
   img.main-animation {
-    max-width: 1480px;
+    max-width: 1208px;
     width: calc(100% - 48px);
     margin: 120px auto 0px;
     padding: 0;
@@ -207,8 +207,7 @@ section.testimonials-section {
   }
 
   div.testimonials-section-title {
-    font-family: "PT Serif", serif;
-    font-weight: 700;
+    @include PTSerif()
     color: $deep_navy;
     font-size: 40px;
     line-height: 38px;
@@ -358,8 +357,7 @@ section.testimonials-section {
         }
 
         div.testimonial-name {
-          font-family: "PT Serif", serif;
-          font-weight: 700;
+          @include PTSerif()
           font-size: 16px;
           color: $deep_navy;
           line-height: 20px;
@@ -417,17 +415,14 @@ section.keep-aligned {
   }
 
   div.keep-aligned-title {
-    font-family: "PT Serif", serif;
-    font-weight: 700;
-    font-size: 60px;
-    line-height: 70px;
+    @include PTSerif()
+    font-size: 32px;
     color: $deep_navy;
     margin-bottom: 40px;
     text-align: center;
 
     @include tablet() {
       font-size: 36px;
-      line-height: 40px;
       margin-bottom: 24px;
     }
   }
@@ -594,7 +589,7 @@ button.get-started-button {
   @include mobile(){
     width: 100%;
     margin: 16px auto;
-    padding: 0px;
+    padding: 2px 0 0;
     font-size: 16px;
   }
 }
@@ -780,8 +775,7 @@ section.home-keep-aligned {
         }
 
         div.keep-aligned-section-copy-title {
-          font-family: "PT Serif", serif;
-          font-weight: 700;
+          @include PTSerif()
           font-size: 80px;
           color: $deep_navy;
           line-height: 78px;

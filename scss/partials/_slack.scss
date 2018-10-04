@@ -53,11 +53,16 @@ div.slack-wrap {
       position: relative;
       overflow: hidden;
 
+      @include tablet() {
+        padding-top: 131px;
+        padding-bottom: 80px;
+      }
+
       &:after {
         background-color: #F8F7F3;
         content: "";
         width: 100%;
-        height: 41%;
+        height: 39%;
         display: block;
         border-bottom-left-radius: 200px;
         position: absolute;
@@ -79,8 +84,7 @@ div.slack-wrap {
       }
 
       h1.slack-headline {
-        font-family: "PT Serif";
-        font-weight: 700;
+        @include PTSerif()
         font-size: 80px;
         line-height: 90px;
         color: $deep_navy;

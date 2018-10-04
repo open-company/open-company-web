@@ -13,6 +13,11 @@ div.slack-lander-wrap {
       position: relative;
       overflow: hidden;
 
+      @include tablet() {
+        padding-top: 131px;
+        padding-bottom: 80px;
+      }
+
       @include mobile() {
         width: 100%;
         overflow: visible;
@@ -28,7 +33,7 @@ div.slack-lander-wrap {
         background-color: #F8F7F3;
         content: "";
         width: 100%;
-        height: 41%;
+        height: 39%;
         display: block;
         border-bottom-left-radius: 200px;
         position: absolute;
@@ -47,8 +52,7 @@ div.slack-lander-wrap {
 
       h1.headline {
         font-size: 80px;
-        font-family: "PT Serif", serif;
-        font-weight: 700;
+        @include PTSerif()
         color: $deep_navy;
         margin: 0 auto;
         z-index: 2;

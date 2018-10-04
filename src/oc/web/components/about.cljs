@@ -27,8 +27,7 @@
 
       [:div.main.about
         [:section.about-header
-          [:a.carrot-logo
-            {:href "/?no_redirect=1"}]
+
           [:h1.about
             "Meet the team"]
 
@@ -141,7 +140,8 @@
                 [:span.oblique "How can that be?"]]
               [:p
                 "This is the question that led us to build Carrot. What we "
-                "found is that leadership is getting lost in the noise."]
+                "found is that "
+                [:span.heavy "leadership is getting lost in the noise."]]
               [:p
                 (str
                  "Sharing key information everyone needs alongside random chats just increases "

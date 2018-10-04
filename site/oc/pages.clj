@@ -222,9 +222,7 @@
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "Keep everyone aligned around"
-      [:br]
-      "what matters most."]
+      "Try Carrot with your team for free."]
     [:button.mlb-reset.get-started-button
       "Get started for free"]
     no-credit-card])
@@ -344,9 +342,6 @@
       ; Hope page header
       [:section.cta.group
 
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
-
         [:h1.headline
           "Communicate "
           [:br.big-web-only]
@@ -392,14 +387,11 @@
     [:div.main.pricing
       [:section.pricing-header
 
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
-
         [:h1.pricing-headline
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Keep everyone aligned around what matters"]
+          "Simple plans to stay aligned."]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -623,9 +615,6 @@
       [:section.carrot-plus-slack.group
         animation-lightbox
 
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
-
         [:h1.slack-headline
           "Rise above the noise"]
 
@@ -669,9 +658,6 @@
     [:div.main.slack-lander
       ; Hope page header
       [:section.cta.group
-        
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
 
         [:h1.headline
           "Join your team on Carrot"]
@@ -695,8 +681,7 @@
     {:id "wrap"}
     [:div.main.about
       [:section.about-header
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
+
         [:h1.about
           "Meet the team"]
 
@@ -809,7 +794,8 @@
               [:span.oblique "How can that be?"]]
             [:p
               "This is the question that led us to build Carrot. What we "
-              "found is that leadership is getting lost in the noise."]
+              "found is that "
+              [:span.heavy "leadership is getting lost in the noise."]]
             [:p
               (str
                "Sharing key information everyone needs alongside random chats just increases "
@@ -996,6 +982,8 @@
              :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
+          ;; Google fonts
+          google-fonts
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
@@ -1010,7 +998,6 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
-          google-fonts
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript

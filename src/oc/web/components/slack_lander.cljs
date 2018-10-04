@@ -24,9 +24,6 @@
         [:div.main.slack-lander
           ; Hope page header
           [:section.cta.group
-            
-            [:a.carrot-logo
-              {:href oc-urls/home-no-redirect}]
 
             [:h1.headline
               "Join your team on Carrot"]

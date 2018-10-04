@@ -29,14 +29,11 @@
       [:div.main.pricing
         [:section.pricing-header
 
-        [:a.carrot-logo
-          {:href "/?no_redirect=1"}]
-
         [:h1.pricing-headline
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Keep everyone aligned around what matters"]
+          "Simple plans to stay aligned."]
 
         [:div.pricing-three-columns.group
           ;; Free
