@@ -70,18 +70,20 @@
     (js/console.log "DBG check-user-walls" auth-settings orgs)
     (let [status-response (set (map keyword (:status auth-settings)))
           has-orgs (pos? (count orgs))]
-      (js/console.log "DBG    status-response" has-orgs)
+      (js/console.log "DBG    status-response" status-response)
+      (js/console.log "DBG    has-orgs" has-orgs)
       (cond
         (status-response :password-required)
         (router/nav! oc-urls/confirm-invitation-password)
 
         (status-response :name-required)
         (if has-orgs
-          (router/nav! oc-urls/confirm-invitation-profile)
-          (router/nav! oc-urls/sign-up-profile))
+          (do (js/console.log "DBG       redirect invitation profile") (router/nav! oc-urls/confirm-invitation-profile))
+          (do (js/console.log "DBG       redirect profile") (router/nav! oc-urls/sign-up-profile)))
 
         :else
         (when-not has-orgs
+          (js/console.log "DBG       redirect profile has-orgs")
           (router/nav! oc-urls/sign-up-profile))))))
 
 ;; API Entry point
