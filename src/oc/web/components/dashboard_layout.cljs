@@ -301,9 +301,7 @@
                               (str
                                 "Carrot is where you’ll find announcements, updates, and "
                                 "decisions that keep your team pulling in the same direction.")
-                              (str
-                                "Create a post to see how easy it is to keep your team pulling in the "
-                                "same direction. "))
+                              "Create a test post now to see how it works. You can delete it anytime.")
                             (str
                              "Carrot is where you’ll find announcements, updates, and decisions "
                              "that keep your team pulling in the same direction."))
@@ -324,11 +322,11 @@
                     [:div.post-added-tooltip-title
                       "Well done!"]
                     [:div.post-added-tooltip
-                      "You are on your way "
+                      "Using Slack? "
                       [:button.mlb-reset.post-added-bt
                         {:on-click #(nav-actions/show-invite)}
-                        "Invite your team"]
-                      " to spark better follow-on discussions adn to keep everyone in sync."]
+                        "Connect to Slack"]
+                      " so your team can see posts and  join the discussion from Slack, too."]
                     [:div.post-added-tooltip-box]]])
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
@@ -336,13 +334,12 @@
                   [:button.mlb-reset.draft-post-tooltip-dismiss
                     {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
                   [:div.draft-post-tooltips
+                    [:div.draft-post-tooltip-box-mobile]
                     [:div.draft-post-tooltip-title
-                      "😎 Finish this draft post to add some personality"]
+                      "Add some personality"]
                     [:div.draft-post-tooltip
-                      (str
-                       "According to smart people on the Internet, "
-                       "everyone likes knowing who they work with. "
-                       "Help your team by finishing this draft post.")]]])
+                      "Finish this draft post to help your team get to know you better!"]
+                    [:div.draft-post-tooltip-box]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards

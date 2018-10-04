@@ -229,6 +229,20 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn edit-tooltip [s]
+  [:div.edit-tooltip-container.group
+    [:button.mlb-reset.edit-tooltip-dismiss
+      {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+    [:div.edit-tooltips
+      [:div.edit-tooltip
+        (str
+         "Share something with your team, like an announcement, update, or decision. "
+         "In a hurry? ")
+         [:button.mlb-reset.edit-tooltip-record-video-bt
+          {:on-click #(video-record-clicked s)}
+          "Record a quick video"]
+         " instead."]]])
+
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
                    (drv/drv :cmail-state)
@@ -445,6 +459,10 @@
                                   @(::record-video s))
                           "remove-video-bt")}]]]
           [:div.cmail-content
+            (when (and is-mobile?
+                       (drv/react s :show-edit-tooltip)
+                       (not (seq @(::initial-uuid s))))
+              (edit-tooltip s))
             ;; Video elements
             ;; FIXME: disable video on mobile for now
             (when-not is-mobile?
@@ -506,22 +524,10 @@
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))
-            (when (and (drv/react s :show-edit-tooltip)
+            (when (and (not is-mobile?)
+                       (drv/react s :show-edit-tooltip)
                        (not (seq @(::initial-uuid s))))
-              [:div.edit-tooltip-container.group
-                [:button.mlb-reset.edit-tooltip-dismiss
-                  {:on-click #(nux-actions/dismiss-edit-tooltip)}]
-                [:div.edit-tooltips
-                  [:div.edit-tooltip-title
-                    "✍️ Update your team in seconds"]
-                  [:div.edit-tooltip
-                    (str
-                     "Carrot keeps everyone aligned around key announcements, updates, and decisions. "
-                     "Don't feel like typing? No worries, ")
-                     [:button.mlb-reset.edit-tooltip-record-video-bt
-                      {:on-click #(video-record-clicked s)}
-                      "record a video"]
-                     " instead."]]])]
+              (edit-tooltip s))]
         [:div.cmail-footer
           (let [disabled? (or @(::publishing s)
                               (not (is-publishable? s cmail-data)))
