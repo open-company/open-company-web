@@ -91,6 +91,7 @@
   ([success body] (entry-point-get-finished success body nil))
 
   ([success body callback]
+  (js/console.log "DBG entry-point-get-finished")
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
@@ -101,6 +102,7 @@
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug]
+  (js/console.log "DBG entry-point-get")
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (when (= status 404)
@@ -192,6 +194,7 @@
 (defn auth-settings-get
   "Entry point call for auth service."
   []
+  (js/console.log "DBG auth-settings-get")
   (api/get-auth-settings (fn [body]
     (when body
       ;; auth settings loaded
@@ -405,6 +408,7 @@
                                (:latest-auth-settings @dis/app-state))
         now (.getTime (js/Date.))
         reload-time (* 1000 60 20)] ; every 20m
+    (js/console.log "DBG initial-loading")
     (when (or (> (- now latest-entry-point) reload-time)
               (and (router/current-org-slug)
                    (nil? (dis/org-data))))

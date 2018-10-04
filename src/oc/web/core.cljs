@@ -125,6 +125,7 @@
 
 (defn post-routing []
   (routing-actions/routing @router/path)
+  (js/console.log "DBG post-routing")
   (user-actions/initial-loading))
 
 ;; home
