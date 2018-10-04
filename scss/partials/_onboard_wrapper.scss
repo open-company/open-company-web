@@ -701,13 +701,13 @@ div.onboard-lander {
 
     div.description {
       @include avenir_R();
-      color: rgba($deep_navy, 0.5);
+      color: $deep_navy;
       font-size: 14px;
       margin-top: 24px;
 
       a {
         text-decoration: underline;
-        color: rgba($deep_navy, 0.5);
+        color: $deep_navy;
       }
     }
 
@@ -841,6 +841,14 @@ div.onboard-lander {
         @include mobile() {
           margin-top: 32px;
         }
+      }
+    }
+  }
+
+  &.invitee-lander-password, &.invitee-lander-profile {
+    div.onboard-form {
+      div.field-label:first-child {
+        margin-top: 40px;
       }
     }
   }

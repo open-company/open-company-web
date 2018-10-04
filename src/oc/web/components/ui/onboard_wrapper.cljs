@@ -647,7 +647,8 @@
         [:div.title
           "Join your team on Carrot"]
         [:div.subtitle
-          "Signing up as " [:span.email-address.fs-hide (:email jwt)]]]
+          "Signing up as " [:span.email-address.fs-hide (:email jwt)]]
+        [:div.steps-separator]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -691,11 +692,8 @@
                                     (drv/drv :current-user-data)
                                     (drv/drv :orgs)
                                     (rum/local false ::saving)
-                                    (rum/local nil ::temp-user-avatar)
                                     {:will-mount (fn [s]
                                       (user-actions/user-profile-reset)
-                                      (let [avatar-with-cdn (:avatar-url (:user-data @(drv/get-ref s :edit-user-profile)))]
-                                        (reset! (::temp-user-avatar s) avatar-with-cdn))
                                       s)
                                      :did-mount (fn [s]
                                       (delay-focus-field-with-ref s "first-name")
@@ -711,20 +709,14 @@
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
         current-user-data (drv/react s :current-user-data)
-        user-data (:user-data edit-user-profile)
-        temp-user-avatar @(::temp-user-avatar s)
-        fixed-user-data (if (empty? (:avatar-url user-data))
-                          (assoc user-data :avatar-url temp-user-avatar)
-                          user-data)
-        is-jelly-head-avatar (= (:avatar-url user-data) temp-user-avatar)]
+        user-data (:user-data edit-user-profile)]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]]
         [:div.title.about-yourself
           "Tell us a bit about you"]
-        [:div.subtitle
-          "This information will be visible to your team"]
+        [:div.steps-separator]
         (when (:error edit-user-profile)
             [:div.subtitle.error
               "An error occurred while saving your data, please try again"])]
@@ -732,23 +724,6 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.logo-upload-container.group.fs-hide
-            {:on-click (fn []
-                        (when (not= (:avatar-url user-data) temp-user-avatar)
-                          (dis/dispatch! [:input [:edit-user-profile :avatar-url] temp-user-avatar]))
-                        (iu/upload! user-utils/user-avatar-filestack-config
-                          (fn [res]
-                            (dis/dispatch! [:input [:edit-user-profile :avatar-url] (gobj/get res "url")]))
-                          nil
-                          (fn [_])
-                          nil))}
-            (if is-jelly-head-avatar
-              [:div.empty-user-avatar-placeholder]
-              (user-avatar-image fixed-user-data))
-            [:div.add-picture-link
-              "+ Upload a profile photo"]
-            [:div.add-picture-link-subtitle
-              "A 160x160 PNG or JPG works best"]]
           [:div.field-label
             "First name"]
           [:input.field.fs-hide
@@ -762,15 +737,14 @@
             {:type "text"
              :value (:last-name user-data)
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
-          [:button.continue
-            {:disabled (or (and (empty? (:first-name user-data))
-                                (empty? (:last-name user-data)))
-                           (empty? (:avatar-url user-data)))
+          [:button.continue.start-using-carrot
+            {:disabled (and (empty? (:first-name user-data))
+                            (empty? (:last-name user-data)))
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/user-profile-save current-user-data edit-user-profile))}
-            "Continue"]]]]))
+            "✨ Start using Carrot ✨"]]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]
