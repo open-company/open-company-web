@@ -11,6 +11,7 @@
             [oc.web.stores.user :as user-store]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.lib.chat :as chat]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -63,9 +64,6 @@
 (defn whats-new-click [e]
   (.preventDefault e)
   (.show js/Headway))
-
-(defn chat-click [interaction]
-  (.startInteraction js/drift.api (clj->js {:interactionId interaction})))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
@@ -134,7 +132,7 @@
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       [:a
-        {:on-click #(chat-click 42861)}
+        {:on-click #(chat/chat-click 42861)}
         [:div.oc-menu-item.support
           "Support"]]
       ; (when (and (router/current-org-slug)

@@ -760,8 +760,7 @@ div.left-navigation-sidebar {
         text-decoration: underline;
       }
 
-      div.invite-people-icon {
-        background-image: cdnUrl("/img/ML/invite_people.svg");
+      div.bottom-nav-icon {
         background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center 5px;
@@ -773,6 +772,15 @@ div.left-navigation-sidebar {
         @include mobile() {
           opacity: 1;
         }
+
+        &.invite-people-icon {
+          background-image: cdnUrl("/img/ML/invite_people.svg");
+        }
+
+        &.support-icon {
+          background-image: cdnUrl("/img/ML/support.svg");
+        }
+
       }
 
       span {

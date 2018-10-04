@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.lib.chat :as chat]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -205,8 +206,12 @@
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
+        [:button.mlb-reset.invite-people-btn
+            {:on-click #(chat/chat-click 42861)}
+            [:div.bottom-nav-icon.support-icon]
+            [:span "Support"]]
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(nav-actions/show-invite)}
-            [:div.invite-people-icon]
+            [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite people"]])]]))
