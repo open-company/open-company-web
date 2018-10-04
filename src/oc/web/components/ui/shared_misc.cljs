@@ -62,7 +62,7 @@
 
 (def no-credit-card
   [:div.no-credit-card
-    "No credit card required&nbsp;•&nbsp;Works with Slack"])
+    "No credit card required • Works with Slack"])
 
 (def keep-aligned
   [:section.keep-aligned
