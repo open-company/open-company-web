@@ -175,13 +175,13 @@
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.group
-           (when has-video
-             [:div.video-play-image
-               {:class (when @(::video-image-clicked s) "clicked")
-                :on-click #(reset! (::video-image-clicked s) true)}
-               [:div.play]
-               [:img.video-image {
-                 :src (str "https://" (:video-image activity-data))}]])
+          (when has-video
+            [:div.video-play-image
+              {:class (when @(::video-image-clicked s) "clicked")
+               :on-click #(reset! (::video-image-clicked s) true)}
+              [:div.play]
+              [:img.video-image {
+                :src (str "https://" (:video-image activity-data))}]])
           (when (and has-video @(::video-image-clicked s))
             (rum/with-key
              (ziggeo-player {:video-id (:fixed-video-id activity-data)

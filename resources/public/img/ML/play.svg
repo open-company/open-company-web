@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="184px" height="103px" viewBox="0 0 184 103" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.1 (67048) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 3</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Video-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Video-in-stream" transform="translate(-348.000000, -710.000000)">
+            <g id="Group-3" transform="translate(348.000000, 710.000000)">
+                <polygon id="Rectangle-2-Copy" fill="#EAECED" points="0 0 184 0 184 103 0 103"></polygon>
+                <rect id="Rectangle" fill="#000000" opacity="0.400000006" x="72" y="32" width="40" height="40" rx="20"></rect>
+                <path d="M88.511197,45.2031782 L98.4934011,51.1404541 C98.9680698,51.4227804 99.123994,52.036446 98.8416677,52.5111147 C98.7564297,52.6544233 98.6367098,52.7741433 98.4934011,52.8593813 L88.511197,58.7966572 C88.0365283,59.0789835 87.4228627,58.9230592 87.1405364,58.4483906 C87.0485518,58.2937391 87,58.1171332 87,57.9371936 L87,46.0626417 C87,45.510357 87.4477153,45.0626417 88,45.0626417 C88.1799396,45.0626417 88.3565454,45.1111936 88.511197,45.2031782 Z" id="Rectangle-3" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>
