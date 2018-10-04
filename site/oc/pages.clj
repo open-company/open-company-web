@@ -497,8 +497,8 @@
             [:div.tear-subtitle
               "A team of more than 100? Let's create a custom plan."]
             [:a.tear-start-bt
-              {:href "#pricing-enterprise"
-               :name "pricing-enterprise"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -587,8 +587,8 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "#pricing-non-profit"
-               :name "pricing-non-profit"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43239 }); return false;"}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -597,8 +597,8 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "#pricing-chat"
-               :name "pricing-chat"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
               "Get in touch with us"]]]]
 
       testimonials-section
@@ -823,8 +823,8 @@
                    "amazing people regardless of where they "
                    "call home.")]
                 [:a
-                  {:href "#hello"
-                   :name "hello"}
+                  {:href "#"
+                   :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
                    "Say hello"]]]
             [:div.about-bottom-copy-row.group
               [:div.about-bottom-copy-left

@@ -20,7 +20,7 @@
 
 (def contact "/contact")
 
-(def help "https://beta.carrot.io/carrot-support/all-posts")
+(def help "http://help.carrot.io/")
 
 (def what-s-new "https://beta.carrot.io/carrot-support/what-s-new")
 
