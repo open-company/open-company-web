@@ -177,8 +177,8 @@ div.stream-item {
         &.loading {
           width: 40px;
           height: 40px;
-          background-image: cdnUrl("/img/ML/video-spinner.svg");
-          background-size: 20px;
+          background-image: cdnUrl("/img/ML/video-spinner.gif");
+          background-size: 150px;
           background-color: #000000;
           opacity: 0.4;
           border-radius: 100px 100px 100px 100px;
