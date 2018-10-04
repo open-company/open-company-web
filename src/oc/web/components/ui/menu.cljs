@@ -11,6 +11,7 @@
             [oc.web.stores.user :as user-store]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.lib.chat :as chat]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -127,20 +128,14 @@
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
             "Settings"]])
-        [:a
-          {:on-click whats-new-click}
-          [:div.oc-menu-item.whats-new
-            "What’s New"]]
-        ; [:a
-        ;   {:href oc-urls/what-s-new
-        ;    :target "_blank"}
-        ;   [:div.oc-menu-item.whats-new
-        ;     "What’s New"]]
-      ; [:a
-      ;   {:href oc-urls/help
-      ;    :target "_blank"}
-      ;   [:div.oc-menu-item.support
-      ;     "Support"]]
+      [:a
+        {:on-click whats-new-click}
+        [:div.oc-menu-item.whats-new
+          "What’s New"]]
+      [:a
+        {:on-click #(chat/chat-click 42861)}
+        [:div.oc-menu-item.support
+          "Support"]]
       ; (when (and (router/current-org-slug)
       ;            (= user-role :admin))
       ;   [:div.oc-menu-item
