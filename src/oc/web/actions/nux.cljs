@@ -75,7 +75,7 @@
           edit-tooltip (:show-edit-tooltip nv)
           add-comment-tooltip (:show-add-comment-tooltip nv)
           user-type (:user-type nv)
-          has-only-sample-posts (every? map? (vals posts-data))
+          has-only-sample-posts (every? :sample (vals posts-data))
           team-has-bot? (jwt/team-has-bot? (:team-id org-data))
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already

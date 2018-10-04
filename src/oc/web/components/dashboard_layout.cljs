@@ -286,28 +286,31 @@
                 ]
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                     non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
-                                           "decisions to keep you and your team pulling in the same direction.")]
+                                           "decisions to keep you and your team pulling in the same direction.")
+                    is-second-user (= add-post-tooltip :has-organic-post)]
                 (when (and (not is-drafts-board)
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
                       {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
                     [:div.add-post-tooltips
-                      {:class (when (= add-post-tooltip :has-organic-post) "second-user")}
+                      {:class (when is-second-user "second-user")}
                       [:div.add-post-tooltip-box-mobile]
                       [:div.add-post-tooltip-title
                         (str "Welcome to Carrot, " (:first-name current-user-data))]
                         [:div.add-post-tooltip
                           (if is-admin-or-author
-                            (if (= add-post-tooltip :has-organic-post)
+                            (if is-second-user
                               non-admin-tooltip
                               "Create a test post now to see how it works. You can delete it anytime.")
                             non-admin-tooltip)
-                          (when is-admin-or-author
+                          (when (and is-admin-or-author
+                                     (not is-second-user))
                             [:button.mlb-reset.add-post-bt
                               {:on-click #(when can-compose (compose s))}
                               "Create a new post"])]
-                      [:div.add-post-tooltip-box]]]))
+                      [:div.add-post-tooltip-box
+                        {:class (when is-second-user "second-user")}]]]))
               (when (and (not is-drafts-board)
                          is-admin-or-author
                          (not is-mobile?)

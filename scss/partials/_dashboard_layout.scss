@@ -119,11 +119,15 @@ div.dashboard-layout {
           float: left;
 
           &.second-user {
-            width: 484px;
+            width: 444px;
           }
 
           @include tablet() {
             width: 100%;
+
+            &.second-user {
+              width: 100%;
+            }
           }
 
           div.add-post-tooltip-box-mobile {
@@ -191,6 +195,13 @@ div.dashboard-layout {
             background-size: 154px 160px;
             background-repeat: no-repeat;
             background-position: center;
+
+            &.second-user {
+              width: 114px;
+              height: 150px;
+              background-size: 114px 150px;
+              @include image-2x("/img/ML/add_post_tooltip_box_second_user");
+            }
 
             @include mobile() {
               display: none;

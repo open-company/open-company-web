@@ -169,6 +169,7 @@
                                   (drv/drv :current-user-data)
                                   (drv/drv :teams-data)
                                   (drv/drv :org-editing)
+                                  (drv/drv :orgs)
                                   (rum/local false ::saving)
                                   {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:org-editing :name] ""])
@@ -187,7 +188,8 @@
                                         (reset! (::saving s) false)))
                                     s)}
   [s]
-  (let [edit-user-profile (drv/react s :edit-user-profile)
+  (let [has-org? (pos? (count (drv/react s :orgs)))
+        edit-user-profile (drv/react s :edit-user-profile)
         current-user-data (drv/react s :current-user-data)
         teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
@@ -195,12 +197,14 @@
         continue-disabled (or @(::saving s)
                               (and (empty? (:first-name user-data))
                                         (empty? (:last-name user-data)))
-                              (<= (count (clean-org-name (:name org-editing))) 1))
+                              (and (not has-org?)
+                                   (<= (count (clean-org-name (:name org-editing))) 1)))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])))]
+    (js/console.log "XXX has-org?" (drv/react s :orgs))
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.mobile-header.mobile-only
@@ -213,10 +217,11 @@
             "Continue"]]
         [:div.title.about-yourself
           "Tell us about you"]
-        [:div.steps.first-step
-          [:div.step]
-          [:div.step]
-          [:div.step]]
+        (when-not has-org?
+          [:div.steps.first-step
+            [:div.step]
+            [:div.step]
+            [:div.step]])
         [:div.steps-separator]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
@@ -240,18 +245,20 @@
              :placeholder "Last name"
              :value (or (:last-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
-          [:div.field-label
-            "Company name"
-            (when (:error org-editing)
-              [:span.error "Must be at least 3 characters"])]
-          [:input.field.fs-hide
-            {:type "text"
-             :ref "org-name"
-             :placeholder "e.g., Acme, or Acme Design"
-             :class (when (:error org-editing) "error")
-             :value (:name org-editing)
-             :on-change #(dis/dispatch! [:input [:org-editing]
-               (merge org-editing {:error nil :name (.. % -target -value)})])}]
+          (when-not has-org?
+            [:div.field-label
+              "Company name"
+              (when (:error org-editing)
+                [:span.error "Must be at least 3 characters"])])
+          (when-not has-org?
+            [:input.field.fs-hide
+              {:type "text"
+               :ref "org-name"
+               :placeholder "e.g., Acme, or Acme Design"
+               :class (when (:error org-editing) "error")
+               :value (:name org-editing)
+               :on-change #(dis/dispatch! [:input [:org-editing]
+                 (merge org-editing {:error nil :name (.. % -target -value)})])}])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
