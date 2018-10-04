@@ -12,7 +12,7 @@
                                (.destroy player-instance))
                              s)
                             :did-mount (fn [s]
-                            (let [{:keys [video-id width height video-processed]
+                            (let [{:keys [video-id width height video-processed autoplay]
                                        :or {width 640
                                             height 480}} (first (:rum/args s))]
                               (when video-processed
@@ -20,6 +20,7 @@
                                       config {:element player-el
                                               :attrs #js {:width width
                                                           :height height
+                                                          :autoplay autoplay
                                                           :theme "carrot"
                                                           :themecolor "white"
                                                           :video video-id}}
@@ -28,7 +29,7 @@
                                   (reset! (::player-instance s) player-instance)
                                   (.activate player-instance))))
                             s)} 
-  [s {:keys [video-id remove-video-cb width height video-processed]
+  [s {:keys [video-id remove-video-cb width height video-processed autoplay]
       :or {width 640
            height 480}}]
   [:div.ziggeo-player
