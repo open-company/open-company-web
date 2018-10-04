@@ -145,6 +145,10 @@ div.stream-item {
       float: right;
       position: relative;
 
+      &.loading {
+        background-color: rgba(0, 0, 0, .1);
+      }
+
       @include tablet(){
         margin-top: 16px;
         float: unset;
@@ -169,12 +173,31 @@ div.stream-item {
         &:hover {
           opacity: 1;
         }
+        
+        &.loading {
+          width: 40px;
+          height: 40px;
+          background-image: cdnUrl("/img/ML/video-spinner.svg");
+          background-size: 20px;
+          background-color: #000000;
+          opacity: 0.4;
+          border-radius: 100px 100px 100px 100px;
+          left: 50px;
+          top: 30px;
+          &:hover {
+            opacity: 0.4;
+          }
+        }
       }
 
       img.video-image {
         width: 136px;
         height: 102px;
         position: absolute;
+
+        &.loading {
+          display: none;
+        }
       }
 
       &.clicked {
