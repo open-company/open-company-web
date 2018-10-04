@@ -78,6 +78,7 @@
                          (rum/local false ::more-menu-open)
                          (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
+                         (rum/local false ::video-image-clicked)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
                          (am/truncate-element-mixin "activity-body" (* 30 3))
@@ -180,11 +181,19 @@
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.group
-          (when has-video
+           (when has-video
+             [:div.video-play-image
+               {:class (when @(::video-image-clicked s) "clicked")
+                :on-click #(reset! (::video-image-clicked s) true)}
+               [:div.play]
+               [:img.video-image {
+                 :src (str "https://" (:video-image activity-data))}]])
+          (when (and has-video @(::video-image-clicked s))
             (rum/with-key
              (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
                              :height (:height video-size)
+                             :autoplay true
                              :video-processed (:video-processed activity-data)})
               (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))))
           [:div.stream-body-left.group.fs-hide
