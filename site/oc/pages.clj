@@ -391,7 +391,9 @@
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Simple plans to stay aligned."]
+          "Simple plans to stay aligned."
+          [:br]
+          "Get started for free."]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -488,7 +490,7 @@
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Make sure you’re being heard, and know who’s seen your post"}
-              [:span "Who Saw That"]]]
+              [:span "Who saw that"]]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
             [:h2.tear-title
@@ -497,7 +499,8 @@
             [:div.tear-subtitle
               "A team of more than 100? Let's create a custom plan."]
             [:a.tear-start-bt
-              {:href "#pricing"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -507,6 +510,10 @@
                 ", plus:"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Make sure everyone sees what matters most."}
               [:span "Carrot AI"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -528,10 +535,10 @@
           [:div.faq-row-answer
             (str
              "Absolutely! You can use Carrot for free with teams of up to 10 people. "
-             "The storage limit is 1TB and there’s a maximum upload of 20mbs. When you "
-             "sign up for the free plan you’ll get to try a fully-featured Team plan "
-             "(incl in-app video recording, recurring updates and advanced permissions) for "
-             "30 days. It’s fast to sign up, and no credit card is required.")]]
+             "The storage limit is 1TB and there's a maximum upload of 20mb per attachment. "
+             "When you sign up for the free plan you’ll get to try a fully-featured Team plan "
+             "(including in-app video recording, recurring updates, advanced permissions, and "
+             "Who Saw That) for 30 days. It’s fast to sign up, and no credit card is required.")]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -542,7 +549,7 @@
               [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
               [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
               [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
-              [:li [:span.heavy "Who Saw That:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
+              [:li [:span.heavy "Who saw that:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -586,8 +593,8 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "#pricing"
-               :target "_blank"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43239 }); return false;"}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -596,8 +603,8 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "#pricing"
-               :target "_blank"}
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
               "Get in touch with us"]]]]
 
       testimonials-section
@@ -781,15 +788,15 @@
           [:div.about-copy-inner
             [:h3.about-copy-header
               "Why we built Carrot"]
-            [:div.about-copy-title
-              (str
-               "In the age of Slack, the lack of clear leadership "
-               "is the single, greatest problem in the workplace.")]
             [:p
               (str
-               "Sure, teams are more connected than ever with chat apps like Slack - and yet, "
-               "it’s become even more difficult for those same teams to stay focused and aligned "
-               "around what matters most. ")
+               "In the age of Slack and fast-moving conversations, the lack of "
+               "focus and clarity have become a huge problem in the workplace.")]
+            [:p
+              (str
+               "Chat apps keep everyone connected throughout the day, and yet "
+               "it's become even more difficult for teams to stay "
+               "aligned around what matters most. ")
               [:span.oblique "How can that be?"]]
             [:p
               "This is the question that led us to build Carrot. What we "
@@ -822,9 +829,9 @@
                    "amazing people regardless of where they "
                    "call home.")]
                 [:a
-                  {:href "#hello"
-                   :target "_blank"}
-                  "Say hello"]]]
+                  {:href "#"
+                   :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                   "Say hello"]]]
             [:div.about-bottom-copy-row.group
               [:div.about-bottom-copy-left
                 "Crazy for open source."]
@@ -981,6 +988,8 @@
              :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
+          ;; Google fonts
+          google-fonts
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
@@ -995,7 +1004,6 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
-          google-fonts
           ;; CarrotKit Font
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript

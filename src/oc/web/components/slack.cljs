@@ -12,7 +12,6 @@
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
-            [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defcs slack < rum/static
@@ -50,7 +49,6 @@
                                                    {:auth-source "slack"})]
                                (user-actions/login-with-slack auth-link)))}]]
             shared-misc/no-credit-card
-            (carrot-box-thanks "carrot-box-thanks-top")
             [:div.carrot-box-container.confirm-thanks.group
               {:style {:display "none"}}
               [:div.carrot-box-thanks

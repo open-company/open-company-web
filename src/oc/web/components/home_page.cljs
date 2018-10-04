@@ -12,7 +12,6 @@
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.try-it-form :refer (try-it-form)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
-            [oc.web.components.ui.carrot-box-thanks :refer (carrot-box-thanks)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
 (rum/defcs home-page < (rum/local false ::thanks-box-top)
@@ -57,7 +56,6 @@
                :on-click #(router/nav! oc-urls/sign-up)}
               "Get started for free"]]
           shared-misc/no-credit-card
-          (carrot-box-thanks "carrot-box-thanks-top")
           [:div.carrot-box-container.confirm-thanks.group
             {:style {:display "none"}}
             [:div.carrot-box-thanks

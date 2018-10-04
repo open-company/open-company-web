@@ -10,7 +10,7 @@
 (def options {:contact-email contact-email
               :contact-mail-to contact-mail-to})
 
-(defn head [drift?]
+(defn head []
   [:head
     [:meta {:charset "utf-8"}]
     [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
@@ -18,6 +18,7 @@
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
     [:title "Carrot | Leadership communication for growing and distributed teams"]
+    pages/google-fonts
     pages/bootstrap-css
     ;; Local css
     [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
@@ -29,11 +30,6 @@
       <script src=\"//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js\"></script>
       <script src=\"//oss.maxcdn.com/respond/1.4.2/respond.min.js\"></script>
     <![endif]-->"
-    ;; Google fonts Open Sans / Lora
-    [:link {:type "text/css", :rel "stylesheet",
-           :href "https://fonts.googleapis.com/css?family=Open+Sans:400,300"}]
-    [:link {:type "text/css", :rel "stylesheet",
-           :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
     ;; CarrotKit Font
     [:link {:type "text/css" :rel "stylesheet" :href (pages/cdn "/css/fonts/CarrotKit.css")}]
     pages/font-awesome
@@ -43,9 +39,8 @@
     [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
     ;; Static js files
     [:script {:src (pages/cdn "/js/static-js.js")}]
-    (when drift?
-      ;; Drift
-      [:script {:src (pages/cdn "/js/drift.js")}])
+    ;; Drift
+    [:script {:src (pages/cdn "/js/drift.js")}]
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
     [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
@@ -208,10 +203,12 @@
               (str
                "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
-            "#help-bot"]
+            "Support"]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
-          ; [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href "#hello"} "Contact"]]]
+          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href "#"
+                                 :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                              "Contact"]]]
 
         [:div.column.column-integrations
           [:div.column-title
@@ -243,10 +240,10 @@
   ([content]
    (static-page content {}))
   ([content opts]
-   (let [{:keys [page title drift]} (-> content :entry read-edn)
+   (let [{:keys [page title]} (-> content :entry read-edn)
          is?    (fn [& args] ((set args) page))]
      (hp/html5 {:lang "en"}
-               (head drift)
+               (head)
                [:body
                 [:div
                  {:class "outer header"}
