@@ -204,7 +204,6 @@
                        (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])))]
-    (js/console.log "XXX has-org?" (drv/react s :orgs))
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.mobile-header.mobile-only
@@ -652,9 +651,9 @@
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]]
         [:div.title
-          "Join your team on Carrot"]
+          "Set a password"]
         [:div.subtitle
-          "Signing up as " [:span.email-address.fs-hide (:email jwt)]]
+          "Joining as: " [:span.email-address.fs-hide (:email jwt)]]
         [:div.steps-separator]]
       [:div.onboard-form
         [:form
