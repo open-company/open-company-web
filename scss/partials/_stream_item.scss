@@ -154,20 +154,20 @@ div.stream-item {
       }
 
       div.play {
-        width: 136px;
-        height: 102px;
+        width: 40%;
+        height: 45%;
         position: absolute;
         background-image: cdnUrl("/img/ML/play.svg");
         background-repeat: no-repeat;
         background-position: center;
-        background-size: cover;
+        background-size: 45px;
         z-index: 10;
-        left: 0; right: 0;
-        top: 0; bottom: 0;
-        opacity: 0.6;
+        left: 40px; right: 0;
+        top: 30px; bottom: 0;
+        opacity: 0.8;
 
         &:hover {
-          opacity: 0.8;
+          opacity: 1;
         }
       }
 
