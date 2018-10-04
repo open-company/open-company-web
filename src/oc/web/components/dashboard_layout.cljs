@@ -297,7 +297,7 @@
                       {:class (when is-second-user "second-user")}
                       [:div.add-post-tooltip-box-mobile]
                       [:div.add-post-tooltip-title
-                        (str "Welcome to Carrot, " (:first-name current-user-data))]
+                        (str "Welcome to Carrot, " (:first-name current-user-data) "!")]
                         [:div.add-post-tooltip
                           (if is-admin-or-author
                             (if is-second-user
