@@ -170,6 +170,7 @@
       ;; instead of creating them
       (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
       (org-loaded org-data false email-domain)
+      (dis/dispatch! [:org-create])
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
 
