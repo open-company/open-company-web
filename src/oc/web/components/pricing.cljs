@@ -132,7 +132,7 @@
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Make sure you’re being heard, and know who’s seen your post"}
-              [:span "Who Saw That"]]]
+              [:span "Who saw that"]]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
             [:h2.tear-title
@@ -191,7 +191,7 @@
               [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
               [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
               [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
-              [:li [:span.heavy "Who Saw That:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
+              [:li [:span.heavy "Who saw that:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
 
         [:div.faq-row
           [:div.faq-row-question
