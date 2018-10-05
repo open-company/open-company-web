@@ -10,6 +10,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -103,6 +104,7 @@
                               ;; Derivative
                               (drv/drv :route)
                               (drv/drv :org-data)
+                              (drv/drv :team-data)
                               (drv/drv :board-data)
                               (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
@@ -161,6 +163,7 @@
         board-data (drv/react s :board-data)
         posts-data (drv/react s :filtered-posts)
         route (drv/react s :route)
+        team-data (drv/react s :team-data)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
         is-must-see (utils/in? (:route route) "must-see")
@@ -311,24 +314,28 @@
                               "Create a new post"])]
                       [:div.add-post-tooltip-box
                         {:class (when is-second-user "second-user")}]]]))
-              (when (and (not is-drafts-board)
-                         is-admin-or-author
-                         (not is-mobile?)
-                         (drv/react s :show-post-added-tooltip))
-                [:div.post-added-tooltip-container.group
-                  [:button.mlb-reset.post-added-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                  [:div.post-added-tooltips
-                    [:div.post-added-tooltip-box-mobile]
-                    [:div.post-added-tooltip-title
-                      "Well done!"]
-                    [:div.post-added-tooltip
-                      "Using Slack? "
-                      [:button.mlb-reset.post-added-bt
-                        {:on-click #(nav-actions/show-invite)}
-                        "Connect to Slack"]
-                      " so your team can see posts and  join the discussion from Slack, too."]
-                    [:div.post-added-tooltip-box]]])
+              (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
+                (when (and (not is-drafts-board)
+                           is-admin-or-author
+                           (not is-mobile?)
+                           (drv/react s :show-post-added-tooltip))
+                  [:div.post-added-tooltip-container.group
+                    [:button.mlb-reset.post-added-tooltip-dismiss
+                      {:on-click #(do
+                                   (nux-actions/dismiss-post-added-tooltip)
+                                   (org-actions/bot-auth team-data current-user-data
+                                    (str (router/get-token) "?org-settings=main")))}]
+                    [:div.post-added-tooltips
+                      [:div.post-added-tooltip-box-mobile]
+                      [:div.post-added-tooltip-title
+                        "Well done!"]
+                      [:div.post-added-tooltip
+                        "Using Slack? "
+                        [:button.mlb-reset.post-added-bt
+                          {:on-click #(nav-actions/show-invite)}
+                          "Connect to Slack"]
+                        " so your team can see posts and  join the discussion from Slack, too."]
+                      [:div.post-added-tooltip-box]]]))
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
                 [:div.draft-post-tooltip-container.group

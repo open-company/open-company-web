@@ -675,7 +675,7 @@
                            (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
              :placeholder "Minimum 8 characters"
              :pattern ".{8,}"}]
-          [:div.description
+          [:div.field-description
             "By signing up you are agreeing to our "
             [:a
               {:href oc-urls/terms}

@@ -354,7 +354,9 @@
                      {:width (win-width)
                       :height @(::mobile-video-height s)}
                      {:width 548
-                      :height (utils/calc-video-height 548)})]
+                      :height (utils/calc-video-height 548)})
+        show-edit-tooltip (and (drv/react s :show-edit-tooltip)
+                               (not (seq @(::initial-uuid s))))]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
                                                  (:fullscreen cmail-state))
@@ -466,9 +468,9 @@
                                   @(::record-video s))
                           "remove-video-bt")}]]]
           [:div.cmail-content
+            {:class (when show-edit-tooltip "showing-edit-tooltip")}
             (when (and is-mobile?
-                       (drv/react s :show-edit-tooltip)
-                       (not (seq @(::initial-uuid s))))
+                       show-edit-tooltip)
               (edit-tooltip s))
             ;; Video elements
             ;; FIXME: disable video on mobile for now
@@ -533,8 +535,7 @@
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))
             (when (and (not is-mobile?)
-                       (drv/react s :show-edit-tooltip)
-                       (not (seq @(::initial-uuid s))))
+                       show-edit-tooltip)
               (edit-tooltip s))]
         [:div.cmail-footer
           (let [disabled? (or @(::publishing s)

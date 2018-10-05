@@ -35,8 +35,7 @@
     {:show-add-post-tooltip true
      :show-post-added-tooltip false
      :show-draft-post-tooltip true
-     :show-edit-tooltip true
-     :show-add-comment-tooltip true}))
+     :show-edit-tooltip true}))
 
 (defn nux-end
   "NUX completed for the current user, remove the cookie and update the nux-cookie-value."
@@ -73,7 +72,6 @@
           fixed-post-added-tooltip (parse-nux-cookie-value post-added-tooltip)
           draft-post-tooltip (:show-draft-post-tooltip nv)
           edit-tooltip (:show-edit-tooltip nv)
-          add-comment-tooltip (:show-add-comment-tooltip nv)
           user-type (:user-type nv)
           all-posts-count (count (vals posts-data))
           sample-posts-count (count (filterv :sample (vals posts-data)))
@@ -92,13 +90,6 @@
                                   (not= edit-tooltip default-tooltip-done)
                                   ;; user is not a viewer
                                   can-edit?)
-          ;; Show the tooltip below the comment
-          fixed-add-comment-tooltip (and ;; jas not been done already
-                                         (not= add-comment-tooltip default-tooltip-done)
-                                         ;; the team has not a bot already
-                                         (not team-has-bot?)
-                                         ;; the user is an admin
-                                         is-admin?)
           fixed-draft-post-tooltip (and ;; draft post is not already done
                                         (not= draft-post-tooltip default-tooltip-done)
                                         ;; user has edit permissions
@@ -109,15 +100,12 @@
                  (true? post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
       (when (and (not fixed-post-added-tooltip)
-                 (not can-edit?))
+                 (or team-has-bot?
+                     (not is-admin?)))
         (mark-nux-step-done :show-post-added-tooltip))
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
-      (when (and (not fixed-add-comment-tooltip)
-                 (or team-has-bot?
-                     (not is-admin?)))
-        (mark-nux-step-done :show-add-comment-tooltip))
       (when (and (not fixed-draft-post-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-draft-post-tooltip))
@@ -129,7 +117,6 @@
                                  false)
         :show-post-added-tooltip fixed-post-added-tooltip
         :show-edit-tooltip fixed-edit-tooltip
-        :show-add-comment-tooltip fixed-add-comment-tooltip
         :show-draft-post-tooltip fixed-draft-post-tooltip
         :user-type user-type}])
 
@@ -137,16 +124,11 @@
       (when (and (= (:show-add-post-tooltip nv) default-tooltip-done)
                  (= (:show-post-added-tooltip nv) default-tooltip-done)
                  (= (:show-edit-tooltip nv) default-tooltip-done)
-                 (= (:show-draft-post-tooltip nv) default-tooltip-done)
-                 (= (:show-add-comment-tooltip nv) default-tooltip-done))
+                 (= (:show-draft-post-tooltip nv) default-tooltip-done))
         (nux-end)))))
 
 (defn dismiss-add-post-tooltip []
   (mark-nux-step-done :show-add-post-tooltip)
-  (check-nux))
-
-(defn dismiss-add-comment-tooltip []
-  (mark-nux-step-done :show-add-comment-tooltip)
   (check-nux))
 
 (defn show-post-added-tooltip []

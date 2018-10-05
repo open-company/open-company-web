@@ -338,7 +338,7 @@ div.onboard-lander {
     @include avenir_R();
     font-size: 16px;
     margin-top: 16px;
-    color: $oc_gray_7;
+    color: $deep_navy;
     padding: 0px 24px;
 
     &.error {
@@ -347,7 +347,7 @@ div.onboard-lander {
 
     span.email-address {
       @include avenir_H();
-      color: $oc_gray_7;
+      color: $deep_navy;
     }
   }
 

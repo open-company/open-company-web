@@ -449,6 +449,14 @@ div.cmail-outer {
         overflow-x: hidden;
         height: auto;
 
+        &.showing-edit-tooltip {
+          max-height: calc(100vh - 145px);
+
+          @include tablet() {
+            max-height: initial;
+          }
+        }
+
         @include tablet() {
           padding: 24px;
           min-height: calc(100vh - 112px);
