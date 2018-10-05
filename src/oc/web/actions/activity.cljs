@@ -686,18 +686,21 @@
 
 ;; Video handling
 
-(defn uploading-video [video-id]
+(defn uploading-video [video-id edit-key]
+  (dis/dispatch! [:update [edit-key] #(merge % {:has-changes true})])
   (dis/dispatch! [:uploading-video (router/current-org-slug) video-id]))
 
-(defn remove-video [edit-key]
-  (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
-                                                :video-id nil
-                                                :video-transcript nil
-                                                :video-processed false
-                                                :video-error false
-                                                :has-changes true})]))
+(defn remove-video [edit-key activity-data]
+  (let [has-changes (or (au/has-attachments? activity-data)
+                        (au/has-text? activity-data))]
+    (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
+                                                  :video-id nil
+                                                  :video-transcript nil
+                                                  :video-processed false
+                                                  :video-error false
+                                                  :has-changes has-changes})])))
 
-(defn prompt-remove-video [edit-key]
+(defn prompt-remove-video [edit-key activity-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "rerecord-video"
                     :message "Are you sure you want to delete the current video? This can’t be undone."
@@ -706,7 +709,7 @@
                     :solid-button-style :red
                     :solid-button-title "Yes"
                     :solid-button-cb (fn []
-                                      (remove-video edit-key)
+                                      (remove-video edit-key activity-data)
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
 
@@ -714,8 +717,7 @@
   (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
                                                 :video-id video-token
                                                 ;; default video error to true
-                                                :video-error true
-                                                :has-changes true})]))
+                                                :video-error true})]))
 
 (defn video-processed-cb [edit-key video-token unmounted?]
   (when-not unmounted?
