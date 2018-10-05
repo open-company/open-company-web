@@ -28,476 +28,228 @@
 
       [:div.main.pricing
         [:section.pricing-header
-          [:h1.pricing-headline
-            "Pricing guide"]
 
-          [:table.pricing-table.big-web-only
-            [:thead
-              [:tr
-                [:th]
-                [:th
-                  [:div.tire-title
-                    "Free"]
-                  [:div.tire-price
-                    "$0"]
-                  [:button.mlb-reset.price-button
-                    "Get started"]]
-                [:th
-                  [:div.tire-title
-                    "Team"]
-                  [:div.tire-price
-                    "$45"
-                    [:span.per-month
-                      "per month"]]
-                  [:button.mlb-reset.price-button
-                    "Try for free"]]
-                [:th
-                  [:div.tire-title
-                    "Enterprise"]
-                  [:div.tire-price
-                    "$125"
-                    [:span.per-month
-                      "per month"]]
-                  [:button.mlb-reset.price-button
-                    "Try for free"]]]]
-            [:tbody
-              [:tr
-                [:td.pricing-description
-                  "Number of users included"]
-                [:td.pricing-value
-                  "10"]
-                [:td.pricing-value
-                  "25"]
-                [:td.pricing-value
-                  "50"]]
+        [:h1.pricing-headline
+          "Pricing"]
 
-              [:tr
-                [:td.pricing-description
-                  "Additional users"]
-                [:td.pricing-value
-                  "—"]
-                [:td.pricing-value
-                  "—"]
-                [:td.pricing-value
-                  "$2 per user"]]
+        [:div.pricing-subheadline
+          "Simple plans to stay aligned."
+          [:br]
+          "Get started for free."]
 
-              [:tr
-                [:td.pricing-description
-                  "Number of new posts"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Number of new posts"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-                [:td.pricing-value
-                  "50"]
-                [:td.pricing-value
-                  "Unlimited"]
-                [:td.pricing-value
-                  "Unlimited"]]
+        [:div.pricing-three-columns.group
+          ;; Free
+          [:div.pricing-column.free-column
+            [:h2.tear-title
+              "Free"]
+            [:h3.tear-price
+              "$0"]
+            [:h5.tear-period
+              "/month"]
+            [:div.tear-subtitle
+              "Free for small teams up to 10 users."]
+            [:a.tear-start-bt
+              {:href "/sign-up"}
+              "Start Free"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Attachments up to 20MB"}
+              [:span "20MB upload max"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              [:span "1TB storage"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Browse and search posts from the previous 6 months"}
+              [:span "6 months history"]]]
+          ;; Team
+          [:div.pricing-column.team-column
+            [:h2.tear-title
+              "Team"]
+            [:h3.tear-price
+              "$65"]
+            [:h5.tear-period
+              "/month"]
+            [:div.tear-subtitle
+              "Includes 15 users, additional users are $4 /mo."]
+            [:a.tear-start-bt
+              {:href "/sign-up"}
+              "Start Free"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Attachments up to 100MB"}
+              [:span "100MB file upload"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              [:span "Unlimited storage"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "No limits on history maintained in Carrot"}
+              [:span "Unlimited history"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Support via chat and email"}
+              [:span "Priority support"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Don’t feel like writing? Record a quick video"}
+              [:span "Video updates"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Schedule and assign weekly and monthly updates to build consistency."}
+              [:span "Recurring updates"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Add private sections for invited team members only"}
+              [:span "Advanced permissions"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Make sure you’re being heard, and know who’s seen your post"}
+              [:span "Who saw that"]]]
+          ;; Enterprise
+          [:div.pricing-column.enterprise-column
+            [:h2.tear-title
+              "Enterprise"]
+            [:div.tear-price]
+            [:div.tear-subtitle
+              "A team of more than 100? Let's create a custom plan."]
+            [:a.tear-start-bt
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
+              "Contact Us"]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              [:span
+                "Includes everything in the "
+                [:span.heavy "Team plan"]
+                ", plus:"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              {:data-toggle "tooltip"
+               :data-placement "top"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Make sure everyone sees what matters most."}
+              [:span "Carrot AI"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              [:span "On premise option"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              [:span "Uptime SLA"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              [:span "Premium support"]]]]]
 
-              [:tr
-                [:td.pricing-description
-                  "History retained"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "History retained"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-                [:td.pricing-value
-                  "6 months"]
-                [:td.pricing-value
-                  "Unlimited"]
-                [:td.pricing-value
-                  "Unlimited"]]
+      [:section.pricing-faq
+        [:h2.faq-header
+          "Frequently asked questions."]
 
-              [:tr
-                [:td.pricing-description
-                  "File upload"]
-                [:td.pricing-value
-                  "25 MB"]
-                [:td.pricing-value
-                  "Unlimited"]
-                [:td.pricing-value
-                  "Unlimited"]]
+        [:div.faq-row
+          [:div.faq-row-question
+            "Can I use Carrot for free?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! You can use Carrot for free with teams of up to 10 people. "
+             "The storage limit is 1TB and there's a maximum upload of 20mb per attachment. "
+             "When you sign up for the free plan you’ll get to try a fully-featured Team plan "
+             "(including in-app video recording, recurring updates, advanced permissions, and "
+             "Who Saw That) for 30 days. It’s fast to sign up, and no credit card is required.")]]
 
-              [:tr
-                [:td.pricing-description
-                  "File storage"]
-                [:td.pricing-value
-                  "500 MB"]
-                [:td.pricing-value
-                  "5 TB"]
-                [:td.pricing-value
-                  "Unlimited"]]
+        [:div.faq-row
+          [:div.faq-row-question
+            "How is the Team plan different from the Free plan?"]
+          [:div.faq-row-answer
+            "With the Team plan you get unlimited  upload file size and storage, and premium features, like:"
+            [:ul
+              [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
+              [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
+              [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
+              [:li [:span.heavy "Who saw that:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
 
-              [:tr
-                [:td.pricing-description
-                  "G suite single sign-on"]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
+        [:div.faq-row
+          [:div.faq-row-question
+            "Do I need a credit card to sign up?"]
+          [:div.faq-row-answer
+            "No! You can use Carrot right away without a credit card."]]
 
-              [:tr
-                [:td.pricing-description
-                  "Slack single sign-on"]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
+        [:div.faq-row
+          [:div.faq-row-question
+            "What happens if we go over our storage limit in the Free plan?"]
+          [:div.faq-row-answer
+            (str
+             "You can still read, write, edit, and organize existing content, "
+             "but you won't be able to add new attachments and videos.")]]
 
-              [:tr
-                [:td.pricing-description
-                  "Sync with Slack"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Sync with Slack"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
+        [:div.faq-row
+          [:div.faq-row-question
+            "How is pricing calculated for the Team plan?"]
+          [:div.faq-row-answer
+            (str
+             "When you upgrade to the Team plan, you will be charged a base fee of $65 per "
+             "month that includes up to 15 team members. Beyond the initial 15 members, you "
+             "will be charged a fee of $4 per additional member per month.")
+            [:br]
+            [:br]
+            (str
+             "For example, if you have 25 team members, you would pay $65 for the first 15 "
+             "members, and $4 for each of the additional 10 members, for a total of $105 per month.")]]
 
-              [:tr
-                [:td.pricing-description
-                  "Dropbox, Google Drive and other integrations"]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
+        [:div.faq-row
+          [:div.faq-row-question
+            "How is the payment being processed?"]
+          [:div.faq-row-answer
+            (str
+             "We use Stripe to process your payment. It's the same payment provider used in products "
+             "such as Slack, Pinterest, and Lyft. We do not handle your credit card information directly.")]]
 
-              [:tr
-                [:td.pricing-description
-                  "Advanced permissions"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Advanced permissions"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-                [:td.pricing-value]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
+        [:div.faq-row
+          [:div.faq-row-question
+            "Are discounts available for nonprofits?"]
+          [:div.faq-row-answer
+            "Yes! We offer eligible nonprofit organizations a 50% discount. "
+            [:a
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43239 }); return false;"}
+              "Contact us"]
+            " to see if your organization is eligible."]]
 
-              [:tr
-                [:td.pricing-description
-                  "Priority support"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Priority support"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-                [:td.pricing-value]
-                [:td.pricing-value
-                  [:div.price-checkmark]]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
-
-              [:tr
-                [:td.pricing-description
-                  "Analytics"]
-                [:td.pricing-value]
-                [:td.pricing-value]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
-
-              [:tr
-                [:td.pricing-description
-                  "Uptime SLA"]
-                [:td.pricing-value]
-                [:td.pricing-value]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]
-
-              [:tr
-                [:td.pricing-description
-                  "On premise"]
-                [:td.pricing-value]
-                [:td.pricing-value]
-                [:td.pricing-value
-                  [:div.price-checkmark]]]]
-            [:thead
-              [:tr
-                [:th]
-                [:th
-                  [:div.tire-title
-                    "Free"]
-                  [:button.mlb-reset.price-button
-                    "Get started"]]
-                [:th
-                  [:div.tire-title
-                    "Team"]
-                  [:button.mlb-reset.price-button
-                    "Try for free"]]
-                [:th
-                  [:div.tire-title
-                    "Enterprise"]
-                  [:button.mlb-reset.price-button
-                    "Try for free"]]]]]
-
-          [:table.pricing-table.mobile-only
-            [:thead
-              [:tr
-                [:th
-                  [:div.tire-title
-                    "FREE"]
-                  [:div.tire-price
-                    [:span.dollar "$"]
-                    "0"]
-                  [:button.mlb-reset.price-button
-                    "Get started"]]]]
-            [:tbody
-              [:tr
-                [:td.pricing-description
-                  "Up to 10 users"]]
-              [:tr
-                [:td.pricing-description
-                  "50 new post cap"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "50 new post cap"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "6 months of history retained"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "6 months of history retained"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "25 MB upload limit"]]
-              [:tr
-                [:td.pricing-description
-                  "500 MB file storage"]]
-              [:tr
-                [:td.pricing-description
-                  "G suite single sign-on"]]
-              [:tr
-                [:td.pricing-description
-                  "Slack single sign-on"]]
-              [:tr
-                [:td.pricing-description
-                  "Sync with Slack"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Sync with Slack"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "Dropbox, Google Drive, and other integrations"]]]]
-
-          [:table.pricing-table.mobile-only
-            [:thead
-              [:tr
-                [:th
-                  [:div.tire-title
-                    "TEAM"]
-                  [:div.tire-price
-                    [:span.dollar "$"]
-                    "45"
-                    [:span.per-month\
-                      "per month"]]
-                  [:button.mlb-reset.price-button
-                    "Get started"]]]]
-            [:tbody
-              [:tr
-                [:td.pricing-description
-                  "Up to 25 users"]]
-              [:tr
-                [:td.pricing-description
-                  "Unlimited posts"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Unlimited posts"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "No history limit"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "No history limit"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "No file size upload limit"]]
-              [:tr
-                [:td.pricing-description
-                  "5 TB file storage"]]
-              [:tr
-                [:td.pricing-description
-                  "G suite single sign-on"]]
-              [:tr
-                [:td.pricing-description
-                  "Slack single sign-on"]]
-              [:tr
-                [:td.pricing-description
-                  "Sync with Slack"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Sync with Slack"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "Dropbox, Google Drive, and other integrations"]]
-              [:tr
-                [:td.pricing-description
-                  "Advanced permissions"]]
-              [:tr
-                [:td.pricing-description
-                  "Priority support"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Priority support"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]]]
-
-          [:table.pricing-table.mobile-only
-            [:thead
-              [:tr
-                [:th
-                  [:div.tire-title
-                    "ENTERPRISE"]
-                  [:div.tire-price
-                    [:span.dollar "$"]
-                    "125"
-                    [:span.per-month\
-                      "per month"]]
-                  [:button.mlb-reset.price-button
-                    "Get started"]]]]
-            [:tbody
-              [:tr
-                [:td.pricing-description
-                  "Includes everthing in "
-                  [:span.strong "team"]
-                  " and:"]]
-              [:tr
-                [:td.pricing-description
-                  "Up to 50 users"]]
-              [:tr
-                [:td.pricing-description
-                  "$2 per additional user "]]
-              [:tr
-                [:td.pricing-description
-                  "Analytics"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Analytics"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "Uptime SLA"
-                  [:span.info
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :title "Uptime SLA"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
-              [:tr
-                [:td.pricing-description
-                  "On premise"]]]]
-
-          ; [:div.pricing-faq
-          ;   [:h2.faq-header
-          ;     "Frequently asked questions"]
-
-          ;   [:div.faq-row
-          ;     [:div.faq-question
-          ;       "What are my payment options (credit card and/or invoicing)?"]
-          ;     [:div.faq-response
-          ;       (str
-          ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-          ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-          ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-          ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-          ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-          ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          ;   [:div.faq-row
-          ;     [:div.faq-question
-          ;       "My team has credits. How do we use them?"]
-          ;     [:div.faq-response
-          ;       (str
-          ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-          ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-          ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-          ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-          ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-          ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          ;   [:div.faq-row
-          ;     [:div.faq-question
-          ;       "We need to add new users to our team. How will that be billed?"]
-          ;     [:div.faq-response
-          ;       (str
-          ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-          ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-          ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-          ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-          ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-          ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          ;   [:div.faq-row
-          ;     [:div.faq-question
-          ;       "My team wasnts to cancel its subscription. How do we do that? Can we get a refund?"]
-          ;     [:div.faq-response
-          ;       (str
-          ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-          ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-          ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-          ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-          ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-          ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          ;   [:div.faq-row
-          ;     [:div.faq-question
-          ;       "What are my payment options (credit card and/or invoicing)?"]
-          ;     [:div.faq-response
-          ;       (str
-          ;        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-          ;        "Vestibulum nisi augue, pharetra nec tempus ac, rhoncus eu felis. Sed tempus"
-          ;        " massa a ipsum commodo, sed condimentum odio viverra. Donec euismod "
-          ;        "mauris et diam pellentesque porta. Donec et laoreet nunc. Maecenas ut leo vel "
-          ;        "dui rutrum dapibus. Etiam viverra tortor quam, in fermentum ipsum rutrum sed. "
-          ;        "Suspendisse risus eros, gravida vel placerat sit amet, viverra vitae massa.")]]
-          ;   [:div.contact-us-row
-          ;     "If you have more questions, don’t hesitate to "
-          ;     [:a.contact
-          ;       {:href oc-urls/contact-mail-to}
-          ;       "contact us"]]]
-        ]
+        [:div.faq-row
+          [:div.faq-row-question
+            "Still have more questions?"]
+          [:div.faq-row-answer
+            [:a.chat-with-us
+              {:href "#"
+               :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
+              "Get in touch with us"]]]]
 
         shared-misc/testimonials-section
-
-        (when-not (jwt/jwt)
-          shared-misc/keep-aligned)
       ] ;<!-- main -->
     ] ; <!-- wrap -->
 

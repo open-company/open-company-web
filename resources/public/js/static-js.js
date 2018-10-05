@@ -94,26 +94,23 @@ if (jwt) {
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
+
+  if ($("#youtube-player").length > 0) {
+    OCYTVideoInit();
+  }
+
+  // Initialize tooltips
+  $('[data-toggle="tooltip"]').tooltip();
   // Sticky header for marketing site
   if ( $("nav.site-navbar").length > 0) {
     $(window).on("scroll", function(){
-      if ($(window).scrollTop() === 0) {
+      if ($(window).scrollTop() < 100) {
         $("nav.site-navbar").removeClass("sticky");
       }else{
         $("nav.site-navbar").addClass("sticky");
       }
     });
   }
-
-  $(".faq-row").each(function(){
-    $(this).on("click", function(){
-      var wasOpen = $(this).hasClass("expanded");
-      $(".faq-row").each(function(){$(this).removeClass("expanded");});
-      if (!wasOpen) {
-        $(this).addClass("expanded");
-      }
-    });
-  });
 
   if (jwt) {
     $("#site-header-login-item").hide();
@@ -134,16 +131,28 @@ document.addEventListener("DOMContentLoaded", function(_) {
     var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
     siteMobileMenuGetStarted.text( "Your digest" );
     siteMobileMenuGetStarted.addClass("your-digest");
+    // No credit card copy below the buttons
+    var siteMobileMenuNoCreditCard = $("button#site-mobile-menu-nocreditcard");
+    siteMobileMenuNoCreditCard.css({"display": "none"});
     // Top right corner became Your digest
     var signupButton = $("#site-header-signup-item");
     signupButton.addClass("your-digest");
     signupButton.attr("href", your_board_url);
-    signupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
+    signupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
+
+    var tabletSignupButton = $("#site-header-tablet-signup-item");
+    tabletSignupButton.removeClass("start");
+    tabletSignupButton.attr("href", your_board_url);
+    tabletSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
+
+    var tabletLoginButton = $("#site-header-tablet-login-item");
+    tabletLoginButton.css({"display": "none"});
 
     var mobileSignupButton = $("#site-header-mobile-signup-item");
     mobileSignupButton.removeClass("start");
     mobileSignupButton.attr("href", your_board_url);
-    mobileSignupButton.html("<span class=\"go-to-digest\">Go to digest</span>");
+    mobileSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
+
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
     // Set the action of the site mobile menu's Get started button
@@ -156,12 +165,9 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("div.home-page").removeClass("no-get-started-button");
     $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
-    $(".get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $("button.get-started-button").attr("onClick", "window.location = \"/sign-up\"");
     $(".signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
-    // Top right corner signup button
-    $("#site-header-signup-item").attr("href", "/sign-up");
-    $("#site-header-mobile-signup-item").attr("href", "/sign-up");
     // Top right corner login button
     $("#site-header-login-item").attr("href", "/login");
     // Mobile menu login button
@@ -272,4 +278,59 @@ function OCStaticStartFixFixedPositioning(sel) {
     },
     blur: resetFixedPosition
   });
+}
+
+var OCYTVideoPlayer = null,
+OCYTVideoFinished = false;
+
+function OCYTVideoInit() {
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
+
+function onYouTubeIframeAPIReady() {
+  var winWidth = document.documentElement.clientWidth || window.innerWidth,
+  winHeight = document.documentElement.clientHeight || window.innerHeight;
+  OCYTVideoPlayer = new YT.Player('youtube-player', {
+    height: Math.min(winHeight, 608).toString(),
+    width: Math.min(winWidth, 1080).toString(),
+    videoId: 'dMWpnHxQMP4',
+    allowfullscreen: 'true',
+    playerVars: {
+        showinfo: 0,
+        rel: 0,
+        autoplay: 0
+    },
+    events: {
+      'onReady': OCYTVideoOnPlayerReady,
+      'onStateChange': OCYTVideoOnPlayerStateChange
+    }
+  });
+}
+
+function OCYTVideoOnPlayerReady(event) {
+}
+
+function OCStaticShowAnimationLightbox() {
+  $(document.body).addClass('show-animation-lightbox no-scroll');
+  
+  if (OCYTVideoFinished) {
+    OCYTVideoPlayer.seekTo(0);
+    OCYTVideoFinished = false;
+  }
+  OCYTVideoPlayer.playVideo();
+}
+
+function OCYTVideoOnPlayerStateChange(event){
+  if (event.data === 0) {
+    OCYTVideoFinished = true;
+    OCStaticHideAnimationLightbox();
+  }
+}
+
+function OCStaticHideAnimationLightbox() {
+  OCYTVideoPlayer.pauseVideo();
+  $(document.body).removeClass('show-animation-lightbox no-scroll');
 }

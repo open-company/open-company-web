@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.actions.user :as user]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
@@ -25,36 +26,10 @@
       (login-overlays-handler)
 
       [:div.main.about
-        [:section.about-header.group
-          [:h1.about "About us"]
-          [:div.about-subline
-            "We believe real transparency and alignment requires focused communication."]
-          [:div.about-copy
-            [:p
-              (str
-               "Workplace chat is everywhere, and "
-               "yet teams are still struggling to "
-               "stay on the same page - especially "
-               "growing or distributed teams.")]
-            [:p
-              (str
-               "Chat might be ideal for fast and "
-               "spontaneous conversations in the moment, "
-               "but it gets noisy and drowns out "
-               "important information and follow-on "
-               "discussions that teams need to stay "
-               "aligned over time.")]
-            [:p
-              (str
-               "Carrot is a company digest that gives "
-               "everyone time to read and react to "
-               "important information without worrying "
-               "they missed it.")]
-            [:p
-              (str
-               "When it’s this easy to see what matters "
-               "most, busy teams stay informed and "
-               "aligned with fewer distractions.")]]
+        [:section.about-header
+
+          [:h1.about
+            "Meet the team"]
 
           [:div.team-container
             [:div.team-row.group.three-cards
@@ -63,95 +38,154 @@
                 [:div.user-name
                   "Iacopo Carraro"]
                 [:div.user-position
-                  "Software Engineer"]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/iacopocarraro/"
-                   :target "_blank"}]]
+                  "Software Engineer"
+                  [:br]
+                  "in Livorno, Italy"]
+                [:div.user-links
+                  [:a.twitter-link
+                    {:href "https://twitter.com/bago2k4"
+                     :target "_blank"}]
+                  [:a.linkedin-link
+                    {:href "https://linkedin.com/in/iacopocarraro/"
+                     :target "_blank"}]]]
               [:div.team-card.sean-johnson
                 [:div.user-avatar]
                 [:div.user-name
                   "Sean Johnson"]
                 [:div.user-position
-                  "CTO and co-founder"]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/snootymonkey/"
-                   :target "_blank"}]]
+                  "CTO & Founder"
+                  [:br]
+                  "in Chapel Hill, USA"]
+                [:div.user-links
+                  [:a.twitter-link
+                    {:href "https://twitter.com/belucid"
+                     :target "_blank"}]
+                  [:a.linkedin-link
+                    {:href "https://linkedin.com/in/snootymonkey/"
+                     :target "_blank"}]]]
               [:div.team-card.georgiana-laudi
                 [:div.user-avatar]
                 [:div.user-name
                   "Georgiana Laudi"]
                 [:div.user-position
-                  "Marketing and CX Advisor"]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/georgianalaudi/"
-                   :target "_blank"}]]]
-            [:div.team-row.group.two-cards
+                  "Marketing & CX Advisor"
+                  [:br]
+                  "in Montreal, Canada"]
+                [:div.user-links
+                  [:a.twitter-link
+                    {:href "https://twitter.com/ggiiaa"
+                     :target "_blank"}]
+                  [:a.linkedin-link
+                    {:href "https://linkedin.com/in/georgianalaudi/"
+                     :target "_blank"}]]]
               [:div.team-card.stuart-levinson
                 [:div.user-avatar]
                 [:div.user-name
                   "Stuart Levinson"]
                 [:div.user-position
-                  "CEO and co-founder"]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/stuartlevinson/"
-                   :target "_blank"}]]
+                  "CEO & Founder"
+                  [:br]
+                  "in Cambridge, USA"]
+                [:div.user-links
+                  [:a.twitter-link
+                    {:href "https://twitter.com/stuartlevinson"
+                     :target "_blank"}]
+                  [:a.linkedin-link
+                    {:href "https://linkedin.com/in/stuartlevinson/"
+                     :target "_blank"}]]]
               [:div.team-card.ryan-le-roux
                 [:div.user-avatar]
                 [:div.user-name
                   "Ryan Le Roux"]
                 [:div.user-position
-                  "Chief Design Officer"]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/ryanleroux/"
-                   :target "_blank"}]]
+                  "Head of Design"
+                  [:br]
+                  "in Vancouver, Canada"]
+                [:div.user-links
+                  [:a.twitter-link
+                    {:href "https://twitter.com/ryanleroux"
+                     :target "_blank"}]
+                  [:a.linkedin-link
+                    {:href "https://linkedin.com/in/ryanleroux/"
+                     :target "_blank"}]]]
               [:div.team-card.nathan-zorn
                 [:div.user-avatar]
                 [:div.user-name
                   "Nathan Zorn"]
                 [:div.user-position
-                  "Software Engineer"]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/nathanzorn/"
-                   :target "_blank"}]]]]
+                  "Software Engineer"
+                  [:br]
+                  "in Charleston, USA"]
+                [:div.user-links
+                  [:a.twitter-link
+                    {:href "https://twitter.com/thepug"
+                     :target "_blank"}]
+                  [:a.linkedin-link
+                    {:href "https://linkedin.com/in/nathanzorn/"
+                     :target "_blank"}]]]]]
 
-          [:div.other-cards.group
-            [:div.other-card.heart-card
-              [:div.card-icon]
-              [:div.card-title
-                "Careers at Carrot"]
-              [:div.card-content
+          [:div.about-copy
+            [:div.about-copy-inner
+              [:h3.about-copy-header
+                "Why we built Carrot"]
+              [:p
                 (str
-                 "Want to join us? We are always looking for "
-                 "amazing people no matter where they live. ")]
-              [:a.card-button
-                {:href oc-urls/contact-mail-to
-                 :on-touch-start identity}
-                "Say hello!"]]
-            [:div.other-card.oss-card
-              [:div.card-icon]
-              [:div.card-title
-                "We’re Crazy for Open Source"]
-              [:div.card-content
+                 "In the age of Slack and fast-moving conversations, the lack of "
+                 "focus and clarity have become a huge problem in the workplace.")]
+              [:p
                 (str
-                 "Have an idea you’d like to contribute? A new "
-                 "integration you’d like to see?")]
-              [:a.card-button
-                {:href "https://github.com/open-company"
-                 :on-touch-start identity
-                 :target "_blank"}
-                "Build with us on GitHub"]]]
+                 "Chat apps keep everyone connected throughout the day, and yet "
+                 "it's become even more difficult for teams to stay "
+                 "aligned around what matters most. ")
+                [:span.oblique "How can that be?"]]
+              [:p
+                "This is the question that led us to build Carrot. What we "
+                "found is that "
+                [:span.heavy "leadership is getting lost in the noise."]]
+              [:p
+                (str
+                 "Sharing key information everyone needs alongside random chats just increases "
+                 "the likelihood it will scroll by without being noticed. "
+                 "And leaders have no idea if anyone even heard what they said.")]
+              [:p
+                (str
+                 "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
+                 "to handle leadership communication. We wanted this “non-chat” communication "
+                 "to be as fun, delightful and interactive as chat; but we also wanted it to be "
+                 "asynchronous so people could get caught up on their own time.")]
+              [:p
+                (str
+                 "The result is Carrot - a platform for leadership communication that keeps "
+                 "everyone focused on what matters to build transparency, trust, and stronger teams.")]]
 
-          [:div.about-bottom-get-started
-            [:div.about-alignment
-              "Keep everyone aligned around what matters most."]
-            [:div.get-started-button-container
-              (when-not (jwt/jwt)
-                [:button.mlb-reset.get-started-button
-                  {:on-click #(if (utils/in? (:route @router/path) "login")
-                                (user/show-login :signup-with-slack)
-                                (router/nav! oc-urls/sign-up))}
-                  "Get started for free"])]]]
-      ] ;<!-- main -->
+            [:div.about-bottom-copy
+              [:div.about-bottom-copy-row.group
+                [:div.about-bottom-copy-left
+                  "Distributed by design."]
+                [:div.about-bottom-copy-right
+                  [:div.about-bottom-copy-description
+                    (str
+                     "Want to join us? We are always looking for "
+                     "amazing people regardless of where they "
+                     "call home.")]
+                  [:a
+                    {:href "#"
+                     :on-click "drift.api.startInteraction({ interactionId: 43229 });"}
+                    "Say hello"]]]
+              [:div.about-bottom-copy-row.group
+                [:div.about-bottom-copy-left
+                  "Crazy for open source."]
+                [:div.about-bottom-copy-right
+                  [:div.about-bottom-copy-description
+                    (str
+                     "Have an idea you’d like to contribute? A "
+                     "new integration you’d like to see?")]
+                  [:a
+                    {:href "https://github.com/open-company"
+                     :target "_blank"}
+                    "Build with us on git"]]]]]]
+
+        shared-misc/keep-aligned-bottom] ;<!-- main -->
     ] ; <!-- wrap -->
 
     (site-footer)])

@@ -4,168 +4,162 @@ div.home-wrap {
   div.main.home-page {
     width: 100%;
 
-    @include mobile() {
-      padding: 0 0px;
-    }
-
     section {
-
-      &:nth-child(odd) {
-        background-color: #FFFDF9;
-      }
-
-      &:nth-child(even) {
-        background-color: #FAF8F4;
-      }
-
-      @include mobile(){
-        padding: 0 24px;
-      }
+      background-color: #FFFDF9;
     }
 
     section.cta {
-      padding-top: 184px;
+      padding-top: 239px;
       padding-bottom: 120px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
+      @include tablet() {
+        padding-top: 131px;
+        padding-bottom: 80px;
+      }
+
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding-top: 152px;
-        margin-bottom: 80px;
-        padding-bottom: 0px;
+        padding: 131px 24px 80px;
       }
 
-      div.balloon {
+      * {
+        position: relative;
+        z-index: 3;
+      }
+
+      &:after {
+        background-color: #F8F7F3;
+        content: "";
+        width: 100%;
+        height: 39%;
+        display: block;
+        border-bottom-left-radius: 200px;
         position: absolute;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
+        bottom: 0;
+        right: 0;
+        z-index: 2;
 
-        @media screen and (max-width: 1100px) {
-          display: none;
+        @include mobile() {
+          border-bottom-left-radius: 100px; 
         }
 
-        &.big-blue {
-          @include image-2x("/img/ML/balloon_big_blue");
-          background-size: 145px 145px;
-          width: 145px;
-          height: 145px;
-          top: -94px;
-          left: 231px;
-        }
-
-        &.small-green {
-          @include image-2x("/img/ML/balloon_small_green");
-          background-size: 15px 15px;
-          width: 15px;
-          height: 15px;
-          top: 46px;
-          left: 232px;
-        }
-
-        &.big-green {
-          @include image-2x("/img/ML/balloon_big_green");
-          background-size: 226px 209px;
-          width: 226px;
-          height: 209px;
-          top: 134px;
-          right: -108px;
-        }
-
-        &.small-purple-face {
-          @include image-2x("/img/ML/balloon_small_purple_face");
-          background-size: 48px 48px;
-          width: 48px;
-          height: 48px;
-          top: 298px;
-          right: 124px;
-        }
-
-        &.big-yellow {
-          @include image-2x("/img/ML/balloon_big_yellow");
-          background-size: 400px 380px;
-          width: 400px;
-          height: 380px;
-          top: 460px;
-          left: 50%;
-          margin-left: -590px;
-        }
-
-        &.small-purple {
-          @include image-2x("/img/ML/balloon_small_purple");
-          background-size: 136px 115px;
-          width: 136px;
-          height: 115px;
-          top: 1000px;
-          left: 50%;
-          margin-left: 432px;
+        @media screen and (max-width: 440px) {
+          height: 25%;
         }
       }
 
       h1.headline {
-        font-size: 40px;
-        @include avenir_H();
+        font-size: 80px;
+        @include PTSerif()
         color: $deep_navy;
-        max-width: 640px;
         margin: 0 auto;
         z-index: 2;
         position: relative;
 
         @include mobile(){
-          text-align: left;
-          font-size: 31px;
-          line-height: 40px;
+          font-size: 50px;
+          line-height: 56px;
+        }
+
+        @media screen and (max-width: 380px) {
+          font-size: 40px;
+          line-height: 46px;
         }
       }
 
       div.subheadline {
         color: $ui_grey;
-        font-size: 24px;
-        line-height: 32px;
+        font-size: 26px;
+        line-height: 34px;
         @include avenir_R();
-        max-width: 510px;
-        margin: 4px auto 0px;
+        margin: 24px auto 0px;
         z-index: 2;
         position: relative;
+        max-width: 800px;
+
+        &.for-others {
+          @include mobile() {
+            display: none;
+          }
+        }
+
+        &.for-mobile {
+          @include big_web() {
+            display: none;
+          }
+
+          @include mobile() {
+            display: block;
+          }
+        }
 
         @include mobile(){
           margin-top: 16px;
           font-size: 18px;
           line-height: 23px;
           padding: 0px;
-          text-align: left;
           color: $deep_navy;
+          max-width: initial;
         }
       }
 
       div.no-credit-card {
         color: $ui_grey;
         @include avenir_R();
-        font-size: 14px;
+        font-size: 16px;
         max-width: 900px;
         text-align: center;
-        margin: 16px auto 0px;
+        margin: 24px auto 0;
 
         @include mobile() {
-          @include avenir_R();
-          font-size: 13px;
+          font-size: 12px;
+          margin: 16px auto 0;
         }
       }
 
       div.get-started-button-container {
-        margin: 0 auto;
+        margin: 40px auto 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        @include mobile() {
+          width: 100%;
+          display: block;
+          justify-content: initial;
+          align-items: initial;
+        }
+
+        button {
+          width: 320px;
+          margin: 0 12px;
+          float: left;
+          height: 64px;
+
+          @include tablet() {
+            max-width: calc(50% - 16px);
+            margin: 0 8px;
+          }
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            height: 48px;
+          }
+        }
 
         button.get-started-button {
-          margin-top: 24px;
+          @include mobile() {
+            margin-top: 16px;
+          }
         }
       }
     }
   }
-}
-
-div.home-wrap + footer.navbar.navbar-default.navbar-bottom {
-  background-color: #FFFDF9 !important;
 }

@@ -22,6 +22,9 @@
 (defn slack []
   (res/resource-response "/slack.html" {:root "public"}))
 
+(defn slack-lander []
+  (res/resource-response "/slack-lander.html" {:root "public"}))
+
 (defn privacy []
   (res/resource-response "/privacy.html" {:root "public"}))
 
@@ -58,6 +61,7 @@
   (GET "/privacy" [] (privacy))
   (GET "/terms" [] (terms))
   (GET "/version/version.json" [] (version-json))
+  (GET "/sign-up/slack" [] (slack-lander))
   (GET "/" [] (index))
   (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
   (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))

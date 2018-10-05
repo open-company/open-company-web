@@ -4,6 +4,7 @@
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [taoensso.timbre :as timbre]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -23,6 +24,11 @@
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
+(defn- cleaned-body []
+  (let [body-el (sel1 [:div.rich-body-editor])]
+    (when body-el
+      (utils/clean-body-html (.-innerHTML body-el)))))
+
 (defn real-close []
   (utils/after 180 activity-actions/cmail-hide))
 
@@ -35,11 +41,8 @@
 
 (defn autosave [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
-        body-el (sel1 [:div.rich-body-editor])
-        cleaned-body (when body-el
-                      (utils/clean-body-html (.-innerHTML body-el)))
         section-editing @(drv/get-ref s :section-editing)]
-    (activity-actions/entry-save-on-exit :cmail-data cmail-data cleaned-body section-editing)))
+    (activity-actions/entry-save-on-exit :cmail-data cmail-data (cleaned-body) section-editing)))
 
 ;; Close dismiss handling
 
@@ -139,7 +142,7 @@
                               (reset! (::video-uploading s) false))]
     (cond
       (:fixed-video-id cmail-data)
-      (activity-actions/prompt-remove-video :cmail-data)
+      (activity-actions/prompt-remove-video :cmail-data cmail-data)
       @(::record-video s)
       (reset! (::record-video s) false)
       :else
@@ -379,7 +382,11 @@
                 {:class (when long-tooltip "long-tooltip")}
                 [:button.mlb-reset.close-bt
                   {:on-click #(do
-                                (autosave s)
+                                (if (au/has-content? (assoc cmail-data
+                                                       :body
+                                                       (cleaned-body)))
+                                  (autosave s)
+                                  (activity-actions/activity-delete cmail-data))
                                 (if (and (= (:status cmail-data) "published")
                                          (:has-changes cmail-data))
                                   (cancel-clicked s)
@@ -469,7 +476,7 @@
               (when (and (:fixed-video-id cmail-data)
                          (not @(::record-video s)))
                 (ziggeo-player {:video-id (:fixed-video-id cmail-data)
-                                :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data)
+                                :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
@@ -478,7 +485,7 @@
               (when @(::record-video s)
                 (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
                                   :upload-started-cb #(do
-                                                        (activity-actions/uploading-video %)
+                                                        (activity-actions/uploading-video % :cmail-data)
                                                         (reset! (::video-picking-cover s) false)
                                                         (reset! (::video-uploading s) true))
                                   :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
@@ -487,7 +494,8 @@
                                   :width (:width video-size)
                                   :height (:height video-size)
                                   :remove-recorder-cb (fn []
-                                    (activity-actions/remove-video :cmail-data)
+                                    (when (:video-id cmail-data)
+                                      (activity-actions/remove-video :cmail-data cmail-data))
                                     (reset! (::record-video s) false))})))
             ; Headline element
             [:div.cmail-content-headline.emoji-autocomplete.emojiable.group.fs-hide

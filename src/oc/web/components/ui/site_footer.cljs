@@ -16,8 +16,6 @@
   [:footer.navbar.navbar-default.navbar-bottom
     {:class (when (utils/in? (:route @router/path) "slack-lander") "light-background")}
     [:div.container-fluid.group
-      [:div.footer-balloon.big-green]
-      [:div.footer-balloon.small-purple]
       [:div.right-column.group
 
         [:div.column.column-company
@@ -55,8 +53,10 @@
                             (reset! (::expanded s) :support)))}
             "Support"]
           [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
-          ; [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href oc-urls/contact-mail-to} "Contact"]]]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href "#"
+                                 :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                              "Contact"]]]
 
         [:div.column.column-integrations
           {:class (when (= @(::expanded s) :integrations) "expanded")}

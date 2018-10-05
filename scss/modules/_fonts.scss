@@ -15,6 +15,14 @@
 950 Black
 */
 
+.PTSerif {
+  font-family: "PT Serif", serif !important;
+  font-weight: 700;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .AvenirLTStd-Book {
   font-family: AvenirLTStd-Book, Muli, Arial, sans-serif;
   font-weight: normal;
@@ -141,4 +149,12 @@
 
 @mixin avenir_BO(){
   @include avenir(AvenirLTStd-BlackOblique);
+}
+
+@mixin PTSerif($weight: 700){
+  font-family: "PT Serif", serif !important;
+  font-weight: $weight;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

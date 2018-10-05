@@ -10,7 +10,7 @@
 (def options {:contact-email contact-email
               :contact-mail-to contact-mail-to})
 
-(defn head [drift?]
+(defn head []
   [:head
     [:meta {:charset "utf-8"}]
     [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
@@ -18,6 +18,7 @@
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
     [:title "Carrot | Leadership communication for growing and distributed teams"]
+    pages/google-fonts
     pages/bootstrap-css
     ;; Local css
     [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
@@ -29,11 +30,6 @@
       <script src=\"//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js\"></script>
       <script src=\"//oss.maxcdn.com/respond/1.4.2/respond.min.js\"></script>
     <![endif]-->"
-    ;; Google fonts Open Sans / Lora
-    [:link {:type "text/css", :rel "stylesheet",
-           :href "https://fonts.googleapis.com/css?family=Open+Sans:400,300"}]
-    [:link {:type "text/css", :rel "stylesheet",
-           :href "//fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic"}]
     ;; CarrotKit Font
     [:link {:type "text/css" :rel "stylesheet" :href (pages/cdn "/css/fonts/CarrotKit.css")}]
     pages/font-awesome
@@ -43,9 +39,8 @@
     [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
     ;; Static js files
     [:script {:src (pages/cdn "/js/static-js.js")}]
-    (when drift?
-      ;; Drift
-      [:script {:src (pages/cdn "/js/drift.js")}])
+    ;; Drift
+    [:script {:src (pages/cdn "/js/drift.js")}]
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
     [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
@@ -59,7 +54,7 @@
 (defn mobile-menu
   "Mobile menu used to show the collapsable menu in the marketing site."
   [active-page]
-  [:div.site-mobile-menu.mobile-only.hidden
+  [:div.site-mobile-menu.hidden
     [:div.site-mobile-menu-container
       [:div.site-mobile-menu-item
         [:a
@@ -87,61 +82,88 @@
         "Login"]
       [:button.mlb-reset.get-started-button
         {:id "site-mobile-menu-getstarted"}
-        "Get started for free"]]])
+        "Get started for free"]
+      [:div.no-credit-card
+        {:id "site-mobile-menu-nocreditcard"}
+        "No credit card required  "
+        [:span.dot "•"]
+        "  Works with Slack"]]])
 
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
    and every change here should be reflected there."
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
-  [:nav.site-navbar
-    [:div.site-navbar-container
-      [:a.navbar-brand-left
-        {:href "/?no_redirect=1"}]
-      [:div.navbar-brand-center
-        [:a
-          {:href "/"
-           :class (when (= active-page "index") "active")}
-          "Home"]
-        [:a
-          {:href "/about"
-           :class (when (= active-page "about") "active")}
-          "About"]
-        [:a
-          {:href "/pricing"
-           :class (when (= active-page "pricing") "active")}
-          "Pricing"]
-        [:a
-          {:href "https://blog.carrot.io"
-           :target "_blank"}
-          "Blog"]]
-      [:div.site-navbar-right.big-web-only
-        [:a.login
-          {:id "site-header-login-item"
-           :href "/login"}
-            "Login"]
-        [:a.start
-          {:id "site-header-signup-item"
-           :href "/sign-up"
-           :class (when (= active-page "slack")
-                    "slack-get-started")}
-          (when (= active-page "slack")
-            [:span.slack-orange-icon])
-          [:span.start-copy
-            (if (= active-page "slack")
-              "Add to Slack"
-              "Get Started")]]]
-      [:div.site-navbar-right.mobile-only
-        [:a.start
-          {:id "site-header-mobile-signup-item"
-           :class (when (= active-page "slack") "slack")
-           :href "/sign-up"}
-            [:span.copy
-              (if (= active-page "slack")
-                "ADD"
-                "START")]]]
-      [:div.mobile-ham-menu.mobile-only
-        {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]])
+  (let [is-slack-lander? (= active-page "slack-lander")
+        site-navbar-container (if is-slack-lander?
+                               :div.site-navbar-container.is-slack-header
+                               :div.site-navbar-container)
+        use-slack-url? (or is-slack-lander?
+                           (= active-page "slack"))]
+    [:nav.site-navbar
+      [site-navbar-container
+        [:a.navbar-brand-left
+          {:href "/?no_redirect=1"}]
+        [:div.navbar-brand-center
+          [:a
+            {:href "/"
+             :class (when (= active-page "index") "active")}
+            "Home"]
+          [:a
+            {:href "/about"
+             :class (when (= active-page "about") "active")}
+            "About"]
+          [:a
+            {:href "/pricing"
+             :class (when (= active-page "pricing") "active")}
+            "Pricing"]
+          [:a
+            {:href "https://blog.carrot.io"
+             :target "_blank"}
+            "Blog"]]
+        [:div.site-navbar-right.big-web-only
+          [:a.login
+            {:id "site-header-login-item"
+             :href "/login"}
+              "Login"]
+          [:a.start
+            {:id "site-header-signup-item"
+             :href (if use-slack-url?
+                      (env :slack-signup-url)
+                      "/sign-up")
+             :class (when use-slack-url?
+                      "slack-get-started")}
+            (when use-slack-url?
+              [:span.slack-orange-icon])
+            [:span.start-copy
+              (if is-slack-lander?
+                "Continue with Slack"
+                (if (= active-page "slack")
+                  "Add to Slack"
+                  "Get Started"))]]]
+        [:div.site-navbar-right.tablet-only
+          [:a.login
+            {:id "site-header-tabket-login-item"
+             :href "/login"}
+              "Login"]
+          [:a.start
+            {:id "site-header-tablet-signup-item"
+             :href (if use-slack-url?
+                      (env :slack-signup-url)
+                      "/sign-up")}
+            [:span.start-copy
+              "Start Free"]]]
+        [:div.site-navbar-right.mobile-only
+          [:a.start
+            {:id "site-header-mobile-signup-item"
+             :class (when (= active-page "slack") "slack")
+             :href (if (= active-page "slack")
+                     (env :slack-signup-url)
+                     "/sign-up")}
+              [:span.copy
+                "START"]]]
+        [:div.mobile-ham-menu
+          {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]]))
 
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
@@ -150,8 +172,6 @@
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
-      [:div.footer-balloon.big-green]
-      [:div.footer-balloon.small-purple]
       [:div.right-column.group
 
         [:div.column.column-company
@@ -185,8 +205,10 @@
                "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
             "Support"]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
-          ; [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
-          [:div.column-item [:a {:href contact-mail-to} "Contact"]]]
+          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+          [:div.column-item [:a {:href "#"
+                                 :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                              "Contact"]]]
 
         [:div.column.column-integrations
           [:div.column-title
@@ -218,10 +240,10 @@
   ([content]
    (static-page content {}))
   ([content opts]
-   (let [{:keys [page title drift]} (-> content :entry read-edn)
+   (let [{:keys [page title]} (-> content :entry read-edn)
          is?    (fn [& args] ((set args) page))]
      (hp/html5 {:lang "en"}
-               (head drift)
+               (head)
                [:body
                 [:div
                  {:class "outer header"}
@@ -231,6 +253,7 @@
                   :index   (pages/index options)
                   :about   (pages/about options)
                   :slack   (pages/slack options)
+                  :slack-lander   (pages/slack-lander options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)

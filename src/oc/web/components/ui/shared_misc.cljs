@@ -6,9 +6,9 @@
 (def testimonials-section
   [:section.testimonials-section
     [:div.testimonials-section-title
-      "Don’t take our word for it"]
+      "Don’t take our word for it."]
     [:div.testimonials-section-subtitle
-      "Here’s how we’re helping teams like yours."]
+      "We’re helping teams like yours."]
     [:div.testimonials-cards-container.group
       [:div.testimonial-card
         [:div.testimonial-image]
@@ -18,9 +18,10 @@
           "Managing Partner"]
         [:div.testimonial-quote
           (str
-           "As a busy leader it's hard to keep everyone up to date. "
-           "I use Carrot to record a quick video update and it "
-           "lets me know that everyone's seen it.")]
+           "“As a busy leader it's hard to keep "
+           "everyone up to date. I use Carrot to "
+           "record a quick video update and it lets "
+           "me know that everyone's seen it.”")]
         [:div.testimonial-footer.group
           [:a
             {:href "https://skylight.digital/"
@@ -33,7 +34,9 @@
         [:div.testimonial-role
           "CEO"]
         [:div.testimonial-quote
-          "On Carrot, my updates get noticed and get the team talking. I love that."]
+          (str
+           "“On Carrot, my updates get noticed and "
+           "get the team talking. I love that.”")]
         [:div.testimonial-footer.group
           [:a
             {:href "https://m.io/"
@@ -47,8 +50,10 @@
           "Director of Digital Communications"]
         [:div.testimonial-quote
           (str
-           "Carrot helps me share things the entire team needs to know "
-           "about - instead of burying it somewhere it won’t get noticed.")]
+           "“Carrot helps me share things the entire "
+           "team needs to know about - instead of "
+           "burying it somewhere it won’t get "
+           "noticed.”")]
         [:div.testimonial-footer.group
           [:a
             {:href "https://wayne.edu/"
@@ -57,7 +62,7 @@
 
 (def no-credit-card
   [:div.no-credit-card
-    "No credit card required&nbsp;•&nbsp;Works with Slack"])
+    "No credit card required • Works with Slack"])
 
 (def keep-aligned
   [:section.keep-aligned
@@ -121,125 +126,114 @@
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "It’s never been easier to keep everyone on the same page"]
+      "Try Carrot with your team for free."]
     [:button.mlb-reset.get-started-button
       "Get started for free"]
     no-credit-card])
 
 (def keep-aligned-section
-  [:section.home-keep-aligned
-    [:div.scroll-down]
-    [:h2.keep-aligned-title
-      "Carrot keeps leaders and their teams aligned"]
+  [:section.home-keep-aligned.group
 
-      [:div.keep-aligned-section
-        [:div.keep-aligned-section-row.first-row.group
-          [:img.keep-aligned-section-screenshot.screenshot-1.big-web-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_update_team.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_update_team@2x.png") " 2x")}]
-          [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_update_team_mobile.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_update_team_mobile@2x.png") " 2x")}]
-          [:div.keep-aligned-section-copy
+    [:div.keep-aligned-section
+      [:div.keep-aligned-section-row.first-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Update your team in seconds"]
-            [:div.keep-aligned-section-list-item.purple-checkmark
-              "Create compelling updates people want to read"]
-            [:div.keep-aligned-section-list-item.purple-checkmark
-              "Capture video updates to add a human touch"]
-            [:div.keep-aligned-section-list-item.purple-checkmark
-              "Link to Google, Dropbox, wikis and others"]
-            [:div.keep-aligned-section-list-item.purple-checkmark
-            "Automate recurring team updates"]]]
+              "Lead with clarity."]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "Key information stays organized and visible so your team can get caught "
+               "up anytime without worrying they missed something in fast-moving conversations.")]
+            [:img.keep-aligned-section-copy-values-list
+              {:src (utils/cdn "/img/ML/homepage_vertical_values_list.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_vertical_values_list@2x.png") " 2x")}]]
+          [:div.keep-aligned-section-row-right
+            [:img.keep-aligned-section-screenshot.screenshot-1
+              {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]]]
 
-        [:div.keep-aligned-section-row.second-row.group
-          [:img.keep-aligned-section-screenshot.screenshot-2.big-web-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_keep_informed.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_keep_informed@2x.png") " 2x")}]
-          [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_keep_informed_mobile.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_keep_informed_mobile@2x.png") " 2x")}]
-          [:div.keep-aligned-section-copy
+      [:div.keep-aligned-section-row.second-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-right.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Keep everyone informed"]
-            [:div.keep-aligned-section-list-item.green-checkmark
-              "“Must see” updates rise to the top"]
-            [:div.keep-aligned-section-list-item.green-checkmark
-              "See what’s trending to stay in the loop"]
-            [:div.keep-aligned-section-list-item.green-checkmark
-              "Organized for easy browsing and search"]
-            [:div.keep-aligned-section-list-item.green-checkmark
-              "A morning digest summarizes what’s new"]]]
+              "Spark meaningful discussions."]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "Reactions and comments stay together with "
+               "the post to provide greater context for "
+               "what’s happening and why.")
+              [:br][:br]
+              (str
+               "Your team can join the discussion from Slack "
+               "— Carrot keeps it all in sync.")]]
+          [:div.keep-aligned-section-row-left
+            [:img.keep-aligned-section-screenshot.screenshot-2
+              {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]]]]
 
-        [:div.keep-aligned-section-row.third-row.group
-          [:img.keep-aligned-section-screenshot.screenshot-3.big-web-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_better_discussions.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_better_discussions@2x.png") " 2x")}]
-          [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_better_discussions_mobile.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_better_discussions_mobile@2x.png") " 2x")}]
-          [:div.keep-aligned-section-copy
+      [:div.keep-aligned-section-row.third-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Spark better follow-on discussions"]
-            [:div.keep-aligned-section-list-item.red-checkmark
-              "Encourage thoughtful comments and questions"]
-            [:div.keep-aligned-section-list-item.red-checkmark
-              "Keep interactions together for greater context"]
-            [:div.keep-aligned-section-list-item.red-checkmark
-              "Syncs with Slack so discussions can happen anywhere"]]]
+              "Make sure you're heard."]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "When you post something new, you’ll always know "
+               "who’s seen it. If they haven’t, Carrot reminds them "
+               "for you.")
+              [:br][:br]
+              (str
+               "Carrot AI works in the background to keep everyone "
+               "on your team looped in to what matters.")]]
+          [:div.keep-aligned-section-row-right
+            [:img.keep-aligned-section-screenshot.screenshot-3
+              {:src (utils/cdn "/img/ML/homepage_screenshots_third_row.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]]]]
 
-        [:div.keep-aligned-section-row.fourth-row.group
-          [:img.keep-aligned-section-screenshot.screenshot-4.big-web-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_being_heard.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_being_heard@2x.png") " 2x")}]
-          [:img.keep-aligned-section-screenshot.screenshot-4.mobile-only
-            {:src (utils/cdn "/img/ML/homepage_screenshots_being_heard_mobile.png")
-             :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_being_heard_mobile@2x.png") " 2x")}]
-          [:div.keep-aligned-section-copy
+      [:div.keep-aligned-section-row.fourth-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-right.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Make sure you're being heard"]
-            [:div.keep-aligned-section-list-item.blue-checkmark
-              "Know who's seen your post"]
-            [:div.keep-aligned-section-list-item.blue-checkmark
-              "Send reminders with a single click"]
-            [:div.keep-aligned-section-list-item.blue-checkmark
-              "Eliminate communication gaps"]
-            [:div.keep-aligned-section-list-item.blue-checkmark
-              "Ensure alignment on important items"]]]]])
+              "Update your team in seconds."]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "Starting a new post is fast - with text or video "
+               "- so it’s easy to create consistent "
+               "communication that builds transparency and "
+               "trust. Set up recurring updates, too.")]]
+          [:div.keep-aligned-section-row-left
+            [:img.keep-aligned-section-screenshot.screenshot-4
+              {:src (utils/cdn "/img/ML/homepage_screenshots_fourth_row.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_fourth_row@2x.png") " 2x")}]]]]
 
-(def access-anywhere-section
-  [:section.access-anywhere-section
-    [:div.access-anywhere-section-container
-      [:div.access-anywhere-copy
-        [:div.access-anywhere-copy-title
-          "Stay up to date on the go."]
-        [:div.access-anywhere-copy-title.big-web-only
-          "Access Carrot from anywhere."]
-        [:div.access-anywhere-copy-title.mobile-only
-          "Access Carrot anywhere."]
-        [:div.access-anywhere-copy-subtitle.big-web-only
-          "Fully responsive web app. No app install required."]
-        [:div.access-anywhere-copy-subtitle.mobile-only
-          "Fully responsive web app."]
-        [:div.access-anywhere-copy-subtitle.mobile-only
-          "No app install required."]]
-      [:div.access-anywhere-screenshot]]])
+      [:div.keep-aligned-section-row.fifth-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
+            [:div.keep-aligned-section-copy-title
+              "Perfect for Slack teams."]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "New posts automatically shared to the "
+               "appropriate Slack channel. Join the "
+               "discussion right from Slack — Carrot keeps "
+               "it all in sync.")]
+            [:a.keep-aligned-section-copy-button
+              {:href oc-urls/sign-up}]]
+          [:div.keep-aligned-section-row-right
+            [:img.keep-aligned-section-screenshot.screenshot-5
+              {:src (utils/cdn "/img/ML/homepage_screenshots_fifth_row.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_fifth_row@2x.png") " 2x")}]]]]]])
 
-(defn slack-comparison-section [& [slack-version?]]
-  [:section.slack-comparison
-    [:div.slack-comparison-headline
-      "PERFECT FOR SLACK TEAMS"]
-    (when-not slack-version?
-      [:div.slack-comparison-headline-1
-        "Slack keeps your team connected in the moment."])
-    (if slack-version? 
-      [:div.slack-comparison-headline-2
-        "Keep your team informed without distractions."]
-      [:div.slack-comparison-headline-2
-        "Carrot keeps it aligned over time."])
-    [:img.slack-comparison-screenshot.big-web-only
-      {:src (utils/cdn "/img/ML/slack_comparison_screenshot.png")
-       :src-set (str (utils/cdn "/img/ML/slack_comparison_screenshot@2x.png") " 2x")}]
-    [:img.slack-comparison-screenshot.mobile-only
-      {:src (utils/cdn "/img/ML/slack_comparison_screenshot_mobile.png")
-       :src-set (str (utils/cdn "/img/ML/slack_comparison_screenshot_mobile@2x.png") " 2x")}]])
+(def animation-lightbox
+  [:div.animation-lightbox-container
+    {:onClick "OCStaticHideAnimationLightbox();"}
+    [:div.animation-lightbox
+      [:div {:id "youtube-player"}]
+      [:button.settings-modal-close.mlb-reset
+        {;:onClick "OCStaticHideAnimationLightbox();"
+         :onMouseDown "OCStaticHideAnimationLightbox();"
+         :ontouchstart "OCStaticHideAnimationLightbox();"}]]])
+
+(def show-animation-button
+  [:button.mlb-reset.show-animation-bt
+    {:onClick "OCStaticShowAnimationLightbox();"}])
