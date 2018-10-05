@@ -231,11 +231,11 @@ div.stream-comments {
             height: 16px;
             background-repeat: no-repeat;
             background-image: cdnUrl("/img/ML/comment_agree_off.svg");
+            opacity: 0.5;
             background-size: 14px 14px;
             background-position: center;
 
-            @include preload_image(cdnUrl("/img/ML/comment_agree_off.svg"));
-            @include preload_image(cdnUrl("/img/ML/comment_agree_hover.svg"), "before");
+            @include preload_image(cdnUrl("/img/ML/comment_agree_on.svg"));
           }
 
           div.stream-comment-reaction-count {
@@ -251,8 +251,21 @@ div.stream-comments {
           &.reacted {
             color: $carrot_green;
 
+            &.can-react:hover {
+              color: $deep_navy;
+              div.stream-comment-reaction-icon {
+                background-image: cdnUrl("/img/ML/comment_agree_off.svg");
+                opacity: 0.7;
+              }
+
+              div.stream-comment-reaction-count {
+                color: $deep_navy;
+              }
+            }
+
             div.stream-comment-reaction-icon {
               background-image: cdnUrl("/img/ML/comment_agree_on.svg");
+              opacity: 1;
             }
 
             div.stream-comment-reaction-count {
@@ -267,7 +280,8 @@ div.stream-comments {
               color: $deep_navy;
 
               div.stream-comment-reaction-icon {
-                background-image: cdnUrl("/img/ML/comment_agree_hover.svg");
+                background-image: cdnUrl("/img/ML/comment_agree_on.svg");
+                opacity: 1;
               }
 
               div.stream-comment-reaction-count {
