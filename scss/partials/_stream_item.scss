@@ -152,6 +152,8 @@ div.stream-item {
       @include tablet(){
         margin-top: 16px;
         float: unset;
+        width: calc(100vw);
+        height: calc(100vw * 0.75);
         margin-left: -16px;
       }
 
@@ -167,6 +169,12 @@ div.stream-item {
         left: 40px; right: 0;
         top: 30px; bottom: 0;
         opacity: 0.8;
+
+        @include tablet(){
+          left: 0;
+          top: 0;
+          margin: auto;
+        }
 
         &:hover {
           opacity: 1;
@@ -192,6 +200,11 @@ div.stream-item {
         width: 136px;
         height: 102px;
         position: absolute;
+
+        @include tablet() {
+          width: 100%;
+          height: 100%;
+        }
 
         &.loading {
           display: none;
