@@ -75,7 +75,12 @@
           edit-tooltip (:show-edit-tooltip nv)
           add-comment-tooltip (:show-add-comment-tooltip nv)
           user-type (:user-type nv)
-          has-only-sample-posts (every? :sample (vals posts-data))
+          all-posts-count (count (vals posts-data))
+          sample-posts-count (count (filterv :sample (vals posts-data)))
+          ;; has organic posts: we start with a draft for user that is not sample
+          ;; so we have organic posts if all or less one are sample posts
+          has-organic-posts (or (= sample-posts-count all-posts-count)
+                                (= sample-posts-count (dec all-posts-count)))
           team-has-bot? (jwt/team-has-bot? (:team-id org-data))
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already
@@ -118,7 +123,7 @@
         (mark-nux-step-done :show-draft-post-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip (if fixed-add-post-tooltip
-                                 (if has-only-sample-posts
+                                 (if has-organic-posts
                                   true
                                   :has-organic-post)
                                  false)
