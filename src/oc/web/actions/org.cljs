@@ -258,15 +258,15 @@
 
 (defn update-org-sections [org-slug all-sections]
   (dis/dispatch! [:input [:ap-loading] true])
-  (utils/after 2000
-    #(let [selected-sections (vec (map :name (filterv :selected all-sections)))
-          patch-payload {:boards (conj selected-sections "General")
-                         :samples true}]
+  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
+           patch-payload {:boards (conj selected-sections "General")
+                          :samples true}]
       (api/patch-org-sections patch-payload
        (fn [{:keys [success status body]}]
          (when success
            (org-loaded (json->cljs body) false))
-         (router/nav! (oc-urls/all-posts org-slug)))))))
+         (utils/after 2000
+          #(router/nav! (oc-urls/all-posts org-slug)))))))
 
 (defn signup-invite-completed [org-data]
   (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
