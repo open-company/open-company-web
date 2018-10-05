@@ -346,15 +346,17 @@
          (if (= status 422)
            (dis/dispatch! [:user-profile-update/failed])
            (when success
-             (dis/dispatch! [:input [:ap-loading] true])
+             ;; If user is not creating a new company let's show the spinner
+             ;; then we will delay the redirect to AP to show the carrot more
+             (when-not org-editing
+               (dis/dispatch! [:input [:ap-loading] true]))
              (utils/after 100
               (fn []
                 (jwt-refresh
                  #(if org-editing
                     (org-actions/create-or-update-org org-editing)
                     (utils/after 2000
-                     (fn []
-                       (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
+                      (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn user-avatar-save [avatar-url]
