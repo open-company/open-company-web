@@ -53,6 +53,7 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
+        background-color: #ECECEC;
       }
 
       &.all-posts-container {
