@@ -433,19 +433,14 @@
        :json-params (cljs->json new-team-data)}
       callback)))
 
-(defn create-org [org-name logo-url logo-width logo-height callback]
+(defn create-org [org-data callback]
   (let [create-org-link (utils/link-for (dispatcher/api-entry-point) "create")
         team-id (first (j/get-key :teams))
-        org-data {:name org-name :team-id team-id}
-        with-logo (if-not (empty? logo-url)
-                    (merge org-data {:logo-url logo-url
-                                     :logo-width logo-width
-                                     :logo-height logo-height})
-                    org-data)]
-    (when (and org-name create-org-link)
+        fixed-org-data (assoc (select-keys org-data org-keys) :team-id team-id)]
+    (when (and fixed-org-data create-org-link)
       (storage-http (method-for-link create-org-link) (relative-href create-org-link)
         {:headers (headers-for-link create-org-link)
-         :json-params (cljs->json with-logo)}
+         :json-params (cljs->json fixed-org-data)}
         (fn [response]
           (callback response))))))
 
