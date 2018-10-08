@@ -3,6 +3,7 @@
             [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
             [oc.web.actions.notifications :as na]
+            [oc.web.lib.responsive :as responsive]
             [clojure.contrib.humanize :refer (filesize)]))
 
 (rum/defcs ziggeo-player < (rum/local nil ::player-instance)
@@ -72,7 +73,8 @@
                                               :theme "carrot"
                                               :themecolor "white"
                                               :localplayback true
-                                              :meta-profile ls/oc-ziggeo-profiles}
+                                              :meta-profile ls/oc-ziggeo-profiles
+                                              :picksnapshots (not (responsive/is-tablet-or-mobile?))}
                                        config {:element recorder-el
                                                :attrs attrs}
                                        Recorder (.. js/ZiggeoApi -V2 -Recorder)
