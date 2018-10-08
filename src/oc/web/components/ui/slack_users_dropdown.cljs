@@ -57,7 +57,7 @@
                                          (reset! (::slack-user s) (or initial-value "")))
                                        (setup-sorted-users s)
                                        (reset! (::window-click s)
-                                        (events/listen js/window EventType/CLICK
+                                        (events/listen (.getElementById js/document "app") EventType/CLICK
                                           #(when (and @(::show-users-dropdown s)
                                                       ; (not
                                                       ;  (utils/event-inside?

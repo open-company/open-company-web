@@ -90,7 +90,7 @@
                              (mention-mixins/oc-mentions-hover)
                              {:will-mount (fn [s]
                                (reset! (::click-listener s)
-                                 (events/listen js/window EventType/CLICK
+                                 (events/listen (.getElementById js/document "app") EventType/CLICK
                                   #(when (and @(::showing-menu s)
                                               (not (utils/event-inside? %
                                                     (rum/ref-node s (str "comment-more-menu-" @(::showing-menu s))))))

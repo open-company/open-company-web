@@ -122,7 +122,7 @@
                             (search/inactive))
                           (reset! (::window-click s)
                             (events/listen
-                             js/window
+                             (.getElementById js/document "app")
                              EventType/CLICK
                              (fn [e]
                                (when (and (not (responsive/is-tablet-or-mobile?))

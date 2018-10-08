@@ -58,14 +58,16 @@
                        (drv/drv :editable-boards)
                        {:will-mount (fn [s]
                          (reset! (::click-listener s)
-                           (events/listen js/window EventType/CLICK
-                            #(when-not (utils/event-inside? % (rum/ref-node s "more-menu"))
-                               (when-let* [args (into [] (:rum/args s))
-                                           opts (get args 2)
-                                           will-close (:will-close opts)]
-                                 (when (fn? will-close)
-                                   (will-close)))
-                               (reset! (::showing-menu s) false))))
+                           (events/listen (.getElementById js/document "app") EventType/CLICK
+                            #(do
+                               (js/console.log "XXX click!")
+                               (when-not (utils/event-inside? % (rum/ref-node s "more-menu"))
+                                 (when-let* [args (into [] (:rum/args s))
+                                             opts (get args 2)
+                                             will-close (:will-close opts)]
+                                   (when (fn? will-close)
+                                     (will-close)))
+                                 (reset! (::showing-menu s) false)))))
                          s)
                         :did-mount (fn [s]
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))

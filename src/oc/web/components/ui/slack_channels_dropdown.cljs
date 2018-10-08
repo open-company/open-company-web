@@ -32,7 +32,7 @@
                                            (reset! (::team-channels-requested s) true)
                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
                                        (reset! (::window-click s)
-                                        (events/listen js/window EventType/CLICK
+                                        (events/listen (.getElementById js/document "app") EventType/CLICK
                                           #(when (and @(::show-channels-dropdown s)
                                                       (not
                                                        (utils/event-inside?

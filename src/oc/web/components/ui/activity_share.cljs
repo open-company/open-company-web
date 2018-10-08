@@ -75,7 +75,7 @@
                                           (has-bot? org-data))
                                  (dis/dispatch! [:input [:activity-share-medium] :slack])))
                               (reset! (::window-click-listener s)
-                               (events/listen js/window EventType/CLICK
+                               (events/listen (.getElementById js/document "app") EventType/CLICK
                                 #(when-not (utils/event-inside? % (rum/dom-node s))
                                    (close-clicked s))))
                              s)

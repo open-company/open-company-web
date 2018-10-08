@@ -26,7 +26,7 @@
                     (rum/local nil ::window-click)
                     {:will-mount (fn [s]
                       (reset! (::window-click s)
-                       (events/listen js/window EventType/CLICK
+                       (events/listen (.getElementById js/document "app") EventType/CLICK
                         #(when-not (utils/event-inside? % (rum/ref-node s "user-menu"))
                            (reset! (::expanded-user-menu s) false))))
                       s)

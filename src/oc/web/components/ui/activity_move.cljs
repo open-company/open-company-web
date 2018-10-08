@@ -28,7 +28,7 @@
                                         (let [opts (first (:rum/args s))
                                               dismiss-cb (:dismiss-cb opts)]
                                           (reset! (::window-click s)
-                                           (events/listen js/window EventType/CLICK
+                                           (events/listen (.getElementById js/document "app") EventType/CLICK
                                             #(when (and (not (utils/event-inside? % (rum/dom-node s)))
                                                         (fn? dismiss-cb))
                                                 (dismiss-cb)))))

@@ -28,7 +28,7 @@
                            (drv/drv :orgs-dropdown-visible)
                            {:will-mount (fn [s]
                              (reset! (::window-click-listener s)
-                              (events/listen js/window EventType/CLICK
+                              (events/listen (.getElementById js/document "app") EventType/CLICK
                                #(when-not (utils/event-inside? % (rum/dom-node s))
                                   (dis/dispatch! [:input [:orgs-dropdown-visible] false]))))
                              s)

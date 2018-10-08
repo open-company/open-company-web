@@ -21,7 +21,7 @@
     (rum/local nil ::window-click-listener)
     {:will-mount (fn [s]
                    (reset! (::window-click-listener s)
-                    (events/listen js/window EventType/CLICK
+                    (events/listen (.getElementById js/document "app") EventType/CLICK
                      #(when-not (utils/event-inside? % (sel1 :div.dropdown-list-container))
                         (let [on-blur (:on-blur (first (:rum/args s)))]
                           (when (fn? on-blur)

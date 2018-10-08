@@ -69,7 +69,7 @@
    :will-mount (fn [s]
                  (check-focus s nil)
                  (let [click-listener (events/listen
-                                       js/window
+                                       (.getElementById js/document "app")
                                        EventType/CLICK
                                        (partial on-click-out s))
                        focusin (events/listen

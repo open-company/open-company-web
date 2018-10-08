@@ -34,7 +34,7 @@
                          (reset!
                           (::window-click s)
                           (events/listen
-                           js/window
+                           (.getElementById js/document "app")
                            EventType/CLICK
                            #(when-not (utils/event-inside? % (rum/dom-node s))
                               (reset! (::show-picker s) false))))
