@@ -158,6 +158,10 @@ div.stream-item {
         video {
           max-height: calc(100vw * 0.75);
         }
+
+        div.ba-videoplayer-carrot-theme-volumebar, div[data-selector="button-icon-volume"] {
+          display: none !important;
+        }
       }
     }
 
