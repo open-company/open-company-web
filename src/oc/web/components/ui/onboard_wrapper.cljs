@@ -149,7 +149,7 @@
 
 (defn- profile-setup-team-data
   ""
-  [s & [setup-email-domain]]
+  [s]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
@@ -176,10 +176,11 @@
                                     (user-actions/user-profile-reset)
                                     s)
                                    :did-mount (fn [s]
-                                    (profile-setup-team-data s true)
+                                    (profile-setup-team-data s)
                                     (delay-focus-field-with-ref s "first-name")
                                     s)
                                    :will-update (fn [s]
+                                    (profile-setup-team-data s)
                                     (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
                                           org-editing @(drv/get-ref s :org-editing)]
                                       (when (and @(::saving s)
