@@ -200,15 +200,18 @@
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:dangerouslySetInnerHTML (cond
-                                                 is-all-posts
-                                                 #js {"__html" "All posts"}
+                      [:div.board-name-with-icon-internal
+                        {:class (utils/class-set {:private (= (:access board-data) "private")
+                                                  :public (= (:access board-data) "public")})
+                         :dangerouslySetInnerHTML (utils/emojify (cond
+                                                   is-all-posts
+                                                   "All posts"
 
-                                                 is-must-see
-                                                 #js {"__html" "Must see"}
+                                                   is-must-see
+                                                   "Must see"
 
-                                                 :default
-                                                 (utils/emojify (:name board-data)))}])
+                                                   :default
+                                                   (:name board-data)))}]])
                   ;; Settings button
                   (when (and (router/current-board-slug)
                              (not is-all-posts)
