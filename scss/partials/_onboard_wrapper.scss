@@ -15,6 +15,7 @@ div.onboard-wrapper-container {
 
     @include mobile(){
       display: block;
+      background-color: white;
     }
 
     div.onboard-wrapper-left {
