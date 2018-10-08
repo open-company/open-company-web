@@ -117,12 +117,10 @@
               [:div.activity-title.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
             (when video-id
-              [:img.video-image {
-                                 :href (:video-image activity-data)
-                                 :on-click #(ziggeo-player {:video-id video-id
-                                                            :width (:width video-size)
-                                                            :height (:height video-size)
-                                                            :video-processed (:video-processed activity-data)})}])
+              (ziggeo-player {:video-id video-id
+                              :width (:width video-size)
+                              :height (:height video-size)
+                              :video-processed (:video-processed activity-data)}))
             (when (:body activity-data)
               [:div.activity-body.fs-hide
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
