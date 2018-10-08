@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
@@ -78,7 +79,7 @@
                          (rum/local false ::more-menu-open)
                          (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
-                         (rum/local false ::video-image-clicked)
+                         (rum/local false ::video-show-player)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
                          (am/truncate-element-mixin "activity-body" (* 30 3))
@@ -126,10 +127,14 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
+        is-publisher? (= (:user-id publisher) (jwt/user-id))
         dom-node-class (str "stream-item-" (:uuid activity-data))
         team-data (drv/react s :team-data)
         cur-user-data (drv/react s :current-user-data)
         has-video (seq (:fixed-video-id activity-data))
+        uploading-video (dis/uploading-video-data (:video-id activity-data))
+        video-player-show (or (and is-publisher? uploading-video)
+                              @(::video-show-player s))
         video-size (when has-video
                      (if is-mobile?
                        {:width (win-width)
@@ -183,15 +188,15 @@
         [:div.group
           (when has-video
             [:div.video-play-image
-              {:class (utils/class-set {:clicked @(::video-image-clicked s)
+              {:class (utils/class-set {:clicked video-player-show
                                         :loading (not (:video-processed activity-data))})
-               :on-click #(reset! (::video-image-clicked s) true)}
+               :on-click #(reset! (::video-show-player s) true)}
               [:div.play {:class (when (not (:video-processed activity-data))
                                   "loading")}]
               [:img.video-image {
                 :class (when (not (:video-processed activity-data)) "loading")
                 :src (str "https://" (:video-image activity-data))}]])
-          (when (and has-video @(::video-image-clicked s))
+          (when (and has-video video-player-show)
             (rum/with-key
              (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
