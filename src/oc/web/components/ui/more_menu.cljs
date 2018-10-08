@@ -141,18 +141,7 @@
                               (when (fn? will-close)
                                 (will-close))
                               (activity-actions/activity-share-show activity-data share-container-id))}
-                "Share"])
-            (when edit-link
-              [:li
-               {:class (utils/class-set
-                         {:must-see (not (:must-see activity-data))
-                          :must-see-on (:must-see activity-data)})
-                :on-click #(do
-                             (utils/event-stop %)
-                             (activity-actions/toggle-must-see activity-data))}
-               (if (:must-see activity-data)
-                 "Unmark"
-                 "Must see")])])
+                "Share"])])
         (when (and external-share
                    share-link
                    (not (responsive/is-tablet-or-mobile?)))
