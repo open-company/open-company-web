@@ -21,6 +21,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-Book {
@@ -29,6 +30,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-BookOblique {
@@ -37,6 +39,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-Roman {
@@ -45,6 +48,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-MediumOblique {
@@ -53,6 +57,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-Medium {
@@ -61,6 +66,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-Oblique {
@@ -69,6 +75,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-Heavy {
@@ -77,6 +84,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-HeavyOblique {
@@ -85,6 +93,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-Black {
@@ -93,6 +102,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 .AvenirLTStd-BlackOblique {
@@ -101,6 +111,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 @mixin avenir($avenir_variant){
@@ -109,6 +120,7 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
 
 @mixin avenir_BOOK() {
@@ -157,4 +169,5 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
 }
