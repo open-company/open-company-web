@@ -188,7 +188,7 @@ div.stream-item {
         &:hover {
           opacity: 1;
         }
-        
+
         &.loading {
           width: 40px;
           height: 40px;
@@ -199,6 +199,7 @@ div.stream-item {
           border-radius: 100px 100px 100px 100px;
           left: 50px;
           top: 30px;
+
           &:hover {
             opacity: 0.4;
           }
