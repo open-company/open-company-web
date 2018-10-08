@@ -45,8 +45,11 @@
     (update-jwt-cookie jbody)
     (dispatch-jwt)))
 
-(defn jwt-refresh []
-  (api/jwt-refresh update-jwt logout))
+(defn jwt-refresh
+  ([]
+    (api/jwt-refresh update-jwt logout))
+  ([success-cb]
+    (api/jwt-refresh #(do (update-jwt %) (success-cb)) logout)))
 
 ;;User walls
 (defn- check-user-walls
@@ -77,7 +80,7 @@
 
         :else
         (when-not has-orgs
-          (router/nav! oc-urls/sign-up-team))))))
+          (router/nav! oc-urls/sign-up-profile))))))
 
 ;; API Entry point
 (defn entry-point-get-finished
@@ -129,7 +132,7 @@
       (entry-point-get-finished success body
         (fn [orgs collection]
           (if (zero? (count orgs))
-            (router/nav! oc-urls/sign-up-team)
+            (router/nav! oc-urls/sign-up-profile)
             (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
 
 ;; Login
@@ -317,31 +320,44 @@
 
 ;; User Profile
 
-(defn user-profile-save [current-user-data edit-data]
-  (let [edit-user-profile (or (:user-data edit-data) edit-data)
-        new-password (:password edit-user-profile)
-        password-did-change (pos? (count new-password))
-        with-pswd (if (and password-did-change
-                           (>= (count new-password) 8))
-                    edit-user-profile
-                    (dissoc edit-user-profile :password))
-        new-email (:email edit-user-profile)
-        email-did-change (not= new-email (:email current-user-data))
-        with-email (if (and email-did-change
-                            (utils/valid-email? new-email))
-                     (assoc with-pswd :email new-email)
-                     (assoc with-pswd :email (:email current-user-data)))
-        user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
-    (api/patch-user-profile
-     user-profile-link
-     with-email
-     (fn [status body success]
-       (if (= status 422)
-         (dis/dispatch! [:user-profile-update/failed])
-         (when success
-           (utils/after 1000 jwt-refresh)
-           (dis/dispatch! [:user-data (json->cljs body)])))))
-    (dis/dispatch! [:user-profile-save])))
+(defn user-profile-save
+  ([current-user-data edit-data]
+   (user-profile-save current-user-data edit-data nil))
+  ([current-user-data edit-data org-editing]
+    (let [edit-user-profile (or (:user-data edit-data) edit-data)
+          new-password (:password edit-user-profile)
+          password-did-change (pos? (count new-password))
+          with-pswd (if (and password-did-change
+                             (>= (count new-password) 8))
+                      edit-user-profile
+                      (dissoc edit-user-profile :password))
+          new-email (:email edit-user-profile)
+          email-did-change (not= new-email (:email current-user-data))
+          with-email (if (and email-did-change
+                              (utils/valid-email? new-email))
+                       (assoc with-pswd :email new-email)
+                       (assoc with-pswd :email (:email current-user-data)))
+          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
+      (dis/dispatch! [:user-profile-save])
+      (api/patch-user-profile
+       user-profile-link
+       with-email
+       (fn [status body success]
+         (if (= status 422)
+           (dis/dispatch! [:user-profile-update/failed])
+           (when success
+             ;; If user is not creating a new company let's show the spinner
+             ;; then we will delay the redirect to AP to show the carrot more
+             (when-not org-editing
+               (dis/dispatch! [:input [:ap-loading] true]))
+             (utils/after 100
+              (fn []
+                (jwt-refresh
+                 #(if org-editing
+                    (org-actions/create-or-update-org org-editing)
+                    (utils/after 2000
+                      (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
+             (dis/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn user-avatar-save [avatar-url]
   (let [user-avatar-data {:avatar-url avatar-url}

@@ -15,6 +15,7 @@ div.onboard-wrapper-container {
 
     @include mobile(){
       display: block;
+      background-color: white;
     }
 
     div.onboard-wrapper-left {
@@ -46,15 +47,15 @@ div.onboard-wrapper-container {
       }
 
       div.onboard-wrapper-left-inner {
-        display: table-cell;
-        vertical-align: middle;
-        text-align: center;
+        // display: table-cell;
+        // vertical-align: middle;
+        // text-align: center;
 
         div.onboard-wrapper-box {
           margin-left: auto;
           margin-right: auto;
           width: 400px;
-          margin-top: 0px;
+          margin-top: 180px;
           width: 294px;
           height: 301px;
           @include image-2x("/img/ML/carrot_box");
@@ -241,15 +242,74 @@ div.onboard-lander {
     }
 
     div.title {
-      @include avenir_H();
+      font-family: "PT Serif";
+      font-weight: 700;
       font-size: 32px;
-      margin-top: 56px;
+      line-height: 42px;
+      margin-top: 64px;
+      color: $deep_navy;
 
       @include mobile() {
         margin-top: 0px;
         padding-top: 32px;
         font-size: 24px;
         margin: 0 auto;
+      }
+    }
+
+    div.steps {
+      width: 96px;
+      height: 8px;
+      margin: 24px auto 0;
+
+      &.first-step {
+        div.step:first-child {
+          background-color: #FFD24A;
+        }
+      }
+
+      &.second-step {
+        div.step:first-child {
+          background-color: #FFD24A;
+        }
+
+        div.step:nth-child(2) {
+          background-color: #FFD24A;
+        }
+      }
+
+      &.third-step {
+        div.step:first-child {
+          background-color: #FFD24A;
+        }
+
+        div.step:nth-child(2) {
+          background-color: #FFD24A;
+        }
+
+        div.step:nth-child(3) {
+          background-color: #FFD24A;
+        }
+      }
+
+      div.step {
+        width: 24px;
+        height: 8px;
+        background-color: #E0E2EC;
+        border-radius: 100px;
+        margin: 0 4px;
+        float: left;
+      }
+    }
+
+    div.steps-separator {
+      width: 77%;
+      height: 1px;
+      margin: 32px auto 0;
+      background-color: #ECECEC;
+
+      @include mobile() {
+        display: none;
       }
     }
 
@@ -279,7 +339,7 @@ div.onboard-lander {
     @include avenir_R();
     font-size: 16px;
     margin-top: 16px;
-    color: $oc_gray_7;
+    color: $deep_navy;
     padding: 0px 24px;
 
     &.error {
@@ -288,7 +348,7 @@ div.onboard-lander {
 
     span.email-address {
       @include avenir_H();
-      color: $oc_gray_7;
+      color: $deep_navy;
     }
   }
 
@@ -318,10 +378,10 @@ div.onboard-lander {
     }
 
     button.signup-with-slack {
-      margin-top: 52px;
+      margin-top: 35px;
 
       @include mobile() {
-        margin-top: 24px;
+        margin-top: 26px;
       }
     }
 
@@ -374,43 +434,15 @@ div.onboard-lander {
     div.or-with-email{
       width: 100%;
       height: 19px;
-      margin-top: 36px;
+      margin-top: 24px;
       position: relative;
 
-      @include mobile() {
-        margin-top: 24px;
-      }
-
-      div.or-with-email-line {
-        position: absolute;
-        height: 1px;
-        background-color: $carrot_dark_bg_gray;
-        width: 340px;
-        top: 9px;
-        left: 0px;
-        display: block;
-
-        @include mobile() {
-          display: none;
-        }
-      }
-
       div.or-with-email-copy {
-        position: absolute;
-        top: 0px;
-        left: 71px;
         text-align: center;
         @include avenir_R();
         font-size: 14px;
-        color: $light_ui_grey;
+        color: $deep_navy;
         margin: 0 auto;
-        width: 196px;
-        background-color: white;
-
-        @include mobile() {
-          left: unset;
-          position: relative;
-        }
       }
     }
 
@@ -552,11 +584,9 @@ div.onboard-lander {
       @include avenir_H();
       font-size: 12px;
       color: $deep_navy;
-      margin-top: 35px;
+      margin-top: 16px;
 
       @include mobile() {
-        margin-top: 16px;
-
         &.email-field {
           margin-top: 8px;
         }
@@ -586,25 +616,21 @@ div.onboard-lander {
       @include avenir_R();
       font-size: 14px;
       margin-top: 16px;
-      color: rgba($oc_gray_7, 0.5);
+      color: $deep_navy;
       text-align: center;
 
       a {
         text-decoration: underline;
-        color: $light_ui_grey;
+        color: $deep_navy;
       }
     }
 
     div.footer-link {
-      margin-top: 20px;
+      margin-top: 24px;
       @include avenir_R();
       font-size: 14px;
       color: $deep_navy;
       text-align: center;
-
-      @include mobile() {
-        margin-top: 0px;
-      }
 
       a {
         @include avenir_R();
@@ -623,19 +649,19 @@ div.onboard-lander {
       height: 40px;
       border-radius: 4px;
       background-color: white;
-      border: 1px solid $light_ui_grey;
+      border: 1px solid rgba(#B1B8C0, 0.6);
       outline: none;
-      padding: 10px 16px;
+      padding: 11px 16px 9px;
       position: relative;
       @include avenir_R();
       font-size: 14px;
       color: $deep_navy;
       line-height: 24px;
       letter-spacing: 0.2px;
-      margin-top: 4px;
+      margin-top: 8px;
 
-      @include mobile() {
-        margin-top: 8px;
+      &:focus, &:active {
+        border: 1px solid #B1B8C0;
       }
 
       @include placeholder() {
@@ -672,13 +698,13 @@ div.onboard-lander {
 
     div.description {
       @include avenir_R();
-      color: rgba($deep_navy, 0.5);
+      color: $deep_navy;
       font-size: 14px;
       margin-top: 24px;
 
       a {
         text-decoration: underline;
-        color: rgba($deep_navy, 0.5);
+        color: $deep_navy;
       }
     }
 
@@ -767,30 +793,42 @@ div.onboard-lander {
       &.disabled {
         background-color: $light_ui_grey;
       }
-
-      @include mobile() {
-        margin-top: 32px;
-        margin-bottom: 24px;
-      }
     }
 
     div.logout-cancel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       @include avenir_R();
       font-size: 14px;
       color: $deep_navy;
+      margin: 24px 0 0;
 
       button.logout-cancel {
-        display: inline-block;
-        @include avenir_H();
+        @include avenir_R();
         font-size: 14px;
         color: $carrot_green;
-        margin: 24px auto 0px;
         padding: 0;
+        margin-left: 8px;
       }
     }
   }
 
+  &.lander-profile {
+    div.mobile-header {
+      button.top-continue {
+        color: $sea_blue;
+      }
+    }
+    div.onboard-form {
+      div.field-label {
+        &:first-child {
+          margin-top: 40px;
+        }
+      }
+    }
+  }
 
   &.lander-team {
     div.onboard-form {
@@ -804,12 +842,32 @@ div.onboard-lander {
     }
   }
 
+  &.invitee-lander-password, &.invitee-lander-profile {
+    div.onboard-form {
+      div.field-label:first-child {
+        margin-top: 40px;
+      }
+    }
+  }
+
   &.lander-sections {
 
     div.subtitle {
-      max-width: 400px;
+      max-width: 500px;
       text-align: center;
       margin: 16px auto 0;
+
+      @include mobile() {
+        max-width: 280px;
+      }
+    }
+
+    div.main-cta {
+      div.mobile-header {
+        button.top-continue {
+          color: $carrot_orange;
+        }
+      }
     }
 
     div.onboard-form {
@@ -821,12 +879,13 @@ div.onboard-lander {
       }
 
       div.sections-list {
-        margin: 24px auto;
+        margin: 40px auto 0;
         width: 456px;
         text-align: center;
         min-height: 276px;
 
         @include mobile() {
+          margin: 32px auto 0;
           width: 100%;
         }
 
@@ -862,6 +921,7 @@ div.onboard-lander {
 
       button.continue {
         width: 340px;
+        margin-top: 32px;
 
         @include mobile() {
           width: 100%;
@@ -906,14 +966,10 @@ div.onboard-lander {
           border: 1px solid rgba($carrot_light_gray_1, 0.5);
           border-radius: 4px;
           background-color: white;
-          margin-top: 16px;
+          margin-top: 8px;
           width: 100%;
           height: 40px;
           padding: 8px 16px;
-
-          &:first-child {
-            margin-top: 0px;
-          }
 
           &.error {
             border: 1px solid $carrot_orange;
@@ -939,27 +995,26 @@ div.onboard-lander {
 
       button.continue {
         padding: 7px;
+        margin-top: 32px;
+
         @include mobile() {
           margin-bottom: 0px;
         }
       }
 
-      div.skip-container {
-        width: 100%;
-        text-align: center;
-        @include avenir_R();
-        font-size: 14px;
-        color: $deep_navy;
+      button.skip-for-now {
+        @include avenir_M();
+        font-size: 16px;
+        background-color: transparent;
+        padding: 0;
         margin: 24px auto 0px;
-
-        button.skip-for-now {
-          display: inline-block;
-          @include avenir_H();
-          font-size: 14px;
-          color: $carrot_green;
-          margin: 0;
-          padding: 0;
-        }
+        width: 100%;
+        max-width: 340px;
+        height: 48px;
+        border: 2px solid $sea_blue;
+        color: $sea_blue;
+        display: block;
+        border-radius: 100px;
       }
     }
   }

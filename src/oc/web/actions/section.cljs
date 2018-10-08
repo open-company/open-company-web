@@ -58,7 +58,8 @@
           :when (not (is-currently-shown? section))]
     (api/get-board (utils/link-for (:links section) ["item" "self"] "GET")
       (fn [status body success]
-        (section-get-finish (json->cljs body))))))
+        (when success
+          (section-get-finish (json->cljs body)))))))
 
 (declare refresh-org-data)
 

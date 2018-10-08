@@ -44,7 +44,14 @@
 
 (defmethod dispatcher/action :org-create
   [db [_]]
-  (dissoc db :latest-entry-point :latest-auth-settings))
+  (dissoc db
+   :latest-entry-point
+   :latest-auth-settings
+   ;; Remove the entry point, orgs and auth settings
+   ;; to avoid using the old loaded orgs
+   (first dispatcher/api-entry-point-key)
+   (first dispatcher/auth-settings-key)
+   dispatcher/orgs-key))
 
 (defmethod dispatcher/action :org-edit-setup
   [db [_ org-data]]

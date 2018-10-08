@@ -338,13 +338,13 @@
       (timbre/info "Routing signup-update-team-route" (urls/sign-up-update-team ":org"))
       (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-update-team-slash-route (str (urls/sign-up-update-team ":org") "/") {:as params}
       (timbre/info "Routing signup-update-team-slash-route" (str (urls/sign-up-update-team ":org") "/"))
       (when-not (jwt/jwt)
         (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
+      (simple-handler #(onboard-wrapper :lander-profile) "sign-up" target params))
 
     (defroute signup-invite-route (urls/sign-up-invite ":org") {:as params}
       (timbre/info "Routing signup-invite-route" (urls/sign-up-invite ":org"))

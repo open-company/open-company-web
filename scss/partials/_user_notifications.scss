@@ -104,7 +104,12 @@ div.user-notifications {
       overflow-x: hidden;
 
       div.user-notifications-tray-empty {
-
+        @include mobile() {
+          div.all-caught-up {
+            display: block !important;
+            margin-top: 100px;
+          }
+        }
       }
 
       div.user-notification {
