@@ -347,7 +347,6 @@
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
-   :show-add-comment-tooltip   [[:nux] (fn [nux] (:show-add-comment-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
    :show-draft-post-tooltip    [[:nux] (fn [nux] (:show-draft-post-tooltip nux))]

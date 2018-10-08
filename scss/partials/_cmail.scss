@@ -449,6 +449,14 @@ div.cmail-outer {
         overflow-x: hidden;
         height: auto;
 
+        &.showing-edit-tooltip {
+          max-height: calc(100vh - 145px);
+
+          @include tablet() {
+            max-height: initial;
+          }
+        }
+
         @include tablet() {
           padding: 24px;
           min-height: calc(100vh - 112px);
@@ -586,16 +594,16 @@ div.cmail-outer {
           position: relative;
 
           @include tablet() {
-            width: calc(100% - 48px);
-            margin: 32px 24px;
+            width: 100%;
+            margin: 0 auto 24px;
           }
 
           button.edit-tooltip-dismiss {
             position: absolute;
             top: 16px;
             right: 16px;
-            width: 33px;
-            height: 33px;
+            width: 32px;
+            height: 32px;
             background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
             background-size: 32px 32px;
             background-position: center;
@@ -603,26 +611,20 @@ div.cmail-outer {
           }
 
           div.edit-tooltips {
-            width: 100%;
-
-            div.edit-tooltip-title {
-              @include avenir_H();
-              font-size: 18px;
-              color: $deep_navy;
-              line-height: 20px;
-            }
+            width: calc(100% - 40px);
 
             div.edit-tooltip {
               @include avenir_R();
               font-size: 14px;
               color: $deep_navy;
               line-height: 18px;
-              margin-top: 8px;
 
               @include tablet() {
                 float: unset;
-                margin: 24px auto 0px;
+                margin: 0 auto 0px;
                 width: 100%;
+                font-size: 16px;
+                line-height: 20px;
               }
 
               button.edit-tooltip-record-video-bt {

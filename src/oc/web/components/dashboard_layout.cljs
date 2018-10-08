@@ -10,6 +10,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -103,6 +104,7 @@
                               ;; Derivative
                               (drv/drv :route)
                               (drv/drv :org-data)
+                              (drv/drv :team-data)
                               (drv/drv :board-data)
                               (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
@@ -161,6 +163,7 @@
         board-data (drv/react s :board-data)
         posts-data (drv/react s :filtered-posts)
         route (drv/react s :route)
+        team-data (drv/react s :team-data)
         is-all-posts (or (utils/in? (:route route) "all-posts")
                          (:from-all-posts route))
         is-must-see (utils/in? (:route route) "must-see")
@@ -287,65 +290,66 @@
                 ;          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                 ;          :title (if grid-view? "Stream view" "Grid view")}])])
                 ]
-              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)]
+              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
+                    non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
+                                           "decisions to keep you and your team pulling in the same direction.")
+                    is-second-user (= add-post-tooltip :has-organic-post)]
                 (when (and (not is-drafts-board)
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
                       {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
                     [:div.add-post-tooltips
-                      {:class (when (= add-post-tooltip :has-organic-post) "second-user")}
+                      {:class (when is-second-user "second-user")}
                       [:div.add-post-tooltip-box-mobile]
                       [:div.add-post-tooltip-title
-                        (str "Welcome to Carrot, " (:first-name current-user-data))]
+                        (str "Welcome to Carrot, " (:first-name current-user-data) "!")]
                         [:div.add-post-tooltip
                           (if is-admin-or-author
-                            (if (= add-post-tooltip :has-organic-post)
-                              (str
-                                "Carrot is where you’ll find announcements, updates, and "
-                                "decisions that keep your team pulling in the same direction.")
-                              (str
-                                "Create a post to see how easy it is to keep your team pulling in the "
-                                "same direction. "))
-                            (str
-                             "Carrot is where you’ll find announcements, updates, and decisions "
-                             "that keep your team pulling in the same direction."))
-                          (when is-admin-or-author
+                            (if is-second-user
+                              non-admin-tooltip
+                              "Create a test post now to see how it works. You can delete it anytime.")
+                            non-admin-tooltip)
+                          (when (and is-admin-or-author
+                                     (not is-second-user))
                             [:button.mlb-reset.add-post-bt
                               {:on-click #(when can-compose (compose s))}
                               "Create a new post"])]
-                      [:div.add-post-tooltip-box]]]))
-              (when (and (not is-drafts-board)
-                         is-admin-or-author
-                         (not is-mobile?)
-                         (drv/react s :show-post-added-tooltip))
-                [:div.post-added-tooltip-container.group
-                  [:button.mlb-reset.post-added-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                  [:div.post-added-tooltips
-                    [:div.post-added-tooltip-box-mobile]
-                    [:div.post-added-tooltip-title
-                      "Well done!"]
-                    [:div.post-added-tooltip
-                      "You are on your way "
-                      [:button.mlb-reset.post-added-bt
-                        {:on-click #(nav-actions/show-invite)}
-                        "Invite your team"]
-                      " to spark better follow-on discussions adn to keep everyone in sync."]
-                    [:div.post-added-tooltip-box]]])
+                      [:div.add-post-tooltip-box
+                        {:class (when is-second-user "second-user")}]]]))
+              (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
+                (when (and (not is-drafts-board)
+                           is-admin-or-author
+                           (not is-mobile?)
+                           (drv/react s :show-post-added-tooltip))
+                  [:div.post-added-tooltip-container.group
+                    [:button.mlb-reset.post-added-tooltip-dismiss
+                      {:on-click #(do
+                                   (nux-actions/dismiss-post-added-tooltip))}]
+                    [:div.post-added-tooltips
+                      [:div.post-added-tooltip-box-mobile]
+                      [:div.post-added-tooltip-title
+                        "Well done!"]
+                      [:div.post-added-tooltip
+                        "Using Slack? "
+                        [:button.mlb-reset.post-added-bt
+                          {:on-click #(org-actions/bot-auth team-data current-user-data
+                                       (str (router/get-token) "?org-settings=main"))}
+                          "Connect to Slack"]
+                        " so your team can see posts and  join the discussion from Slack, too."]
+                      [:div.post-added-tooltip-box]]]))
               (when (and is-drafts-board
                          (drv/react s :show-draft-post-tooltip))
                 [:div.draft-post-tooltip-container.group
                   [:button.mlb-reset.draft-post-tooltip-dismiss
                     {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
                   [:div.draft-post-tooltips
+                    [:div.draft-post-tooltip-box-mobile]
                     [:div.draft-post-tooltip-title
-                      "😎 Finish this draft post to add some personality"]
+                      "Add some personality"]
                     [:div.draft-post-tooltip
-                      (str
-                       "According to smart people on the Internet, "
-                       "everyone likes knowing who they work with. "
-                       "Help your team by finishing this draft post.")]]])
+                      "Finish this draft post to help your team get to know you better!"]
+                    [:div.draft-post-tooltip-box]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
