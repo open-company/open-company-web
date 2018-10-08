@@ -433,6 +433,41 @@ div.dashboard-layout {
               margin: 0 auto;
               position: relative;
               float: unset;
+
+              div.board-name-with-icon-internal {
+                position: relative;
+
+                &.private {
+                  padding-left: 20px;
+                  &:before {
+                    content: "";
+                    background-image: cdnUrl("/img/ML/board_private.svg");
+                    background-size: 10px 12px;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    position: absolute;
+                    top: 3px;
+                    left: 0px;
+                    width: 10px;
+                    height: 12px;
+                  }
+                }
+                &.public {
+                  padding-left: 20px;
+                  &:before {
+                    content: "";
+                    background-image: cdnUrl("/img/ML/board_public.svg");
+                    background-size: 12px 12px;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    position: absolute;
+                    top: 3px;
+                    left: 0px;
+                    width: 12px;
+                    height: 12px;
+                  }
+                }
+              }
             }
           }
 
@@ -505,6 +540,7 @@ div.dashboard-layout {
               position: absolute;
               top: 3px;
               left: 0px;
+              opacity: 0.5;
 
               @include mobile(){
                 left: unset;
@@ -538,6 +574,7 @@ div.dashboard-layout {
               position: absolute;
               top: 4px;
               left: 0px;
+              opacity: 0.5;
 
               @include mobile(){
                 left: unset;

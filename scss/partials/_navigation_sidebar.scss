@@ -556,12 +556,9 @@ div.left-navigation-sidebar {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
+        opacity: 0.5;
 
         @include preload_image(cdnUrl("/img/ML/board_public_green.svg"));
-
-        @include mobile() {
-          opacity: 1;
-        }
 
         &.selected {
           opacity: 1;
@@ -577,12 +574,9 @@ div.left-navigation-sidebar {
         background-size: 9px 11px;
         background-position: center;
         background-repeat: no-repeat;
+        opacity: 0.5;
 
         @include preload_image(cdnUrl("/img/ML/board_private_green.svg"));
-
-        @include mobile() {
-          opacity: 1;
-        }
 
         &.selected {
           opacity: 1;
