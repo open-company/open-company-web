@@ -120,7 +120,7 @@ div.stream-item {
     }
 
     &.expanded {
-      div.ziggeo-player {
+      div.ziggeo-player, div.video-play-image {
         margin-top: 24px;
         margin-bottom: 24px;
         float: unset;
@@ -129,6 +129,15 @@ div.stream-item {
 
         video {
           max-height: 408px;
+        }
+
+        img.video-image {
+          width: 638px;
+          height: 480px;
+        }
+
+        div.play {
+          margin: auto;
         }
 
         @include tablet(){

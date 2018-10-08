@@ -195,7 +195,7 @@
              (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
                              :height (:height video-size)
-                             :autoplay true
+                             :autoplay @(::video-show-player s)
                              :video-processed (:video-processed activity-data)})
               (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))))
           [:div.stream-body-left.group.fs-hide
