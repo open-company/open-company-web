@@ -2,19 +2,21 @@
   (:require [rum.core :as rum]
             [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.utils :as utils]
             [oc.web.actions.notifications :as na]
             [oc.web.lib.responsive :as responsive]
             [clojure.contrib.humanize :refer (filesize)]))
 
 (rum/defcs ziggeo-player < (rum/local nil ::player-instance)
+                           (rum/local false ::video-show-player)
                            {:will-unmount (fn [s]
                              (when-let [player-instance @(::player-instance s)]
                                (.destroy player-instance))
                              s)
                             :did-mount (fn [s]
-                            (let [{:keys [video-id width height video-processed autoplay]
-                                       :or {width 640
-                                            height 480}} (first (:rum/args s))]
+                              (let [{:keys [video-id width height video-processed autoplay]
+                                     :or {width 640
+                                          height 480}} (first (:rum/args s))]
                               (when video-processed
                                 (let [player-el (rum/ref-node s :ziggeo-player)
                                       config {:element player-el
@@ -29,14 +31,32 @@
                                   (reset! (::player-instance s) player-instance)
                                   (.activate player-instance))))
                             s)} 
-  [s {:keys [video-id remove-video-cb width height video-processed autoplay]
+  [s {:keys [video-id remove-video-cb width height video-processed autoplay lazy video-image]
       :or {width 640
            height 480}}]
   [:div.ziggeo-player
+    (when lazy
+      [:div.video-play-image
+        {:style {:width (str (or width 640) "px")
+                 :height (str (or height 480) "px")}
+         :class (utils/class-set {:clicked @(::video-show-player s)
+                                  :loading (not video-processed)})
+         :on-click #(do
+                      (reset! (::video-show-player s) true)
+                      (utils/after 100
+                                   (fn [] (.play @(::player-instance s)))))}
+        [:div.play {:class (when (not video-processed) "loading")}]
+        [:img.video-image {
+                           :style {:width (str (or width 640) "px")
+                                   :height (str (or height 480) "px")}
+                           :class (when (not video-processed) "loading")
+                           :src (str "https://" video-image)}]])
     (when (fn? remove-video-cb)
       [:button.mlb-reset.remove-video-bt
         {:on-click (fn [] (when (fn? remove-video-cb)
                             (remove-video-cb video-id)))
+         :class  (when (and lazy (not @(::video-show-player s)))
+                   "hide")
          :data-toggle "tooltip"
          :data-placement "top"
          :data-container "body"
@@ -44,10 +64,14 @@
     (if-not video-processed
       [:div.ziggeo-player-not-processed
         {:style {:width (str (or width 640) "px")
-                 :height (str (or height 480) "px")}}
-        [:span "Preparing video…"]]
+                 :height (str (or height 480) "px")}
+         :class  (when (and lazy (not @(::video-show-player s)))
+                   "hide")}
+       [:span "Preparing video…"]]
       [:div.ziggeo-player-embed
-        {:ref :ziggeo-player}])])
+       {:ref :ziggeo-player
+        :class  (when (and lazy (not @(::video-show-player s)))
+                  "hide")}])])
 
 (rum/defcs ziggeo-recorder <  (rum/local nil ::recorder-instance)
                               (rum/local false ::uploading)

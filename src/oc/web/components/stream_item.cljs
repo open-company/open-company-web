@@ -75,7 +75,6 @@
                          (rum/local false ::more-menu-open)
                          (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
-                         (rum/local false ::video-show-player)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
                          (am/truncate-element-mixin "activity-body" (* 30 3))
@@ -127,8 +126,7 @@
         dom-node-class (str "stream-item-" (:uuid activity-data))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        video-player-show (or (and is-publisher? uploading-video)
-                              @(::video-show-player s))
+        video-player-show (and is-publisher? uploading-video)
         video-size (when has-video
                      (if is-mobile?
                        {:width (win-width)
@@ -181,25 +179,12 @@
         {:class (when expanded? "expanded")}
         [:div.group
           (when has-video
-            [:div.video-play-image
-              {:style {:width (str (or (:width video-size) 640) "px")
-                       :height (str (or (:height video-size) 480) "px")}
-               :class (utils/class-set {:clicked video-player-show
-                                        :loading (not (:video-processed activity-data))})
-               :on-click #(reset! (::video-show-player s) true)}
-              [:div.play {:class (when (not (:video-processed activity-data))
-                                  "loading")}]
-              [:img.video-image {
-                :style {:width (str (or (:width video-size) 640) "px")
-                        :height (str (or (:height video-size) 480) "px")}
-                :class (when (not (:video-processed activity-data)) "loading")
-                :src (str "https://" (:video-image activity-data))}]])
-          (when (and has-video video-player-show)
             (rum/with-key
              (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
                              :height (:height video-size)
-                             :autoplay @(::video-show-player s)
+                             :lazy (not video-player-show)
+                             :video-image (:video-image activity-data)
                              :video-processed (:video-processed activity-data)})
               (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))))
           [:div.stream-body-left.group.fs-hide
