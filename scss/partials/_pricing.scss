@@ -51,7 +51,7 @@ div.pricing-wrap {
       }
 
       div.pricing-subheadline {
-        color: $ui_grey;
+        color: $deep_navy;
         font-size: 30px;
         line-height: 38px;
         @include avenir_R();
@@ -157,7 +157,7 @@ div.pricing-wrap {
             max-width: 220px;
             @include avenir_R();
             font-size: 20px;
-            color: $ui_grey;
+            color: $deep_navy;
             text-align: center;
             margin: 16px auto 0;
             cursor: pointer;
@@ -221,7 +221,7 @@ div.pricing-wrap {
 
             a.tear-start-bt {
               background-color: transparent;
-              border: 1px solid $coral;
+              border: 2px solid $coral;
               color: $carrot_orange;
             }
 
@@ -274,7 +274,7 @@ div.pricing-wrap {
         div.faq-row-answer {
           @include avenir_R();
           font-size: 20px;
-          color: $ui_grey;
+          color: $deep_navy;
           margin-top: 8px;
 
           span.heavy {
