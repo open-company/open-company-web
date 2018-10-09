@@ -473,32 +473,28 @@
                        show-edit-tooltip)
               (edit-tooltip s))
             ;; Video elements
-            ;; FIXME: disable video on mobile for now
-            (when-not is-mobile?
-              (when (and (:fixed-video-id cmail-data)
-                         (not @(::record-video s)))
-                (ziggeo-player {:video-id (:fixed-video-id cmail-data)
-                                :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
+            (when (and (:fixed-video-id cmail-data)
+                       (not @(::record-video s)))
+              (ziggeo-player {:video-id (:fixed-video-id cmail-data)
+                              :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
+                              :width (:width video-size)
+                              :height (:height video-size)
+                              :video-processed (:video-processed cmail-data)}))
+            (when @(::record-video s)
+              (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
+                                :upload-started-cb #(do
+                                                      (activity-actions/uploading-video % :cmail-data)
+                                                      (reset! (::video-picking-cover s) false)
+                                                      (reset! (::video-uploading s) true))
+                                :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
+                                :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
+                                :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
                                 :width (:width video-size)
                                 :height (:height video-size)
-                                :video-processed (:video-processed cmail-data)})))
-            ;; FIXME: disable video on mobile for now
-            (when-not is-mobile?
-              (when @(::record-video s)
-                (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
-                                  :upload-started-cb #(do
-                                                        (activity-actions/uploading-video % :cmail-data)
-                                                        (reset! (::video-picking-cover s) false)
-                                                        (reset! (::video-uploading s) true))
-                                  :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
-                                  :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
-                                  :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
-                                  :width (:width video-size)
-                                  :height (:height video-size)
-                                  :remove-recorder-cb (fn []
-                                    (when (:video-id cmail-data)
-                                      (activity-actions/remove-video :cmail-data cmail-data))
-                                    (reset! (::record-video s) false))})))
+                                :remove-recorder-cb (fn []
+                                  (when (:video-id cmail-data)
+                                    (activity-actions/remove-video :cmail-data cmail-data))
+                                  (reset! (::record-video s) false))}))
             ; Headline element
             [:div.cmail-content-headline.emoji-autocomplete.emojiable.group.fs-hide
               {:content-editable true
