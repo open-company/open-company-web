@@ -158,6 +158,10 @@ div.stream-item {
         video {
           max-height: calc(100vw * 0.75);
         }
+
+        div.ba-videoplayer-carrot-theme-volumebar, div[data-selector="button-icon-volume"] {
+          display: none !important;
+        }
       }
     }
 
@@ -208,13 +212,13 @@ div.stream-item {
             margin-top: 8px;
 
             &.to-truncate{
-              @include activity-body(16, 22, 22, $ui_grey);
-              color: $ui_grey;
+              @include activity-body(16, 22, 22, $deep_navy);
+              color: $deep_navy;
               @include avenir_R();
               line-height: 22px;
 
               @include mobile() {
-                @include activity-body(18, 24, 24, $ui_grey); 
+                @include activity-body(18, 24, 24, $deep_navy); 
                 line-height: 24px;
               }
 
@@ -233,7 +237,7 @@ div.stream-item {
               display: none;
 
               @include mobile() {
-                @include activity-body(18, 24, 24, $ui_grey); 
+                @include activity-body(18, 24, 24, $deep_navy); 
                 line-height: 24px;
               }
             }

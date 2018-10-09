@@ -632,10 +632,6 @@ div.onboard-lander {
       color: $deep_navy;
       text-align: center;
 
-      @include mobile() {
-        margin-top: 0px;
-      }
-
       a {
         @include avenir_R();
         font-size: 14px;
