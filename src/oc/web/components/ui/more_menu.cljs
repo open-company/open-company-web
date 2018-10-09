@@ -1,8 +1,6 @@
 (ns oc.web.components.ui.more-menu
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -10,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
@@ -54,26 +53,17 @@
 (rum/defcs more-menu < rum/reactive
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
-                       (rum/local nil ::click-listener)
+                       (on-window-click-mixin (fn [s e]
+                        (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
+                          (when-let* [args (into [] (:rum/args s))
+                                      opts (get args 2)
+                                      will-close (:will-close opts)]
+                            (when (fn? will-close)
+                              (will-close)))
+                         (reset! (::showing-menu s) false))))
                        (drv/drv :editable-boards)
-                       {:will-mount (fn [s]
-                         (reset! (::click-listener s)
-                           (events/listen js/window EventType/CLICK
-                            #(when-not (utils/event-inside? % (rum/ref-node s "more-menu"))
-                               (when-let* [args (into [] (:rum/args s))
-                                           opts (get args 2)
-                                           will-close (:will-close opts)]
-                                 (when (fn? will-close)
-                                   (will-close)))
-                               (reset! (::showing-menu s) false))))
-                         s)
-                        :did-mount (fn [s]
+                       {:did-mount (fn [s]
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                         s)
-                        :will-unmount (fn [s]
-                         (when @(::click-listener s)
-                           (events/unlistenByKey @(::click-listener s))
-                           (reset! (::click-listener s) nil))
                          s)}
   [s activity-data share-container-id
    {:keys [will-open will-close external-share tooltip-position]}]

@@ -1,11 +1,10 @@
 (ns oc.web.components.user-notifications
   (:require [rum.core :as rum]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -20,19 +19,9 @@
 (rum/defcs user-notifications < rum/reactive
                                 (drv/drv :user-notifications)
                                 (rum/local false ::tray-open)
-                                (rum/local nil ::click-out-listener)
-
-                                {:will-mount (fn [s]
-                                  (reset! (::click-out-listener s)
-                                   (events/listen js/window EventType/CLICK
-                                    #(when-not (utils/event-inside? % (rum/dom-node s))
-                                       (close-tray s))))
-                                  s)
-                                 :will-unmount (fn [s]
-                                  (when @(::click-out-listener s)
-                                    (events/unlistenByKey @(::click-out-listener s))
-                                    (reset! (::click-out-listener s) nil))
-                                  s)}
+                                (on-window-click-mixin (fn [s e]
+                                 (when-not (utils/event-inside? e (rum/dom-node s))
+                                   (close-tray s))))
   [s]
   (let [user-notifications-data (drv/react s :user-notifications)
         has-new-content (has-new-content? user-notifications-data)]

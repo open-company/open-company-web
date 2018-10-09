@@ -222,3 +222,16 @@
                             (dissoc next-state stream-item-expand-kw))
                           next-state)]
          next-state))}))
+
+(defn on-window-click-mixin [callback]
+  {:did-mount (fn [s]
+   (let [on-click-listener (events/listen (.getElementById js/document "app") EventType/CLICK
+                            (fn [e]
+                             (callback s e)))]
+    (assoc s :on-click-out-listener on-click-listener)))
+   :will-unmount (fn [s]
+   (if (:on-click-out-listener s)
+    (do
+      (events/unlistenByKey (:on-click-out-listener s))
+      (dissoc s :on-click-out-listener))
+    s))})

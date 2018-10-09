@@ -7,12 +7,11 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.actions.reaction :as reaction-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]
-            [goog.events :as events]
-            [goog.object :as gobj]
-            [goog.events.EventType :as EventType]))
+            [goog.object :as gobj]))
 
 (defn can-pick-reaction
   "Given an emoji and the list of the current reactions
@@ -29,21 +28,9 @@
 (def default-reaction-number 5)
 
 (rum/defcs reactions < (rum/local false ::show-picker)
-                       (rum/local nil ::window-click)
-                       {:did-mount (fn [s]
-                         (reset!
-                          (::window-click s)
-                          (events/listen
-                           js/window
-                           EventType/CLICK
-                           #(when-not (utils/event-inside? % (rum/dom-node s))
-                              (reset! (::show-picker s) false))))
-                         s)
-                        :will-unmount (fn [s]
-                         (when @(::window-click s)
-                           (events/unlistenByKey @(::window-click s))
-                           (reset! (::window-click s) nil))
-                         s)}
+                       (on-window-click-mixin (fn [s e]
+                        (when-not (utils/event-inside? e (rum/dom-node s))
+                          (reset! (::show-picker s) false))))
   [s entry-data hide-last-reaction?]
   (let [reactions-data (if hide-last-reaction?
                          (vec (take (dec default-reaction-number) (:reactions entry-data)))

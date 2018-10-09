@@ -3,6 +3,7 @@
             [dommy.core :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as react-utils]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
@@ -65,14 +66,11 @@
   (rum/local false ::caret-pos)
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
+  (on-window-click-mixin on-click-out)
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
-                 (let [click-listener (events/listen
-                                       js/window
-                                       EventType/CLICK
-                                       (partial on-click-out s))
-                       focusin (events/listen
+                 (let [focusin (events/listen
                                 js/document
                                 EventType/FOCUSIN
                                 (partial check-focus s))
@@ -90,23 +88,20 @@
                                       js/window
                                       EventType/KEYPRESS
                                       (partial check-focus s)))]
-                   (merge s {::click-listener click-listener
-                             ::focusin-listener focusin
+                   (merge s {::focusin-listener focusin
                              ::focusout-listener focusout
                              ::ff-window-click ff-click
                              ::ff-keypress ff-keypress})))
    :did-mount (fn [s]
                 (utils/after 100 #(check-focus s nil))
                 s)
-   :will-unmount (fn [s] (events/unlistenByKey (::click-listener s))
-                         (events/unlistenByKey (::focusin-listener s))
+   :will-unmount (fn [s] (events/unlistenByKey (::focusin-listener s))
                          (events/unlistenByKey (::focusout-listener s))
                          (when (::ff-window-click s)
                            (events/unlistenByKey (::ff-window-click s)))
                          (when (::ff-keypress s)
                            (events/unlistenByKey (::ff-keypress s)))
                          (dissoc s
-                          ::click-listener
                           ::focusin-listener
                           ::focusout-listener
                           ::ff-window-click

@@ -3,11 +3,10 @@
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.team :as team-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn check-user [user s]
@@ -45,41 +44,32 @@
 
 (rum/defcs slack-users-dropdown   <  (rum/local nil ::show-users-dropdown)
                                      (rum/local nil ::field-value)
-                                     (rum/local nil ::window-click)
                                      (rum/local "" ::slack-user)
                                      (rum/local false ::typing)
                                      (rum/local [] ::all-sorted-users)
                                      rum/reactive
+                                     (on-window-click-mixin (fn [s e]
+                                      (when (and @(::show-users-dropdown s)
+                                                ; (not (utils/event-inside? e
+                                                ;       (sel1 [:div.board-edit-slack-channels-dropdown])))
+                                                (not (utils/event-inside? e
+                                                      (.-parentElement (sel1 [:input.slack-users-dropdown])))))
+                                       (reset! (::show-users-dropdown s) false)
+                                       (let [{:keys [on-blur]} (first (:rum/args s))]
+                                         (when (fn? on-blur)
+                                           (on-blur))))))
                                      (drv/drv :team-data)
                                      (drv/drv :team-roster)
                                      {:will-mount (fn [s]
                                        (let [initial-value (:initial-value (first (:rum/args s)))]
                                          (reset! (::slack-user s) (or initial-value "")))
                                        (setup-sorted-users s)
-                                       (reset! (::window-click s)
-                                        (events/listen js/window EventType/CLICK
-                                          #(when (and @(::show-users-dropdown s)
-                                                      ; (not
-                                                      ;  (utils/event-inside?
-                                                      ;   %
-                                                      ;   (sel1 [:div.board-edit-slack-channels-dropdown])))
-                                                      (not
-                                                       (utils/event-inside?
-                                                        %
-                                                        (.-parentElement (sel1 [:input.slack-users-dropdown])))))
-                                             (reset! (::show-users-dropdown s) false)
-                                             (let [{:keys [on-blur]} (first (:rum/args s))]
-                                               (when (fn? on-blur)
-                                                 (on-blur))))))
                                        s)
                                       :will-update (fn [s]
                                        (setup-sorted-users s)
                                        s)
                                       :before-render (fn [s]
                                        (team-actions/teams-get-if-needed)
-                                       s)
-                                      :will-unmount (fn [s]
-                                       (events/unlistenByKey @(::window-click s))
                                        s)}
   [s {:keys [disabled initial-value on-change on-intermediate-change on-focus on-blur filter-fn] :as data}]
   (let [_ (drv/react s :team-roster) ; Make sure the component is re-rendered when roster changes

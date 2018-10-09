@@ -1,9 +1,7 @@
 (ns oc.web.components.ui.section-editor
   (:require [rum.core :as rum]
             [goog.object :as gobj]
-            [goog.events :as events]
             [cuerdas.core :as string]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
@@ -11,6 +9,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.org-settings :as org-settings]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -97,7 +96,6 @@
                             (rum/local nil ::show-edit-user-top)
                             (rum/local "" ::initial-section-name)
                             (rum/local false ::editing-existing-section)
-                            (rum/local nil ::click-listener)
                             (rum/local false ::slack-enabled)
                             (rum/local "" ::section-name)
                             (rum/local false ::pre-flight-check)
@@ -105,6 +103,9 @@
                             (rum/local nil ::section-name-check-timeout)
                             ;; Mixins
                             mixins/no-scroll-mixin
+                            (on-window-click-mixin (fn [s e]
+                             (when-not (utils/event-inside? e (rum/dom-node s))
+                               (dismiss))))
                             ;; Derivatives
                             (drv/drv :org-data)
                             (drv/drv :board-data)
@@ -126,10 +127,6 @@
                                 (dis/dispatch! [:input [:section-editing] fixed-section-data])
                                 (reset! (::slack-enabled s)
                                  (not (empty? (:channel-id (:slack-mirror fixed-section-data))))))
-                              (reset! (::click-listener s)
-                               (events/listen js/window EventType/CLICK
-                                #(when-not (utils/event-inside? % (rum/dom-node s))
-                                   (dismiss))))
                               s)
                              :will-update (fn [s]
                               (let [section-editing @(drv/get-ref s :section-editing)]
@@ -138,11 +135,6 @@
                                     (reset! (::pre-flight-check s) false)
                                     (when-not (:section-name-error section-editing)
                                       (reset! (::pre-flight-ok s) true)))))
-                              s)
-                             :will-unmount (fn [s]
-                              (when @(::click-listener s)
-                                (events/unlistenByKey @(::click-listener s))
-                                (reset! (::click-listener s) nil))
                               s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)

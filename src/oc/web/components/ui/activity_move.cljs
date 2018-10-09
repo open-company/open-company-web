@@ -3,8 +3,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.activity :as activity-actions]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
 (defn move-post [s]
   ;; move the post
@@ -23,20 +22,12 @@
 
 (rum/defcs activity-move < (rum/local nil ::show-boards-list)
                            (rum/local nil ::selected-board)
-                           (rum/local nil ::window-click)
-                           {:did-mount (fn [s]
-                                        (let [opts (first (:rum/args s))
-                                              dismiss-cb (:dismiss-cb opts)]
-                                          (reset! (::window-click s)
-                                           (events/listen js/window EventType/CLICK
-                                            #(when (and (not (utils/event-inside? % (rum/dom-node s)))
-                                                        (fn? dismiss-cb))
-                                                (dismiss-cb)))))
-                                        s)
-                             :will-unmount (fn [s]
-                                            (when @(::window-click s)
-                                              (events/unlistenByKey @(::window-click s)))
-                                            s)}
+                           (on-window-click-mixin (fn [s e]
+                            (let [opts (first (:rum/args s))
+                                  dismiss-cb (:dismiss-cb opts)]
+                              (when (and (not (utils/event-inside? e (rum/dom-node s)))
+                                         (fn? dismiss-cb))
+                                (dismiss-cb)))))
   [s {:keys [boards-list activity-data dismiss-cb]}]
   (let [sorted-boards-list (sort-by :name boards-list)]
     [:div.activity-move

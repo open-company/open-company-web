@@ -2,10 +2,9 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
 (defn filter-team-channels [channels s]
   (let [look-for (string/lower
@@ -17,10 +16,13 @@
 (rum/defcs slack-channels-dropdown < (rum/local nil ::show-channels-dropdown)
                                      (rum/local nil ::field-value)
                                      (rum/local nil ::team-channels-requested)
-                                     (rum/local nil ::window-click)
                                      (rum/local "" ::slack-channel)
                                      (rum/local false ::typing)
                                      rum/reactive
+                                     (on-window-click-mixin (fn [s e]
+                                      (when (and @(::show-channels-dropdown s)
+                                                (not (utils/event-inside? e (rum/dom-node s))))
+                                       (reset! (::show-channels-dropdown s) false))))
                                      (drv/drv :team-data)
                                      (drv/drv :team-channels)
                                      {:will-mount (fn [s]
@@ -31,14 +33,6 @@
                                          (when-let [team-data @(drv/get-ref s :team-data)]
                                            (reset! (::team-channels-requested s) true)
                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                       (reset! (::window-click s)
-                                        (events/listen js/window EventType/CLICK
-                                          #(when (and @(::show-channels-dropdown s)
-                                                      (not
-                                                       (utils/event-inside?
-                                                        %
-                                                        (rum/dom-node s))))
-                                             (reset! (::show-channels-dropdown s) false))))
                                        s)
                                       :did-remount (fn [o s]
                                        (when (and (not @(drv/get-ref s :team-channels))
@@ -46,9 +40,6 @@
                                          (when-let [team-data @(drv/get-ref s :team-data)]
                                            (reset! (::team-channels-requested s) true)
                                            (dis/dispatch! [:channels-enumerate (:team-id team-data)])))
-                                       s)
-                                      :will-unmount (fn [s]
-                                       (events/unlistenByKey @(::window-click s))
                                        s)}
   [s {:keys [disabled initial-value on-change on-intermediate-change] :as data}]
   (let [slack-teams (drv/react s :team-channels)]

@@ -1,9 +1,6 @@
 (ns oc.web.components.ui.activity-share
   (:require [rum.core :as rum]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -11,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -59,10 +57,12 @@
                             (rum/local "" ::email-subject)
                             (rum/local (rand 1000) ::item-input-key)
                             (rum/local (rand 1000) ::slack-channels-dropdown-key)
-                            (rum/local nil ::window-click-listener)
                             (rum/local :team ::url-audience)
                             ;; Mixins
                             mixins/first-render-mixin
+                            (on-window-click-mixin (fn [s e]
+                              (when-not (utils/event-inside? e (rum/dom-node s))
+                                (close-clicked s))))
                             {:will-mount (fn [s]
                               (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
@@ -74,10 +74,6 @@
                                (when (and (not @(drv/get-ref s :activity-share-medium))
                                           (has-bot? org-data))
                                  (dis/dispatch! [:input [:activity-share-medium] :slack])))
-                              (reset! (::window-click-listener s)
-                               (events/listen js/window EventType/CLICK
-                                #(when-not (utils/event-inside? % (rum/dom-node s))
-                                   (close-clicked s))))
                              s)
                              :did-mount (fn [s]
                               (let [slack-button (rum/ref-node s "slack-button")
@@ -112,11 +108,6 @@
                                    (fn []
                                     (reset! (::shared s) false)
                                     (activity-actions/activity-share-reset)))))
-                              s)
-                             :will-unmount (fn [s]
-                              (when @(::window-click-listener s)
-                                (events/unlistenByKey @(::window-click-listener s))
-                                (reset! (::window-click-listener s) nil))
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
