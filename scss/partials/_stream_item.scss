@@ -153,6 +153,7 @@ div.stream-item {
       height: 102px;
       float: right;
       position: relative;
+      cursor: pointer;
 
       &.loading {
         background-color: rgba(0, 0, 0, .1);
