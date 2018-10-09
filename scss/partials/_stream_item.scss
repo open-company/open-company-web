@@ -131,18 +131,23 @@ div.stream-item {
           max-height: 408px;
         }
 
+        @include tablet(){
+          width: auto;
+          height: auto;
+        }
+
         img.video-image {
           width: 638px;
           height: 480px;
+
+          @include tablet(){
+            width: auto;
+            height: auto;
+          }
         }
 
         div.play {
           margin: auto;
-        }
-
-        @include tablet(){
-          width: auto;
-          height: auto;
         }
       }
     }
@@ -211,6 +216,8 @@ div.stream-item {
         width: 136px;
         height: 102px;
         position: absolute;
+        object-fit: contain;
+        background-color: black;
 
         @include tablet() {
           width: 100%;

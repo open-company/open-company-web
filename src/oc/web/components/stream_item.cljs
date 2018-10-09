@@ -182,12 +182,16 @@
         [:div.group
           (when has-video
             [:div.video-play-image
-              {:class (utils/class-set {:clicked video-player-show
+              {:style {:width (str (or (:width video-size) 640) "px")
+                       :height (str (or (:height video-size) 480) "px")}
+               :class (utils/class-set {:clicked video-player-show
                                         :loading (not (:video-processed activity-data))})
                :on-click #(reset! (::video-show-player s) true)}
               [:div.play {:class (when (not (:video-processed activity-data))
                                   "loading")}]
               [:img.video-image {
+                :style {:width (str (or (:width video-size) 640) "px")
+                        :height (str (or (:height video-size) 480) "px")}
                 :class (when (not (:video-processed activity-data)) "loading")
                 :src (str "https://" (:video-image activity-data))}]])
           (when (and has-video video-player-show)
