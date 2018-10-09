@@ -114,7 +114,6 @@
                             (drv/drv :team-channels)
                             (drv/drv :team-roster)
                             {:will-mount (fn [s]
-                              (js/console.log "XXX section-editor/will-mount")
                               (let [initial-section-data (first (:rum/args s))
                                     new-section (nil? initial-section-data)
                                     fixed-section-data (if new-section
@@ -130,7 +129,6 @@
                                  (not (empty? (:channel-id (:slack-mirror fixed-section-data))))))
                               s)
                              :will-update (fn [s]
-                              (js/console.log "XXX section-editor/will-update")
                               (let [section-editing @(drv/get-ref s :section-editing)]
                                 (when @(::pre-flight-check s)
                                   (when-not (:pre-flight-loading section-editing)
@@ -155,7 +153,6 @@
         can-change (or (= (:slug section-editing) utils/default-section-slug)
                        (some #{current-user-id} (:authors section-editing)))
         last-section-standing (= (count no-drafts-boards) 1)]
-    (js/console.log "XXX section-editor/render")
     [:div.section-editor-container
       [:div.section-editor.group.fs-hide
         {:on-click (fn [e]
