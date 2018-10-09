@@ -1,9 +1,8 @@
 (ns oc.web.components.ui.dropdown-list
   (:require [rum.core :as rum]
-            [goog.events :as events]
-            [oc.web.lib.utils :as utils]
             [dommy.core :refer-macros (sel1)]
-            [goog.events.EventType :as EventType]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
 (rum/defc dropdown-list
   "Component to create a dropdown list. Accept a map with these keys:
@@ -18,18 +17,11 @@
   Elements with this format will be transfomed into a divider line:
   {:value nil :label :divider-line}."
   < rum/static
-    (rum/local nil ::window-click-listener)
-    {:will-mount (fn [s]
-                   (reset! (::window-click-listener s)
-                    (events/listen (.getElementById js/document "app") EventType/CLICK
-                     #(when-not (utils/event-inside? % (sel1 :div.dropdown-list-container))
-                        (let [on-blur (:on-blur (first (:rum/args s)))]
-                          (when (fn? on-blur)
-                            (on-blur))))))
-                   s)
-     :will-unmount (fn [s]
-                     (events/unlistenByKey @(::window-click-listener s))
-                    s)}
+    (on-window-click-mixin (fn [s e]
+     (when-not (utils/event-inside? e (sel1 :div.dropdown-list-container))
+       (let [on-blur (:on-blur (first (:rum/args s)))]
+         (when (fn? on-blur)
+           (on-blur))))))
   [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
   [:div.dropdown-list-container
     [:div.triangle]

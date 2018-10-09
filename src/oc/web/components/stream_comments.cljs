@@ -8,6 +8,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -81,22 +82,18 @@
                              (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local false ::showing-menu)
-                             (rum/local nil ::click-listener)
                              (rum/local false ::editing?)
                              (rum/local false ::medium-editor)
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
-                             {:will-mount (fn [s]
-                               (reset! (::click-listener s)
-                                 (events/listen (.getElementById js/document "app") EventType/CLICK
-                                  #(when (and @(::showing-menu s)
-                                              (not (utils/event-inside? %
-                                                    (rum/ref-node s (str "comment-more-menu-" @(::showing-menu s))))))
-                                     (reset! (::showing-menu s) false))))
-                               s)
-                              :after-render (fn [s]
+                             (on-window-click-mixin (fn [s e]
+                              (when (and @(::showing-menu s)
+                                        (not (utils/event-inside? e
+                                              (rum/ref-node s (str "comment-more-menu-" @(::showing-menu s))))))
+                               (reset! (::showing-menu s) false))))
+                             {:after-render (fn [s]
                                (let [activity-uuid (:uuid (first (:rum/args s)))
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
                                      current-local-state @(::last-focused-state s)
@@ -105,11 +102,6 @@
                                     (reset! (::last-focused-state s) is-self-focused?)
                                     (when is-self-focused?
                                       (scroll-to-bottom s))))
-                               s)
-                              :will-unmount (fn [s]
-                               (when @(::click-listener s)
-                                 (events/unlistenByKey @(::click-listener s))
-                                 (reset! (::click-listener s) nil))
                                s)}
   [s activity-data comments-data collapse-comments]
   [:div.stream-comments

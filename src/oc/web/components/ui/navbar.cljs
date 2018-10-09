@@ -1,7 +1,5 @@
 (ns oc.web.components.ui.navbar
   (:require [rum.core :as rum]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -13,6 +11,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
             [oc.web.components.search :refer (search-box)]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -23,23 +22,14 @@
                     (drv/drv :navbar-data)
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::expanded-user-menu)
-                    (rum/local nil ::window-click)
-                    {:will-mount (fn [s]
-                      (reset! (::window-click s)
-                       (events/listen (.getElementById js/document "app") EventType/CLICK
-                        #(when-not (utils/event-inside? % (rum/ref-node s "user-menu"))
-                           (reset! (::expanded-user-menu s) false))))
-                      s)
-                     :did-mount (fn [s]
+                    (on-window-click-mixin (fn [s e]
+                     (when-not (utils/event-inside? e (rum/ref-node s "user-menu"))
+                       (reset! (::expanded-user-menu s) false))))
+                    {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
-                     s)
-                     :will-unmount (fn [s]
-                      (when @(::window-click s)
-                        (events/unlistenByKey @(::window-click s))
-                        (reset! (::window-click s) nil))
-                      s)}
+                     s)}
   [s]
   (let [{:keys [current-user-data
                 org-data

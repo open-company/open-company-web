@@ -1,9 +1,7 @@
 (ns oc.web.components.ui.section-editor
   (:require [rum.core :as rum]
             [goog.object :as gobj]
-            [goog.events :as events]
             [cuerdas.core :as string]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
@@ -11,6 +9,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.org-settings :as org-settings]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -97,7 +96,6 @@
                             (rum/local nil ::show-edit-user-top)
                             (rum/local "" ::initial-section-name)
                             (rum/local false ::editing-existing-section)
-                            (rum/local nil ::click-listener)
                             (rum/local false ::slack-enabled)
                             (rum/local "" ::section-name)
                             (rum/local false ::pre-flight-check)
@@ -105,6 +103,9 @@
                             (rum/local nil ::section-name-check-timeout)
                             ;; Mixins
                             mixins/no-scroll-mixin
+                            (on-window-click-mixin (fn [s e]
+                             (when-not (utils/event-inside? e (rum/dom-node s))
+                               (dismiss))))
                             ;; Derivatives
                             (drv/drv :org-data)
                             (drv/drv :board-data)
@@ -113,6 +114,7 @@
                             (drv/drv :team-channels)
                             (drv/drv :team-roster)
                             {:will-mount (fn [s]
+                              (js/console.log "XXX section-editor/will-mount")
                               (let [initial-section-data (first (:rum/args s))
                                     new-section (nil? initial-section-data)
                                     fixed-section-data (if new-section
@@ -126,23 +128,15 @@
                                 (dis/dispatch! [:input [:section-editing] fixed-section-data])
                                 (reset! (::slack-enabled s)
                                  (not (empty? (:channel-id (:slack-mirror fixed-section-data))))))
-                              (reset! (::click-listener s)
-                               (events/listen (.getElementById js/document "app") EventType/CLICK
-                                #(when-not (utils/event-inside? % (rum/dom-node s))
-                                   (dismiss))))
                               s)
                              :will-update (fn [s]
+                              (js/console.log "XXX section-editor/will-update")
                               (let [section-editing @(drv/get-ref s :section-editing)]
                                 (when @(::pre-flight-check s)
                                   (when-not (:pre-flight-loading section-editing)
                                     (reset! (::pre-flight-check s) false)
                                     (when-not (:section-name-error section-editing)
                                       (reset! (::pre-flight-ok s) true)))))
-                              s)
-                             :will-unmount (fn [s]
-                              (when @(::click-listener s)
-                                (events/unlistenByKey @(::click-listener s))
-                                (reset! (::click-listener s) nil))
                               s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
@@ -161,6 +155,7 @@
         can-change (or (= (:slug section-editing) utils/default-section-slug)
                        (some #{current-user-id} (:authors section-editing)))
         last-section-standing (= (count no-drafts-boards) 1)]
+    (js/console.log "XXX section-editor/render")
     [:div.section-editor-container
       [:div.section-editor.group.fs-hide
         {:on-click (fn [e]

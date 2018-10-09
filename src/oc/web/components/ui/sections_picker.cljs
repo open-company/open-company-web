@@ -1,13 +1,12 @@
 (ns oc.web.components.ui.sections-picker
   (:require [rum.core :as rum]
-            [goog.events :as events]
             [cuerdas.core :as string]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.section :as section-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.section-editor :refer (section-editor)]))
 
 (defn calc-max-height [s]
@@ -22,29 +21,20 @@
 
 (rum/defcs sections-picker < ;; Mixins
                              rum/reactive
+                             (on-window-click-mixin (fn [s e]
+                              (when-not (utils/event-inside? e (rum/dom-node s))
+                                (dis/dispatch! [:input [:show-sections-picker] false]))))
                              ;; Derivatives
                              (drv/drv :editable-boards)
                              (drv/drv :section-editing)
                              ;; Locals
-                             (rum/local nil ::click-listener)
                              (rum/local nil ::container-max-height)
                              ;; Local mixins
-                             {:will-mount (fn [s]
-                               (reset! (::click-listener s)
-                                (events/listen (.getElementById js/document "app") EventType/CLICK
-                                 #(when-not (utils/event-inside? % (rum/dom-node s))
-                                    (dis/dispatch! [:input [:show-sections-picker] false]))))
-                               s)
-                              :did-mount (fn [s]
+                             {:did-mount (fn [s]
                                (calc-max-height s)
                                s)
                               :did-remount (fn [_ s]
                                (calc-max-height s)
-                               s)
-                              :will-unmount (fn [s]
-                               (when @(::click-listener s)
-                                 (events/unlistenByKey @(::click-listener s))
-                                 (reset! (::click-listener s) nil))
                                s)}
   [s active-slug on-change moving?]
   (let [section-editing (drv/react s :section-editing)

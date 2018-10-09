@@ -6,9 +6,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.components.ui.org-avatar :refer (org-avatar)]))
 
 (rum/defc org-dropdown-item < rum/static
   [current-slug org is-mobile?]
@@ -22,21 +21,12 @@
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive
-                           (rum/local nil ::window-click-listener)
                            (drv/drv :orgs)
                            (drv/drv :org-data)
                            (drv/drv :orgs-dropdown-visible)
-                           {:will-mount (fn [s]
-                             (reset! (::window-click-listener s)
-                              (events/listen (.getElementById js/document "app") EventType/CLICK
-                               #(when-not (utils/event-inside? % (rum/dom-node s))
-                                  (dis/dispatch! [:input [:orgs-dropdown-visible] false]))))
-                             s)
-                            :will-unmount (fn [s]
-                             (when @(::window-click-listener s)
-                               (events/unlistenByKey @(::window-click-listener s))
-                               (reset! (::window-click-listener s) nil))
-                             s)}
+                           (on-window-click-mixin (fn [s e]
+                            (when-not (utils/event-inside? e (rum/dom-node s))
+                              (dis/dispatch! [:input [:orgs-dropdown-visible] false]))))
   [s]
   (let [orgs (drv/react s :orgs)
         org-data (drv/react s :org-data)

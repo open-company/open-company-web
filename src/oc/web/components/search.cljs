@@ -3,14 +3,13 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [org.martinklepsch.derivatives :as drv]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [oc.web.lib.utils :as utils]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.search :as search]
-            [oc.web.stores.search :as store]))
+            [oc.web.stores.search :as store]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
 (rum/defcs entry-display < rum/static
 
@@ -104,9 +103,15 @@
                         (drv/drv store/search-active?)
                         rum/reactive
                         rum/static
-                        (rum/local nil ::window-click)
                         (rum/local false ::search-clicked?)
                         (rum/local nil ::search-timeout)
+                        (on-window-click-mixin (fn [s e]
+                          (when (and (not (responsive/is-tablet-or-mobile?))
+                                     @(::search-clicked? s)
+                                     (not
+                                      (utils/event-inside? e
+                                        (sel1 [:div.search-box]))))
+                            (search-inactive s))))
                         {:after-render (fn [s]
                           (let [search-input (rum/ref-node s "search-input")]
                             (when (and
@@ -120,23 +125,7 @@
                          :will-mount (fn [s]
                           (when-not (responsive/is-tablet-or-mobile?)
                             (search/inactive))
-                          (reset! (::window-click s)
-                            (events/listen
-                             (.getElementById js/document "app")
-                             EventType/CLICK
-                             (fn [e]
-                               (when (and (not (responsive/is-tablet-or-mobile?))
-                                          @(::search-clicked? s)
-                                          (not
-                                           (utils/event-inside? e
-                                             (sel1 [:div.search-box]))))
-                                 (search-inactive s)))))
-                          s)
-                         :will-unmount (fn [s]
-                           (when @(::window-click s)
-                             (events/unlistenByKey @(::window-click s))
-                             (reset! (::window-click s) nil))
-                           s)}
+                          s)}
   [s]
   (when (store/should-display)
     (let [search-active? (drv/react s store/search-active?)]
