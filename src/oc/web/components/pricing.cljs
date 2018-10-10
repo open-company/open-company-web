@@ -33,9 +33,7 @@
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Simple plans to stay aligned."
-          [:br]
-          "Get started for free."]
+          "Simple plans to stay aligned. Get started for free."]
 
         [:div.pricing-three-columns.group
           ;; Free

@@ -136,7 +136,7 @@ div.about-wrap {
             div.user-position {
               @include avenir_R();
               font-size: 14px;
-              color: rgba($ui_grey, 0.6);
+              color: $deep_navy;
               margin-top: 8px;
             }
 
@@ -226,7 +226,7 @@ div.about-wrap {
           div.about-copy-title {
             @include avenir_H();
             font-size: 30px;
-            color: $ui_grey;
+            color: $deep_navy;
             text-align: left;
             margin: 40px 0 0;
             padding: 0;
@@ -245,7 +245,7 @@ div.about-wrap {
           p {
             @include avenir_R();
             font-size: 30px;
-            color: $ui_grey;
+            color: $deep_navy;
             text-align: left;
             margin: 40px 0 0;
             padding: 0;
@@ -315,7 +315,7 @@ div.about-wrap {
                 @include avenir_R();
                 font-size: 20px;
                 line-height: 26px;
-                color: $ui_grey;
+                color: $deep_navy;
                 width: 100%;
                 display: block;
                 margin: 0 0 16px 0;
@@ -337,7 +337,7 @@ div.about-wrap {
       div.about-alignment {
         @include avenir_M();
         font-size: 34px;
-        color: $carrot_dark_gray;
+        color: $deep_navy;
         margin: 80px auto 0px;
       }
 
