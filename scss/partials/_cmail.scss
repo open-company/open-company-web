@@ -415,6 +415,8 @@ div.cmail-outer {
               width: 24px;
               height: 24px;
               display: block;
+              // FIXME: disable video on mobile for now
+              display: none;
 
               &.remove-video-bt {
                 &:before {
