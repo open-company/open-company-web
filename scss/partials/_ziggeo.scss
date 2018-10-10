@@ -47,29 +47,27 @@ div.ziggeo-player {
   div.video-play-image {
     position: relative;
     cursor: pointer;
+    width: 100%;
+    height: 100%;
 
     &.loading {
       background-color: rgba(0, 0, 0, .1);
     }
 
     div.play {
-      width: 40%;
-      height: 45%;
+      width: 45px;
+      height: 45px;
       position: absolute;
       background-image: cdnUrl("/img/ML/play.svg");
       background-repeat: no-repeat;
       background-position: center;
       background-size: 45px;
       z-index: 10;
-      left: 40px; right: 0;
-      top: 30px; bottom: 0;
+      left: 50%;
+      top: 50%;
+      margin-left: -22.5px;
+      margin-top: -22.5px;
       opacity: 0.8;
-
-      @include tablet(){
-        left: 0;
-        top: 0;
-        margin: auto;
-      }
 
       &:hover {
         opacity: 1;
@@ -96,6 +94,8 @@ div.ziggeo-player {
       position: absolute;
       object-fit: contain;
       background-color: black;
+      width: 100%;
+      height: 100%;
 
       &.loading {
         display: none;

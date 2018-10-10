@@ -120,7 +120,7 @@ div.stream-item {
     }
 
     &.expanded {
-      div.ziggeo-player, div.video-play-image {
+      div.ziggeo-player {
         margin-top: 24px;
         margin-bottom: 24px;
         float: unset;
@@ -131,60 +131,13 @@ div.stream-item {
           max-height: 408px;
         }
 
-        img.video-image {
-          width: 638px;
-          height: 480px;
-        }
-
-        div.play {
-          margin: auto;
-        }
-
         @include tablet(){
-          width: auto;
-          height: auto;
-        }
-
-        img.video-image {
-          width: 638px;
-          height: 480px;
-
-          @include tablet(){
-            width: auto;
-            height: auto;
-          }
-        }
-
-        div.play {
-          margin: auto;
+          width: 100vw;
+          height: calc(100vw *  0.75);
         }
       }
     }
 
-    div.video-play-image {
-      margin-top: 0px;
-      width: 136px;
-      height: 102px;
-      float: right;
-
-      @include tablet(){
-        margin-top: 16px;
-        float: unset;
-        width: calc(100vw);
-        height: calc(100vw * 0.75);
-        margin-left: -16px;
-      }
-
-      img.video-image {
-        width: 136px;
-        height: 102px;
-
-        @include tablet() {
-          width: 100%;
-          height: 100%;
-        }
-      }
-    }
     div.ziggeo-player {
       margin-top: 0px;
       width: 136px;
