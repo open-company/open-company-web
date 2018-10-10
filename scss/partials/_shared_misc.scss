@@ -223,7 +223,7 @@ section.testimonials-section {
     @include avenir_R();
     font-size: 24px;
     line-height: 32px;
-    color: $ui_grey;
+    color: $deep_navy;
     margin-top: 16px;
     position: relative;
 
@@ -440,131 +440,6 @@ section.keep-aligned {
 
     @include tablet() {
       font-size: 12px;
-    }
-  }
-}
-
-div.core-values-list {
-  width: calc(100% - 48px);
-  text-align: center;
-  margin: 40px auto 0px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  @include tablet() {
-    width: 251px;
-    height: auto;
-    display: block;
-    justify-content: unset;
-    align-items: unset;
-  }
-
-  div.core-value-container {
-    float: left;
-    margin-left: 20px;
-
-    div.core-value-header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      @include tablet(){
-        margin-top: 24px;
-      }
-
-      div.core-value-icon {
-        width: 40px;
-        height: 40px;
-        background-size: 40px 40px;
-        background-repeat: no-repeat;
-        background-position: center;
-        margin-right: 12px;
-      }
-
-      div.core-value {
-        @include avenir_B();
-        font-size: 14px;
-        line-height: 19px;
-        text-transform: uppercase;
-
-        @include tablet(){
-          font-size: 16px;
-          line-height: 18px;
-        }
-      }
-    }
-
-    div.core-value-white-box {
-      background-color: white;
-      width: 246px;
-      padding: 20px;
-      box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.1);
-      text-align: left;
-      margin-top: 16px;
-
-      @include tablet() {
-        display: none;
-      }
-
-      div.core-value-box-header {
-        @include avenir_M();
-        font-size: 12px;
-        color: $ui_grey;
-
-        span.dot {
-          font-size: 8px;
-          color: $light_ui_grey;
-        }
-      }
-
-      div.core-value-box-title {
-        @include avenir_H();
-        color: $deep_navy;
-        font-size: 16px;
-        line-height: 18px;
-        margin-top: 16px;
-      }
-    }
-
-    &.key-announcement {
-      div.core-value-icon {
-        background-image: cdnUrl("/img/ML/key_announcements_icon.svg");
-      }
-
-      div.core-value {
-        color: #AF66F9;
-      }
-    }
-
-    &.team-updates {
-      div.core-value-icon {
-        background-image: cdnUrl("/img/ML/team_updates_icon.svg");
-      }
-
-      div.core-value {
-        color: #5789FA;
-      }
-    }
-
-    &.strategic-plans {
-      div.core-value-icon {
-        background-image: cdnUrl("/img/ML/strategic_plans_icon.svg");
-      }
-
-      div.core-value {
-        color: #32C97B;
-      }
-    }
-
-    &.stories {
-      div.core-value-icon {
-        background-image: cdnUrl("/img/ML/stories_icon.svg");
-      }
-
-      div.core-value {
-        color: #FB5E48;
-      }
     }
   }
 }
@@ -789,7 +664,7 @@ section.home-keep-aligned {
         div.keep-aligned-section-copy-subtitle {
           @include avenir_R();
           font-size: 24px;
-          color: $ui_grey;
+          color: $deep_navy;
           line-height: 32px;
           margin-top: 40px;
 

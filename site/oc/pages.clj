@@ -40,7 +40,7 @@
 
 (def google-fonts
   ;; Google fonts Muli
-  [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif" :rel "stylesheet"}])
+  [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif:700" :rel "stylesheet"}])
 
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
@@ -103,57 +103,6 @@
     [:img.main-animation
       {:src (cdn "/img/ML/homepage_screenshot.png")
        :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]])
-
-(def core-values-list
-  [:div.core-values-list.group
-    [:div.core-value-container.key-announcement
-      [:div.core-value-header.group
-        [:div.core-value-icon]
-        [:div.core-value
-          "Announcements"]]
-      [:div.core-value-white-box
-        [:div.core-value-box-header
-          "Product "
-          [:span.dot "•"]
-          " 45 views"]
-        [:div.core-value-box-title
-          "Updates to billing & subscriptions (beta edition)"]]]
-    [:div.core-value-container.team-updates
-      [:div.core-value-header.group
-        [:div.core-value-icon]
-        [:div.core-value
-          "Team updates"]]
-      [:div.core-value-white-box
-        [:div.core-value-box-header
-          "General "
-          [:span.dot "•"]
-          " 22 views"]
-        [:div.core-value-box-title
-          "June 25, 2018 all hands video highlights"]]]
-    [:div.core-value-container.strategic-plans
-      [:div.core-value-header.group
-        [:div.core-value-icon]
-        [:div.core-value
-          "Decisions"]]
-      [:div.core-value-white-box
-        [:div.core-value-box-header
-          "Strategy "
-          [:span.dot "•"]
-          " 67 views"]
-        [:div.core-value-box-title
-          "Product roadmap review presentation and PDF"]]]
-    [:div.core-value-container.stories
-      [:div.core-value-header.group
-        [:div.core-value-icon]
-        [:div.core-value
-          "Stories"]]
-      [:div.core-value-white-box
-        [:div.core-value-box-header
-          "Design "
-          [:span.dot "•"]
-          " 34 views"]
-        [:div.core-value-box-title
-          "How we pulled off our biggest launch ever 🤩"]]]])
 
 (def testimonials-section
   [:section.testimonials-section
@@ -391,9 +340,7 @@
           "Pricing"]
 
         [:div.pricing-subheadline
-          "Simple plans to stay aligned."
-          [:br]
-          "Get started for free."]
+          "Simple plans to stay aligned. Get started for free."]
 
         [:div.pricing-three-columns.group
           ;; Free
