@@ -22,9 +22,10 @@ div.site-mobile-menu {
 
   div.site-mobile-menu-container {
     margin: 64px 0 0;
+    min-height: calc(100vh - 366px);
 
     @media screen and (max-height: 610px) {
-      margin: 40px 0 0;      
+      margin: 40px 0 0;
     }
 
     div.site-mobile-menu-item {

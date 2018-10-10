@@ -70,12 +70,7 @@
                         (user/show-login nil)
                         (site-menu-toggle true)
                         (router/nav! oc-urls/about))}
-            "About"]]
-        [:div.site-mobile-menu-item
-          [:a
-            {:href oc-urls/blog
-             :target "_blank"}
-            "Blog"]]]
+            "About"]]]
       [:div.site-mobile-menu-footer
         (when-not (jwt/jwt)
           [:button.mlb-reset.login-btn

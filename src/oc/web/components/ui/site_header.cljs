@@ -69,10 +69,11 @@
             {:href oc-urls/pricing
              :on-click (partial nav! oc-urls/pricing)}
             "Pricing"]
-          [:a
-            {:href oc-urls/blog
-             :target "_blank"}
-            "Blog"]]
+          ; [:a
+          ;   {:href oc-urls/blog
+          ;    :target "_blank"}
+          ;   "Blog"]
+            ]
         [:div.site-navbar-right.big-web-only
           (when-not logged-in
             [:a.login

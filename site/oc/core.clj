@@ -70,12 +70,7 @@
         [:a
           {:href "/about"
            :class (when (= active-page "about") "active")}
-          "About"]]
-      [:div.site-mobile-menu-item
-        [:a
-          {:href "http://blog.carrot.io"
-           :target "_blank"}
-          "Blog"]]]
+          "About"]]]
     [:div.site-mobile-menu-footer
       [:button.mlb-reset.login-btn
         {:id "site-mobile-menu-login"}
@@ -116,11 +111,7 @@
           [:a
             {:href "/pricing"
              :class (when (= active-page "pricing") "active")}
-            "Pricing"]
-          [:a
-            {:href "https://blog.carrot.io"
-             :target "_blank"}
-            "Blog"]]
+            "Pricing"]]
         [:div.site-navbar-right.big-web-only
           [:a.login
             {:id "site-header-login-item"
