@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.1 (67048) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 7</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Video-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Video-in-stream" transform="translate(-420.000000, -742.000000)">
+            <g id="Group-3" transform="translate(348.000000, 710.000000)">
+                <g id="Group-7" transform="translate(72.000000, 32.000000)">
+                    <rect id="Rectangle" fill="#000000" opacity="0.400000006" x="0" y="0" width="40" height="40" rx="20"></rect>
+                    <path d="M16.511197,13.2031782 L26.4934011,19.1404541 C26.9680698,19.4227804 27.123994,20.036446 26.8416677,20.5111147 C26.7564297,20.6544233 26.6367098,20.7741433 26.4934011,20.8593813 L16.511197,26.7966572 C16.0365283,27.0789835 15.4228627,26.9230592 15.1405364,26.4483906 C15.0485518,26.2937391 15,26.1171332 15,25.9371936 L15,14.0626417 C15,13.510357 15.4477153,13.0626417 16,13.0626417 C16.1799396,13.0626417 16.3565454,13.1111936 16.511197,13.2031782 Z" id="Rectangle-3" fill="#FFFFFF"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

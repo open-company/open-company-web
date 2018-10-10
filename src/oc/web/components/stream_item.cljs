@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
@@ -121,8 +122,11 @@
         publisher (if is-drafts-board
                     (first (:author activity-data))
                     (:publisher activity-data))
+        is-publisher? (= (:user-id publisher) (jwt/user-id))
         dom-node-class (str "stream-item-" (:uuid activity-data))
         has-video (seq (:fixed-video-id activity-data))
+        uploading-video (dis/uploading-video-data (:video-id activity-data))
+        video-player-show (and is-publisher? uploading-video)
         video-size (when has-video
                      (if is-mobile?
                        {:width (win-width)
@@ -179,6 +183,8 @@
              (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
                              :height (:height video-size)
+                             :lazy (not video-player-show)
+                             :video-image (:video-image activity-data)
                              :video-processed (:video-processed activity-data)})
               (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))))
           [:div.stream-body-left.group.fs-hide

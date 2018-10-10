@@ -125,15 +125,15 @@ div.stream-item {
         margin-bottom: 24px;
         float: unset;
         width: 638px;
-        height: 480px;
+        height: 478px;
 
         video {
-          max-height: 408px;
+          max-height: 478px;
         }
 
         @include tablet(){
-          width: auto;
-          height: auto;
+          width: 100vw;
+          height: calc(100vw *  0.75);
         }
       }
     }
