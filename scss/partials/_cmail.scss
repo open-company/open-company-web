@@ -473,6 +473,14 @@ div.cmail-outer {
             margin-left: -24px;
           }
 
+          video {
+            max-width: 548px;
+
+            @include tablet() {
+              max-width: 100vw;
+            }
+          }
+
           div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
             margin: 0px auto;
 
