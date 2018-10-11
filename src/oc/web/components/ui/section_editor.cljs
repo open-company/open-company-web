@@ -151,7 +151,8 @@
         ;; he's creating a new section
         ;; or if he's in the authors list of the existing section
         can-change (or (= (:slug section-editing) utils/default-section-slug)
-                       (some #{current-user-id} (:authors section-editing)))
+                       (some #{current-user-id} (:authors section-editing))
+                       (jwt/is-admin? (:team-id org-data)))
         last-section-standing (= (count no-drafts-boards) 1)]
     [:div.section-editor-container
       [:div.section-editor.group.fs-hide
