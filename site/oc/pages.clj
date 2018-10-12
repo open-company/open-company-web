@@ -166,7 +166,7 @@
 
 (def no-credit-card
   [:div.no-credit-card
-    "No credit card required&nbsp;&nbsp;•&nbsp;&nbsp;Works with Slack"])
+    "No credit card required&nbsp;&nbsp;•&nbsp;&nbsp;No install required"])
 
 (def keep-aligned-bottom
   [:section.keep-aligned
@@ -184,7 +184,7 @@
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Lead with clarity."]
+              "Stay visible."]
             [:div.keep-aligned-section-copy-subtitle
               (str
                "Key information stays organized and visible so your team can get caught "
@@ -292,14 +292,12 @@
       [:section.cta.group
 
         [:h1.headline
-          "Communicate "
-          [:br.big-web-only]
-          "what matters."]
+          "Lead with clarity"]
         [:div.subheadline.for-others
           (str
-           "Leaders struggle to communicate clearly because chat and email are "
-           "noisy and overwhelming. Carrot helps leaders rise above the noise "
-           "to keep distributed teams up to date and aligned.")]
+           "Leaders struggle to communicate clearly because "
+           "chat and email are too noisy. Carrot helps leaders "
+           "rise above the noise to build great teams.")]
         [:div.subheadline.for-mobile
           "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
@@ -569,7 +567,7 @@
         animation-lightbox
 
         [:h1.slack-headline
-          "Rise above the noise"]
+          "Lead with clarity"]
 
         [:div.slack-subline
           (str

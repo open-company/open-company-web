@@ -88,6 +88,7 @@ div.slack-wrap {
         font-size: 80px;
         line-height: 90px;
         color: $deep_navy;
+        margin: 0 auto;
 
         @include tablet() {
           font-size: 80px;
@@ -104,21 +105,14 @@ div.slack-wrap {
         @include avenir_R();
         font-size: 30px;
         line-height: 38px;
-        color: $ui_grey;
+        color: $deep_navy;
         max-width: 720px;
-        margin: 40px auto 0px;
+        margin: 24px auto 0px;
         text-align: center;
 
         @include tablet(){
           width: 100%;
-          margin: 32px auto 0;
-          font-size: 24px;
-          line-height: 32px;
-        }
-
-        @include mobile(){
-          width: 100%;
-          margin: 16px auto 0;
+          margin-top: 16px;
           font-size: 24px;
           line-height: 32px;
         }

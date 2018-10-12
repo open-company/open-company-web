@@ -79,7 +79,7 @@ div.home-wrap {
         margin: 24px auto 0px;
         z-index: 2;
         position: relative;
-        max-width: 800px;
+        max-width: 627px;
 
         &.for-others {
           @include mobile() {
@@ -103,7 +103,6 @@ div.home-wrap {
           line-height: 23px;
           padding: 0px;
           color: $deep_navy;
-          max-width: initial;
         }
       }
 

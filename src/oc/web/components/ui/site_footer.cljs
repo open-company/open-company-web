@@ -11,7 +11,7 @@
 (defn navigate-to-your-digest [your-digest-url]
   (router/redirect! your-digest-url))
 
-(rum/defcs site-footer  < (rum/local nil ::expanded)
+(rum/defcs site-footer 
   [s]
   [:footer.navbar.navbar-default.navbar-bottom
     {:class (when (utils/in? (:route @router/path) "slack-lander") "light-background")}
@@ -19,54 +19,31 @@
       [:div.right-column.group
 
         [:div.column.column-company
-          {:class (when (= @(::expanded s) :company) "expanded")}
           [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :company)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :company)))}
-            "Company"]
-          [:div.column-item [:a {:href oc-urls/home-no-redirect} "Home"]]
-          [:div.column-item [:a {:href oc-urls/about} "About"]]
+            "Product"]
           [:div.column-item [:a {:href oc-urls/pricing} "Pricing"]]
-          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
-          [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]]
+          [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
+          [:div.column-item [:a {:href oc-urls/what-s-new :target "_blank"} "What’s new"]]
+          [:div.column-item [:a {:href oc-urls/oc-github :target "_blank"} "GitHub"]]]
 
         [:div.column.column-resources
-          {:class (when (= @(::expanded s) :resources) "expanded")}
           [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :resources)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :resources)))}
-            "Resources"]
-          [:div.column-item [:a {:href oc-urls/oc-github :target "_blank"} "GitHub"]]
-          [:div.column-item [:a {:href oc-urls/privacy} "Privacy"]]
-          [:div.column-item [:a {:href oc-urls/terms} "Terms"]]]
-
-        [:div.column.column-support
-          {:class (when (= @(::expanded s) :support) "expanded")}
-          [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :support)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :support)))}
-            "Support"]
-          [:div.column-item [:a {:href oc-urls/oc-trello-public :target "_blank"} "Roadmap"]]
-          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help"]]
+            "Company"]
+          [:div.column-item [:a {:href oc-urls/about} "About Carrot"]]
+          [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
+          [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]
+          [:div.column-item [:a {:href "#"} "Press Kit"]]
           [:div.column-item [:a {:href "#"
                                  :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
                               "Contact"]]]
 
-        [:div.column.column-integrations
-          {:class (when (= @(::expanded s) :integrations) "expanded")}
+        [:div.column.column-support
           [:div.column-title
-            {:on-click #(when (responsive/is-mobile-size?)
-                          (if (= @(::expanded s) :integrations)
-                            (reset! (::expanded s) nil)
-                            (reset! (::expanded s) :integrations)))}
-            "Integrations"]
-          [:div.column-item [:a {:href oc-urls/slack} "Slack"]]]]
+            "Resources"]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help center"]]
+          [:div.column-item [:a {:href "#" :target "_blank"} "Leadership in the age of Slack"]]
+          [:div.column-item [:a {:href "#" :target "_blank"} "How Slack works with Carrot"]]
+          [:div.column-item [:a {:href "#" :target "_blank"} "Carrot AI eliminates communication gaps"]]]]
       [:div.left-column.group
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]

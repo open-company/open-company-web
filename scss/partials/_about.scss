@@ -37,7 +37,7 @@ div.about-wrap {
       }
 
       div.team-container{
-        margin: 80px 0 160px;
+        margin: 80px 0 120px;
 
         @include tablet() {
           margin: 28px 0 60px;
@@ -179,7 +179,7 @@ div.about-wrap {
         width: 100%;
         margin: 0 auto;
         border-radius: 8px;
-        padding: 160px 0;
+        padding: 120px 0;
         position: relative;
         z-index: 1;
         text-align: left;
