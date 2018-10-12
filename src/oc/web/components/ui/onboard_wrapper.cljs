@@ -450,7 +450,7 @@
              :aria-label "Start using Carrot"}
            "Start"]]
         [:div.title
-          "Start with a few sections"]
+          "Pick a few topics to start"]
         [:div.subtitle
           "What types of communication are shared with your team?"]
         [:div.steps.third-step
@@ -469,6 +469,8 @@
                  :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
                 (:name section)])
             (small-loading))]
+        [:div.field-description
+          "Don't worry, you'll be able to change these later."]
         [:button.continue.start-using-carrot
           {:on-touch-start identity
            :on-click continue-fn
