@@ -76,12 +76,6 @@ div.org-settings {
           background-repeat: no-repeat;
         }
 
-        div.org-avatar:not(.missing-logo) {
-          border: 1px solid #D8DBDF;
-          border-radius: 4px;
-          padding: 4px;
-        }
-
         @include org-avatar(48);
 
         div.org-avatar-container img.org-avatar-img {
