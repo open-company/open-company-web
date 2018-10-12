@@ -116,20 +116,26 @@
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
-
+                               (not= (router/current-board-slug) "all-posts")
+                               (not= (router/current-board-slug) "must-see")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
                              (or board-data
                                  container-data)
                              posts-data
-                             (not ((set (keys posts-data)) (router/current-activity-id))))
+                             (or (and (router/current-activity-id)
+                                      (not ((set (keys posts-data)) (router/current-activity-id))))
+                                 (and ap-initial-at
+                                      (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
         show-activity-not-found (and (not jwt)
-                                     (router/current-activity-id)
+                                     (or (router/current-activity-id)
+                                         ap-initial-at)
                                      (or org-not-found
                                          section-not-found
                                          entry-not-found))
         show-activity-removed (and jwt
-                                   (router/current-activity-id)
+                                   (or (router/current-activity-id)
+                                       ap-initial-at)
                                    (or org-not-found
                                        section-not-found
                                        entry-not-found))
