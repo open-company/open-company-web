@@ -32,7 +32,7 @@
             shared-misc/animation-lightbox
 
             [:h1.slack-headline
-              "Rise above the noise"]
+              "Lead with clarity"]
 
             [:div.slack-subline
               (str

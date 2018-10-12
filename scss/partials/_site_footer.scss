@@ -28,8 +28,8 @@
     position: relative;
     max-width: 1209px;
     width: 100%;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
 
     @include mobile(){
       padding-left: 32px;
@@ -41,10 +41,17 @@
       width: 231px;
       z-index: 2;
 
-      @include mobile(){
+      // @include mobile(){
+      //   width: 100%;
+      //   margin-top: 12px;
+      //   padding-top: 32px;
+      //   border-top: 1px solid #E7E6E5;
+      // }
+
+      @include tablet() {
         width: 100%;
-        margin-top: 12px;
-        padding-top: 32px;
+        float: none;
+        padding-top: 40px;
         border-top: 1px solid #E7E6E5;
       }
 
@@ -108,22 +115,29 @@
       float: right;
       z-index: 2;
 
-      @include mobile(){
+      @include tablet() {
         width: 100%;
         float: none;
         margin-right: 0;
+        padding-bottom: 40px;
+        padding-top: 40px;
+        border-top: 1px solid #E7E6E5;
       }
 
       div.column {
         float: left;
         margin-right: 40px;
-        width: 100px;
+        width: 180px;
+
+        &:nth-child(3) {
+          width: 300px;
+        }
 
         @include mobile() {
           width: 48%;
 
           &:nth-child(2), &:nth-child(3) {
-            float: right;
+            float: left;
           }
         }
 
