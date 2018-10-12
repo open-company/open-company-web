@@ -98,4 +98,4 @@
           [:div.no-credit-card
             "No credit card required  "
             [:span.dot "•"]
-            "  Works with Slack"])]]))
+            "  No install required"])]]))

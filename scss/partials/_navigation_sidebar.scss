@@ -2,8 +2,8 @@
   background-color: transparent;
 
   @include mobile() {
-    height: 56px;
-    padding: 16px 32px;
+    height: 72px;
+    padding: 24px 32px;
     position: relative;
 
     &:before {
@@ -29,6 +29,10 @@
     color: $ui_grey;
     text-decoration: none;
 
+    @include mobile() {
+      font-size: 16px;
+    }
+
     &.new {
       @include avenir_H();
       color: $deep_navy;
@@ -42,9 +46,12 @@
     color: $ui_grey;
     text-decoration: none;
 
+    @include mobile() {
+      font-size: 16px;
+    }
+
     span.count {
       @include avenir_M();
-      font-size: 14px;
       color: #C5C6C8;
     }
 
@@ -71,6 +78,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
+    @include mobile() {
+      font-size: 16px;
+    }
+
     &:active, &:focus {
       text-decoration: none;
     }
@@ -90,6 +101,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    @include mobile() {
+      font-size: 16px;
+    }
 
     &:active, &:focus {
       text-decoration: none;
@@ -119,7 +134,7 @@
 
     @include mobile() {
       @include avenir_H();
-      font-size: 14px;
+      font-size: 16px;
     }
 
     span.count {
@@ -127,7 +142,7 @@
 
       @include mobile() {
         @include avenir_H();
-        font-size: 14px;
+        font-size: 16px;
       }
     }
   }
@@ -135,6 +150,10 @@
   div.all-posts-label, div.drafts-label, div.must-see-label {
     font-size: 14px;
     text-decoration: none;
+
+    @include mobile() {
+      font-size: 16px;
+    }
   }
 
   &:active, &:focus {
@@ -173,6 +192,7 @@
 
     @include mobile() {
       @include avenir_M();
+      font-size: 16px;
     }
 
     &.new {
@@ -196,6 +216,10 @@
     font-size: 14px;
     line-height: 25px;
     text-decoration: none;
+
+    @include mobile() {
+      font-size: 16px;
+    }
 
     &:active, &:focus {
       text-decoration: none;
@@ -252,7 +276,7 @@ div.left-navigation-sidebar {
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
       // border-top: 1px solid $light_tan;
       @include avenir_H();
-      font-size: 15px;
+      font-size: 16px;
       color: $deep_navy;
 
       &:before {
@@ -271,15 +295,15 @@ div.left-navigation-sidebar {
       }
       
       div.board-name {
-        max-width: 350px;
+        max-width: 80vw;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-
-        @include mobile() {
-          margin: 0 auto;
-          text-align: center;
-        }
+        display: block;
+        width: auto;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
       }
     }
   }
@@ -379,10 +403,10 @@ div.left-navigation-sidebar {
 
     div.must-see-icon {
       background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-      background-size: 13px 16px;
-      background-position: center 6px;
+      background-size: 14px 18px;
+      background-position: center 4px;
       background-repeat: no-repeat;
-      width: 16px;
+      width: 18px;
       height: 28px;
       float: left;
 
@@ -391,7 +415,7 @@ div.left-navigation-sidebar {
       @include mobile() {
         margin-left: 0px;
         margin-top: 0px;
-        background-position: center 4px;
+        background-position: center 3px;
         opacity: 1;
       }
 
@@ -432,7 +456,7 @@ div.left-navigation-sidebar {
       margin-bottom: 8px;
 
       @include mobile() {
-        background-color: $oc_gray_8;
+        background-color: #ECECEC;
         height: 56px;
         width: 100%;
         padding: 16px 32px;
@@ -442,7 +466,7 @@ div.left-navigation-sidebar {
       span {
         @include avenir_B();
         font-size: 13px;
-        color: $light_ui_grey;
+        color: rgba($deep_navy, 0.5);
         float: left;
         cursor: default;
 

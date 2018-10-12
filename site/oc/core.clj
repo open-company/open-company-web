@@ -82,7 +82,7 @@
         {:id "site-mobile-menu-nocreditcard"}
         "No credit card required  "
         [:span.dot "•"]
-        "  Works with Slack"]]])
+        "  No install required"]]])
 
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
@@ -167,48 +167,30 @@
 
         [:div.column.column-company
           [:div.column-title
-            {:onClick
-              (str
-               "$('nav.navbar-bottom div.column:not(.column-company)').removeClass('expanded');"
-               "$('nav.navbar-bottom div.column.column-company').toggleClass('expanded');")}
-            "Company"]
-          [:div.column-item [:a {:href "/?no_redirect=1"} "Home"]]
-          [:div.column-item [:a {:href "/about"} "About"]]
+            "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
-          [:div.column-item [:a {:href "http://blog.carrot.io" :target "_blank"} "Blog"]]
-          [:div.column-item [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]]]
+          [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
+          [:div.column-item [:a {:href "https://whats-new.carrot.io/" :target "_blank"} "What’s new"]]
+          [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]]
 
         [:div.column.column-resources
           [:div.column-title
-            {:onClick (str
-                       "$('nav.navbar-bottom div.column:not(.column-resources)').removeClass('expanded');"
-                       "$('nav.navbar-bottom div.column.column-resources').toggleClass('expanded');")}
-            "Resources"]
-          [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
-          [:div.column-item [:a {:href "/privacy"} "Privacy"]]
-          [:div.column-item [:a {:href "/terms"} "Terms"]]]
-
-        [:div.column.column-support
-          [:div.column-title
-            {:onClick
-              (str
-               "$('nav.navbar-bottom div.column:not(.column-support)').removeClass('expanded');"
-               "$('nav.navbar-bottom div.column.column-support').toggleClass('expanded');")}
-            "Support"]
-          [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
-          [:div.column-item [:a {:href "http://help.carrot.io" :target "_blank"} "Help"]]
+            "Company"]
+          [:div.column-item [:a {:href "/about"} "About Carrot"]]
+          [:div.column-item [:a {:href "https://blog.carrot.io" :target "_blank"} "Blog"]]
+          [:div.column-item [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]]
+          [:div.column-item [:a {:href "#"} "Press Kit"]]
           [:div.column-item [:a {:href "#"
                                  :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
                               "Contact"]]]
 
-        [:div.column.column-integrations
+        [:div.column.column-support
           [:div.column-title
-            {:onClick
-              (str
-               "$('nav.navbar-bottom div.column:not(.column-integrations)').removeClass('expanded');"
-               "$('nav.navbar-bottom div.column.column-integrations').toggleClass('expanded');")}
-            "Integrations"]
-          [:div.column-item [:a {:href "/slack"} "Slack"]]]]
+            "Resources"]
+          [:div.column-item [:a {:href "http://help.carrot.io/" :target "_blank"} "Help center"]]
+          [:div.column-item [:a {:href "#" :target "_blank"} "Leadership in the age of Slack"]]
+          [:div.column-item [:a {:href "#" :target "_blank"} "How Slack works with Carrot"]]
+          [:div.column-item [:a {:href "#" :target "_blank"} "Carrot AI eliminates communication gaps"]]]]
       [:div.left-column.group
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]

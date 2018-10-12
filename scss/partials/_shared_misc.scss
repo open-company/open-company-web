@@ -173,7 +173,7 @@ div.cards-container {
 
 section.testimonials-section {
   text-align: center;
-  padding: 160px 0px !important;
+  padding: 120px 0px !important;
   position: relative;
 
   &:before {
@@ -265,10 +265,10 @@ section.testimonials-section {
       &:first-child {
         div.testimonial-header {
           div.testimonial-logo {
-            width: 112px;
+            width: 89px;
             height: 24px;
             @include image-2x("/img/ML/testimonial_1_logo");
-            background-size: 112px 24px;
+            background-size: 89px 24px;
           }
         }
 
@@ -496,7 +496,7 @@ section.home-keep-aligned {
     margin: 0px auto;
 
     div.keep-aligned-section-row {
-      margin: 272px auto;
+      margin: 192px auto;
       position: relative;
 
       @include tablet() {
@@ -540,7 +540,7 @@ section.home-keep-aligned {
       }
 
       &:first-child {
-        margin-top: 160px;
+        margin-top: 120px;
 
         @include tablet() {
           margin: 0 auto;
@@ -560,10 +560,10 @@ section.home-keep-aligned {
           background-color: #F8F7F3;
           border-top-right-radius: 200px;
           width: calc(50vw + 293px);
-          height: calc(100% + 320px);
+          height: calc(100% + 240px);
           position: absolute;
           left: 0px;
-          top: -160px;
+          top: -120px;
 
           @include tablet() {
             width: calc(100% + 48px);
@@ -582,10 +582,10 @@ section.home-keep-aligned {
           background-color: #F8F7F3;
           border-bottom-left-radius: 200px;
           width: calc(50vw + 397px);
-          height: calc(100% + 320px);
+          height: calc(100% + 240px);
           position: absolute;
           right: 0px;
-          top: -160px;
+          top: -120px;
 
           @include tablet() {
             width: calc(100% + 48px);
