@@ -43,7 +43,7 @@
             (str
              "Leaders struggle to communicate clearly because "
              "chat and email are too noisy. Carrot helps leaders "
-             "rise above the noise to build great teams.")]
+             "rise above the noise to keep teams focused.")]
           [:div.subheadline.for-mobile
             "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
