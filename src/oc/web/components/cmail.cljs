@@ -460,10 +460,7 @@
                                         :invite-note note})]))))])
             [:div.cmail-section-right
               [:button.mlb-reset.video-record-bt
-                {:on-click #(do
-                              (when is-mobile?
-                                (js/alert (str "Video size is:" (:width video-size) "x" (:height video-size) ". Screen width is:" (win-width))))
-                              (video-record-clicked s))
+                {:on-click #(video-record-clicked s)
                  :class (when (or (:fixed-video-id cmail-data)
                                   @(::record-video s))
                           "remove-video-bt")}]]]
@@ -473,7 +470,7 @@
                        show-edit-tooltip)
               (edit-tooltip s))
             ;; Video elements
-            ;; FIXME: disable video on mobile for now
+            ; FIXME: disable video on mobile for now
             (when-not is-mobile?
               (when (and (:fixed-video-id cmail-data)
                          (not @(::record-video s)))
@@ -482,7 +479,7 @@
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
-            ;; FIXME: disable video on mobile for now
+            ; FIXME: disable video on mobile for now
             (when-not is-mobile?
               (when @(::record-video s)
                 (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
