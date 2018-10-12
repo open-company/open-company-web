@@ -38,13 +38,13 @@ div.activity-not-found-container {
       div.activity-not-found-box {
         position: absolute;
         left: 50%;
-        top: 220px;
+        top: 180px;
         margin-left: -147px;
         margin-top: 0px;
         width: 294px;
-        height: 260px;
-        @include image-2x("/img/ML/logged_in_carrot_box");
-        background-size: 294px 260px;
+        height: 301px;
+        @include image-2x("/img/ML/carrot_box");
+        background-size: 294px 301px;
         background-repeat: no-repeat;
       }
     }
@@ -65,7 +65,7 @@ div.activity-not-found-container {
       }
 
       div.activity-not-found-right-content {
-        margin: 102px auto;
+        margin: 64px auto;
         width: 440px;
         text-align: center;
 
@@ -75,68 +75,83 @@ div.activity-not-found-container {
           margin: 40px auto;
         }
 
-        div.barred-eye {
-          width: 44px;
-          height: 35px;
-          margin: 0px auto;
-          background-image: cdnUrl("/img/ML/barred_eye.svg");
-          background-size: 44px 35px;
-          background-repeat: no-repeat;
-          background-position: center;
-        }
-
         div.login-title {
-          @include avenir_H();
+          @include PTSerif();
           font-size: 32px;
           color: $deep_navy;
-          margin-top: 16px;
         }
 
         div.login-description {
           @include avenir_R();
-          font-size: 18px;
+          font-size: 16px;
           color: $deep_navy;
+          margin-top: 16px;
         }
 
-        button.sign-in-button {
+        button.signup-with-slack {
+          margin-top: 40px;
+
+          @include mobile() {
+            margin-top: 26px;
+          }
+        }
+
+        button.signup-with-google {
+          margin-top: 16px;
+        }
+
+        button.signup-with-slack, button.signup-with-google {
           width: 340px;
-          height: 48px;
-          margin: 72px auto 0px;
-          border: 1px solid $sea_blue;
+          height: 40px;
+          border: 1px solid #D8DBDF;
+          color: $light_ui_grey;
           border-radius: 100px;
-          color: $sea_blue;
-          @include avenir_H();
-          font-size: 18px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 12px;
+          text-align: center;
+
+          div.signup-with-slack-content, div.signup-with-google-content {
+            @include avenir_H();
+            font-size: 14px;
+            color: $deep_navy;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            div.slack-icon {
+              width: 21px;
+              height: 21px;
+              background-image: cdnUrl("/img/ML/slack_normal.svg");
+              background-repeat: no-repeat;
+              background-size: 21px 21px;
+              float: left;
+              margin-right: 16px;
+            }
+
+            div.google-icon {
+              width: 21px;
+              height: 21px;
+              background-image: cdnUrl("/img/ML/google_signin.svg");
+              background-repeat: no-repeat;
+              float: left;
+              margin-right: 16px;
+            }
+          }
 
           @include mobile() {
             width: 100%;
           }
-
-          span.slack-blue-copy {
-            width: 70px;
-            height: 21px;
-            @include image-2x("/img/ML/slack_blue_with_copy");
-            background-size: 70px 21px;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin: -5px 0px 0px 6px;
-          }
         }
 
         div.or-login {
-          @include avenir_M();
-          font-size: 16px;
+          @include avenir_R();
+          font-size: 14px;
           color: $deep_navy;
-          margin: 32px auto 0px
+          margin: 24px auto 0;
         }
 
         div.fields-container {
           width: 340px;
-          margin: 32px auto 0px;
+          margin: 16px auto 0px;
           text-align: left;
 
           @include mobile() {
@@ -146,7 +161,7 @@ div.activity-not-found-container {
           div.field-label {
             margin-top: 16px;
             @include avenir_H();
-            font-size: 15px;
+            font-size: 12px;
             color: $deep_navy;
             margin-top: 16px;
           }
@@ -156,14 +171,15 @@ div.activity-not-found-container {
             height: 40px;
             border-radius: 4px;
             border: 1px solid rgba(#B1B8C0, 0.5);
-            margin-top: 8px;
+            margin-top: 16px;
             padding: 6px 12px;
           }
 
           a.forgot-password {
-            float: right;
+            display: block;
+            text-align: center;
+            margin: 16px auto 0;
             color: $carrot_green;
-            margin-top: 16px;
             @include avenir_M();
             font-size: 13px;
           }
@@ -172,12 +188,12 @@ div.activity-not-found-container {
         button.continue-btn {
           width: 340px;
           height: 48px;
-          margin: 32px auto 0px;
+          margin: 40px auto 0px;
           background-color: $sea_blue;
           color: white;
           border-radius: 100px;
           @include avenir_H();
-          font-size: 18px;
+          font-size: 16px;
 
           @include mobile() {
             width: 100%;
