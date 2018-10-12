@@ -112,7 +112,7 @@
                               ap-initial-at)
                           ;; But no all-posts data yet
                          (not container-data)))
-        org-not-found (and orgs
+        org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
