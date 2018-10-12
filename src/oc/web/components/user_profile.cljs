@@ -1,5 +1,6 @@
 (ns oc.web.components.user-profile
   (:require [rum.core :as rum]
+            [cuerdas.core :as s]
             [goog.object :as googobj]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
@@ -115,7 +116,7 @@
         edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         temp-user-avatar @(::temp-user-avatar s)
-        is-jelly-head-avatar (= (:avatar-url user-for-avatar) temp-user-avatar)]
+        is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")]
     [:div.user-profile
       [:div.user-profile-inner
         [:button.mlb-reset.settings-modal-close
