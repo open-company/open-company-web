@@ -700,7 +700,7 @@
                     "what your team is thinking, and give everyone more context about what’s happening.")]]]
             [:div.core-ft-grid
               [:div.core-ft-content-title
-                "Viewership - make sure you’re being heard"]
+                "Make sure you're being heard"]
               [:div.core-ft-content-description
                 [:p
                  (str
@@ -770,9 +770,8 @@
 
           [:div.odds-ends-description
             (str
-             "Mauris commodo risus vitae tortor semper euismod. Fusce ac mi eget "
-             "tortor commodo mollis non vel massa. Etiam laoreet congue lectus, non "
-             "placerat metus consectetur vel. Nunc nec rutrum massa.")]
+             "Here are a few more details about Carrot and where to find us. "
+             "For a quote or to talk more about leadership communication, contact us anytime.")]
 
           [:div.odds-ends-content
             [:div.odds-ends-content-left
@@ -783,7 +782,7 @@
                 [:li "Carrot is open source. " [:a {:href "https://github.com/open-company" :target "_blank"} "Visit us on Github"]]
                 [:li "Carrot has a free plan for small teams, and offers 50% off for approved nonprofits."]
                 [:li "Press contact: "
-                    [:a {:href "mailto:stuart@carrot.io"}
+                    [:a {:href "mailto:stuart.levinson@carrot.io"}
                       "Stuart Levinson"]]]]]
           [:div.odds-ends-content
             [:div.odds-ends-content-left
@@ -794,7 +793,10 @@
                      [:a {:href "https://carrot.io"} "https://carrot.io"]]
                 [:li "Email: "
                      [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"]]
-                [:li "Carrot has a free plan for small teams, and offers 50% off for approved nonprofits."]
+                [:li "Chat: "
+                     [:a {:onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"
+                          :href "#"}
+                      "Say hello"]]
                 [:li "Social: "
                      [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]
                      ", "
