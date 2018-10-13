@@ -214,11 +214,8 @@
     [:div.ph-banner-content
       [:div.ph-banner-cat]
       [:div.ph-banner-copy
-        [:span.heavy "Hello Product Hunter!"]
-        " Carrot is forever-free for teams of up to 10 people. We can’t wait to hear what you think"]
-      [:a.ph-banner-signup
-        {:href "/sign-up"}
-        "Sign up now"]]
+        [:span.heavy "Hello Product Hunter! "]
+        " Carrot is free for teams of up to 10 people. We can’t wait to hear what you think."]]
     [:div.ph-banner-opac-bg]
     [:button.mlb-reset.ph-banner-close-button
       {:onclick "OCStaticHidePHBanner();"}]])

@@ -21,7 +21,7 @@ div.ph-banner {
   background-color: $carrot_dark_brown_1;
   z-index: 100;
   display: none;
-  padding: 17px;
+  padding: 17px 64px;
 
   div.ph-banner-content {
     display: flex;
@@ -35,39 +35,36 @@ div.ph-banner {
       background-size: 75px 70px;
       background-position: center;
       background-repeat: no-repeat;
-      display: inline-block;
+      display: block;
       z-index: 105;
+      margin-right: 16px;
+
+      @media screen and (max-width: 815px) {
+        display: none;
+      }
     }
 
     div.ph-banner-copy {
       @include avenir_R();
       color: white;
       font-size: 16px;
-      text-align: center;
-      display: inline-block;
+      text-align: left;
+      display: block;
+
+      @media screen and (max-width: 815px) {
+        margin-top: 12px;
+      }
+
+      @media screen and (max-width: 505px) {
+        margin-top: 0;
+      }
 
       span.heavy {
         @include avenir_H();
-        margin: 0 8px 0 16px;
-      }
-    }
 
-    a.ph-banner-signup {
-      display: inline-block;
-      width: 144px;
-      height: 40px;
-      color: white;
-      @include avenir_H();
-      text-align: center;
-      padding: 9px 6px;
-      font-size: 16px;
-      background-color: $carrot_green;
-      border-radius: 100px;
-      margin-left: 16px;
-      z-index: 105;
-
-      &:visited, &:hover {
-        color: white;
+        @media screen and (max-width: 400px) {
+          display: none;
+        }
       }
     }
   }
