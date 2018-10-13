@@ -23,6 +23,14 @@ div.ph-banner {
   display: none;
   padding: 17px 64px;
 
+  @include tablet() {
+    padding: 17px 48px; 
+  }
+
+  @include mobile() {
+    padding: 17px 40px 17px 24px; 
+  }
+
   div.ph-banner-content {
     display: flex;
     justify-content: center;
@@ -38,10 +46,7 @@ div.ph-banner {
       display: block;
       z-index: 105;
       margin-right: 16px;
-
-      @media screen and (max-width: 815px) {
-        display: none;
-      }
+      flex-shrink: 0;
     }
 
     div.ph-banner-copy {
@@ -51,18 +56,10 @@ div.ph-banner {
       text-align: left;
       display: block;
 
-      @media screen and (max-width: 815px) {
-        margin-top: 12px;
-      }
-
-      @media screen and (max-width: 505px) {
-        margin-top: 0;
-      }
-
       span.heavy {
         @include avenir_H();
 
-        @media screen and (max-width: 400px) {
+        @media screen and (max-width: 420px) {
           display: none;
         }
       }
@@ -94,5 +91,9 @@ div.ph-banner {
     right: 24px;
     top: 32px;
     z-index: 105;
+
+    @include mobile() {
+      right: 12px;
+    }
   }
 }
