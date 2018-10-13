@@ -741,7 +741,7 @@
                 [:div.play-button]]
 
               [:a.media-res-content-video-download
-                {:href "#"}
+                {:href "https://files.slack.com/files-pri/T06SBMH60-FDDGE09D1/download/carrot_intro_video_final.mp4"}
                 "Download marketing video"]
 
               [:div.media-res-footer
