@@ -51,6 +51,7 @@
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
             [oc.web.components.slack :refer (slack)]
+            [oc.web.components.press-kit :refer (press-kit)]
             [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
@@ -402,6 +403,10 @@
       (timbre/info "Routing pricing-route" urls/pricing)
       (simple-handler pricing "pricing" target params))
 
+    (defroute press-kit-route urls/press-kit {:as params}
+      (timbre/info "Routing press-kit-route" urls/press-kit)
+      (simple-handler press-kit "press-kit" target params))
+
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
@@ -567,6 +572,7 @@
                                  about-route
                                  slack-route
                                  pricing-route
+                                 press-kit-route
                                  logout-route
                                  email-confirmation-route
                                  confirm-invitation-route

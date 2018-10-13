@@ -31,6 +31,9 @@
 (defn terms []
   (res/resource-response "/terms.html" {:root "public"}))
 
+(defn press-kit []
+  (res/resource-response "/press-kit.html" {:root "public"}))
+
 (defn index []
   (res/resource-response "/index.html" {:root "public"}))
 
@@ -62,6 +65,7 @@
   (GET "/terms" [] (terms))
   (GET "/version/version.json" [] (version-json))
   (GET "/sign-up/slack" [] (slack-lander))
+  (GET "/press-kit" [] (press-kit))
   (GET "/" [] (index))
   (GET ["/_/sheets-proxy/:path" :path #".*"] [path & params] (chart-proxy path params))
   (GET ["/_/sheets-proxy-pass-through/:path" :path #".*"] [path & params] (sheets-proxy path params))
