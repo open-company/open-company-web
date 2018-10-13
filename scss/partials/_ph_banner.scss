@@ -1,14 +1,16 @@
-body.ph-banner {
-  div.ph-banner {
-    display: block;
-  }
+@include big_web() {
+  body.ph-banner {
+    div.ph-banner {
+      display: block;
+    }
 
-  nav.site-navbar {
-    margin-top: 104px;
-  }
+    nav.site-navbar {
+      margin-top: 104px;
+    }
 
-  div.main {
-    padding-top: 104px;
+    div.main {
+      padding-top: 104px;
+    }
   }
 }
 
