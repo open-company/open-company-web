@@ -1,0 +1,101 @@
+body.ph-banner {
+  div.ph-banner {
+    display: block;
+  }
+
+  nav.site-navbar {
+    margin-top: 104px;
+  }
+
+  div.main {
+    padding-top: 104px;
+  }
+}
+
+div.ph-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 104px;
+  background-color: $carrot_dark_brown_1;
+  z-index: 100;
+  display: none;
+  padding: 17px;
+
+  div.ph-banner-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    div.ph-banner-cat {
+      width: 75px;
+      height: 70px;
+      @include image-2x("/img/ML/ph_banner_cat");
+      background-size: 75px 70px;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: inline-block;
+      z-index: 105;
+    }
+
+    div.ph-banner-copy {
+      @include avenir_R();
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      display: inline-block;
+
+      span.heavy {
+        @include avenir_H();
+        margin: 0 8px 0 16px;
+      }
+    }
+
+    a.ph-banner-signup {
+      display: inline-block;
+      width: 144px;
+      height: 40px;
+      color: white;
+      @include avenir_H();
+      text-align: center;
+      padding: 9px 6px;
+      font-size: 16px;
+      background-color: $carrot_green;
+      border-radius: 100px;
+      margin-left: 16px;
+      z-index: 105;
+
+      &:visited, &:hover {
+        color: white;
+      }
+    }
+  }
+
+  div.ph-banner-opac-bg {
+    width: 390px;
+    height: 104px;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    margin-left: 172px;
+    @include image-2x("/img/ML/ph_banner_bg");
+    background-size: 390px 104px;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 104;
+  }
+
+  button.ph-banner-close-button {
+    width: 32px;
+    height: 32px;
+    background-image: cdnUrl("/img/ML/ph_banner_close.svg");
+    background-size: 16px 16px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 24px;
+    top: 32px;
+    z-index: 105;
+  }
+}
