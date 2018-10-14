@@ -99,6 +99,10 @@ document.addEventListener("DOMContentLoaded", function(_) {
     OCYTVideoInit();
   }
 
+  if(OCStaticGetParameterByName("ref") === "producthunt"){
+    $(document.body).addClass("ph-banner");
+  }
+
   // Initialize tooltips
   $('[data-toggle="tooltip"]').tooltip();
   // Sticky header for marketing site
@@ -333,4 +337,12 @@ function OCYTVideoOnPlayerStateChange(event){
 function OCStaticHideAnimationLightbox() {
   OCYTVideoPlayer.pauseVideo();
   $(document.body).removeClass('show-animation-lightbox no-scroll');
+}
+
+function OCStaticShowPHBanner(){
+  $(document.body).addClass("ph-banner");
+}
+
+function OCStaticHidePHBanner(){
+  $(document.body).removeClass("ph-banner");
 }
