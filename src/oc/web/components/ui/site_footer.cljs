@@ -32,7 +32,7 @@
           [:div.column-item [:a {:href oc-urls/about} "About Carrot"]]
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
           [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]
-          [:div.column-item [:a {:href "#"} "Press Kit"]]
+          [:div.column-item [:a {:href oc-urls/press-kit} "Press Kit"]]
           [:div.column-item [:a {:href "#"
                                  :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
                               "Contact"]]]

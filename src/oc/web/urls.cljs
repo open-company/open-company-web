@@ -20,6 +20,8 @@
 
 (def contact "/contact")
 
+(def press-kit "/press-kit")
+
 (def help "http://help.carrot.io/")
 
 (def what-s-new "https://whats-new.carrot.io/")
