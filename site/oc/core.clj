@@ -179,7 +179,7 @@
           [:div.column-item [:a {:href "/about"} "About Carrot"]]
           [:div.column-item [:a {:href "https://blog.carrot.io" :target "_blank"} "Blog"]]
           [:div.column-item [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]]
-          [:div.column-item [:a {:href "#"} "Press Kit"]]
+          [:div.column-item [:a {:href "/press-kit"} "Press Kit"]]
           [:div.column-item [:a {:href "#"
                                  :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
                               "Contact"]]]
@@ -239,6 +239,7 @@
                   :about   (pages/about options)
                   :slack   (pages/slack options)
                   :slack-lander   (pages/slack-lander options)
+                  :press-kit   (pages/press-kit options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)
