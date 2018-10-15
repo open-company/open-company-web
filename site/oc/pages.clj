@@ -741,7 +741,7 @@
                 [:div.play-button]]
 
               [:a.media-res-content-video-download
-                {:href "https://files.slack.com/files-pri/T06SBMH60-FDDGE09D1/download/carrot_intro_video_final.mp4"}
+                {:href "https://carrot-press-kit.s3.amazonaws.com/Carrot-intro-video.mp4"}
                 "Download marketing video"]
 
               [:div.media-res-footer
@@ -751,7 +751,7 @@
                   "Carrot logo assets. Light, dark, and the Carrot icon."
                   [:div.media-res-download
                     [:a
-                      {:href "#"}
+                      {:href "https://carrot-press-kit.s3.amazonaws.com/Carrot-Logo.zip"}
                       "Download"]]]]
 
               [:div.media-res-footer
@@ -761,7 +761,7 @@
                   "Press-friendly product screenshots."
                   [:div.media-res-download
                     [:a
-                      {:href "#"}
+                      {:href "https://carrot-press-kit.s3.amazonaws.com/Carrot-Screenshots.zip"}
                       "Download"]]]]]]]
 
         [:div.odds-ends
