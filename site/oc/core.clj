@@ -179,7 +179,7 @@
           [:div.column-item [:a {:href "/about"} "About Carrot"]]
           [:div.column-item [:a {:href "https://blog.carrot.io" :target "_blank"} "Blog"]]
           [:div.column-item [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]]
-          [:div.column-item [:a {:href "#"} "Press Kit"]]
+          [:div.column-item [:a {:href "/press-kit"} "Press Kit"]]
           [:div.column-item [:a {:href "#"
                                  :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
                               "Contact"]]]
@@ -188,9 +188,10 @@
           [:div.column-title
             "Resources"]
           [:div.column-item [:a {:href "http://help.carrot.io/" :target "_blank"} "Help center"]]
-          [:div.column-item [:a {:href "#" :target "_blank"} "Leadership in the age of Slack"]]
-          [:div.column-item [:a {:href "#" :target "_blank"} "How Slack works with Carrot"]]
-          [:div.column-item [:a {:href "#" :target "_blank"} "Carrot AI eliminates communication gaps"]]]]
+          ;[:div.column-item [:a {:href "#" :target "_blank"} "Leadership in the age of Slack"]]
+          ;[:div.column-item [:a {:href "#" :target "_blank"} "How Slack works with Carrot"]]
+          ;[:div.column-item [:a {:href "#" :target "_blank"} "Carrot AI eliminates communication gaps"]]
+          ]]
       [:div.left-column.group
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
@@ -209,6 +210,17 @@
 (defn read-edn [entry]
   (read-string (slurp (:full-path entry))))
 
+(def ph-banner
+  [:div.ph-banner
+    [:div.ph-banner-content
+      [:div.ph-banner-cat]
+      [:div.ph-banner-copy
+        [:span.heavy "Hello Product Hunter! "]
+        " Carrot is free for teams of up to 10 people. We can’t wait to hear what you think."]]
+    [:div.ph-banner-opac-bg]
+    [:button.mlb-reset.ph-banner-close-button
+      {:onclick "OCStaticHidePHBanner();"}]])
+
 (defn static-page
   ([content]
    (static-page content {}))
@@ -220,6 +232,7 @@
                [:body
                 [:div
                  {:class "outer header"}
+                 ph-banner
                  (nav (name page))
                  (mobile-menu (name page))]
                 (case page
@@ -227,6 +240,7 @@
                   :about   (pages/about options)
                   :slack   (pages/slack options)
                   :slack-lander   (pages/slack-lander options)
+                  :press-kit   (pages/press-kit options)
                   :pricing (pages/pricing options)
                   :404     (pages/not-found options)
                   :500     (pages/server-error options)

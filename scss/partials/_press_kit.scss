@@ -1,0 +1,461 @@
+div.press-kit-wrap {
+  background-color: #FFFDF9;
+
+  div.main.press-kit {
+    text-align: center;
+    width: 100%;
+
+    section.cta {
+      padding-top: 239px;
+      padding-bottom: 120px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+
+      @include tablet() {
+        padding-top: 131px;
+        padding-bottom: 80px;
+      }
+
+      @include mobile() {
+        width: 100%;
+        overflow: visible;
+        padding: 131px 0 80px;
+      }
+
+      h1.headline {
+        font-size: 80px;
+        @include PTSerif()
+        color: $deep_navy;
+        margin: 0 auto;
+        position: relative;
+        padding: 0 24px;
+        z-index: 3;
+
+        @include mobile(){
+          font-size: 50px;
+          line-height: 56px;
+          padding: 0;
+        }
+
+        @media screen and (max-width: 380px) {
+          font-size: 40px;
+          line-height: 46px;
+        }
+      }
+
+      div.press-kit-intro-container {
+        margin-top: 80px;
+        padding: 120px 0;
+        position: relative;
+
+        &:before {
+          background-color: #F8F7F3;
+          content: "";
+          width: 90vw;
+          height: 100%;
+          display: block;
+          border-top-right-radius: 200px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 2;
+
+          @include tablet() {
+            border-top-right-radius: 100px;
+            width: 100%;
+          }
+        }
+
+        div.press-kit-intro {
+          margin: 0 auto;
+          max-width: 795px;
+          text-align: left;
+          z-index: 3;
+          position: relative;
+
+          @include tablet() {
+            max-width: 512px;
+          }
+
+          @include mobile() {
+            padding: 0 24px;
+          }
+
+          div.press-kit-intro-title {
+            @include PTSerif();
+            font-size: 40px;
+          }
+
+          div.press-kit-intro-description {
+            @include avenir_R();
+            font-size: 30px;
+
+            p {
+              margin: 40px 0 0;
+              padding: 0;
+            }
+          }
+
+          div.press-kit-intro-footer {
+            margin-top: 80px;
+            padding-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 373px;
+            grid-template-rows: 1fr;
+            border-top: 1px solid #E7E6E5;
+
+            @include tablet(){
+              grid-template-columns: 1fr;
+              grid-template-rows: 50% 50%;
+              margin-top: 40px;
+              padding-top: 32px;
+            }
+
+            div.press-kit-intro-footer-left {
+              grid-column-start: 1;
+              grid-row-start: 1;
+              @include PTSerif();
+              font-size: 20px;
+            }
+
+            div.press-kit-intro-footer-right {
+              grid-column-start: 2;
+              grid-row-start: 1;
+              text-align: left;
+              @include avenir_R();
+              font-size: 20px;
+              line-height: 26px;
+
+              a {
+                display: block;
+                @include avenir_B();
+                font-size: 14px;
+                text-decoration: uppercase;
+                letter-spacing: 0.5;
+                color: $carrot_green;
+                margin-top: 16px;
+              }
+
+
+              @include tablet() {
+                grid-column-start: 1;
+                grid-row-start: 2;
+                margin-top: 8px;
+              }
+            }
+          }
+        }
+      }
+
+      div.media-res-container {
+        margin-top: 80px;
+        padding: 120px 0;
+        position: relative;
+
+        &:before {
+          background-color: #F8F7F3;
+          content: "";
+          width: 90vw;
+          height: 100%;
+          display: block;
+          border-bottom-left-radius: 200px;
+          position: absolute;
+          top: 0;
+          right: 0;
+          z-index: 2;
+
+          @include tablet() {
+            border-bottom-left-radius: 100px;
+            width: 100%;
+          }
+        }
+
+        div.media-res {
+          margin: 0 auto;
+          max-width: 795px;
+          text-align: left;
+          z-index: 3;
+          position: relative;
+
+          @include tablet() {
+            max-width: 512px;
+          }
+
+          @include mobile() {
+            padding: 0 24px;
+          }
+
+          div.media-res-title {
+            @include PTSerif();
+            font-size: 80px;
+
+            @include mobile() {
+              font-size: 36px;
+            }
+          }
+
+          div.media-res-content {
+            margin-top: 60px;
+
+            @include tablet() {
+              margin-top: 40px;
+            }
+
+            button.media-res-content-video {
+              width: 100%;
+              position: relative;
+              opacity: 1;
+
+              img {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
+              }
+
+              &:hover {
+                button.play-button {
+                  opacity: 1;
+                }
+              }
+
+              div.play-button {
+                background-image: cdnUrl("/img/ML/press_kit_play.svg");
+                background-size: 80px 80px;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-color: transparent;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 80px;
+                height: 80px;
+                margin-top: -40px;
+                margin-left: -40px;
+                opacity: 0.8;
+              }
+            }
+
+            a.media-res-content-video-download {
+              text-align: center;
+              margin: 32px auto 40px;
+              @include avenir_B();
+              font-size: 14px;
+              text-transform: uppercase;
+              letter-spacing: 0.5;
+              color: #32C97B;
+              display: block;
+
+              @include mobile() {
+                text-align: left;
+              }
+            }
+
+            div.media-res-footer {
+              display: grid;
+              grid-template-columns: 324px 1fr;
+              grid-template-rows: 1fr;
+              border-top: 1px solid #E7E6E5;
+              padding: 40px 0;
+
+              @include tablet() {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 8px 1fr;
+                padding: 32px 0;
+              }
+
+              div.media-res-footer-left {
+                grid-column-start: 1;
+                grid-row-start: 1;
+                @include PTSerif();
+                font-size: 20px;
+                text-align: left;
+              }
+
+              div.media-res-footer-right {
+                grid-column-start: 2;
+                grid-row-start: 1;
+                @include avenir_R();
+                font-size: 20px;
+
+                @include tablet() {
+                  grid-column-start: 1;
+                  grid-row-start: 3;
+                }
+
+                div.media-res-download {
+                  margin-top: 24px;
+
+                  a {
+                    color: #32C97B;
+                    text-align: left;
+                    @include avenir_B();
+                    font-size: 14px;
+                    text-transform: uppercase;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      div.core-ft {
+        padding: 120px 0;
+        max-width: 795px;
+        margin: 0 auto;
+        text-align: left;
+        position: relative;
+        z-index: 3;
+
+        @include tablet() {
+          padding: 80px 24px;
+          max-width: 595px;
+        }
+
+        div.core-ft-title {
+          @include PTSerif();
+          font-size: 80px;
+
+          @include mobile() {
+            font-size: 36px;
+          }
+        }
+
+        div.core-ft-content {
+          margin-top: 40px;
+
+          div.core-ft-grid {
+            display: grid;
+            grid-template-columns: 226px 1fr 486px;
+            grid-template-rows: 1fr;
+            border-top: 1px solid #E7E6E5;
+            padding: 40px 0;
+
+            @include tablet() {
+              grid-template-columns: 1fr;
+              grid-template-rows: 50% 50%;
+            }
+
+            div.core-ft-content-title {
+              grid-column-start: 1;
+              grid-row-start: 1;
+              @include PTSerif();
+              font-size: 20px;
+              text-align: left;
+            }
+
+            div.core-ft-content-description {
+              grid-column-start: 3;
+              grid-row-start: 1;
+
+              @include tablet() {
+                grid-column-start: 1;
+                grid-row-start: 2;
+                margin-top: 8px;
+              }
+
+              p {
+                @include avenir_R();
+                font-size: 20px;
+                text-align: left;
+                margin: 0;
+                padding: 0;
+
+                &:not(:first-child) {
+                  margin-top: 32px;
+                }
+              }
+
+              ul {
+                @include avenir_R();
+                font-size: 20px;
+                text-align: left;
+                padding-inline-start: 30px;
+                margin-top: 16px;
+              }
+            }
+          }
+        }
+      }
+
+      div.odds-ends {
+        padding: 120px 0 0;
+        max-width: 795px;
+        margin: 0 auto;
+        text-align: left;
+        position: relative;
+        z-index: 3;
+
+        @include tablet() {
+          padding: 80px 24px;
+          max-width: 595px;
+        }
+
+        div.odds-ends-title {
+          @include PTSerif();
+          font-size: 80px;
+
+          @include mobile() {
+            font-size: 36px;
+          }
+        }
+
+        div.odds-ends-description {
+          margin-top: 40px;
+          @include avenir_R();
+          font-size: 30px;
+
+          @include tablet() {
+            font-size: 20px;
+          }
+        }
+
+        div.odds-ends-content {
+          display: grid;
+          grid-template-columns: 137px 1fr 590px;
+          grid-template-rows: 1fr;
+          border-top: 1px solid #E7E6E5;
+          margin-top: 40px;
+          padding: 40px 0 0;
+
+          @include tablet() {
+            grid-template-columns: 1fr;
+            grid-template-rows: 50% 50%;
+          }
+
+          div.odds-ends-content-left {
+            grid-column-start: 1;
+            grid-row-start: 1;
+            @include PTSerif();
+            font-size: 20px;
+            text-align: left;
+          }
+
+          div.odds-ends-content-right {
+            grid-column-start: 3;
+            grid-row-start: 1;
+            @include avenir_R();
+            font-size: 20px;
+            line-height: 26px;
+            text-align: left;
+
+            ul {
+              padding-inline-start: 30px;
+            }
+
+            a {
+              color: #32C97B;
+            }
+
+            @include tablet() {
+              margin-top: 8px;
+              grid-column-start: 1;
+              grid-row-start: 2;
+            }
+          }
+        }
+      }
+    }
+  }
+}

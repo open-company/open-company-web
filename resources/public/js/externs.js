@@ -166,3 +166,6 @@ Headway.show = function(){};
 var drift = function(){};
 drift.api = {};
 drift.api.startInteraction = function(){};
+// Homepage animation
+var OCStaticShowAnimationLightbox = function(){};
+var OCStaticHideAnimationLightbox = function(){};
