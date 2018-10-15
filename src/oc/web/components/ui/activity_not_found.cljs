@@ -31,20 +31,32 @@
           [:div.activity-not-found-box]]
         [:div.activity-not-found-right
           [:div.activity-not-found-right-content
-            [:div.barred-eye]
             [:div.login-title
               "Please log in to continue"]
             [:div.login-description
               "You need to be logged in to view this post"]
-            [:button.mlb-reset.sign-in-button
-              {:on-click #(do
+            [:button.mlb-reset.signup-with-slack
+              {:on-touch-start identity
+               :on-click #(do
                            (.preventDefault %)
                            (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                  {:auth-source "slack"})]
-                             (user-actions/login-with-slack auth-link)))
-               :on-touch-start identity}
-              "Sign in with "
-              [:span.slack-blue-copy]]
+                             (user-actions/login-with-slack auth-link)))}
+              [:div.signup-with-slack-content
+                [:div.slack-icon
+                  {:aria-label "slack"}]
+                "Continue with Slack"]]
+           [:button.mlb-reset.signup-with-google
+             {:on-touch-start identity
+              :on-click #(do
+                           (.preventDefault %)
+                           (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                                {:auth-source "google"})]
+                             (user-actions/login-with-google auth-link)))}
+              [:div.signup-with-google-content
+                [:div.google-icon
+                  {:aria-label "google"}]
+                "Continue with Google "]]
             [:div.or-login
               "Or, sign in with email"]
             ;; Email fields
@@ -74,7 +86,7 @@
               [:form.sign-in-form
                 [:div.fields-container.group
                   [:div.field-label
-                    "Email"]
+                    "Work Email"]
                   [:input.field-content.email.fs-hide
                     {:type "email"
                      :name "email"

@@ -65,9 +65,9 @@
       (aa/must-see-get org-data))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
-      (or (= (router/current-board-slug) "all-posts")
-          ap-initial-at
-          (= (router/current-board-slug) "must-see"))
+      (and (not ap-initial-at)
+           (or (= (router/current-board-slug) "all-posts")
+               (= (router/current-board-slug) "must-see")))
       (when-not activity-link
         (check-org-404))
 
@@ -80,7 +80,8 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
-          (when-not (router/current-activity-id) ;; user is not asking for a specific post
+          (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
+                     (not ap-initial-at)) ;; neither for a briefing link
             (router/redirect-404!))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))

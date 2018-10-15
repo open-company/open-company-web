@@ -4,23 +4,24 @@
             [org.martinklepsch.derivatives :as drv]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.stores.search :as search]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.stores.search :as search]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
+            [oc.web.components.search :refer (search-box)]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -116,20 +117,30 @@
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
-
+                               (not= (router/current-board-slug) "all-posts")
+                               (not= (router/current-board-slug) "must-see")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
-                             (or board-data
-                                 container-data)
-                             posts-data
-                             (not ((set (keys posts-data)) (router/current-activity-id))))
+                             (or (and (router/current-activity-id)
+                                      board-data)
+                                 (and ap-initial-at
+                                      (not (jwt/user-is-part-of-the-team (:team-id org-data))))
+                                 (and ap-initial-at
+                                      container-data))
+                             (not (nil? posts-data))
+                             (or (and (router/current-activity-id)
+                                      (not ((set (keys posts-data)) (router/current-activity-id))))
+                                 (and ap-initial-at
+                                      (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
         show-activity-not-found (and (not jwt)
-                                     (router/current-activity-id)
+                                     (or (router/current-activity-id)
+                                         ap-initial-at)
                                      (or org-not-found
                                          section-not-found
                                          entry-not-found))
         show-activity-removed (and jwt
-                                   (router/current-activity-id)
+                                   (or (router/current-activity-id)
+                                       ap-initial-at)
                                    (or org-not-found
                                        section-not-found
                                        entry-not-found))
