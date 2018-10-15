@@ -124,7 +124,9 @@
                              (or (and (router/current-activity-id)
                                       board-data)
                                  (and ap-initial-at
-                                      (not (jwt/user-is-part-of-the-team (:team-id org-data)))))
+                                      (not (jwt/user-is-part-of-the-team (:team-id org-data))))
+                                 (and ap-initial-at
+                                      container-data))
                              (not (nil? posts-data))
                              (or (and (router/current-activity-id)
                                       (not ((set (keys posts-data)) (router/current-activity-id))))
