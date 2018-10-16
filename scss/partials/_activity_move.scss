@@ -1,7 +1,7 @@
 div.activity-move {
   width: 310px;
   height: 166px;
-  z-index: 1000;
+  z-index: 110;
 
   div.move-post-inner {
     background-color: white;
@@ -57,7 +57,7 @@ div.activity-move {
       border: 1px solid $carrot_light_gray_1;
       border-radius: 4px;
       background-color: white;
-      z-index: 1002;
+      z-index: 112;
 
       div.board-item {
         height: 40px;
