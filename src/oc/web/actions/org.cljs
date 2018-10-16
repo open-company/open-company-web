@@ -183,6 +183,13 @@
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
 
+(defn- trunc
+  "
+  Truncate a string based on length
+  "
+  [s n]
+  (subs s 0 (min (count s) n)))
+
 (defn create-or-update-org [org-data]
   (dis/dispatch! [:input [:org-editing :error] false])
   (let [email-domain (:email-domain org-data)
@@ -190,9 +197,12 @@
                              (subs email-domain 1)
                              email-domain)
         existing-org (dis/org-data)
-        clean-org-data (if (seq (:logo-url org-data))
+        logo-org-data (if (seq (:logo-url org-data))
                           org-data
-                          (dissoc org-data :logo-url :logo-width :logo-height))]
+                          (dissoc org-data :logo-url :logo-width :logo-height))
+        clean-org-data (assoc logo-org-data
+                              :name
+                              (trunc (:name logo-org-data) 127))]
     (if (seq (:slug existing-org))
       (api/patch-org clean-org-data (partial org-update-cb fixed-email-domain))
       (api/create-org clean-org-data (partial org-create-cb fixed-email-domain)))))
