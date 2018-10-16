@@ -3,22 +3,6 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
-  div.section-add {
-
-    &.has-drafts {
-      div.section-editor {
-        top: 250px;
-      }
-    }
-
-    div.section-editor {
-      position: absolute;
-      top: 214px;
-      left: 180px;
-      z-index: 1000;
-    }
-  }
-
   @include mobile() {
     &.sticky-board-name {
       padding-top: 48px;
@@ -801,12 +785,6 @@ div.dashboard-layout {
               }
             }
           }
-
-          div.dropdown-list-container {
-            top: 46px;
-            width: 200px;
-            left: -26px;
-          }
         }
       }
     }
@@ -817,7 +795,6 @@ div.dashboard-layout {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      z-index: 1000;
 
       button.add-to-board-floating-button {
         width: 56px;
@@ -846,22 +823,6 @@ div.dashboard-layout {
           background-repeat: no-repeat;
           width: 56px;
           height: 56px;
-        }
-      }
-
-      div.dropdown-list-container {
-        top: unset;
-        bottom: 0px;
-        width: 200px;
-        left: -220px;
-        z-index: 100;
-
-        div.triangle {
-          transform: rotate(135deg);
-          top: unset;
-          bottom: 20px;
-          left: unset;
-          right: -10px;
         }
       }
     }

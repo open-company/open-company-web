@@ -165,7 +165,7 @@ div.cmail-outer {
           border-top-left-radius: 0;
           border-top-right-radius: 0;
           padding: 16px 14px;
-          z-index: 100;
+          z-index: #{$navbar_zindex + 126};
         }
 
         div.cmail-header-title {
@@ -394,7 +394,7 @@ div.cmail-outer {
           position: absolute;
           top: 36px;
           left: 16px;
-          z-index: 1000;
+          z-index: #{$navbar_zindex + 156};
           max-height: 370px;
           overflow: auto;
         }
