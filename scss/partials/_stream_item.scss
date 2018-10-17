@@ -62,7 +62,6 @@ div.stream-item {
     div.stream-header-head-author {
       float: left;
       width: 55%;
-      // overflow: hidden;
 
       @include activity-author(32);
 
@@ -120,47 +119,100 @@ div.stream-item {
     }
 
     &.expanded {
-      div.ziggeo-player {
-        margin-top: 24px;
-        margin-bottom: 24px;
-        float: unset;
-        width: 638px;
-        height: 478px;
+      div.thumbnail-container {
+        cursor: default;
 
-        video {
-          max-height: 478px;
+        div.ziggeo-player {
+          margin-top: 24px;
+          margin-bottom: 24px;
+          float: unset;
+          width: 638px;
+          height: 478px;
+          position: relative;
+          top: unset;
+          right: unset;
+          transform: translate(0%,0%);
+
+          video {
+            max-height: 478px;
+          }
+
+          @include tablet(){
+            width: 100vw;
+            height: calc(100vw *  0.75);
+          }
         }
 
-        @include tablet(){
-          width: 100vw;
-          height: calc(100vw *  0.75);
+        div.body-thumbnail {
+          display: none;
         }
       }
     }
 
-    div.ziggeo-player {
-      margin-top: 0px;
-      width: 136px;
-      height: 102px;
-      float: right;
+    div.thumbnail-container {
+      position: relative;
+      cursor: pointer;
 
-      video {
-        max-height: 102px;
-      }
-
-      @include tablet(){
-        margin-top: 16px;
-        float: unset;
-        width: calc(100vw + 32px);
-        height: auto;
-        margin-left: -16px;
+      div.ziggeo-player {
+        width: 136px;
+        height: 102px;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
 
         video {
-          max-height: calc(100vw * 0.75);
+          max-height: 102px;
         }
 
-        div.ba-videoplayer-carrot-theme-volumebar, div[data-selector="button-icon-volume"] {
-          display: none !important;
+        @include tablet(){
+          margin-top: 16px;
+          float: unset;
+          width: calc(100vw + 32px);
+          height: auto;
+          margin-left: -16px;
+
+          video {
+            max-height: calc(100vw * 0.75);
+          }
+
+          div.ba-videoplayer-carrot-theme-volumebar, div[data-selector="button-icon-volume"] {
+            display: none !important;
+          }
+        }
+      }
+
+      div.body-thumbnail {
+        width: 136px;
+        height: 102px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+        transform: translateY(-50%);
+        position: absolute;
+        right: 0;
+        top: 50%;
+        cursor: pointer;
+
+        &.video {
+          &:hover:after {
+            opacity: 1;
+          }
+
+          &:after {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            content: "";
+            width: 45px;
+            height: 45px;
+            background-image: cdnUrl("/img/ML/play.svg");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 45px;
+            opacity: 0.6;
+          }
         }
       }
     }
@@ -169,7 +221,7 @@ div.stream-item {
       position: relative;
       margin-top: 8px;
 
-      &.has-video {
+      &.has-thumbnail {
         float: left;
         width: 400px;
         min-height: 98px;
