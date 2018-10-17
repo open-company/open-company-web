@@ -53,8 +53,8 @@
 (defn enumerate-channels [team-data]
   (let [org-data (dis/org-data)
         team-id (:team-id team-data)]
-    (when (= (:team-id org-data) team-id)
-      (api/enumerate-channels team-id (partial enumerate-channels-cb team-id))
+    (when team-id
+      (api/enumerate-channels team-data (partial enumerate-channels-cb team-id))
       (dis/dispatch! [:channels-enumerate team-id]))))
 
 (defn team-get [team-link]
@@ -76,10 +76,12 @@
 (defn read-teams [teams]
   (doseq [team teams
           :let [team-link (utils/link-for (:links team) "item")
+                channels-link (utils/link-for (:links team) "channels")
                 roster-link (utils/link-for (:links team) "roster")]]
     ; team link may not be present for non-admins, if so they can still get team users from the roster
-    (when team-link
-      (team-get team-link))
+    (if team-link
+      (team-get team-link)
+      (when channels-link (enumerate-channels team)))
     (when roster-link
       (roster-get roster-link))))
 

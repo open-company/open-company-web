@@ -336,14 +336,14 @@
       {:headers (headers-for-link team-link)}
       callback)))
 
-(defn enumerate-channels [team-id callback]
-  (when team-id
-    (let [team-data (dispatcher/team-data team-id)
-          enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
-      (when enumerate-link
-        (auth-http (method-for-link enumerate-link) (relative-href enumerate-link)
-          {:headers (headers-for-link enumerate-link)}
-          callback)))))
+(defn enumerate-channels [team-data callback]
+  (let [team-id (:team-id team-data)]
+    (when team-id
+      (let [enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
+        (when enumerate-link
+          (auth-http (method-for-link enumerate-link) (relative-href enumerate-link)
+                     {:headers (headers-for-link enumerate-link)}
+                     callback))))))
 
 (defn user-action [action-link payload callback]
   (when action-link
