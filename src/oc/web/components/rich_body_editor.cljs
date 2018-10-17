@@ -3,6 +3,7 @@
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -104,15 +105,26 @@
    (= (:type video) :vimeo)
    (str "https://player.vimeo.com/video/" (:id video))))
 
+(defn add-loom [video-data]
+  (timbre/debug "ADDING LOOM " (.getSelection js/window))
+  (js/pasteHtmlAtCaret
+   (str "<iframe width=\"360\" height=\"394\" src="
+        "https://www.useloom.com/embed/" (:id video-data)
+        " frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")
+   (.getSelection js/window)
+   false))
+
 (defn media-video-add [s editable video-data]
   (if (nil? video-data)
     (.addVideo editable nil nil nil nil)
-    (.addVideo
-     editable
-     (get-video-src video-data)
-     (name (:type video-data))
-     (:id video-data)
-     (get-video-thumbnail video-data))))
+    (if (= (:type video-data) :loom)
+      (add-loom video-data)
+      (.addVideo
+       editable
+       (get-video-src video-data)
+       (name (:type video-data))
+       (:id video-data)
+       (get-video-thumbnail video-data)))))
 
 ;; Photo
 
