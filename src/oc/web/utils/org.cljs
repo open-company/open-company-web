@@ -3,3 +3,5 @@
 (def org-avatar-filestack-config
   {:accept "image/*"
    :fromSources ["local_file_system"]})
+
+(def org-name-max-length 126)

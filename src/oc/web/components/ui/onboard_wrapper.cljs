@@ -256,6 +256,7 @@
                :ref "org-name"
                :placeholder "e.g., Acme, or Acme Design"
                :class (when (:error org-editing) "error")
+               :max-length org-utils/org-name-max-length
                :value (:name org-editing)
                :on-change #(dis/dispatch! [:input [:org-editing]
                  (merge org-editing {:error nil :name (.. % -target -value)})])}])
