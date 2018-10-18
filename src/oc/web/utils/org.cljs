@@ -4,4 +4,4 @@
   {:accept "image/*"
    :fromSources ["local_file_system"]})
 
-(def org-name-max-length 126)
+(def org-name-max-length 64)
