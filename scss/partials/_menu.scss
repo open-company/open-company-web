@@ -119,22 +119,24 @@ div.menu {
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
-      width: calc(100% - 48px);
+      width: 100%;
       line-height: 18px;
       height: 18px;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     div.org-url {
       @include avenir_R();
       font-size: 13px;
-      width: calc(100% - 48px);
+      width: 100%;
       height: 15px;
       color: $light_ui_grey;
       overflow: hidden;
       text-overflow: ellipsis;
       line-height: 15px;
+      white-space: nowrap;
     }
   }
 
