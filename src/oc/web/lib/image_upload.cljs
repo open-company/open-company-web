@@ -80,8 +80,8 @@
   (let [fs-client (init-filestack)
         opts (clj->js {:resize {
                         :fit "crop"
-                        :width 72
-                        :height 72
+                        :width 272
+                        :height 204
                         :align "faces"}})
        transformed-url (.transform fs-client fs-url opts)
        fixed-success-cb (fn [res]

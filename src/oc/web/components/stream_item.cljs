@@ -177,8 +177,10 @@
             :external-share (not is-mobile?)}))]
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
-        [:div.group
-          (when has-video
+        [:div.thumbnail-container.group
+          {:on-click #(when (and truncated? (not expanded?))
+                       (expand s true))}
+          (if has-video
             (rum/with-key
              (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
@@ -186,9 +188,14 @@
                              :lazy (not video-player-show)
                              :video-image (:video-image activity-data)
                              :video-processed (:video-processed activity-data)})
-              (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))))
+              (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" "")))
+            (when (:body-thumbnail activity-data)
+              [:div.body-thumbnail
+                {:class (:type (:body-thumbnail activity-data))
+                 :data-image (:thumbnail (:body-thumbnail activity-data))
+                 :style {:background-image (str "url(\"" (:thumbnail (:body-thumbnail activity-data)) "\")")}}]))
           [:div.stream-body-left.group.fs-hide
-            {:class (when (and has-video (not expanded?)) "has-video")}
+            {:class (when (and (:has-thumbnail activity-data) (not expanded?)) "has-thumbnail")}
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)

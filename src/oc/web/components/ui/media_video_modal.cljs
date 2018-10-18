@@ -38,7 +38,7 @@
 
 (defn- get-vimeo-thumbnail-success [s video res]
   (let [resp (aget res 0)
-        thumbnail (aget resp "thumbnail_small")
+        thumbnail (aget resp "thumbnail_medium")
         video-data (assoc video :thumbnail thumbnail)]
     (dis/dispatch! [:input [:media-input :media-video] video-data])
     (close-clicked s true)))
@@ -61,7 +61,7 @@
   (.ajax js/$
     #js {
       :method "GET"
-      :url (str "http://vimeo.com/api/v2/video/" (:id video) ".json")
+      :url (str "https://vimeo.com/api/v2/video/" (:id video) ".json")
       :success #(get-vimeo-thumbnail-success s video %)
       :error #(get-vimeo-thumbnail-retry s video)}))
 
