@@ -54,8 +54,9 @@
   (let [org-data (dis/org-data)
         team-id (:team-id team-data)]
     (when team-id
-      (api/enumerate-channels team-data (partial enumerate-channels-cb team-id))
-      (dis/dispatch! [:channels-enumerate team-id]))))
+      (let [enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
+        (api/enumerate-channels enumerate-link (partial enumerate-channels-cb team-id))
+        (dis/dispatch! [:channels-enumerate team-id])))))
 
 (defn team-get [team-link]
   (api/get-team team-link
@@ -98,8 +99,8 @@
 
 (defn teams-get []
   (let [auth-settings (dis/auth-settings)]
-    (when (utils/link-for (:links auth-settings) "collection")
-      (api/get-teams auth-settings teams-get-cb)
+    (when-let [enumerate-link (utils/link-for (:links auth-settings) "collection" "GET")]
+      (api/get-teams enumerate-link teams-get-cb)
       (dis/dispatch! [:teams-get]))))
 
 (defn teams-get-if-needed []
@@ -120,10 +121,12 @@
     (org-actions/get-org)))
 
 (defn remove-author [author]
-  (api/remove-author author author-change-cb))
+  (let [remove-author-link (utils/link-for (:links author) "remove")]
+    (api/remove-author remove-author-link author author-change-cb)))
 
 (defn add-author [author]
-  (api/add-author (:user-id author) author-change-cb))
+  (let [add-author-link (utils/link-for (:links (dis/org-data)) "add")]
+    (api/add-author add-author-link (:user-id author) author-change-cb)))
 
 ;; Admins
 
@@ -135,10 +138,13 @@
     (dis/dispatch! [:invite-user/failed user])))
 
 (defn add-admin [user]
-  (api/add-admin user (partial admin-change-cb user)))
+  (let [add-admin-link (utils/link-for (:links user) "add")]
+    (api/add-admin add-admin-link user (partial admin-change-cb user))))
 
 (defn remove-admin [user]
-  (api/remove-admin user (partial admin-change-cb user)))
+  (let [remove-admin-link (utils/link-for (:links user) "remove" "DELETE"
+                           {:ref "application/vnd.open-company.team.admin.v1"})]
+    (api/remove-admin remove-admin-link user (partial admin-change-cb user))))
 
 ;; Invite user callbacks
 
@@ -231,8 +237,14 @@
         (when (and user
                   (not= old-user-type user-type))
           (switch-user-type invite-data old-user-type user-type user))
-        (api/send-invitation invite-data user-value invite-from user-type first-name last-name note
-         (partial send-invitation-cb invite-data user-type))))))
+        (let [team-data (or (dis/team-data)
+                            (first (filter #(= (:team-id org-data) (:team-id %))
+                                           (dis/teams-data))))
+              invitation-link (utils/link-for (:links team-data) "add" "POST"
+                               {:content-type "application/vnd.open-company.team.invite.v1"})
+              entry-point-link (:api-entry-point @dis/app-state)]
+          (api/send-invitation invitation-link entry-point-link user-value invite-from user-type
+           first-name last-name note (partial send-invitation-cb invite-data user-type)))))))
 
 ;; Invite user helpers
 
@@ -301,7 +313,14 @@
 
 (defn email-domain-team-add [domain]
   (when (utils/valid-domain? domain)
-    (api/add-email-domain (if (.startsWith domain "@") (subs domain 1) domain) email-domain-team-add-cb)
+    (let [team-data (dis/team-data)
+          add-email-domain-link (utils/link-for
+                                   (:links team-data)
+                                   "add"
+                                   "POST"
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1"})
+          fixed-domain (if (.startsWith domain "@") (subs domain 1) domain)]
+      (api/add-email-domain add-email-domain-link fixed-domain email-domain-team-add-cb team-data))
     (dis/dispatch! [:email-domain-team-add])))
 
 ;; Slack team add

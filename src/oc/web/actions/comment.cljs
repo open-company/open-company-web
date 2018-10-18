@@ -26,32 +26,31 @@
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
   (let [org-slug (router/current-org-slug)
-        comments-key (dis/activity-comments-key org-slug (:uuid activity-data))]
+        comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
+        add-comment-link (utils/link-for (:links activity-data) "create" "POST")]
     ;; Add the comment to the app-state to show it immediately
     (dis/dispatch! [:comment-add
                     activity-data
                     comment-body
                     comments-key])
-    (api/add-comment activity-data comment-body
+    (api/add-comment add-comment-link comment-body
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
-        (api/get-comments activity-data
-          #(get-comments-finished comments-key activity-data %))
+        (let [comments-link (utils/link-for (:links activity-data) "comments")]
+          (api/get-comments comments-link #(get-comments-finished comments-key activity-data %)))
         (dis/dispatch! [:comment-add/finish {:success success
                                              :error (when-not success body)
                                              :body (when (seq body) (json->cljs body))
                                              :activity-data activity-data}])))))
 
 (defn get-comments [activity-data]
-  (let [comments-key (dis/activity-comments-key
-                      (router/current-org-slug)
-                      (:uuid activity-data))]
+  (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
+        comments-link (utils/link-for (:links activity-data) "comments")]
     (dis/dispatch! [:comments-get
                     comments-key
                     activity-data])
-    (api/get-comments activity-data
-      #(get-comments-finished comments-key activity-data %))))
+    (api/get-comments comments-link #(get-comments-finished comments-key activity-data %))))
 
 (defn get-comments-if-needed [activity-data all-comments-data]
   (let [comments-link (utils/link-for (:links activity-data) "comments")
@@ -70,37 +69,39 @@
 (defn delete-comment [activity-data comment-data]
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      (:uuid activity-data))]
+                      (:uuid activity-data))
+        delte-comment-link (utils/link-for (:links comment-data) "delete")]
     (dis/dispatch! [:comment-delete
                     (:uuid activity-data)
                     comment-data
                     comments-key])
-    (api/delete-comment (:uuid activity-data) comment-data
+    (api/delete-comment delte-comment-link
       (fn [{:keys [status success body]}]
-        (api/get-comments activity-data
-          #(get-comments-finished comments-key activity-data %))))))
+        (let [comments-link (utils/link-for (:links activity-data) "comments")]
+          (api/get-comments comments-link
+           #(get-comments-finished comments-key activity-data %)))))))
 
-(defn comment-reaction-toggle
-  [activity-data comment-data reaction-data reacting?]
-  (let [comments-key (dis/activity-comments-key
-                      (router/current-org-slug)
-                      (:uuid activity-data))]
+(defn comment-reaction-toggle [activity-data comment-data reaction-data reacting?]
+  (let [comments-key (dis/activity-comments-key (router/current-org-slug)
+                      (:uuid activity-data))
+        link-method (if reacting? "PUT" "DELETE")
+        reaction-link (utils/link-for (:links reaction-data) "react" link-method)]
     (dis/dispatch! [:comment-reaction-toggle
                     comments-key
                     activity-data
                     comment-data
                     reaction-data
                     reacting?])
-    (api/toggle-reaction reaction-data reacting?
+    (api/toggle-reaction reaction-link
       (fn [{:keys [status success body]}]
         (get-comments activity-data)))))
 
-(defn save-comment
-  [activity-uuid comment-data new-body]
-  (api/save-comment comment-data new-body)
+(defn save-comment [activity-uuid comment-data new-body]
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
-                      activity-uuid)]
+                      activity-uuid)
+        patch-comment-link (utils/link-for (:links comment-data) "partial-update")]
+    (api/patch-comment patch-comment-link new-body nil)
     (dis/dispatch! [:comment-save
                     comments-key
                     activity-uuid

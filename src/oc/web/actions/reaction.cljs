@@ -17,23 +17,26 @@
   ;; so we need to avoid posting empty emojis
   (when (and emoji
              (utils/link-for (:links activity-data) "react"))
-    (api/react-from-picker activity-data emoji
-      (fn [{:keys [status success body]}]
-        ;; Refresh the full entry after the reaction finished
-        ;; in the meantime update the local state with the result.
-        (activity-actions/get-entry activity-data)
-        (dis/dispatch!
-         [:react-from-picker/finish
-          {:status status
-           :activity-data activity-data
-           :activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))
-           :reaction-data (if success (json->cljs body) {})}])))))
+    (let [react-link (utils/link-for (:links activity-data) "react")]
+      (api/react-from-picker react-link emoji
+        (fn [{:keys [status success body]}]
+          ;; Refresh the full entry after the reaction finished
+          ;; in the meantime update the local state with the result.
+          (activity-actions/get-entry activity-data)
+          (dis/dispatch!
+           [:react-from-picker/finish
+            {:status status
+             :activity-data activity-data
+             :activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))
+             :reaction-data (if success (json->cljs body) {})}]))))))
 
 (defn reaction-toggle
   [activity-data reaction-data reacting?]
-  (let [activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))]
+  (let [activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))
+        link-method (if reacting? "PUT" "DELETE")
+        reaction-link (utils/link-for (:links reaction-data) "react" link-method)]
     (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data activity-key])
-    (api/toggle-reaction reaction-data reacting?
+    (api/toggle-reaction reaction-link
       (fn [{:keys [status success body]}]
         (dis/dispatch!
          [:activity-reaction-toggle/finish

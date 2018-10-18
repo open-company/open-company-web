@@ -122,7 +122,8 @@
       (sa/section-get (utils/link-for (:links board-data) "self" "GET")))))
 
 (defn refresh-org-data []
-  (api/get-org (dis/org-data) refresh-org-data-cb))
+  (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
+    (api/get-org org-link refresh-org-data-cb)))
 
 ;; Entry
 (defn get-entry-cache-key
@@ -336,17 +337,20 @@
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
            section-editing)
     (let [fixed-entry-data (dissoc activity-data :board-slug :board-name :invite-note)
-          final-board-data (assoc section-editing :entries [fixed-entry-data])]
-      (api/create-board final-board-data (:invite-note activity-data)
+          final-board-data (assoc section-editing :entries [fixed-entry-data])
+          create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+      (api/create-board create-board-link final-board-data (:invite-note activity-data)
         (fn [{:keys [success status body]}]
           (if (= status 409)
             ;; Board name exists
             (board-name-exists-error :modal-editing-data)
             (let [board-data (when success (json->cljs body))]
               (when (router/current-activity-id)
-                (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data) (:uuid activity-data))))
+                (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data)
+                              (:uuid activity-data))))
               (entry-modal-save-with-board-finish activity-data board-data))))))
-    (api/update-entry activity-data :modal-editing-data create-update-entry-cb))
+    (let [patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
+      (api/patch-entry patch-entry-link activity-data :modal-editing-data create-update-entry-cb)))
   (dis/dispatch! [:entry-modal-save]))
 
 (defn add-attachment [dispatch-input-key attachment-data]
@@ -358,9 +362,11 @@
   (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
 (defn get-entry [entry-data]
-  (api/get-entry entry-data
-    (fn [{:keys [status success body]}]
-      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))
+  (let [entry-link (utils/link-for (:links entry-data) "self")]
+    (api/get-entry entry-link
+      (fn [{:keys [status success body]}]
+        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+         nil])))))
 
 (declare entry-revert)
 
@@ -386,21 +392,24 @@
                   section-editing)
            ;; Save existing post to new board
            (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-                 final-board-data (assoc section-editing :entries [fixed-entry-data])]
-             (api/create-board final-board-data (:invite-note fixed-edited-data)
+                 final-board-data (assoc section-editing :entries [fixed-entry-data])
+                 create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+             (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                (fn [{:keys [success status body] :as response}]
                  (if (= status 409)
                    ;; Board name exists
                    (board-name-exists-error fixed-edit-key)
                    (entry-save-cb fixed-edited-data fixed-edit-key response)))))
            ;; Update existing post
-           (api/update-entry fixed-edited-data fixed-edit-key entry-save-cb))
+           (let [patch-entry-link (utils/link-for (:links edited-data) "partial-update")]
+             (api/patch-entry patch-entry-link fixed-edited-data fixed-edit-key entry-save-cb)))
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                   section-editing)
            ;; Save new post to new board
            (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-                 final-board-data (assoc section-editing :entries [fixed-entry-data])]
-             (api/create-board final-board-data (:invite-note fixed-edited-data)
+                 final-board-data (assoc section-editing :entries [fixed-entry-data])
+                 create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+             (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                (fn [{:keys [success status body] :as response}]
                  (if (= status 409)
                    ;; Board name exists
@@ -410,7 +419,7 @@
            (let [org-slug (router/current-org-slug)
                  entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
                  entry-create-link (utils/link-for (:links entry-board-data) "create")]
-             (api/create-entry fixed-edited-data fixed-edit-key entry-create-link entry-save-cb))))
+             (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb))))
        (dis/dispatch! [:entry-save fixed-edit-key]))))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
@@ -459,8 +468,9 @@
     (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
              section-editing)
       (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
-            final-board-data (assoc section-editing :entries [fixed-entry-data])]
-        (api/create-board final-board-data (:invite-note section-editing)
+            final-board-data (assoc section-editing :entries [fixed-entry-data])
+            create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+        (api/create-board create-board-link final-board-data (:invite-note section-editing)
          (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
       (let [entry-exists? (seq (:links fixed-entry-editing))
             org-slug (router/current-org-slug)
@@ -470,7 +480,7 @@
                                 (utils/link-for (:links fixed-entry-editing) "publish")
                                 ;; If the entry is new, use
                                 (utils/link-for (:links board-data) "create"))]
-        (api/publish-entry fixed-entry-editing publish-entry-link
+        (api/publish-entry publish-entry-link fixed-entry-editing
          (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key))))
     (dis/dispatch! [:entry-publish fixed-edit-key])))
 
@@ -480,12 +490,14 @@
     (refresh-org-data)))
 
 (defn activity-delete [activity-data]
-  (api/delete-activity activity-data activity-delete-finish)
-  (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data]))
+  (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
+    (api/delete-entry activity-delete-link activity-delete-finish)
+    (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data])))
 
 (defn activity-move [activity-data board-data]
-  (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))]
-    (api/update-entry fixed-activity-data nil create-update-entry-cb)
+  (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
+        patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
+    (api/patch-entry patch-entry-link fixed-activity-data nil create-update-entry-cb)
     (dis/dispatch! [:activity-move activity-data (router/current-org-slug) board-data])))
 
 (defn activity-share-show [activity-data & [element-id share-medium]]
@@ -501,8 +513,9 @@
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
 (defn activity-share [activity-data share-data & [share-cb]]
-  (api/share-activity activity-data share-data (or share-cb activity-share-cb))
-  (dis/dispatch! [:activity-share share-data]))
+  (let [share-link (utils/link-for (:links activity-data) "share")]
+    (api/share-entry share-link share-data (or share-cb activity-share-cb))
+    (dis/dispatch! [:activity-share share-data])))
 
 (defn entry-revert [revision-id entry-editing]
   (when (not (nil? revision-id))
@@ -514,7 +527,7 @@
                               ;; If the entry already exists use the publish link in it
                               (utils/link-for (:links entry-editing) "revert"))]
       (if entry-exists?
-        (api/revert-entry entry-version revert-entry-link
+        (api/revert-entry revert-entry-link entry-version
                           (fn [{:keys [success body]}]
                             (dis/dispatch! [:entry-revert entry-version])
                             (when success
@@ -534,7 +547,7 @@
   (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
 (defn secure-activity-get []
-  (api/get-secure-activity (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
 ;; Change reaction
 
@@ -665,19 +678,21 @@
         must-see-count (:must-see-count dis/org-data)
         new-must-see-count (if-not must-see
                              (inc must-see-count)
-                             (dec must-see-count))]
+                             (dec must-see-count))
+        patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
     (dis/dispatch! [:org-loaded
                     (assoc org-data :must-see-count new-must-see-count)
                     false])
     (dis/dispatch! [:must-see-toggle (router/current-org-slug) must-see-toggled])
-    (api/update-entry must-see-toggled :must-see
+    (api/patch-entry patch-entry-link must-see-toggled :must-see
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success
-                          (api/get-org org-data
-                            (fn [{:keys [status body success]}]
-                              (let [api-org-data (json->cljs body)]
-                                (dis/dispatch! [:org-loaded api-org-data false])
-                                (must-see-get api-org-data))))
+                          (let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
+                            (api/get-org org-link
+                              (fn [{:keys [status body success]}]
+                                (let [api-org-data (json->cljs body)]
+                                  (dis/dispatch! [:org-loaded api-org-data false])
+                                  (must-see-get api-org-data)))))
                           (dis/dispatch! [:activity-get/finish
                                            status
                                            (router/current-org-slug)
