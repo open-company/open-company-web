@@ -370,6 +370,15 @@
    :id :app-update-error
    :dismiss true})
 
+(def internal-error
+  {:title "Internal occurred"
+   :description (str "An internal error occurrent, we have been informed of the "
+                 "problem and we will be working on it as soon as possible. "
+                 "Thanks for understanding.")
+   :id :internal-error
+   :server-error true
+   :dismiss true})
+
 (defn clean-google-chart-url [gchart-url]
   (if (string? gchart-url)
     (.replace gchart-url #"(?i)/u/\d+" "")

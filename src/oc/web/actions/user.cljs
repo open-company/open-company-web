@@ -200,7 +200,7 @@
     (when body
       ;; auth settings loaded
       (let [user-link (utils/link-for (:links body) "user" "GET")]
-        (api/get-current-user user-link (fn [data]
+        (api/get-user user-link (fn [data]
           (dis/dispatch! [:user-data (json->cljs data)])
           (utils/after 100 nux-actions/check-nux))))
       (dis/dispatch! [:auth-settings body])
@@ -359,9 +359,7 @@
                        (assoc with-pswd :email (:email current-user-data)))
           user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
       (dis/dispatch! [:user-profile-save])
-      (api/patch-user-profile
-       user-profile-link
-       with-email
+      (api/patch-user user-profile-link with-email
        (fn [status body success]
          (if (= status 422)
            (dis/dispatch! [:user-profile-update/failed])
@@ -383,9 +381,7 @@
   (let [user-avatar-data {:avatar-url avatar-url}
         current-user-data (dis/current-user-data)
         user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
-    (api/patch-user-profile
-     user-profile-link
-     user-avatar-data
+    (api/patch-user user-profile-link user-avatar-data
      (fn [status body success]
        (if-not success
          (do

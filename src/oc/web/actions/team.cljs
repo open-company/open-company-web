@@ -241,9 +241,8 @@
                             (first (filter #(= (:team-id org-data) (:team-id %))
                                            (dis/teams-data))))
               invitation-link (utils/link-for (:links team-data) "add" "POST"
-                               {:content-type "application/vnd.open-company.team.invite.v1"})
-              entry-point-link (:api-entry-point @dis/app-state)]
-          (api/send-invitation invitation-link entry-point-link user-value invite-from user-type
+                               {:content-type "application/vnd.open-company.team.invite.v1"})]
+          (api/send-invitation invitation-link user-value invite-from user-type
            first-name last-name note (partial send-invitation-cb invite-data user-type)))))))
 
 ;; Invite user helpers
