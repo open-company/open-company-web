@@ -445,19 +445,24 @@ div.dashboard-layout {
             width: auto;
             display: inline-block;
             position: relative;
-            padding-right: 29px;
 
-            &:after {
-              content: "";
-              position: absolute;
-              right: 12px;
-              top: 12px;
-              width: 1px;
-              height: 16px;
-              background-color: $light_ui_grey;
+            @include big_web() {
+              &.has-settings {
+                padding-right: 29px;
 
-              @include mobile(){
-                display: none;
+                &:after {
+                  content: "";
+                  position: absolute;
+                  right: 12px;
+                  top: 12px;
+                  width: 1px;
+                  height: 16px;
+                  background-color: $light_ui_grey;
+
+                  @include mobile(){
+                    display: none;
+                  }
+                }
               }
             }
 
