@@ -195,7 +195,7 @@
   (sentry/set-user-context! (merge {:callee callee-name
                                     :link link}
                                     parameters))
-  (sentry/capture-message (str "missing link for:" callee-name))
+  (sentry/capture-message (str "Client API error on: " callee-name))
   (sentry/set-user-context! nil)
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))
   (when (fn? callback)
