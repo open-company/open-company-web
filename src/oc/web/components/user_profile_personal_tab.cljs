@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
@@ -101,6 +102,7 @@
               [:input
                 {:type "text"
                  :tab-index 1
+                 :max-length user-utils/user-name-max-lenth
                  :on-change #(change! s :first-name (.. % -target -value))
                  :value (:first-name current-user-data)}]]]
           ;; Mobile last name
@@ -111,6 +113,7 @@
               [:input
                 {:type "text"
                  :tab-index 2
+                 :max-length user-utils/user-name-max-lenth
                  :on-change #(change! s :last-name (.. % -target -value))
                  :value (:last-name current-user-data)}]]]
           ; Email

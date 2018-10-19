@@ -236,6 +236,7 @@
             {:type "text"
              :ref "first-name"
              :placeholder "First name"
+             :max-length user-utils/user-name-max-lenth
              :value (or (:first-name user-data) "")
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
@@ -244,6 +245,7 @@
             {:type "text"
              :placeholder "Last name"
              :value (or (:last-name user-data) "")
+             :max-length user-utils/user-name-max-lenth
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
           (when-not has-org?
             [:div.field-label
@@ -256,6 +258,7 @@
                :ref "org-name"
                :placeholder "e.g., Acme, or Acme Design"
                :class (when (:error org-editing) "error")
+               :max-length org-utils/org-name-max-length
                :value (:name org-editing)
                :on-change #(dis/dispatch! [:input [:org-editing]
                  (merge org-editing {:error nil :name (.. % -target -value)})])}])
@@ -739,12 +742,14 @@
             {:type "text"
              :ref "first-name"
              :value (:first-name user-data)
+             :max-length user-utils/user-name-max-lenth
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
           [:input.field.fs-hide
             {:type "text"
              :value (:last-name user-data)
+             :max-length user-utils/user-name-max-lenth
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
           [:button.continue.start-using-carrot
             {:disabled (and (empty? (:first-name user-data))
