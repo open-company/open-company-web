@@ -93,38 +93,31 @@
 
 (defn get-video-thumbnail [video]
   (cond
-    (= (:type video) :youtube)
-    (str "https://img.youtube.com/vi/" (:id video) "/0.jpg")
-    (= (:type video) :vimeo)
-    (:thumbnail video)))
+   (= (:type video) :loom)
+   (str "https://www.useloom.com/embed/" (:id video) "/0.jpg")
+   (= (:type video) :youtube)
+   (str "https://img.youtube.com/vi/" (:id video) "/0.jpg")
+   (= (:type video) :vimeo)
+   (:thumbnail video)))
 
 (defn get-video-src [video]
   (cond
+   (= (:type video) :loom)
+   (str "https://www.useloom.com/embed/" (:id video))
    (= (:type video) :youtube)
    (str "https://www.youtube.com/embed/" (:id video))
    (= (:type video) :vimeo)
    (str "https://player.vimeo.com/video/" (:id video))))
 
-(defn add-loom [video-data]
-  (timbre/debug "ADDING LOOM " (.getSelection js/window))
-  (js/pasteHtmlAtCaret
-   (str "<iframe width=\"360\" height=\"394\" src="
-        "https://www.useloom.com/embed/" (:id video-data)
-        " frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")
-   (.getSelection js/window)
-   false))
-
 (defn media-video-add [s editable video-data]
   (if (nil? video-data)
     (.addVideo editable nil nil nil nil)
-    (if (= (:type video-data) :loom)
-      (add-loom video-data)
-      (.addVideo
-       editable
-       (get-video-src video-data)
-       (name (:type video-data))
-       (:id video-data)
-       (get-video-thumbnail video-data)))))
+    (.addVideo
+     editable
+     (get-video-src video-data)
+     (name (:type video-data))
+     (:id video-data)
+     (get-video-thumbnail video-data))))
 
 ;; Photo
 
