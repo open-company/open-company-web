@@ -217,14 +217,16 @@
                              (not is-all-posts)
                              (not is-must-see)
                              (not (:read-only board-data)))
-                    [:div.board-settings-container.group
+                    ;[:div.board-settings-container.group
                       [:button.mlb-reset.board-settings-bt
                         {:data-toggle (when-not is-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (str (:name board-data) " settings")
-                         :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]])
+                         :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]
+                         ;]
+                         )
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"
