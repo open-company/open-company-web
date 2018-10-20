@@ -164,8 +164,7 @@
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
         fixed-video-id (:video-id entry-data)
-        body-thumbnail (get-first-body-thumbnail (:body entry-data))
-        has-thumbnail (or (seq fixed-video-id) body-thumbnail)]
+        body-thumbnail (get-first-body-thumbnail (:body entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
       (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
@@ -178,7 +177,7 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
-      (assoc :has-thumbnail has-thumbnail)
+      (assoc :has-thumbnail body-thumbnail)
       (assoc :body-thumbnail body-thumbnail))))
 
 (defn fix-board
