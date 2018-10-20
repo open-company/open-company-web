@@ -154,7 +154,7 @@
            (fn [success body] (entry-point-get-finished success body
              (fn [orgs collection]
                (when (pos? (count orgs))
-                 (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
+                 (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -199,7 +199,7 @@
   (api/get-auth-settings (fn [body]
     (when body
       ;; auth settings loaded
-      (let [user-link (utils/link-for (:links body) "user" "GET")]
+      (when-let [user-link (utils/link-for (:links body) "user" "GET")]
         (api/get-user user-link (fn [data]
           (dis/dispatch! [:user-data (json->cljs data)])
           (utils/after 100 nux-actions/check-nux))))
@@ -237,7 +237,7 @@
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
               to-org (utils/get-default-org orgs)]
-          (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))))))
+          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/user-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))
@@ -285,7 +285,7 @@
          (entry-point-get-finished success body
            (fn [orgs collection]
              (when (pos? (count orgs))
-               (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
+               (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
