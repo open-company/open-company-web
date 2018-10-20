@@ -371,7 +371,7 @@
    :dismiss true})
 
 (def internal-error
-  {:title "Internal occurred"
+  {:title "Internal error occurred"
    :description (str "An internal error occurrent, we have been informed of the "
                  "problem and we will be working on it as soon as possible. "
                  "Thanks for understanding.")
