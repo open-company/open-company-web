@@ -34,7 +34,8 @@
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data [s]
-  (when-not (router/current-activity-id)
+  (when (and (not (router/current-activity-id))
+             (router/current-board-slug))
     (utils/after 100 (fn []
      (let [{:keys [org-data
                    board-data
