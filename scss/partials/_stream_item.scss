@@ -171,6 +171,10 @@ div.stream-item {
           width: calc(100vw + 32px);
           height: auto;
           margin-left: -16px;
+          position: initial;
+          top: unset;
+          right: unset;
+          transform: translateY(0%);
 
           video {
             max-height: calc(100vw * 0.75);
@@ -221,15 +225,29 @@ div.stream-item {
       position: relative;
       margin-top: 8px;
 
-      &.has-thumbnail {
+      &.has-thumbnail, &.has-video {
         float: left;
         width: 400px;
         min-height: 98px;
       }
 
-      @include mobile() {
+      @include tablet() {
         width: 100%;
         margin: 8px 0px 0px;
+      }
+
+      &.has-thumbnail {
+        @include tablet() {
+          width: calc(100% - 136px - 16px);
+        }
+      }
+
+      &.has-video {
+        @include tablet() {
+          float: unset;
+          width: 100%;
+          min-height: initial;
+        }
       }
 
       div.stream-item-headline {

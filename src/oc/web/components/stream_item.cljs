@@ -195,7 +195,8 @@
                  :data-image (:thumbnail (:body-thumbnail activity-data))
                  :style {:background-image (str "url(\"" (:thumbnail (:body-thumbnail activity-data)) "\")")}}]))
           [:div.stream-body-left.group.fs-hide
-            {:class (when (and (:has-thumbnail activity-data) (not expanded?)) "has-thumbnail")}
+            {:class (utils/class-set {:has-thumbnail (and (:has-thumbnail activity-data) (not expanded?))
+                                      :has-video (:fixed-video-id activity-data)})}
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
