@@ -2,10 +2,11 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
+            [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.user :as user]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.user :as user]
             [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
@@ -65,7 +66,7 @@
                   "We’re always happy to talk about Carrot."
                   [:a
                     {:href "#"
-                     :on-click #(js/drift.api.startInteraction #js {:interactionId 43229})}
+                     :on-click #(chat/chat-click 43229)}
                     "SAY HELLO"]]]]]
 
           [:div.core-ft
@@ -189,7 +190,7 @@
                   [:li "Email: "
                        [:a {:href oc-urls/contact-mail-to} oc-urls/contact-email]]
                   [:li "Chat: "
-                     [:a {:onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"
+                     [:a {:on-click #(chat/chat-click 43229)
                           :href "#"}
                       "Say hello"]]
                   [:li "Social: "

@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]))
@@ -34,7 +35,7 @@
           [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]
           [:div.column-item [:a {:href oc-urls/press-kit} "Press Kit"]]
           [:div.column-item [:a {:href "#"
-                                 :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                                 :on-click #(chat/chat-click 43229)}
                               "Contact"]]]
 
         [:div.column.column-support
