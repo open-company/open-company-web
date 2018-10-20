@@ -229,6 +229,10 @@ div.stream-item {
         float: left;
         width: 400px;
         min-height: 98px;
+
+        @include mobile() {
+          width: calc(100% - 136px - 16px);
+        }
       }
 
       @include tablet() {
