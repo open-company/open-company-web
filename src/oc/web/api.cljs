@@ -171,9 +171,9 @@
                         :jwt (j/jwt)
                         :params params}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
-            (sentry/set-user-context! report)
+            (sentry/set-extra-context! report)
             (sentry/capture-message (str "xhr response error:" status))
-            (sentry/set-user-context! nil)))
+            (sentry/clear-extra-context!)))
         (on-complete response)))))
 
 (def ^:private web-http (partial req web-endpoint))
@@ -191,12 +191,12 @@
 ;; Report failed api request
 
 (defn- handle-missing-link [callee-name link callback & parameters]
-  (timbre/error "report missing link:" callee-name ":" link)
-  (sentry/set-user-context! (merge {:callee callee-name
-                                    :link link}
-                                    parameters))
+  (timbre/error "Hanling missing link:" callee-name ":" link)
+  (sentry/set-extra-context! (merge {:callee callee-name
+                                     :link link}
+                                     parameters))
   (sentry/capture-message (str "Client API error on: " callee-name))
-  (sentry/set-user-context! nil)
+  (sentry/clear-extra-context!)
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))
   (when (fn? callback)
     (callback {:success false :status 0})))
