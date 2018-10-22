@@ -204,7 +204,6 @@
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
-                      {:class (utils/class-set {:has-settings should-show-settings-bt})}
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (= (:access board-data) "private")
                                                   :public (= (:access board-data) "public")})
@@ -217,15 +216,6 @@
 
                                                    :default
                                                    (:name board-data)))}]])
-                  ;; Settings button
-                  (when should-show-settings-bt
-                    [:button.mlb-reset.board-settings-bt
-                      {:data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (str (:name board-data) " settings")
-                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}])
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"
@@ -243,7 +233,16 @@
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
-                      "Public"])]
+                      "Public"])
+                  ;; Settings button
+                  (when should-show-settings-bt
+                    [:button.mlb-reset.board-settings-bt
+                      {:data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title (str (:name board-data) " settings")
+                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}])]
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group

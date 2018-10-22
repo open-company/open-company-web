@@ -446,26 +446,6 @@ div.dashboard-layout {
             display: inline-block;
             position: relative;
 
-            @include big_web() {
-              &.has-settings {
-                padding-right: 29px;
-
-                &:after {
-                  content: "";
-                  position: absolute;
-                  right: 12px;
-                  top: 12px;
-                  width: 1px;
-                  height: 16px;
-                  background-color: $light_ui_grey;
-
-                  @include mobile(){
-                    display: none;
-                  }
-                }
-              }
-            }
-
             &:before {
               display: none;
 
@@ -544,14 +524,30 @@ div.dashboard-layout {
             background-image: cdnUrl("/img/ML/section_settings_gear.svg");
             background-size: 16px 16px;
             background-repeat: no-repeat;
-            background-position: center;
+            background-position: 16px center;
             background-color: transparent;
             border-radius: 10px;
-            width: 24px;
+            width: 40px;
             height: 40px;
             opacity: 0.8;
-            padding: 0;
+            padding: 0 0 0 16px;
+            margin: 0 0 0 16px;
             float: left;
+            position: relative;
+
+            &:before {
+              content: "";
+              position: absolute;
+              left: 0;
+              top: 12px;
+              width: 1px;
+              height: 16px;
+              background-color: $light_ui_grey;
+
+              @include mobile(){
+                display: none;
+              }
+            }
 
             @include mobile(){
               margin-right: -30px;
