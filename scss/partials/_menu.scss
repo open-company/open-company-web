@@ -119,7 +119,7 @@ div.menu {
       @include avenir_H();
       font-size: 15px;
       color: $deep_navy;
-      width: 100%;
+      width: calc(100% - 48px);
       line-height: 18px;
       height: 18px;
       overflow: hidden;
@@ -130,7 +130,7 @@ div.menu {
     div.org-url {
       @include avenir_R();
       font-size: 13px;
-      width: 100%;
+      width: calc(100% - 48px);
       height: 15px;
       color: $light_ui_grey;
       overflow: hidden;
