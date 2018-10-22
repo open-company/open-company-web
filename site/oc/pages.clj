@@ -1066,8 +1066,6 @@
           [:div#oc-loading]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
-          ;; https://github.com/embedly/player.js/
-          [:script {:src "https://cdn.embed.ly/player-0.1.0.min.js"}]
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
@@ -1169,8 +1167,6 @@
           ;; Resolve jQuery UI and Bootstrap tooltip conflict
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           bootstrap-js
-          ;; https://github.com/embedly/player.js/
-          [:script {:src "https://cdn.embed.ly/player-0.1.0.min.js"}]
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
           ;; Drift (Support)

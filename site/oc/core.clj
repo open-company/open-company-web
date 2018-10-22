@@ -37,8 +37,6 @@
     [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
     ;; jQuery needed by Bootstrap JavaScript
     [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
-    ;; https://github.com/embedly/player.js/
-    [:script {:src "https://cdn.embed.ly/player-0.1.0.min.js"}]
     ;; Static js files
     [:script {:src (pages/cdn "/js/static-js.js")}]
     ;; Drift

@@ -3,7 +3,6 @@
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -94,7 +93,7 @@
 (defn get-video-thumbnail [video]
   (cond
    (= (:type video) :loom)
-   "https://www.useloom.com/assets/img/og/loom-banner.png"
+   (str "https://cdn.useloom.com/sessions/thumbnails/" (:id video) "-00001.jpg")
    (= (:type video) :youtube)
    (str "https://img.youtube.com/vi/" (:id video) "/0.jpg")
    (= (:type video) :vimeo)
