@@ -158,11 +158,21 @@
              (seq teams-data))
       (let [first-team (select-keys
                         (first teams-data)
-                        [:name])]
-        (dis/dispatch!
-         [:update
-          [:org-editing]
-          #(merge % first-team)])))))
+                        [:name :logo-url])]
+        (dis/dispatch! [:update [:org-editing] #(merge % first-team)])
+        (when (seq (:logo-url first-team))
+          (let [img (gdom/createDom "img")]
+            (set! (.-onload img)
+             (fn []
+               (dis/dispatch! [:update [:org-editing] #(merge % {:logo-width (.-width img)
+                                                                 :logo-height (.-height img)})])
+               (gdom/removeNode img)))
+            (set! (.-onerror img)
+             (fn []
+               (dis/dispatch! [:update [:org-editing] #(dissoc % :logo-url)])
+               (gdom/removeNode img)))
+            (gdom/append (.-body js/document) img)
+            (set! (.-src img) (:logo-url first-team))))))))
 
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
