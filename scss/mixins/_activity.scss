@@ -291,6 +291,20 @@ $h2_top_margin: 24;
     margin-top: 0px;
     margin-bottom: 0px;
   }
+
+  iframe, img {
+    margin: 0 auto;
+    display: block;
+    width: 100% !important;
+  }
+
+  @include tablet() {
+    iframe.carrot-no-preview, img.carrot-no-preview {
+      width: calc(100% + 32px) !important;
+      margin: 0 0 0 -16px;
+      max-width: calc(100% + 32px);
+    }
+  }
 }
 
 @mixin activity-attachment($hide-remove-button: false){

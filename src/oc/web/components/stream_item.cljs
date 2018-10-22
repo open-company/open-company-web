@@ -178,17 +178,23 @@
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.thumbnail-container.group
-          {:on-click #(when (and truncated? (not expanded?))
+          {:on-click #(when (and ;; it's truncated
+                                 truncated?
+                                 ;; it's not already expanded
+                                 (not expanded?)
+                                 ;; click is not on a Ziggeo video to play it inline
+                                 (not (utils/event-inside? % (rum/ref-node s :ziggeo-player))))
                        (expand s true))}
           (if has-video
-            (rum/with-key
+            [:div.group
+             {:key (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))
+              :ref :ziggeo-player}
              (ziggeo-player {:video-id (:fixed-video-id activity-data)
                              :width (:width video-size)
                              :height (:height video-size)
                              :lazy (not video-player-show)
                              :video-image (:video-image activity-data)
-                             :video-processed (:video-processed activity-data)})
-              (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" "")))
+                             :video-processed (:video-processed activity-data)})]
             (when (:body-thumbnail activity-data)
               [:div.body-thumbnail
                 {:class (:type (:body-thumbnail activity-data))
