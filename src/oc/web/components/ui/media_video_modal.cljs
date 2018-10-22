@@ -1,7 +1,6 @@
 (ns oc.web.components.ui.media-video-modal
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
-            [taoensso.timbre :as timbre]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -105,7 +104,6 @@
 (defn video-add-click [s]
   (when (valid-video-url? @(::video-url s))
     (let [video-data (get-video-data @(::video-url s))]
-      (timbre/debug "VIDEO DATA: " video-data)
       (if (= :vimeo (:type video-data))
         (get-vimeo-thumbnail s video-data)
         (do
