@@ -239,7 +239,8 @@ div.secure-activity-container {
     }
   }
 
-  div.activity-content-footer {
+  a.activity-content-footer {
+    display: block;
     position: fixed;
     bottom: 0px;
     left: 0px;

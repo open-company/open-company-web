@@ -15,7 +15,6 @@
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
-            [oc.web.components.ui.made-with-carrot-modal :as made-with-carrot-modal]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -33,7 +32,6 @@
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
-                             (drv/drv :made-with-carrot-modal)
                              ;; Locals
                              (rum/local 0 ::win-height)
                              (rum/local nil ::win-resize-listener)
@@ -62,8 +60,6 @@
     [:div.secure-activity-container
       {:style {:min-height (when is-mobile?
                              (str (- win-height default-activity-header-height) "px"))}}
-      (when (drv/react s :made-with-carrot-modal)
-        (made-with-carrot-modal/made-with-carrot-modal))
       (when @(::show-login-header s)
         [:div.secure-activity-login-header
           [:button.mlb-reset.remove-header-bt
@@ -136,9 +132,11 @@
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])
-      [:div.activity-content-footer
-        {:on-click #(when-not is-mobile?
-                      (made-with-carrot-modal/show-modal))}
+      [:a.activity-content-footer
+        {:href oc-urls/home
+         :on-click #(do
+                     (utils/event-stop %)
+                     (router/redirect! oc-urls/home))}
         [:div.activity-content-footer-inner
           [:div.carrot-logo]
           [:div.you-did-it "Made with Carrot"]]]]))
