@@ -48,9 +48,10 @@
     [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
     [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
     (pages/google-analytics-init)
-    (when (= (env :fullstory) "true")
-      [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
-    (when (= (env :fullstory) "true") (pages/fullstory-init))
+    ;; TODO: enable when we want to use full story for static pages.
+    ;;(when (= (env :fullstory) "true")
+    ;;  [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
+    ;;(when (= (env :fullstory) "true") (pages/fullstory-init))
     pages/bootstrap-js])
 
 (defn mobile-menu
