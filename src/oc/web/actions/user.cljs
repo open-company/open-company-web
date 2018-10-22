@@ -44,7 +44,8 @@
       (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
                         (clj->js {:nickname (:name jwt-contents)
                                   :email email
-                                  :fsUrl (.getCurrentSessionURL js/FS)
+                                  :fsUrl (when (and js/FS (.-getCurrentSessionURL js/FS))
+                                           (.getCurrentSessionURL js/FS))
                                   }))))))
 
 (defn update-jwt [jbody]
