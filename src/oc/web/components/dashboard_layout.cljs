@@ -181,7 +181,11 @@
         can-compose (pos? (count all-boards))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))
         current-user-data (drv/react s :current-user-data)
-        is-admin-or-author (utils/is-admin-or-author? org-data)]
+        is-admin-or-author (utils/is-admin-or-author? org-data)
+        should-show-settings-bt (and (router/current-board-slug)
+                                     (not is-all-posts)
+                                     (not is-must-see)
+                                     (not (:read-only board-data)))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -212,19 +216,6 @@
 
                                                    :default
                                                    (:name board-data)))}]])
-                  ;; Settings button
-                  (when (and (router/current-board-slug)
-                             (not is-all-posts)
-                             (not is-must-see)
-                             (not (:read-only board-data)))
-                    [:div.board-settings-container.group
-                      [:button.mlb-reset.board-settings-bt
-                        {:data-toggle (when-not is-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title (str (:name board-data) " settings")
-                         :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]])
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"
@@ -242,7 +233,16 @@
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
-                      "Public"])]
+                      "Public"])
+                  ;; Settings button
+                  (when should-show-settings-bt
+                    [:button.mlb-reset.board-settings-bt
+                      {:data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title (str (:name board-data) " settings")
+                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}])]
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
