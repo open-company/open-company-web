@@ -807,7 +807,11 @@
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
     (if (contains? (router/query-params) :new)
-      (cmail-show (get-board-for-edit (router/query-param :new)))
+      (let [new-data (get-board-for-edit (router/query-param :new))
+            with-headline (if (router/query-param :headline)
+                           (assoc new-data :headline (router/query-param :headline))
+                           new-data)]
+        (cmail-show with-headline))
       (let [edit-param (router/query-param :edit)
             edit-activity (dis/activity-data edit-param)]
         (if edit-activity
