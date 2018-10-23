@@ -168,7 +168,7 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         query-params (:query-params params)]
-    (pre-routing query-params)
+    (pre-routing query-params true {:query-params query-params :keep-params [:at]})
     ;; save route
     (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
     ;; load data from api
