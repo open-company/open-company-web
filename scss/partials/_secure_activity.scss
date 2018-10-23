@@ -12,8 +12,12 @@ div.secure-activity-container {
     width: 100%;
     background-color: $deep_navy;
     text-align: center;
-    z-index: 10;
+    z-index: 11;
     padding: 12px 32px;
+
+    @include tablet() {
+      padding: 14px 22px;
+    }
 
     button.remove-header-bt {
       width: 24px;
@@ -25,6 +29,29 @@ div.secure-activity-container {
       background-size: 12px;
       background-repeat: no-repeat;
       background-position: center;
+
+      @include tablet() {
+        display: none;
+      }
+    }
+
+    div.secure-activity-mobile-login-header {
+      display: none;
+
+      @include tablet() {
+        display: block;
+        color: white;
+        @include avenir_R();
+        font-size: 16px;
+        line-height: 20px;
+        text-align: center;
+
+        a {
+          text-decoration: none;
+          border-bottom: 1px dotted white;
+          color: white;
+        }
+      }
     }
 
     div.secure-activity-login-header-center {
@@ -32,6 +59,10 @@ div.secure-activity-container {
       display: flex;
       justify-content: center;
       align-items: center;
+
+      @include tablet() {
+        display: none;
+      }
 
       div.carrot-logo-copy {
         width: 62px;
@@ -80,7 +111,7 @@ div.secure-activity-container {
       top: 48px;
     }
 
-    @include mobile() {
+    @include tablet() {
       position: absolute;
     }
 
@@ -102,7 +133,7 @@ div.secure-activity-container {
       margin-top: 144px;
     }
 
-    @include mobile() {
+    @include tablet() {
       width: 100%;
       margin: 0px auto;
     }
@@ -153,7 +184,7 @@ div.secure-activity-container {
         top: unset;
       }
 
-      @include mobile() {
+      @include tablet() {
         padding: 32px;
       }
 
@@ -252,7 +283,7 @@ div.secure-activity-container {
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
     cursor: pointer;
 
-    @include mobile() {
+    @include tablet() {
       position: relative;
     }
 
