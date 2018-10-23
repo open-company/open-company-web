@@ -490,9 +490,10 @@
     (refresh-org-data)))
 
 (defn activity-delete [activity-data]
-  (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
-    (api/delete-entry activity-delete-link activity-delete-finish)
-    (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data])))
+  (when (:links activity-data)
+    (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
+      (api/delete-entry activity-delete-link activity-delete-finish)
+      (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data]))))
 
 (defn activity-move [activity-data board-data]
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
