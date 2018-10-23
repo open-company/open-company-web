@@ -759,7 +759,6 @@
   (let [board-data (if (seq board-slug)
                     (dis/board-data (router/current-org-slug) board-slug)
                     (dis/board-data))]
-    (js/console.log "DBG get-board-for-edit board-slug" board-slug "board-data" board-data)
     (if (or (not board-data)
             (= (:slug board-data) utils/default-drafts-board-slug))
       (get-default-section)
