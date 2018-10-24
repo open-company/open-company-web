@@ -38,12 +38,20 @@
              (not= (cook/get-cookie :show-login-overlay) "collect-password"))
     (cook/remove-cookie! :show-login-overlay))
   (let [jwt-contents (jwt/get-contents)
-        email (:email jwt-contents)]
+        email (:email jwt-contents)
+        user-id (:user-id jwt-contents)]
     (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
     (when email
-      (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
-                        (clj->js {:nickname (:name jwt-contents)
-                                  :email email}))))))
+      (when (exists? js/amplitude)
+        (utils/after 1 #(.append (new (.-Identify js/amplitude))
+                                 (clj->js {:carrot_userid user-id
+                                           :user_id user-id
+                                           :nickname (:name jwt-contents)
+                                           :email email}))))
+      (when (exists? js/drift)
+        (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
+                                   (clj->js {:nickname (:name jwt-contents)
+                                             :email email})))))))
 
 (defn update-jwt [jbody]
   (timbre/info jbody)
