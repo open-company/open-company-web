@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ../betajs-media-components
-grunt --force
+grunt -f
 npm link
 cd ../ziggeo-client-sdk
 npm link betajs-media-components

@@ -98,6 +98,7 @@
                                               :theme "carrot"
                                               :themecolor "white"
                                               :localplayback true
+                                              :timelimit 300
                                               :meta-profile ls/oc-ziggeo-profiles
                                               :picksnapshots (not (responsive/is-tablet-or-mobile?))}
                                        config {:element recorder-el
