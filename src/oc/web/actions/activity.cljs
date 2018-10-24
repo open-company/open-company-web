@@ -480,6 +480,7 @@
     (refresh-org-data)))
 
 (defn activity-delete [activity-data]
+  (remove-cached-item (:uuid activity-data))
   (api/delete-activity activity-data activity-delete-finish)
   (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data]))
 
@@ -742,6 +743,28 @@
         sample-posts (filterv :sample (vals all-posts))]
     (pos? (count sample-posts))))
 
+;; Last used and default section for editing
+
+(defn get-default-section []
+  (let [org-slug (router/current-org-slug)
+        editable-boards (dis/editable-boards-data org-slug)
+        cookie-value (au/last-used-section)
+        board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
+        filtered-boards (filterv #(not (:draft %)) (vals editable-boards))
+        board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
+    {:board-name (:name board-data)
+     :board-slug (:slug board-data)}))
+
+(defn get-board-for-edit [& [board-slug]]
+  (let [board-data (if (seq board-slug)
+                    (dis/board-data (router/current-org-slug) board-slug)
+                    (dis/board-data))]
+    (if (or (not board-data)
+            (= (:slug board-data) utils/default-drafts-board-slug))
+      (get-default-section)
+      {:board-slug (:slug board-data)
+       :board-name (:name board-data)})))
+
 ;; Cmail
 
 (defn- cmail-fullscreen-cookie []
@@ -782,16 +805,28 @@
 
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
-    (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
-      (cmail-show (dis/activity-data activity-uuid)))))
+    (if (contains? (router/query-params) :new)
+      (let [new-data (get-board-for-edit (router/query-param :new))
+            with-headline (if (router/query-param :headline)
+                           (assoc new-data :headline (router/query-param :headline))
+                           new-data)]
+        (cmail-show with-headline))
+      (let [edit-param (router/query-param :edit)
+            edit-activity (dis/activity-data edit-param)]
+        (if edit-activity
+          (cmail-show edit-activity)
+          (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
+            (cmail-show (dis/activity-data activity-uuid))))))))
 
 (defn activity-edit
-  [activity-data]
-  (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
-                              (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
-                              activity-data)
-        is-published? (= (:status fixed-activity-data) "published")
-        initial-cmail-state (if is-published?
-                              {:fullscreen true :auto true}
-                              {})]
-    (cmail-show fixed-activity-data initial-cmail-state)))
+  ([]
+    (activity-edit (get-board-for-edit)))
+  ([activity-data]
+    (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
+                                (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
+                                activity-data)
+          is-published? (= (:status fixed-activity-data) "published")
+          initial-cmail-state (if is-published?
+                                {:fullscreen true :auto true}
+                                {})]
+      (cmail-show fixed-activity-data initial-cmail-state))))

@@ -1,7 +1,8 @@
 (ns oc.web.dispatcher
-  (:require [cljs-flux.dispatcher :as flux]
-            [org.martinklepsch.derivatives :as drv]
+  (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
+            [cljs-flux.dispatcher :as flux]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
@@ -103,6 +104,14 @@
         board-posts (map :uuid (filter filter-fn posts-list))]
     (select-keys posts-data board-posts)))
 
+;; Functions needed by derivatives
+
+(declare org-data)
+(declare board-data)
+(declare editable-boards-data)
+(declare activity-data)
+(declare secure-activity-data)
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -146,7 +155,7 @@
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
-                              (get-in base (org-data-key org-slug))))]
+                              (org-data base org-slug)))]
    :team-data           [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -206,26 +215,17 @@
                               (get-in base (change-cache-data-key org-slug))))]
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
-                            (let [boards-key (boards-key org-slug)
-                                  boards (get-in base boards-key)
-                                  filtered-boards (filterv
-                                                   (fn [board]
-                                                      (let [links (-> board :board-data :links)]
-                                                        (some #(when (= (:rel %) "create") %) links)))
-                                                   (vals boards))]
-                              (zipmap
-                               (map #(-> % :board-data :slug) filtered-boards)
-                               (map :board-data filtered-boards))))]
+                           (editable-boards-data base org-slug))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (when (and org-slug board-slug)
-                              (get-in base (board-data-key org-slug board-slug))))]
+                              (board-data base org-slug board-slug)))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
-                            (get-in base (activity-key org-slug activity-uuid)))]
+                            (activity-data org-slug activity-uuid base))]
    :secure-activity-data [[:base :org-slug :secure-id]
                           (fn [base org-slug secure-id]
-                            (get-in base (secure-activity-key org-slug secure-id)))]
+                            (secure-activity-data org-slug secure-id base))]
    :comments-data       [[:base :org-slug]
                          (fn [base org-slug]
                            (get-in base (comments-key org-slug)))]
@@ -423,7 +423,7 @@
 (defn org-data
   "Get org data."
   ([]
-    (org-data @app-state))
+    (org-data @app-state (router/current-org-slug)))
   ([data]
     (org-data data (router/current-org-slug)))
   ([data org-slug]
@@ -438,16 +438,35 @@
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
 
-(defn board-data
+(defun board-data
   "Get board data."
   ([]
     (board-data @app-state))
-  ([data]
+  ([data :guard map?]
     (board-data data (router/current-org-slug) (router/current-board-slug)))
-  ([data org-slug]
-    (board-data data org-slug (router/current-board-slug)))
+  ([board-slug :guard #(or (keyword? %) (string? %))]
+    (board-data @app-state (router/current-org-slug) board-slug))
+  ([org-slug :guard #(or (keyword? %) (string? %)) board-slug :guard #(or (keyword? %) (string? %))]
+    (board-data @app-state org-slug board-slug))
+  ([data :guard map? org-slug :guard #(or (keyword? %) (string? %))]
+    (board-data @app-state org-slug (router/current-board-slug)))
   ([data org-slug board-slug]
     (get-in data (board-data-key org-slug board-slug))))
+
+(defn editable-boards-data
+  ([] (editable-boards-data @app-state (router/current-org-slug)))
+  ([org-slug] (editable-boards-data @app-state org-slug))
+  ([data org-slug]
+  (let [boards-key (boards-key org-slug)
+        boards (get-in data boards-key)
+        filtered-boards (filterv
+                         (fn [board]
+                            (let [links (-> board :board-data :links)]
+                              (some #(when (= (:rel %) "create") %) links)))
+                         (vals boards))]
+    (zipmap
+     (map #(-> % :board-data :slug) filtered-boards)
+     (map :board-data filtered-boards)))))
 
 (defn container-data
   "Get container data."
