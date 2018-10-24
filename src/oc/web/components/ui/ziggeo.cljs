@@ -23,7 +23,6 @@
                                               :attrs #js {:width width
                                                           :height height
                                                           :autoplay autoplay
-                                                          :timelimit 300
                                                           :theme "carrot"
                                                           :themecolor "white"
                                                           :video video-id}}
