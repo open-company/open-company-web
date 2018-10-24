@@ -236,7 +236,9 @@
 (defn edit-tooltip [s]
   [:div.edit-tooltip-container.group
     [:button.mlb-reset.edit-tooltip-dismiss
-      {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+      {:on-click #(do
+                    (.logEvent (.getInstance js/amplitude) "TOOLTIP_DISMISS_EDIT")
+                    (nux-actions/dismiss-edit-tooltip))}]
     [:div.edit-tooltips
       [:div.edit-tooltip
         (str
@@ -244,7 +246,7 @@
          "In a hurry? ")
          [:button.mlb-reset.edit-tooltip-record-video-bt
           {:on-click #(do
-                        (.logEvent (.getInstance js/amplitude) "TOOLTIP_VIDEO_RECORD_CLICKED")
+                        (.logEvent (.getInstance js/amplitude) "TOOLTIP_CTA_VIDEO_RECORD")
                         (video-record-clicked s))}
           "Record a quick video"]
          " instead."]]])
