@@ -49,10 +49,10 @@
         (activity-actions/must-see-get org-data)
 
         :default
-        (let [fixed-board-data (or
-                                board-data
-                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
-          (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
+        (when-let* [fixed-board-data (or board-data
+                     (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
+                    board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
+          (section-actions/section-get board-link))))))))
 
 (rum/defcs org-dashboard < ;; Mixins
                            rum/static
