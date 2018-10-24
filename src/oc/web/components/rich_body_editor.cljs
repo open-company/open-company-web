@@ -92,13 +92,17 @@
 
 (defn get-video-thumbnail [video]
   (cond
-    (= (:type video) :youtube)
-    (str "https://img.youtube.com/vi/" (:id video) "/0.jpg")
-    (= (:type video) :vimeo)
-    (:thumbnail video)))
+   (= (:type video) :loom)
+   (str "https://cdn.useloom.com/sessions/thumbnails/" (:id video) "-00001.jpg")
+   (= (:type video) :youtube)
+   (str "https://img.youtube.com/vi/" (:id video) "/0.jpg")
+   (= (:type video) :vimeo)
+   (:thumbnail video)))
 
 (defn get-video-src [video]
   (cond
+   (= (:type video) :loom)
+   (str "https://www.useloom.com/embed/" (:id video))
    (= (:type video) :youtube)
    (str "https://www.youtube.com/embed/" (:id video))
    (= (:type video) :vimeo)

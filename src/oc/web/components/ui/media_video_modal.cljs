@@ -26,15 +26,39 @@
   "(?:channels\\/(?:\\w+\\/)?|groups\\/(?:[?:^\\/]*)"
   "\\/videos\\/|)(\\d+)(?:|\\/\\?)"))
 
+(def loom-regexp
+ (str
+  "(?:http|https)?:\\/\\/(?:www\\.)?useloom.com\\/share\\/"
+  "([a-zA-Z0-9_-]*/?)"))
+
 (defn get-video-data [url]
   (let [yr (js/RegExp youtube-regexp "ig")
         yr2 (js/RegExp youtube-short-regexp "ig")
         vr (js/RegExp vimeo-regexp "ig")
+        loomr (js/RegExp loom-regexp "ig")
         y-groups (.exec yr url)
         y2-groups (.exec yr2 url)
-        v-groups (.exec vr url)]
-    {:id (if (nth y-groups 1) (nth y-groups 1) (if (nth y2-groups 1) (nth y2-groups 1) (nth v-groups 1)))
-     :type (if (or (nth y-groups 1) (nth y2-groups 1)) :youtube :vimeo)}))
+        v-groups (.exec vr url)
+        loom-groups (.exec loomr url)]
+    {:id (cond
+          (nth y-groups 1)
+          (nth y-groups 1)
+
+          (nth y2-groups 1)
+          (nth y2-groups 1)
+
+          (nth v-groups 1)
+          (nth v-groups 1)
+
+          (nth loom-groups 1)
+          (nth loom-groups 1))
+     :type (cond
+            (or (nth y-groups 1) (nth y2-groups 1))
+            :youtube
+            (nth v-groups 1)
+            :vimeo
+            (nth loom-groups 1)
+            :loom)}))
 
 (defn- get-vimeo-thumbnail-success [s video res]
   (let [resp (aget res 0)
@@ -69,11 +93,13 @@
   (let [trimmed-url (string/trim url)
         yr (js/RegExp youtube-regexp "ig")
         yr2 (js/RegExp youtube-short-regexp "ig")
-        vr (js/RegExp vimeo-regexp "ig")]
+        vr (js/RegExp vimeo-regexp "ig")
+        loomr (js/RegExp loom-regexp "ig")]
     (when (seq trimmed-url)
       (or (.match trimmed-url yr)
           (.match trimmed-url yr2)
-          (.match trimmed-url vr)))))
+          (.match trimmed-url vr)
+          (.match trimmed-url loomr)))))
 
 (defn video-add-click [s]
   (when (valid-video-url? @(::video-url s))
@@ -116,7 +142,7 @@
                :value @(::video-url s)
                :ref "video-input"
                :on-change #(reset! (::video-url s) (.. % -target -value))
-               :placeholder "Link from YouTube or Vimeo"}]]
+               :placeholder "Link from Loom, YouTube or Vimeo"}]]
           [:div.media-video-modal-buttons.group
             [:button.mlb-reset.mlb-default
               {:on-click #(video-add-click s)
