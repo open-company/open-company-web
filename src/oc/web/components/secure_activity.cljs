@@ -82,7 +82,22 @@
                               (.preventDefault %)
                               (router/nav! oc-urls/login))}
                 "Sign in"]
-              "."]]])
+              "."]]
+          [:div.secure-activity-mobile-login-header
+            [:a
+              {:href oc-urls/home
+               :on-click #(do
+                           (utils/event-stop %)
+                           (router/redirect! oc-urls/home))}
+              "Learn more"]
+            " about Carrot or "
+            [:a
+              {:href oc-urls/login
+               :on-click #(do
+                           (utils/event-stop %)
+                           (router/redirect! oc-urls/login))}
+              "login to continue"]
+            "."]])
       (when activity-data
         [:div.activity-header.group
           {:class (when @(::show-login-header s) "showing-login-header")}
