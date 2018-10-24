@@ -46,3 +46,5 @@
    (remove nil?
     (map fix-notification
      notifications))))
+
+(def user-name-max-lenth 64)

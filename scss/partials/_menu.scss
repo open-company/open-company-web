@@ -124,6 +124,7 @@ div.menu {
       height: 18px;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     div.org-url {
@@ -135,6 +136,7 @@ div.menu {
       overflow: hidden;
       text-overflow: ellipsis;
       line-height: 15px;
+      white-space: nowrap;
     }
   }
 

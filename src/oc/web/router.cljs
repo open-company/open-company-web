@@ -116,6 +116,9 @@
 (defn query-params []
   (:query-params @path))
 
+(defn query-param [k]
+  (get (:query-params @path) k nil))
+
 (defn last-org-cookie
   "Cookie to save the last accessed org"
   []

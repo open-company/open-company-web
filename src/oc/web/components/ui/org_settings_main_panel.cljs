@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -71,6 +72,7 @@
             [:input
               {:type "text"
                :value (:name org-editing)
+               :max-length org-utils/org-name-max-length
                :on-change (fn [e]
                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. e -target -value)
                                                                                       :has-changes true})]))}]]]

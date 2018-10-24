@@ -24,7 +24,7 @@ div.section-stream {
       button.back-to-board {
         padding: 0;
         margin: 16px auto 0;
-        padding-left: 18px;
+        padding-left: 24px;
         position: relative;
         @include avenir_H();
         font-size: 14px;
@@ -32,10 +32,10 @@ div.section-stream {
 
         &:before {
           content: "";
-          width: 10px;
-          height: 16px;
+          width: 16px;
+          height: 10px;
           background-image: cdnUrl("/img/ML/back_green_arrow.svg");
-          background-size: 10px 16px;
+          background-size: 16px 10px;
           background-position: center;
           background-repeat: no-repeat;
           position: absolute;

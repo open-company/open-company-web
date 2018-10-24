@@ -14,9 +14,11 @@
 
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :board-data)
+                         (drv/drv :editable-boards)
                          section-mixins/container-nav-in
-  [s edit-board]
+  [s]
   (let [board-data (drv/react s :board-data)
+        editable-boards (drv/react s :editable-boards)
         is-all-posts? (= (router/current-board-slug) "all-posts")
         is-must-see? (= (router/current-board-slug) "must-see")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)]
@@ -38,7 +40,7 @@
            is-must-see? "When someone marks a post as “must see” everyone will see it here."
            is-drafts-board? "Keep a private draft until you're ready to share it with your team."
            :else (str "Looks like there aren’t any posts in " (:name board-data) "."))]
-        (when edit-board
+        (when (pos? (count editable-boards))
           [:button.mlb-reset.create-new-post-bt
-            {:on-click #(activity-actions/activity-edit edit-board)}
+            {:on-click #(activity-actions/activity-edit)}
             "Create a new post"])]]))

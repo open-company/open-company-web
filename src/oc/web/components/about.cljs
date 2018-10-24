@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -170,7 +171,7 @@
                      "call home.")]
                   [:a
                     {:href "#"
-                     :on-click "drift.api.startInteraction({ interactionId: 43229 });"}
+                     :on-click #(chat/chat-click 43229)}
                     "Say hello"]]]
               [:div.about-bottom-copy-row.group
                 [:div.about-bottom-copy-left
