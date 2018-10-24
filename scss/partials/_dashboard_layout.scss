@@ -444,6 +444,7 @@ div.dashboard-layout {
             white-space: nowrap;
             width: auto;
             display: inline-block;
+            position: relative;
 
             &:before {
               display: none;
@@ -461,6 +462,13 @@ div.dashboard-layout {
                 top: 6px;
                 left: 0px;
               }
+            }
+
+            div.board-name-with-icon-internal {
+              max-width: 350px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
 
             @include mobile() {
@@ -512,48 +520,49 @@ div.dashboard-layout {
             }
           }
 
-          div.board-settings-container {
+          button.board-settings-bt {
+            background-image: cdnUrl("/img/ML/section_settings_gear.svg");
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+            background-position: 16px center;
+            background-color: transparent;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            opacity: 0.8;
+            padding: 0 0 0 16px;
+            margin: 0 0 0 16px;
             float: left;
-            margin-top: 11px;
-            margin-left: 7px;
             position: relative;
 
+            &:before {
+              content: "";
+              position: absolute;
+              left: 0;
+              top: 12px;
+              width: 1px;
+              height: 16px;
+              background-color: $light_ui_grey;
+
+              @include mobile(){
+                display: none;
+              }
+            }
+
             @include mobile(){
+              margin-right: -30px;
+              margin-left: 8px;
+              padding: 0px;
+              float: unset;
+              width: 20px;
+              height: 20px;
+
+              // Remove to show settings button on mobile
               display: none;
             }
 
-            div.section-editor {
-              position: absolute;
-              top: 28px;
-              left: 50%;
-              margin-left: -180px;
-              z-index: 1000;
-            }
-
-            button.board-settings-bt {
-              background-image: cdnUrl("/img/ML/board_settings.svg");
-              background-size: 8px 8px;
-              background-repeat: no-repeat;
-              background-position: 6px 7px;
-              background-color: #F0EFEA;
-              border-radius: 10px;
-              width: 20px;
-              height: 20px;
-              opacity: 0.8;
-
-              @include mobile(){
-                margin-right: -30px;
-                margin-left: 8px;
-                padding: 0px;
-                float: unset;
-
-                // Remove to show settings button on mobile
-                display: none;
-              }
-
-              &:hover {
-                opacity: 1;
-              }
+            &:hover {
+              opacity: 1;
             }
           }
 
@@ -565,7 +574,7 @@ div.dashboard-layout {
             padding-left: 16px;
             float: left;
             margin-top: 12px;
-            margin-left: 16px;
+            margin-left: 12px;
 
             @include mobile() {
               display: none;
@@ -599,7 +608,7 @@ div.dashboard-layout {
             padding-left: 16px;
             float: left;
             margin-top: 12px;
-            margin-left: 16px;
+            margin-left: 12px;
 
             @include mobile() {
               display: none;

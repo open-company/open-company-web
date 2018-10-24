@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.web.lib.chat :as chat]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
@@ -140,7 +141,7 @@
               "A team of more than 100? Let's create a custom plan."]
             [:a.tear-start-bt
               {:href "#"
-               :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
+               :on-click (chat/chat-click 43235)}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -234,7 +235,7 @@
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
               {:href "#"
-               :onclick "drift.api.startInteraction({ interactionId: 43239 }); return false;"}
+               :on-click #(chat/chat-click 43239)}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -244,7 +245,7 @@
           [:div.faq-row-answer
             [:a.chat-with-us
               {:href "#"
-               :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
+               :on-click #(chat/chat-click 43234)}
               "Get in touch with us"]]]]
 
         shared-misc/testimonials-section

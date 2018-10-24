@@ -57,24 +57,6 @@
       (.add (.-classList dashboard-layout) "sticky-board-name")
       (.remove (.-classList dashboard-layout) "sticky-board-name"))))
 
-(defn get-default-section [s]
-  (let [editable-boards @(drv/get-ref s :editable-boards)
-        org-slug (router/current-org-slug)
-        cookie-value (au/last-used-section)
-        board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
-        filtered-boards (filterv #(not (:draft %)) (vals editable-boards))
-        board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
-    {:board-name (:name board-data)
-     :board-slug (:slug board-data)}))
-
-(defn get-board-for-edit [s]
-  (let [board-data @(drv/get-ref s :board-data)]
-    (if (or (not board-data)
-            (= (:slug board-data) utils/default-drafts-board-slug))
-      (get-default-section s)
-      {:board-slug (:slug board-data)
-       :board-name (:name board-data)})))
-
 (defn win-width
   "Save the window width in the state."
   [s]
@@ -94,7 +76,7 @@
 
 (defn compose [s]
   (utils/remove-tooltips)
-  (activity-actions/activity-edit (get-board-for-edit s))
+  (activity-actions/activity-edit)
   ;; If the add post tooltip is visible
   (when @(drv/get-ref s :show-add-post-tooltip)
     ;; Dismiss it and bring up the invite people tooltip
@@ -181,7 +163,11 @@
         can-compose (pos? (count all-boards))
         should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))
         current-user-data (drv/react s :current-user-data)
-        is-admin-or-author (utils/is-admin-or-author? org-data)]
+        is-admin-or-author (utils/is-admin-or-author? org-data)
+        should-show-settings-bt (and (router/current-board-slug)
+                                     (not is-all-posts)
+                                     (not is-must-see)
+                                     (not (:read-only board-data)))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -212,19 +198,6 @@
 
                                                    :default
                                                    (:name board-data)))}]])
-                  ;; Settings button
-                  (when (and (router/current-board-slug)
-                             (not is-all-posts)
-                             (not is-must-see)
-                             (not (:read-only board-data)))
-                    [:div.board-settings-container.group
-                      [:button.mlb-reset.board-settings-bt
-                        {:data-toggle (when-not is-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title (str (:name board-data) " settings")
-                         :on-click #(dis/dispatch! [:input [:show-section-editor] true])}]])
                   (when (= (:access board-data) "private")
                     [:div.private-board
                       {:data-toggle "tooltip"
@@ -242,7 +215,16 @@
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
-                      "Public"])]
+                      "Public"])
+                  ;; Settings button
+                  (when should-show-settings-bt
+                    [:button.mlb-reset.board-settings-bt
+                      {:data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title (str (:name board-data) " settings")
+                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}])]
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
@@ -357,7 +339,7 @@
                 (empty-org)
                 ;; Empty board
                 empty-board?
-                (empty-board (when can-compose (get-board-for-edit s)))
+                (empty-board)
                 ;; All Posts
                 (and (or is-all-posts
                          is-must-see)

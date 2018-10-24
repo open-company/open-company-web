@@ -75,6 +75,7 @@
       text-overflow: ellipsis;
       overflow: hidden;
       width: 100%;
+      max-width: 250px;
 
       @include mobile() {
         display: none;

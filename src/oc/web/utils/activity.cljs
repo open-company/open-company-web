@@ -163,7 +163,8 @@
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
-        fixed-video-id (:video-id entry-data)]
+        fixed-video-id (:video-id entry-data)
+        body-thumbnail (get-first-body-thumbnail (:body entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
       (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
@@ -175,7 +176,9 @@
       (assoc :can-comment (boolean add-comment-link))
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
-      (assoc :fixed-video-id fixed-video-id))))
+      (assoc :fixed-video-id fixed-video-id)
+      (assoc :has-thumbnail body-thumbnail)
+      (assoc :body-thumbnail body-thumbnail))))
 
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."

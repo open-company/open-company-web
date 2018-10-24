@@ -35,21 +35,3 @@
    :did-remount (fn [o s]
     (reset! (:comments-truncated s) false)
     s)})
-
-(def body-thumbnail-mixin
-  {:init (fn [s]
-    (assoc s :body-thumbnail (atom nil)))
-   :will-mount (fn [s]
-    (let [activity-data (first (:rum/args s))]
-      (reset!
-       (:body-thumbnail s)
-       (au/get-first-body-thumbnail (:body activity-data))))
-    s)
-   :did-remount (fn [o s]
-    (let [old-activity-data (first (:rum/args o))
-          new-activity-data (first (:rum/args s))]
-      (when (not= (:body old-activity-data) (:body new-activity-data))
-        (reset!
-         (:body-thumbnail s)
-         (au/get-first-body-thumbnail (:body new-activity-data)))))
-    s)})

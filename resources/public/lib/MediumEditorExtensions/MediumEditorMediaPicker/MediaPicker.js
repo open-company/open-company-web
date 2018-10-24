@@ -328,8 +328,8 @@ function PlaceCaretAtEnd(el) {
         iframe.dataset.videoType = videoType;
         iframe.dataset.videoId = videoId;
         iframe.setAttribute("src", videoUrl);
-        iframe.setAttribute("width", 560);
-        iframe.setAttribute("height", 315);
+        iframe.setAttribute("width", 548);
+        iframe.setAttribute("height", 308);
         p.appendChild(iframe);
 
         var nextP = this.document.createElement("p");

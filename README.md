@@ -121,6 +121,13 @@ If you need to change the mentions popup panels you can write the JSX code in re
 #### Ziggeo media player and recorder development
 
 To change the Ziggeo video player and recorder you need to change [our fork](https://github.com/open-company/betajs-media-components) of [betajs/betajs-media-components](https://github.com/betajs/betajs-media-components).
+
+In order to work on `betajs-media-components` you will need to do the following:
+- You will need to clone the javascript ziggeo sdk. `git clone git@github.com:open-company/ziggeo-client-sdk.git`
+- checkout the `carrot-theme` branch
+- Run `npm install` from the `ziggeo-client-sdk` directory.
+- In the `betajs-media-components` directory make sure to use the `carrot-theme` branch.
+
 Once you changed everything you need you only need to run this `source script/local_ziggeo_dev.sh` to compile the ziggeo sdk and copy it here.
 Do not forget to commit the changes made to betajs-media-compoentns and the changed files here in oc-web.
 
