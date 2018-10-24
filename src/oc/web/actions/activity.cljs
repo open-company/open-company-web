@@ -721,6 +721,7 @@
 
 (defn video-processed-cb [edit-key video-token unmounted?]
   (when-not unmounted?
+    (.logEvent (.getInstance js/amplitude) "VIDEO_PROCESSED")
     (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
                                                   :video-id video-token
                                                   ;; turn off video error since upload finished
