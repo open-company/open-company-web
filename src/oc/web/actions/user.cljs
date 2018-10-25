@@ -240,7 +240,8 @@
   (if success
     (do
       (update-jwt body)
-      (when (not= token-type :password-reset)
+      (when (and (not= token-type :password-reset)
+                 (empty? (jwt/get-key :name)))
         (nux-actions/new-user-registered "email"))
       (auth-with-token-success token-type body))
     (cond
