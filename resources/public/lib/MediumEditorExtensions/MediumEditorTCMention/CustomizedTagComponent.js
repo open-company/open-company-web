@@ -32,7 +32,19 @@ function getUserDisplayName(user) {
 }
 
 function getUserSelectedDisplayValue(user) {
-  return (user["selectedKey"] === "slack-username")? user["slack-username"] : user["name"] || (user["first-name"] + " " + user["last-name"]);
+  if (user["selectedKey"] === "slack-username" && user["slack-username"]) {
+    return user["slack-username"];
+  }else if (user["name"]) {
+    return user["name"];
+  }else if (user["first-name"] && user["last-name"]) {
+    return user["first-name"] + " " + user["last-name"];
+  }else if (user["first-name"]) {
+    return user["first-name"];
+  }else if (user["last-name"]) {
+    return user["last-name"];
+  }else {
+    return user["email"];
+  }
 }
 
 function getSlackUsername(user) {
@@ -146,6 +158,7 @@ class CustomizedTagComponent extends React.PureComponent {
 
   selectItem(user){
     let selectedValue = getUserSelectedDisplayValue(user);
+    console.log("DBG CustomizedTagComponent.selectItem", user, selectedValue);
     this.props.selectMentionCallback("@" + selectedValue, user);
   }
 
