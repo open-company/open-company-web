@@ -24,12 +24,16 @@
         fixed-top-pos (if (> (+ top-pos 56) (- win-height 20))
                         (- (.-top mention-offset) (.scrollTop $win) 56 8)
                         top-pos)
-        format-str (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"
-                        "<div class=\"oc-mention-popup-name\">" user-name "</div>"
-                        "<div class=\"oc-mention-popup-subline"
-                         (when has-slack-username
-                           " slack-icon")
-                         "\">" user-subline "</div>")
+        avatar-div (when user-avatar-url
+                    (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"))
+        name-div (when (and user-name (not= user-name " "))
+                  (str "<div class=\"oc-mention-popup-name\">" user-name "</div>"))
+        subline-div (when user-subline
+                     (str "<div class=\"oc-mention-popup-subline" (when has-slack-username " slack-icon")
+                          "\">" user-subline "</div>"))
+        format-str (str avatar-div
+                        name-div
+                        subline-div)
         popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\">") format-str)]
     (.append $mention-el (.css popup-node #js {:left (str fixed-left-pos "px")
                                                :top (str fixed-top-pos "px")}))))
