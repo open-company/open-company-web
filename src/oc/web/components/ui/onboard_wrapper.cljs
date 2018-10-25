@@ -66,7 +66,9 @@
            :on-click #(do
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                             {:auth-source "slack"})]
+                                                            {:auth-source "slack"})]
+                         (.logEvent (.getInstance js/amplitude)
+                                    "SIGNUP_WITH_SLACK")
                          (user-actions/login-with-slack auth-link)))}
           [:div.signup-with-slack-content
             [:div.slack-icon
@@ -78,6 +80,8 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                             {:auth-source "google"})]
+                         (.logEvent (.getInstance js/amplitude)
+                                    "SIGNUP_WITH_GOOGLE")
                          (user-actions/login-with-google auth-link)))}
           [:div.signup-with-google-content
             [:div.google-icon
@@ -141,6 +145,8 @@
                               (reset! (::email-error s) true))
                             (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))
+                          (.logEvent (.getInstance js/amplitude)
+                                     "SIGNUP_WITH_EMAIL")
                           (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
             "Sign up"]]
         [:div.footer-link

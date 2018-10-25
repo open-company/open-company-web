@@ -1071,6 +1071,7 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
+          [:script {:type "text/javascript" :src "/lib/amplitude.js"}]
           ;; jQuery needed by Bootstrap JavaScript
           jquery
           ;; Truncate html string

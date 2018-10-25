@@ -134,6 +134,7 @@
        (not (zero? (count (fix-headline cmail-data))))))
 
 (defn video-record-clicked [s]
+  (.logEvent (.getInstance js/amplitude) "VIDEO_RECORD_CLICKED")
   (nux-actions/dismiss-edit-tooltip)
   (let [cmail-data @(drv/get-ref s :cmail-data)
         start-recording-fn #(do
@@ -235,14 +236,18 @@
 (defn edit-tooltip [s]
   [:div.edit-tooltip-container.group
     [:button.mlb-reset.edit-tooltip-dismiss
-      {:on-click #(nux-actions/dismiss-edit-tooltip)}]
+      {:on-click #(do
+                    (.logEvent (.getInstance js/amplitude) "TOOLTIP_DISMISS_EDIT")
+                    (nux-actions/dismiss-edit-tooltip))}]
     [:div.edit-tooltips
       [:div.edit-tooltip
         (str
          "Share something with your team, like an announcement, update, or decision. "
          "In a hurry? ")
          [:button.mlb-reset.edit-tooltip-record-video-bt
-          {:on-click #(video-record-clicked s)}
+          {:on-click #(do
+                        (.logEvent (.getInstance js/amplitude) "TOOLTIP_CTA_VIDEO_RECORD")
+                        (video-record-clicked s))}
           "Record a quick video"]
          " instead."]]])
 

@@ -280,7 +280,10 @@
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
-                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                      {:on-click #(do
+                                    (.logEvent (.getInstance js/amplitude)
+                                               "TOOLTIP_DISMISS_ADD_POST")
+                                    (nux-actions/dismiss-add-post-tooltip))}]
                     [:div.add-post-tooltips
                       {:class (when is-second-user "second-user")}
                       [:div.add-post-tooltip-box-mobile]
@@ -295,7 +298,9 @@
                           (when (and is-admin-or-author
                                      (not is-second-user))
                             [:button.mlb-reset.add-post-bt
-                              {:on-click #(when can-compose (compose s))}
+                              {:on-click #(when can-compose
+                                            (.logEvent (.getInstance js/amplitude) "TOOLTIP_CTA_ADD_POST")
+                                            (compose s))}
                               "Create a new post"])]
                       [:div.add-post-tooltip-box
                         {:class (when is-second-user "second-user")}]]]))
@@ -307,7 +312,9 @@
                   [:div.post-added-tooltip-container.group
                     [:button.mlb-reset.post-added-tooltip-dismiss
                       {:on-click #(do
-                                   (nux-actions/dismiss-post-added-tooltip))}]
+                                    (.logEvent (.getInstance js/amplitude)
+                                               "TOOLTIP_DISMISS_POST_ADDED")
+                                    (nux-actions/dismiss-post-added-tooltip))}]
                     [:div.post-added-tooltips
                       [:div.post-added-tooltip-box-mobile]
                       [:div.post-added-tooltip-title
@@ -315,8 +322,13 @@
                       [:div.post-added-tooltip
                         "Using Slack? "
                         [:button.mlb-reset.post-added-bt
-                          {:on-click #(org-actions/bot-auth team-data current-user-data
-                                       (str (router/get-token) "?org-settings=main"))}
+                          {:on-click #(do
+                                        (.logEvent (.getInstance js/amplitude) "TOOLTIP_CTA_POST_ADDED_SLACK")
+                                        (org-actions/bot-auth
+                                           team-data
+                                           current-user-data
+                                           (str (router/get-token)
+                                                "?org-settings=main")))}
                           "Connect to Slack"]
                         " so your team can see posts and  join the discussion from Slack, too."]
                       [:div.post-added-tooltip-box]]]))
@@ -324,7 +336,10 @@
                          (drv/react s :show-draft-post-tooltip))
                 [:div.draft-post-tooltip-container.group
                   [:button.mlb-reset.draft-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
+                    {:on-click #(do
+                                  (.logEvent (.getInstance js/amplitude)
+                                            "TOOLTIP_DISMISS_DRAFT_POST")
+                                  (nux-actions/dismiss-draft-post-tooltip))}]
                   [:div.draft-post-tooltips
                     [:div.draft-post-tooltip-box-mobile]
                     [:div.draft-post-tooltip-title

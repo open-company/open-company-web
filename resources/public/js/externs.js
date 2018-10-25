@@ -137,6 +137,7 @@ CarrotGA.NULL_VALUE = {};
 CarrotGA.clientid = '';
 var init_fullstory = function(){};
 var FS = function(){};
+var amplitude = function();
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};

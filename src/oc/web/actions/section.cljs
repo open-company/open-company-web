@@ -131,6 +131,13 @@
     (if (empty? (:links section-data))
       (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")]
         (api/create-board create-board-link section-data note
+          (.logEvent (.getInstance js/amplitude)
+                     (str "SECTION_CREATED_"
+                          (clojure.string/upper-case
+                           (name (:access section-data)))))
+          (.logEvent (.getInstance js/amplitude)
+                     (str "SECTION_CREATED_NAME_"
+                          (clojure.string/upper-case (:name section-data))))
           (fn [{:keys [success status body]}]
             (let [section-data (when success (json->cljs body))]
               (if-not success

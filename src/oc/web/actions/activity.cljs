@@ -432,6 +432,7 @@
   ;; need a new revision number on the next edit.
   (swap! initial-revision dissoc (:uuid activity-data))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
+  (.logEvent (.getInstance js/amplitude) "POST_PUBLISHED")
   ;; Send item read
   (send-item-read (:uuid activity-data)))
 
@@ -516,6 +517,11 @@
 
 (defn activity-share [activity-data share-data & [share-cb]]
   (let [share-link (utils/link-for (:links activity-data) "share")]
+    (cond
+     (= (:medium (first share-data)) :email)
+     (.logEvent (.getInstance js/amplitude) "POST_SHARED_EMAIL")
+     (= (:medium (first share-data)) :slack)
+     (.logEvent (.getInstance js/amplitude) "POST_SHARED_SLACK"))
     (api/share-entry share-link share-data (or share-cb activity-share-cb))
     (dis/dispatch! [:activity-share share-data])))
 
@@ -737,6 +743,7 @@
                                                 :video-error true})]))
 
 (defn video-processed-cb [edit-key video-token unmounted?]
+  (.logEvent (.getInstance js/amplitude) "VIDEO_PROCESSED")
   (when-not unmounted?
     (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
                                                   :video-id video-token
