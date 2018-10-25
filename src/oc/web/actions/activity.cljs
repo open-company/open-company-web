@@ -500,10 +500,14 @@
   (dis/dispatch! [:activity-share-reset]))
 
 (defn activity-share-cb [{:keys [status success body]}]
-  (.logEvent (.getInstance js/amplitude) "POST_SHARED")
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
 (defn activity-share [activity-data share-data & [share-cb]]
+  (cond
+    (= (:medium (first share-data)) :email)
+    (.logEvent (.getInstance js/amplitude) "POST_SHARED_EMAIL")
+    (= (:medium (first share-data)) :slack)
+    (.logEvent (.getInstance js/amplitude) "POST_SHARED_SLACK"))
   (api/share-activity activity-data share-data (or share-cb activity-share-cb))
   (dis/dispatch! [:activity-share share-data]))
 

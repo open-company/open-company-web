@@ -127,6 +127,10 @@
     (if (empty? (:links section-data))
       (api/create-board section-data note
         (fn [{:keys [success status body]}]
+          (.logEvent (.getInstance js/amplitude)
+                     (str "SECTION_CREATED_"
+                          (clojure.string/upper-case
+                           (name (:access section-data)))))
           (let [section-data (when success (json->cljs body))]
             (if-not success
               (when (fn? error-cb)
