@@ -158,7 +158,6 @@ class CustomizedTagComponent extends React.PureComponent {
 
   selectItem(user){
     let selectedValue = getUserSelectedDisplayValue(user);
-    console.log("DBG CustomizedTagComponent.selectItem", user, selectedValue);
     this.props.selectMentionCallback("@" + selectedValue, user);
   }
 
