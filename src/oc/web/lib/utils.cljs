@@ -270,7 +270,7 @@
 
 (defn valid-domain? [domain]
   (when (string? domain)
-    (let [re (js/RegExp "^@?[a-z0-9.-]+\\.[a-z]{2,4}$" "i")]
+    (let [re #"(?i)^@?([a-z0-9][a-z0-9\-]{1,61}[A-Za-z0-9]\.)+[A-Za-z]+$"]
       (pos? (count (.match domain re))))))
 
 (defn remove-tooltips []
