@@ -423,6 +423,7 @@
   ;; need a new revision number on the next edit.
   (swap! initial-revision dissoc (:uuid activity-data))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
+  (.logEvent (.getInstance js/amplitude) "POST_PUBLISHED")
   ;; Send item read
   (send-item-read (:uuid activity-data)))
 
@@ -499,6 +500,7 @@
   (dis/dispatch! [:activity-share-reset]))
 
 (defn activity-share-cb [{:keys [status success body]}]
+  (.logEvent (.getInstance js/amplitude) "POST_SHARED")
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
 (defn activity-share [activity-data share-data & [share-cb]]
