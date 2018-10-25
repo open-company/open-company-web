@@ -131,6 +131,9 @@
                      (str "SECTION_CREATED_"
                           (clojure.string/upper-case
                            (name (:access section-data)))))
+          (.logEvent (.getInstance js/amplitude)
+                     (str "SECTION_CREATED_NAME_"
+                          (clojure.string/upper-case (:name section-data))))
           (let [section-data (when success (json->cljs body))]
             (if-not success
               (when (fn? error-cb)
