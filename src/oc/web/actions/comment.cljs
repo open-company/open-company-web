@@ -25,6 +25,8 @@
 
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
+  ;; Send WRT read on comment add
+  (activity-actions/send-item-read (:uuid activity-data))
   (let [org-slug (router/current-org-slug)
         comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
         add-comment-link (utils/link-for (:links activity-data) "create" "POST")]
@@ -67,6 +69,8 @@
       (get-comments activity-data))))
 
 (defn delete-comment [activity-data comment-data]
+  ;; Send WRT read on comment delete
+  (activity-actions/send-item-read (:uuid activity-data))
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
                       (:uuid activity-data))
@@ -82,6 +86,8 @@
            #(get-comments-finished comments-key activity-data %)))))))
 
 (defn comment-reaction-toggle [activity-data comment-data reaction-data reacting?]
+  ;; Send WRT read on comment reaction
+  (activity-actions/send-item-read (:uuid activity-data))
   (let [comments-key (dis/activity-comments-key (router/current-org-slug)
                       (:uuid activity-data))
         link-method (if reacting? "PUT" "DELETE")
@@ -97,6 +103,8 @@
         (get-comments activity-data)))))
 
 (defn save-comment [activity-uuid comment-data new-body]
+  ;; Send WRT on comment update
+  (activity-actions/send-item-read activity-uuid)
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
                       activity-uuid)
