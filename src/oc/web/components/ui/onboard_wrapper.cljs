@@ -838,9 +838,7 @@
                         (if org
                           (if (and (empty? (jwt/get-key :first-name))
                                    (empty? (jwt/get-key :last-name)))
-                            (do
-                              (nux-actions/new-user-registered "email")
-                              (router/nav! oc-urls/confirm-invitation-profile))
+                            (router/nav! oc-urls/confirm-invitation-profile)
                             (router/nav! (oc-urls/org (:slug org))))
                           (router/nav! oc-urls/login)))
            :on-touch-start identity}
