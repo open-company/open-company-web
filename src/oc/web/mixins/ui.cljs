@@ -166,29 +166,23 @@
 (defn wrt-stream-item-mixin
   "Give a selector for the items to check under the component root.
   On each scroll event checks which items are:
-  - not truncated or expanded
-  - the bottom of the element is visible at screen
+  - not truncated
+  - the top or the bottom of the element is visible at screen
   The stream-item component uses 2 different bodies, one is shown initially and truncated if needed,
-  the second is shown if it was truncated and the user clicked expand."
+  the second is shown if it was truncated and expanded by the user."
    [items-selector item-read-cb]
    (let [scroll-listener-kw :wrt-stream-mixin-scroll-listener
          stream-item-expand-kw :wrt-stream-mixin-expand-listener
          check-item-fn (fn [s idx el]
                          ;; Check if we need to send the item read
-                         (when (and (or      ;; element is the initially visible body
-                                        (and (.contains (.-classList el) "to-truncate")
-                                             ;; but item is not truncated
-                                             (not (.contains (.-classList el) "wrt-truncated")))
-                                             ;; element is the body shown wnen expanded
-                                        (and (.contains (.-classList el) "no-truncate")
-                                             ;; the item was truncated
-                                             (.contains (.-classList el) "wrt-truncated")
-                                             ;; and also expanded
-                                             ;; (so this body is actually visible, not the other body item)
-                                             (.contains (.-classList el) "wrt-expanded")))
-                                    ;; and the bottom of the element is visible at screen
-                                    (au/is-element-bottom-visible? el))
-                          (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
+                         (when       ;; element is the initially visible body
+                                (and (.contains (.-classList el) "to-truncate")
+                                     ;; but item is not truncated
+                                     (not (.contains (.-classList el) "wrt-truncated"))
+                                     ;; and the bottom of the element is visible at screen
+                                     (or (au/is-element-bottom-visible? el)
+                                         (au/is-element-bottom-visible? el)))
+                            (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s]
                          (let [dom-node (rum/dom-node s)
                                $all-items (js/$ items-selector dom-node)]
@@ -204,10 +198,12 @@
             (check-items-fn s))))
         ))
       :did-mount (fn [s]
-       (check-items-fn s)
+       ;; Let's delay to give the time to render
+       (utils/after 500 #(check-items-fn s))
        s)
       :did-remount (fn [_ s]
-       (check-items-fn s)
+       ;; Let's delay to give the time to render
+       (utils/after 500 #(check-items-fn s))
        s)
       :will-unmount (fn [s]
        (check-items-fn s)

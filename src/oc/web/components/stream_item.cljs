@@ -37,6 +37,8 @@
   (when-not expand?
     (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0)))
   (when expand?
+    ;; When expanding a post send the WRT read
+    (activity-actions/send-item-read (:uuid (first (:rum/args s))))
     ;; When expanding send an expand event with a bit of delay to let the component re-render first
     (utils/after 100
      #(let [e (expand-event/ExpandEvent. expand?)]
@@ -87,6 +89,9 @@
                            s)
                           :did-mount (fn [s]
                            (should-show-continue-reading? s)
+                           (let [activity-uuid (:uuid (first (:rum/args s)))]
+                             (when (= (router/current-activity-id) activity-uuid)
+                               (activity-actions/send-item-read activity-uuid)))
                            s)
                           :after-render (fn [s]
                            (let [activity-data (first (:rum/args s))
