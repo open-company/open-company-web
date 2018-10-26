@@ -145,9 +145,10 @@
                               (reset! (::email-error s) true))
                             (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))
-                          (.logEvent (.getInstance js/amplitude)
-                                     "SIGNUP_WITH_EMAIL")
-                          (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
+                          (do
+                            (.logEvent (.getInstance js/amplitude)
+                                       "SIGNUP_WITH_EMAIL")
+                            (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)})))}
             "Sign up"]]
         [:div.footer-link
           "Already have an account?"
