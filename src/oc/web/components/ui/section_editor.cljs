@@ -155,7 +155,7 @@
                        (jwt/is-admin? (:team-id org-data)))
         last-section-standing (= (count no-drafts-boards) 1)]
     [:div.section-editor-container
-      [:div.section-editor.group.fs-hide
+      [:div.section-editor.group
         {:on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
                        (reset! (::show-access-list s) false))
@@ -272,7 +272,7 @@
               (when can-change
                 [:div.section-editor-private-users-search
                   {:ref "private-users-search"}
-                  [:input
+                  [:input.fs-hide
                     {:value @query
                      :type "text"
                      :placeholder "Select a member..."
@@ -287,7 +287,7 @@
                               :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
                                     user (merge u team-user)
                                     user-type (utils/get-user-type user org-data section-editing)]]
-                          [:div.section-editor-private-users-result
+                          [:div.section-editor-private-users-result.fs-hide
                             {:on-click #(do
                                           (reset! query "")
                                           (reset! (::show-search-results s) false)
@@ -333,7 +333,7 @@
                                    (if (= (:value item) :remove)
                                      (section-actions/private-section-user-remove team-user)
                                      (section-actions/private-section-user-add team-user (:value item))))})])
-              [:div.section-editor-add-private-users-list.group
+              [:div.section-editor-add-private-users-list.group.fs-hide
                 {:on-scroll #(do
                               (reset! (::show-edit-user-dropdown s) nil)
                               (reset! (::show-edit-user-top s) nil))
@@ -398,7 +398,7 @@
             [:div.section-editor-add-label
               "Personal note"])
           (when (= (:access section-editing) "private")
-            [:div.section-editor-add-personal-note
+            [:div.section-editor-add-personal-note.fs-hide
               {:content-editable true
                :placeholder "Add a personal note to your invitation..."
                :ref "personal-note"
