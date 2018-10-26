@@ -256,39 +256,14 @@
         doc-element (.-documentElement js/document)
         win-height (or (.-clientHeight doc-element)
                        (.-innerHeight js/window))]
-    (and ;; Item starts below the navbar
-         (>= (.-top rect) responsive/navbar-height)
-         ;; Item bottom is less than the screen height
-         (<= (.-bottom rect) win-height))))
-
-(defn- is-element-top-visible?
-   "Given a DOM element return true if it's actually visible in the viewport."
-  [el]
-  (let [rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
-        doc-element (.-documentElement js/document)
-        win-height (or (.-innerHeight js/window)
-                       (.-clientHeight doc-element))]
-         ;; Item top is more then the navbar height
-    (and (>= (.-top rect) responsive/navbar-height)
-         ;; and less than the screen height
-         (< (.-top rect) win-height))))
-
-(defn- is-element-bottom-visible?
-   "Given a DOM element return true if it's actually visible in the viewport."
-  [el]
-  (let [rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
-        doc-element (.-documentElement js/document)
-        win-height (or (.-innerHeight js/window)
-                       (.-clientHeight doc-element))]
-         ;; Item bottom is less than the screen height
-    (and (<= (.-bottom rect) win-height)
+    (or      ;; Item top is more then the navbar height
+        (and (>= (.-top rect) responsive/navbar-height)
+             ;; and less than the screen height
+             (< (.-top rect) win-height))
+             ;; Item bottom is less than the screen height
+        (and (<= (.-bottom rect) win-height)
          ;; and more than the navigation bar to
-         ;; make sure it's not hidden behind it
-         (> (.-bottom rect) responsive/navbar-height))))
+         (> (.-bottom rect) responsive/navbar-height)))))
 
 (defn clean-who-reads-count-ids
   "Given a list of items we want to request the who reads count
