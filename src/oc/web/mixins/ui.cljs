@@ -192,11 +192,11 @@
         ))
       :did-mount (fn [s]
        ;; Let's delay to give the time to render
-       (utils/after 500 #(check-items-fn s))
+       (utils/after 0 #(check-items-fn s))
        s)
       :did-remount (fn [_ s]
        ;; Let's delay to give the time to render
-       (utils/after 500 #(check-items-fn s))
+       (utils/after 0 #(check-items-fn s))
        s)
       :will-unmount (fn [s]
        (check-items-fn s)
