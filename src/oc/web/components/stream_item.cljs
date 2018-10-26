@@ -18,7 +18,6 @@
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
-            [oc.web.events.expand-event :as expand-event]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -38,11 +37,7 @@
     (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0)))
   (when expand?
     ;; When expanding a post send the WRT read
-    (activity-actions/send-item-read (:uuid (first (:rum/args s))))
-    ;; When expanding send an expand event with a bit of delay to let the component re-render first
-    (utils/after 100
-     #(let [e (expand-event/ExpandEvent. expand?)]
-        (.dispatchEvent expand-event/expand-event-target e)))))
+    (activity-actions/send-item-read (:uuid (first (:rum/args s))))))
 
 (defn should-show-continue-reading? [s]
   (let [activity-data (first (:rum/args s))

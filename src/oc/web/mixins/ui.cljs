@@ -5,8 +5,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.events.expand-event :as expand-event]))
+            [oc.web.lib.responsive :as responsive]))
 
 (def -no-scroll-mixin-class :no-scroll)
 
@@ -138,7 +137,7 @@
   and call the passed callback with the element uuid (got via the data-itemuuid property)."
    [items-selector item-is-visible-cb]
    (let [scroll-listener-kw :ap-seen-mixin-scroll-listener
-         check-items-fn (fn [s]
+         check-items-fn (fn [s & [_]]
                          (let [dom-node (rum/dom-node s)
                                $all-items (js/$ items-selector dom-node)]
                            (.each $all-items (fn [idx el]
@@ -148,7 +147,7 @@
      {:will-mount (fn [s]
        (assoc s scroll-listener-kw
         (events/listen js/window EventType/SCROLL
-         #(check-items-fn s))))
+         #(utils/after 0 (partial check-items-fn s)))))
       :did-mount (fn [s]
        (check-items-fn s)
        s)
@@ -172,18 +171,16 @@
   the second is shown if it was truncated and expanded by the user."
    [items-selector item-read-cb]
    (let [scroll-listener-kw :wrt-stream-mixin-scroll-listener
-         stream-item-expand-kw :wrt-stream-mixin-expand-listener
          check-item-fn (fn [s idx el]
                          ;; Check if we need to send the item read
                          (when       ;; element is the initially visible body
                                 (and (.contains (.-classList el) "to-truncate")
                                      ;; but item is not truncated
                                      (not (.contains (.-classList el) "wrt-truncated"))
-                                     ;; and the bottom of the element is visible at screen
-                                     (or (au/is-element-bottom-visible? el)
-                                         (au/is-element-bottom-visible? el)))
+                                     ;; and the element is visible in the viewport
+                                     (au/is-element-visible? el))
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
-         check-items-fn (fn [s]
+         check-items-fn (fn [s & [_]]
                          (let [dom-node (rum/dom-node s)
                                $all-items (js/$ items-selector dom-node)]
                            (.each $all-items (partial check-item-fn s))))]
@@ -191,11 +188,7 @@
        (-> s
         (assoc scroll-listener-kw
          (events/listen js/window EventType/SCROLL
-          #(check-items-fn s)))
-        (assoc stream-item-expand-kw
-         (events/listen expand-event/expand-event-target expand-event/EXPAND
-          #(when (.-expanding %)
-            (check-items-fn s))))
+          #(utils/after 0 (partial check-items-fn s))))
         ))
       :did-mount (fn [s]
        ;; Let's delay to give the time to render
@@ -211,12 +204,7 @@
                           (do
                             (events/unlistenByKey scroll-listener)
                             (dissoc s scroll-listener-kw))
-                          s)
-             next-state (if-let [expand-listener (get s stream-item-expand-kw)]
-                          (do
-                            (events/unlistenByKey expand-listener)
-                            (dissoc next-state stream-item-expand-kw))
-                          next-state)]
+                          s)]
          next-state))}))
 
 (defn on-window-click-mixin [callback]
