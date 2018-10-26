@@ -199,7 +199,8 @@
                              :height (:height video-size)
                              :lazy (not video-player-show)
                              :video-image (:video-image activity-data)
-                             :video-processed (:video-processed activity-data)})]
+                             :video-processed (:video-processed activity-data)
+                             :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})]
             (when (:body-thumbnail activity-data)
               [:div.body-thumbnail
                 {:class (:type (:body-thumbnail activity-data))

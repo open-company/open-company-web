@@ -14,7 +14,7 @@
                                (.destroy player-instance))
                              s)
                             :did-mount (fn [s]
-                              (let [{:keys [video-id width height video-processed autoplay]
+                              (let [{:keys [video-id width height video-processed autoplay playing-cb]
                                      :or {width 640
                                           height 480}} (first (:rum/args s))]
                               (when video-processed
@@ -29,7 +29,12 @@
                                       Player (.. js/ZiggeoApi -V2 -Player)
                                       player-instance (Player. (clj->js config))]
                                   (reset! (::player-instance s) player-instance)
-                                  (.activate player-instance))))
+                                  (.activate player-instance)
+                                  (.on player-instance "playing"
+                                    (fn []
+                                     (timbre/debug "playing")
+                                     (when (fn? playing-cb)
+                                       (playing-cb (.get player-instance "video"))))))))
                             s)} 
   [s {:keys [video-id remove-video-cb width height video-processed autoplay lazy video-image]
       :or {width 640
