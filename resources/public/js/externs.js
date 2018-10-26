@@ -138,6 +138,8 @@ CarrotGA.clientid = '';
 var init_fullstory = function(){};
 var FS = function(){};
 var amplitude = function(){};
+amplitude.getInstance = function(){};
+amplitude.getInstance.logEvent = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
