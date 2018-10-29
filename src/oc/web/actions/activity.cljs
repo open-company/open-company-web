@@ -650,8 +650,11 @@
   [activity-id]
   (let [wait-interval-ms (* wrt-wait-interval 1000)]
     ;; Remove the old timeout if there is
-    (when-let [uuid-timeout (get @wrt-timeouts-list activity-id)]
-      (.clearTimeout js/window uuid-timeout))
+    (if-let [uuid-timeout (get @wrt-timeouts-list activity-id)]
+      ;; Remove the previous timeout if exists
+      (.clearTimeout js/window uuid-timeout)
+      ;; Send read if it's the first timeout for the current element
+      (send-item-read activity-id))
     ;; Set the new timeout
     (swap! wrt-timeouts-list assoc activity-id
      (utils/after wait-interval-ms

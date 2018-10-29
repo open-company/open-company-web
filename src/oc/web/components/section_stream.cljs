@@ -32,7 +32,7 @@
                             (drv/drv :org-data)
                             ;; Mixins
                             mixins/first-render-mixin
-                            (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner"
+                            (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner.to-truncate"
                              wrt-stream-item-mixin-cb)
                             section-mixins/container-nav-in
 

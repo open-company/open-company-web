@@ -25,6 +25,8 @@
 
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
+  ;; Send WRT read on comment add
+  (activity-actions/send-item-read (:uuid activity-data))
   (let [org-slug (router/current-org-slug)
         comments-key (dis/activity-comments-key org-slug (:uuid activity-data))]
     ;; Add the comment to the app-state to show it immediately
@@ -68,6 +70,8 @@
       (get-comments activity-data))))
 
 (defn delete-comment [activity-data comment-data]
+  ;; Send WRT read on comment delete
+  (activity-actions/send-item-read (:uuid activity-data))
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
                       (:uuid activity-data))]
@@ -82,6 +86,8 @@
 
 (defn comment-reaction-toggle
   [activity-data comment-data reaction-data reacting?]
+  ;; Send WRT read on comment reaction
+  (activity-actions/send-item-read (:uuid activity-data))
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
                       (:uuid activity-data))]
@@ -97,6 +103,8 @@
 
 (defn save-comment
   [activity-uuid comment-data new-body]
+  ;; Send WRT on comment update
+  (activity-actions/send-item-read activity-uuid)
   (api/save-comment comment-data new-body)
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)

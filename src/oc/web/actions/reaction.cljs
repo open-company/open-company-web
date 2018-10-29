@@ -17,6 +17,8 @@
   ;; so we need to avoid posting empty emojis
   (when (and emoji
              (utils/link-for (:links activity-data) "react"))
+    ;; Send a read for WRT when reacting
+    (activity-actions/send-item-read (:uuid activity-data))
     (api/react-from-picker activity-data emoji
       (fn [{:keys [status success body]}]
         ;; Refresh the full entry after the reaction finished
@@ -31,6 +33,8 @@
 
 (defn reaction-toggle
   [activity-data reaction-data reacting?]
+  ;; Send WRT read when reacting
+  (activity-actions/send-item-read (:uuid activity-data))
   (let [activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))]
     (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data activity-key])
     (api/toggle-reaction reaction-data reacting?

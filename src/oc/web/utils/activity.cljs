@@ -255,38 +255,15 @@
                        (pos? %))
         doc-element (.-documentElement js/document)
         win-height (or (.-clientHeight doc-element)
-                       (.-innerHeight js/window))
-        win-width (or (.-clientWidth doc-element)
-                      (.-innerWidth js/window))]
-    (and ;; Item starts below the navbar
-         (>= (.-top rect) responsive/navbar-height)
-         ;; Item left is not out of the screen
-         (zero-pos? (.-left rect))
-         ;; Item bottom is less than the screen height
-         (<= (.-bottom rect) win-height)
-         ;; Item right is less than the screen width
-         (<= (.-right rect) win-width))))
-
-(defn- is-element-bottom-visible?
-   "Given a DOM element return true if it's actually visible in the viewport."
-  [el]
-  (let [rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
-        doc-element (.-documentElement js/document)
-        win-height (or (.-innerHeight js/window)
-                       (.-clientHeight doc-element))
-        win-width (or (.-innerWidth js/window)
-                      (.-clientWidth doc-element))]
-    (and ;; Item left is not out of the screen
-         (zero-pos? (.-left rect))
-         ;; Item bottom is less than the screen height
-         (and (<= (.-bottom rect) win-height)
-              ;; and more than the navigation bar to
-              ;; make sure it's not hidden behind it
-              (> (.-bottom rect) responsive/navbar-height))
-         ;; Item right is less than the screen width
-         (<= (.-right rect) win-width))))
+                       (.-innerHeight js/window))]
+    (or      ;; Item top is more then the navbar height
+        (and (>= (.-top rect) responsive/navbar-height)
+             ;; and less than the screen height
+             (< (.-top rect) win-height))
+             ;; Item bottom is less than the screen height
+        (and (<= (.-bottom rect) win-height)
+         ;; and more than the navigation bar to
+         (> (.-bottom rect) responsive/navbar-height)))))
 
 (defn clean-who-reads-count-ids
   "Given a list of items we want to request the who reads count
