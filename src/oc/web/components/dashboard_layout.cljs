@@ -324,6 +324,7 @@
                         [:button.mlb-reset.post-added-bt
                           {:on-click #(do
                                         (.logEvent (.getInstance js/amplitude) "TOOLTIP_CTA_POST_ADDED_SLACK")
+                                        (nux-actions/dismiss-post-added-tooltip)
                                         (org-actions/bot-auth
                                            team-data
                                            current-user-data
