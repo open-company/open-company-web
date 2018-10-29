@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]))
 
 (def big-web-min-width 768)
+(def tablet-max-width 980)
 (def navbar-height 56)
 
 (defn ww []
@@ -43,9 +44,11 @@
   ;; check if it's test env, can't import utils to avoid circular dependencies
   (if (.-_phantom js/window)
     false
-    (or (= (gobj/get js/WURFL "form_factor") "Tablet")
-        (= (gobj/get js/WURFL "form_factor") "Smartphone")
-        (= (gobj/get js/WURFL "form_factor") "Other Mobile"))))
+    (if-not (.-WURFL js/window)
+      (<= (ww) tablet-max-width)
+      (or (= (gobj/get js/WURFL "form_factor") "Tablet")
+          (= (gobj/get js/WURFL "form_factor") "Smartphone")
+          (= (gobj/get js/WURFL "form_factor") "Other Mobile")))))
 
 (when-not (.-_phantom js/window)
   (events/listen js/window EventType/RESIZE set-browser-type!))
