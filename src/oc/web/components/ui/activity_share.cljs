@@ -215,24 +215,27 @@
                 [:button.mlb-reset.mlb-black-link
                   {:on-click #(close-clicked s)}
                   "Cancel"]
-                [:button.mlb-reset.share-button
-                  {:on-click #(let [email-share {:medium :email
-                                                 :note (:note email-data)
-                                                 :subject (:subject email-data)
-                                                 :to (:to email-data)}]
-                                (if (empty? (:to email-data))
-                                  (reset! (::email-data s) (merge email-data {:to-error true}))
-                                  (do
-                                    (reset! (::sharing s) true)
-                                    (activity-actions/activity-share activity-data [email-share]))))
-                   :class (when (empty? (:to email-data)) "disabled")}
-                  (if @(::shared s)
-                    (if (= @(::shared s) :shared)
-                      "Shared!"
-                      "Ops...")
-                    [(when @(::sharing s)
-                      (small-loading))
-                     "Share"])]]]])
+                (let [share-bt-disabled? (or @(::sharing s)
+                                             (empty? (:to email-data)))]
+                  [:button.mlb-reset.share-button
+                    {:on-click #(when-not share-bt-disabled?
+                                  (let [email-share {:medium :email
+                                                     :note (:note email-data)
+                                                     :subject (:subject email-data)
+                                                     :to (:to email-data)}]
+                                    (if (empty? (:to email-data))
+                                      (reset! (::email-data s) (merge email-data {:to-error true}))
+                                      (do
+                                        (reset! (::sharing s) true)
+                                        (activity-actions/activity-share activity-data [email-share])))))
+                     :class (when share-bt-disabled? "disabled")}
+                    (if @(::shared s)
+                      (if (= @(::shared s) :shared)
+                        "Shared!"
+                        "Ops...")
+                      [(when @(::sharing s)
+                        (small-loading))
+                       "Share"])])]]])
         (when (= medium :url)
           [:div.activity-share-modal-shared.group
             [:form
@@ -324,21 +327,24 @@
                 [:button.mlb-reset.mlb-black-link
                   {:on-click #(close-clicked s)}
                   "Cancel"]
-                [:button.mlb-reset.share-button
-                  {:on-click #(let [slack-share {:medium :slack
-                                                 :note (:note slack-data)
-                                                 :channel (:channel slack-data)}]
-                                (if (empty? (:channel slack-data))
-                                  (when (empty? (:channel slack-data))
-                                    (reset! (::slack-data s) (merge slack-data {:channel-error true})))
-                                  (do
-                                    (reset! (::sharing s) true)
-                                    (activity-actions/activity-share activity-data [slack-share]))))
-                   :class (when (empty? (:channel slack-data)) "disabled")}
-                  (if @(::shared s)
-                    (if (= @(::shared s) :shared)
-                      "Sent!"
-                      "Ops...")
-                    [(when @(::sharing s)
-                      (small-loading))
-                     "Send"])]]]])]]))
+                (let [send-bt-disabled? (or @(::sharing s)
+                                           (empty? (:channel slack-data)))]
+                  [:button.mlb-reset.share-button
+                    {:on-click #(when-not send-bt-disabled?
+                                  (let [slack-share {:medium :slack
+                                                     :note (:note slack-data)
+                                                     :channel (:channel slack-data)}]
+                                    (if (empty? (:channel slack-data))
+                                      (when (empty? (:channel slack-data))
+                                        (reset! (::slack-data s) (merge slack-data {:channel-error true})))
+                                      (do
+                                        (reset! (::sharing s) true)
+                                        (activity-actions/activity-share activity-data [slack-share])))))
+                     :class (when send-bt-disabled? "disabled")}
+                    (if @(::shared s)
+                      (if (= @(::shared s) :shared)
+                        "Sent!"
+                        "Ops...")
+                      [(when @(::sharing s)
+                        (small-loading))
+                       "Send"])])]]])]]))
