@@ -139,24 +139,28 @@
    (let [scroll-listener-kw :ap-seen-mixin-scroll-listener
          mounted-kw :ap-seen-mixin-is-mounted
          check-items-fn (fn [s & [_]]
-                         (when (get s mounted-kw)
+                         (when @(get s mounted-kw)
                            (let [dom-node (rum/dom-node s)
                                  $all-items (js/$ items-selector dom-node)]
                              (.each $all-items (fn [idx el]
                                (when (and (fn? item-is-visible-cb)
                                           (au/is-element-visible? el))
                                  (item-is-visible-cb s (.attr (js/$ el) "data-itemuuid"))))))))]
-     {:will-mount (fn [s]
+     {:init (fn [s]
+       (assoc s mounted-kw (atom false)))
+      :will-mount (fn [s]
        (assoc s scroll-listener-kw
         (events/listen js/window EventType/SCROLL
          (fn [e] (utils/after 0 #(check-items-fn s e))))))
       :did-mount (fn [s]
-       (utils/after 200 #(check-items-fn s))
-       (assoc s mounted-kw true))
+       (reset! (get s mounted-kw) true)
+       (utils/after 500 #(check-items-fn s))
+       s)
       :did-remount (fn [_ s]
-       (utils/after 200 #(check-items-fn s))
+       (utils/after 1500 #(check-items-fn s))
        s)
       :will-unmount (fn [s]
+       (reset! (get s mounted-kw) false)
        (check-items-fn s)
        (let [scroll-listener (get s scroll-listener-kw)
              next-state (if scroll-listener
@@ -187,24 +191,27 @@
                                      (au/is-element-visible? el))
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s & [_]]
-                         (when (get s mounted-kw)
+                         (when @(get s mounted-kw)
                            (let [dom-node (rum/dom-node s)
                                  $all-items (js/$ items-selector dom-node)]
                              (.each $all-items (partial check-item-fn s)))))]
-     {:will-mount (fn [s]
+     {:init (fn [s]
+       (assoc s mounted-kw (atom false)))
+      :will-mount (fn [s]
        (-> s
         (assoc scroll-listener-kw
          (events/listen js/window EventType/SCROLL
           (fn [e] (utils/after 0 #(check-items-fn s e)))))))
       :did-mount (fn [s]
-       ;; Let's delay to give the time to render
-       (utils/after 200 #(check-items-fn s))
-       (assoc s mounted-kw true))
+       (reset! (get s mounted-kw) true)
+       (utils/after 500 #(check-items-fn s))
+       s)
       :did-remount (fn [_ s]
        ;; Let's delay to give the time to render
-       (utils/after 200 #(check-items-fn s))
+       (utils/after 1500 #(check-items-fn s))
        s)
       :will-unmount (fn [s]
+       (reset! (get s mounted-kw) false)
        (check-items-fn s)
        (let [next-state (if-let [scroll-listener (get s scroll-listener-kw)]
                           (do
