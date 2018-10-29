@@ -306,8 +306,7 @@
                            (drv/react s :show-post-added-tooltip))
                   [:div.post-added-tooltip-container.group
                     [:button.mlb-reset.post-added-tooltip-dismiss
-                      {:on-click #(do
-                                   (nux-actions/dismiss-post-added-tooltip))}]
+                      {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
                     [:div.post-added-tooltips
                       [:div.post-added-tooltip-box-mobile]
                       [:div.post-added-tooltip-title
@@ -315,8 +314,10 @@
                       [:div.post-added-tooltip
                         "Using Slack? "
                         [:button.mlb-reset.post-added-bt
-                          {:on-click #(org-actions/bot-auth team-data current-user-data
-                                       (str (router/get-token) "?org-settings=main"))}
+                          {:on-click #(do
+                                       (nux-actions/dismiss-post-added-tooltip)
+                                       (org-actions/bot-auth team-data current-user-data
+                                        (str (router/get-token) "?org-settings=main")))}
                           "Connect to Slack"]
                         " so your team can see posts and  join the discussion from Slack, too."]
                       [:div.post-added-tooltip-box]]]))
