@@ -137,30 +137,39 @@
   and call the passed callback with the element uuid (got via the data-itemuuid property)."
    [items-selector item-is-visible-cb]
    (let [scroll-listener-kw :ap-seen-mixin-scroll-listener
+         mounted-kw :ap-seen-mixin-is-mounted
          check-items-fn (fn [s & [_]]
-                         (let [dom-node (rum/dom-node s)
-                               $all-items (js/$ items-selector dom-node)]
-                           (.each $all-items (fn [idx el]
-                             (when (and (fn? item-is-visible-cb)
-                                        (au/is-element-visible? el))
-                               (item-is-visible-cb s (.attr (js/$ el) "data-itemuuid")))))))]
-     {:will-mount (fn [s]
+                         (when @(get s mounted-kw)
+                           (let [dom-node (rum/dom-node s)
+                                 $all-items (js/$ items-selector dom-node)]
+                             (.each $all-items (fn [idx el]
+                               (when (and (fn? item-is-visible-cb)
+                                          (au/is-element-visible? el))
+                                 (item-is-visible-cb s (.attr (js/$ el) "data-itemuuid"))))))))]
+     {:init (fn [s]
+       (assoc s mounted-kw (atom false)))
+      :will-mount (fn [s]
        (assoc s scroll-listener-kw
         (events/listen js/window EventType/SCROLL
-         #(utils/after 0 (partial check-items-fn s)))))
+         (fn [e] (utils/after 0 #(check-items-fn s e))))))
       :did-mount (fn [s]
-       (check-items-fn s)
+       (reset! (get s mounted-kw) true)
+       (utils/after 500 #(check-items-fn s))
        s)
       :did-remount (fn [_ s]
-       (check-items-fn s)
+       (utils/after 1500 #(check-items-fn s))
        s)
       :will-unmount (fn [s]
+       (reset! (get s mounted-kw) false)
        (check-items-fn s)
-       (if-let [scroll-listener (get s scroll-listener-kw)]
-         (do
-           (events/unlistenByKey scroll-listener)
-           (dissoc s scroll-listener-kw))
-         s))}))
+       (let [scroll-listener (get s scroll-listener-kw)
+             next-state (if scroll-listener
+                         (do
+                          (events/unlistenByKey scroll-listener)
+                          (dissoc s scroll-listener-kw))
+                         s)
+             next-state (dissoc next-state mounted-kw)]
+        next-state))}))
 
 (defn wrt-stream-item-mixin
   "Give a selector for the items to check under the component root.
@@ -171,6 +180,7 @@
   the second is shown if it was truncated and expanded by the user."
    [items-selector item-read-cb]
    (let [scroll-listener-kw :wrt-stream-mixin-scroll-listener
+         mounted-kw :wrt-mixin-is-mounted
          check-item-fn (fn [s idx el]
                          ;; Check if we need to send the item read
                          (when       ;; element is the initially visible body
@@ -181,30 +191,34 @@
                                      (au/is-element-visible? el))
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s & [_]]
-                         (let [dom-node (rum/dom-node s)
-                               $all-items (js/$ items-selector dom-node)]
-                           (.each $all-items (partial check-item-fn s))))]
-     {:will-mount (fn [s]
+                         (when @(get s mounted-kw)
+                           (let [dom-node (rum/dom-node s)
+                                 $all-items (js/$ items-selector dom-node)]
+                             (.each $all-items (partial check-item-fn s)))))]
+     {:init (fn [s]
+       (assoc s mounted-kw (atom false)))
+      :will-mount (fn [s]
        (-> s
         (assoc scroll-listener-kw
          (events/listen js/window EventType/SCROLL
-          #(utils/after 0 (partial check-items-fn s))))
-        ))
+          (fn [e] (utils/after 0 #(check-items-fn s e)))))))
       :did-mount (fn [s]
-       ;; Let's delay to give the time to render
-       (utils/after 0 #(check-items-fn s))
+       (reset! (get s mounted-kw) true)
+       (utils/after 500 #(check-items-fn s))
        s)
       :did-remount (fn [_ s]
        ;; Let's delay to give the time to render
-       (utils/after 0 #(check-items-fn s))
+       (utils/after 1500 #(check-items-fn s))
        s)
       :will-unmount (fn [s]
+       (reset! (get s mounted-kw) false)
        (check-items-fn s)
        (let [next-state (if-let [scroll-listener (get s scroll-listener-kw)]
                           (do
                             (events/unlistenByKey scroll-listener)
                             (dissoc s scroll-listener-kw))
-                          s)]
+                          s)
+            next-state (dissoc next-state mounted-kw)]
          next-state))}))
 
 (defn on-window-click-mixin [callback]
