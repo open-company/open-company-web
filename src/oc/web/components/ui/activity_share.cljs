@@ -83,9 +83,9 @@
                                    (js/$ slack-button)
                                    #js {:trigger "manual"})))
                               s)
-                             :before-render (fn [s]
+                             :did-update (fn [s]
                               ;; When we have a sharing response
-                              (js/console.log "DBG activity-share/before-render")
+                              (js/console.log "DBG activity-share/did-update")
                               (when-let [shared-data @(drv/get-ref s :activity-shared-data)]
                                 (js/console.log "DBG    activity-shared-data" shared-data)
                                 (when (compare-and-set! (::sharing s) true false)
