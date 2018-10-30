@@ -85,8 +85,11 @@
                               s)
                              :before-render (fn [s]
                               ;; When we have a sharing response
+                              (js/console.log "DBG activity-share/before-render")
                               (when-let [shared-data @(drv/get-ref s :activity-shared-data)]
+                                (js/console.log "DBG    activity-shared-data" shared-data)
                                 (when (compare-and-set! (::sharing s) true false)
+                                  (js/console.log "DBG       sharing reset!")
                                   (reset!
                                    (::shared s)
                                    (if (:error shared-data) :error :shared))
@@ -217,17 +220,16 @@
                   "Cancel"]
                 (let [share-bt-disabled? (or @(::sharing s)
                                              (empty? (:to email-data)))]
+                  (js/console.log "DBG activity-share/render email chs" (:to email-data) "sharing" @(::sharing s))
                   [:button.mlb-reset.share-button
                     {:on-click #(when-not share-bt-disabled?
+                                  (js/console.log "DBG email share clicked")
+                                  (reset! (::sharing s) true)
                                   (let [email-share {:medium :email
                                                      :note (:note email-data)
                                                      :subject (:subject email-data)
                                                      :to (:to email-data)}]
-                                    (if (empty? (:to email-data))
-                                      (reset! (::email-data s) (merge email-data {:to-error true}))
-                                      (do
-                                        (reset! (::sharing s) true)
-                                        (activity-actions/activity-share activity-data [email-share])))))
+                                    (activity-actions/activity-share activity-data [email-share])))
                      :class (when share-bt-disabled? "disabled")}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)
@@ -329,17 +331,15 @@
                   "Cancel"]
                 (let [send-bt-disabled? (or @(::sharing s)
                                            (empty? (:channel slack-data)))]
+                  (js/console.log "DBG activity-share/render slack chs" (:channel slack-data) "sharing" @(::sharing s))
                   [:button.mlb-reset.share-button
                     {:on-click #(when-not send-bt-disabled?
+                                  (js/console.log "DBG slack share clicked")
+                                  (reset! (::sharing s) true)
                                   (let [slack-share {:medium :slack
                                                      :note (:note slack-data)
                                                      :channel (:channel slack-data)}]
-                                    (if (empty? (:channel slack-data))
-                                      (when (empty? (:channel slack-data))
-                                        (reset! (::slack-data s) (merge slack-data {:channel-error true})))
-                                      (do
-                                        (reset! (::sharing s) true)
-                                        (activity-actions/activity-share activity-data [slack-share])))))
+                                    (activity-actions/activity-share activity-data [slack-share])))
                      :class (when send-bt-disabled? "disabled")}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)
