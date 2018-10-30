@@ -118,6 +118,9 @@
                                   (utils/after 2000 #(reset! (::shared s) false)))
                                 (js/console.log "DBG    activity-share-reset")
                                 (activity-actions/activity-share-reset))
+                              s)
+                             :will-unmount (fn [s]
+                              (js/console.log "DBG activity-share/will-unmount")
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
