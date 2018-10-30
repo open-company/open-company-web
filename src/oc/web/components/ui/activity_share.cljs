@@ -63,11 +63,7 @@
                             (on-window-click-mixin (fn [s e]
                               (when-not (utils/event-inside? e (rum/dom-node s))
                                 (close-clicked s))))
-                            {:init (fn [s]
-                              (js/console.log "DBG activity-share/init")
-                              s)
-                             :will-mount (fn [s]
-                              (js/console.log "DBG activity-share/will-mount")
+                            {:will-mount (fn [s]
                               (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
                                     org-data @(drv/get-ref s :org-data)
@@ -80,7 +76,6 @@
                                  (dis/dispatch! [:input [:activity-share-medium] :slack])))
                              s)
                              :did-mount (fn [s]
-                              (js/console.log "DBG activity-share/did-mount")
                               (let [slack-button (rum/ref-node s "slack-button")
                                     org-data @(drv/get-ref s :org-data)]
                                 (when (show-slack-tooltip? org-data)
@@ -88,23 +83,16 @@
                                    (js/$ slack-button)
                                    #js {:trigger "manual"})))
                               s)
-                             :did-remount (fn [_ s]
-                              (js/console.log "DBG activity-share/did-remount")
-                              s)
                              :did-update (fn [s]
                               ;; When we have a sharing response
-                              (js/console.log "DBG activity-share/did-update sharing" @(::sharing s))
                               (when-let [shared-data @(drv/get-ref s :activity-shared-data)]
-                                (js/console.log "DBG    activity-shared-data" shared-data)
                                 (when (compare-and-set! (::sharing s) true false)
-                                  (js/console.log "DBG       sharing reset!")
                                   (reset!
                                    (::shared s)
                                    (if (:error shared-data) :error :shared))
                                   ;; If share succeeded reset share fields
                                   (when-not (:error shared-data)
                                     (let [medium @(drv/get-ref s :activity-share-medium)]
-                                      (js/console.log "DBG          reset slack/email share data")
                                       (cond
                                         (= medium :email)
                                         (do
@@ -116,11 +104,7 @@
                                           (reset! (::slack-channels-dropdown-key s) (rand 1000))
                                           (reset! (::slack-data s) {:note ""})))))
                                   (utils/after 2000 #(reset! (::shared s) false)))
-                                (js/console.log "DBG    activity-share-reset")
                                 (activity-actions/activity-share-reset))
-                              s)
-                             :will-unmount (fn [s]
-                              (js/console.log "DBG activity-share/will-unmount")
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
@@ -132,7 +116,6 @@
         _ (drv/react s :activity-shared-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         medium (drv/react s :activity-share-medium)]
-    (js/console.log "DBG activity-share/render sharing:" @(::sharing s))
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -231,16 +214,14 @@
                   "Cancel"]
                 (let [share-bt-disabled? (or @(::sharing s)
                                              (empty? (:to email-data)))]
-                  (js/console.log "DBG    email share disabled?" share-bt-disabled? "to:" (:to email-data))
                   [:button.mlb-reset.share-button
-                    {:on-click (fn[]
-                                  (js/console.log "DBG email share clicked")
-                                  (reset! (::sharing s) true)
-                                  (let [email-share {:medium :email
-                                                     :note (:note email-data)
-                                                     :subject (:subject email-data)
-                                                     :to (:to email-data)}]
-                                    (activity-actions/activity-share activity-data [email-share])))
+                    {:on-click (fn [_]
+                                (reset! (::sharing s) true)
+                                (let [email-share {:medium :email
+                                                   :note (:note email-data)
+                                                   :subject (:subject email-data)
+                                                   :to (:to email-data)}]
+                                  (activity-actions/activity-share activity-data [email-share])))
                      :disabled share-bt-disabled?}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)
@@ -342,15 +323,13 @@
                   "Cancel"]
                 (let [send-bt-disabled? (or @(::sharing s)
                                            (empty? (:channel slack-data)))]
-                  (js/console.log "DBG    slack share disabled?" send-bt-disabled? "to:" (:channel slack-data))
                   [:button.mlb-reset.share-button
-                    {:on-click (fn[]
-                                  (js/console.log "DBG slack share clicked")
-                                  (reset! (::sharing s) true)
-                                  (let [slack-share {:medium :slack
-                                                     :note (:note slack-data)
-                                                     :channel (:channel slack-data)}]
-                                    (activity-actions/activity-share activity-data [slack-share])))
+                    {:on-click (fn [_]
+                                (reset! (::sharing s) true)
+                                (let [slack-share {:medium :slack
+                                                   :note (:note slack-data)
+                                                   :channel (:channel slack-data)}]
+                                  (activity-actions/activity-share activity-data [slack-share])))
                      :disabled send-bt-disabled?}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)
