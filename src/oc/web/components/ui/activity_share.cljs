@@ -233,7 +233,7 @@
                                              (empty? (:to email-data)))]
                   (js/console.log "DBG    email share disabled?" share-bt-disabled? "to:" (:to email-data))
                   [:button.mlb-reset.share-button
-                    {:on-click #(when-not share-bt-disabled?
+                    {:on-click (fn[]
                                   (js/console.log "DBG email share clicked")
                                   (reset! (::sharing s) true)
                                   (let [email-share {:medium :email
@@ -241,7 +241,7 @@
                                                      :subject (:subject email-data)
                                                      :to (:to email-data)}]
                                     (activity-actions/activity-share activity-data [email-share])))
-                     :class (when share-bt-disabled? "disabled")}
+                     :disabled share-bt-disabled?}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)
                         "Shared!"
@@ -344,14 +344,14 @@
                                            (empty? (:channel slack-data)))]
                   (js/console.log "DBG    slack share disabled?" send-bt-disabled? "to:" (:channel slack-data))
                   [:button.mlb-reset.share-button
-                    {:on-click #(when-not send-bt-disabled?
+                    {:on-click (fn[]
                                   (js/console.log "DBG slack share clicked")
                                   (reset! (::sharing s) true)
                                   (let [slack-share {:medium :slack
                                                      :note (:note slack-data)
                                                      :channel (:channel slack-data)}]
                                     (activity-actions/activity-share activity-data [slack-share])))
-                     :class (when send-bt-disabled? "disabled")}
+                     :disabled send-bt-disabled?}
                     (if @(::shared s)
                       (if (= @(::shared s) :shared)
                         "Sent!"
