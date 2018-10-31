@@ -76,7 +76,7 @@ div.container {
       }
     }
 
-    p, h2 {
+    p, h2, h3, ul {
       margin: 0 auto 32px;
 
       @include tablet() {
