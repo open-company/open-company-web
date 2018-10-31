@@ -76,7 +76,9 @@
         headway-config (clj->js {
           :selector ".whats-new"
           :account "xGYD6J"
-          :translations {:title "What's New"}})]
+          :position {:y "bottom"}
+          :translations {:title "What's New"
+                         :footer "👉 Show me more new stuff"}})]
     (.init js/Headway headway-config)
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
