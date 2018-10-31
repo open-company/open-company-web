@@ -25,6 +25,16 @@ div.stream-item {
     }
   }
 
+  &.must-see-item {
+    div.stream-item-header {
+      div.stream-header-head-author {
+        div.must-see-tag {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
   &.show-continue-reading:not(.single-post-view) {
     div.stream-item-body-ext {
       div.stream-item-footer {
@@ -98,6 +108,12 @@ div.stream-item {
       @include new-tag();
 
       div.new-tag {
+        display: none;
+      }
+
+      @include must-see-tag();
+
+      div.must-see-tag {
         display: none;
       }
     }
@@ -265,8 +281,6 @@ div.stream-item {
           margin-top: 16px;
         }
       }
-
-      @include must-see();
 
       div.stream-item-body-container {
 

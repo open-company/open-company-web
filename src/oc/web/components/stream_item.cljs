@@ -138,6 +138,7 @@
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
                                 :draft is-drafts-board
+                                :must-see-item (:must-see activity-data)
                                 :new-item (:new activity-data)
                                 :single-post-view single-post-view})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
@@ -152,6 +153,7 @@
              (:name publisher)
              " in "
              (:board-name activity-data))
+            [:div.must-see-tag "Must see"]
             [:div.new-tag "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
@@ -208,10 +210,6 @@
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            (when (:must-see activity-data)
-              [:div.must-see
-               {:class (utils/class-set {:must-see-on
-                                         (:must-see activity-data)})}])
             [:div.stream-item-body-container
               [:div.stream-item-body
                 {:class (utils/class-set {:expanded expanded?
