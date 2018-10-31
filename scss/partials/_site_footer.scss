@@ -1,5 +1,5 @@
 .navbar-bottom {
-  background-color: #FFFDF9 !important;
+  background-color: $ultra_light_gold !important;
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
@@ -7,7 +7,7 @@
   overflow: hidden;
 
   &.light-background {
-    background-color: #FFFDF9 !important;
+    background-color: $ultra_light_gold !important;
   }
 
   @include mobile(){
