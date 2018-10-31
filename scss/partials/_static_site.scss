@@ -65,13 +65,13 @@ div.container {
         line-height: 26px;
         margin: 24px auto 40px;
       }
+    }
 
-      a {
-        color: $carrot_green;
+    a {
+      color: $carrot_green;
 
-        &:hover {
-          text-decoration: underline;
-        }
+      &:hover {
+        text-decoration: underline;
       }
     }
 
