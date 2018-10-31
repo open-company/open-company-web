@@ -1,11 +1,14 @@
 (ns oc.terms)
 
-(defn terms [{contact-mail-to :contact-mail-to contact-email :contact-email}]
+(defn terms [_]
   [:div.container.terms-of-service-page
 
-    [:div.legal-link "Click here to see OpenCompany " [:a {:href "/privacy"} "Privacy Policy"] "."]
     [:div.readable-content-container
+
       [:h1 "Terms of Service"]
+
+      [:div.legal-link "Check out our " [:a {:href "/privacy"} "privacy policy here"]]
+
       [:p "PLEASE READ THESE TERMS OF USE CAREFULLY BEFORE USING THE SERVICES OFFERED BY OPENCOMPANY, LLC. (\"OPENCOMPANY\"), A DELAWARE CORPORATION. THESE TERMS OF USE SET FORTH THE LEGALLY BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE WEBSITE AT HTTPS://CARROT.IO AND THE CARROT SERVICES, FEATURES, CONTENT, APPLICATIONS OR WIDGETS OFFERED BY OPENCOMPANY (COLLECTIVELY THE \"SERVICES\")."]
       [:p "1. Your Relationship with OpenCompany"]
       [:p "1.1 Your use of OpenCompany’s Services is subject to the terms of a legal agreement between you and OpenCompany. “OpenCompany” means OpenCompany LLC, whose principal place of business is at 8 Lincoln Ln, Cambridge, MA 02138, United States. This document explains how the agreement is made up, and sets out some of the terms of that agreement."]

@@ -1,10 +1,14 @@
 (ns oc.privacy)
 
-(defn privacy [{contact-mail-to :contact-mail-to contact-email :contact-email}]
+(defn privacy [_]
   [:div.container.privacy-policy-page
-    [:div.legal-link "Click here to see OpenCompany " [:a {:href "/terms"} "Terms of Service"] "."]
+
     [:div.readable-content-container
+
       [:h1 "Privacy policy"]
+
+      [:div.legal-link "Check out our " [:a {:href "/terms"} "terms of service here"]]
+
       [:p "This Privacy Policy describes OpenCompany's policies and procedures on the collection, use and disclosure of your information. OpenCompany receives your information through our Carrot web site, APIs, services and third parties (\"Services\"). When using any of our Services you consent to the collection, transfer, manipulation, storage, disclosure and other uses of your information as described in this Privacy Policy. Irrespective of which country that you reside in or create information from, your information may be used by OpenCompany in the United States or any other country where OpenCompany operates."]
       [:h2 "Information Collection and Use"]
       [:p [:i "We collect and use your information to provide our Services and improve them over time."]]
