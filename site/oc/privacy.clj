@@ -7,7 +7,7 @@
 
       [:h1 "Privacy policy"]
 
-      [:div.legal-link "Check out our " [:a {:href "/terms"} "terms of service here"]]
+      [:div.legal-link "Check out our " [:a {:href "/terms"} "terms of service"] " here."]
 
       [:p "This Privacy Policy describes OpenCompany's policies and procedures on the collection, use and disclosure of your information. OpenCompany receives your information through our Carrot website https://carrot.io, APIs, services and third parties (\"Services\"). When using any of our Services you consent to the collection, transfer, manipulation, storage, disclosure and other uses of your information as described in this Privacy Policy. Irrespective of which country that you reside in or create information from, your information may be used by OpenCompany in the United States or any other country where OpenCompany operates."]
       [:h2 "Information Collection and Use"]
@@ -50,7 +50,7 @@
       [:p "You can log in to our Service using Slack. This service will authenticate your identity and provide you the option to share certain personal information with us such as your name, email address, and picture to pre-populate your profile."]
       [:h3 {:id "gdpr"} "Not For Children"]
       [:p "None of our websites, applications or services are intended for children. Please do not submit information about yourself using our websites if you are under 13."]
-      [:p "OpenCompany does not knowingly collect personally identifiable information from children under 13. If a parent or guardian becomes aware that his or her child has provided us with Personal Information without their consent, he or she should contact us at privacy@carrot.io. If we become aware that a child under 13 has provided us with Personal Information, we will take steps to delete such information and terminate the child’s account."]
+      [:p "OpenCompany does not knowingly collect personally identifiable information from children under 13. If a parent or guardian becomes aware that his or her child has provided us with Personal Information without their consent, he or she should contact us at " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] ". If we become aware that a child under 13 has provided us with Personal Information, we will take steps to delete such information and terminate the child’s account."]
       [:h2 "Statement For European Union Users"]
       [:p "On May 25, 2018, the EU’s General Data Protection Regulation (GDPR) went into effect. For the purposes of the GDPR, OpenCompany is a data controller."]
       [:h3 "Description of Processing Activity"]
@@ -105,16 +105,16 @@
       [:h3 "Cross-border Transfers"]
       [:p "OpenCompany is hosted in the United States. By using any of our Services, you authorize OpenCompany to transfer, store, and use your information in the United States and any other country where we or our data processors operate."]
       [:h3 "Retention"]
-      [:p "OpenCompany retains personal data associated with your account for the lifetime of your account. You can delete your account by contacting privacy@carrot.io which will erase your personal information completely within 60 days (except to the extent OpenCompany is prevented by law from deleting your information)."]
+      [:p "OpenCompany retains personal data associated with your account for the lifetime of your account. You can delete your account by contacting " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] " which will erase your personal information completely within 60 days (except to the extent OpenCompany is prevented by law from deleting your information)."]
       [:h3 "EU Citizen Rights"]
       [:ul
-        [:li "You may request an export of your personal information by contacting privacy@carrot.io."]
-        [:li "You may correct information associated with your account from the \"Personal Profile\" dialog in the Service and by contacting privacy@carrot.io."]
-        [:li "You may withdraw consent by requesting your account be deleted by contacting privacy@carrot.io, which will erase your personal information completely within 60 days (except to the extent OpenCompany is prevented by law from deleting your information)."]
-        [:li "You may object at any time to the use of your personal data by contacting privacy@carrot.io."]]
-      [:p "Data Protection Officer contact email: privacy@carrot.io"]
+        [:li "You may request an export of your personal information by contacting " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] "."]
+        [:li "You may correct information associated with your account from the \"Personal Profile\" dialog in the Service and by contacting " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] "."]
+        [:li "You may withdraw consent by requesting your account be deleted by contacting " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] ", which will erase your personal information completely within 60 days (except to the extent OpenCompany is prevented by law from deleting your information)."]
+        [:li "You may object at any time to the use of your personal data by contacting " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] "."]]
+      [:p "Data Protection Officer contact email: " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] ""]
       [:h2 "Changes to this Policy"]
       [:p "We may revise this Privacy Policy from time to time. The most current version of the policy will govern our use of your information and will always be at" [:a {:href "http://carrot.io/privacy"} "http://carrot.io/privacy"] ". If we make a change to this policy that, in our sole discretion, is material, we may notify you via the e-mail address associated with your account. By continuing to access or use the Services after those changes become effective, you agree to be bound by the revised Privacy Policy."]
       [:p "This Privacy Policy is effective as of May 25, 2018"]
-      [:p "Questions about this Privacy Policy? Please let us know at hello@carrot.io."]
+      [:p "Questions about this Privacy Policy? Please let us know at " [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"] "."]
 ]])
