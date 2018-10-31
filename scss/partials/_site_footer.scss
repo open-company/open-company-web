@@ -101,9 +101,28 @@
       div.copyright {
         font-size: 14px;
         @include avenir_M();
-        color: $light_ui_grey;
+        color: $ui_grey;
         margin-top: 40px;
         max-width: 180px;
+
+        @include mobile(){
+          text-align: left;
+        }
+      }
+
+      div.tos-and-pp {
+        font-size: 14px;
+        @include avenir_M();
+        color: $ui_grey;
+        max-width: 180px;
+
+        a {
+          color: $ui_grey;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
 
         @include mobile(){
           text-align: left;
