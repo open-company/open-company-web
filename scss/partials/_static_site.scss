@@ -1,95 +1,92 @@
 div.container {
   width: 100%;
-  padding: 30px 0px 60px;
+  padding: 0 24px 60px;
   margin-top: 1px;
   position: relative;
   overflow: hidden;
-
-  &.privacy-policy-page, &.terms-of-service-page {
-    background: linear-gradient(to top, #FBFAF7 80%, #FBE3DD 85%, #FFEFBD 91%, #FFFBED 105%);
-  }
-
-  div.balloon {
-    position: absolute;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 1;
-
-    @include mobile() {
-      display: none;
-    }
-
-    &.big-purple {
-      @include image-2x("/img/ML/balloon_big_purple");
-      background-size: 111px 111px;
-      width: 111px;
-      height: 111px;
-      top: -64px;
-      right: 118px;
-    }
-
-    &.big-red {
-      @include image-2x("/img/ML/balloon_big_red");
-      background-size: 226px 208px;
-      width: 226px;
-      height: 208px;
-      top: -82px;
-      right: -55px;
-    }
-
-    &.big-green {
-      @include image-2x("/img/ML/balloon_big_green");
-      background-size: 200px 172px;
-      width: 200px;
-      height: 172px;
-      top: 358px;
-      left: 50%;
-      margin-left: -534px;
-    }
-  }
-
-  div.legal-link {
-    width: 800px;
-    margin: 20px auto 40px;
-    @include avenir_R();
-    font-size: 18px;
-    color: $carrot_dark_brown;
-
-    @include mobile(){
-      width: 100%;
-      padding: 0 32px;
-    }
-
-    a {
-      color: $carrot_orange;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
+  background-color: $ultra_light_gold;
 
   div.readable-content-container {
-    margin: 0px auto;
+    margin: 240px auto 0;
     @include avenir_R();
-    font-size: 15px;
-    color: $carrot_dark_brown;
+    font-size: 22px;
+    line-height: 32px;
+    color: $deep_navy;
+    max-width: 1002px;
+    width: 100%;
 
-    h1 {
-      @include avenir_H();
-      font-size: 32px;
-      color: $carrot_dark_brown_1;
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    @include big_web(){
-      width: 800px;
+    @include tablet(){
+      max-width: 720px;
+      font-size: 22px;
+      line-height: 30px;
+      margin: 144px auto 0;
     }
 
     @include mobile(){
+      margin: 131px auto 0;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    h1 {
+      @include PTSerif();
+      font-size: 80px;
+      line-height: 90px;
+      text-align: center;
+      margin: 0;
+
+      @include tablet() {
+        font-size: 80px;
+        line-height: 60px;
+      }
+
+      @include mobile() {
+        font-size: 36px;
+        line-height: 40px;
+      }
+    }
+
+    div.legal-link {
+      max-width: 800px;
       width: 100%;
-      padding: 0 32px;
+      margin: 20px auto 40px;
+      @include avenir_R();
+      font-size: 30px;
+      line-height: 38px;
+      margin: 40px auto 80px;
+      text-align: center;
+
+      @include tablet() {
+        font-size: 24px;
+        line-height: 38px;
+      }
+
+      @include mobile(){
+        font-size: 20px;
+        line-height: 26px;
+        margin: 24px auto 40px;
+      }
+
+      a {
+        color: $carrot_green;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    p, h2 {
+      margin: 0 auto 32px;
+
+      @include tablet() {
+        margin: 0 auto 30px;
+        max-width: 595px;
+      }
+
+      @include mobile() {
+        margin: 0 auto 24px;
+      }
     }
   }
 }
