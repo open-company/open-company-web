@@ -21,6 +21,10 @@ div.stream-item {
         div.new-tag {
           display: inline-block;
         }
+
+        div.name div.name-inner {
+          max-width: calc(100% - 52px);
+        }
       }
     }
   }
@@ -30,6 +34,20 @@ div.stream-item {
       div.stream-header-head-author {
         div.must-see-tag {
           display: inline-block;
+        }
+
+        div.name div.name-inner {
+          max-width: calc(100% - 94px);
+        }
+      }
+    }
+  }
+
+  &.must-see-item.new-item {
+    div.stream-item-header {
+      div.stream-header-head-author {
+        div.name div.name-inner {
+          max-width: calc(100% - 138px);
         }
       }
     }
@@ -71,17 +89,26 @@ div.stream-item {
 
     div.stream-header-head-author {
       float: left;
-      width: 55%;
+      width: 567px;
 
       @include activity-author(32);
 
       @include mobile() {
-        width: 80%;
+        width: calc(100% - 46px);
       }
 
       div.name {
+        height: 20px;
+
         @include mobile() {
           width: auto;
+        }
+
+        div.name-inner {
+          display: inline-block;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          line-height: 20px;
         }
       }
 

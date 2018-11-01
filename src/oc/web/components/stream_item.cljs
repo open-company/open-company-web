@@ -148,11 +148,12 @@
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (user-avatar-image publisher)
-          [:div.name.fs-hide
-            (str
-             (:name publisher)
-             " in "
-             (:board-name activity-data))
+          [:div.name
+            [:div.name-inner.fs-hide
+              (str
+               (:name publisher)
+               " in "
+               (:board-name activity-data))]
             [:div.must-see-tag "Must see"]
             [:div.new-tag "NEW"]]
           [:div.time-since
