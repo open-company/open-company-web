@@ -459,11 +459,14 @@
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
         updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
         created-str (activity-date created-at)
-        updated-str (activity-date updated-at)]
+        updated-str (activity-date updated-at)
+        label-prefix (if (= (:status entry-data) "published")
+                       "Posted "
+                       "Created ")]
     (if (or (= (:created-at entry-data) (:updated-at entry-data))
             (not (:updated-at entry-data)))
-      (str "Posted " created-str)
-      (str "Posted " created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
+      (str label-prefix created-str)
+      (str label-prefix created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
 
 (defn activity-date-tooltip [activity-data]
   (entry-date-tooltip activity-data))
