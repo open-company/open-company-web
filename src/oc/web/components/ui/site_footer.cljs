@@ -62,4 +62,10 @@
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
               "Login"]])
         [:div.copyright
-          "Copyright © 2018 Carrot. All rights reserved"]]]])
+          "© 2018 Carrot"]
+        [:div.tos-and-pp
+          [:a {:href oc-urls/privacy}
+           "Privacy"]
+          " • "
+          [:a {:href oc-urls/terms}
+           "Terms"]]]]])
