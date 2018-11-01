@@ -107,7 +107,7 @@
                     "Daily"
                     "weekly"
                     "Weekly"
-                    "Never")]
+                    "In-app Only")]
                 [:ul.dropdown-menu.user-type-dropdown-menu
                   {:aria-labelledby "user-digest-frequency-dropdown"}
                   [:li
@@ -118,7 +118,7 @@
                     "Weekly"]
                   [:li
                     {:on-click #(change! s :digest-frequency "never")}
-                    "Never"]]]]]]]
+                    "In-app Only"]]]]]]]
       [:div.user-profile-footer.group
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)
