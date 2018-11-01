@@ -12,14 +12,14 @@ div.is-comments {
 
     div.is-comments-author {
       float: left;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border: 2px solid white;
       background-color: white;
       border-radius: 12px;
-      margin-left: -9px;
+      margin-left: -10px;
 
-      @include user-profile(22);
+      @include user-profile(24);
 
       &:first-child {
         margin-left: 0px;
