@@ -1,12 +1,15 @@
 (ns oc.terms)
 
-(defn terms [{contact-mail-to :contact-mail-to contact-email :contact-email}]
+(defn terms [_]
   [:div.container.terms-of-service-page
 
-    [:div.legal-link "Click here to see OpenCompany " [:a {:href "/privacy"} "Privacy Policy"] "."]
     [:div.readable-content-container
+
       [:h1 "Terms of Service"]
-      [:p "PLEASE READ THESE TERMS OF USE CAREFULLY BEFORE USING THE SERVICES OFFERED BY OPENCOMPANY, LLC. (\"OPENCOMPANY\"), A DELAWARE CORPORATION. THESE TERMS OF USE SET FORTH THE LEGALLY BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE WEBSITE AT HTTPS://CARROT.IO AND THE CARROT SERVICES, FEATURES, CONTENT, APPLICATIONS OR WIDGETS OFFERED BY OPENCOMPANY (COLLECTIVELY THE \"SERVICES\")."]
+
+      [:div.legal-link "Check out our " [:a {:href "/privacy"} "privacy policy"] " here."]
+
+      [:p "PLEASE READ THESE TERMS OF USE CAREFULLY BEFORE USING THE SERVICES OFFERED BY OPENCOMPANY, LLC. (\"OPENCOMPANY\"), A DELAWARE CORPORATION. THESE TERMS OF USE SET FORTH THE LEGALLY BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE WEBSITE AT "[:a {:href "https://carrot.io"} "HTTPS://CARROT.IO"]" AND THE CARROT SERVICES, FEATURES, CONTENT, APPLICATIONS OR WIDGETS OFFERED BY OPENCOMPANY (COLLECTIVELY THE \"SERVICES\")."]
       [:p "1. Your Relationship with OpenCompany"]
       [:p "1.1 Your use of OpenCompany’s Services is subject to the terms of a legal agreement between you and OpenCompany. “OpenCompany” means OpenCompany LLC, whose principal place of business is at 8 Lincoln Ln, Cambridge, MA 02138, United States. This document explains how the agreement is made up, and sets out some of the terms of that agreement."]
       [:p "1.2 Unless otherwise agreed in writing with OpenCompany, your agreement with OpenCompany will always include, at a minimum, the terms and conditions set out in this document. These are referred to below as the “Universal Terms”."]
@@ -41,7 +44,7 @@
       [:p "6.2 Accordingly, you agree that you will be solely responsible to OpenCompany for all activities that occur under your account."]
       [:p "6.3 In creating or updating information for your business, you must be an authorized representative of the business in question, and you must provide complete and accurate information about yourself and the business you represent. If you are no longer an authorized representative of the business in question, you must terminate your access to the information immediately."]
       [:p "7. Privacy and Your Personal Information"]
-      [:p "7.1 For information about OpenCompany’s data protection practices, please read OpenCompany's privacy policy at https://carrot.io/privacy. This policy explains how OpenCompany treats your personal information, and protects your privacy, when you use the Services."]
+      [:p "7.1 For information about OpenCompany’s data protection practices, please read OpenCompany's privacy policy at "[:a {:href "https://carrot.io/privacy"} "https://carrot.io/privacy"]". This policy explains how OpenCompany treats your personal information, and protects your privacy, when you use the Services."]
       [:p "7.2 You agree to the use of your data in accordance with OpenCompany’s privacy policies."]
       [:p "8. Content in the Services"]
       [:p "8.1 You understand that all information (such as data files, written text, computer software, music, audio files or other sounds, images, videos, contact information, location data, availability information, and all other forms of data or communications) which you may have access to as part of, or through your use of, the Services are the sole responsibility of the person from which such content originated. All such information is referred to below as the “Content”."]

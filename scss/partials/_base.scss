@@ -142,7 +142,7 @@ span.num.red {
 
 div#wrap {
   min-height: 100vh;
-  background-color: #FFFDF9;
+  background-color: $ultra_light_gold;
 }
 
 button.slack-button {
@@ -197,6 +197,18 @@ div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span
 
 .big-web-only {
   @include tablet(){
+    display: none !important;
+  }
+}
+
+.tablet-mobile-only {
+  @media screen and (min-width: #{$max_tablet_width}px) {
+    display: none !important;
+  }
+}
+
+.big-web-tablet-only {
+  @media screen and (max-width: #{$min_big_web_width - 1}px) {
     display: none !important;
   }
 }
