@@ -214,4 +214,4 @@
           [:button.mlb-reset.invite-people-btn
             {:on-click #(nav-actions/show-invite)}
             [:div.bottom-nav-icon.invite-people-icon]
-            [:span "Invite people"]])]]))
+            [:span "Invite team"]])]]))
