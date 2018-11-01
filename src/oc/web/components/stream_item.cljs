@@ -33,8 +33,6 @@
   (when (and expand?
              scroll-to-comments?)
     (reset! (::should-scroll-to-comments s) true))
-  (when-not expand?
-    (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0)))
   (when expand?
     ;; When expanding a post send the WRT read
     (activity-actions/send-item-read (:uuid (first (:rum/args s))))))
@@ -87,6 +85,9 @@
                            (let [activity-uuid (:uuid (first (:rum/args s)))]
                              (when (= (router/current-activity-id) activity-uuid)
                                (activity-actions/send-item-read activity-uuid)))
+                           s)
+                          :did-remount (fn [_ s]
+                           (should-show-continue-reading? s)
                            s)
                           :after-render (fn [s]
                            (let [activity-data (first (:rum/args s))
