@@ -18,6 +18,7 @@ $h2_top_margin: 24;
     @include avenir_M();
     color: $deep_navy;
     font-size: 14px;
+    line-height: 20px;
     white-space: nowrap;
   }
 
@@ -46,15 +47,48 @@ $h2_top_margin: 24;
     font-size: 11px;
     line-height: 17px;
     padding: 2px 0px 0px;
-    border-radius: 3px;
+    border-radius: 4px;
     height: 18px;
     width: 36px;
     background-color: rgba(255,176,61,.2);
     text-transform: uppercase;
     text-align: center;
-    margin-left: 8px;
+    vertical-align: top;
   }
 }
+
+@mixin must-see-tag() {
+  div.must-see-tag {
+    @include avenir_B();
+    color: $sea_blue;
+    font-size: 11px;
+    line-height: 17px;
+    padding: 2px 6px 2px 17px;
+    border-radius: 4px;
+    height: 18px;
+    width: 78px;
+    background-color: rgba($sea_blue,.2);
+    text-transform: uppercase;
+    text-align: center;
+    margin-right: 8px;
+    position: relative;
+    vertical-align: top;
+
+    &:before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 10px 10px;
+      position: absolute;
+      top: 5px;
+      left: 6px;
+    }
+  }
+}
+
 
 @mixin must-see(){
   div.must-see {
