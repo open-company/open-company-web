@@ -119,9 +119,10 @@
                          (= (router/current-board-slug) "all-posts"))
         is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "stream-item-" (:uuid activity-data))
-        publisher (if is-drafts-board
-                    (first (:author activity-data))
-                    (:publisher activity-data))
+        is-published? (au/is-published? activity-data)
+        publisher (if is-published?
+                    (:publisher activity-data)
+                    (first (:author activity-data)))
         is-publisher? (= (:user-id publisher) (jwt/user-id))
         dom-node-class (str "stream-item-" (:uuid activity-data))
         has-video (seq (:fixed-video-id activity-data))
@@ -133,11 +134,13 @@
                         :height @(::mobile-video-height s)}
                        {:width (if expanded? 638 136)
                         :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))]
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
+        should-show-wrt (and user-is-part-of-the-team
+                             is-published?)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
-                                :draft is-drafts-board
+                                :draft (not is-published?)
                                 :new-item (:new activity-data)
                                 :single-post-view single-post-view})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
@@ -162,12 +165,12 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
-          (when user-is-part-of-the-team
+          (when should-show-wrt
             [:div.separator])
-          (when user-is-part-of-the-team
+          (when should-show-wrt
             [:div.stream-item-wrt
               (wrt activity-data read-data)])]
-        (when (and (not is-drafts-board)
+        (when (and is-published?
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)
                        is-mobile?))
