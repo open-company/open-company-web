@@ -140,7 +140,9 @@
                                 :draft is-drafts-board
                                 :must-see-item (:must-see activity-data)
                                 :new-item (:new activity-data)
-                                :single-post-view single-post-view})
+                                :single-post-view single-post-view
+                                :show-menu (or @(::hovering-tile s)
+                                               @(::more-menu-open s))})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
        :id dom-element-id}
@@ -154,8 +156,8 @@
                (:name publisher)
                " in "
                (:board-name activity-data))]
-            [:div.must-see-tag "Must see"]
-            [:div.new-tag "NEW"]]
+            [:div.must-see-tag.big-web-tablet-only "Must see"]
+            [:div.new-tag.big-web-tablet-only "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
@@ -170,14 +172,13 @@
           (when user-is-part-of-the-team
             [:div.stream-item-wrt
               (wrt activity-data read-data)])]
-        (when (and (not is-drafts-board)
-                   (or @(::hovering-tile s)
-                       @(::more-menu-open s)
-                       is-mobile?))
+        (when (not is-drafts-board)
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
             :external-share (not is-mobile?)}))]
+      [:div.must-see-tag.mobile-only "Must see"]
+      [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.thumbnail-container.group
