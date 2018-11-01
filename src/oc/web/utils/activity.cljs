@@ -9,6 +9,9 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.responsive :as responsive]))
 
+(defn is-published? [entry-data]
+  (= (:status entry-data) "published"))
+
 (defn board-by-uuid [board-uuid]
   (let [org-data (dis/org-data)
         boards (:boards org-data)]
