@@ -59,7 +59,6 @@
         (router/redirect-404!))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
-        (au/save-last-used-section "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards (:fixed-items fixed-all-posts))
@@ -87,7 +86,7 @@
           must-see-data (when success (json->cljs body))
           must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data))]
       (when (= (router/current-board-slug) "must-see")
-        (au/save-last-used-section "must-see"))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (watch-boards (:fixed-items must-see-posts))
       (dis/dispatch! [:must-see-get/finish org must-see-posts]))))
 
