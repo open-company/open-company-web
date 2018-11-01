@@ -201,6 +201,18 @@ div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span
   }
 }
 
+.tablet-mobile-only {
+  @media screen and (min-width: #{$max_tablet_width}px) {
+    display: none !important;
+  }
+}
+
+.big-web-tablet-only {
+  @media screen and (max-width: #{$min_big_web_width - 1}px) {
+    display: none !important;
+  }
+}
+
 div.not-found, div.server-error{
   div.error-page {
     text-align: center;
