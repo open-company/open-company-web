@@ -142,7 +142,7 @@
                :value @(::video-url s)
                :ref "video-input"
                :on-change #(reset! (::video-url s) (.. % -target -value))
-               :placeholder "Link from Loom, YouTube or Vimeo"}]]
+               :placeholder "Link from Youtube, Vimeo or Loom"}]]
           [:div.media-video-modal-buttons.group
             [:button.mlb-reset.mlb-default
               {:on-click #(video-add-click s)
