@@ -78,7 +78,9 @@
                   (case (:digest-medium current-user-data)
                     "slack"
                     "Slack"
-                    "Email")]
+                    "email"
+                    "Email"
+                    "In-app only")]
                 [:ul.dropdown-menu.user-type-dropdown-menu
                   {:aria-labelledby "user-digest-medium-dropdown"}
                   [:li
@@ -88,7 +90,10 @@
                   (when (jwt/team-has-bot? (:team-id org-data))
                     [:li
                       {:on-click #(change! s :digest-medium "slack")}
-                      "Slack"])]]]]]
+                      "Slack"])
+                  [:li
+                    {:on-click #(change! s :digest-medium "in-app")}
+                    "In-app only"]]]]]]
         ; Right column
         [:div.user-profile-column-right.fs-hide
           ;; Digest Medium
@@ -101,13 +106,15 @@
                   {:id "user-digest-frequency-dropdown"
                    :data-toggle "dropdown"
                    :aria-haspopup true
-                   :aria-expanded false}
+                   :aria-expanded false
+                   :disabled (and (not= (:digest-medium current-user-data) "email")
+                                  (not= (:digest-medium current-user-data) "slack"))}
                   (case (:digest-frequency current-user-data)
                     "daily"
                     "Daily"
                     "weekly"
                     "Weekly"
-                    "In-app Only")]
+                    "Never")]
                 [:ul.dropdown-menu.user-type-dropdown-menu
                   {:aria-labelledby "user-digest-frequency-dropdown"}
                   [:li
@@ -118,7 +125,7 @@
                     "Weekly"]
                   [:li
                     {:on-click #(change! s :digest-frequency "never")}
-                    "In-app Only"]]]]]]]
+                    "Never"]]]]]]]
       [:div.user-profile-footer.group
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)
