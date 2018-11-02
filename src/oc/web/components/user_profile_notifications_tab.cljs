@@ -84,12 +84,20 @@
                 [:ul.dropdown-menu.user-type-dropdown-menu
                   {:aria-labelledby "user-digest-medium-dropdown"}
                   [:li
-                    {:on-click #(change! s :digest-medium "email")}
+                    {:on-click #(do
+                                  (when (and (= (:digest-medium current-user-data) "in-app")
+                                             (= (:digest-frequency current-user-data) "never"))
+                                    (change! s :digest-frequency "daily"))
+                                  (change! s :digest-medium "email"))}
                     "Email"]
                   ;; Show Slack digest option if
                   (when (jwt/team-has-bot? (:team-id org-data))
                     [:li
-                      {:on-click #(change! s :digest-medium "slack")}
+                      {:on-click #(do
+                                    (when (and (= (:digest-medium current-user-data) "in-app")
+                                               (= (:digest-frequency current-user-data) "never"))
+                                      (change! s :digest-frequency "daily"))
+                                    (change! s :digest-medium "slack"))}
                       "Slack"])
                   [:li
                     {:on-click #(change! s :digest-medium "in-app")}
