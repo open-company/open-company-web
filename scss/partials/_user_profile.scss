@@ -6,7 +6,7 @@ div.user-profile {
   position: fixed;
   top: 0px;
   left: 0px;
-  z-index: 1000;
+  z-index: #{$navbar_zindex + 156};
   overflow-x: hidden;
   overflow-y: auto;
   width: 100vw;
