@@ -214,4 +214,4 @@
         [:button.mlb-reset.invite-people-btn
           {:on-click #(chat/chat-click 42861)}
           [:div.bottom-nav-icon.support-icon]
-          [:span "Support"]]]]))
+          [:span "Get support"]]]]))
