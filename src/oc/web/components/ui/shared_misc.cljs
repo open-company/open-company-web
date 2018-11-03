@@ -10,10 +10,10 @@
     [:div.testimonials-section-subtitle
       "We’re helping teams like yours."]
     [:div.testimonials-cards-container.group
-      [:div.testimonial-card
+      [:div.testimonial-card.skylight
         [:div.testimonial-image]
         [:div.testimonial-name
-          "CHRIS CAIRNS"]
+          "Chris Cairns"]
         [:div.testimonial-role
           "Managing Partner"]
         [:div.testimonial-quote
@@ -27,22 +27,22 @@
             {:href "https://skylight.digital/"
              :target "_blank"}
             [:div.testimonial-logo]]]]
-      [:div.testimonial-card
-        [:div.testimonial-image]
-        [:div.testimonial-name
-          "Tom Hadfield"]
-        [:div.testimonial-role
-          "CEO"]
-        [:div.testimonial-quote
-          (str
-           "“On Carrot, my updates get noticed and "
-           "get the team talking. I love that.”")]
-        [:div.testimonial-footer.group
-          [:a
-            {:href "https://m.io/"
-             :target "_blank"}
-            [:div.testimonial-logo]]]]
-      [:div.testimonial-card
+      ; [:div.testimonial-card.m-io
+      ;   [:div.testimonial-image]
+      ;   [:div.testimonial-name
+      ;     "Tom Hadfield"]
+      ;   [:div.testimonial-role
+      ;     "CEO"]
+      ;   [:div.testimonial-quote
+      ;     (str
+      ;      "“On Carrot, my updates get noticed and "
+      ;      "get the team talking. I love that.”")]
+      ;   [:div.testimonial-footer.group
+      ;     [:a
+      ;       {:href "https://m.io/"
+      ;        :target "_blank"}
+      ;       [:div.testimonial-logo]]]]
+      [:div.testimonial-card.wayne-edu
         [:div.testimonial-image]
         [:div.testimonial-name
           "Nick DeNardis"]
