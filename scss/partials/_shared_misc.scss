@@ -234,13 +234,13 @@ section.testimonials-section {
   }
 
   div.testimonials-cards-container {
-    // width: 1194px;
-    width: 834px;
+    // $testimonials_breakpoint: 1193;
+    $testimonials_breakpoint: 833;
+    width: #{$testimonials_breakpoint + 1}px;
     margin: 55px auto 0px;
     position: relative;
 
-    // @media screen and (max-width: 1193px) {
-    @media screen and (max-width: 833px) {
+    @media screen and (max-width: #{$testimonials_breakpoint}px) {
       width: 100%;
       margin: 42px auto 0px;
     }
@@ -377,8 +377,7 @@ section.testimonials-section {
         }
       }
 
-      // @media screen and (max-width: 1193px) {
-      @media screen and (max-width: 833px) {
+      @media screen and (max-width: #{$testimonials_breakpoint}px) {
 
         float: unset;
         margin: 40px auto 0;
@@ -386,7 +385,7 @@ section.testimonials-section {
         max-width: 440px;
         float: unset;
 
-        &:nth-child(3) {
+        &.wayne-edu, &.m-io,  &.skylight{
           float: unset;
         }
       }
@@ -394,8 +393,7 @@ section.testimonials-section {
       &:not(:first-child) {
         margin-left: 30px;
 
-        // @media screen and (max-width: 1193px) {
-        @media screen and (max-width: 833px) {
+        @media screen and (max-width: #{$testimonials_breakpoint}px) {
           margin: 40px auto 0;
         }
       }
