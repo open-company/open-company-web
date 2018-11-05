@@ -77,7 +77,12 @@ div.wrt-popup {
         line-height: 24px;
         @include avenir_H();
         font-size: 16px;
-        color: $deep_navy; 
+        color: $deep_navy;
+        white-space: nowrap;
+        max-width: calc(100% - 40px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
       }
     }
   }
