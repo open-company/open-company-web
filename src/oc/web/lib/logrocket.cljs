@@ -17,15 +17,15 @@
       (js/console.log "DBG LogRocket.getSessionURL" session-url)
       (when (exists? js/drift)
         (js/console.log "DBG   add drift track" session-url)
-        (.track js/drift "LogRocket" (clj->js {:sessionURL session-url})))
+        (.track js/drift "LogRocket" #js {"sessionURL" session-url}))
 
       (when (exists? js/Raven)
        (.setDataCallback js/Raven
         (fn [data]
          (js/console.log "DBG   add Raven extra:" (.-extra data))
-         (if (.-extra data)
-           (set! (.-sessionURL (.-extra data)) (.-sessionURL js/LogRocket))
-           (set! (.-extra data) #js {:sessionURL (.-sessionURL js/LogRocket)}))
+         (if (aget data "extra")
+           (aset (aget (aget data "extra") "sessionURL") (.-sessionURL js/LogRocket))
+           (aset (aget data "extra") #js {:sessionURL (.-sessionURL js/LogRocket)}))
          data)))))))
 
 (defn identify []
