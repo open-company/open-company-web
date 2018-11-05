@@ -229,7 +229,7 @@ div.wrt-popup {
           span.unopened-label {
             display: none;
           }
-        }          
+        }
       }
 
       div.wrt-popup-list-row-seen {
@@ -265,6 +265,10 @@ div.wrt-popup {
           opacity: 0.6;
           background-image: cdnUrl("/img/ML/send_reminder.svg");
           background-size: 14px 14px;
+
+          @include mobile() {
+            display: block;
+          }
 
           &:hover {
             opacity: 1;
