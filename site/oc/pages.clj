@@ -1149,7 +1149,8 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js]
+          ziggeo-js
+          (logrocket)]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -1183,5 +1184,4 @@
           [:script {:src (cdn "/oc_assets.js")}]
           ; (when (= (env :fullstory) "true")
           ;   (fullstory-init))
-          (logrocket)
           (google-analytics-init)]})
