@@ -44,8 +44,7 @@
     (when email
       (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
                         (clj->js {:nickname (:name jwt-contents)
-                                  :email email
-                                  :sessionURL (.-sessionURL js/LogRocket)}))))
+                                  :email email}))))
     (when jwt-contents
       (logrocket/identify))))
 

@@ -16,8 +16,8 @@
      (fn [session-url]
       (js/console.log "DBG LogRocket.getSessionURL" session-url)
       (when (exists? js/drift)
-        (js/console.log "DBG   add drift track" session-url)
-        (.track js/drift "LogRocket" #js {"sessionURL" session-url}))
+        (js/console.log "DBG   add drift track" session-url (clj->js {:sessionURL session-url}))
+        (.track js/drift "LogRocket" (clj->js {:sessionURL session-url})))
 
       (when (exists? js/Raven)
        (.setDataCallback js/Raven
