@@ -31,6 +31,12 @@
                        (on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/dom-node s))
                           (reset! (::show-picker s) false))))
+                       {:did-remount (fn [_ s]
+                        (when-not (responsive/is-tablet-or-mobile?)
+                          (doto (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+                            (.tooltip "fixTitle")
+                            (.tooltip "hide")))
+                        s)}
   [s entry-data hide-last-reaction?]
   (let [reactions-data (if hide-last-reaction?
                          (vec (take (dec default-reaction-number) (:reactions entry-data)))

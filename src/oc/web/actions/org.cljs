@@ -121,8 +121,9 @@
     (org-loaded org-data false)))
 
 (defn get-org [& [org-data]]
-  (let [fixed-org-data (or org-data (dis/org-data))]
-    (api/get-org fixed-org-data get-org-cb)))
+  (let [fixed-org-data (or org-data (dis/org-data))
+        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
+    (api/get-org org-link get-org-cb)))
 
 ;; Org redirect
 
@@ -148,7 +149,11 @@
     ;; the user has write permission on it
     ;; use the org name
     ;; for it and patch it back
-    (api/patch-team (:team-id org-data) {:name (:name org-data)} org-data (partial team-patch-cb org-data))
+    (let [team-id (:team-id org-data)
+          team-data (dis/team-data team-id)
+          team-patch-link (utils/link-for (:links team-data) "partial-update")]
+      (api/patch-team team-patch-link team-id {:name (:name org-data)}
+       (partial team-patch-cb org-data)))
     ;; if not redirect the user to the invite page
     (org-created org-data)))
 
@@ -156,7 +161,12 @@
   (let [team-data (dis/team-data (:team-id org-data))
         redirect-cb #(handle-org-redirect team-data org-data email-domain)]
     (if (seq email-domain)
-      (api/add-email-domain email-domain redirect-cb team-data)
+      (let [add-email-domain-link (utils/link-for
+                                   (:links team-data)
+                                   "add"
+                                   "POST"
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1"})]
+        (api/add-email-domain add-email-domain-link email-domain redirect-cb team-data))
       (redirect-cb))))
 
 (defn org-create-check-errors [status]
@@ -204,8 +214,10 @@
                               :name
                               (trunc (:name logo-org-data) 127))]
     (if (seq (:slug existing-org))
-      (api/patch-org clean-org-data (partial org-update-cb fixed-email-domain))
-      (api/create-org clean-org-data (partial org-create-cb fixed-email-domain)))))
+      (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
+        (api/patch-org org-patch-link clean-org-data (partial org-update-cb fixed-email-domain)))
+      (let [create-org-link (utils/link-for (dis/api-entry-point) "create")]
+        (api/create-org create-org-link clean-org-data (partial org-create-cb fixed-email-domain))))))
 
 ;; Org edit
 
@@ -216,7 +228,8 @@
   (org-loaded (json->cljs body) true))
 
 (defn org-edit-save [org-data]
-  (api/patch-org org-data org-edit-save-cb))
+  (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
+    (api/patch-org org-patch-link org-data org-edit-save-cb)))
 
 (defn org-avatar-edit-save-cb [{:keys [success body status]}]
   (if success
@@ -237,7 +250,8 @@
         :dismiss true}))))
 
 (defn org-avatar-edit-save [org-avatar-data]
-  (api/patch-org org-avatar-data org-avatar-edit-save-cb))
+  (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
+    (api/patch-org org-patch-link org-avatar-data org-avatar-edit-save-cb)))
 
 (defn org-change [data org-data]
   (let [change-data (:data data)
@@ -270,9 +284,10 @@
 (defn update-org-sections [org-slug all-sections]
   (dis/dispatch! [:input [:ap-loading] true])
   (let [selected-sections (vec (map :name (filterv :selected all-sections)))
-           patch-payload {:boards (conj selected-sections "General")
-                          :samples true}]
-      (api/patch-org-sections patch-payload
+        patch-payload {:boards (conj selected-sections "General")
+                       :samples true}
+        org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
+      (api/patch-org-sections org-patch-link patch-payload
        (fn [{:keys [success status body]}]
          (when success
            (org-loaded (json->cljs body) false))
