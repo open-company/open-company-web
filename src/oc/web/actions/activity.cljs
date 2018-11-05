@@ -40,7 +40,7 @@
 (defn request-reads-count
   "Request the reads count data only for the items we don't have already."
   [item-ids]
-  (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activities-read-data))]
+  (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activity-read-data))]
     (when (seq cleaned-ids)
       (api/request-reads-count cleaned-ids))))
 

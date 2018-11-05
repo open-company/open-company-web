@@ -299,7 +299,7 @@ section.testimonials-section {
       }
 
       &.wayne-edu {
-        float: right;
+        // float: right;
 
         div.testimonial-header {
           div.testimonial-logo {
@@ -385,9 +385,9 @@ section.testimonials-section {
         max-width: 440px;
         float: unset;
 
-        &.wayne-edu, &.m-io,  &.skylight{
-          float: unset;
-        }
+        // &.wayne-edu, &.m-io,  &.skylight{
+        //   float: unset;
+        // }
       }
 
       &:not(:first-child) {

@@ -15,9 +15,9 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -175,7 +175,7 @@
             [:div.separator])
           (when should-show-wrt
             [:div.stream-item-wrt
-              (wrt activity-data read-data)])]
+              (wrt-count activity-data read-data)])]
         (when (and is-published?
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)

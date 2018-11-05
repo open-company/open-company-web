@@ -47,7 +47,7 @@
                (not= (:slug section) utils/default-drafts-board-slug)
                (seq (:entries section)))
       (let [item-ids (map :uuid (:entries section))
-            cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activities-read-data))]
+            cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
         (when (seq cleaned-ids)
           (api/request-reads-count cleaned-ids))))
     (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))

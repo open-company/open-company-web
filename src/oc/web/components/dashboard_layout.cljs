@@ -19,7 +19,7 @@
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.section-stream :refer (section-stream)]
-            [oc.web.components.entries-layout :refer (entries-layout)]
+            ; [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]

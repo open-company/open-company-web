@@ -40,7 +40,7 @@
                                   :mention-users (users-for-mentions users)}]
            (dis/dispatch! [:team-roster-loaded fixed-roster-data])
            ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
-           (let [activities-read (dis/activities-read-data)]
+           (let [activities-read (dis/activity-read-data)]
              (doseq [read-data activities-read]
                (dis/dispatch! [:activity-reads (:item-id read-data) (:reads read-data) fixed-roster-data])))))))))
 
