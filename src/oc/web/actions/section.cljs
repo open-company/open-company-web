@@ -89,25 +89,29 @@
       (when success (section-get-finish (json->cljs body))))))
 
 (defn section-delete [section-slug]
-  (api/delete-board section-slug (fn [status success body]
-    (if success
-      (let [org-slug (router/current-org-slug)
-            last-used-section-slug (au/last-used-section)]
-        (when (= last-used-section-slug section-slug)
-          (au/save-last-used-section nil))
-        (if (= section-slug (router/current-board-slug))
-          (do
-            (router/nav! (oc-urls/all-posts org-slug))
-            (api/get-org (dispatcher/org-data)
-              (fn [{:keys [status body success]}]
-                (dispatcher/dispatch! [:org-loaded (json->cljs body)]))))
-          (dispatcher/dispatch! [:section-delete org-slug section-slug])))
-      (.reload (.-location js/window))))))
+  (let [section-data (dispatcher/board-data (router/current-org-slug) section-slug)
+        delete-section-link (utils/link-for (:links section-data) "delete")]
+    (api/delete-board delete-section-link section-slug (fn [status success body]
+      (if success
+        (let [org-slug (router/current-org-slug)
+              last-used-section-slug (au/last-used-section)]
+          (when (= last-used-section-slug section-slug)
+            (au/save-last-used-section nil))
+          (if (= section-slug (router/current-board-slug))
+            (do
+              (router/nav! (oc-urls/all-posts org-slug))
+              (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
+                (api/get-org org-link
+                  (fn [{:keys [status body success]}]
+                    (dispatcher/dispatch! [:org-loaded (json->cljs body)])))))
+            (dispatcher/dispatch! [:section-delete org-slug section-slug])))
+        (.reload (.-location js/window)))))))
 
 (defn refresh-org-data []
-  (api/get-org (dispatcher/org-data)
-    (fn [{:keys [status body success]}]
-      (dispatcher/dispatch! [:org-loaded (json->cljs body)]))))
+  (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
+    (api/get-org org-link
+      (fn [{:keys [status body success]}]
+        (dispatcher/dispatch! [:org-loaded (json->cljs body)])))))
 
 (defn section-name-error [status]
   ;; Board name exists or too short
@@ -125,28 +129,30 @@
   ([section-data note success-cb error-cb]
     (timbre/debug section-data)
     (if (empty? (:links section-data))
-      (api/create-board section-data note
-        (fn [{:keys [success status body]}]
-          (let [section-data (when success (json->cljs body))]
-            (if-not success
-              (when (fn? error-cb)
-                (error-cb status))
-              (do
-                (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
-                (utils/after 500 refresh-org-data)
-                (ws-cc/container-watch (:uuid section-data))
-                (dispatcher/dispatch! [:section-edit-save/finish section-data])
-                (when (fn? success-cb)
-                  (success-cb)))))))
-      (api/patch-board section-data note (fn [success body status]
-        (if-not success
-          (when (fn? error-cb)
-            (error-cb status))
-          (do
-            (refresh-org-data)
-            (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])
-            (when (fn? success-cb)
-              (success-cb)))))))))
+      (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")]
+        (api/create-board create-board-link section-data note
+          (fn [{:keys [success status body]}]
+            (let [section-data (when success (json->cljs body))]
+              (if-not success
+                (when (fn? error-cb)
+                  (error-cb status))
+                (do
+                  (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
+                  (utils/after 500 refresh-org-data)
+                  (ws-cc/container-watch (:uuid section-data))
+                  (dispatcher/dispatch! [:section-edit-save/finish section-data])
+                  (when (fn? success-cb)
+                    (success-cb))))))))
+      (let [board-patch-link (utils/link-for (:links section-data) "partial-update")]
+        (api/patch-board board-patch-link section-data note (fn [success body status]
+          (if-not success
+            (when (fn? error-cb)
+              (error-cb status))
+            (do
+              (refresh-org-data)
+              (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])
+              (when (fn? success-cb)
+                (success-cb))))))))))
 
 (defn private-section-user-add
   [user user-type]
@@ -159,18 +165,19 @@
 (defn private-section-kick-out-self
   [user]
   (when (= (:user-id user) (jwt/user-id))
-    (api/remove-user-from-private-board user (fn [status success body]
-      ;; Redirect to the first available board
-      (let [org-data (dispatcher/org-data)
-            all-boards (:boards org-data)
-            current-board-slug (router/current-board-slug)
-            except-this-boards (remove #(#{current-board-slug "drafts"} (:slug %)) all-boards)
-            redirect-url (if-let [next-board (first except-this-boards)]
-                           (oc-urls/board (:slug next-board))
-                           (oc-urls/org (router/current-org-slug)))]
-        (refresh-org-data)
-        (utils/after 0 #(router/nav! redirect-url))
-        (dispatcher/dispatch! [:private-section-kick-out-self/finish success]))))))
+    (let [remove-link (utils/link-for (:links user) "remove")]
+      (api/remove-user-from-private-board remove-link (fn [status success body]
+        ;; Redirect to the first available board
+        (let [org-data (dispatcher/org-data)
+              all-boards (:boards org-data)
+              current-board-slug (router/current-board-slug)
+              except-this-boards (remove #(#{current-board-slug "drafts"} (:slug %)) all-boards)
+              redirect-url (if-let [next-board (first except-this-boards)]
+                             (oc-urls/board (:slug next-board))
+                             (oc-urls/org (router/current-org-slug)))]
+          (refresh-org-data)
+          (utils/after 0 #(router/nav! redirect-url))
+          (dispatcher/dispatch! [:private-section-kick-out-self/finish success])))))))
 
 (defn ws-comment-add
   [interaction-data]

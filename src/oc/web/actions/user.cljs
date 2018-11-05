@@ -107,7 +107,7 @@
     (fn [{:keys [success body status]}]
       (when (= status 404)
         (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
-  (api/get-entry-point
+  (api/get-entry-point (:org @router/path)
    (fn [success body]
      (entry-point-get-finished success body
        (fn [orgs collection]
@@ -133,7 +133,7 @@
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
 (defn lander-check-team-redirect []
-  (utils/after 100 #(api/get-entry-point
+  (utils/after 100 #(api/get-entry-point (:org @router/path)
     (fn [success body]
       (entry-point-get-finished success body
         (fn [orgs collection]
@@ -150,11 +150,11 @@
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
           (update-jwt-cookie body)
-          (api/get-entry-point
+          (api/get-entry-point (:org @router/path)
            (fn [success body] (entry-point-get-finished success body
              (fn [orgs collection]
                (when (pos? (count orgs))
-                 (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
+                 (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -163,8 +163,10 @@
      (dis/dispatch! [:login-with-email/failed 500]))))
 
 (defn login-with-email [email pswd]
-  (api/auth-with-email email pswd (partial login-with-email-finish email))
-  (dis/dispatch! [:login-with-email]))
+  (let [email-links (:links (dis/auth-settings))
+        auth-link (utils/link-for email-links "authenticate" "GET" {:auth-source "email"})]
+    (api/auth-with-email auth-link email pswd (partial login-with-email-finish email))
+    (dis/dispatch! [:login-with-email])))
 
 (defn login-with-slack [auth-url]
   (let [auth-url-with-redirect (utils/slack-link-with-state
@@ -179,10 +181,12 @@
   (dis/dispatch! [:login-with-google]))
 
 (defn refresh-slack-user []
-  (api/refresh-slack-user (fn [status body success]
-    (if success
-      (update-jwt body)
-      (router/redirect! oc-urls/logout)))))
+  (let [refresh-link (utils/link-for (:links (dis/auth-settings)) "refresh")]
+    (api/refresh-slack-user refresh-link
+     (fn [status body success]
+      (if success
+        (update-jwt body)
+        (router/redirect! oc-urls/logout))))))
 
 (defn show-login [login-type]
   (dis/dispatch! [:login-overlay-show login-type]))
@@ -195,9 +199,10 @@
   (api/get-auth-settings (fn [body]
     (when body
       ;; auth settings loaded
-      (api/get-current-user body (fn [data]
-        (dis/dispatch! [:user-data (json->cljs data)])
-        (utils/after 100 nux-actions/check-nux)))
+      (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+        (api/get-user user-link (fn [data]
+          (dis/dispatch! [:user-data (json->cljs data)])
+          (utils/after 100 nux-actions/check-nux))))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
@@ -212,25 +217,27 @@
     (update-jwt body)
     (when (= status 201)
       (nux-actions/new-user-registered "email")
-      (api/get-entry-point entry-point-get-finished)
+      (api/get-entry-point (:org @router/path) entry-point-get-finished)
       (auth-settings-get))
     ;; Go to password setup
     (router/nav! oc-urls/confirm-invitation-password))
   (dis/dispatch! [:invitation-confirmed success]))
 
 (defn confirm-invitation [token]
-  (api/confirm-invitation token invitation-confirmed))
+  (let [auth-link (utils/link-for (:links (dis/auth-settings)) "authenticate" "GET"
+                   {:auth-source "email"})]
+    (api/confirm-invitation auth-link token invitation-confirmed)))
 
 ;; Token authentication
 (defn auth-with-token-success [token-type jwt]
   (api/get-auth-settings
    (fn [auth-body]
-     (api/get-entry-point
+     (api/get-entry-point (:org @router/path)
       (fn [success body]
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
               to-org (utils/get-default-org orgs)]
-          (router/redirect! (if to-org (oc-urls/org (:slug to-org)) oc-urls/user-profile)))))))
+          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/user-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))
@@ -251,8 +258,11 @@
       (auth-with-token-failed 500))))
 
 (defn auth-with-token [token-type]
-  (api/auth-with-token (:token (:query-params @router/path)) (partial auth-with-token-callback token-type))
-  (dis/dispatch! [:auth-with-token token-type]))
+  (let [token-links (:links (dis/auth-settings))
+        auth-url (utils/link-for token-links "authenticate" "GET" {:auth-source "email"})
+        token (:token (:query-params @router/path))]
+    (api/auth-with-token auth-url token (partial auth-with-token-callback token-type))
+    (dis/dispatch! [:auth-with-token token-type])))
 
 ;; Signup
 
@@ -270,19 +280,19 @@
           (empty? (:avatar-url jwt)))
       (do
         (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-        (api/get-entry-point entry-point-get-finished))
-      (api/get-entry-point
+        (api/get-entry-point (:org @router/path) entry-point-get-finished))
+      (api/get-entry-point (:org @router/path)
        (fn [success body]
          (entry-point-get-finished success body
            (fn [orgs collection]
              (when (pos? (count orgs))
-               (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs))))))))))
+               (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
       (update-jwt-cookie jwt)
       (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-      (api/get-entry-point entry-point-get-finished)
+      (api/get-entry-point (:org @router/path) entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
 
 (defn signup-with-email-callback
@@ -292,38 +302,42 @@
     (signup-with-email-failed status)))
 
 (defn signup-with-email [signup-data]
-  (api/signup-with-email
-   (or (:firstname signup-data) "")
-   (or (:lastname signup-data) "")
-   (:email signup-data)
-   (:pswd signup-data)
-   (partial signup-with-email-callback (:email signup-data)))
-  (dis/dispatch! [:signup-with-email]))
+  (let [email-links (:links (dis/auth-settings))
+        auth-link (utils/link-for email-links "create" "POST" {:auth-source "email"})]
+    (api/signup-with-email auth-link
+     (or (:firstname signup-data) "")
+     (or (:lastname signup-data) "")
+     (:email signup-data)
+     (:pswd signup-data)
+     (partial signup-with-email-callback (:email signup-data)))
+    (dis/dispatch! [:signup-with-email])))
 
 (defn signup-with-email-reset-errors []
   (dis/dispatch! [:input [:signup-with-email] {}]))
 
 (defn pswd-collect [form-data password-reset?]
-  (api/collect-password (:pswd form-data)
-    (fn [status body success]
-      (when success
-        (dis/dispatch! [:user-data (json->cljs body)]))
-      (when (and (>= status 200)
-                 (<= status 299))
-        (if password-reset?
-          (do
-            (cook/remove-cookie! :show-login-overlay)
-            (utils/after 200 #(router/nav! oc-urls/login)))
-          (do
-            (nux-actions/new-user-registered "email")
-            (router/nav! oc-urls/confirm-invitation-profile))))
-      (dis/dispatch! [:pswd-collect/finish status])))
+  (let [update-link (utils/link-for (:links (:current-user-data @dis/app-state)) "partial-update" "PATCH")]
+    (api/collect-password update-link (:pswd form-data)
+      (fn [status body success]
+        (when success
+          (dis/dispatch! [:user-data (json->cljs body)]))
+        (when (and (>= status 200)
+                   (<= status 299))
+          (if password-reset?
+            (do
+              (cook/remove-cookie! :show-login-overlay)
+              (utils/after 200 #(router/nav! oc-urls/login)))
+            (do
+              (nux-actions/new-user-registered "email")
+              (router/nav! oc-urls/confirm-invitation-profile))))
+        (dis/dispatch! [:pswd-collect/finish status]))))
   (dis/dispatch! [:pswd-collect password-reset?]))
 
 (defn password-reset [email]
-  (api/password-reset email
-                      #(dis/dispatch! [:password-reset/finish %]))
-  (dis/dispatch! [:password-reset]))
+  (let [reset-link (utils/link-for (:links (dis/auth-settings)) "reset")]
+    (api/password-reset reset-link email
+     #(dis/dispatch! [:password-reset/finish %]))
+    (dis/dispatch! [:password-reset])))
 
 ;; User Profile
 
@@ -346,9 +360,7 @@
                        (assoc with-pswd :email (:email current-user-data)))
           user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
       (dis/dispatch! [:user-profile-save])
-      (api/patch-user-profile
-       user-profile-link
-       with-email
+      (api/patch-user user-profile-link with-email
        (fn [status body success]
          (if (= status 422)
            (dis/dispatch! [:user-profile-update/failed])
@@ -370,9 +382,7 @@
   (let [user-avatar-data {:avatar-url avatar-url}
         current-user-data (dis/current-user-data)
         user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
-    (api/patch-user-profile
-     user-profile-link
-     user-avatar-data
+    (api/patch-user user-profile-link user-avatar-data
      (fn [status body success]
        (if-not success
          (do

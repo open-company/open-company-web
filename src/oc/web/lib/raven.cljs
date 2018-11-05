@@ -38,3 +38,9 @@
 
 (defn set-user-context! [ctx]
   (.setUserContext js/Raven (when ctx (clj->js ctx))))
+
+(defn set-extra-context! [ctx]
+  (.setExtraContext js/Raven (when ctx (clj->js ctx))))
+
+(defn clear-extra-context! []
+  (.setExtraContext js/Raven))
