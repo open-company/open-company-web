@@ -151,7 +151,7 @@
                         (when @(::search-active s)
                           [:span.unopened-label "Unopened"])
                         [:button.mlb-reset.button.send-reminder-bt
-                          {:data-toggle "tooltip"
+                          {:data-toggle (when-not is-mobile? "tooltip")
                            :data-placement "top"
                            :data-container "body"
                            :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
