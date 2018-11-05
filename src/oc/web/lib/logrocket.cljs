@@ -5,30 +5,38 @@
             [oc.web.local-settings :as ls]))
 
 (defn init []
+  (js/console.log "DBG logrocket/init")
   (when (and ls/logrocket-key
              (exists? js/LogRocket))
     (.init js/LogRocket ls/logrocket-key
      (clj->js {:release ls/deploy-key}))
+    (js/console.log "DBG   initialized")
 
     (.getSessionURL js/LogRocket
      (fn [session-url]
-
+      (js/console.log "DBG LogRocket.getSessionURL" session-url)
       (when (exists? js/drift)
-       (.track js/drift "LogRocket" (clj->js {:sessionURL session-url})))
+        (js/console.log "DBG   add drift track" session-url)
+        (.track js/drift "LogRocket" (clj->js {:sessionURL session-url})))
 
       (when (exists? js/Raven)
        (.setDataCallback js/Raven
         (fn [data]
-         (set! (.-sessionURL (.-extra data)) (.-sessionURL js/LogRocket))
+         (js/console.log "DBG   add Raven extra:" (.-extra data))
+         (if (.-extra data)
+           (set! (.-sessionURL (.-extra data)) (.-sessionURL js/LogRocket))
+           (set! (.-extra data) #js {:sessionURL (.-sessionURL js/LogRocket)}))
          data)))))))
 
 (defn identify []
+  (js/console.log "DBG logrocket/identify")
   (when (and ls/logrocket-key
-             (exists? js/LogRocket))
-    (when (jwt/user-id)
-      (let [user-data (jwt/get-contents)
-            org-data (dis/org-data)]
-        (.identify js/LogRocket (:user-id user-data)
-         (clj->js {:name (or (:name user-data) (str (:first-name user-data) " " (:last-name user-data)))
-                   :email (:email user-data)
-                   :org (if org-data (:name org-data) "")}))))))
+             (exists? js/LogRocket)
+             (jwt/user-id))
+    (let [user-data (jwt/get-contents)
+          org-data (dis/org-data)]
+      (js/console.log "DBG    identifying" user-data org-data)
+      (.identify js/LogRocket (:user-id user-data)
+       (clj->js {:name (or (:name user-data) (str (:first-name user-data) " " (:last-name user-data)))
+                 :email (:email user-data)
+                 :org (if org-data (:name org-data) "")})))))
