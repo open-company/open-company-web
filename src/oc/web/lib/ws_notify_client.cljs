@@ -20,6 +20,23 @@
 (def publication
   (pub ch-pub :topic))
 
+
+(defn notifications-watch []
+  (timbre/debug "Watching notifications.")
+  (@chsk-send! [:watch/notifications {}] 1000))
+
+;; Auth
+(defn should-disconnect? [rep]
+  (when (:valid rep)
+    (notifications-watch))
+  (when-not (:valid rep)
+    (timbre/warn "disconnecting client due to invalid JWT!" rep)
+    (s/chsk-disconnect! @channelsk)))
+
+(defn post-handshake-auth []
+  (timbre/debug "Trying post handshake jwt auth")
+  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+
 (defn subscribe
   [topic handler-fn]
   (let [ws-nc-chan (chan)]
@@ -86,6 +103,7 @@
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
+  (post-handshake-auth)
   (let [[?uid ?csrf-token ?handshake-data] ?data]
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)))
 
@@ -109,7 +127,7 @@
     (when (or (not @ch-state)
             (not (:open? @@ch-state)))
 
-      ;; Need a connection to change service
+      ;; Need a connection to notification service
       (do
         (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state)
         ; if the path is different it means
@@ -117,7 +135,7 @@
                    (:open? @@ch-state))
           (timbre/info "Closing previous connection")
           (stop-router!))
-        (timbre/info "Attempting change service connection to:" ws-domain)
+        (timbre/info "Attempting notification service connection to:" ws-domain)
         (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
                                                           {:type :auto
                                                            :host ws-domain
