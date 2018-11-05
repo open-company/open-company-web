@@ -165,14 +165,8 @@ div.section-editor-container {
         }
 
         &:empty:before {
-          padding: 10px 16px;
-          height: 40px;
-          position: absolute;
-          top: 0px;
-          left: 0px;
           content: attr(placeholder);
           opacity: 0.5;
-          font-style: none;
           display: block;
         }
       }
@@ -511,14 +505,8 @@ div.section-editor-container {
         margin-top: 8px;
 
         &:empty:before {
-          padding: 10px 16px;
-          height: 40px;
-          position: absolute;
-          top: 0px;
-          left: 0px;
           content: attr(placeholder);
           opacity: 0.5;
-          font-style: none;
           display: block;
         }
       }

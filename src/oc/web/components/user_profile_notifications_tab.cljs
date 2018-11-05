@@ -79,17 +79,30 @@
                   (case (:digest-medium current-user-data)
                     "slack"
                     "Slack"
-                    "Email")]
+                    "email"
+                    "Email"
+                    "In-app only")]
                 [:ul.dropdown-menu.user-type-dropdown-menu
                   {:aria-labelledby "user-digest-medium-dropdown"}
                   [:li
-                    {:on-click #(change! s :digest-medium "email")}
+                    {:on-click #(do
+                                  (when (and (= (:digest-medium current-user-data) "in-app")
+                                             (= (:digest-frequency current-user-data) "never"))
+                                    (change! s :digest-frequency "daily"))
+                                  (change! s :digest-medium "email"))}
                     "Email"]
                   ;; Show Slack digest option if
                   (when (jwt/team-has-bot? (:team-id org-data))
                     [:li
-                      {:on-click #(change! s :digest-medium "slack")}
-                      "Slack"])]]]]]
+                      {:on-click #(do
+                                    (when (and (= (:digest-medium current-user-data) "in-app")
+                                               (= (:digest-frequency current-user-data) "never"))
+                                      (change! s :digest-frequency "daily"))
+                                    (change! s :digest-medium "slack"))}
+                      "Slack"])
+                  [:li
+                    {:on-click #(change! s :digest-medium "in-app")}
+                    "In-app only"]]]]]]
         ; Right column
         [:div.user-profile-column-right
           {:class utils/hide-class}
@@ -103,13 +116,15 @@
                   {:id "user-digest-frequency-dropdown"
                    :data-toggle "dropdown"
                    :aria-haspopup true
-                   :aria-expanded false}
+                   :aria-expanded false
+                   :disabled (and (not= (:digest-medium current-user-data) "email")
+                                  (not= (:digest-medium current-user-data) "slack"))}
                   (case (:digest-frequency current-user-data)
                     "daily"
                     "Daily"
                     "weekly"
                     "Weekly"
-                    "In-app Only")]
+                    "Never")]
                 [:ul.dropdown-menu.user-type-dropdown-menu
                   {:aria-labelledby "user-digest-frequency-dropdown"}
                   [:li
@@ -120,7 +135,7 @@
                     "Weekly"]
                   [:li
                     {:on-click #(change! s :digest-frequency "never")}
-                    "In-app Only"]]]]]]]
+                    "Never"]]]]]]]
       [:div.user-profile-footer.group
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)
