@@ -143,7 +143,7 @@
                 "Please try again, then "
                 [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
                 "."]))
-          [:form.sign-in-form {:class "fs-hide"}
+          [:form.sign-in-form {:class utils/hide-class}
             ;; Email label
             [:div.sign-in-label-container
               [:label.sign-in-label "Enter Email"]]
@@ -217,8 +217,9 @@
             [:div.sign-in-label-container
               [:label.sign-in-label "Please enter your email address"]]
             [:div.sign-in-field-container.email
-              [:input.sign-in-field.fs-hide
-                {:value (:email (:password-reset (rum/react dis/app-state)))
+              [:input.sign-in-field
+                {:class utils/hide-class
+                 :value (:email (:password-reset (rum/react dis/app-state)))
                  :tabIndex 1
                  :type "email"
                  :autoCapitalize "none"

@@ -60,7 +60,8 @@
               (when error
                 "An error occurred while saving, please try again.")]]]
         ; Left column
-        [:div.user-profile-column-left.fs-hide
+        [:div.user-profile-column-left
+          {:class utils/hide-class}
           ;; Digest frequency
           [:div.user-profile-field-box
             [:div.user-profile-field-label
@@ -90,7 +91,8 @@
                       {:on-click #(change! s :digest-medium "slack")}
                       "Slack"])]]]]]
         ; Right column
-        [:div.user-profile-column-right.fs-hide
+        [:div.user-profile-column-right
+          {:class utils/hide-class}
           ;; Digest Medium
           [:div.user-profile-field-box
             [:div.user-profile-field-label

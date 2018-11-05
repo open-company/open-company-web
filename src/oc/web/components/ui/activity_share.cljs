@@ -164,7 +164,8 @@
                 "Slack"]))]
         [:div.activity-share-divider-line]
         (when (= medium :email)
-          [:div.activity-share-share.fs-hide
+          [:div.activity-share-share
+            {:class utils/hide-class}
             [:div.mediums-box
               [:div.medium
                 [:div.email-medium.group
@@ -285,7 +286,8 @@
                     "Copied!"
                     "Copy")]]]])
         (when (= medium :slack)
-          [:div.activity-share-share.fs-hide
+          [:div.activity-share-share
+            {:class utils/hide-class}
             [:div.mediums-box
               [:div.medium
                 [:div.slack-medium.group

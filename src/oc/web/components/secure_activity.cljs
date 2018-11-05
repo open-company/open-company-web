@@ -101,15 +101,17 @@
       (when activity-data
         [:div.activity-header.group
           {:class (when @(::show-login-header s) "showing-login-header")}
-          [:div.activity-header-title.fs-hide
-            {:dangerouslySetInnerHTML #js {:__html (:headline activity-data)}}]])
+          [:div.activity-header-title
+            {:dangerouslySetInnerHTML #js {:__html (:headline activity-data)}
+             :class utils/hide-class}]])
       (when activity-data
         [:div.activity-content-outer
           {:class (when @(::show-login-header s) "showing-login-header")}
           [:div.activity-content-header
             [:div.activity-content-header-author
               (user-avatar-image (:publisher activity-data))
-              [:div.name.fs-hide
+              [:div.name
+                {:class utils/hide-class}
                 (:name (:publisher activity-data))]
               [:div.time-since
                 (let [t (or (:published-at activity-data) (:created-at activity-data))]
@@ -125,16 +127,18 @@
             {:style {:min-height (when is-mobile?
                                   (str (- win-height default-activity-header-height) "px"))}}
             (when (:headline activity-data)
-              [:div.activity-title.fs-hide
-                {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
+              [:div.activity-title
+                {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
+                 :class utils/hide-class}])
             (when video-id
               (ziggeo-player {:video-id video-id
                               :width (:width video-size)
                               :height (:height video-size)
                               :video-processed (:video-processed activity-data)}))
             (when (:body activity-data)
-              [:div.activity-body.fs-hide
-                {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))}])
+              [:div.activity-body
+                {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
+                 :class utils/hide-class}])
             (when (and ls/oc-enable-transcriptions
                        (:video-transcript activity-data)
                        (:video-processed activity-data))

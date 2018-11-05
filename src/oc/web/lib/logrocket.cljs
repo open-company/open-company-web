@@ -7,7 +7,8 @@
 (defn init []
   (when (and ls/logrocket-key
              (exists? js/LogRocket))
-    (.init js/LogRocket ls/logrocket-key)
+    (.init js/LogRocket ls/logrocket-key
+     (clj->js {:release ls/deploy-key}))
 
     (.getSessionURL js/LogRocket
      (fn [session-url]

@@ -60,9 +60,10 @@
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
         ; Comments count
-        [:div.is-comments-summary.fs-hide
+        [:div.is-comments-summary
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                    :add-a-comment (not (pos? comments-count))})}
+                                    :add-a-comment (not (pos? comments-count))
+                                    utils/hide-class true})}
           (if (responsive/is-tablet-or-mobile?)
             (comment-summary-string comments-authors)
             (if (pos? comments-count)

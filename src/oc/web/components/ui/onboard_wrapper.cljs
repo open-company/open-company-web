@@ -96,9 +96,10 @@
               [:span.error "Email already exists"]
               @(::email-error s)
               [:span.error "Email is not valid"])]
-          [:input.field.fs-hide
+          [:input.field
             {:type "email"
-             :class (when (= (:error signup-with-email) 409) "error")
+             :class (utils/class-set {:error (= (:error signup-with-email) 409)
+                                      utils/hide-class true})
              :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
              :value @(::email s)
              :on-change #(let [v (.. % -target -value)]
@@ -242,8 +243,9 @@
                         (.preventDefault e))}
           [:div.field-label
             "First name"]
-          [:input.field.fs-hide
-            {:type "text"
+          [:input.field
+            {:class utils/hide-class
+             :type "text"
              :ref "first-name"
              :placeholder "First name"
              :max-length user-utils/user-name-max-lenth
@@ -251,8 +253,9 @@
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
-          [:input.field.fs-hide
-            {:type "text"
+          [:input.field
+            {:class utils/hide-class
+             :type "text"
              :placeholder "Last name"
              :value (or (:last-name user-data) "")
              :max-length user-utils/user-name-max-lenth
@@ -263,11 +266,12 @@
               (when (:error org-editing)
                 [:span.error "Must be at least 3 characters"])])
           (when-not has-org?
-            [:input.field.fs-hide
+            [:input.field
               {:type "text"
                :ref "org-name"
                :placeholder "e.g., Acme, or Acme Design"
-               :class (when (:error org-editing) "error")
+               :class (utils/class-set {:error (:error org-editing)
+                                        utils/hide-class true})
                :max-length org-utils/org-name-max-length
                :value (:name org-editing)
                :on-change #(dis/dispatch! [:input [:org-editing]
@@ -367,8 +371,9 @@
           {:on-submit (fn [e]
                         (.preventDefault e))}
           (when-not is-mobile?
-            [:div.logo-upload-container.org-logo.group.fs-hide
-              {:on-click (fn [_]
+            [:div.logo-upload-container.org-logo.group
+              {:class utils/hide-class
+               :on-click (fn [_]
                           (if (empty? (:logo-url org-editing))
                             (iu/upload! org-utils/org-avatar-filestack-config
                               (fn [res]
@@ -404,10 +409,11 @@
             "Company name"
             (when (:error org-editing)
               [:span.error "Must be at least 3 characters"])]
-          [:input.field.fs-hide
+          [:input.field
             {:type "text"
              :ref "org-name"
-             :class (when (:error org-editing) "error")
+             :class (utils/class-set {:error (:error org-editing)
+                                      utils/hide-class true})
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing]
                (merge org-editing {:error nil :name (.. % -target -value)})])}]
@@ -581,7 +587,8 @@
               "+ add more"]]
           (when @(::invite-error s)
             [:div.error @(::invite-error s)])
-          [:div.invite-rows.fs-hide
+          [:div.invite-rows
+            {:class utils/hide-class}
             (for [idx (range (count @(::invite-rows s)))
                   :let [invite (get @(::invite-rows s) idx)]]
               [:div.invite-row
@@ -669,7 +676,10 @@
         [:div.title
           "Set a password"]
         [:div.subtitle
-          "Joining as: " [:span.email-address.fs-hide (:email jwt)]]
+          "Joining as: "
+          [:span.email-address
+            {:class utils/hide-class}
+            (:email jwt)]]
         [:div.steps-separator]]
       [:div.onboard-form
         [:form
@@ -748,16 +758,18 @@
                         (.preventDefault e))}
           [:div.field-label
             "First name"]
-          [:input.field.fs-hide
-            {:type "text"
+          [:input.field
+            {:class utils/hide-class
+             :type "text"
              :ref "first-name"
              :value (:first-name user-data)
              :max-length user-utils/user-name-max-lenth
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
-          [:input.field.fs-hide
-            {:type "text"
+          [:input.field
+            {:class utils/hide-class
+             :type "text"
              :value (:last-name user-data)
              :max-length user-utils/user-name-max-lenth
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
@@ -794,7 +806,9 @@
           ":"
           " ")
         (if (seq email)
-          [:div.email-address.fs-hide email]
+          [:div.email-address
+            {:class utils/hide-class}
+            email]
           "your email address")
         "."]]))
 

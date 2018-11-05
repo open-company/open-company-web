@@ -497,8 +497,9 @@
                                       (activity-actions/remove-video :cmail-data cmail-data))
                                     (reset! (::record-video s) false))})))
             ; Headline element
-            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group.fs-hide
-              {:content-editable true
+            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
+              {:class utils/hide-class
+               :content-editable true
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
@@ -519,7 +520,7 @@
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]
-                               :classes "emoji-autocomplete emojiable fs-hide"})
+                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
             (when (and ls/oc-enable-transcriptions
                        (:fixed-video-id cmail-data)
                        (:video-processed cmail-data))

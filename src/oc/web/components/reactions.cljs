@@ -72,11 +72,12 @@
                                                   :reacted (not reacted)})
                             reaction-data)]]
 
-              [:button.reaction-btn.btn-reset.fs-hide
+              [:button.reaction-btn.btn-reset
                 {:key (str "reaction-" (:uuid entry-data) "-" idx)
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
-                                          :has-reactions (pos? (:count r))})
+                                          :has-reactions (pos? (:count r))
+                                          utils/hide-class true})
                  :on-mouse-leave #(this-as this
                                    (utils/remove-tooltips)
                                    (.tooltip (js/$ this)))
