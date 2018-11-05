@@ -128,9 +128,7 @@
 
 (defn post-routing []
   (routing-actions/routing @router/path)
-  (user-actions/initial-loading)
-  (utils/after 2500
-   #(logrocket/identify)))
+  (user-actions/initial-loading))
 
 ;; home
 (defn home-handler [target params]
