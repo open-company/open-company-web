@@ -206,12 +206,12 @@
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
-        [:button.mlb-reset.invite-people-btn
-            {:on-click #(chat/chat-click 42861)}
-            [:div.bottom-nav-icon.support-icon]
-            [:span "Support"]]
         (when show-invite-people
           [:button.mlb-reset.invite-people-btn
             {:on-click #(nav-actions/show-invite)}
             [:div.bottom-nav-icon.invite-people-icon]
-            [:span "Invite people"]])]]))
+            [:span "Invite team"]])
+        [:button.mlb-reset.invite-people-btn
+          {:on-click #(chat/chat-click 42861)}
+          [:div.bottom-nav-icon.support-icon]
+          [:span "Get support"]]]]))
