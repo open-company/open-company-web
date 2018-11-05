@@ -170,3 +170,9 @@ drift.identify = function(){};
 // Homepage animation
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
+// Logrocket
+var LogRocket = function(){};
+LogRocket.init = function(){};
+LogRocket.getSessionURL = function(){};
+LogRocket.sessionURL = {};
+LogRocket.identify = function(){};
