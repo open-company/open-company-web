@@ -24,8 +24,8 @@
         (fn [data]
          (js/console.log "DBG   add Raven extra:" (.-extra data))
          (if (aget data "extra")
-           (aset (aget (aget data "extra") "sessionURL") (.-sessionURL js/LogRocket))
-           (aset (aget data "extra") #js {:sessionURL (.-sessionURL js/LogRocket)}))
+           (aset (aget data "extra") "sessionURL" (.-sessionURL js/LogRocket))
+           (aset data "extra" #js {:sessionURL (.-sessionURL js/LogRocket)}))
          data)))))))
 
 (defn identify []
