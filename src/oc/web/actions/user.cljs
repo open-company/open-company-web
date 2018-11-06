@@ -10,6 +10,7 @@
             [oc.web.local_settings :as ls]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
+            [oc.web.lib.logrocket :as logrocket]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
@@ -43,7 +44,9 @@
     (when email
       (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
                         (clj->js {:nickname (:name jwt-contents)
-                                  :email email}))))))
+                                  :email email}))))
+    (when jwt-contents
+      (logrocket/identify))))
 
 (defn update-jwt [jbody]
   (timbre/info jbody)

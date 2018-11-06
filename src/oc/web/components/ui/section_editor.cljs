@@ -272,8 +272,9 @@
               (when can-change
                 [:div.section-editor-private-users-search
                   {:ref "private-users-search"}
-                  [:input.fs-hide
-                    {:value @query
+                  [:input
+                    {:class utils/hide-class
+                     :value @query
                      :type "text"
                      :placeholder "Select a member..."
                      :on-focus #(reset! (::show-search-results s) true)
@@ -287,8 +288,9 @@
                               :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
                                     user (merge u team-user)
                                     user-type (utils/get-user-type user org-data section-editing)]]
-                          [:div.section-editor-private-users-result.fs-hide
-                            {:on-click #(do
+                          [:div.section-editor-private-users-result
+                            {:class utils/hide-class
+                             :on-click #(do
                                           (reset! query "")
                                           (reset! (::show-search-results s) false)
                                           (section-actions/private-section-user-add user user-type))
@@ -333,8 +335,9 @@
                                    (if (= (:value item) :remove)
                                      (section-actions/private-section-user-remove team-user)
                                      (section-actions/private-section-user-add team-user (:value item))))})])
-              [:div.section-editor-add-private-users-list.group.fs-hide
-                {:on-scroll #(do
+              [:div.section-editor-add-private-users-list.group
+                {:class utils/hide-class
+                 :on-scroll #(do
                               (reset! (::show-edit-user-dropdown s) nil)
                               (reset! (::show-edit-user-top s) nil))
                  :ref "edit-users-scroll"}
@@ -398,8 +401,9 @@
             [:div.section-editor-add-label
               "Personal note"])
           (when (= (:access section-editing) "private")
-            [:div.section-editor-add-personal-note.fs-hide
-              {:content-editable true
+            [:div.section-editor-add-personal-note
+              {:class utils/hide-class
+               :content-editable true
                :placeholder "Add a personal note to your invitation..."
                :ref "personal-note"
                :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "personal-note") %)

@@ -167,10 +167,11 @@
             [:button.settings-modal-close.mlb-reset
               {:on-click #(close-clicked s)}])
           [:div.org-settings-header
-            [:div.org-settings-header-avatar.fs-hide
+            [:div.org-settings-header-avatar
               {:ref "org-settings-header-logo"
                :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
-                                        :main-panel main-tab?})
+                                        :main-panel main-tab?
+                                        utils/hide-class true})
                :on-click logo-on-click}
               (org-avatar org-data-for-avatar false :never)]
             [:div.org-name (:name org-data)]

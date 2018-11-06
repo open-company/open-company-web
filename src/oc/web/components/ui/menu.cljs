@@ -83,7 +83,8 @@
                                                        mobile-menu-open)})}
       [:div.menu-header
         (user-avatar-image current-user-data)
-        [:div.user-name.fs-hide
+        [:div.user-name
+          {:class utils/hide-class}
           (str "Hi " (jwt/get-key :first-name) "!")]
         [:div.user-type
           (case user-role
