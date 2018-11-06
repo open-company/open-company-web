@@ -234,6 +234,7 @@ section.testimonials-section {
   }
 
   div.testimonials-cards-container {
+    // TODO: use this to add a third testimony
     // $testimonials_breakpoint: 1193;
     $testimonials_breakpoint: 833;
     width: #{$testimonials_breakpoint + 1}px;
@@ -299,8 +300,6 @@ section.testimonials-section {
       }
 
       &.wayne-edu {
-        // float: right;
-
         div.testimonial-header {
           div.testimonial-logo {
             width: 234px;
@@ -384,10 +383,6 @@ section.testimonials-section {
         width: 100%;
         max-width: 440px;
         float: unset;
-
-        // &.wayne-edu, &.m-io,  &.skylight{
-        //   float: unset;
-        // }
       }
 
       &:not(:first-child) {
