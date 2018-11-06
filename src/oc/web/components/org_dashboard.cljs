@@ -12,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -90,7 +91,9 @@
                 activity-share-container
                 mobile-menu-open
                 show-cmail
-                showing-mobile-user-notifications]} (drv/react s :org-dashboard-data)
+                showing-mobile-user-notifications
+                wrt-activity-data
+                wrt-read-data]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -190,6 +193,10 @@
           (and is-mobile?
                is-sharing-activity)
           (activity-share)
+          ;; Mobile WRT
+          (and is-mobile?
+               wrt-activity-data)
+          (wrt wrt-activity-data wrt-read-data)
           ;; Search results
           is-showing-mobile-search
           (search-box)
@@ -227,7 +234,8 @@
                        (not is-sharing-activity)
                        (not show-section-add)
                        (not show-section-editor)
-                       (not show-cmail)))
+                       (not show-cmail)
+                       (not wrt-activity-data)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container

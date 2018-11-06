@@ -1,4 +1,4 @@
-div.wrt-container {
+div.wrt-count-container {
   position: relative;
 
   &:hover {
@@ -28,259 +28,326 @@ div.wrt-container {
       background-size: 8px 8px;
     }
   }
+}
 
-  div.wrt-popup {
-    width: 360px;
-    background-color: white;
-    border-radius: 6px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 0px;
-    border: 1px solid $deep_tan;
-    box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.1);
-    position: absolute;
-    top: 100%;
-    left: 0px;
-    z-index: 2;
-    max-height: calc(50vh - #{$navbar_height}px);
-    z-index: 10;
+div.wrt-popup {
+  width: 360px;
+  background-color: white;
+  border-radius: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0px;
+  border: 1px solid $deep_tan;
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.1);
+  position: absolute;
+  top: 100%;
+  left: 0px;
+  z-index: 2;
+  max-height: calc(50vh - #{$navbar_height}px);
+  z-index: 10;
 
-    &.top {
-      top: unset;
-      bottom: 100%;
-    }
+  &.loading{
+    border: 0;
+    height: 0;
+    box-shadow: none;
+  }
 
-    div.wrt-popup-tabs {
-      margin-top: 8px;
+  div.wrt-popup-header {
+    display: none;
+
+    @include mobile() {
       width: 100%;
-      height: 41px;
-      border-bottom: 1px solid #ECECEC;
-      padding: 0px 24px;
+      height: 56px;
+      box-shadow: 0 2px 6px 0 rgba(0,0,0,0.10);
+      padding: 19px 16px;
+      display: block;
 
-      button.wrt-popup-tab {
-        height: 41px;
-        border-bottom: 1px solid transparent;
-        @include avenir_B();
-        font-size: 13px;
-        color: $deep_navy;
-        line-height: 33px;
-        text-transform: uppercase;
-        float: left;
-        margin-right: 24px;
-        padding-bottom: 8px;
-
-        &.active {
-          border-bottom: 1px solid $carrot_orange;
-          color: $carrot_orange;
-        }
-      }
-
-      button.search-bt {
-        width: 32px;
-        height: 32px;
-        float: right;
-        background-image: cdnUrl("/img/ML/search_lens.svg");
-        background-size: 16px 16px;
+      button.wrt-close-bt {
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/section_add_mobile_close.svg");
+        background-size: 14px 14px;
         background-repeat: no-repeat;
         background-position: center;
+        float: left;
       }
 
-      &.search-active {
-        &:before {
-          content: "";
-          width: 32px;
-          height: 40px;
-          float: left;
-          background-image: cdnUrl("/img/ML/search_lens_dark.svg");
-          background-size: 16px 16px;
-          background-repeat: no-repeat;
-          background-position: center 9px;
-        }
+      span.wrt-popup-header-title {
+        margin-left: 16px;
+        line-height: 24px;
+        @include avenir_H();
+        font-size: 16px;
+        color: $deep_navy;
+        white-space: nowrap;
+        max-width: calc(100% - 40px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+      }
+    }
+  }
 
-        input.wrt-popup-query {
-          width: calc(100% - 32px - 24px - 16px);
-          margin-right: 16px;
-          height: 36px;
-          border: none;
-          outline: none;
-          padding: 6px 14px;
-          @include avenir_M();
-          font-size: 15px;
-          color: $deep_navy;
-          outline: none;
-          float: right;
+  div.small-loading {
+    margin: 24px;
+  }
 
-          @include placeholder(){
-            color: $ui_grey;
-          }
-        }
+  &.top {
+    top: unset;
+    bottom: 100%;
+  }
 
-        button.close-search-bt {
-          width: 24px;
-          height: 40px;
-          float: right;
-          background-image: cdnUrl("/img/ML/close_search_bt.svg");
-          background-size: 12px 12px;
-          background-repeat: no-repeat;
-          background-position: center 12px;
-        }
+  div.wrt-popup-tabs {
+    margin-top: 8px;
+    width: 100%;
+    height: 41px;
+    border-bottom: 1px solid #ECECEC;
+    padding: 0px 24px;
+
+    button.wrt-popup-tab {
+      height: 41px;
+      border-bottom: 1px solid transparent;
+      @include avenir_B();
+      font-size: 13px;
+      color: $deep_navy;
+      line-height: 33px;
+      text-transform: uppercase;
+      float: left;
+      margin-right: 24px;
+      padding-bottom: 8px;
+
+      &.active {
+        border-bottom: 1px solid $carrot_orange;
+        color: $carrot_orange;
       }
     }
 
-    div.wrt-popup-list {
-      margin: 16px 0px 0px 0px;
+    button.search-bt {
+      width: 32px;
+      height: 32px;
+      float: right;
+      background-image: cdnUrl("/img/ML/search_lens.svg");
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    &.search-active {
+      &:before {
+        content: "";
+        width: 32px;
+        height: 40px;
+        float: left;
+        background-image: cdnUrl("/img/ML/search_lens_dark.svg");
+        background-size: 16px 16px;
+        background-repeat: no-repeat;
+        background-position: center 9px;
+      }
+
+      input.wrt-popup-query {
+        width: calc(100% - 32px - 24px - 16px);
+        margin-right: 16px;
+        height: 36px;
+        border: none;
+        outline: none;
+        padding: 6px 14px;
+        @include avenir_M();
+        font-size: 15px;
+        color: $deep_navy;
+        outline: none;
+        float: right;
+
+        @include placeholder(){
+          color: $ui_grey;
+        }
+      }
+
+      button.close-search-bt {
+        width: 24px;
+        height: 40px;
+        float: right;
+        background-image: cdnUrl("/img/ML/close_search_bt.svg");
+        background-size: 12px 12px;
+        background-repeat: no-repeat;
+        background-position: center 12px;
+      }
+    }
+  }
+
+  div.wrt-popup-list {
+    margin: 16px 0px 0px 0px;
+    width: 100%;
+    padding: 0px 24px;
+
+    div.wrt-popup-list-row {
+      padding: 0px 0px 16px;
+      margin: 16px 0px 0px;
+      height: 48px;
       width: 100%;
-      padding: 0px 24px;
+      border-bottom: 1px solid #ECECEC;
 
-      div.wrt-popup-list-row {
-        padding: 0px 0px 16px;
-        margin: 16px 0px 0px;
-        height: 48px;
-        width: 100%;
-        border-bottom: 1px solid #ECECEC;
+      &:last-child {
+        border-bottom: 1px solid transparent;
+      }
 
-        &:last-child {
-          border-bottom: 1px solid transparent;
+      div.wrt-popup-list-row-avatar {
+        float: left;
+        position: relative;
+        width: 32px;
+        height: 32px;
+
+        @include user_profile(32);
+
+        &.seen:after {
+          position: absolute;
+          width: 12px;
+          height: 12px;
+          background-image: cdnUrl("/img/ML/green_checkmark.svg");
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: 12px 12px;
+          content: "";
+          bottom: 0px;
+          right: 0px;
+        }
+      }
+
+      $row_right_label_max_width: 110px;
+
+      div.wrt-popup-list-row-name {
+        float: left;
+        margin-left: 16px;
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: calc(100% - 32px - 16px - 8px - $row_right_label_max_width);
+      }
+
+      &:hover {
+        div.wrt-popup-list-row-seen {
+          button.send-reminder-bt {
+            display: block;
+          }
+          span.unopened-label {
+            display: none;
+          }
+        }
+      }
+
+      div.wrt-popup-list-row-seen {
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        float: right;
+        text-align: right;
+        max-width: $row_right_label_max_width;
+        line-height: 32px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        span.unopened-label {
+          float: right;
+          @include avenir_R();
+          font-size: 14px;
+          color: $deep_navy;
         }
 
-        div.wrt-popup-list-row-avatar {
-          float: left;
-          position: relative;
-          width: 32px;
+        &.seen {
+          color: $light_ui_grey;
+        }
+
+        button.send-reminder-bt {
+          background-position: right 9px;
+          background-repeat: no-repeat;
+          width: 24px;
+          height: 24px;
+          float: right;
+          display: none;
+          opacity: 0.6;
+          background-image: cdnUrl("/img/ML/send_reminder.svg");
+          background-size: 14px 14px;
+
+          @include mobile() {
+            display: block;
+            float: right;
+            margin-left: 8px;
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      &.empty-list {
+        text-align: center;
+
+        div.empty-copy {
           height: 32px;
+          text-align: left;
+          padding-left: 32px;
+          @include avenir_R();
+          font-size: 14px;
+          color: $ui_grey;
+          line-height: 32px;
+          position: relative;
 
-          @include user_profile(32);
-
-          &.seen:after {
+          &:before {
+            content: "";
             position: absolute;
-            width: 12px;
-            height: 12px;
-            background-image: cdnUrl("/img/ML/green_checkmark.svg");
+            top: 0px;
+            left: 0px;
+            width: 23px;
+            height: 29px;
             background-position: center;
             background-repeat: no-repeat;
-            background-size: 12px 12px;
-            content: "";
-            bottom: 0px;
-            right: 0px;
-          }
-        }
-
-        $row_right_label_max_width: 110px;
-
-        div.wrt-popup-list-row-name {
-          float: left;
-          margin-left: 16px;
-          @include avenir_R();
-          font-size: 14px;
-          color: $deep_navy;
-          line-height: 32px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          max-width: calc(100% - 32px - 16px - 8px - $row_right_label_max_width);
-        }
-
-        &:hover {
-          div.wrt-popup-list-row-seen {
-            button.send-reminder-bt {
-              display: block;
-            }
-            span.unopened-label {
-              display: none;
-            }
-          }          
-        }
-
-        div.wrt-popup-list-row-seen {
-          @include avenir_R();
-          font-size: 14px;
-          color: $deep_navy;
-          float: right;
-          text-align: right;
-          max-width: $row_right_label_max_width;
-          line-height: 32px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-
-          span.unopened-label {
-            float: right;
-            @include avenir_R();
-            font-size: 14px;
-            color: $deep_navy;
+            background-size: 23px 29px;
           }
 
-          &.seen {
-            color: $light_ui_grey;
-          }
-
-          button.send-reminder-bt {
-            background-position: right 9px;
-            background-repeat: no-repeat;
-            width: 24px;
-            height: 24px;
-            float: right;
-            display: none;
-            opacity: 0.6;
-            background-image: cdnUrl("/img/ML/send_reminder.svg");
-            background-size: 14px 14px;
-
-            &:hover {
-              opacity: 1;
-            }
-          }
-        }
-
-        &.empty-list {
-          text-align: center;
-
-          div.empty-copy {
+          &.empty-search:before {
+            width: 310px;
             height: 32px;
-            text-align: left;
-            padding-left: 32px;
-            @include avenir_R();
-            font-size: 14px;
-            color: $ui_grey;
-            line-height: 32px;
-            position: relative;
+            background-size: 310px 32px;
+            background-image: cdnUrl("/img/ML/wrt_empty_search.svg");
+          }
 
+          &.no-viewed {
+            width: 234px;
+            margin-left: 38px;
             &:before {
-              content: "";
-              position: absolute;
-              top: 0px;
-              left: 0px;
-              width: 23px;
-              height: 29px;
-              background-position: center;
-              background-repeat: no-repeat;
-              background-size: 23px 29px;
+              background-image: cdnUrl("/img/ML/no_viewed.svg");
             }
+          }
 
-            &.empty-search:before {
-              width: 310px;
-              height: 32px;
-              background-size: 310px 32px;
-              background-image: cdnUrl("/img/ML/wrt_empty_search.svg");
-            }
-
-            &.no-viewed {
-              width: 234px;
-              margin-left: 38px;
-              &:before {
-                background-image: cdnUrl("/img/ML/no_viewed.svg");
-              }
-            }
-
-            &.no-unseen{
-              width: 214px;
-              margin-left: 48px;
-              &:before {
-                background-image: cdnUrl("/img/ML/no_unseen.svg");
-              }
+          &.no-unseen{
+            width: 214px;
+            margin-left: 48px;
+            &:before {
+              background-image: cdnUrl("/img/ML/no_unseen.svg");
             }
           }
         }
       }
     }
+  }
+}
+
+/* If WRT is direct child of org-dashboard it means it's for mobile*/
+div.org-dashboard > div.wrt-popup {
+  display: none;
+
+  @include mobile() {
+    position: fixed;
+    top: 0;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    border-radius: 0px;
+    max-height: initial;
   }
 }
