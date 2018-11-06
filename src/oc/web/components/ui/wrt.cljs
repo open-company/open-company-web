@@ -148,8 +148,6 @@
                       (utils/time-since (:read-at u))
                       ;; Send reminder button
                       [:div
-                        (when @(::search-active s)
-                          [:span.unopened-label "Unopened"])
                         [:button.mlb-reset.button.send-reminder-bt
                           {:data-toggle (when-not is-mobile? "tooltip")
                            :data-placement "top"
@@ -167,7 +165,9 @@
                                            {:title (str "Reminder sent to " (utils/name-or-email u) ".")
                                             :id (str "wrt-share-" (utils/name-or-email u))
                                             :dismiss true
-                                            :expire 5}))))}]])]])
+                                            :expire 5}))))}]
+                        (when @(::search-active s)
+                          [:span.unopened-label "Unopened"])])]])
               [:div.wrt-popup-list-row.empty-list
                 {:class (if (= @list-view :seen) "viewed" "unseen")}
                 (if @(::search-active s)

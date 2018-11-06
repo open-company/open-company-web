@@ -273,6 +273,8 @@ div.wrt-popup {
 
           @include mobile() {
             display: block;
+            float: right;
+            margin-left: 8px;
           }
 
           &:hover {
