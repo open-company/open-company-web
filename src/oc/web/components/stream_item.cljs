@@ -155,7 +155,8 @@
         [:div.stream-header-head-author
           (user-avatar-image publisher)
           [:div.name
-            [:div.name-inner.fs-hide
+            [:div.name-inner
+              {:class utils/hide-class}
               (str
                (:name publisher)
                " in "
@@ -212,9 +213,10 @@
                 {:class (:type (:body-thumbnail activity-data))
                  :data-image (:thumbnail (:body-thumbnail activity-data))
                  :style {:background-image (str "url(\"" (:thumbnail (:body-thumbnail activity-data)) "\")")}}]))
-          [:div.stream-body-left.group.fs-hide
+          [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (and (:has-thumbnail activity-data) (not expanded?))
-                                      :has-video (:fixed-video-id activity-data)})}
+                                      :has-video (:fixed-video-id activity-data)
+                                      utils/hide-class true})}
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)

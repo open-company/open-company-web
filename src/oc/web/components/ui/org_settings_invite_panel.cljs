@@ -135,7 +135,8 @@
         ;; Panel rows
         [:div.org-settings-invite-table-container.org-settings-panel-row
           ;; Team table
-          [:table.org-settings-table.org-settings-invite-table.fs-hide
+          [:table.org-settings-table.org-settings-invite-table
+            {:class utils/hide-class}
             [:thead
               [:tr
                 [:th "Invitee"
@@ -231,7 +232,8 @@
         [:div.org-settings-panel-row.org-setings-invite-personal-note.group
           [:div.org-settings-label
             [:label "Personal note"]]
-          [:div.org-settings-field.fs-hide
+          [:div.org-settings-field
+            {:class utils/hide-class}
             [:textarea
               {:ref "personal-note-textarea"
                :placeholder "Add a personal note to your invitation..."}]]]]

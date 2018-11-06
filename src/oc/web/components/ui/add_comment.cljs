@@ -96,9 +96,10 @@
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
         [:div.add-comment-internal
-          [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.fs-hide
+          [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover
            {:ref "add-comment"
-            :content-editable true}]
+            :content-editable true
+            :class utils/hide-class}]
           (when (and (not (js/isIE))
                      (not (responsive/is-tablet-or-mobile?)))
             (emoji-picker {:width 32

@@ -87,16 +87,18 @@
                 [:div.fields-container.group
                   [:div.field-label
                     "Work Email"]
-                  [:input.field-content.email.fs-hide
+                  [:input.field-content.email
                     {:type "email"
                      :name "email"
+                     :class utils/hide-class
                      :value @(::email s)
                      :on-change #(reset! (::email s) (.. % -target -value))}]
                   [:div.field-label
                     "Password"]
-                  [:input.field-content.password.fs-hide
+                  [:input.field-content.password
                     {:type "password"
                      :name "password"
+                     :class utils/hide-class
                      :value @(::pswd s)
                      :on-change #(reset! (::pswd s) (.. % -target -value))}]
                   [:a.forgot-password

@@ -91,7 +91,8 @@
               (when error
                 "An error occurred while saving, please try again.")]]]
         ; Left column
-        [:div.user-profile-column-left.fs-hide
+        [:div.user-profile-column-left
+          {:class utils/hide-class}
           ; First name
           [:div.user-profile-field-box
             [:div.user-profile-field-label
@@ -143,7 +144,8 @@
                      :on-change #(change! s :current-password (.. % -target -value))
                      :value (:current-password current-user-data)}]]])]
         ; Right column
-        [:div.user-profile-column-right.fs-hide
+        [:div.user-profile-column-right
+          {:class utils/hide-class}
           ; Last name
           [:div.user-profile-field-box.big-web-only
             [:div.user-profile-field-label

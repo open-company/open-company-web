@@ -119,7 +119,8 @@
               (user-avatar-image (:author comment-data))]
 
             [:div.stream-comment-right
-              [:div.stream-comment-header.group.fs-hide
+              [:div.stream-comment-header.group
+                {:class utils/hide-class}
                 [:div.stream-comment-author-right
                   [:div.stream-comment-author-name
                     (:name (:author comment-data))]
@@ -152,7 +153,7 @@
                                          (delete-clicked % activity-data comment-data))}
                             "Delete"])])])]
               [:div.stream-comment-content
-                [:div.stream-comment-body.oc-mentions.oc-mentions-hover.fs-hide
+                [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                    :ref (str "comment-body-" (:uuid comment-data))
                    :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
@@ -161,7 +162,8 @@
                                   (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
                    :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                             :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
-                                            :editing is-editing?})}]
+                                            :editing is-editing?
+                                            utils/hide-class true})}]
                 (when (and (not is-editing?)
                            (not (:is-emoji comment-data))
                            (or (:can-react comment-data)
