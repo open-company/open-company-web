@@ -370,6 +370,15 @@
    :id :app-update-error
    :dismiss true})
 
+(def internal-error
+  {:title "Internal error occurred"
+   :description (str "An internal error occurrent, we have been informed of the "
+                 "problem and we will be working on it as soon as possible. "
+                 "Thanks for understanding.")
+   :id :internal-error
+   :server-error true
+   :dismiss true})
+
 (defn clean-google-chart-url [gchart-url]
   (if (string? gchart-url)
     (.replace gchart-url #"(?i)/u/\d+" "")
@@ -459,11 +468,14 @@
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
         updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
         created-str (activity-date created-at)
-        updated-str (activity-date updated-at)]
+        updated-str (activity-date updated-at)
+        label-prefix (if (= (:status entry-data) "published")
+                       "Posted "
+                       "Created ")]
     (if (or (= (:created-at entry-data) (:updated-at entry-data))
             (not (:updated-at entry-data)))
-      (str "Posted " created-str)
-      (str "Posted " created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
+      (str label-prefix created-str)
+      (str label-prefix created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
 
 (defn activity-date-tooltip [activity-data]
   (entry-date-tooltip activity-data))
@@ -619,3 +631,5 @@
 
 (defn calc-video-height [width]
   (int (* width (/ 3 4))))
+
+(def hide-class "_lr-hide") ;; Use fs-hide for FullStory

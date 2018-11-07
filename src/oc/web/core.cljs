@@ -41,6 +41,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.raven :as sentry]
+            [oc.web.lib.logrocket :as logrocket]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
@@ -72,6 +73,7 @@
 
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
+(defonce _logrocket (logrocket/init))
 
 ;; Avoid warnings
 (declare route-dispatch!)

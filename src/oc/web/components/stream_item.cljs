@@ -15,9 +15,9 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -33,8 +33,6 @@
   (when (and expand?
              scroll-to-comments?)
     (reset! (::should-scroll-to-comments s) true))
-  (when-not expand?
-    (utils/after 150 #(utils/scroll-to-y (- (.-top (.offset (js/$ (rum/dom-node s)))) 70) 0)))
   (when expand?
     ;; When expanding a post send the WRT read
     (activity-actions/send-item-read (:uuid (first (:rum/args s))))))
@@ -88,6 +86,9 @@
                              (when (= (router/current-activity-id) activity-uuid)
                                (activity-actions/send-item-read activity-uuid)))
                            s)
+                          :did-remount (fn [_ s]
+                           (should-show-continue-reading? s)
+                           s)
                           :after-render (fn [s]
                            (let [activity-data (first (:rum/args s))
                                  comments-data @(drv/get-ref s :comments-data)]
@@ -119,9 +120,10 @@
                          (= (router/current-board-slug) "all-posts"))
         is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "stream-item-" (:uuid activity-data))
-        publisher (if is-drafts-board
-                    (first (:author activity-data))
-                    (:publisher activity-data))
+        is-published? (au/is-published? activity-data)
+        publisher (if is-published?
+                    (:publisher activity-data)
+                    (first (:author activity-data)))
         is-publisher? (= (:user-id publisher) (jwt/user-id))
         dom-node-class (str "stream-item-" (:uuid activity-data))
         has-video (seq (:fixed-video-id activity-data))
@@ -133,13 +135,18 @@
                         :height @(::mobile-video-height s)}
                        {:width (if expanded? 638 136)
                         :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))]
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
+        should-show-wrt (and user-is-part-of-the-team
+                             is-published?)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :show-continue-reading truncated?
-                                :draft is-drafts-board
+                                :draft (not is-published?)
+                                :must-see-item (:must-see activity-data)
                                 :new-item (:new activity-data)
-                                :single-post-view single-post-view})
+                                :single-post-view single-post-view
+                                :show-menu (or @(::hovering-tile s)
+                                               @(::more-menu-open s))})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
        :id dom-element-id}
@@ -147,12 +154,15 @@
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (user-avatar-image publisher)
-          [:div.name.fs-hide
-            (str
-             (:name publisher)
-             " in "
-             (:board-name activity-data))
-            [:div.new-tag "NEW"]]
+          [:div.name
+            [:div.name-inner
+              {:class utils/hide-class}
+              (str
+               (:name publisher)
+               " in "
+               (:board-name activity-data))]
+            [:div.must-see-tag.big-web-tablet-only "Must see"]
+            [:div.new-tag.big-web-tablet-only "NEW"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time
@@ -162,12 +172,12 @@
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/time-since t)])]
-          (when user-is-part-of-the-team
+          (when should-show-wrt
             [:div.separator])
-          (when user-is-part-of-the-team
+          (when should-show-wrt
             [:div.stream-item-wrt
-              (wrt activity-data read-data)])]
-        (when (and (not is-drafts-board)
+              (wrt-count activity-data read-data)])]
+        (when (and is-published?
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)
                        is-mobile?))
@@ -175,6 +185,8 @@
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
             :external-share (not is-mobile?)}))]
+      [:div.must-see-tag.mobile-only "Must see"]
+      [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.thumbnail-container.group
@@ -201,17 +213,14 @@
                 {:class (:type (:body-thumbnail activity-data))
                  :data-image (:thumbnail (:body-thumbnail activity-data))
                  :style {:background-image (str "url(\"" (:thumbnail (:body-thumbnail activity-data)) "\")")}}]))
-          [:div.stream-body-left.group.fs-hide
+          [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (and (:has-thumbnail activity-data) (not expanded?))
-                                      :has-video (:fixed-video-id activity-data)})}
+                                      :has-video (:fixed-video-id activity-data)
+                                      utils/hide-class true})}
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            (when (:must-see activity-data)
-              [:div.must-see
-               {:class (utils/class-set {:must-see-on
-                                         (:must-see activity-data)})}])
             [:div.stream-item-body-container
               [:div.stream-item-body
                 {:class (utils/class-set {:expanded expanded?

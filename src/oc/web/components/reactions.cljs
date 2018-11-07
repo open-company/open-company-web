@@ -31,6 +31,12 @@
                        (on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/dom-node s))
                           (reset! (::show-picker s) false))))
+                       {:did-remount (fn [_ s]
+                        (when-not (responsive/is-tablet-or-mobile?)
+                          (doto (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+                            (.tooltip "fixTitle")
+                            (.tooltip "hide")))
+                        s)}
   [s entry-data hide-last-reaction?]
   (let [reactions-data (if hide-last-reaction?
                          (vec (take (dec default-reaction-number) (:reactions entry-data)))
@@ -72,11 +78,12 @@
                                                   :reacted (not reacted)})
                             reaction-data)]]
 
-              [:button.reaction-btn.btn-reset.fs-hide
+              [:button.reaction-btn.btn-reset
                 {:key (str "reaction-" (:uuid entry-data) "-" idx)
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
-                                          :has-reactions (pos? (:count r))})
+                                          :has-reactions (pos? (:count r))
+                                          utils/hide-class true})
                  :on-mouse-leave #(this-as this
                                    (utils/remove-tooltips)
                                    (.tooltip (js/$ this)))

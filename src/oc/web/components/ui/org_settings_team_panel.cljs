@@ -73,7 +73,8 @@
                :placeholder "Find a member..."
                :on-change #(reset! (::query s) (.. % -target -value))}]])
         ;; Team table
-        [:table.org-settings-table.org-settings-team-table.fs-hide
+        [:table.org-settings-table.org-settings-team-table
+          {:class utils/hide-class}
           [:thead
             [:tr
               [:th "MEMBER"]

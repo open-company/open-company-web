@@ -676,14 +676,14 @@ div.left-navigation-sidebar {
         width: 16px;
         height: 28px;
         float: left;
-        opacity: 0.6;
+        opacity: 1;
 
         @include mobile() {
           opacity: 1;
         }
 
         &.invite-people-icon {
-          background-image: cdnUrl("/img/ML/invite_people.svg");
+          background-image: cdnUrl("/img/ML/invite_team.svg");
         }
 
         &.support-icon {

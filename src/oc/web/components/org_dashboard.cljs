@@ -12,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -34,7 +35,8 @@
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
 
 (defn refresh-board-data [s]
-  (when-not (router/current-activity-id)
+  (when (and (not (router/current-activity-id))
+             (router/current-board-slug))
     (utils/after 100 (fn []
      (let [{:keys [org-data
                    board-data
@@ -48,10 +50,10 @@
         (activity-actions/must-see-get org-data)
 
         :default
-        (let [fixed-board-data (or
-                                board-data
-                                (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))]
-          (section-actions/section-get (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")))))))))
+        (when-let* [fixed-board-data (or board-data
+                     (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
+                    board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
+          (section-actions/section-get board-link))))))))
 
 (rum/defcs org-dashboard < ;; Mixins
                            rum/static
@@ -89,7 +91,9 @@
                 activity-share-container
                 mobile-menu-open
                 show-cmail
-                showing-mobile-user-notifications]} (drv/react s :org-dashboard-data)
+                showing-mobile-user-notifications
+                wrt-activity-data
+                wrt-read-data]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -189,6 +193,10 @@
           (and is-mobile?
                is-sharing-activity)
           (activity-share)
+          ;; Mobile WRT
+          (and is-mobile?
+               wrt-activity-data)
+          (wrt wrt-activity-data wrt-read-data)
           ;; Search results
           is-showing-mobile-search
           (search-box)
@@ -226,7 +234,8 @@
                        (not is-sharing-activity)
                        (not show-section-add)
                        (not show-section-editor)
-                       (not show-cmail)))
+                       (not show-cmail)
+                       (not wrt-activity-data)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container

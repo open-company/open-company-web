@@ -111,6 +111,8 @@
 (declare editable-boards-data)
 (declare activity-data)
 (declare secure-activity-data)
+(declare activity-read-data)
+(declare activity-data-get)
 
 ;; Derived Data ================================================================
 
@@ -134,7 +136,6 @@
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
-   :comment-add-finish  [[:base] (fn [base] (:comment-add-finish base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
@@ -316,12 +317,13 @@
                             (fn [base org-slug]
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
+   :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :jwt]
+                            :mobile-menu-open :jwt :wrt-show]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
                                  ap-initial-at show-section-editor show-section-add show-sections-picker
-                                 entry-editing mobile-menu-open jwt]
+                                 entry-editing mobile-menu-open jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -345,7 +347,11 @@
                                :activity-share-container (:activity-share-container base)
                                :mobile-menu-open mobile-menu-open
                                :show-cmail (boolean (:cmail-state base))
-                               :showing-mobile-user-notifications (:mobile-user-notifications base)})]
+                               :showing-mobile-user-notifications (:mobile-user-notifications base)
+                               :wrt-activity-data (when wrt-show
+                                                   (activity-data-get wrt-show))
+                               :wrt-read-data (when wrt-show
+                                                (activity-read-data wrt-show))})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -526,6 +532,7 @@
   ([org-slug activity-id data]
     (let [activity-key (activity-key org-slug activity-id)]
       (get-in data activity-key))))
+(def activity-data-get activity-data)
 
 (defn secure-activity-data
   "Get secure activity data."
@@ -619,17 +626,22 @@
   ([data org-slug]
     (get-in data (change-cache-data-key org-slug))))
 
-(defn activities-read-data
+(defun activity-read-data
   "Get the read counts of all the items."
   ([]
-    (activities-read-data nil @app-state))
-  ([item-ids]
-    (activities-read-data @app-state item-ids))
-  ([item-ids data]
+    (activity-read-data @app-state))
+  ([data :guard map?]
+    (get-in data activities-read-key))
+  ([item-ids :guard seq?]
+    (activity-read-data item-ids @app-state))
+  ([item-ids :guard seq? data :guard map?]
     (let [all-activities-read (get-in data activities-read-key)]
-      (if item-ids
-        (select-keys all-activities-read item-ids)
-        all-activities-read))))
+      (select-keys all-activities-read item-ids)))
+  ([item-id :guard string?]
+    (activity-read-data item-id @app-state))
+  ([item-id :guard string? data :guard map?]
+    (let [all-activities-read (get-in data activities-read-key)]
+      (get all-activities-read item-id))))
 
 ;; Debug functions
 
@@ -648,7 +660,7 @@
 (defn print-change-data []
   (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
 
-(defn print-activities-read-data []
+(defn print-activity-read-data []
   (js/console.log (get-in @app-state activities-read-key)))
 
 (defn print-change-cache-data []
@@ -711,7 +723,7 @@
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
-(set! (.-OCWebPrintActivitiesReadData js/window) print-activities-read-data)
+(set! (.-OCWebPrintActivitiesReadData js/window) print-activity-read-data)
 (set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintContainerData js/window) print-container-data)

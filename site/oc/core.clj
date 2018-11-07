@@ -203,9 +203,13 @@
           "or"
           [:a {:href "/login"} "Login"]]
         [:div.copyright
-          (str
-           "Copyright © 2018 Carrot. "
-           "All rights reserved.")]]]])
+          "© 2018 Carrot"]
+        [:div.tos-and-pp
+          [:a {:href "/privacy"}
+           "Privacy"]
+          " • "
+          [:a {:href "/terms"}
+           "Terms"]]]]])
 
 
 (defn read-edn [entry]

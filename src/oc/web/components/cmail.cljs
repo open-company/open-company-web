@@ -256,6 +256,7 @@
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
+                   (rum/local true ::show-placeholder)
                    (rum/local nil ::initial-uuid)
                    (rum/local nil ::headline-input-listener)
                    (rum/local nil ::uploading-media)
@@ -282,7 +283,8 @@
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
-                      (reset! (::initial-uuid s) (:uuid cmail-data)))
+                      (reset! (::initial-uuid s) (:uuid cmail-data))
+                      (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*"))))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
@@ -497,8 +499,9 @@
                                       (activity-actions/remove-video :cmail-data cmail-data))
                                     (reset! (::record-video s) false))})))
             ; Headline element
-            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group.fs-hide
-              {:content-editable true
+            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
+              {:class utils/hide-class
+               :content-editable true
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
@@ -513,13 +516,13 @@
                                :use-inline-media-picker false
                                :multi-picker-container-selector "div#cmail-footer-multi-picker"
                                :initial-body @(::initial-body s)
-                               :show-placeholder true
+                               :show-placeholder @(::show-placeholder s)
                                :show-h2 true
                                :dispatch-input-key :cmail-data
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]
-                               :classes "emoji-autocomplete emojiable fs-hide"})
+                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
             (when (and ls/oc-enable-transcriptions
                        (:fixed-video-id cmail-data)
                        (:video-processed cmail-data))

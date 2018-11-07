@@ -44,7 +44,7 @@
                             (map
                              first
                              (vals
-                              (group-by :user-id (map :author (sort-by :created-at comments-data))))))
+                              (group-by :avatar-url (map :author (sort-by :created-at comments-data))))))
                            (reverse (:authors comments-link)))
         comments-count (max (count comments-data) (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))]
@@ -54,15 +54,16 @@
       [:div.is-comments
         ; Comments authors heads
         [:div.is-comments-authors.group
-          {:style {:width (str (if (pos? face-pile-count) (+ 9 (* 15 face-pile-count)) 0) "px")}}
+          {:style {:width (str (if (pos? face-pile-count) (+ 10 (* 18 face-pile-count)) 0) "px")}}
           (for [user-data (take max-face-pile comments-authors)]
             [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
         ; Comments count
-        [:div.is-comments-summary.fs-hide
+        [:div.is-comments-summary
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                    :add-a-comment (not (pos? comments-count))})}
+                                    :add-a-comment (not (pos? comments-count))
+                                    utils/hide-class true})}
           (if (responsive/is-tablet-or-mobile?)
             (comment-summary-string comments-authors)
             (if (pos? comments-count)

@@ -54,6 +54,9 @@
 (defn fullstory-init []
   [:script (str "init_fullstory();")])
 
+(defn logrocket []
+  [:script {:src "https://cdn.logrocket.io/LogRocket.min.js" :crossorigin "anonymous"}])
+
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
@@ -111,7 +114,7 @@
     [:div.testimonials-section-subtitle
       "We’re helping teams like yours."]
     [:div.testimonials-cards-container.group
-      [:div.testimonial-card
+      [:div.testimonial-card.skylight
         [:div.testimonial-header.group
           [:a
             {:href "https://skylight.digital/"
@@ -126,26 +129,26 @@
         [:div.testimonial-footer.group
           [:div.testimonial-image]
           [:div.testimonial-name
-            "CHRIS CAIRNS"]
+            "Chris Cairns"]
           [:div.testimonial-role
             "Managing Partner"]]]
-      [:div.testimonial-card
-        [:div.testimonial-header.group
-          [:a
-            {:href "https://m.io/"
-             :target "_blank"}
-            [:div.testimonial-logo]]]
-        [:div.testimonial-quote
-          (str
-           "“On Carrot, my updates get noticed and "
-           "get the team talking. I love that.”")]
-        [:div.testimonial-footer.group
-          [:div.testimonial-image]
-          [:div.testimonial-name
-            "Tom Hadfield"]
-          [:div.testimonial-role
-            "CEO"]]]
-      [:div.testimonial-card
+      ; [:div.testimonial-card.m-io
+      ;   [:div.testimonial-header.group
+      ;     [:a
+      ;       {:href "https://m.io/"
+      ;        :target "_blank"}
+      ;       [:div.testimonial-logo]]]
+      ;   [:div.testimonial-quote
+      ;     (str
+      ;      "“On Carrot, my updates get noticed and "
+      ;      "get the team talking. I love that.”")]
+      ;   [:div.testimonial-footer.group
+      ;     [:div.testimonial-image]
+      ;     [:div.testimonial-name
+      ;       "Tom Hadfield"]
+      ;     [:div.testimonial-role
+      ;       "CEO"]]]
+      [:div.testimonial-card.wayne-edu
         [:div.testimonial-header.group
           [:a
             {:href "https://wayne.edu/"
@@ -1055,6 +1058,7 @@
           ;; Drift (Support): not enabled for local dev
           ;; [:script {:src (cdn "/js/drift.js")}]
           ;; Headway (What's New)
+          (logrocket)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
    :body [:body
           [:div#app
@@ -1145,7 +1149,8 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js]
+          ziggeo-js
+          (logrocket)]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -1177,6 +1182,6 @@
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]
-          (when (= (env :fullstory) "true")
-            (fullstory-init))
+          ; (when (= (env :fullstory) "true")
+          ;   (fullstory-init))
           (google-analytics-init)]})
