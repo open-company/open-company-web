@@ -144,6 +144,11 @@
   [user-id]
   (str "nux-" user-id))
 
+(defn first-ever-ap-land-cookie
+  "Cookie used to land the user to a special URL only the first time."
+  [user-id]
+  (str "first-ever-ap-land-" user-id))
+
 (defn show-add-post-tooltip-cookie
   "Cookie to check if the add first post tooltip shuold be visible."
   []

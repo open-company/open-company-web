@@ -169,17 +169,31 @@
 (defn org-handler [route target component params]
   (let [org (:org (:params params))
         board (:board (:params params))
-        query-params (:query-params params)]
-    (pre-routing query-params true {:query-params query-params :keep-params [:at]})
-    ;; save route
-    (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
-    ;; load data from api
-    (when-not (dis/org-data)
-      (swap! dis/app-state merge {:loading true}))
-    (check-nux query-params)
-    (post-routing)
-    ;; render component
-    (drv-root component target)))
+        query-params (:query-params params)
+        ;; First ever landing cookie name
+        first-ever-cookie-name (when (= route "all-posts")
+                                 (router/first-ever-ap-land-cookie (jwt/user-id)))
+        ;; First ever landing cookie value
+        first-ever-cookie (when (= route "all-posts")
+                            (cook/get-cookie first-ever-cookie-name))]
+    (if first-ever-cookie
+      ;; If first ever land cookie is set redirect user to the hello url
+      (do
+        ;; Remove the cookie
+        (cook/remove-cookie! first-ever-cookie-name)
+        ;; Redirect to the first ever landing page
+        (router/redirect! (urls/first-ever-all-posts org)))
+      (do
+        (pre-routing query-params true {:query-params query-params :keep-params [:at]})
+        ;; save route
+        (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
+        ;; load data from api
+        (when-not (dis/org-data)
+          (swap! dis/app-state merge {:loading true}))
+        (check-nux query-params)
+        (post-routing)
+        ;; render component
+        (drv-root component target)))))
 
 (defn simple-handler [component route-name target params & [rewrite-url]]
   (pre-routing (:query-params params) rewrite-url)
@@ -481,6 +495,14 @@
       (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
       (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
 
+    (defroute first-ever-all-posts-route (urls/first-ever-all-posts ":org") {:as params}
+      (timbre/info "Routing first-ever-all-posts-route" (urls/first-ever-all-posts ":org"))
+      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
+
+    (defroute first-ever-all-posts-slash-route (str (urls/first-ever-all-posts ":org") "/") {:as params}
+      (timbre/info "Routing first-ever-all-posts-slash-route" (str (urls/first-ever-all-posts ":org") "/"))
+      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
+
     (defroute drafts-route (urls/drafts ":org") {:as params}
       (timbre/info "Routing board-route" (urls/drafts ":org"))
       (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
@@ -589,6 +611,8 @@
                                  ;; Org routes
                                  org-route
                                  org-slash-route
+                                 first-ever-all-posts-route
+                                 first-ever-all-posts-slash-route
                                  all-posts-route
                                  all-posts-slash-route
                                  ; Drafts board
