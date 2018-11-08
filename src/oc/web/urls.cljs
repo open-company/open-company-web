@@ -111,6 +111,13 @@
   ([org-slug]
     (str (org org-slug) "/all-posts")))
 
+(defn first-ever-all-posts
+  "Org all posts url for the first ever land"
+  ([]
+    (first-ever-all-posts (router/current-org-slug)))
+  ([org-slug]
+    (str (all-posts org-slug) "/hello")))
+
 (defn must-see
   "Org must see url"
   ([]
