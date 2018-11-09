@@ -5,14 +5,15 @@
 (defn check-drift-dialog []
   (let [$drift-el (js/$ "#drift-widget-container iframe")]
     (js/console.log "DBG check-drift-dialog" $drift-el (.width $drift-el))
-    (when (or (zero? (.-length $drift-el))
+    (when (or (not (exists? js/drift))
+              (zero? (.-length $drift-el))
               (zero? (.width $drift-el)))
       (let [alert-data {:action "drift-not-working"
-                        :title "Chat not available"
+                        :title "Support chat not available"
                         :message [:span
-                                   "If you want to chat with us please disable"
-                                   " your ad blocker and reload this page."
-                                   "Or send us an email: "
+                                   "Oh no! It seems our support chat has been blocked. "
+                                   "You can whitelist Carrot in your ad-blocker settings, "
+                                   "or just send us an email instead at "
                                    [:a {:href "mailto:hello@carrot.io"
                                         :target "_blank"}
                                     "hello@carrot.io"]
