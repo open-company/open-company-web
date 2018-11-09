@@ -23,7 +23,8 @@
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::expanded-user-menu)
                     (on-window-click-mixin (fn [s e]
-                     (reset! (::expanded-user-menu s) false)))
+                     (when-not (utils/event-inside? e (rum/ref-node s "user-menu"))
+                       (reset! (::expanded-user-menu s) false))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
