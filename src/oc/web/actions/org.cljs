@@ -21,6 +21,15 @@
 ;; User related functions
 ;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
 
+(defn- get-ap-url [org-slug]
+  (let [first-ever-ap-name (router/first-ever-ap-land-cookie (jwt/user-id))
+        first-ever-ap (cook/get-cookie first-ever-ap-name)]
+    (if first-ever-ap
+      (oc-urls/all-posts org-slug)
+      (do
+        (cook/remove-cookie! first-ever-ap-name)
+        (oc-urls/first-ever-all-posts org-slug)))))
+
 (defn bot-auth [team-data user-data & [redirect-to]]
   (let [redirect (or redirect-to (router/get-token))
         auth-link (utils/link-for (:links team-data) "bot")
@@ -130,7 +139,7 @@
 (defn org-redirect [org-data]
   (when org-data
     (let [org-slug (:slug org-data)]
-      (utils/after 100 #(router/redirect! (oc-urls/all-posts org-slug))))))
+      (utils/after 100 #(router/redirect! (get-ap-url (:slug org-data)))))))
 
 ;; Org create
 
@@ -292,7 +301,7 @@
          (when success
            (org-loaded (json->cljs body) false))
          (utils/after 2000
-          #(router/nav! (oc-urls/all-posts org-slug)))))))
+          #(router/nav! (get-ap-url org-slug)))))))
 
 (defn signup-invite-completed [org-data]
   (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
