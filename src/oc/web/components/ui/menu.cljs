@@ -132,7 +132,10 @@
           [:div.oc-menu-item.digest-settings
             "Settings"]])
       [:a
-        {:on-click whats-new-click}
+        (if is-mobile?
+          {:href "https://whats-new.carrot.io/"
+           :target "_blank"}
+          {:on-click whats-new-click})
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       [:a
