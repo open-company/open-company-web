@@ -83,6 +83,10 @@ div.alert-modal-container {
         font-size: 16px;
         color: $oc_gray_7;
         margin-top: 8px;
+
+        a {
+          color: $carrot_green;
+        }
       }
 
       div.alert-modal-buttons {
