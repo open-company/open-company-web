@@ -76,7 +76,9 @@
         headway-config (clj->js {
           :selector ".whats-new"
           :account "xGYD6J"
-          :translations {:title "What's New"}})]
+          :position {:y "bottom"}
+          :translations {:title "What's New"
+                         :footer "👉 Show me more new stuff"}})]
     (.init js/Headway headway-config)
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
@@ -130,7 +132,10 @@
           [:div.oc-menu-item.digest-settings
             "Settings"]])
       [:a
-        {:on-click whats-new-click}
+        (if is-mobile?
+          {:href "https://whats-new.carrot.io/"
+           :target "_blank"}
+          {:on-click whats-new-click})
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       [:a

@@ -1058,8 +1058,9 @@
           ;; Drift (Support): not enabled for local dev
           ;; [:script {:src (cdn "/js/drift.js")}]
           ;; Headway (What's New)
-          (logrocket)
-          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
+          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
+          ;; Session capture for support
+          (logrocket)]
    :body [:body
           [:div#app
             [:div.oc-loading.active
