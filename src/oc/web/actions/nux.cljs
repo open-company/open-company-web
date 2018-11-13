@@ -71,7 +71,6 @@
           add-post-tooltip (:show-add-post-tooltip nv)
           post-added-tooltip (:show-post-added-tooltip nv)
           fixed-post-added-tooltip (parse-nux-cookie-value post-added-tooltip)
-          draft-post-tooltip (:show-draft-post-tooltip nv)
           edit-tooltip (:show-edit-tooltip nv)
           user-type (:user-type nv)
           all-posts-count (count (vals posts-data))
@@ -90,11 +89,7 @@
           fixed-edit-tooltip (and ;; has not been done already
                                   (not= edit-tooltip default-tooltip-done)
                                   ;; user is not a viewer
-                                  can-edit?)
-          fixed-draft-post-tooltip (and ;; draft post is not already done
-                                        (not= draft-post-tooltip default-tooltip-done)
-                                        ;; user has edit permissions
-                                        can-edit?)]
+                                  can-edit?)]
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
