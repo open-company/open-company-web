@@ -4,7 +4,6 @@
 
 (defn check-drift-dialog []
   (let [$drift-el (js/$ "#drift-widget-container iframe")]
-    (js/console.log "DBG check-drift-dialog" $drift-el (.width $drift-el))
     (when (or (not (exists? js/drift))
               (zero? (.-length $drift-el))
               (zero? (.width $drift-el)))
