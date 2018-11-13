@@ -65,3 +65,6 @@
 
 ;; LogRocket
 (def logrocket-key nil)
+
+;; WS monitor
+(def ws-monitor-interval 30)

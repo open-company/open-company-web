@@ -43,7 +43,7 @@
                (not @@ch-state)
                (not (:open? @@ch-state)))
        (sentry-report))
-    25000)))
+    (* ls/ws-monitor-interval 1000))))
 
 (defn- send! [& args]
   (if @chsk-send!
