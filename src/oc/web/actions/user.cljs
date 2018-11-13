@@ -41,7 +41,8 @@
   (let [jwt-contents (jwt/get-contents)
         email (:email jwt-contents)]
     (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
-    (when email
+    (when (and (exists? js/drift)
+               email)
       (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
                         (clj->js {:nickname (:name jwt-contents)
                                   :email email}))))
