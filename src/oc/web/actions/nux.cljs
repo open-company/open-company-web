@@ -36,7 +36,6 @@
   (set-nux-cookie user-type
     {:show-add-post-tooltip true
      :show-post-added-tooltip false
-     :show-draft-post-tooltip true
      :show-edit-tooltip true}))
 
 (defn nux-end
@@ -108,9 +107,6 @@
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
-      (when (and (not fixed-draft-post-tooltip)
-                 (not can-edit?))
-        (mark-nux-step-done :show-draft-post-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip (if fixed-add-post-tooltip
                                  (if has-organic-posts
@@ -119,14 +115,12 @@
                                  false)
         :show-post-added-tooltip fixed-post-added-tooltip
         :show-edit-tooltip fixed-edit-tooltip
-        :show-draft-post-tooltip fixed-draft-post-tooltip
         :user-type user-type}])
 
       ;; Check if we need to remove the nux cookie
       (when (and (= (:show-add-post-tooltip nv) default-tooltip-done)
                  (= (:show-post-added-tooltip nv) default-tooltip-done)
-                 (= (:show-edit-tooltip nv) default-tooltip-done)
-                 (= (:show-draft-post-tooltip nv) default-tooltip-done))
+                 (= (:show-edit-tooltip nv) default-tooltip-done))
         (nux-end)))))
 
 (defn dismiss-add-post-tooltip []
@@ -147,11 +141,3 @@
 (defn dismiss-edit-tooltip []
   (mark-nux-step-done :show-edit-tooltip)
   (check-nux))
-
-(defn dismiss-draft-post-tooltip []
-  (mark-nux-step-done :show-draft-post-tooltip)
-  (check-nux))
-
-(defn maybe-dismiss-draft-post-tooltip [activity-data]
-  (when (not= (.indexOf (:headline activity-data) "10 things to know about") -1)
-    (dismiss-draft-post-tooltip)))
