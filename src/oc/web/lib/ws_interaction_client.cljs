@@ -7,21 +7,56 @@
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
+            [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
             [goog.Uri :as guri]))
 
-(def current-board-path (atom nil))
+(defonce current-board-path (atom nil))
 
 ;; Sente WebSocket atoms
-(def channelsk (atom nil))
-(def ch-chsk (atom nil))
-(def ch-state (atom nil))
-(def chsk-send! (atom nil))
+(defonce channelsk (atom nil))
+(defonce ch-chsk (atom nil))
+(defonce ch-state (atom nil))
+(defonce chsk-send! (atom nil))
 
-(def ch-pub (chan))
+(defonce ch-pub (chan))
+
 ;; Publication that handlers will subscribe to
-(def publication
+(defonce publication
   (pub ch-pub :topic))
+
+;; Connection check
+
+(defonce last-interval (atom nil))
+
+(defn- sentry-report [& [action-id]]
+  (let [connection-status (if @ch-state
+                            @@ch-state
+                            nil)
+        ch-send-fn? (fn? @chsk-send!)
+        ctx {:action action-id
+             :connection-status connection-status
+             :send-fn ch-send-fn?}]
+    (sentry/set-extra-context! ctx)
+    (sentry/capture-message "Send over closed Interaction WS connection")
+    (sentry/clear-extra-context!)
+    (timbre/error "Send over closed Interaction WS connection" ctx)))
+
+(defn- check-interval []
+  (when @last-interval
+    (.clearTimeout @last-interval))
+  (reset! last-interval
+   (.setInterval js/window
+    #(when (or (not @ch-state)
+               (not @@ch-state)
+               (not (:open? @@ch-state)))
+       (sentry-report))
+    25000)))
+
+(defn- send! [& args]
+  (if @chsk-send!
+    (apply @chsk-send! args)
+    (sentry-report (first (first args)))))
 
 ;; Auth
 (defn should-disconnect? [rep]
@@ -31,16 +66,16 @@
 
 (defn post-handshake-auth []
   (timbre/debug "Trying post handshake jwt auth")
-  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+  (send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
 
 ;; Actions
 (defn board-watch [board-uuid]
   (timbre/debug "Watching board: " board-uuid)
-  (@chsk-send! [:watch/board {:board-uuid board-uuid}] 1000))
+  (send! [:watch/board {:board-uuid board-uuid}]))
 
 (defn board-unwatch [callback]
   (timbre/debug "Unwatching all boards.")
-  (@chsk-send! [:unwatch/board] 1000 callback))
+  (send! [:unwatch/board] 1000 callback))
 
 (defn subscribe
   [topic handler-fn]
@@ -130,7 +165,7 @@
 (defn test-session
   "Ping the server to update the sesssion state."
   []
-  (@chsk-send! [:session/status]))
+  (send! [:session/status]))
 
 ;;;; Sente event router (our `event-msg-handler` loop)
 
@@ -147,18 +182,12 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-board-path (.getPath ws-uri)]
+    (check-interval)
     (when (or (not @ch-state)
               (not (:open? @@ch-state))
               (not= @current-board-path ws-board-path))
-      (timbre/debug
-       "Reconnect for"
-       (:href ws-link)
-       "and"
-       uid
-       "current state:"
-       @ch-state
-       "current board:"
-       @current-board-path)
+      (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state
+       "current board:" @current-board-path)
       ; if the path is different it means
       (when (and @ch-state
                  (:open? @@ch-state))

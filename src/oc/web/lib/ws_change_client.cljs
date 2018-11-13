@@ -6,22 +6,56 @@
             [taoensso.timbre :as timbre]
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.lib.time :as time]
+            [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
             [goog.Uri :as guri]))
 
-(def current-org (atom nil))
-(def container-ids (atom []))
+(defonce current-org (atom nil))
+(defonce container-ids (atom []))
 
 ;; Sente WebSocket atoms
-(def channelsk (atom nil))
-(def ch-chsk (atom nil))
-(def ch-state (atom nil))
-(def chsk-send! (atom nil))
-(def ch-pub (chan))
+(defonce channelsk (atom nil))
+(defonce ch-chsk (atom nil))
+(defonce ch-state (atom nil))
+(defonce chsk-send! (atom nil))
+(defonce ch-pub (chan))
 
 ;; Publication that handlers will subscribe to
-(def publication
+(defonce publication
   (pub ch-pub :topic))
+
+;; Connection check
+
+(defonce last-interval (atom nil))
+
+(defn- sentry-report [& [action-id]]
+  (let [connection-status (if @ch-state
+                            @@ch-state
+                            nil)
+        ch-send-fn? (fn? @chsk-send!)
+        ctx {:action action-id
+             :connection-status connection-status
+             :send-fn ch-send-fn?}]
+    (sentry/set-extra-context! ctx)
+    (sentry/capture-message "Send over closed Change WS connection")
+    (sentry/clear-extra-context!)
+    (timbre/error "Send over closed Change WS connection" ctx)))
+
+(defn- check-interval []
+  (when @last-interval
+    (.clearTimeout @last-interval))
+  (reset! last-interval
+   (.setInterval js/window
+    #(when (or (not @ch-state)
+               (not @@ch-state)
+               (not (:open? @@ch-state)))
+       (sentry-report))
+    25000)))
+
+(defn- send! [& args]
+  (if @chsk-send!
+    (apply @chsk-send! args)
+    (sentry-report (first (first args)))))
 
 ;; ----- Actions -----
 
@@ -41,39 +75,33 @@
     (container-watch))
 
   ([]
-    (when @chsk-send!
-      (timbre/debug "Sending container/watch for:" @container-ids)
-      (@chsk-send! [:container/watch @container-ids] 1000))))
+    (timbre/debug "Sending container/watch for:" @container-ids)
+    (send! [:container/watch @container-ids])))
 
 (defn container-seen [container-id]
-  (when @chsk-send!
-    (timbre/debug "Sending container/seen for:" container-id)
-    (@chsk-send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}] 1000)))
+  (timbre/debug "Sending container/seen for:" container-id)
+  (send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}]))
 
 (defn item-seen [publisher-id container-id item-id]
-  (when @chsk-send!
-    (timbre/debug "Sending item/seen for container:" container-id "item:" item-id)
-    (@chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}] 1000)))
+  (timbre/debug "Sending item/seen for container:" container-id "item:" item-id)
+  (send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}]))
 
 (defn item-read [org-id container-id item-id user-name avatar-url]
-  (when @chsk-send!
-    (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
-    (@chsk-send! [:item/read {:org-id org-id
-                              :container-id container-id
-                              :item-id item-id
-                              :name user-name
-                              :avatar-url avatar-url
-                              :read-at (time/current-timestamp)}] 1000)))
+  (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
+  (send! [:item/read {:org-id org-id
+                                 :container-id container-id
+                                 :item-id item-id
+                                 :name user-name
+                                 :avatar-url avatar-url
+                                 :read-at (time/current-timestamp)}]))
 
 (defn who-read-count [item-ids]
-  (when @chsk-send!
-    (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
-    (@chsk-send! [:item/who-read-count item-ids] 1000)))
+  (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
+  (send! [:item/who-read-count item-ids]))
 
 (defn who-read [item-ids]
-  (when @chsk-send!
-    (timbre/debug "Sending item/who-read for item-ids:" item-ids)
-    (@chsk-send! [:item/who-read item-ids] 1000)))
+  (timbre/debug "Sending item/who-read for item-ids:" item-ids)
+  (send! [:item/who-read item-ids]))
 
 (defn subscribe
   [topic handler-fn]
@@ -181,6 +209,7 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
+    (check-interval)
     (if (or (not @ch-state)
             (not (:open? @@ch-state))
             (not= @current-org org-slug))
@@ -188,7 +217,7 @@
       ;; Need a connection to change service
       (do
         (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state
-                      "current org:" @current-org "this org:" org-slug)
+         "current org:" @current-org "this org:" org-slug)
         ; if the path is different it means
         (when (and @ch-state
                    (:open? @@ch-state))

@@ -6,24 +6,57 @@
             [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as j]
             [oc.lib.time :as time]
+            [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
             [goog.Uri :as guri]))
 
 ;; Sente WebSocket atoms
-(def channelsk (atom nil))
-(def ch-chsk (atom nil))
-(def ch-state (atom nil))
-(def chsk-send! (atom nil))
-(def ch-pub (chan))
+(defonce channelsk (atom nil))
+(defonce ch-chsk (atom nil))
+(defonce ch-state (atom nil))
+(defonce chsk-send! (atom nil))
+(defonce ch-pub (chan))
+
+;; Connection check
+
+(defonce last-interval (atom nil))
+
+(defn- sentry-report [& [action-id]]
+  (let [connection-status (if @ch-state
+                            @@ch-state
+                            nil)
+        ch-send-fn? (fn? @chsk-send!)
+        ctx {:action action-id
+             :connection-status connection-status
+             :send-fn ch-send-fn?}]
+    (sentry/set-extra-context! ctx)
+    (sentry/capture-message "Send over closed Notify WS connection")
+    (sentry/clear-extra-context!)
+    (timbre/error "Send over closed Notify WS connection" ctx)))
+
+(defn- check-interval []
+  (when @last-interval
+    (.clearTimeout @last-interval))
+  (reset! last-interval
+   (.setInterval js/window
+    #(when (or (not @ch-state)
+               (not @@ch-state)
+               (not (:open? @@ch-state)))
+       (sentry-report))
+    25000)))
+
+(defn- send! [& args]
+  (if @chsk-send!
+    (apply @chsk-send! args)
+    (sentry-report (first (first args)))))
 
 ;; Publication that handlers will subscribe to
-(def publication
+(defonce publication
   (pub ch-pub :topic))
-
 
 (defn notifications-watch []
   (timbre/debug "Watching notifications.")
-  (@chsk-send! [:watch/notifications {}] 1000))
+  (send! [:watch/notifications {}]))
 
 ;; Auth
 (defn should-disconnect? [rep]
@@ -35,7 +68,7 @@
 
 (defn post-handshake-auth []
   (timbre/debug "Trying post handshake jwt auth")
-  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+  (send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
 
 (defn subscribe
   [topic handler-fn]
@@ -124,6 +157,7 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
+    (check-interval)
     (when (or (not @ch-state)
             (not (:open? @@ch-state)))
 
