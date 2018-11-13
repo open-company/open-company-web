@@ -93,7 +93,6 @@
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :show-post-added-tooltip)
-                              (drv/drv :show-draft-post-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
                               (drv/drv :current-user-data)
                               ;; Locals
@@ -321,18 +320,6 @@
                           "Connect to Slack"]
                         " so your team can see posts and  join the discussion from Slack, too."]
                       [:div.post-added-tooltip-box]]]))
-              (when (and is-drafts-board
-                         (drv/react s :show-draft-post-tooltip))
-                [:div.draft-post-tooltip-container.group
-                  [:button.mlb-reset.draft-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-draft-post-tooltip)}]
-                  [:div.draft-post-tooltips
-                    [:div.draft-post-tooltip-box-mobile]
-                    [:div.draft-post-tooltip-title
-                      "Add some personality"]
-                    [:div.draft-post-tooltip
-                      "Finish this draft post to help your team get to know you better!"]
-                    [:div.draft-post-tooltip-box]]])
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards
