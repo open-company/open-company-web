@@ -169,7 +169,8 @@
                         :path path
                         :method (method-name method)
                         :jwt (j/jwt)
-                        :params params}]
+                        :params params
+                        :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/set-extra-context! report)
             (sentry/capture-message (str "xhr response error:" status))
@@ -193,7 +194,8 @@
 (defn- handle-missing-link [callee-name link callback & parameters]
   (timbre/error "Hanling missing link:" callee-name ":" link)
   (sentry/set-extra-context! (merge {:callee callee-name
-                                     :link link}
+                                     :link link
+                                     :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}
                                      parameters))
   (sentry/capture-message (str "Client API error on: " callee-name))
   (sentry/clear-extra-context!)

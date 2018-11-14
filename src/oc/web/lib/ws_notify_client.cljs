@@ -28,7 +28,8 @@
         ch-send-fn? (fn? @chsk-send!)
         ctx {:action action-id
              :connection-status connection-status
-             :send-fn ch-send-fn?}]
+             :send-fn ch-send-fn?
+             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
     (sentry/set-extra-context! ctx)
     (sentry/capture-message "Send over closed Notify WS connection")
     (sentry/clear-extra-context!)
