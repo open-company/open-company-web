@@ -14,6 +14,5 @@
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
                                        (activity-actions/activity-delete draft)
-                                       (nux-actions/maybe-dismiss-draft-post-tooltip draft)
                                        (alert-modal/hide-alert))}]
    (alert-modal/show-alert alert-data)))
