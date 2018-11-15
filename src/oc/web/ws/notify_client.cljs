@@ -66,8 +66,8 @@
   (timbre/debug "Trying post handshake jwt auth")
   (if (j/expired?)
     (ja/jwt-refresh
-     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 10000 should-disconnect?))
-    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 10000 should-disconnect?)))
+     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?))
+    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?)))
 
 (defn subscribe
   [topic handler-fn]
