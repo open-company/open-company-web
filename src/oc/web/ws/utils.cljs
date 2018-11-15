@@ -24,7 +24,7 @@
 
 (defn check-interval [service-name chsk-send! ch-state]
   (when @last-interval
-    (.clearTimeout @last-interval))
+    (.clearTimeout js/window @last-interval))
   (reset! last-interval
    (.setInterval js/window
     #(when (or (not @ch-state)
