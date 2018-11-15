@@ -20,6 +20,8 @@
 
 (defonce last-ws-link (atom nil))
 
+(defonce last-interval (atom nil))
+
 ;; Publication that handlers will subscribe to
 (defonce publication
   (pub ch-pub :topic))
@@ -143,7 +145,7 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (ws-utils/check-interval "Notify" chsk-send! ch-state)
+    (ws-utils/check-interval last-interval "Notify" chsk-send! ch-state)
     (when (or (not @ch-state)
             (not (:open? @@ch-state)))
 

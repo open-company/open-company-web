@@ -24,6 +24,8 @@
 
 (defonce ch-pub (chan))
 
+(defonce last-interval (atom nil))
+
 ;; Publication that handlers will subscribe to
 (defonce publication
   (pub ch-pub :topic))
@@ -169,7 +171,7 @@
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-board-path (.getPath ws-uri)]
     (reset! last-ws-link ws-link)
-    (ws-utils/check-interval "Interaction" chsk-send! ch-state)
+    (ws-utils/check-interval last-interval "Interaction" chsk-send! ch-state)
     (when (or (not @ch-state)
               (not (:open? @@ch-state))
               (not= @current-board-path ws-board-path))

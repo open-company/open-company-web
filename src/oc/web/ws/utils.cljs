@@ -6,8 +6,6 @@
 
 ;; Connection check
 
-(defonce last-interval (atom nil))
-
 (defn- sentry-report [service-name chsk-send! ch-state & [action-id]]
   (let [connection-status (if @ch-state
                             @@ch-state
@@ -22,9 +20,9 @@
     (sentry/clear-extra-context!)
     (timbre/error "Send over closed " service-name " WS connection" ctx)))
 
-(defn check-interval [service-name chsk-send! ch-state]
+(defn check-interval [last-interval service-name chsk-send! ch-state]
   (when @last-interval
-    (.clearTimeout js/window @last-interval))
+    (.clearInterval js/window @last-interval))
   (reset! last-interval
    (.setInterval js/window
     #(when (or (not @ch-state)
