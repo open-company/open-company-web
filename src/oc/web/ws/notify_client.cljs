@@ -8,6 +8,7 @@
             [oc.lib.time :as time]
             [oc.web.local-settings :as ls]
             [oc.web.actions.jwt :as ja]
+            [oc.web.lib.utils :as utils]
             [oc.web.ws.utils :as ws-utils]
             [goog.Uri :as guri]))
 
@@ -41,22 +42,32 @@
 (declare reconnect)
 
 (defn should-disconnect? [rep]
-  (when (:valid rep)
-    (notifications-watch))
-  (when-not (:valid rep)
-    (timbre/warn "disconnecting client due to invalid JWT!" rep)
-    (s/chsk-disconnect! @channelsk)
-    (if (j/expired?)
-      (ja/jwt-refresh
-       #(reconnect @last-ws-link (j/user-id)))
-      (ws-utils/report-invalid-jwt "Notify" ch-state))))
+  (if (:valid rep)
+    (notifications-watch)
+    (do
+      (timbre/warn "disconnecting client due to invalid JWT!" rep)
+      (s/chsk-disconnect! @channelsk)
+      (cond
+        (j/expired?)
+        (ja/jwt-refresh
+         #(reconnect @last-ws-link (j/user-id)))
+        (= rep :chsk/timeout)
+        (do
+          (ws-utils/report-connect-timeout "Notify" ch-state)
+          ;; retry in 10 seconds if sente is not trying reconnecting
+          (when (and @ch-state
+                     (not (:udt-next-reconnect @@ch-state)))
+            (utils/after (* 10 1000)
+             (reconnect @last-ws-link (j/user-id)))))
+        :else
+        (ws-utils/report-invalid-jwt "Notify" ch-state rep)))))
 
 (defn post-handshake-auth []
   (timbre/debug "Trying post handshake jwt auth")
   (if (j/expired?)
     (ja/jwt-refresh
-     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
-    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?)))
+     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 10000 should-disconnect?))
+    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 10000 should-disconnect?)))
 
 (defn subscribe
   [topic handler-fn]

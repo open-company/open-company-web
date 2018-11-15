@@ -31,14 +31,28 @@
        (sentry-report service-name chsk-send! ch-state))
     (* ls/ws-monitor-interval 1000))))
 
-(defn report-invalid-jwt [service-name ch-state]
+(defn report-invalid-jwt [service-name ch-state auth-response]
   (let [connection-status (if @ch-state
                             @@ch-state
                             nil)
         ctx {:jwt (j/jwt)
+             :connection-status connection-status
              :timestamp (.getTime (new js/Date))
+             :auth-response auth-response
              :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str service-name " WS: not valid JWT"))
     (sentry/clear-extra-context!)
     (timbre/error (str service-name " WS: not valid JWT") ctx)))
+
+(defn report-connect-timeout [service-name ch-state]
+  (let [connection-status (if @ch-state
+                            @@ch-state
+                            nil)
+        ctx {:timestamp (.getTime (new js/Date))
+             :connection-status connection-status
+             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
+    (sentry/set-extra-context! ctx)
+    (sentry/capture-message (str service-name " WS: handshake timeout"))
+    (sentry/clear-extra-context!)
+    (timbre/error (str service-name " WS: handshake timeout") ctx)))
