@@ -1,4 +1,4 @@
-(ns oc.web.lib.ws-notify-client
+(ns oc.web.ws.notify-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]
                    [taoensso.encore :refer (have)])
   (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
@@ -6,8 +6,9 @@
             [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as j]
             [oc.lib.time :as time]
-            [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
+            [oc.web.actions.jwt :as ja]
+            [oc.web.ws.utils :as ws-utils]
             [goog.Uri :as guri]))
 
 ;; Sente WebSocket atoms
@@ -17,59 +18,43 @@
 (defonce chsk-send! (atom nil))
 (defonce ch-pub (chan))
 
-;; Connection check
-
-(defonce last-interval (atom nil))
-
-(defn- sentry-report [& [action-id]]
-  (let [connection-status (if @ch-state
-                            @@ch-state
-                            nil)
-        ch-send-fn? (fn? @chsk-send!)
-        ctx {:action action-id
-             :connection-status connection-status
-             :send-fn ch-send-fn?
-             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
-    (sentry/set-extra-context! ctx)
-    (sentry/capture-message "Send over closed Notify WS connection")
-    (sentry/clear-extra-context!)
-    (timbre/error "Send over closed Notify WS connection" ctx)))
-
-(defn- check-interval []
-  (when @last-interval
-    (.clearTimeout @last-interval))
-  (reset! last-interval
-   (.setInterval js/window
-    #(when (or (not @ch-state)
-               (not @@ch-state)
-               (not (:open? @@ch-state)))
-       (sentry-report))
-    (* ls/ws-monitor-interval 1000))))
-
-(defn- send! [& args]
-  (if @chsk-send!
-    (apply @chsk-send! args)
-    (sentry-report (first (first args)))))
+(defonce last-ws-link (atom nil))
 
 ;; Publication that handlers will subscribe to
 (defonce publication
   (pub ch-pub :topic))
 
+;; Send wrapper
+
+(defn- send! [chsk-send! & args]
+  (if @chsk-send!
+    (apply @chsk-send! args)
+    (ws-utils/sentry-report "Notify" ch-state (first (first args)))))
+
 (defn notifications-watch []
   (timbre/debug "Watching notifications.")
-  (send! [:watch/notifications {}]))
+  (send! chsk-send! [:watch/notifications {}]))
 
 ;; Auth
+(declare reconnect)
+
 (defn should-disconnect? [rep]
   (when (:valid rep)
     (notifications-watch))
   (when-not (:valid rep)
     (timbre/warn "disconnecting client due to invalid JWT!" rep)
-    (s/chsk-disconnect! @channelsk)))
+    (s/chsk-disconnect! @channelsk)
+    (if (j/expired?)
+      (ja/jwt-refresh
+       #(reconnect @last-ws-link (j/user-id)))
+      (ws-utils/report-invalid-jwt "Notify" ch-state))))
 
 (defn post-handshake-auth []
   (timbre/debug "Trying post handshake jwt auth")
-  (send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+  (if (j/expired?)
+    (ja/jwt-refresh
+     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?)))
 
 (defn subscribe
   [topic handler-fn]
@@ -158,7 +143,7 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (check-interval)
+    (ws-utils/check-interval "Notify" chsk-send! ch-state)
     (when (or (not @ch-state)
             (not (:open? @@ch-state)))
 

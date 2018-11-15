@@ -1,4 +1,4 @@
-(ns oc.web.lib.ws-change-client
+(ns oc.web.ws.change-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
             [defun.core :refer (defun)]
@@ -6,8 +6,8 @@
             [taoensso.timbre :as timbre]
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.lib.time :as time]
-            [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
+            [oc.web.ws.utils :as ws-utils]
             [goog.Uri :as guri]))
 
 (defonce current-org (atom nil))
@@ -24,39 +24,12 @@
 (defonce publication
   (pub ch-pub :topic))
 
-;; Connection check
+;; Send wrapper
 
-(defonce last-interval (atom nil))
-
-(defn- sentry-report [& [action-id]]
-  (let [connection-status (if @ch-state
-                            @@ch-state
-                            nil)
-        ch-send-fn? (fn? @chsk-send!)
-        ctx {:action action-id
-             :connection-status connection-status
-             :send-fn ch-send-fn?
-             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
-    (sentry/set-extra-context! ctx)
-    (sentry/capture-message "Send over closed Change WS connection")
-    (sentry/clear-extra-context!)
-    (timbre/error "Send over closed Change WS connection" ctx)))
-
-(defn- check-interval []
-  (when @last-interval
-    (.clearTimeout @last-interval))
-  (reset! last-interval
-   (.setInterval js/window
-    #(when (or (not @ch-state)
-               (not @@ch-state)
-               (not (:open? @@ch-state)))
-       (sentry-report))
-    (* ls/ws-monitor-interval 1000))))
-
-(defn- send! [& args]
+(defn- send! [chsk-send! & args]
   (if @chsk-send!
     (apply @chsk-send! args)
-    (sentry-report (first (first args)))))
+    (ws-utils/sentry-report "Interaction" ch-state (first (first args)))))
 
 ;; ----- Actions -----
 
@@ -77,19 +50,19 @@
 
   ([]
     (timbre/debug "Sending container/watch for:" @container-ids)
-    (send! [:container/watch @container-ids])))
+    (send! chsk-send! [:container/watch @container-ids])))
 
 (defn container-seen [container-id]
   (timbre/debug "Sending container/seen for:" container-id)
-  (send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}]))
+  (send! chsk-send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}]))
 
 (defn item-seen [publisher-id container-id item-id]
   (timbre/debug "Sending item/seen for container:" container-id "item:" item-id)
-  (send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}]))
+  (send! chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}]))
 
 (defn item-read [org-id container-id item-id user-name avatar-url]
   (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
-  (send! [:item/read {:org-id org-id
+  (send! chsk-send! [:item/read {:org-id org-id
                                  :container-id container-id
                                  :item-id item-id
                                  :name user-name
@@ -98,11 +71,11 @@
 
 (defn who-read-count [item-ids]
   (timbre/debug "Sending item/who-read-count for item-ids:" item-ids)
-  (send! [:item/who-read-count item-ids]))
+  (send! chsk-send! [:item/who-read-count item-ids]))
 
 (defn who-read [item-ids]
   (timbre/debug "Sending item/who-read for item-ids:" item-ids)
-  (send! [:item/who-read item-ids]))
+  (send! chsk-send! [:item/who-read item-ids]))
 
 (defn subscribe
   [topic handler-fn]
@@ -210,7 +183,7 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (check-interval)
+    (ws-utils/check-interval "Change" chsk-send! ch-state)
     (if (or (not @ch-state)
             (not (:open? @@ch-state))
             (not= @current-org org-slug))

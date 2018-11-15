@@ -1,4 +1,4 @@
-(ns oc.web.lib.ws-interaction-client
+(ns oc.web.ws.interaction-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [sablono.core :as html :refer-macros [html]]
             [taoensso.sente :as s]
@@ -7,8 +7,9 @@
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
-            [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
+            [oc.web.actions.jwt :as ja]
+            [oc.web.ws.utils :as ws-utils]
             [goog.Uri :as guri]))
 
 (defonce current-board-path (atom nil))
@@ -19,64 +20,48 @@
 (defonce ch-state (atom nil))
 (defonce chsk-send! (atom nil))
 
+(defonce last-ws-link (atom nil))
+
 (defonce ch-pub (chan))
 
 ;; Publication that handlers will subscribe to
 (defonce publication
   (pub ch-pub :topic))
 
-;; Connection check
+;; Send wrapper
 
-(defonce last-interval (atom nil))
-
-(defn- sentry-report [& [action-id]]
-  (let [connection-status (if @ch-state
-                            @@ch-state
-                            nil)
-        ch-send-fn? (fn? @chsk-send!)
-        ctx {:action action-id
-             :connection-status connection-status
-             :send-fn ch-send-fn?
-             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
-    (sentry/set-extra-context! ctx)
-    (sentry/capture-message "Send over closed Interaction WS connection")
-    (sentry/clear-extra-context!)
-    (timbre/error "Send over closed Interaction WS connection" ctx)))
-
-(defn- check-interval []
-  (when @last-interval
-    (.clearTimeout @last-interval))
-  (reset! last-interval
-   (.setInterval js/window
-    #(when (or (not @ch-state)
-               (not @@ch-state)
-               (not (:open? @@ch-state)))
-       (sentry-report))
-    (* ls/ws-monitor-interval 1000))))
-
-(defn- send! [& args]
+(defn- send! [chsk-send! & args]
   (if @chsk-send!
     (apply @chsk-send! args)
-    (sentry-report (first (first args)))))
+    (ws-utils/sentry-report "Interaction" ch-state (first (first args)))))
 
 ;; Auth
+(declare reconnect)
+
 (defn should-disconnect? [rep]
   (when-not (:valid rep)
     (timbre/warn "disconnecting client due to invalid JWT!" rep)
-    (s/chsk-disconnect! @channelsk)))
+    (s/chsk-disconnect! @channelsk)
+    (if (j/expired?)
+      (ja/jwt-refresh
+       #(reconnect @last-ws-link (j/user-id)))
+      (ws-utils/report-invalid-jwt "Interaction" ch-state))))
 
 (defn post-handshake-auth []
   (timbre/debug "Trying post handshake jwt auth")
-  (send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+  (if (j/expired?)
+    (ja/jwt-refresh
+     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?)))
 
 ;; Actions
 (defn board-watch [board-uuid]
   (timbre/debug "Watching board: " board-uuid)
-  (send! [:watch/board {:board-uuid board-uuid}]))
+  (send! chsk-send! [:watch/board {:board-uuid board-uuid}]))
 
 (defn board-unwatch [callback]
   (timbre/debug "Unwatching all boards.")
-  (send! [:unwatch/board] 1000 callback))
+  (send! chsk-send! [:unwatch/board] 1000 callback))
 
 (defn subscribe
   [topic handler-fn]
@@ -166,7 +151,7 @@
 (defn test-session
   "Ping the server to update the sesssion state."
   []
-  (send! [:session/status]))
+  (send! chsk-send! [:session/status]))
 
 ;;;; Sente event router (our `event-msg-handler` loop)
 
@@ -183,7 +168,8 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-board-path (.getPath ws-uri)]
-    (check-interval)
+    (reset! last-ws-link ws-link)
+    (ws-utils/check-interval "Interaction" chsk-send! ch-state)
     (when (or (not @ch-state)
               (not (:open? @@ch-state))
               (not= @current-board-path ws-board-path))

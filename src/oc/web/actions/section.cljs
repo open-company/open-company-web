@@ -7,8 +7,8 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
-            [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn is-currently-shown? [section]
