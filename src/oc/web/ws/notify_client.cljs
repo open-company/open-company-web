@@ -157,7 +157,7 @@
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
     (ws-utils/check-interval last-interval "Notify" chsk-send! ch-state)
-    (when (or (not @ch-state)
+    (if (or (not @ch-state)
             (not (:open? @@ch-state)))
 
       ;; Need a connection to notification service
@@ -180,4 +180,5 @@
             (reset! ch-chsk ch-recv)
             (reset! chsk-send! send-fn)
             (reset! ch-state state)
-            (start-router!))))))
+            (start-router!)))
+      (notifications-watch))))
