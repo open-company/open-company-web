@@ -19,7 +19,7 @@
   ;; only watch the currently visible board.
   (ws-ic/board-unwatch (fn [rep]
     (timbre/debug rep "Watching on socket " (:uuid section))
-        (ws-ic/board-watch (:uuid section)))))
+        (ws-ic/boards-watch [(:uuid section)]))))
 
 (defn section-seen
   [uuid]

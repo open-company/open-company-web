@@ -26,9 +26,9 @@
           org-boards (:boards org-data)
           org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
       (ws-ic/board-unwatch (fn [rep]
-        (doseq [board-slug board-slugs]
-          (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
-          (ws-ic/board-watch (org-board-map board-slug))))))))
+        (let [board-uuids (map org-board-map board-slugs)]
+          (timbre/debug "Watching on socket " board-slugs board-uuids)
+          (ws-ic/boards-watch board-uuids)))))))
 
 ;; Reads data
 
