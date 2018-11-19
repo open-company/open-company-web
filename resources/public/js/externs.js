@@ -137,6 +137,7 @@ CarrotGA.NULL_VALUE = {};
 CarrotGA.clientid = '';
 var init_fullstory = function(){};
 var FS = function(){};
+FS.setUserVars = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
@@ -171,9 +172,3 @@ drift.track = function(){};
 // Homepage animation
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
-// Logrocket
-var LogRocket = function(){};
-LogRocket.init = function(){};
-LogRocket.getSessionURL = function(){};
-LogRocket.sessionURL = {};
-LogRocket.identify = function(){};
