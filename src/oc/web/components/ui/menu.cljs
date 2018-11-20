@@ -25,13 +25,11 @@
   (dis/dispatch! [:input [:mobile-menu-open] false]))
 
 (defn logout-click [e]
-  ; (utils/event-stop e)
   (.preventDefault e)
   (mobile-menu-toggle)
   (user-actions/logout))
 
 (defn user-profile-click [e]
-  ; (utils/event-stop e)
   (.preventDefault e)
   (if (responsive/is-tablet-or-mobile?)
     (user-profile/show-modal :profile)
@@ -39,22 +37,19 @@
   (mobile-menu-toggle))
 
 (defn notifications-settings-click [e]
-  ; (utils/event-stop e)
   (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
 (defn team-settings-click [e]
-  ; (utils/event-stop e)
   (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
-(defn invite-click [e]
-  ; (utils/event-stop e)
+(defn manage-team-click [e]
   (.preventDefault e)
   (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
 
 (defn sign-in-sign-up-click [e]
   (mobile-menu-toggle)
@@ -65,12 +60,15 @@
   (.preventDefault e)
   (.show js/Headway))
 
+(defn billing-click [e]
+  (.preventDefault e)
+  (mobile-menu-toggle)
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :billing)))
+
 (rum/defcs menu < rum/reactive
-                  (drv/drv :navbar-data)
-                  (drv/drv :current-user-data)
+                  (drv/drv :menu-data)
   [s]
-  (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
-        current-user-data (drv/react s :current-user-data)
+  (let [{:keys [mobile-menu-open org-data current-user-data team-data]} (drv/react s :navbar-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         headway-config (clj->js {
@@ -120,9 +118,9 @@
                      (= user-role :author)))
         [:a
           {:href "#"
-           :on-click invite-click}
-          [:div.oc-menu-item.invite-people
-            "Invite People"]])
+           :on-click manage-team-click}
+          [:div.oc-menu-item.manage-team
+            "Manage Team"]])
       (when (and (not is-mobile?)
                  (= user-role :admin)
                  (router/current-org-slug))
@@ -130,7 +128,16 @@
           {:href "#"
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
-            "Settings"]])
+            "Digest Settings"]])
+      (when (and (not is-mobile?)
+                 ls/billing-enabled
+                 (= user-role :admin)
+                 (router/current-org-slug))
+        [:a
+          {:href "#"
+           :on-click billing-click}
+          [:div.oc-menu-item.billing
+            "Billing"]])
       [:a
         (if is-mobile?
           {:href "https://whats-new.carrot.io/"
@@ -146,6 +153,32 @@
       ;            (= user-role :admin))
       ;   [:div.oc-menu-item
       ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
+      ;; Show billing stuff only to admins and if feature is enabled for env
+      (when (and ls/billing-enabled
+                 (= user-role :admin)
+                 (not is-mobile?))
+        (case
+          ; (:exceeded-users team-data)
+          true
+          [:div.billing-yellow-box
+            [:div.billing-yellow-box-title
+              "Team size exceeded"]
+            [:div.billing-yellow-box-desc
+              "You've outgrown the Free plan which covers up to 10 users."]
+            [:a.billing-yellow-box-link
+              {:href "#"
+               :on-click billing-click}
+              "Upgrade your plan"]]
+          (:upgrade-plan team-data)
+          [:div.billing-yellow-box
+            [:div.billing-yellow-box-title
+              "6 month history limit"]
+            [:div.billing-yellow-box-desc
+              "Your free plan maintains up to six months of history in Carrot."]
+            [:a.billing-yellow-box-link
+              {:href "#"
+               :on-click billing-click}
+              "Upgrade your plan for unlimited history"]]))
       [:div.oc-menu-separator]
       (if (jwt/jwt)
         [:a.sign-out

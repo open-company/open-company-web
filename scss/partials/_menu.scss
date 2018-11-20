@@ -6,10 +6,11 @@ div.menu {
   border-radius: 6px;
   width: 240px;
   position: absolute;
-  overflow: visible;
   padding: 24px;
   text-transform: none;
   background-color: white;
+  max-height: calc(100vh - 68px);
+  overflow: auto;
 
   &.dropdown-menu {
     letter-spacing: 0em;
@@ -63,6 +64,39 @@ div.menu {
     &.mobile-menu-open {
       display: block;
       opacity: 1;
+    }
+  }
+
+  div.billing-yellow-box {
+    width: 100%;
+    margin: 16px 0;
+    padding: 16px;
+    border-radius: 6px;
+    background-color: $opac_yellow;
+
+    @include mobile() {
+      display: none;
+    }
+
+    div.billing-yellow-box-title {
+      @include avenir_H();
+      font-size: 14px;
+      color: $deep_navy;
+    }
+
+    div.billing-yellow-box-desc {
+      @include avenir_R();
+      font-size: 14px;
+      color: $deep_navy;
+      margin-top: 4px;
+    }
+
+    a.billing-yellow-box-link {
+      display: block;
+      @include avenir_H();
+      font-size: 12px;
+      color: $carrot_green;
+      margin-top: 8px;
     }
   }
 
@@ -154,15 +188,21 @@ div.menu {
         }
       }
 
-      &.invite-people {
+      &.manage-team {
         &:before {
-          background-image: cdnUrl("/img/ML/menu_invite_people_hover.svg");
+          background-image: cdnUrl("/img/ML/menu_manage_team_hover.svg");
         }
       }
 
       &.digest-settings {
         &:before {
           background-image: cdnUrl("/img/ML/menu_digest_settings_hover.svg");
+        }
+      }
+
+      &.billing {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_billing_hover.svg");
         }
       }
 
@@ -225,10 +265,10 @@ div.menu {
       }
     }
 
-    &.invite-people {
-      @include preload_image(cdnUrl("/img/ML/menu_invite_people_hover.svg"));
+    &.manage-team {
+      @include preload_image(cdnUrl("/img/ML/menu_manage_team_hover.svg"));
       &:before {
-        background-image: cdnUrl("/img/ML/menu_invite_people.svg");
+        background-image: cdnUrl("/img/ML/menu_manage_team.svg");
       }
     }
 
@@ -236,6 +276,14 @@ div.menu {
       @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_digest_settings.svg");
+      }
+    }
+
+    &.billing {
+      @include preload_image(cdnUrl("/img/ML/menu_billing_hover.svg"));
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_billing.svg");
+        background-size: 16px 12px;
       }
     }
 
