@@ -54,9 +54,6 @@
 (defn fullstory-init []
   [:script (str "init_fullstory();")])
 
-(defn logrocket []
-  [:script {:src "https://cdn.logrocket.io/LogRocket.min.js" :crossorigin "anonymous"}])
-
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
@@ -1058,9 +1055,7 @@
           ;; Drift (Support): not enabled for local dev
           ;; [:script {:src (cdn "/js/drift.js")}]
           ;; Headway (What's New)
-          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
-          ;; Session capture for support
-          (logrocket)]
+          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -1150,8 +1145,7 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js
-          (logrocket)]
+          ziggeo-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -1183,6 +1177,6 @@
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]
-          ; (when (= (env :fullstory) "true")
-          ;   (fullstory-init))
+          (when (= (env :fullstory) "true")
+            (fullstory-init))
           (google-analytics-init)]})
