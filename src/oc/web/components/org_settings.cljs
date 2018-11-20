@@ -19,7 +19,8 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
-            [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
+            [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]
+            [oc.web.components.ui.org-settings-billing-panel :refer (org-settings-billing-panel)]))
 
 ;; FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
 
@@ -46,14 +47,22 @@
         [:a.org-settings-tab-link
           {:href "#"
            :on-click #(do (utils/event-stop %) (show-modal :team))}
-          "MANAGE MEMBERS"]])
+          "MANAGE TEAM"]])
     (when (utils/is-admin-or-author? org-data)
       [:div.org-settings-tab
         {:class (when (= :invite active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
            :on-click #(do (utils/event-stop %) (show-modal :invite))}
-          "INVITE PEOPLE"]])])
+          "INVITE PEOPLE"]])
+    (when (and (utils/is-admin? org-data)
+               ls/billing-enabled)
+      [:div.org-settings-tab
+        {:class (when (= :billing active-tab) "active")}
+        [:a.org-settings-tab-link
+          {:href "#"
+           :on-click #(do (utils/event-stop %) (show-modal :billing))}
+          "BILLING"]])])
 
 (defn close-clicked [s]
   (let [org-data @(drv/get-ref s :org-data)
@@ -182,5 +191,7 @@
             (org-settings-team-panel org-data)
             :invite
             (org-settings-invite-panel org-data #(close-clicked s))
+            :billing
+            (org-settings-billing-panel org-data #(close-clicked s))
             (org-settings-main-panel org-data #(close-clicked s)))]]
       (loading {:loading true}))))
