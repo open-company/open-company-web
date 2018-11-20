@@ -276,7 +276,7 @@
                              :add-comment-focus add-comment-focus
                              :comments-data comments-data
                              :read-data (get activities-read (router/current-activity-id))})]
-   :navbar-data         [[:base :org-data :board-data]
+   :navbar-data         [[:base :org-data :board-data :team-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
                                                                  :show-login-overlay
@@ -290,6 +290,12 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data))))]
+   :menu-data           [[:base :org-data :team-data :current-user-data :mobile-menu-open]
+                         (fn [base org-data team-data current-user-data mobile-menu-open]
+                           {:org-data org-data
+                            :team-data team-data
+                            :current-user-data current-user-data
+                            :mobile-menu-open mobile-menu-open})]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
                             (fn [base route auth-settings jwt]
                               {:invitation-confirmed (:email-confirmed base)
