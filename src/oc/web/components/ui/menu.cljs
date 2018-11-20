@@ -68,7 +68,7 @@
 (rum/defcs menu < rum/reactive
                   (drv/drv :menu-data)
   [s]
-  (let [{:keys [mobile-menu-open org-data current-user-data team-data]} (drv/react s :navbar-data)
+  (let [{:keys [mobile-menu-open org-data current-user-data team-data]} (drv/react s :menu-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         headway-config (clj->js {
