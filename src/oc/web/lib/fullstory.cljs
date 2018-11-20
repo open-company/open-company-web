@@ -18,3 +18,8 @@
      (clj->js {:org (:name org-data)
                :org-slug (:slug org-data)
                :role (user-store/user-role org-data (dis/current-user-data))}))))
+
+(defn session-url []
+  (when (and (exists? js/FS)
+             (.-getCurrentSessionURL js/FS))
+    (.getCurrentSessionURL js/FS)))
