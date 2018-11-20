@@ -10,7 +10,7 @@
             [oc.web.local_settings :as ls]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
-            [oc.web.lib.logrocket :as logrocket]
+            [oc.web.lib.fullstory :as fullstory]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
@@ -41,12 +41,13 @@
   (let [jwt-contents (jwt/get-contents)
         email (:email jwt-contents)]
     (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
-    (when email
+    (when (and (exists? js/drift)
+               email)
       (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
                         (clj->js {:nickname (:name jwt-contents)
                                   :email email}))))
     (when jwt-contents
-      (logrocket/identify))))
+      (fullstory/identify))))
 
 (defn update-jwt [jbody]
   (timbre/info jbody)

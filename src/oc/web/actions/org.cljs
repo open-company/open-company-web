@@ -9,9 +9,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.comment :as ca]
+            [oc.web.actions.section :as sa]
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.activity :as aa]
-            [oc.web.actions.section :as sa]
+            [oc.web.lib.fullstory :as fullstory]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.ws-notify-client :as ws-nc]
             [oc.web.lib.ws-change-client :as ws-cc]
@@ -123,7 +124,8 @@
       (ws-nc/reconnect ws-link (jwt/user-id))))
 
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
-  (utils/after 100 maybe-show-bot-added-notification?))
+  (utils/after 100 maybe-show-bot-added-notification?)
+  (fullstory/track-org org-data))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]

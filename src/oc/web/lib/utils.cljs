@@ -632,4 +632,4 @@
 (defn calc-video-height [width]
   (int (* width (/ 3 4))))
 
-(def hide-class "_lr-hide") ;; Use fs-hide for FullStory
+(def hide-class "fs-hide") ;; Use fs-hide for FullStory
