@@ -65,3 +65,6 @@
 
 ;; LogRocket
 (def logrocket-key nil)
+
+;; Billing enabled
+(def billing-enabled true)
