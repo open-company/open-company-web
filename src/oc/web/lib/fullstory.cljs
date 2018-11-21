@@ -16,7 +16,7 @@
              (map? org-data))
     (.setUserVars js/FS
      (clj->js {:org (:name org-data)
-               :org-slug (:slug org-data)
+               :org_slug (:slug org-data)
                :role (user-store/user-role org-data (dis/current-user-data))}))))
 
 (defn session-url []
