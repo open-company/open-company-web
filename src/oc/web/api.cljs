@@ -311,15 +311,12 @@
 ;; Board/section
 
 (defn get-board [board-link callback]
-  (if (or (= (:href board-link) "http://localhost:3001/orgs/carrot/boards/people-1")
-          (= (:href board-link) "/orgs/carrot/boards/people-1"))
-    (handle-missing-link "get-board" nil callback)
-    (if board-link
-      (storage-http (method-for-link board-link) (relative-href board-link)
-        {:headers (headers-for-link board-link)}
-        (fn [{:keys [status body success]}]
-          (callback status body success)))
-      (handle-missing-link "get-board" board-link callback))))
+  (if board-link
+    (storage-http (method-for-link board-link) (relative-href board-link)
+      {:headers (headers-for-link board-link)}
+      (fn [{:keys [status body success]}]
+        (callback status body success)))
+    (handle-missing-link "get-board" board-link callback)))
 
 (defn patch-board [board-patch-link data note callback]
   (if (and board-patch-link data)
