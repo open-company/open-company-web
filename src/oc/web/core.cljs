@@ -641,9 +641,9 @@
         (route-dispatch! (router/get-token))
         ; remove all the tooltips
         (utils/after 100 #(utils/remove-tooltips)))))
-  (let [error-message "Error: div#app is not defined!"]
-    (timbre/error error-message)
-    (sentry/capture-error-with-message error-message)))
+  (do
+    (timbre/error "Error: div#app is not defined!")
+    (sentry/capture-message "Error: div#app is not defined!")))
 
 (defn init []
   ;; Setup timbre log level
