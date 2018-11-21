@@ -100,10 +100,10 @@
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
-        (when (fn? callback)
-          (callback orgs collection))
         (dis/dispatch! [:entry-point orgs collection])
-        (check-user-walls))
+        (check-user-walls)
+        (when (fn? callback)
+          (callback orgs collection)))
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug]
@@ -136,6 +136,24 @@
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
+(defn save-login-redirect [& [url]]
+  (let [url (or url (.. js/window -location -href))]
+    (when url
+      (cook/set-cookie! router/login-redirect-cookie url))))
+
+(defn maybe-save-login-redirect []
+  (let [url-pathname (.. js/window -location -pathname)]
+    (when (not= url-pathname oc-urls/login)
+      (save-login-redirect))))
+
+(defn login-redirect []
+  (let [redirect-url (cook/get-cookie router/login-redirect-cookie)
+        orgs (dis/orgs-data)]
+    (cook/remove-cookie! router/login-redirect-cookie)
+    (if redirect-url
+      (router/redirect! redirect-url)
+      (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))
+
 (defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point (:org @router/path)
     (fn [success body]
@@ -143,7 +161,7 @@
         (fn [orgs collection]
           (if (zero? (count orgs))
             (router/nav! oc-urls/sign-up-profile)
-            (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
+            (login-redirect))))))))
 
 ;; Login
 (defn login-with-email-finish
@@ -155,10 +173,7 @@
         (do
           (update-jwt-cookie body)
           (api/get-entry-point (:org @router/path)
-           (fn [success body] (entry-point-get-finished success body
-             (fn [orgs collection]
-               (when (pos? (count orgs))
-                 (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))))))
+           (fn [success body] (entry-point-get-finished success body login-redirect)))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
