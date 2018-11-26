@@ -159,6 +159,8 @@
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
 
+(def login-redirect-cookie "login-redirect")
+
 ;; Debug
 
 (defn print-router-path []
