@@ -71,6 +71,7 @@
                               email (:email login-with-email)
                               pswd (:pswd login-with-email)]
                           (.preventDefault %)
+                          (user-actions/maybe-save-login-redirect)
                           (user-actions/login-with-email email pswd)))]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
@@ -96,6 +97,7 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
+                         (user-actions/maybe-save-login-redirect)
                          (user-actions/login-with-slack auth-link)))
            :on-touch-start identity}
           [:div.signin-with-slack-content
@@ -108,6 +110,7 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                             {:auth-source "google"})]
+                         (user-actions/maybe-save-login-redirect)
                          (user-actions/login-with-google auth-link)))
            :on-touch-start identity}
           [:div.signin-with-google-content
