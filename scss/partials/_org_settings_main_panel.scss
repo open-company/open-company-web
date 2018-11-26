@@ -58,6 +58,10 @@ div.org-settings div.org-settings-inner div.org-settings-main {
   }
 
   div.org-settings-panel-row.email-domains-row {
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid $ultra_light_grey;
+
     div.org-settings-label {
       i.mdi.mdi-information-outline {
         margin-left: 8px;
@@ -194,28 +198,28 @@ div.org-settings div.org-settings-inner div.org-settings-main {
     div.org-settings-list {
       div.org-settings-list-item {
         height: 90px !important;
-        border-top: 1px solid rgba($deep_tan, 0.3);
-        padding-top: 32px;
-        margin-top: 32px;
+        border-top: 1px solid $ultra_light_grey;
+        padding-top: 24px;
+        margin-top: 24px;
 
         div.logo-container {
           float: left;
-          width: 46px;
-          height: 46px;
-          border: 1px solid #D8DBDF;
+          width: 40px;
+          height: 40px;
+          border: 1px solid rgba(#B1B8C0, 0.5);
           border-radius: 4px;
           margin-right: 16px;
 
           img.slack-logo {
-            width: 40px;
-            height: 40px;
+            width: 37px;
+            height: 37px;
             padding: 3px;
 
             &.no-logo {
-              width: 20px;
-              margin-left: 10px;
-              margin-top: 10px;
-              height: 20px;
+              width: 22px;
+              height: 22px;
+              padding: 0px;
+              margin: 8px;
             }
           }
         }
@@ -223,71 +227,167 @@ div.org-settings div.org-settings-inner div.org-settings-main {
         div.org-settings-list-item-slack-org {
           padding-left: 64px;
 
-          div.org-settings-list-item-name{
-            @include avenir_M();
-            font-size: 15px;
+          &:hover {
+            div.org-settings-list-item-name {
+              div.integrations-more-menu {
+                button.integrations-more-menu-bt {
+                  display: inline;
+                }
+              }
+            }
+          }
+
+          div.org-settings-list-item-name {
+            @include avenir_H();
+            font-size: 14px;
             color: $deep_navy;
             float: none !important;
             width: 100%;
             line-height: 20px;
 
-            button.org-settings-list-item-btn {
+            div.integrations-more-menu {
               float: right;
-              color: $carrot_green;
-              @include avenir_M();
-              font-size: 12px;
+              width: auto;
+              transform: opacity 180ms ease-in;
+              opacity: 1;
+              position: relative;
 
-              i.mdi.mdi-information-outline {
-                color: $light_ui_grey;
-                margin-left: 6px;
+              button.integrations-more-menu-bt {
+                width: 24px;
+                height: 24px;
+                display: none;
+                background-image: cdnUrl("/img/ML/more_menu_icon.svg");
+                background-size: 32px 32px;
+                background-position: center;
+                background-repeat: no-repeat;
+                opacity: 0.8;
 
-                &:before {
-                  font-size: 16px;
+                &:hover, &:active, &:focus, &.active {
+                  opacity: 1;
+                  display: inline;
+                }
+              }
+
+              ul.integrations-more-menu-list {
+                position: absolute;
+                top: 24px;
+                left: calc(100% - 152px);
+                width: 160px;
+                outline: none;
+                z-index: 110;
+                background-color: $deep_navy;
+                box-shadow: none;
+                border-radius: 4px;
+                margin: 0;
+                padding: 0px 16px;
+                list-style-type: none;
+
+                li {
+                  height: 48px;
+                  @include avenir_H();
+                  font-size: 14px;
+                  color: white;
+                  cursor: pointer;
+                  padding: 16px 0px 16px 0px;
+                  position: relative;
+                  border-bottom: 1px solid rgba(white, 0.1);
+
+                  &:first-child {
+                    margin-top: 0px;
+                  }
+
+                  &:last-child {
+                    border-bottom: 0px;
+                  }
                 }
               }
             }
           }
 
           div.org-settings-list-item-desc {
-            @include avenir_M();
+            @include avenir_R();
             font-size: 14px;
             color: $deep_navy;
             line-height: 20px;
             height: 20px;
             float: none;
-
-            div.slack-domain-label {
-              float: left;
-              width: 470px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-
-              span.slack-domain {
-                @include avenir_H();
-              }
-            }
           }
 
           div.slack-org-self-join {
-            @include avenir_M();
+            @include avenir_R();
             font-size: 12px;
-            color: $light_ui_grey;
+            color: $deep_navy;
+            opacity: 0.5;
             line-height: 14px;
             margin-top: 8px;
-
-            span.self-join {
-              @include avenir_H();
-            } 
           }
 
-          button.remove-team-btn {
-            float: none;
-            color: $carrot_orange;
-            @include avenir_M();
-            font-size: 12px;
-            margin-left: 0px !important;
-            padding: 0px !important;
-            margin-top: 8px;
+          div.slack-org-bot-switch {
+            @include avenir_R();
+            font-size: 13px;
+            color: $deep_navy;
+            height: 26px;
+            margin-top: 16px;
+
+            i.mdi-information-outline {
+              color: $light_ui_grey;
+              margin-left: 6px;
+            }
+
+            div.slack-org-switch-container {
+              float: right;
+              width: 64px;
+              height: 26px;
+
+              &.disabled {
+                cursor: not-allowed;
+              }
+
+              div.carrot-checkbox {
+                height: 26px;
+                width: 64px;
+                background-color: #E1E2E4;
+                color: $ui_grey;
+                padding: 4px;
+                content: "OFF";
+                position: relative;
+                z-index: 10000;
+
+                &.disabled {
+                  cursor: not-allowed;
+                  opacity: 1;
+                  pointer-events: none;
+                }
+
+                span.dot {
+                  width: 18px;
+                  height: 18px;
+                  background-color: $ui_grey;
+                  top: 4px;
+                  margin-left: 4px;
+                }
+
+                span.unselected-label {
+                  margin-right: 8px;
+                  margin-top: 2px;
+                }
+
+                span.selected-label {
+                  margin-left: 8px;
+                  margin-top: 2px;
+                }
+
+                &.selected {
+                  background-color: $feint_emerald;
+                  color: $carrot_green;
+
+                  span.dot {
+                    margin-left: 42px;
+                    background-color: $carrot_green;
+                  }
+                }
+              }
+            }
           }
         }
       }
