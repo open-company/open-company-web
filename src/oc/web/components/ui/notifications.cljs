@@ -68,6 +68,9 @@
                               :slack-bot slack-bot
                               :opac opac
                               :mention-notification (and mention mention-author)
+                              :inline-bt (or (= id :slack-team-added)
+                                             (= id :slack-bot-added)
+                                             (= id :org-settings-saved))
                               :dismiss-button dismiss-bt})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)

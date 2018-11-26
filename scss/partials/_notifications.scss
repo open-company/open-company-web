@@ -96,6 +96,13 @@ div.notifications {
       }
     }
 
+    &.inline-bt {
+      div.notification-title {
+        max-width: 80%;
+        float: left;
+      }
+    }
+
     div.mention-author {
       @include user-profile(24);
 
