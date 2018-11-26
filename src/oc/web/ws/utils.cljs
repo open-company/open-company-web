@@ -14,7 +14,7 @@
         ctx {:action action-id
              :connection-status connection-status
              :send-fn ch-send-fn?
-             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
+             :sessionURL (when js/FS (.-getCurrentSessionURL js/FS))}]
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str "Send over closed " service-name " WS connection"))
     (sentry/clear-extra-context!)
@@ -39,7 +39,7 @@
              :connection-status connection-status
              :timestamp (.getTime (new js/Date))
              :auth-response auth-response
-             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
+             :sessionURL (when js/FS (.-getCurrentSessionURL js/FS))}]
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str service-name " WS: not valid JWT"))
     (sentry/clear-extra-context!)
@@ -51,7 +51,7 @@
                             nil)
         ctx {:timestamp (.getTime (new js/Date))
              :connection-status connection-status
-             :sessionURL (when js/LogRocket (.-sessionURL js/LogRocket))}]
+             :sessionURL (when js/FS (.-getCurrentSessionURL js/FS))}]
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str service-name " WS: handshake timeout"))
     (sentry/clear-extra-context!)
