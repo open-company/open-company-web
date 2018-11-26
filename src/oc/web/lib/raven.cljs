@@ -33,8 +33,10 @@
 (defn capture-message [msg]
   (.captureMessage js/Raven msg))
 
-(defn capture-error-with-message [msg]
-  (capture-error (js/Error. msg)))
+(defn capture-error-with-message [error-name & [error-message]]
+  (let [err (js/Error. (or error-message error-name))]
+    (set! (.-name err) (or error-name "Error"))
+    (capture-error err)))
 
 (defn set-user-context! [ctx]
   (.setUserContext js/Raven (when ctx (clj->js ctx))))

@@ -172,7 +172,7 @@
                         :params params}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/set-extra-context! report)
-            (sentry/capture-message (str "xhr response error:" status))
+            (sentry/capture-error-with-message (str "xhr response error:" status))
             (sentry/clear-extra-context!)))
         (on-complete response)))))
 
@@ -194,8 +194,8 @@
   (timbre/error "Hanling missing link:" callee-name ":" link)
   (sentry/set-extra-context! (merge {:callee callee-name
                                      :link link}
-                                     parameters))
-  (sentry/capture-message (str "Client API error on: " callee-name))
+                                    parameters))
+  (sentry/capture-error-with-message (str "Client API error on: " callee-name))
   (sentry/clear-extra-context!)
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))
   (when (fn? callback)
