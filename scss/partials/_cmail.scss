@@ -344,7 +344,7 @@ div.cmail-outer {
 
       div.cmail-section {
         height: 48px;
-        border-bottom: 1px solid #ECECEC;
+        border-bottom: 1px solid $ultra_light_grey;
         padding: 16px;
         position: relative;
 
@@ -577,8 +577,8 @@ div.cmail-outer {
           max-height: 330px;
           margin-top: 16px;
           width: 100%;
-          background-color: rgba(#ECECEC, 0.2);
-          border-top: 1px solid #ECECEC;
+          background-color: rgba($ultra_light_grey, 0.2);
+          border-top: 1px solid $ultra_light_grey;
           padding: 24px;
           overflow-x: hidden;
           overflow-y: auto;

@@ -37,7 +37,7 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
-        background-color: #ECECEC;
+        background-color: $ultra_light_grey;
       }
 
       &.all-posts-container {
@@ -308,7 +308,7 @@ div.dashboard-layout {
           left: 0px;
           background-color: white;
           box-shadow: none;
-          border-bottom: 1px solid #ECECEC;
+          border-bottom: 1px solid $ultra_light_grey;
           padding: 15px;
           text-align: center;
 

@@ -13,7 +13,7 @@
       left: 65px;
       height: 1px;
       width: calc(100% - 65px);
-      background-color: #ECECEC;
+      background-color: $ultra_light_grey;
     }
 
     &:first-child:before {
@@ -446,7 +446,7 @@ div.left-navigation-sidebar {
     height: 20px;
 
     @include mobile() {
-      border-top: 1px solid #ECECEC;
+      border-top: 1px solid $ultra_light_grey;
       height: 56px;
     }
 
@@ -456,7 +456,7 @@ div.left-navigation-sidebar {
       margin-bottom: 8px;
 
       @include mobile() {
-        background-color: #ECECEC;
+        background-color: $ultra_light_grey;
         height: 56px;
         width: 100%;
         padding: 16px 32px;
