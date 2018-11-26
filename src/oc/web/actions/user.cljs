@@ -7,59 +7,17 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.local_settings :as ls]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.lib.fullstory :as fullstory]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
-            [oc.web.lib.ws-notify-client :as ws-nc]
+            [oc.web.ws.notify-client :as ws-nc]
             [oc.web.actions.notifications :as notification-actions]))
-
-;; Logout
-
-(defn logout
-  ([]
-     (logout oc-urls/home))
-  ([location]
-     (cook/remove-cookie! :jwt)
-     (router/redirect! location)
-     (dis/dispatch! [:logout])))
-
-;; JWT
-
-(defn update-jwt-cookie [jwt]
-  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-
-(defn dispatch-jwt []
-  (when (and (cook/get-cookie :show-login-overlay)
-             (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
-             (not= (cook/get-cookie :show-login-overlay) "collect-password"))
-    (cook/remove-cookie! :show-login-overlay))
-  (let [jwt-contents (jwt/get-contents)
-        email (:email jwt-contents)]
-    (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
-    (when (and (exists? js/drift)
-               email)
-      (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
-                        (clj->js {:nickname (:name jwt-contents)
-                                  :email email}))))
-    (when jwt-contents
-      (fullstory/identify))))
-
-(defn update-jwt [jbody]
-  (timbre/info jbody)
-  (when jbody
-    (update-jwt-cookie jbody)
-    (dispatch-jwt)))
-
-(defn jwt-refresh
-  ([]
-    (api/jwt-refresh update-jwt logout))
-  ([success-cb]
-    (api/jwt-refresh #(do (update-jwt %) (success-cb)) logout)))
 
 ;;User walls
 (defn- check-user-walls
@@ -171,7 +129,7 @@
       (if (empty? body)
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
-          (update-jwt-cookie body)
+          (jwt-actions/update-jwt-cookie body)
           (api/get-entry-point (:org @router/path)
            (fn [success body] (entry-point-get-finished success body login-redirect)))))
       (dis/dispatch! [:login-with-email/success body]))
@@ -204,7 +162,7 @@
     (api/refresh-slack-user refresh-link
      (fn [status body success]
       (if success
-        (update-jwt body)
+        (jwt-actions/update-jwt body)
         (router/redirect! oc-urls/logout))))))
 
 (defn show-login [login-type]
@@ -233,7 +191,7 @@
 ;;Invitation
 (defn invitation-confirmed [status body success]
  (when success
-    (update-jwt body)
+    (jwt-actions/update-jwt body)
     (when (= status 201)
       (nux-actions/new-user-registered "email")
       (api/get-entry-point (:org @router/path) entry-point-get-finished)
@@ -265,7 +223,7 @@
   [token-type success body status]
   (if success
     (do
-      (update-jwt body)
+      (jwt-actions/update-jwt body)
       (when (and (not= token-type :password-reset)
                  (empty? (jwt/get-key :name)))
         (nux-actions/new-user-registered "email"))
@@ -308,7 +266,7 @@
                (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
-      (update-jwt-cookie jwt)
+      (jwt-actions/update-jwt-cookie jwt)
       (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point (:org @router/path) entry-point-get-finished)
@@ -390,7 +348,7 @@
                (dis/dispatch! [:input [:ap-loading] true]))
              (utils/after 100
               (fn []
-                (jwt-refresh
+                (jwt-actions/jwt-refresh
                  #(if org-editing
                     (org-actions/create-or-update-org org-editing)
                     (utils/after 2000
@@ -413,7 +371,7 @@
              :id :user-avatar-upload-failed
              :dismiss true}))
          (do
-           (utils/after 1000 jwt-refresh)
+           (utils/after 1000 jwt-actions/jwt-refresh)
            (dis/dispatch! [:user-data (json->cljs body)])
            (notification-actions/show-notification
             {:title "Image update succeeded"
@@ -489,6 +447,6 @@
 ;; Debug
 
 (defn force-jwt-refresh []
-  (when (jwt/jwt) (jwt-refresh)))
+  (when (jwt/jwt) (jwt-actions/jwt-refresh)))
 
 (set! (.-OCWebForceRefreshToken js/window) force-jwt-refresh)

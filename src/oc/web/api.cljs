@@ -14,7 +14,7 @@
             [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.lib.ws-change-client :as ws-cc]
+            [oc.web.ws.change-client :as ws-cc]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -169,7 +169,8 @@
                         :path path
                         :method (method-name method)
                         :jwt (j/jwt)
-                        :params params}]
+                        :params params
+                        :sessionURL (when js/FS (.-getCurrentSessionURL js/FS))}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/set-extra-context! report)
             (sentry/capture-error-with-message (str "xhr response error:" status))
@@ -193,7 +194,8 @@
 (defn- handle-missing-link [callee-name link callback & parameters]
   (timbre/error "Hanling missing link:" callee-name ":" link)
   (sentry/set-extra-context! (merge {:callee callee-name
-                                     :link link}
+                                     :link link
+                                     :sessionURL (when js/FS (.-getCurrentSessionURL js/FS))}
                                     parameters))
   (sentry/capture-error-with-message (str "Client API error on: " callee-name))
   (sentry/clear-extra-context!)
