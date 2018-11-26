@@ -8,10 +8,11 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.org-settings :as org-settings]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.item-input :refer (item-input email-item)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
@@ -27,13 +28,6 @@
   "Check if the current team has a bot associated."
   [org-data]
   (jwt/team-has-bot? (:team-id org-data)))
-
-(defn- show-slack-tooltip?
-  "Show the Slack tooltip only if the user signed in with Slack
-  and there our bot was added to the team."
-  [org-data]
-  (and (jwt/is-slack-org?)
-       (not (has-bot? org-data))))
 
 (defn- highlight-url
   "Select the whole content of the share link filed."
@@ -76,12 +70,8 @@
                                  (dis/dispatch! [:input [:activity-share-medium] :slack])))
                              s)
                              :did-mount (fn [s]
-                              (let [slack-button (rum/ref-node s "slack-button")
-                                    org-data @(drv/get-ref s :org-data)]
-                                (when (show-slack-tooltip? org-data)
-                                  (.tooltip
-                                   (js/$ slack-button)
-                                   #js {:trigger "manual"})))
+                              (when (not (has-bot? @(drv/get-ref s :org-data)))
+                                (.tooltip (js/$ (rum/ref-node s "slack-button"))))
                               s)
                              :did-update (fn [s]
                               ;; When we have a sharing response
@@ -140,28 +130,23 @@
              :on-click #(when-not @(::sharing s)
                          (dis/dispatch! [:input [:activity-share-medium] :email]))}
             "Email"]
-          (let [is-slack-org? (jwt/is-slack-org?)
-                has-bot? (has-bot? org-data)]
-            (when is-slack-org?
-              [:div.activity-share-medium-selector
-                {:class (utils/class-set {:selected (= medium :slack)
-                                          :medium-selector-disabled (not has-bot?)})
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title "Enable the Slack bot in Settings"
-                 :ref "slack-button"
-                 :on-click (fn [e]
-                             (utils/event-stop e)
-                             (when-not @(::sharing s)
-                               (if has-bot?
-                                 (dis/dispatch! [:input [:activity-share-medium] :slack])
-                                 (let [$this (js/$ (rum/ref-node s "slack-button"))]
-                                   (.tooltip $this "show")
-                                   (utils/after
-                                    2000
-                                    #(.tooltip $this "hide"))))))}
-                "Slack"]))]
+          (let [has-bot? (has-bot? org-data)]
+            [:div.activity-share-medium-selector
+              {:class (utils/class-set {:selected (= medium :slack)
+                                        :medium-selector-disabled (not has-bot?)})
+               :data-placement "top"
+               :data-container "body"
+               :data-tooltip (if has-bot? "" "tooltip")
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title "Enable the Slack bot in Settings"
+               :ref "slack-button"
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (when-not @(::sharing s)
+                             (if has-bot?
+                               (dis/dispatch! [:input [:activity-share-medium] :slack])
+                               (org-settings/show-modal :main))))}
+              "Slack"])]
         [:div.activity-share-divider-line]
         (when (= medium :email)
           [:div.activity-share-share

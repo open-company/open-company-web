@@ -63,8 +63,5 @@
 (def oc-ziggeo-profiles [])
 (def oc-enable-transcriptions false)
 
-;; LogRocket
-(def logrocket-key nil)
-
 ;; WS monitor
 (def ws-monitor-interval 30)
