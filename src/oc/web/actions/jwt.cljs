@@ -3,12 +3,13 @@
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.logrocket :as logrocket]))
+            [oc.web.lib.fullstory :as fullstory]))
 
 ;; Logout
 
@@ -30,16 +31,12 @@
              (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
              (not= (cook/get-cookie :show-login-overlay) "collect-password"))
     (cook/remove-cookie! :show-login-overlay))
-  (let [jwt-contents (jwt/get-contents)
-        email (:email jwt-contents)]
+  (let [jwt-contents (jwt/get-contents)]
     (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
-    (when (and (exists? js/drift)
-               email)
-      (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
-                        (clj->js {:nickname (:name jwt-contents)
-                                  :email email}))))
+    ;; User identifications for third party services
     (when jwt-contents
-      (logrocket/identify))))
+      (chat/identify)
+      (fullstory/identify))))
 
 (defn update-jwt [jbody]
   (timbre/info jbody)
