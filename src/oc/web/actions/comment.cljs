@@ -6,7 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn add-comment-focus [activity-uuid]

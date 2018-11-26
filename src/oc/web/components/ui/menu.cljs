@@ -9,6 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
+            [oc.web.actions.jwt :as jwt-actions]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -28,7 +29,7 @@
   ; (utils/event-stop e)
   (.preventDefault e)
   (mobile-menu-toggle)
-  (user-actions/logout))
+  (jwt-actions/logout))
 
 (defn user-profile-click [e]
   ; (utils/event-stop e)

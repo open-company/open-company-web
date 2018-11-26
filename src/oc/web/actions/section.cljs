@@ -7,8 +7,8 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
-            [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn is-currently-shown? [section]
@@ -19,7 +19,7 @@
   ;; only watch the currently visible board.
   (ws-ic/board-unwatch (fn [rep]
     (timbre/debug rep "Watching on socket " (:uuid section))
-        (ws-ic/board-watch (:uuid section)))))
+        (ws-ic/boards-watch [(:uuid section)]))))
 
 (defn section-seen
   [uuid]

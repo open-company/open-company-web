@@ -1,5 +1,6 @@
 (ns oc.web.lib.chat
-  (:require [oc.web.lib.utils :as utils]
+  (:require [oc.web.lib.jwt :as jwt]
+            [oc.web.lib.utils :as utils]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (defn check-drift-dialog []
@@ -25,3 +26,10 @@
 (defn chat-click [interaction]
   (.startInteraction js/drift.api (clj->js {:interactionId interaction}))
   (utils/after 500 #(check-drift-dialog)))
+
+(defn identify []
+  (when (and (exists? js/drift)
+             (jwt/get-key :email))
+    (utils/after 1 #(.identify js/drift (jwt/user-id)
+                      (clj->js {:nickname (jwt/get-key :name)
+                                :email (jwt/get-key :email)})))))

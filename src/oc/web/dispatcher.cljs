@@ -16,6 +16,7 @@
 (def auth-settings-key [:auth-settings])
 
 (def notifications-key [:notifications-data])
+(def show-login-overlay-key :show-login-overlay)
 
 (def orgs-key :orgs)
 

@@ -18,21 +18,20 @@
 
 (def default-avatar-url (random-user-image))
 
-(defn- user-icon [user-id]
+(defn user-icon [user-id]
   (if (= user-id (j/get-key :user-id))
     ;; If the user id is the same of the current JWT use the red icon
     default-user-image
     ;; if not get a random icon from the rest of the images vector
     (first other-user-images)))
 
-(defonce show-login-overlay-key :show-login-overlay)
-(defonce show-login-overlay? show-login-overlay-key)
+(defonce show-login-overlay? dispatcher/show-login-overlay-key)
 
 ;; Signup keys
 (defonce signup-with-email :signup-with-email)
 
 (defn get-show-login-overlay []
-  (get-in @dispatcher/app-state [show-login-overlay-key]))
+  (get-in @dispatcher/app-state [dispatcher/show-login-overlay-key]))
 
 ;; Auth Settings
 (defn auth-settings? []
@@ -97,18 +96,6 @@
   [db [_ user-data]]
   (update-user-data db user-data))
 
-;; JWT handling
-
-;; Store JWT in App DB so it can be easily accessed in actions etc.
-(defmethod dispatcher/action :jwt
-  [db [_]]
-  (let [jwt-data (j/get-contents)
-        next-db (if (cook/get-cookie :show-login-overlay)
-                  (assoc db show-login-overlay-key (keyword (cook/get-cookie :show-login-overlay)))
-                  db)]
-    (timbre/debug jwt-data)
-    (assoc next-db :jwt jwt-data)))
-
 ;; Login actions
 
 ;; Store in application state whether to display the login overlay
@@ -117,16 +104,16 @@
  (cond
     (= show-login-overlay :login-with-email)
     (-> db
-      (assoc show-login-overlay-key show-login-overlay)
+      (assoc dispatcher/show-login-overlay-key show-login-overlay)
       (assoc :login-with-email {:email "" :pswd ""})
       (dissoc :login-with-email-error))
     (= show-login-overlay :signup-with-email)
     (-> db
-      (assoc show-login-overlay-key show-login-overlay)
+      (assoc dispatcher/show-login-overlay-key show-login-overlay)
       (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""})
       (dissoc :signup-with-email-error))
     :else
-    (assoc db show-login-overlay-key show-login-overlay)))
+    (assoc db dispatcher/show-login-overlay-key show-login-overlay)))
 
 (defn- dissoc-auth
   [db]
@@ -148,7 +135,7 @@
 
 (defmethod dispatcher/action :login-with-email/success
   [db [_]]
-  (dissoc db show-login-overlay-key))
+  (dissoc db dispatcher/show-login-overlay-key))
 
 ;; Auth actions
 

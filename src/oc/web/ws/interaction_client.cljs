@@ -1,4 +1,4 @@
-(ns oc.web.lib.ws-interaction-client
+(ns oc.web.ws.interaction-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [sablono.core :as html :refer-macros [html]]
             [taoensso.sente :as s]
@@ -8,39 +8,90 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
             [oc.web.local-settings :as ls]
+            [oc.web.actions.jwt :as ja]
+            [oc.web.lib.utils :as utils]
+            [oc.web.ws.utils :as ws-utils]
             [goog.Uri :as guri]))
 
-(def current-board-path (atom nil))
+(defonce current-board-path (atom nil))
 
 ;; Sente WebSocket atoms
-(def channelsk (atom nil))
-(def ch-chsk (atom nil))
-(def ch-state (atom nil))
-(def chsk-send! (atom nil))
+(defonce channelsk (atom nil))
+(defonce ch-chsk (atom nil))
+(defonce ch-state (atom nil))
+(defonce chsk-send! (atom nil))
 
-(def ch-pub (chan))
+(defonce last-ws-link (atom nil))
+(defonce last-board-uuids (atom []))
+
+(defonce ch-pub (chan))
+
+(defonce last-interval (atom nil))
+
 ;; Publication that handlers will subscribe to
-(def publication
+(defonce publication
   (pub ch-pub :topic))
 
+;; Send wrapper
+
+(defn- send! [chsk-send! & args]
+  (if @chsk-send!
+    (apply @chsk-send! args)
+    (ws-utils/sentry-report "Interaction" ch-state (first (first args)))))
+
 ;; Auth
+(declare reconnect)
+(declare boards-watch)
+
 (defn should-disconnect? [rep]
-  (when-not (:valid rep)
-    (timbre/warn "disconnecting client due to invalid JWT!" rep)
-    (s/chsk-disconnect! @channelsk)))
+  (if (:valid rep)
+    (boards-watch)
+    (do
+      (timbre/warn "disconnecting client due to invalid JWT!" rep)
+      (s/chsk-disconnect! @channelsk)
+      (cond
+        (j/expired?)
+        (ja/jwt-refresh
+         #(reconnect @last-ws-link (j/user-id)))
+        (= rep :chsk/timeout)
+        (do
+          (ws-utils/report-connect-timeout "Interaction" ch-state)
+          ;; retry in 10 seconds if sente is not trying reconnecting
+          (when (and @ch-state
+                     (not (:udt-next-reconnect @@ch-state)))
+            (utils/after (* 10 1000)
+             (reconnect @last-ws-link (j/user-id)))))
+        :else
+        (ws-utils/report-invalid-jwt "Interaction" ch-state rep)))))
 
 (defn post-handshake-auth []
   (timbre/debug "Trying post handshake jwt auth")
-  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+  (if (j/expired?)
+    (ja/jwt-refresh
+     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?))
+    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?)))
 
 ;; Actions
-(defn board-watch [board-uuid]
-  (timbre/debug "Watching board: " board-uuid)
-  (@chsk-send! [:watch/board {:board-uuid board-uuid}] 1000))
+(defn boards-watch
+  ([board-uuids]
+    (timbre/debug "Watching boards: " board-uuids)
+    (reset! last-board-uuids board-uuids)
+    (boards-watch))
+  ([]
+    (timbre/debug "DBG boards-watch" @last-board-uuids (fn? @chsk-send!)
+               @ch-state
+               (:open? @@ch-state))
+    (when (and (fn? @chsk-send!)
+               @ch-state
+               (:open? @@ch-state))
+      (doseq [board-uuid @last-board-uuids]
+        (timbre/debug "DBG   board-watch" board-uuid)
+        (send! chsk-send! [:watch/board {:board-uuid board-uuid}])))))
 
 (defn board-unwatch [callback]
   (timbre/debug "Unwatching all boards.")
-  (@chsk-send! [:unwatch/board] 1000 callback))
+  (reset! last-board-uuids [])
+  (send! chsk-send! [:unwatch/board] 10000 callback))
 
 (defn subscribe
   [topic handler-fn]
@@ -130,7 +181,7 @@
 (defn test-session
   "Ping the server to update the sesssion state."
   []
-  (@chsk-send! [:session/status]))
+  (send! chsk-send! [:session/status]))
 
 ;;;; Sente event router (our `event-msg-handler` loop)
 
@@ -147,34 +198,32 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-board-path (.getPath ws-uri)]
-    (when (or (not @ch-state)
-              (not (:open? @@ch-state))
-              (not= @current-board-path ws-board-path))
-      (timbre/debug
-       "Reconnect for"
-       (:href ws-link)
-       "and"
-       uid
-       "current state:"
-       @ch-state
-       "current board:"
-       @current-board-path)
-      ; if the path is different it means
-      (when (and @ch-state
-                 (:open? @@ch-state))
-        (timbre/info "Closing previous connection for" @current-board-path)
-        (stop-router!))
-      (timbre/info "Attempting interaction service connection to" ws-domain "for board" ws-board-path)
-      (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-board-path
-                                                        {:type :auto
-                                                         :host ws-domain
-                                                         :protocol (if ls/jwt-cookie-secure :https :http)
-                                                         :packer :edn
-                                                         :uid uid
-                                                         :params {:user-id uid}})]
-          (reset! current-board-path ws-board-path)
-          (reset! channelsk chsk)
-          (reset! ch-chsk ch-recv)
-          (reset! chsk-send! send-fn)
-          (reset! ch-state state)
-          (start-router!)))))
+    (reset! last-ws-link ws-link)
+    (ws-utils/check-interval last-interval "Interaction" chsk-send! ch-state)
+    (if (or (not @ch-state)
+            (not (:open? @@ch-state))
+            (not= @current-board-path ws-board-path))
+      (do
+        (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state
+         "current board:" @current-board-path)
+        ; if the path is different it means
+        (when (and @ch-state
+                   (:open? @@ch-state))
+          (timbre/info "Closing previous connection for" @current-board-path)
+          (stop-router!))
+        (timbre/info "Attempting interaction service connection to" ws-domain "for board" ws-board-path)
+        (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-board-path
+                                                          {:type :auto
+                                                           :host ws-domain
+                                                           :protocol (if ls/jwt-cookie-secure :https :http)
+                                                           :packer :edn
+                                                           :uid uid
+                                                           :params {:user-id uid}})]
+            (reset! current-board-path ws-board-path)
+            (reset! channelsk chsk)
+            (reset! ch-chsk ch-recv)
+            (reset! chsk-send! send-fn)
+            (reset! ch-state state)
+            (start-router!)))
+      (when (pos? (count @last-board-uuids))
+        (boards-watch)))))

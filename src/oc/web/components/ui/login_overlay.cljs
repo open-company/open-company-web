@@ -308,20 +308,20 @@
   [s]
   (cond
     ; login via email
-    (or (= (drv/react s user-store/show-login-overlay-key) :login-with-email)
-        (= (drv/react s user-store/show-login-overlay-key) :login-with-slack))
+    (or (= (drv/react s dis/show-login-overlay-key) :login-with-email)
+        (= (drv/react s dis/show-login-overlay-key) :login-with-slack))
     (login-with-email)
     ; signup via email
-    (or (= (drv/react s user-store/show-login-overlay-key) :signup-with-email)
-        (= (drv/react s user-store/show-login-overlay-key) :signup-with-slack))
+    (or (= (drv/react s dis/show-login-overlay-key) :signup-with-email)
+        (= (drv/react s dis/show-login-overlay-key) :signup-with-slack))
     (do
       (utils/after 150 #(router/nav! oc-urls/sign-up))
       [:div])
     ; password reset
-    (= (drv/react s user-store/show-login-overlay-key) :password-reset)
+    (= (drv/react s dis/show-login-overlay-key) :password-reset)
     (password-reset)
     ; form to insert a new password
-    (= (drv/react s user-store/show-login-overlay-key) :collect-password)
+    (= (drv/react s dis/show-login-overlay-key) :collect-password)
     (collect-password)
     ; show nothing
     :else
