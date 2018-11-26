@@ -161,7 +161,22 @@
                         :org-settings org-settings
                         :user-settings user-settings
                         :bot-access bot-access}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
+        (utils/after 1 #(swap! dis/app-state merge next-app-state))
+        (utils/after 5000
+          #(cond
+             (and (= (:access query-params) "team")
+                  (not= (:new query-params) "true"))
+             (notification-actions/show-notification {:title "Integration added"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :slack-team-added})
+             (= (:access query-params) "bot")
+             (notification-actions/show-notification {:title "Carrot bot enabled"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :slack-bot-added})))))
 
 ;; Company list
 (defn org-handler [route target component params]

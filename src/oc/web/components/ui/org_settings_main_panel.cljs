@@ -13,6 +13,7 @@
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
@@ -47,7 +48,12 @@
                       (when (and @(::saving s)
                                  (:saved org-editing))
                         (reset! (::saving s) false)
-                        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))))
+                        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
+                        (notification-actions/show-notification {:title "Settings saved"
+                                                                 :primary-bt-title "OK"
+                                                                 :primary-bt-dismiss true
+                                                                 :expire 10
+                                                                 :id :org-settings-saved})))
                     s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
