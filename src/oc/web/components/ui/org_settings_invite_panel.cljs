@@ -227,23 +227,14 @@
                           (assoc default-user-row :type @(::inviting-from s)))])}
                     "+ add another"]]
                 [:td]
-                [:td]]]]]
-        ;; Personal note
-        [:div.org-settings-panel-row.org-setings-invite-personal-note.group
-          [:div.org-settings-label
-            [:label "Personal note"]]
-          [:div.org-settings-field
-            {:class utils/hide-class}
-            [:textarea
-              {:ref "personal-note-textarea"
-               :placeholder "Add a personal note to your invitation..."}]]]]
+                [:td]]]]]]
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
           {:on-click #(do
                         (reset! (::sending s) (count (filterv valid-user? invite-users)))
                         (reset! (::send-bt-cta s) "Sending")
-                        (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)) (.-value (rum/ref-node s "personal-note-textarea"))))
+                        (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
            :disabled (or (not (has-valid-user? invite-users))
                          (pos? @(::sending s)))}

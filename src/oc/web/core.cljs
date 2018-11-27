@@ -9,6 +9,7 @@
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
+            [oc.web.stores.jwt]
             [oc.web.stores.org]
             [oc.web.stores.team]
             [oc.web.stores.user]
@@ -20,7 +21,7 @@
             [oc.web.stores.section]
             [oc.web.stores.notifications]
             ;; Pull in the needed file for the ws interaction events
-            [oc.web.lib.ws-interaction-client]
+            [oc.web.ws.interaction-client]
             [oc.web.actions.team]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
@@ -28,6 +29,7 @@
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
             [oc.web.actions.nux :as na]
+            [oc.web.actions.jwt :as ja]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
@@ -116,7 +118,7 @@
   (when (and (contains? query-params :jwt)
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
-    (user-actions/update-jwt (:jwt query-params)))
+    (ja/update-jwt (:jwt query-params)))
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
@@ -305,6 +307,13 @@
           (router/redirect! urls/sign-up-profile)))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
+    (defroute signup-slash-route (str urls/sign-up "/") {:as params}
+      (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
+      (when (and (jwt/jwt)
+                 (seq (cook/get-cookie (router/last-org-cookie))))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
+
     (defroute sign-up-slack-route urls/sign-up-slack {:as params}
       (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
       (when (jwt/jwt)
@@ -313,12 +322,13 @@
           (router/redirect! urls/sign-up-profile)))
       (simple-handler slack-lander "slack-lander" target params))
 
-    (defroute signup-slash-route (str urls/sign-up "/") {:as params}
-      (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
-      (when (and (jwt/jwt)
-                 (seq (cook/get-cookie (router/last-org-cookie))))
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
-      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
+    (defroute sign-up-slack-slash-route (str urls/sign-up-slack "/") {:as params}
+      (timbre/info "Routing sign-up-slack-slash-route" (str urls/sign-up-slack "/"))
+      (when (jwt/jwt)
+        (if (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! urls/sign-up-profile)))
+      (simple-handler slack-lander "slack-lander" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
@@ -523,7 +533,9 @@
       (post-routing)
       (if (jwt/jwt)
         (router/redirect! (str (utils/your-digest-url) "?user-settings=notifications"))
-        (router/redirect! urls/home)))
+        (do
+          (user-actions/save-login-redirect)
+          (router/redirect! urls/login))))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
@@ -532,7 +544,9 @@
       (post-routing)
       (if (jwt/jwt)
         (router/redirect! (str (utils/your-digest-url) "?user-settings=profile"))
-        (router/redirect! urls/home)))
+        (do
+          (user-actions/save-login-redirect)
+          (router/redirect! urls/login))))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
@@ -568,6 +582,7 @@
                                  login-route
                                  ;; Signup email
                                  sign-up-slack-route
+                                 sign-up-slack-slash-route
                                  signup-profile-route
                                  signup-profile-slash-route
                                  signup-team-route
@@ -649,13 +664,13 @@
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Setup API requests
   (api/config-request
-   #(user-actions/update-jwt %) ;; success jwt refresh after expire
-   #(user-actions/logout) ;; failed to refresh jwt
+   #(ja/update-jwt %) ;; success jwt refresh after expire
+   #(ja/logout) ;; failed to refresh jwt
    ;; network error
    #(notification-actions/show-notification (assoc utils/network-error :expire 10)))
 
   ;; Persist JWT in App State
-  (user-actions/dispatch-jwt)
+  (ja/dispatch-jwt)
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)

@@ -268,8 +268,9 @@
 
 ;; Invite users
 
-(defn invite-users [inviting-users note]
-  (let [org-data (dis/org-data)
+(defn invite-users [inviting-users & [note]]
+  (let [note (or note "")
+        org-data (dis/org-data)
         team-data (dis/team-data (:team-id org-data))
         filter-empty (filterv #(seq (:user %)) inviting-users)
         checked-users (for [user filter-empty]

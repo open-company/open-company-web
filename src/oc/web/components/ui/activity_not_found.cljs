@@ -22,6 +22,7 @@
                              {:auth-source "email"}))))
         login-action #(when login-enabled
                         (.preventDefault %)
+                        (user-actions/save-login-redirect)
                         (user-actions/login-with-email @(::email s) @(::pswd s)))
         login-with-email-error (drv/react s :login-with-email-error)]
     [:div.activity-not-found-container

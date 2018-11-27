@@ -14,9 +14,9 @@
             [oc.web.actions.activity :as aa]
             [oc.web.lib.fullstory :as fullstory]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.ws-notify-client :as ws-nc]
-            [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.notify-client :as ws-nc]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
