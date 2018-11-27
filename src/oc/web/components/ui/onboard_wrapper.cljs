@@ -16,6 +16,7 @@
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -284,7 +285,7 @@
           [:div.logout-cancel
             "Need to start over? "
             [:button.mlb-reset.logout-cancel
-              {:on-click #(user-actions/logout oc-urls/sign-up)}
+              {:on-click #(jwt-actions/logout oc-urls/sign-up)}
               "Cancel sign up"]]]]]))
 
 (defn- setup-team-data

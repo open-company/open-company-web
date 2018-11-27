@@ -147,6 +147,10 @@
     }
   }
 
+  button.section-cog {
+    display: none;
+  }
+
   div.all-posts-label, div.drafts-label, div.must-see-label {
     font-size: 14px;
     text-decoration: none;
@@ -199,6 +203,10 @@
       @include avenir_H();
       color: $deep_navy;
     }
+  }
+
+  button.section-cog {
+    display: block;
   }
 
 
@@ -616,7 +624,7 @@ div.left-navigation-sidebar {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-          width: 133px;
+          width: 120px;
           float: left;
           cursor: pointer;
 
@@ -627,6 +635,24 @@ div.left-navigation-sidebar {
 
           .emojione {
             @include emoji-size(12);
+          }
+        }
+
+        button.section-cog {
+          width: 13px;
+          height: 14px;
+          background-image: cdnUrl("/img/ML/section_settings_gear.svg");
+          background-size: 13px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0.6;
+          float: right;
+          margin-right: 8px;
+          margin-top: 6px;
+          display: none;
+
+          &:hover {
+            opacity: 0.8;
           }
         }
       }

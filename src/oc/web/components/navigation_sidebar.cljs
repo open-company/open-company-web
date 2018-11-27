@@ -202,7 +202,17 @@
                     {:class (utils/class-set {:new (seq (:unseen board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]
+                  (when-not (:read-only board-data)
+                    [:button.mlb-reset.section-cog
+                      {:data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :title "Section settings"
+                       :on-click #(do
+                                   (utils/event-stop %)
+                                   (nav-actions/nav-to-url! % board-url)
+                                   (dis/dispatch! [:input [:show-section-editor] true]))}])]])])]
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}

@@ -63,8 +63,7 @@
                                     org-data @(drv/get-ref s :org-data)
                                     subject (.text (.html (js/$ "<div />") (:headline activity-data)))]
                                (reset! (::email-subject s) subject)
-                               (reset! (::email-data s) {:subject subject
-                                                         :note ""})
+                               (reset! (::email-data s) {:subject subject})
                                (when (and (not @(drv/get-ref s :activity-share-medium))
                                           (has-bot? org-data))
                                  (dis/dispatch! [:input [:activity-share-medium] :slack])))
@@ -87,8 +86,7 @@
                                         (= medium :email)
                                         (do
                                           (reset! (::item-input-key s) (rand 1000))
-                                          (reset! (::email-data s) {:subject @(::email-subject s)
-                                                                    :note ""}))
+                                          (reset! (::email-data s) {:subject @(::email-subject s)}))
                                         (= medium :slack)
                                         (do
                                           (reset! (::slack-channels-dropdown-key s) (rand 1000))
@@ -167,7 +165,7 @@
                                    :container-node :div.email-field
                                    :valid-item? utils/valid-email?
                                    :items (:to email-data)
-                                   :input-type "email"
+                                   :input-type "text"
                                    :on-intermediate-change #(reset!
                                                              (::email-data s)
                                                              (merge email-data {:to-error false}))
@@ -175,24 +173,7 @@
                                                (reset!
                                                 (::email-data s)
                                                 (merge email-data {:to v
-                                                                   :to-error false})))})]]
-                  [:div.medium-row.subject.group
-                    [:div.labels
-                      "Subject"]
-                    [:div.fields
-                      {:class (when (:subject-error email-data) "error")}
-                      [:input
-                        {:type "text"
-                         :value (:subject email-data)
-                         :on-change #(reset! (::email-data s) (merge email-data {:subject (.. % -target -value)
-                                                                                 :subject-error false}))}]]]
-                  [:div.medium-row.note.group
-                    [:div.labels
-                      "Personal note (optional)"]
-                    [:div.fields
-                      [:textarea
-                        {:value (:note email-data)
-                         :on-change #(reset! (::email-data s) (merge email-data {:note (.. % -target -value)}))}]]]]]]
+                                                                   :to-error false})))})]]]]]
             [:div.share-footer.group
               [:div.right-buttons
                 [:button.mlb-reset.mlb-black-link
@@ -204,7 +185,6 @@
                     {:on-click (fn [_]
                                 (reset! (::sharing s) true)
                                 (let [email-share {:medium :email
-                                                   :note (:note email-data)
                                                    :subject (:subject email-data)
                                                    :to (:to email-data)}]
                                   (activity-actions/activity-share activity-data [email-share])))

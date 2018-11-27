@@ -1,4 +1,4 @@
-(ns oc.web.lib.ws-notify-client
+(ns oc.web.ws.notify-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]
                    [taoensso.encore :refer (have)])
   (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
@@ -7,35 +7,67 @@
             [oc.web.lib.jwt :as j]
             [oc.lib.time :as time]
             [oc.web.local-settings :as ls]
+            [oc.web.actions.jwt :as ja]
+            [oc.web.lib.utils :as utils]
+            [oc.web.ws.utils :as ws-utils]
             [goog.Uri :as guri]))
 
 ;; Sente WebSocket atoms
-(def channelsk (atom nil))
-(def ch-chsk (atom nil))
-(def ch-state (atom nil))
-(def chsk-send! (atom nil))
-(def ch-pub (chan))
+(defonce channelsk (atom nil))
+(defonce ch-chsk (atom nil))
+(defonce ch-state (atom nil))
+(defonce chsk-send! (atom nil))
+(defonce ch-pub (chan))
+
+(defonce last-ws-link (atom nil))
+
+(defonce last-interval (atom nil))
 
 ;; Publication that handlers will subscribe to
-(def publication
+(defonce publication
   (pub ch-pub :topic))
 
+;; Send wrapper
+
+(defn- send! [chsk-send! & args]
+  (if @chsk-send!
+    (apply @chsk-send! args)
+    (ws-utils/sentry-report "Notify" ch-state (first (first args)))))
 
 (defn notifications-watch []
   (timbre/debug "Watching notifications.")
-  (@chsk-send! [:watch/notifications {}] 1000))
+  (send! chsk-send! [:watch/notifications {}]))
 
 ;; Auth
+(declare reconnect)
+
 (defn should-disconnect? [rep]
-  (when (:valid rep)
-    (notifications-watch))
-  (when-not (:valid rep)
-    (timbre/warn "disconnecting client due to invalid JWT!" rep)
-    (s/chsk-disconnect! @channelsk)))
+  (if (:valid rep)
+    (notifications-watch)
+    (do
+      (timbre/warn "disconnecting client due to invalid JWT!" rep)
+      (s/chsk-disconnect! @channelsk)
+      (cond
+        (j/expired?)
+        (ja/jwt-refresh
+         #(reconnect @last-ws-link (j/user-id)))
+        (= rep :chsk/timeout)
+        (do
+          (ws-utils/report-connect-timeout "Notify" ch-state)
+          ;; retry in 10 seconds if sente is not trying reconnecting
+          (when (and @ch-state
+                     (not (:udt-next-reconnect @@ch-state)))
+            (utils/after (* 10 1000)
+             (reconnect @last-ws-link (j/user-id)))))
+        :else
+        (ws-utils/report-invalid-jwt "Notify" ch-state rep)))))
 
 (defn post-handshake-auth []
   (timbre/debug "Trying post handshake jwt auth")
-  (@chsk-send! [:auth/jwt {:jwt (j/jwt)}] 1000 should-disconnect?))
+  (if (j/expired?)
+    (ja/jwt-refresh
+     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?))
+    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?)))
 
 (defn subscribe
   [topic handler-fn]
@@ -124,7 +156,8 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (when (or (not @ch-state)
+    (ws-utils/check-interval last-interval "Notify" chsk-send! ch-state)
+    (if (or (not @ch-state)
             (not (:open? @@ch-state)))
 
       ;; Need a connection to notification service
@@ -147,4 +180,5 @@
             (reset! ch-chsk ch-recv)
             (reset! chsk-send! send-fn)
             (reset! ch-state state)
-            (start-router!))))))
+            (start-router!)))
+      (notifications-watch))))
