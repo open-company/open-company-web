@@ -268,10 +268,6 @@ div.org-settings {
             padding: 14px 0;
             border-bottom: 1px solid rgba($carrot_light_gray, 0.3);
 
-            &:last-child {
-              border-bottom: none;
-            }
-
             .org-settings-list-item-name {
               float: left;
               @include avenir_R();

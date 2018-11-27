@@ -197,10 +197,13 @@ div.org-settings div.org-settings-inner div.org-settings-main {
 
     div.org-settings-list {
       div.org-settings-list-item {
-        height: 90px !important;
-        border-top: 1px solid $ultra_light_grey;
-        padding-top: 24px;
-        margin-top: 24px;
+        height: auto;
+
+        &:first-child {
+          border-top: 1px solid $ultra_light_grey;
+          padding-top: 24px;
+          margin-top: 24px;
+        }
 
         div.logo-container {
           float: left;
