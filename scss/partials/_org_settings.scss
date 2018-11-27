@@ -368,7 +368,11 @@ div.org-settings-tabs {
     }
 
     &:hover {
-      border-bottom: 1px solid $carrot_orange;
+      border-bottom: 1px solid $deep_navy;
+
+      a.org-settings-tab-link {
+        color: $deep_navy;
+      }
     }
 
     &.active {
