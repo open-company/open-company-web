@@ -153,30 +153,14 @@
         org-settings (when (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
-        bot-access (when (and (contains? query-params :access)
-                              (= (:access query-params) "bot"))
-                      :slack-bot-success-notification)
+        bot-access (when (contains? query-params :access)
+                      (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :user-settings user-settings
                         :bot-access bot-access}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))
-        (utils/after 5000
-          #(cond
-             (and (= (:access query-params) "team")
-                  (not= (:new query-params) "true"))
-             (notification-actions/show-notification {:title "Integration added"
-                                                      :primary-bt-title "OK"
-                                                      :primary-bt-dismiss true
-                                                      :expire 10
-                                                      :id :slack-team-added})
-             (= (:access query-params) "bot")
-             (notification-actions/show-notification {:title "Carrot Bot enabled"
-                                                      :primary-bt-title "OK"
-                                                      :primary-bt-dismiss true
-                                                      :expire 10
-                                                      :id :slack-bot-added})))))
+        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
 
 ;; Company list
 (defn org-handler [route target component params]

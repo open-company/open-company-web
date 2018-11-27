@@ -823,7 +823,10 @@
 
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
-    (if (contains? (router/query-params) :new)
+    ;; Make sure the new param is alone and not with an access param that means
+    ;; it was adding a slack team or bot
+    (if (and (contains? (router/query-params) :new)
+             (not (contains? (router/query-params) :access)))
       (let [new-data (get-board-for-edit (router/query-param :new))
             with-headline (if (router/query-param :headline)
                            (assoc new-data :headline (router/query-param :headline))
