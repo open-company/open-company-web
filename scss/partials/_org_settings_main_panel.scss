@@ -197,12 +197,9 @@ div.org-settings div.org-settings-inner div.org-settings-main {
 
     div.org-settings-list {
       div.org-settings-list-item {
-        height: auto;
-
-        &:first-child {
-          border-top: 1px solid $ultra_light_grey;
-          padding-top: 24px;
-          margin-top: 24px;
+        &:last-child {
+          border-bottom: 1px solid $ultra_light_grey;
+          padding-bottom: 24px;
         }
 
         div.logo-container {
@@ -329,7 +326,6 @@ div.org-settings div.org-settings-inner div.org-settings-main {
             @include avenir_R();
             font-size: 13px;
             color: $deep_navy;
-            height: 32px;
             margin-top: 16px;
 
             i.mdi-information-outline {
@@ -346,6 +342,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
               color: $carrot_green;
               background-color: $feint_emerald;
               border-radius: 6px;
+              margin-top: -5px;
             }
           }
         }
