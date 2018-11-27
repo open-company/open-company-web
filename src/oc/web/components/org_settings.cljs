@@ -46,7 +46,7 @@
         [:a.org-settings-tab-link
           {:href "#"
            :on-click #(do (utils/event-stop %) (show-modal :team))}
-          "MANAGE MEMBERS"]])
+          "MANAGE TEAM"]])
     (when (utils/is-admin-or-author? org-data)
       [:div.org-settings-tab
         {:class (when (= :invite active-tab) "active")}
