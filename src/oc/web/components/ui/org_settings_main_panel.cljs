@@ -14,7 +14,6 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
@@ -216,21 +215,20 @@
                       [:div.slack-org-self-join
                         "Slack members can self-join this team."]
                       [:div.slack-org-bot-switch
-                        "Carrot bot for Slack"
-                        [:i.mdi.mdi-information-outline
-                          {:title "The Carrot Slack bot enables Slack unfurls, invites, notifications and sharing."
-                           :data-toggle "tooltip"
-                           :data-placement "top"
-                           :data-container "body"}]
-                        [:div.slack-org-switch-container
-                          {:class (when has-bot? "disabled")}
-                          (carrot-checkbox
-                            {:selected has-bot?
-                             :disabled has-bot?
-                             :unselected-label "OFF"
-                             :selected-label "ON"
-                             :did-change-cb #(when-not has-bot?
-                                               (org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main")))})]]]]))])]]
+                        "Carrot Bot for Slack is currently "
+                        [:span.bold
+                          (if has-bot? "on" "off")]
+                        "."
+                        (when-not has-bot?
+                          [:i.mdi.mdi-information-outline
+                            {:title "The Carrot Bot for Slack enables Slack unfurls, invites, notifications and sharing."
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :data-container "body"}])
+                        (when-not has-bot?
+                          [:button.mlb-reset.enable-carrot-bot-bt
+                            {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
+                            "Enable Carrot Bot"])]]]))])]]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group

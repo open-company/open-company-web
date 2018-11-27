@@ -326,7 +326,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
             @include avenir_R();
             font-size: 13px;
             color: $deep_navy;
-            height: 26px;
+            height: 32px;
             margin-top: 16px;
 
             i.mdi-information-outline {
@@ -334,59 +334,15 @@ div.org-settings div.org-settings-inner div.org-settings-main {
               margin-left: 6px;
             }
 
-            div.slack-org-switch-container {
+            button.enable-carrot-bot-bt {
               float: right;
-              width: 64px;
-              height: 26px;
-
-              &.disabled {
-                cursor: not-allowed;
-              }
-
-              div.carrot-checkbox {
-                height: 26px;
-                width: 64px;
-                background-color: #E1E2E4;
-                color: $ui_grey;
-                padding: 4px;
-                content: "OFF";
-                position: relative;
-                z-index: 10000;
-
-                &.disabled {
-                  cursor: not-allowed;
-                  opacity: 1;
-                  pointer-events: none;
-                }
-
-                span.dot {
-                  width: 18px;
-                  height: 18px;
-                  background-color: $ui_grey;
-                  top: 4px;
-                  margin-left: 4px;
-                }
-
-                span.unselected-label {
-                  margin-right: 8px;
-                  margin-top: 2px;
-                }
-
-                span.selected-label {
-                  margin-left: 8px;
-                  margin-top: 2px;
-                }
-
-                &.selected {
-                  background-color: $feint_emerald;
-                  color: $carrot_green;
-
-                  span.dot {
-                    margin-left: 42px;
-                    background-color: $carrot_green;
-                  }
-                }
-              }
+              width: 140px;
+              height: 32px;
+              @include avenir_H();
+              font-size: 13px;
+              color: $carrot_green;
+              background-color: $feint_emerald;
+              border-radius: 6px;
             }
           }
         }
