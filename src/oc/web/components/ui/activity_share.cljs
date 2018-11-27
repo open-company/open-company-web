@@ -138,7 +138,7 @@
                :data-container "body"
                :data-tooltip (if has-bot? "" "tooltip")
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Enable the Slack bot in Settings"
+               :title "Enable the Carrot Bot for Slack in Settings"
                :ref "slack-button"
                :on-click (fn [e]
                            (utils/event-stop e)

@@ -172,7 +172,7 @@
                                                       :expire 10
                                                       :id :slack-team-added})
              (= (:access query-params) "bot")
-             (notification-actions/show-notification {:title "Carrot bot enabled"
+             (notification-actions/show-notification {:title "Carrot Bot enabled"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
                                                       :expire 10
