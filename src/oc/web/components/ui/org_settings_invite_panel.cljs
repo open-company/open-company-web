@@ -126,9 +126,7 @@
                :data-toggle (when-not slack-enabled? "tooltip")
                :data-placement "top"
                :data-container "body"
-               :title (if has-slack-org?
-                        "Enable Carrot Bot for Slack"
-                        "Enable Slack for Carrot")
+               :title "In Settings, enable the Carrot Bot for Slack."
                :class (utils/class-set {:disabled (not slack-enabled?)
                                         :active (= "slack" @(::inviting-from s))})}
               "Slack"])]
