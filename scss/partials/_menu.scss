@@ -154,9 +154,9 @@ div.menu {
         }
       }
 
-      &.invite-people {
+      &.manage-team {
         &:before {
-          background-image: cdnUrl("/img/ML/menu_invite_people_hover.svg");
+          background-image: cdnUrl("/img/ML/menu_manage_team_hover.svg");
         }
       }
 
@@ -225,10 +225,10 @@ div.menu {
       }
     }
 
-    &.invite-people {
-      @include preload_image(cdnUrl("/img/ML/menu_invite_people_hover.svg"));
+    &.manage-team {
+      @include preload_image(cdnUrl("/img/ML/menu_manage_team_hover.svg"));
       &:before {
-        background-image: cdnUrl("/img/ML/menu_invite_people.svg");
+        background-image: cdnUrl("/img/ML/menu_manage_team.svg");
       }
     }
 

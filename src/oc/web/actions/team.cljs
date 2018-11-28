@@ -297,11 +297,15 @@
 (defn user-action-cb [_]
   (teams-get))
 
-(defn user-action [team-id invitation action method other-link-params payload]
+(defn user-action [team-id invitation action method other-link-params payload & [finished-cb]]
   (let [team-data (dis/team-data team-id)
         idx (.indexOf (:users team-data) invitation)]
     (when (> idx -1)
-      (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload user-action-cb)
+      (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload
+       #(do
+          (when (fn? finished-cb)
+            (finished-cb team-id invitation action method other-link-params payload %))
+          (user-action-cb %)))
       (dis/dispatch! [:user-action team-id idx]))))
 
 ;; Email domains
