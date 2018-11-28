@@ -38,14 +38,23 @@
                         redirect)]
     (router/redirect! fixed-auth-url)))
 
-(defn maybe-show-bot-added-notification? []
+(defn maybe-show-integration-added-notification? []
   ;; Do we need to show the add bot banner?
   (when-let* [org-data (dis/org-data)
               bot-access (dis/bot-access)]
-    (when (= bot-access :slack-bot-success-notification)
-      (notification-actions/show-notification {:title "Slack integration successful"
-                                               :slack-icon true
-                                               :id "slack-bot-integration-succesful"}))
+    (when (= bot-access "bot")
+      (notification-actions/show-notification {:title "Carrot Bot enabled"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :slack-bot-added}))
+    (when (and (= bot-access "team")
+               (not= (:new (router/query-params)) "true"))
+      (notification-actions/show-notification {:title "Integration added"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
 
 ;; Org get
@@ -124,7 +133,7 @@
       (ws-nc/reconnect ws-link (jwt/user-id))))
 
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
-  (utils/after 100 maybe-show-bot-added-notification?)
+  (utils/after 100 maybe-show-integration-added-notification?)
   (fullstory/track-org org-data))
 
 (defn get-org-cb [{:keys [status body success]}]

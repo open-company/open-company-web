@@ -54,7 +54,7 @@
 
     img.org-avatar-img{
       @if $show-border == true {
-        border: 1px solid #ECECEC;
+        border: 1px solid $ultra_light_grey;
         padding: 4px;
       }
 

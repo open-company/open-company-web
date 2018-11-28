@@ -5,7 +5,7 @@ div.activity-card {
   border-radius: 6px;
   margin: 8px;
   position: relative;
-  border: 1px solid #ECECEC;
+  border: 1px solid $ultra_light_grey;
   min-height: 195px;
 
   &:not(.draft), &:not(.draft) * {
@@ -46,7 +46,7 @@ div.activity-card {
 
   &.draft {
     background-color: $light_gold;
-    border: 1px solid #ECECEC;
+    border: 1px solid $ultra_light_grey;
   }
 
   div.activity-card-menu-container {
@@ -141,7 +141,7 @@ div.activity-card {
 
   div.activity-card-bottom-container {
     width: 100%;
-    border-top: 1px solid #ECECEC;
+    border-top: 1px solid $ultra_light_grey;
     padding: 16px 24px;
     background-color: white;
     border-bottom-left-radius: 6px;
