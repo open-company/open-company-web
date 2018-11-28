@@ -143,12 +143,16 @@
                                                          :error nil}]])
                                       (reset! (::resending-invite s) true)
                                       (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)) "")))
+                        ;; Retrieve the Slack display name for pending and active users
                         slack-display-name (if (or (= (:status user) "uninvited")
                                                    (= (:status user) "pending"))
                                             (:slack-display-name roster-user)
                                             (some #(when (seq (:display-name %)) (:display-name %)) (vals (:slack-users roster-user))))
-                        fixed-display-name (if (= slack-display-name "-")
-                                             ""
+                        ;; Add @ in front of the slack display name if it's not there already
+                        fixed-display-name (if (and (seq slack-display-name)
+                                                    (not= slack-display-name "-")
+                                                    (not (clojure.string/starts-with? slack-display-name "@")))
+                                             (str "@" slack-display-name)
                                              slack-display-name)]]
               [:tr
                 {:key (str "org-settings-team-" (:user-id user))}
@@ -158,7 +162,7 @@
                   [:div.user-name-label
                     {:title (str "<span>" (:email user)
                               (when (seq fixed-display-name)
-                                (str " | <i class=\"mdi mdi-slack\"></i> " fixed-display-name))
+                                (str " | <i class=\"mdi mdi-slack\"></i>" (when-not (= fixed-display-name "-") (str " " fixed-display-name))))
                               "</span>")
                      :class (utils/class-set {:pending pending?
                                               :removing removing?})
