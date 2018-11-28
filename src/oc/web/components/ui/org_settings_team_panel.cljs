@@ -9,6 +9,7 @@
             [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
@@ -16,7 +17,8 @@
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
   (team-actions/user-action team-id user action method other-link-params nil remove-cb))
 
-(defn real-remove-fn [author user team-id remove-cb]
+(defn real-remove-fn [s author user team-id remove-cb]
+  (swap! (::removing s) #(set (conj % (:user-id user))))
   (when author
     (team-actions/remove-author author))
   (user-action team-id user "remove" "DELETE"  {:ref "application/vnd.open-company.user.v1+json"} remove-cb))
@@ -40,6 +42,7 @@
     (drv/drv :invite-data)
     (rum/local false ::resending-invite)
     (rum/local "" ::query)
+    (rum/local #{} ::removing)
     {:after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
                         (.tooltip "fixTitle")
@@ -86,6 +89,7 @@
                                       (or (contains? user :email)
                                           (contains? user :slack-id)))
                         display-name (utils/name-or-email user)
+                        removing? (@(::removing s) (:user-id user))
                         remove-fn (fn []
                                     (let [alert-data {:icon "/img/ML/trash.svg"
                                                       :action
@@ -110,7 +114,7 @@
                                                                             "Yes, remove")
                                                       :solid-button-cb
                                                        #(do
-                                                         (real-remove-fn author user (:team-id team-data)
+                                                         (real-remove-fn s author user (:team-id team-data)
                                                           (fn []
                                                             (notification-actions/show-notification
                                                              {:title (if pending?
@@ -142,7 +146,10 @@
                         slack-display-name (if (or (= (:status user) "uninvited")
                                                    (= (:status user) "pending"))
                                             (:slack-display-name roster-user)
-                                            (some #(when (seq (:display-name %)) (:display-name %)) (vals (:slack-users roster-user))))]]
+                                            (some #(when (seq (:display-name %)) (:display-name %)) (vals (:slack-users roster-user))))
+                        fixed-display-name (if (= slack-display-name "-")
+                                             ""
+                                             slack-display-name)]]
               [:tr
                 {:key (str "org-settings-team-" (:user-id user))}
                 [:td.user-name
@@ -150,10 +157,11 @@
                   (user-avatar-image user)
                   [:div.user-name-label
                     {:title (str "<span>" (:email user)
-                              (when (seq slack-display-name)
-                                (str " | <i class=\"mdi mdi-slack\"></i> " slack-display-name))
+                              (when (seq fixed-display-name)
+                                (str " | <i class=\"mdi mdi-slack\"></i> " fixed-display-name))
                               "</span>")
-                     :class (when pending? "pending")
+                     :class (utils/class-set {:pending pending?
+                                              :removing removing?})
                      :data-toggle "tooltip"
                      :data-html "true"
                      :data-placement "top"}
@@ -166,7 +174,7 @@
                          :data-toggle "tooltip"
                          :data-placement "top"
                          :data-container "body"
-                         :title (str "Resend invitation via " (if (seq slack-display-name) "slack" "email"))}
+                         :title (str "Resend invitation via " (if (seq fixed-display-name) "slack" "email"))}
                         "resend"]
                       " or "
                       [:button.mlb-reset.remove-pending-bt
@@ -176,7 +184,9 @@
                          :data-container "body"
                          :title "Cancel invitation"}
                         "cancel"]
-                      ")"])]
+                      ")"])
+                  (when removing?
+                    (small-loading))]
                 [:td.role
                   (user-type-dropdown {:user-id (:user-id user)
                                        :user-type user-type

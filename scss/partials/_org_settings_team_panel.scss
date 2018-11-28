@@ -71,6 +71,14 @@ div.org-settings {
                 &.pending {
                   max-width: calc(100% - 230px);
                 }
+
+                &.removing {
+                  max-width: calc(100% - 23px);
+                }
+
+                &.pending.removing {
+                  max-width: calc(100% - 253px);
+                }
               }
 
               div.tooltip {
@@ -101,6 +109,12 @@ div.org-settings {
                   margin: 0;
                   display: inline;
                 }
+              }
+
+              div.small-loading {
+                margin: 4px 0 0 8px;
+                display: inline-block;
+                vertical-align: bottom;
               }
             }
 
