@@ -51,11 +51,11 @@
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
-(defn invite-click [e]
+(defn manage-team-click [e]
   ; (utils/event-stop e)
   (.preventDefault e)
   (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
 
 (defn sign-in-sign-up-click [e]
   (mobile-menu-toggle)
@@ -117,13 +117,12 @@
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
       (when (and (not is-mobile?)
                  (router/current-org-slug)
-                 (or (= user-role :admin)
-                     (= user-role :author)))
+                 (= user-role :admin))
         [:a
           {:href "#"
-           :on-click invite-click}
-          [:div.oc-menu-item.invite-people
-            "Invite People"]])
+           :on-click manage-team-click}
+          [:div.oc-menu-item.manage-team
+            "Manage Team"]])
       (when (and (not is-mobile?)
                  (= user-role :admin)
                  (router/current-org-slug))
@@ -131,7 +130,7 @@
           {:href "#"
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
-            "Settings"]])
+            "Digest Settings"]])
       [:a
         (if is-mobile?
           {:href "https://whats-new.carrot.io/"
