@@ -18,6 +18,20 @@ div.carrot-checkbox {
     pointer-events: none;
   }
 
+  span.selected-label {
+    color: $carrot_green;
+    float: left;
+    @include avenir_H();
+    font-size: 12px;
+  }
+
+  span.unselected-label {
+    color: $ui_grey;
+    float: right;
+    @include avenir_H();
+    font-size: 12px;
+  }
+
   span.dot {
     position: absolute;
     top: 0;

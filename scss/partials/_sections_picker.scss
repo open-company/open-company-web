@@ -10,7 +10,7 @@ div.sections-picker {
 
   div.sections-picker-header {
     height: 33px;
-    border-bottom: 1px solid #ECECEC;
+    border-bottom: 1px solid $ultra_light_grey;
     padding: 0 16px 9px;
 
     div.sections-picker-header-left {
@@ -49,7 +49,7 @@ div.sections-picker {
     div.sections-picker-group {
 
       div.sections-picker-section {
-        border-bottom: 1px solid #ECECEC;
+        border-bottom: 1px solid $ultra_light_grey;
         padding: 16px 0px;
         cursor: pointer;
 

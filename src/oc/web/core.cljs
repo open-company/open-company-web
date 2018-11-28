@@ -155,9 +155,8 @@
         org-settings (when (and (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
-        bot-access (when (and (contains? query-params :access)
-                              (= (:access query-params) "bot"))
-                      :slack-bot-success-notification)
+        bot-access (when (contains? query-params :access)
+                      (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings

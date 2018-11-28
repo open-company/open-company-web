@@ -127,7 +127,7 @@
                :data-placement "top"
                :data-container "body"
                :title (if has-slack-org?
-                        "Enable Carrot bot for Slack"
+                        "Enable Carrot Bot for Slack"
                         "Enable Slack for Carrot")
                :class (utils/class-set {:disabled (not slack-enabled?)
                                         :active (= "slack" @(::inviting-from s))})}

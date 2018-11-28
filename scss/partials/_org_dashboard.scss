@@ -57,7 +57,7 @@ div.org-dashboard {
 
 html {
   @include mobile(){
-    background-color: #ECECEC;
+    background-color: $ultra_light_grey;
   }
 }
 
@@ -79,12 +79,12 @@ body {
       min-height: 100vh;
 
       @include mobile(){
-        background-color: #ECECEC;
+        background-color: $ultra_light_grey;
       }
     }
 
     @include mobile(){
-      background-color: #ECECEC;
+      background-color: $ultra_light_grey;
     }
   }
 }
@@ -102,7 +102,7 @@ div.org-dashboard div.org-dashboard-inner {
     padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
   }
   @include mobile(){
-    background-color: #ECECEC;
+    background-color: $ultra_light_grey;
     min-height: calc(100vh - #{$navbar_height}px);
   }
 }

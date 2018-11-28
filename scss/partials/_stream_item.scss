@@ -1,7 +1,7 @@
 div.stream-item {
   width: #{$board_container_width}px;
   margin: 12px 0px 16px;
-  border: 1px solid #ECECEC;
+  border: 1px solid $ultra_light_grey;
   border-radius: 6px;
   padding: 32px 40px;
   background-color: white;
@@ -11,7 +11,7 @@ div.stream-item {
     padding: 24px 16px;
     margin: 0;
     border: none;
-    border-bottom: 4px solid #ECECEC;
+    border-bottom: 4px solid $ultra_light_grey;
     border-radius: 0;
   }
 
@@ -398,8 +398,8 @@ div.stream-item {
       white-space: pre-wrap;
       word-wrap: break-word;
       width: 100%;
-      background-color: rgba(#ECECEC, 0.2);
-      border-top: 1px solid #ECECEC;
+      background-color: rgba($ultra_light_grey, 0.2);
+      border-top: 1px solid $ultra_light_grey;
       padding: 24px;
 
       div.stream-item-transcript-header {

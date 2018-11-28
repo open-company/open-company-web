@@ -10,8 +10,10 @@
             [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.actions.notifications :as notification-actions]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
@@ -31,10 +33,12 @@
 (rum/defcs org-settings-main-panel
   < rum/reactive
     (rum/local false ::saving)
+    (rum/local false ::showing-menu)
     (drv/drv :org-data)
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
     (drv/drv :current-user-data)
+    (on-window-click-mixin (fn [s _] (reset! (::showing-menu s) false)))
     {:will-mount (fn [s]
                    (reset-form s)
                    s)
@@ -43,7 +47,12 @@
                       (when (and @(::saving s)
                                  (:saved org-editing))
                         (reset! (::saving s) false)
-                        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))))
+                        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
+                        (notification-actions/show-notification {:title "Settings saved"
+                                                                 :primary-bt-title "OK"
+                                                                 :primary-bt-dismiss true
+                                                                 :expire 10
+                                                                 :id :org-settings-saved})))
                     s)
      :after-render (fn [s]
                      (doto (js/$ "[data-toggle=\"tooltip\"]")
@@ -124,7 +133,7 @@
         [:div.org-settings-panel-row.slack-teams-row.group
           [:div.org-settings-label
             [:label
-              "Slack integration"
+              "Integrations"
               [:i.mdi.mdi-information-outline
                 {:title "Anyone who signs up with your Slack team can contribute to team boards."
                  :data-toggle "tooltip"
@@ -147,49 +156,79 @@
                 {:on-click #(team-actions/slack-team-add @(drv/get-ref s :current-user-data) (str (router/get-token) "?org-settings=main"))}
                 [:img {:alt "Add to Slack"
                        :height "40"
-                       :width "173"
+                       :width "262"
                        :src (utils/cdn "/img/ML/add_a_slack_team_bt.png")
                        :src-set (str (utils/cdn "/img/ML/add_a_slack_team_bt.png") " 1x, "
                                  (utils/cdn "/img/ML/add_a_slack_team_bt@2x.png") " 2x")}]])
           (when-not (zero? (count (:slack-orgs team-data)))
             [:div.org-settings-list
               (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
-                (for [team (:slack-orgs team-data)]
+                (for [team (:slack-orgs team-data)
+                      :let [has-logo (not (seq (:logo-url team)))
+                            logo-url (if has-logo
+                                       (:logo-url team)
+                                       (utils/cdn "/img/slack.png"))
+                            slack-domain (:slack-domain team)
+                            has-bot? (pos? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))]]
                   [:div.org-settings-list-item.group
                     {:key (str "slack-org-" (:slack-org-id team))}
-                    (let [has-logo (seq (:logo-url team))
-                          logo-url (if has-logo
-                                     (:logo-url team)
-                                     (utils/cdn "/img/slack.png"))]
-                      [:div.logo-container
-                        [:img.slack-logo
-                          {:class (when-not has-logo "no-logo")
-                           :src logo-url}]])
+                    [:div.logo-container
+                      [:img.slack-logo
+                        {:class (when-not has-logo "no-logo")
+                         :src logo-url}]]
                     [:div.org-settings-list-item-slack-org
                       [:div.org-settings-list-item-name
+                        {:ref (str "slack-team-" (:slack-org-id team))}
                         (:name team)
-                        (when (zero? (count (filter #(= (:slack-org-id %) (:slack-org-id team)) slack-bots)))
-                          (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
-                            [:button.org-settings-list-item-btn.btn-reset
-                              {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))
-                               :title "The Carrot Slack bot enables Slack unfurls, invites, notifications and sharing."
-                               :data-toggle "tooltip"
-                               :data-placement "top"
-                               :data-container "body"}
-                              "Add Slackbot to team"
-                              [:i.mdi.mdi-information-outline]]))]
-                      (when (seq (:slack-domain team))
+                        [:div.integrations-more-menu
+                          {:ref (str "integrations-more-menu-" (:slack-org-id team))}
+                          [:button.mlb-reset.integrations-more-menu-bt
+                            {:type "button"
+                             :class (utils/class-set {:active (= @(::showing-menu s) (:slack-org-id team))})
+                             :ref (str "integrations-more-menu-bt-" (:slack-org-id team))
+                             :on-click #(reset! (::showing-menu s) (:slack-org-id team))
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :data-container "body"
+                             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                             :title "More"}]
+                          (when (= @(::showing-menu s) (:slack-org-id team))
+                            [:ul.integrations-more-menu-list
+                              [:li.delete
+                                {:on-click (fn []
+                                            (alert-modal/show-alert {:icon "/img/ML/trash.svg"
+                                                                     :action "remove-slack-team"
+                                                                     :message "Are you sure you want to remove this Slack team?"
+                                                                     :link-button-title "Keep"
+                                                                     :link-button-cb #(alert-modal/hide-alert)
+                                                                     :solid-button-style :red
+                                                                     :solid-button-title "Yes"
+                                                                     :solid-button-cb (fn []
+                                                                                       (team-actions/remove-team (:links team))
+                                                                                       (alert-modal/hide-alert))}))}
+                                "Remove Slack team"]])]]
+                      (when (seq slack-domain)
                         [:div.org-settings-list-item-desc.group
-                          [:div.slack-domain-label
-                            "This team is linked to the "
-                            [:span.slack-domain
-                               (:slack-domain team) ".slack.com"]
-                            " team."]])
+                          "This team is linked to the "
+                          slack-domain ".slack.com"
+                          " team."])
                       [:div.slack-org-self-join
-                        "Members of this Slack team can join Carrot " [:span.self-join "without an invite"] "."]
-                      [:button.remove-team-btn.btn-reset
-                        {:on-click #(team-actions/remove-team (:links team))}
-                        "Remove Slack team"]]]))])]]
+                        "Slack members can self-join this team."]
+                      [:div.slack-org-bot-switch
+                        "Carrot Bot for Slack is currently "
+                        [:span.bold
+                          (if has-bot? "on" "off")]
+                        "."
+                        (when-not has-bot?
+                          [:i.mdi.mdi-information-outline
+                            {:title "The Carrot Bot for Slack enables Slack unfurls, invites, notifications and sharing."
+                             :data-toggle "tooltip"
+                             :data-placement "top"
+                             :data-container "body"}])
+                        (when-not has-bot?
+                          [:button.mlb-reset.enable-carrot-bot-bt
+                            {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
+                            "Enable Carrot Bot"])]]]))])]]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
