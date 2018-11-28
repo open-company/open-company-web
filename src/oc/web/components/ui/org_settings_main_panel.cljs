@@ -164,7 +164,7 @@
             [:div.org-settings-list
               (let [slack-bots (get (jwt/get-key :slack-bots) (jwt/slack-bots-team-key (:team-id org-data)))]
                 (for [team (:slack-orgs team-data)
-                      :let [has-logo (not (seq (:logo-url team)))
+                      :let [has-logo (seq (:logo-url team))
                             logo-url (if has-logo
                                        (:logo-url team)
                                        (utils/cdn "/img/slack.png"))
