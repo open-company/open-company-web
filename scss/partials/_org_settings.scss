@@ -238,7 +238,7 @@ div.org-settings {
               th {
                 @include avenir_H();
                 font-size: 14px;
-                color: $oc_gray_7;
+                color: $ui_grey;
 
                 span.error {
                   @include avenir_H();
@@ -254,7 +254,7 @@ div.org-settings {
                 border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
                 @include avenir_R();
                 font-size: 16px;
-                color: $carrot_dark_gray;
+                color: $deep_navy;
               }
             }
           }
