@@ -11,6 +11,7 @@
             [oc.web.components.org-settings :as org-settings]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -434,7 +435,13 @@
                                 :solid-button-title "Yes, I'm sure"
                                 :solid-button-cb (fn []
                                                    (section-actions/section-delete
-                                                     (:slug section-data))
+                                                     (:slug section-data)
+                                                     (notification-actions/show-notification
+                                                      {:title "Section deleted"
+                                                       :primary-bt-title "OK"
+                                                       :primary-bt-dismiss true
+                                                       :expire 10
+                                                       :id :section-deleted}))
                                                    (alert-modal/hide-alert)
                                                    (dismiss))})))
                  :data-toggle "tooltip"
