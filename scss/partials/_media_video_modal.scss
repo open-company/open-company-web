@@ -1,99 +1,58 @@
 div.media-video-modal-container {
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  background-color: $carrot_modal_bg;
+  position: absolute;
+  top: -70px;
+  left: -80px;
   z-index: #{$navbar_zindex + 126};
-  transition: opacity 180ms ease-in;
+  width: 498px;
+  height: 56px;
+  background-color: white;
+  border: 1px solid $deep_tan;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.10);
+  padding: 8px;
 
-  &.will-appear {
-    opacity: 0;
-  }
+  button.record-video-bt {
+    width: 152px;
+    height: 40px;
+    float: left;
+    background-color: $carrot_green;
+    border-radius: 4px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    @include avenir_H();
+    font-size: 14px;
 
-  &.appear {
-    opacity: 1;
-  }
-
-  div.modal-wrapper {
-    width: #{552 + 20 + 8}px;
-    height: 241px;
-    margin: 100px auto 50px;
-    position: relative;
-
-    button.settings-modal-close {
-      right: -56px;
+    span.white-video-icon {
+      width: 18px;
+      height: 12px;
+      background-image: cdnUrl("/img/ML/white_video_icon.svg");
+      background-position: center;
+      background-size: 18px 12px;
+      background-repeat: no-repeat;
+      margin-right: 6px;
     }
+  }
 
-    div.media-video-modal {
-      width: 552px;
-      margin: 0px 0px 0px 28px;
-      position: relative;
-      overflow: hidden;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
-      padding: 24px;
+  input {
+    width: 320px;
+    height: 40px;
+    float: left;
+    border-radius: 4px;
+    background-color: white;
+    border: 1px solid rgba(177,184,192,0.50);
+    padding: 10px 17px;
+    @include avenir_R();
+    font-size: 14px;
+    line-height: 24px;
+    color: $deep_navy;
+    outline: none;
+    padding: 9px 12px;
+    margin-left: 8px;
 
-      div.media-video-modal-header{
-        height: 44px;
-
-        div.title {
-          @include avenir_M();
-          font-size: 16px;
-          color: $carrot_light_gray;
-          float: left;
-          margin-top: 5px;
-        }
-      }
-
-      div.media-video-modal-divider {
-        width: calc(100% + 48px);
-        margin-left: -24px;
-        height: 1px;
-        background-color: $carrot_light_gray_1;
-        opacity: 0.3;
-      }
-
-      div.media-video-modal-content {
-        div.content-title {
-          margin-top: 24px;
-          font-size: 12px;
-          @include avenir_H();
-          color: $oc_gray_7;
-        }
-
-        input {
-          margin-top: 8px;
-          width: 100%;
-          border-radius: 4px;
-          background-color: #ffffff;
-          border: solid 1px rgba(177, 184, 192, 0.5);
-          height: 40px;
-          padding: 10px 17px;
-          @include avenir_R();
-          font-size: 16px;
-          color: $oc_gray_7;
-          outline: none;
-
-          @include placeholder(){
-            color: $carrot_light_gray;
-          }
-        }
-      }
-
-      div.media-video-modal-buttons {
-        height: 40px;
-        margin-top: 16px;
-
-        button {
-          margin-left: 15px;
-          float: right;
-          height: 40px;
-          width: 96px;
-        }
-      }
+    @include placeholder(){
+      color: $carrot_light_gray;
     }
   }
 }

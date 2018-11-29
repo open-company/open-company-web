@@ -6,14 +6,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :refer (first-render-mixin)]))
 
-(defn dismiss-modal [s]
-  (dis/dispatch! [:input [:media-input :media-video] :dismiss]))
-
-(defn close-clicked [s & [no-dismiss]]
-  (reset! (::dismiss s) true)
-  (when-not no-dismiss
-    (utils/after 180 #(dismiss-modal s))))
-
 (def youtube-regexp
  "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/watch/?\\?(?:(?:time_continue|t)=\\d+s?&)?v=([a-zA-Z0-9_-]{11}).*")
 (def youtube-short-regexp
@@ -63,9 +55,10 @@
 (defn- get-vimeo-thumbnail-success [s video res]
   (let [resp (aget res 0)
         thumbnail (aget resp "thumbnail_medium")
-        video-data (assoc video :thumbnail thumbnail)]
+        video-data (assoc video :thumbnail thumbnail)
+        dismiss-modal-cb (:dismiss-cb (first (:rum/args s)))]
     (dis/dispatch! [:input [:media-input :media-video] video-data])
-    (close-clicked s true)))
+    (dismiss-modal-cb)))
 
 (def _retry (atom 0))
 
@@ -79,7 +72,8 @@
     ;; Add the video without thumbnail
     (do
       (dis/dispatch! [:input [:media-input :media-video] video])
-      (close-clicked s true))))
+      (let [dismiss-modal-cb (:dismiss-cb (first (:rum/args s)))]
+        (dismiss-modal-cb)))))
 
 (defn- get-vimeo-thumbnail [s video]
   (.ajax js/$
@@ -103,12 +97,13 @@
 
 (defn video-add-click [s]
   (when (valid-video-url? @(::video-url s))
-    (let [video-data (get-video-data @(::video-url s))]
+    (let [video-data (get-video-data @(::video-url s))
+          dismiss-modal-cb (:dismiss-cb (first (:rum/args s)))]
       (if (= :vimeo (:type video-data))
         (get-vimeo-thumbnail s video-data)
         (do
           (dis/dispatch! [:input [:media-input :media-video] video-data])
-          (close-clicked s true))))))
+          (dismiss-modal-cb))))))
 
 (rum/defcs media-video-modal < rum/reactive
                                ;; Locals
@@ -123,31 +118,18 @@
                                              #(when-let [input-field (rum/ref-node s "video-input")]
                                                 (.focus input-field)))
                                             s)}
-  [s]
+  [s {:keys [dismiss-modal-cb record-video-cb]}]
   (let [current-user-data (drv/react s :current-user-data)]
     [:div.media-video-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-       :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
-      [:div.modal-wrapper
-        [:button.settings-modal-close.mlb-reset
-          {:on-click #(close-clicked s)}]
-        [:div.media-video-modal
-          [:div.media-video-modal-header.group
-            [:div.title "Adding a video"]]
-          [:div.media-video-modal-divider]
-          [:div.media-video-modal-content
-            [:div.content-title "VIDEO LINK"]
-            [:input.media-video-modal-input
-              {:type "text"
-               :value @(::video-url s)
-               :ref "video-input"
-               :on-change #(reset! (::video-url s) (.. % -target -value))
-               :placeholder "Link from Youtube, Vimeo or Loom"}]]
-          [:div.media-video-modal-buttons.group
-            [:button.mlb-reset.mlb-default
-              {:on-click #(video-add-click s)
-               :disabled (not (valid-video-url? @(::video-url s)))}
-              "Add"]
-            [:button.mlb-reset.mlb-link-black
-              {:on-click #(close-clicked s)}
-              "Cancel"]]]]]))
+      [:button.mlb-reset.button.record-video-bt
+        {:on-click #(record-video-cb %)}
+        [:span.white-video-icon]
+        "Record video"]
+      [:input.media-video-modal-input
+          {:type "text"
+           :value @(::video-url s)
+           :ref "video-input"
+           :on-change #(reset! (::video-url s) (.. % -target -value))
+           :on-key-down #(when (= "Enter" (.-key %))
+                           (video-add-click s))
+           :placeholder "Link from Youtube, Vimeo or Loom"}]]))

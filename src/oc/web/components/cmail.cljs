@@ -531,6 +531,7 @@
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
                                :dispatch-input-key :cmail-data
+                               :start-video-recording-cb #(video-record-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["photo" "video"]

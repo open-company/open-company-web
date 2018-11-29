@@ -15,12 +15,8 @@ div.multi-picker-container {
     height: 21px;
     opacity: 0.4;
 
-    &:hover {
+    &:hover, &.active {
       opacity: 1;
-    }
-
-    &:first-child {
-      margin-left: 0px;
     }
 
     div.multi-picker-choice-icon {
@@ -34,6 +30,8 @@ div.multi-picker-container {
     }
 
     &.choice-images {
+      margin-left: 0px;
+
       div.multi-picker-choice-icon {
         background-image: cdnUrl("/img/ML/multi_picker_image_icon.svg");
         background-size: 22px 18px;
@@ -43,8 +41,8 @@ div.multi-picker-container {
 
     &.choice-media {
       div.multi-picker-choice-icon {
-        @include image-2x("/img/ML/multi_picker_video_icon");
-        background-size: 22px 18px;
+        background-image: cdnUrl("/img/ML/multi_picker_video_icon.svg");
+        background-size: 18px 12px;
         top: -1px;
       }
     }
