@@ -309,16 +309,16 @@
                     [:div.post-added-tooltips
                       [:div.post-added-tooltip-box-mobile]
                       [:div.post-added-tooltip-title
-                        "Well done!"]
+                        "Auto-share to Slack!"]
                       [:div.post-added-tooltip
-                        "Using Slack? "
-                        [:button.mlb-reset.post-added-bt
-                          {:on-click #(do
-                                       (nux-actions/dismiss-post-added-tooltip)
-                                       (org-actions/bot-auth team-data current-user-data
-                                        (str (router/get-token) "?org-settings=main")))}
-                          "Connect to Slack"]
-                        " so your team can see posts and  join the discussion from Slack, too."]
+                        "Using Slack? Connect to Slack so your team can view and comment on posts from within Slack, too."]
+                      [:button.mlb-reset.post-added-bt
+                        {:on-click #(do
+                                     (nux-actions/dismiss-post-added-tooltip)
+                                     (org-actions/bot-auth team-data current-user-data
+                                      (str (router/get-token) "?org-settings=main")))}
+                        [:span.slack-icon]
+                        "Connect to Slack"]
                       [:div.post-added-tooltip-box]]]))
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond

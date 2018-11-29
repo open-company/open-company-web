@@ -258,21 +258,40 @@ div.dashboard-layout {
             line-height: 20px;
             margin-top: 8px;
 
-            button.post-added-bt {
-              display: inline;
-              background-color: transparent;
-              padding: 0;
-              margin: 0;
-              color: $carrot_green;
-              @include avenir_H();
-              font-size: 16px;
-              line-height: 20px;
-            }
-
             @include tablet() {
               float: unset;
               margin: 8px auto 0px;
               width: 100%;
+            }
+          }
+
+          button.post-added-bt {
+            width: auto;
+            margin-top: 16px;
+            padding: 1px 24px 2px;
+            height: 40px;
+            background-color: transparent;
+            border-radius: 6px;
+            color: white;
+            background-color: $carrot_green;
+            @include avenir_H();
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            @include mobile() {
+              width: 100%;
+            }
+
+            span.slack-icon {
+              width: 16px;
+              height: 16px;
+              background-size: 16px;
+              background-position: 0px 0px;
+              background-image: cdnUrl("/img/ML/slack_white_icon.svg");
+              float: left;
+              margin-right: 8px;
             }
           }
 
