@@ -366,7 +366,6 @@
       [:div.cmail-middle
         [:div.cmail-container
           [:div.cmail-header
-            {:class (when (:must-see cmail-data) "must-see-on")}
             [:div.cmail-header-title
               (if (:collapse cmail-state)
                 (:headline cmail-data)
@@ -460,12 +459,25 @@
                                         :board-name (:name board-data)
                                         :has-changes true
                                         :invite-note note})]))))])
+            (when (:must-see cmail-data)
+              [:div.must-see-tag.big-web-tablet-only
+                "Must see"])
             [:div.cmail-section-right
-              [:button.mlb-reset.video-record-bt
-                {:on-click #(video-record-clicked s)
-                 :class (when (or (:fixed-video-id cmail-data)
-                                  @(::record-video s))
-                          "remove-video-bt")}]]]
+              ; [:button.mlb-reset.video-record-bt
+              ;   {:on-click #(video-record-clicked s)
+              ;    :class (when (or (:fixed-video-id cmail-data)
+              ;                     @(::record-video s))
+              ;             "remove-video-bt")}]
+              [:div.must-see-toggle-container
+                {:class (when (:must-see cmail-data) "on")}
+                [:div.must-see-toggle
+                  {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-trigger "hover"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                   :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
+                  [:span.must-see-toggle-circle]]]]]
           [:div.cmail-content
             {:class (when show-edit-tooltip "showing-edit-tooltip")}
             (when (and is-mobile?
@@ -561,38 +573,23 @@
                          :position "top"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
-          [:div.footer-separator]
-          [:button.mlb-reset.cmail-must-see-bt
-            {:class (when (:must-see cmail-data) "on")
-             :on-click #(activity-actions/cmail-toggle-must-see)
-             :data-toggle "tooltip"
-             :data-placement "top"
-             :data-trigger "hover"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-             :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}]
-          [:button.mlb-reset.video-record-bt
-            {:on-click #(do
-                          ; (when is-mobile?
-                          ;   (js/alert (str "Video size is:" (:width video-size) "x" (:height video-size) ". Screen width is:" (win-width))))
-                          (video-record-clicked s))
-             :class (when (or (:fixed-video-id cmail-data)
-                              @(::record-video s))
-                      "remove-video-bt")
-             :title (if (or (:fixed-video-id cmail-data)
-                            @(::record-video s))
-                      "Remove video"
-                      "Record video")
-             :data-toggle "tooltip"
-             :data-placement "top"
-             :data-trigger "hover"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
-          (when (and (not= (:status cmail-data) "published")
-                     (not is-mobile?))
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
-              [:div.saving-saved "Saving..."]
-              (when (false? (:auto-saving cmail-data))
-                [:div.saving-saved "Saved"])))
+          ; [:div.footer-separator]
+          ; [:button.mlb-reset.video-record-bt
+          ;   {:on-click #(do
+          ;                 ; (when is-mobile?
+          ;                 ;   (js/alert (str "Video size is:" (:width video-size) "x" (:height video-size) ". Screen width is:" (win-width))))
+          ;                 (video-record-clicked s))
+          ;    :class (when (or (:fixed-video-id cmail-data)
+          ;                     @(::record-video s))
+          ;             "remove-video-bt")
+          ;    :title (if (or (:fixed-video-id cmail-data)
+          ;                   @(::record-video s))
+          ;             "Remove video"
+          ;             "Record video")
+          ;    :data-toggle "tooltip"
+          ;    :data-placement "top"
+          ;    :data-trigger "hover"
+          ;    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
           [:div.cmail-footer-right
             [:div.footer-separator]
             [:div.delete-button-container
@@ -602,4 +599,11 @@
                  :data-placement "top"
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :on-click #(delete-clicked % cmail-data)}]]]]]]]))
+                 :on-click #(delete-clicked % cmail-data)}]]]
+          (when (and (not= (:status cmail-data) "published")
+                     (not is-mobile?))
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
+              [:div.saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.saving-saved "Saved"])))]]]]))
