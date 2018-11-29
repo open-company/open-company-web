@@ -521,19 +521,21 @@ div.section-editor-container {
           height: 32px;
           float: left;
           width: 120px;
-          color: $ui_grey;
-          @include avenir_R();
+          color: $carrot_orange_2;
+          @include avenir_H();
           font-size: 14px;
           margin-left: 0px;
           padding-left: 0px;
           text-align: left;
+          opacity: 0.8;
 
           &:not(.disabled):hover {
-            color: $deep_navy;
+            opacity: 1;
           }
 
           &.disabled {
-            color: $light_ui_grey;
+            opacity: 0.4;
+            cursor: not-allowed;
           }
         }
 
