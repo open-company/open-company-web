@@ -124,7 +124,7 @@
       [:button.mlb-reset.button.record-video-bt
         {:on-click #(record-video-cb %)}
         [:span.white-video-icon]
-        "Record video"]
+        "Record a video"]
       [:input.media-video-modal-input
           {:type "text"
            :value @(::video-url s)
@@ -132,4 +132,4 @@
            :on-change #(reset! (::video-url s) (.. % -target -value))
            :on-key-down #(when (= "Enter" (.-key %))
                            (video-add-click s))
-           :placeholder "Link from Youtube, Vimeo or Loom"}]]))
+           :placeholder "Or, paste a link..."}]]))

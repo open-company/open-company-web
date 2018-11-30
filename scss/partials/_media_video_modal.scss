@@ -1,20 +1,19 @@
 div.media-video-modal-container {
   position: absolute;
-  top: -70px;
-  left: -80px;
+  top: -134px;
+  left: -40px;
   z-index: #{$navbar_zindex + 126};
-  width: 498px;
-  height: 56px;
+  width: 194px;
+  height: 122px;
   background-color: white;
   border: 1px solid $deep_tan;
   border-radius: 6px;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.10);
-  padding: 8px;
+  padding: 16px;
 
   button.record-video-bt {
-    width: 152px;
+    width: 160px;
     height: 40px;
-    float: left;
     background-color: $carrot_green;
     border-radius: 4px;
     color: white;
@@ -36,9 +35,8 @@ div.media-video-modal-container {
   }
 
   input {
-    width: 320px;
+    width: 160px;
     height: 40px;
-    float: left;
     border-radius: 4px;
     background-color: white;
     border: 1px solid rgba(177,184,192,0.50);
@@ -49,7 +47,7 @@ div.media-video-modal-container {
     color: $deep_navy;
     outline: none;
     padding: 9px 12px;
-    margin-left: 8px;
+    margin-top: 8px;
 
     @include placeholder(){
       color: $carrot_light_gray;

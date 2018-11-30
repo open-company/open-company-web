@@ -9,7 +9,7 @@ div.multi-picker-container {
     font-size: 14px;
     color: $deep_navy;
     position: relative;
-    margin-left: 16px;
+    margin-left: 12px;
     float: left;
     width: 22px;
     height: 21px;
@@ -34,7 +34,7 @@ div.multi-picker-container {
 
       div.multi-picker-choice-icon {
         background-image: cdnUrl("/img/ML/multi_picker_image_icon.svg");
-        background-size: 22px 18px;
+        background-size: 13px 16px;
         top: -1px;
       }
     }
@@ -50,7 +50,7 @@ div.multi-picker-container {
     &.choice-attachment {
       div.multi-picker-choice-icon {
         background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-        background-size: 19px 21px;
+        background-size: 16px 14px;
         left: -1px;
       }
     }

@@ -463,11 +463,6 @@
               [:div.must-see-tag.big-web-tablet-only
                 "Must see"])
             [:div.cmail-section-right
-              ; [:button.mlb-reset.video-record-bt
-              ;   {:on-click #(video-record-clicked s)
-              ;    :class (when (or (:fixed-video-id cmail-data)
-              ;                     @(::record-video s))
-              ;             "remove-video-bt")}]
               [:div.must-see-toggle-container
                 {:class (when (:must-see cmail-data) "on")}
                 [:div.must-see-toggle
