@@ -409,7 +409,9 @@
            :add-photo-cb #(add-photo s nil)
            :add-video-cb #(add-video s nil)
            :add-attachment-cb #(add-attachment s nil)
-           :start-video-recording-cb start-video-recording-cb})
+           :start-video-recording-cb #(do
+                                        (.removeSelection (get-media-picker-extension s))
+                                        (start-video-recording-cb %))})
          multi-picker-container)))
     [:div.rich-body-editor.oc-mentions.oc-mentions-hover
       {:ref "body"

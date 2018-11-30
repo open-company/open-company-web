@@ -8,13 +8,18 @@
 (rum/defcs multi-picker < rum/static
                           (rum/local false ::showing-media-video-modal)
                           (on-window-click-mixin (fn [s e]
-                            (when-not (utils/event-inside? e (rum/ref-node s :video-button))
+                            (when-not (or (utils/event-inside? e (rum/ref-node s :video-button))
+                                          (utils/event-inside? e (rum/ref-node s :video-container)))
                               (reset! (::showing-media-video-modal s) false))))
   [s {:keys [toggle-button-id add-photo-cb add-video-cb add-attachment-cb start-video-recording-cb]}]
   [:div.multi-picker-container
     (when @(::showing-media-video-modal s)
-      (media-video-modal {:record-video-cb #(start-video-recording-cb)
-                          :dismiss-cb #(reset! (::showing-media-video-modal s) false)}))
+      [:div.video-container
+        {:ref :video-container}
+        (media-video-modal {:record-video-cb #(do
+                                                (reset! (::showing-media-video-modal s) false)
+                                                (start-video-recording-cb %))
+                            :dismiss-cb #(reset! (::showing-media-video-modal s) false)})])
     [:button.mlb-reset.multi-picker-choice.choice-images
       {:on-click #(add-photo-cb %)
        :data-toggle "tooltip"
@@ -23,7 +28,9 @@
        :title "Insert image"}
       [:div.multi-picker-choice-icon]]
     [:button.mlb-reset.multi-picker-choice.choice-media
-      {:on-click #(reset! (::showing-media-video-modal s) true) ;#(add-video-cb %)
+      {:on-click #(do
+                   (add-video-cb %)
+                   (reset! (::showing-media-video-modal s) true))
        :ref :video-button
        :data-toggle "tooltip"
        :data-placement "top"
