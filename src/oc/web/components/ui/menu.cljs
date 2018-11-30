@@ -102,13 +102,13 @@
           {:href "#"
            :on-click user-profile-click}
           [:div.oc-menu-item.personal-profile
-            "Personal Profile"]])
+            "My Profile"]])
       (when (jwt/jwt)
         [:a
           {:href "#"
            :on-click notifications-settings-click}
           [:div.oc-menu-item.notifications-settings
-            "Notification Settings"]])
+            "Notifications"]])
       [:div.oc-menu-separator]
       (when org-data
         [:div.org-item
@@ -130,7 +130,7 @@
           {:href "#"
            :on-click team-settings-click}
           [:div.oc-menu-item.digest-settings
-            "Digest Settings"]])
+            "Settings"]])
       [:a
         (if is-mobile?
           {:href "https://whats-new.carrot.io/"
