@@ -569,23 +569,6 @@
                          :position "top"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
                          :container-selector "div.cmail-content"})
-          ; [:div.footer-separator]
-          ; [:button.mlb-reset.video-record-bt
-          ;   {:on-click #(do
-          ;                 ; (when is-mobile?
-          ;                 ;   (js/alert (str "Video size is:" (:width video-size) "x" (:height video-size) ". Screen width is:" (win-width))))
-          ;                 (video-record-clicked s))
-          ;    :class (when (or (:fixed-video-id cmail-data)
-          ;                     @(::record-video s))
-          ;             "remove-video-bt")
-          ;    :title (if (or (:fixed-video-id cmail-data)
-          ;                   @(::record-video s))
-          ;             "Remove video"
-          ;             "Record video")
-          ;    :data-toggle "tooltip"
-          ;    :data-placement "top"
-          ;    :data-trigger "hover"
-          ;    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
           [:div.cmail-footer-right
             [:div.footer-separator]
             [:div.delete-button-container
