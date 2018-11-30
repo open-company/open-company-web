@@ -471,7 +471,7 @@
                    :data-placement "top"
                    :data-trigger "hover"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                   :title (if (:must-see cmail-data) "Remove “Must see”" "Mark as “Must see”")}
+                   :title "Must See"}
                   [:span.must-see-toggle-circle]]]]]
           [:div.cmail-content
             {:class (when show-edit-tooltip "showing-edit-tooltip")}
