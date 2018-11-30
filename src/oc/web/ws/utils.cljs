@@ -31,14 +31,14 @@
        (sentry-report service-name chsk-send! ch-state))
     (* ls/ws-monitor-interval 1000))))
 
-(defn report-invalid-jwt [service-name ch-state auth-response]
+(defn report-invalid-jwt [service-name ch-state rep]
   (let [connection-status (if @ch-state
                             @@ch-state
                             nil)
         ctx {:jwt (j/jwt)
              :connection-status connection-status
              :timestamp (.getTime (new js/Date))
-             :auth-response auth-response
+             :rep rep
              :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str service-name " WS: not valid JWT"))
