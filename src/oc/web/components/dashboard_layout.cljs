@@ -19,7 +19,6 @@
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.section-stream :refer (section-stream)]
-            ; [oc.web.components.entries-layout :refer (entries-layout)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
@@ -145,8 +144,7 @@
         posts-data (drv/react s :filtered-posts)
         route (drv/react s :route)
         team-data (drv/react s :team-data)
-        is-all-posts (or (utils/in? (:route route) "all-posts")
-                         (:from-all-posts route))
+        is-all-posts (utils/in? (:route route) "all-posts")
         is-must-see (utils/in? (:route route) "must-see")
         current-activity-id (router/current-activity-id)
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -177,7 +175,6 @@
           (when (or (not is-mobile?)
                     (not mobile-navigation-sidebar))
             [:div.board-container.group
-              {:class (when is-all-posts "all-posts-container")}
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:on-click #(nav-actions/mobile-nav-sidebar)}

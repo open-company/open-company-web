@@ -223,8 +223,7 @@
      {:org org
       :board board
       :activity entry
-      :query-params query-params
-      :from-all-posts (or has-at-param (contains? query-params :ap))})
+      :query-params query-params})
     (check-nux query-params)
     (post-routing)
     ;; render component
