@@ -40,33 +40,6 @@ div.dashboard-layout {
         background-color: $ultra_light_grey;
       }
 
-      &.all-posts-container {
-        width: #{$board_container_width}px;
-
-        @include mobile() {
-          width: 100%;
-        }
-
-        div.board-name-container {
-          
-          div.board-name {
-
-            div.board-name-with-icon {
-              max-width: 350px;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              white-space: nowrap;
-              width: auto;
-
-              @include mobile() {
-                margin: 0 auto;
-                text-align: center;
-              }
-            }
-          }
-        }
-      }
-
       @include mobile() {
         width: 100%;
         margin: 0px;
