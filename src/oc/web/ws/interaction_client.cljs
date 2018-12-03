@@ -37,14 +37,15 @@
 (defn- send! [chsk-send! & args]
   (if @chsk-send!
     (apply @chsk-send! args)
-    (ws-utils/sentry-report "Interaction" ch-state (first (first args)))))
+    (ws-utils/sentry-report "Interaction" chsk-send! ch-state (first (first args)))))
 
 ;; Auth
 (declare reconnect)
 (declare boards-watch)
 
 (defn should-disconnect? [rep]
-  (if (:valid rep)
+  (if (and (s/cb-success? rep)
+           (:valid rep))
     (boards-watch)
     (do
       (timbre/warn "disconnecting client due to invalid JWT!" rep)
@@ -56,6 +57,17 @@
         (= rep :chsk/timeout)
         (do
           (ws-utils/report-connect-timeout "Interaction" ch-state)
+          ;; retry in 10 seconds if sente is not trying reconnecting
+          (when (and @ch-state
+                     (not (:udt-next-reconnect @@ch-state)))
+            (utils/after (* 10 1000)
+             (reconnect @last-ws-link (j/user-id)))))
+        (or (= rep :chsk/closed)
+            (= rep "closed"))
+        (do
+          (ws-utils/sentry-report "Interaction" chsk-send! ch-state "jwt-validation/should-disconnect?"
+           {:chsk/closed (= rep :chsk/closed)
+            :closed (= rep "closed")})
           ;; retry in 10 seconds if sente is not trying reconnecting
           (when (and @ch-state
                      (not (:udt-next-reconnect @@ch-state)))

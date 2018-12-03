@@ -6,7 +6,7 @@
 
 ;; Connection check
 
-(defn- sentry-report [service-name chsk-send! ch-state & [action-id]]
+(defn- sentry-report [service-name chsk-send! ch-state & [action-id infos]]
   (let [connection-status (if @ch-state
                             @@ch-state
                             nil)
@@ -14,6 +14,7 @@
         ctx {:action action-id
              :connection-status connection-status
              :send-fn ch-send-fn?
+             :infos infos
              :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str "Send over closed " service-name " WS connection"))
