@@ -1,6 +1,8 @@
 (ns oc.web.ws.utils
   (:require [taoensso.timbre :as timbre]
+            [taoensso.sente :as s]
             [oc.web.lib.jwt :as j]
+            [oc.web.lib.utils :as utils]
             [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]))
 
@@ -57,3 +59,42 @@
     (sentry/capture-message (str service-name " WS: handshake timeout"))
     (sentry/clear-extra-context!)
     (timbre/error (str service-name " WS: handshake timeout") ctx)))
+
+(defn auth-check [service-name ch-state chsk-send! channelsk jwt-refresh-cb reconnect-cb success-cb rep]
+  (if (and (s/cb-success? rep)
+           (:valid rep))
+    (when (fn? success-cb)
+      (success-cb rep))
+    (do
+      (timbre/warn "disconnecting client due to invalid JWT!" rep)
+      (s/chsk-disconnect! @channelsk)
+      (cond
+        (j/expired?)
+        (jwt-refresh-cb reconnect-cb)
+        (= rep :chsk/timeout)
+        (do
+          (report-connect-timeout service-name ch-state)
+          ;; retry in 10 seconds if sente is not trying reconnecting
+          (when (and @ch-state
+                     (not (:udt-next-reconnect @@ch-state)))
+            (utils/after (* 10 1000)
+             (reconnect-cb))))
+        (or (= rep :chsk/closed)
+            (= rep "closed"))
+        (do
+          (sentry-report service-name chsk-send! ch-state "jwt-validation/auth-check"
+           {:chsk/closed (= rep :chsk/closed)
+            :closed (= rep "closed")})
+          ;; retry in 10 seconds if sente is not trying reconnecting
+          (when (and @ch-state
+                     (not (:udt-next-reconnect @@ch-state)))
+            (utils/after (* 10 1000)
+             (reconnect-cb))))
+        :else
+        (report-invalid-jwt service-name ch-state rep)))))
+
+(defn post-handshake-auth [jwt-refresh-cb auth-cb]
+  (timbre/debug "Trying post handshake jwt auth")
+  (if (j/expired?)
+    (jwt-refresh-cb auth-cb)
+    (auth-cb)))
