@@ -2,15 +2,14 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]
                    [taoensso.encore :refer (have)])
   (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
+            [goog.Uri :as guri]
             [taoensso.sente :as s]
             [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as j]
             [oc.lib.time :as time]
-            [oc.web.local-settings :as ls]
             [oc.web.actions.jwt :as ja]
-            [oc.web.lib.utils :as utils]
-            [oc.web.ws.utils :as ws-utils]
-            [goog.Uri :as guri]))
+            [oc.web.local-settings :as ls]
+            [oc.web.ws.utils :as ws-utils]))
 
 ;; Sente WebSocket atoms
 (defonce channelsk (atom nil))
@@ -32,42 +31,13 @@
 (defn- send! [chsk-send! & args]
   (if @chsk-send!
     (apply @chsk-send! args)
-    (ws-utils/sentry-report "Notify" ch-state (first (first args)))))
+    (ws-utils/sentry-report "Notify" chsk-send! ch-state (first (first args)))))
 
 (defn notifications-watch []
   (timbre/debug "Watching notifications.")
   (send! chsk-send! [:watch/notifications {}]))
 
 ;; Auth
-(declare reconnect)
-
-(defn should-disconnect? [rep]
-  (if (:valid rep)
-    (notifications-watch)
-    (do
-      (timbre/warn "disconnecting client due to invalid JWT!" rep)
-      (s/chsk-disconnect! @channelsk)
-      (cond
-        (j/expired?)
-        (ja/jwt-refresh
-         #(reconnect @last-ws-link (j/user-id)))
-        (= rep :chsk/timeout)
-        (do
-          (ws-utils/report-connect-timeout "Notify" ch-state)
-          ;; retry in 10 seconds if sente is not trying reconnecting
-          (when (and @ch-state
-                     (not (:udt-next-reconnect @@ch-state)))
-            (utils/after (* 10 1000)
-             (reconnect @last-ws-link (j/user-id)))))
-        :else
-        (ws-utils/report-invalid-jwt "Notify" ch-state rep)))))
-
-(defn post-handshake-auth []
-  (timbre/debug "Trying post handshake jwt auth")
-  (if (j/expired?)
-    (ja/jwt-refresh
-     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?))
-    (send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 should-disconnect?)))
 
 (defn subscribe
   [topic handler-fn]
@@ -133,9 +103,14 @@
   (timbre/debug "Push event from server: " ?data)
   (apply event-handler ?data))
 
+(declare reconnect)
+
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
-  (post-handshake-auth)
+  (let [auth-cb (partial ws-utils/auth-check "Notify" ch-state chsk-send!
+                 channelsk ja/jwt-refresh #(reconnect @last-ws-link (j/user-id)) notifications-watch)]
+    (ws-utils/post-handshake-auth ja/jwt-refresh
+     #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 auth-cb)))
   (let [[?uid ?csrf-token ?handshake-data] ?data]
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)))
 
