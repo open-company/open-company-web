@@ -34,7 +34,7 @@ div.multi-picker-container {
 
       div.multi-picker-choice-icon {
         background-image: cdnUrl("/img/ML/multi_picker_image_icon.svg");
-        background-size: 13px 16px;
+        background-size: 16px 13px;
         top: -1px;
       }
     }
@@ -50,7 +50,7 @@ div.multi-picker-container {
     &.choice-attachment {
       div.multi-picker-choice-icon {
         background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-        background-size: 16px 14px;
+        background-size: 14px 16px;
         left: -1px;
       }
     }
