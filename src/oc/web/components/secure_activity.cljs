@@ -1,6 +1,7 @@
 (ns oc.web.components.secure-activity
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -40,7 +41,10 @@
                              ;; Mixins
                              (ui-mixins/render-on-resize save-win-height)
 
-                             {:will-mount (fn [s]
+                             {:after-render (fn [s]
+                               (activity-actions/send-secure-item-read)
+                               s)
+                              :will-mount (fn [s]
                                (utils/after 100 #(activity-actions/secure-activity-get))
                                (save-win-height s)
                                (reset! (::show-login-header s) (not (jwt/jwt)))

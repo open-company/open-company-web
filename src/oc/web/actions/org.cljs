@@ -143,7 +143,7 @@
 (defn get-org [& [org-data]]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link get-org-cb)))
+    (api/get-org (dis/id-token) org-link get-org-cb)))
 
 ;; Org redirect
 

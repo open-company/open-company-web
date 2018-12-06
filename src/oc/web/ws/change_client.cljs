@@ -152,7 +152,7 @@
 
 (defmethod -event-msg-handler :chsk/state
   [{:as ev-msg :keys [?data]}]
-  (let [[old-state-map new-state-map] (have vector? ?data)]
+  (let [[old-state-map new-state-map] (have vector? ?data)]    
     (if (:first-open? new-state-map)
       (timbre/debug "Channel socket successfully established!: " new-state-map)
       (timbre/debug "Channel socket state change: " new-state-map))))

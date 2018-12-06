@@ -17,6 +17,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.ws.notify-client :as ws-nc]
+            [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;;User walls
@@ -69,14 +70,14 @@
     (fn [{:keys [success body status]}]
       (when (= status 404)
         (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
-  (api/get-entry-point (:org @router/path)
+  (api/get-entry-point (:org @router/path) (dis/id-token)
    (fn [success body]
      (entry-point-get-finished success body
        (fn [orgs collection]
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (org-actions/get-org org-data)
-             (let [ap-initial-at (:ap-initial-at @dis/app-state)
+             (let [ap-initial-at (dis/ap-initial-at)
                    currently-logged-in (jwt/jwt)]
                (when-not (or (router/current-activity-id)
                              ap-initial-at)
@@ -113,7 +114,7 @@
       (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))
 
 (defn lander-check-team-redirect []
-  (utils/after 100 #(api/get-entry-point (:org @router/path)
+  (utils/after 100 #(api/get-entry-point (:org @router/path) (dis/id-token)
     (fn [success body]
       (entry-point-get-finished success body
         (fn [orgs collection]
@@ -130,7 +131,7 @@
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
           (jwt-actions/update-jwt-cookie body)
-          (api/get-entry-point (:org @router/path)
+          (api/get-entry-point (:org @router/path) (dis/id-token)
            (fn [success body] (entry-point-get-finished success body login-redirect)))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
@@ -173,17 +174,29 @@
 (defn auth-settings-get
   "Entry point call for auth service."
   []
-  (api/get-auth-settings (fn [body]
+  (api/get-auth-settings (dis/id-token) (fn [body]
     (when body
       ;; auth settings loaded
-      (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-        (api/get-user user-link (fn [data]
-          (dis/dispatch! [:user-data (json->cljs data)])
-          (utils/after 100 nux-actions/check-nux))))
-      (dis/dispatch! [:auth-settings body])
-      (check-user-walls)
-      ;; Start teams retrieve if we have a link
-      (team-actions/teams-get)))))
+      (if (and (not (jwt/jwt)) (dis/id-token))
+        (do ;; id token given and not logged in
+          (let [claims (get-in body [:token-info :claims])
+                secure-uuid (:secure_uuid claims)
+                user-id (:user_id claims)
+                org-data (dis/org-data)
+                ws-link (utils/link-for (:links org-data) "changes")]
+            (when (and secure-uuid user-id org-data ws-link)
+              (ws-cc/reconnect ws-link user-id (:slug org-data) [])
+              (dis/dispatch! [:auth-settings body])
+              (utils/after 200 #(router/nav! (oc-urls/secure-activity (router/current-org-slug) secure-uuid))))))
+        (do
+          (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+            (api/get-user user-link (fn [data]
+              (dis/dispatch! [:user-data (json->cljs data)])
+              (utils/after 100 nux-actions/check-nux))))
+          (dis/dispatch! [:auth-settings body])
+          (check-user-walls)
+          ;; Start teams retrieve if we have a link
+          (team-actions/teams-get)))))))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))
@@ -194,7 +207,7 @@
     (jwt-actions/update-jwt body)
     (when (= status 201)
       (nux-actions/new-user-registered "email")
-      (api/get-entry-point (:org @router/path) entry-point-get-finished)
+      (api/get-entry-point (:org @router/path) (dis/id-token) entry-point-get-finished)
       (auth-settings-get))
     ;; Go to password setup
     (router/nav! oc-urls/confirm-invitation-password))
@@ -207,9 +220,9 @@
 
 ;; Token authentication
 (defn auth-with-token-success [token-type jwt]
-  (api/get-auth-settings
+  (api/get-auth-settings (dis/id-token)
    (fn [auth-body]
-     (api/get-entry-point (:org @router/path)
+     (api/get-entry-point (:org @router/path) (dis/id-token)
       (fn [success body]
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
@@ -257,8 +270,8 @@
           (empty? (:avatar-url jwt)))
       (do
         (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-        (api/get-entry-point (:org @router/path) entry-point-get-finished))
-      (api/get-entry-point (:org @router/path)
+        (api/get-entry-point (:org @router/path) (dis/id-token) entry-point-get-finished))
+      (api/get-entry-point (:org @router/path) (dis/id-token)
        (fn [success body]
          (entry-point-get-finished success body
            (fn [orgs collection]
@@ -269,7 +282,7 @@
       (jwt-actions/update-jwt-cookie jwt)
       (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-      (api/get-entry-point (:org @router/path) entry-point-get-finished)
+      (api/get-entry-point (:org @router/path) (dis/id-token) entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
 
 (defn signup-with-email-callback

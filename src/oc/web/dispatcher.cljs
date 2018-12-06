@@ -131,11 +131,12 @@
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
-   :user-settings        [[:base] (fn [base] (:user-settings base))]
+   :user-settings       [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
+   :id-token            [[:base] (fn [base] (:id-token base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
@@ -265,11 +266,11 @@
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :fullscreen-post-data [[:base :org-data :activity-data :activity-share
-                           :add-comment-focus :ap-initial-at :comments-data
+                           :add-comment-focus :ap-initial-at :id-token :comments-data
                            :show-sections-picker :section-editing :activities-read]
                           (fn [base org-data activity-data activity-share
-                               add-comment-focus ap-initial-at comments-data
-                               show-sections-picker section-editing activities-read]
+                               add-comment-focus ap-initial-at id-token comments-data
+                               show-sections-picker section-editing activities-read id-token]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-share activity-share
@@ -318,11 +319,11 @@
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at :id-token
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :jwt :wrt-show]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
-                                 ap-initial-at show-section-editor show-section-add show-sections-picker
+                                 ap-initial-at id-token show-section-editor show-section-add show-sections-picker
                                  entry-editing mobile-menu-open jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
@@ -338,6 +339,7 @@
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
                                :ap-initial-at ap-initial-at
+                               :id-token id-token
                                :show-section-editor show-section-editor
                                :show-section-add show-section-add
                                :show-section-add-cb (:show-section-add-cb base)
@@ -388,6 +390,11 @@
   "Get ap-initial-at."
   ([] (ap-initial-at @app-state))
   ([data] (:ap-initial-at data)))
+
+(defn id-token
+  "Get identifying token"
+  ([] (id-token @app-state))
+  ([data] (:id-token data)))
 
 (defn bot-access
   ""

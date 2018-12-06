@@ -126,7 +126,7 @@
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
-    (api/get-org org-link refresh-org-data-cb)))
+    (api/get-org (dis/id-token) org-link refresh-org-data-cb)))
 
 ;; Entry
 (defn get-entry-cache-key
@@ -603,6 +603,17 @@
 
 ;; WRT read
 
+(defn send-secure-item-read []
+  (let [activity-data (dis/secure-activity-data)
+        activity-id (:uuid activity-data)
+        container-id (:board-uuid activity-data)
+        claims (:claims (:token-info (dis/auth-settings)))
+        user-name (:user_id claims)
+        avatar-url (:avatar_url claims)
+        org-id (:org_id claims)]
+    (when (and org-id activity-id container-id user-name avatar-url)
+      (ws-cc/item-read org-id container-id activity-id user-name avatar-url))))
+
 (defn- send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
@@ -656,7 +667,7 @@
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success
                           (let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
-                            (api/get-org org-link
+                            (api/get-org (dis/id-token) org-link
                               (fn [{:keys [status body success]}]
                                 (let [api-org-data (json->cljs body)]
                                   (dis/dispatch! [:org-loaded api-org-data false])

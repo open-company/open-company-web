@@ -4,6 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -75,6 +76,7 @@
                 container-data
                 posts-data
                 ap-initial-at
+                id-token
                 user-settings
                 org-settings-data
                 made-with-carrot-modal-data

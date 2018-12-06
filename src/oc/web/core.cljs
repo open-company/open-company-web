@@ -141,6 +141,7 @@
 
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)
+        has-id-param (contains? query-params :id)
         loading (or (and ;; if is board page
                          (not (contains? query-params :ap))
                          ;; if the board data are not present
@@ -159,10 +160,12 @@
                       (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
+                        :id-token (when has-id-param (:id query-params))
                         :org-settings org-settings
                         :user-settings user-settings
                         :bot-access bot-access}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
+    (timbre/debug "ID TOKEN:" has-id-param (:id query-params) (:id-token next-app-state))
+    (swap! dis/app-state merge next-app-state)))
 
 ;; Company list
 (defn org-handler [route target component params]

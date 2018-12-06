@@ -137,7 +137,6 @@
   (timbre/debug "Req:" (method-name method) (str endpoint path))
   (let [jwt (j/jwt)
         expired? (j/expired?)]
-    (timbre/debug jwt expired?)
     (go
      ;; sync refresh
      (when (and jwt expired?)
@@ -192,7 +191,7 @@
 ;; Report failed api request
 
 (defn- handle-missing-link [callee-name link callback & parameters]
-  (timbre/error "Hanling missing link:" callee-name ":" link)
+  (timbre/error "Handling missing link:" callee-name ":" link)
   (sentry/set-extra-context! (merge {:callee callee-name
                                      :link link
                                      :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
@@ -239,20 +238,22 @@
 
 ;; Entry point and Auth settings
 
-(defn get-entry-point [requested-org callback]
-  (let [entry-point-href (str "/" (when requested-org (str "?requested=" requested-org)))]
-    (storage-http http/get entry-point-href
-     nil
-     (fn [{:keys [success body]}]
-       (let [fixed-body (when success (json->cljs body))]
-         (callback success fixed-body))))))
+(defn get-entry-point [requested-org id-token callback]
+  (storage-http http/get "/"
+    {:query-params {:requested requested-org :id-token id-token}}
+    (fn [{:keys [success body]}]
+      (let [fixed-body (when success (json->cljs body))]
+        (callback success fixed-body)))))
 
-(defn get-auth-settings [callback]
-  (auth-http http/get "/"
-   {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
+(defn get-auth-settings [id-token callback]
+  (let [header-options {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
+        options (if id-token
+                  (assoc header-options :query-params {:id-token id-token})
+                  header-options)]
+  (auth-http http/get "/" options
    (fn [response]
      (let [body (if (:success response) (:body response) false)]
-       (callback body)))))
+       (callback body))))))
 
 ;; Subscription
 
@@ -263,11 +264,14 @@
 
 ;; Org
 
-(defn get-org [org-link callback]
+(defn get-org [id-token org-link callback]
   (if org-link
-    (storage-http (method-for-link org-link) (relative-href org-link)
-     {:headers (headers-for-link org-link)}
-     callback)
+    (let [params {:headers (headers-for-link org-link)}
+          token-params (when id-token (assoc params :query-params {:id-token id-token}))]
+      (storage-http (method-for-link org-link)
+                    (relative-href org-link)
+                    token-params
+                    callback))
     (handle-missing-link "get-org" org-link callback)))
 
 (defn patch-org [org-patch-link data callback]

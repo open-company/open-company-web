@@ -103,7 +103,7 @@
             (do
               (router/nav! (oc-urls/all-posts org-slug))
               (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
-                (api/get-org org-link
+                (api/get-org (dispatcher/id-token) org-link
                   (fn [{:keys [status body success]}]
                     (dispatcher/dispatch! [:org-loaded (json->cljs body)])))))
             (dispatcher/dispatch! [:section-delete org-slug section-slug])))
@@ -111,7 +111,7 @@
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
-    (api/get-org org-link
+    (api/get-org (dispatcher/id-token) org-link
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:org-loaded (json->cljs body)])))))
 
