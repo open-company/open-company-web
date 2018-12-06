@@ -812,13 +812,12 @@ div.cmail-outer {
         }
 
         div.saving-saved {
-          width: 40px;
-          height: 20px;
+          height: 35px;
           @include avenir_M();
           color: $light_ui_grey;
           font-size: 14px;
-          line-height: 20px;
-          margin: 10px 16px 0px 0px;
+          line-height: 46px;
+          margin: 0px 16px 0px 0px;
           float: right;
         }
 
