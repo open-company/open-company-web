@@ -96,40 +96,45 @@
           (.match trimmed-url loomr)))))
 
 (defn video-add-click [s]
-  (when (valid-video-url? @(::video-url s))
-    (let [video-data (get-video-data @(::video-url s))
-          dismiss-modal-cb (:dismiss-cb (first (:rum/args s)))]
-      (if (= :vimeo (:type video-data))
-        (get-vimeo-thumbnail s video-data)
-        (do
-          (dis/dispatch! [:input [:media-input :media-video] video-data])
-          (dismiss-modal-cb))))))
+  (let [video-data (get-video-data @(::video-url s))
+        dismiss-modal-cb (:dismiss-cb (first (:rum/args s)))]
+    (if (= :vimeo (:type video-data))
+      (get-vimeo-thumbnail s video-data)
+      (do
+        (dis/dispatch! [:input [:media-input :media-video] video-data])
+        (dismiss-modal-cb)))))
 
 (rum/defcs media-video-modal < rum/reactive
                                ;; Locals
                                (rum/local false ::dismiss)
                                (rum/local "" ::video-url)
+                               (rum/local false ::video-url-focused)
                                ;; Derivatives
                                (drv/drv :current-user-data)
                                ;; Mixins
                                first-render-mixin
-                               {:did-mount (fn [s]
-                                            (utils/after 100
-                                             #(when-let [input-field (rum/ref-node s "video-input")]
-                                                (.focus input-field)))
-                                            s)}
   [s {:keys [dismiss-modal-cb record-video-cb]}]
-  (let [current-user-data (drv/react s :current-user-data)]
+  (let [current-user-data (drv/react s :current-user-data)
+        valid-url (valid-video-url? @(::video-url s))]
     [:div.media-video-modal-container
-      [:button.mlb-reset.button.record-video-bt
-        {:on-click #(record-video-cb %)}
-        [:span.white-video-icon]
-        "Record a video"]
+      {:class (when @(::video-url-focused s) "video-url-focused")}
       [:input.media-video-modal-input
           {:type "text"
            :value @(::video-url s)
            :ref "video-input"
            :on-change #(reset! (::video-url s) (.. % -target -value))
-           :on-key-down #(when (= "Enter" (.-key %))
-                           (video-add-click s))
-           :placeholder "Or, paste a link..."}]]))
+           :on-focus #(reset! (::video-url-focused s) true)
+           :on-blur #(when (clojure.string/blank? @(::video-url s))
+                       (reset! (::video-url-focused s) false))
+           :placeholder "Paste link from Youtube, Vimeo, or Loom"}]
+      [:button.mlb-reset.embed-video-bt
+        {:class (when-not valid-url "disabled")
+         :on-click #(when valid-url
+                      (video-add-click s))}
+        "Embed video"]
+      [:span.middle-or
+        "Or"]
+      [:button.mlb-reset.record-video-bt
+        {:on-click #(record-video-cb %)}
+        [:span.white-video-icon]
+        "Record a video"]]))

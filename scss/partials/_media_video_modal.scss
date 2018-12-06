@@ -1,15 +1,92 @@
 div.media-video-modal-container {
   position: absolute;
-  top: -134px;
-  left: -40px;
+  top: -98px;
+  left: -129px;
   z-index: #{$navbar_zindex + 126};
-  width: 194px;
-  height: 122px;
+  width: 550px;
+  height: 72px;
   background-color: white;
   border: 1px solid $deep_tan;
   border-radius: 6px;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.10);
   padding: 16px;
+
+  &.video-url-focused {
+    input {
+      width: 396px;
+      border-top: 1px solid rgba(177,184,192,0.50);
+      border-left: 1px solid rgba(177,184,192,0.50);
+      border-bottom: 1px solid rgba(177,184,192,0.50);
+      border-right: none;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+
+    span.middle-or {
+      opacity: 0;
+    }
+
+    button.embed-video-bt {
+      display: block;
+    }
+
+    button.record-video-bt {
+      display: none;
+    }
+  }
+
+  input {
+    width: 307px;
+    height: 40px;
+    border-radius: 4px;
+    background-color: white;
+    border: 1px solid rgba(177,184,192,0.50);
+    padding: 10px 17px;
+    @include avenir_R();
+    font-size: 14px;
+    line-height: 24px;
+    color: $deep_navy;
+    outline: none;
+    padding: 9px 12px;
+    float: left;
+
+    @include placeholder(){
+      color: $carrot_light_gray;
+    }
+  }
+
+  span.middle-or {
+    @include avenir_R();
+    font-size: 14px;
+    color: $deep_navy;
+    margin-left: 16px;
+    margin-right: 16px;
+    line-height: 40px;
+    opacity: 0.5;
+    vertical-align: middle;
+    float: left;
+  }
+
+  button.embed-video-bt {
+    display: none;
+
+    width: 120px;
+    height: 40px;
+    background-color: $carrot_green;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    color: white;
+    @include avenir_H();
+    font-size: 14px;
+    float: left;
+
+    &.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
 
   button.record-video-bt {
     width: 160px;
@@ -22,6 +99,7 @@ div.media-video-modal-container {
     align-items: center;
     @include avenir_H();
     font-size: 14px;
+    float: left;
 
     span.white-video-icon {
       width: 18px;
@@ -31,26 +109,6 @@ div.media-video-modal-container {
       background-size: 18px 12px;
       background-repeat: no-repeat;
       margin-right: 6px;
-    }
-  }
-
-  input {
-    width: 160px;
-    height: 40px;
-    border-radius: 4px;
-    background-color: white;
-    border: 1px solid rgba(177,184,192,0.50);
-    padding: 10px 17px;
-    @include avenir_R();
-    font-size: 14px;
-    line-height: 24px;
-    color: $deep_navy;
-    outline: none;
-    padding: 9px 12px;
-    margin-top: 8px;
-
-    @include placeholder(){
-      color: $carrot_light_gray;
     }
   }
 }
