@@ -92,7 +92,7 @@
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
-        is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
+        is-all-posts (= (router/current-board-slug) "all-posts")
         is-must-see (= (router/current-board-slug) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")

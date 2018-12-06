@@ -112,12 +112,16 @@
 ;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
-        is-all-posts (or (:from-all-posts @router/path)
-                         (= (router/current-board-slug) "all-posts"))
+        is-all-posts (= (router/current-board-slug) "all-posts")
+        is-must-see (= (router/current-board-slug) "must-see")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))]
     (dis/dispatch! [:org-loaded org-data])
-    (if is-all-posts
+    (cond
+      is-all-posts
       (all-posts-get org-data (:ap-initial-at @dis/app-state))
+      is-must-see
+      (must-see-get org-data)
+      :else
       (sa/section-get (utils/link-for (:links board-data) "self" "GET")))))
 
 (defn refresh-org-data []
@@ -155,51 +159,6 @@
        (when (fn? completed-cb)
          (completed-cb))))))
 
-(defn activity-modal-fade-in
-  [activity-data & [editing item-load-cb dismiss-on-editing-end]]
-  (let [org (router/current-org-slug)
-        board (:board-slug activity-data)
-        activity-uuid (:uuid activity-data)
-        to-url (oc-urls/entry board activity-uuid)]
-    (.pushState (.-history js/window) #js {} "" to-url)
-    (router/set-route! [org board activity-uuid "activity"]
-     {:org org
-      :board board
-      :activity activity-uuid
-      :previous-board (router/current-board-slug)
-      :query-params (dissoc (:query-params @router/path) :ap-initial-at)
-      :from-all-posts (= (router/current-board-slug) "all-posts")}))
-  (when editing
-    (utils/after 100 #(load-cached-item activity-data :modal-editing-data item-load-cb)))
-  (dis/dispatch! [:activity-modal-fade-in activity-data editing dismiss-on-editing-end]))
-
-(defn activity-modal-fade-out
-  [activity-board-slug]
-  (let [from-all-posts (:from-all-posts @router/path)
-        previous-board-slug (:previous-board @router/path)
-        to-board (cond
-                   ;; If user was in AP go back there
-                   from-all-posts "all-posts"
-                   ;; if the previous position is set use it
-                   (seq previous-board-slug) previous-board-slug
-                   ;; use the passed activity board slug if present
-                   (seq activity-board-slug) activity-board-slug
-                   ;; fallback to the current board slug
-                   :else (router/current-board-slug))
-        org (router/current-org-slug)
-        to-url (if from-all-posts
-                (oc-urls/all-posts org)
-                (oc-urls/board org to-board))]
-    (.pushState (.-history js/window) #js {} "" to-url)
-    (router/set-route! [org to-board (if from-all-posts "all-posts" "dashboard")]
-     {:org org
-      :board to-board
-      :activity nil
-      :previous-board nil
-      :query-params (:query-params @router/path)
-      :from-all-posts false}))
-  (dis/dispatch! [:activity-modal-fade-out activity-board-slug]))
-
 (defn- edit-open-cookie []
   (str "edit-open-" (jwt/user-id) "-" (:slug (dis/org-data))))
 
@@ -212,12 +171,15 @@
   []
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
-    (utils/after 1 #(let [from-all-posts (or
-                                          (:from-all-posts @router/path)
-                                          (= (router/current-board-slug) "all-posts"))]
+    (utils/after 1 #(let [is-all-posts (= (router/current-board-slug) "all-posts")
+                          is-must-see (= (router/current-board-slug) "must-see")]
                       (router/nav!
-                        (if from-all-posts ; AP
+                        (cond
+                          is-all-posts ; AP
                           (oc-urls/all-posts (router/current-org-slug))
+                          is-must-see
+                          (oc-urls/must-see (router/current-org-slug))
+                          :else
                           (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))

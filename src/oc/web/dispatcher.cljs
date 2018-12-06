@@ -272,7 +272,6 @@
                                show-sections-picker section-editing activities-read]
                             {:org-data org-data
                              :activity-data activity-data
-                             :activity-modal-fade-in (:activity-modal-fade-in base)
                              :activity-share activity-share
                              :add-comment-focus add-comment-focus
                              :comments-data comments-data

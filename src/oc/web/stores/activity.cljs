@@ -5,18 +5,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-(defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ activity-data editing dismiss-on-editing-end]]
-  (if (get-in db [:search-active])
-    db
-    (assoc db :activity-modal-fade-in (:uuid activity-data))))
-
-(defmethod dispatcher/action :activity-modal-fade-out
-  [db [_ board-slug]]
-  (if (get-in db [:search-active])
-    db
-    (dissoc db :activity-modal-fade-in)))
-
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
   (-> db
