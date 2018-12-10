@@ -393,7 +393,7 @@ div.cmail-outer {
 
         div.must-see-tag {
           float: left;
-          margin-left: 16px;
+          margin-left: 12px;
         }
 
         div.sections-picker {
@@ -416,7 +416,7 @@ div.cmail-outer {
             height: 20px;
 
             .tooltip {
-              margin-top: -16px;
+              width: 97px;
             }
 
             &.on {
@@ -686,7 +686,7 @@ div.cmail-outer {
           height: 40px;
           @include avenir_B();
           font-size: 14px;
-          border-radius: 100px;
+          border-radius: 6px;
           margin-right: 24px;
           float: left;
 
@@ -709,7 +709,7 @@ div.cmail-outer {
           width: 1px;
           height: 16px;
           margin-top: 12px;
-          background-color: $light_ui_grey;
+          background-color: #E1E2E4;
           float: left;
           margin-right: 24px;
         }
@@ -724,8 +724,7 @@ div.cmail-outer {
 
         div.emoji-picker {
           float: left;
-          margin-left: 16px;
-          margin-right: 16px;
+          margin-left: 8px;
           margin-top: 8px;
 
           button.emoji-button {
@@ -813,13 +812,12 @@ div.cmail-outer {
         }
 
         div.saving-saved {
-          width: 40px;
-          height: 20px;
+          height: 35px;
           @include avenir_M();
           color: $light_ui_grey;
-          font-size: 12px;
-          line-height: 20px;
-          margin: 10px 16px 0px 0px;
+          font-size: 14px;
+          line-height: 46px;
+          margin: 0px 16px 0px 0px;
           float: right;
         }
 

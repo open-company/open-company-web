@@ -398,7 +398,8 @@
              show-placeholder
              upload-progress-cb
              multi-picker-container-selector
-             dispatch-input-key]}]
+             dispatch-input-key
+             start-video-recording-cb]}]
   [:div.rich-body-editor-container
     (when multi-picker-container-selector
       (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]
@@ -407,7 +408,10 @@
           {:toggle-button-id default-mutli-picker-button-id
            :add-photo-cb #(add-photo s nil)
            :add-video-cb #(add-video s nil)
-           :add-attachment-cb #(add-attachment s nil)})
+           :add-attachment-cb #(add-attachment s nil)
+           :start-video-recording-cb #(do
+                                        (.removeSelection (get-media-picker-extension s))
+                                        (start-video-recording-cb %))})
          multi-picker-container)))
     [:div.rich-body-editor.oc-mentions.oc-mentions-hover
       {:ref "body"
