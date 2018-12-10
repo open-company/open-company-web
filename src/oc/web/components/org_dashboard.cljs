@@ -29,7 +29,6 @@
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
-            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
@@ -222,10 +221,6 @@
         ;; cmail editor
         (when show-cmail
           (cmail))
-        ;; Media video modal for entry editing
-        (when (and media-input
-                   (:media-video media-input))
-          (media-video-modal))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
