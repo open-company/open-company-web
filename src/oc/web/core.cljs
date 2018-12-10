@@ -164,7 +164,6 @@
                         :org-settings org-settings
                         :user-settings user-settings
                         :bot-access bot-access}]
-    (timbre/debug "ID TOKEN:" has-id-param (:id query-params) (:id-token next-app-state))
     (swap! dis/app-state merge next-app-state)))
 
 ;; Company list

@@ -65,8 +65,9 @@
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
 (defn all-posts-get [org-data ap-initial-at]
-  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
+  (when (not (dis/id-token))
+    (when-let [activity-link (utils/link-for (:links org-data) "activity")]
+      (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at)))))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
@@ -507,8 +508,6 @@
   (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid]))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
-  ;; connect to websocket change service using identity token if success
-  ;; send wst
   (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
 (defn secure-activity-get []

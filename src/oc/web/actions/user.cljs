@@ -52,6 +52,7 @@
           (router/nav! oc-urls/sign-up-profile))))))
 
 ;; API Entry point
+(declare handle-id-token)
 (defn entry-point-get-finished
   ([success body] (entry-point-get-finished success body nil))
 
@@ -76,7 +77,14 @@
        (fn [orgs collection]
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-             (org-actions/get-org org-data)
+             (if (and (not (jwt/jwt)) (dis/id-token))
+               (org-actions/get-org-for-id-token
+                org-data
+                (fn [success]
+                  (if success
+                    (handle-id-token (dis/auth-settings))
+                    (notification-actions/show-notification (assoc utils/network-error :expire 0)))))
+               (org-actions/get-org org-data))
              (let [ap-initial-at (dis/ap-initial-at)
                    currently-logged-in (jwt/jwt)]
                (when-not (or (router/current-activity-id)
@@ -170,33 +178,34 @@
   (dis/dispatch! [:login-overlay-show login-type]))
 
 ;; Auth
+(defn handle-id-token [auth-settings]
+  ;; auth settings loaded
+  (when (and (not (jwt/jwt)) (dis/id-token))
+    ;; id token given and not logged in
+    (let [claims (get-in auth-settings [:token-info :claims])
+          secure-uuid (:secure_uuid claims)
+          user-id (:user_id claims)
+          org-data (dis/org-data)
+          ws-link (utils/link-for (:links org-data) "changes")]
+      (when (and secure-uuid user-id org-data ws-link)
+        (ws-cc/reconnect ws-link user-id (:slug org-data) [])
+        (utils/after 200 #(router/nav! (oc-urls/secure-activity (router/current-org-slug) secure-uuid)))))))
 
 (defn auth-settings-get
   "Entry point call for auth service."
   []
   (api/get-auth-settings (dis/id-token) (fn [body]
     (when body
-      ;; auth settings loaded
-      (if (and (not (jwt/jwt)) (dis/id-token))
-        (do ;; id token given and not logged in
-          (let [claims (get-in body [:token-info :claims])
-                secure-uuid (:secure_uuid claims)
-                user-id (:user_id claims)
-                org-data (dis/org-data)
-                ws-link (utils/link-for (:links org-data) "changes")]
-            (when (and secure-uuid user-id org-data ws-link)
-              (ws-cc/reconnect ws-link user-id (:slug org-data) [])
-              (dis/dispatch! [:auth-settings body])
-              (utils/after 200 #(router/nav! (oc-urls/secure-activity (router/current-org-slug) secure-uuid))))))
-        (do
-          (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-            (api/get-user user-link (fn [data]
-              (dis/dispatch! [:user-data (json->cljs data)])
+        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+          (api/get-user user-link (fn [data]
+            (dis/dispatch! [:user-data (json->cljs data)])
               (utils/after 100 nux-actions/check-nux))))
-          (dis/dispatch! [:auth-settings body])
-          (check-user-walls)
-          ;; Start teams retrieve if we have a link
-          (team-actions/teams-get)))))))
+        (dis/dispatch! [:auth-settings body])
+        (if (and (not (jwt/jwt)) (dis/id-token))
+          (handle-id-token body)
+          (check-user-walls))
+        ;; Start teams retrieve if we have a link
+        (team-actions/teams-get)))))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))
