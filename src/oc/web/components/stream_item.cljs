@@ -304,6 +304,6 @@
               (when (pos? (count comments-data))
                 [:div.stream-comments-title.mobile-only
                   (str (count comments-data) " Comment" (when (not= (count comments-data) 1) "s"))])
+              (stream-comments activity-data comments-data true)
               (when (:can-comment activity-data)
-                (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))
-              (stream-comments activity-data comments-data true)]])]))
+                (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]])]))
