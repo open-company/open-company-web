@@ -65,7 +65,7 @@
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
 (defn all-posts-get [org-data ap-initial-at]
-  (when (not (dis/id-token))
+  (when (or (jwt/jwt) (not (dis/id-token)))
     (when-let [activity-link (utils/link-for (:links org-data) "activity")]
       (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at)))))
 
