@@ -3,7 +3,7 @@ div.add-comment-box-container {
   width: 100%;
 
   @include tablet() {
-    padding: 16px 0px 0px;
+    padding: 0;
     width: 100%;
     position: relative;
   }

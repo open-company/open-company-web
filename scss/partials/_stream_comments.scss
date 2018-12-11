@@ -81,6 +81,10 @@ div.stream-comments {
             &:hover, &:hover, &.active {
               opacity: 1;
             }
+
+            @include tablet() {
+              display: block;
+            }
           }
 
           div.stream-comment-more-menu {
