@@ -268,6 +268,9 @@
                 (if expanded?
                   "Show less"
                   "Show more")]
+              [:div.stream-item-comments-summary
+                {:on-click #(expand s true true)}
+                (comments-summary activity-data true)]
               (when-not is-mobile?
                 (reactions activity-data))
               (if is-mobile?
@@ -292,10 +295,7 @@
                     (when (pos? (count (:attachments activity-data)))
                       [:div.mobile-summary-attachments
                         [:span.attachments-icon]
-                        [:span.attachments-count (count (:attachments activity-data))]])])
-                [:div.stream-item-comments-summary
-                  {:on-click #(expand s true true)}
-                  (comments-summary activity-data true)])])]
+                        [:span.attachments-count (count (:attachments activity-data))]])]))])]
         (when (and expanded?
                    (:has-comments activity-data))
           [:div.stream-body-right

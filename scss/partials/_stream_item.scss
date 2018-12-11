@@ -531,19 +531,27 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         margin-top: 4px;
-        float: right;
+        float: left;
         cursor: pointer;
+
+        @include tablet() {
+          display: none;
+        }
       }
 
       div.reactions {
-        float: right;
+        float: left;
         margin-top: 4px;
+
+        @include tablet() {
+          float: right;
+        }
 
         div.reactions-picker-container {
           div.emoji-mart {
-            bottom: -26px;
-            right: 44px;
-            left: unset;
+            bottom: unset;
+            top: 0;
+            left: calc(100% + 8px);
 
             @include mobile(){
               bottom: unset;
@@ -559,23 +567,24 @@ div.stream-item {
       }
 
       button.expand-button {
-        width: 134px;
+        width: auto;
         height: 24px;
         color: $carrot_green;
         @include avenir_H();
         font-size: 14px;
         text-align: left;
         display: none;
-        padding: 6px 7px 0px 22px;
+        padding: 6px 0 0 22px;
         position: relative;
         overflow: visible;
-        float: left;
+        float: right;
 
         @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
 
         @include mobile() {
-          width: auto;
           margin-right: 24px;
+          float: left;
+          padding: 6px 7px 0px 22px;
         }
 
         &:before {
@@ -604,7 +613,15 @@ div.stream-item {
 
   div.stream-body-right {
     position: relative;
-    margin-top: 16px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid $ultra_light_grey;
+
+    @include tablet(){
+      border-top: none;
+      margin-top: 16px;
+      padding-top: 0;
+    }
 
     div.stream-body-comments {
       height: 100%;
