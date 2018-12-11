@@ -9,7 +9,7 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment {
-      padding: 0px 0px 24px;
+      padding: 0px 0px 16px;
 
       &:hover, &.showing-more-menu {
         div.stream-comment-header {
@@ -51,13 +51,12 @@ div.stream-comments {
 
           div.stream-comment-author-timestamp {
             @include avenir_R();
-            font-size: 14px;
+            font-size: 12px;
             color: $ui_grey;
             opacity: 0.5;
             float: left;
             margin-left: 8px;
             line-height: 14px;
-            text-transform: capitalize;
           }
         }
 

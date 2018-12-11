@@ -1,6 +1,7 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
+  margin-top: 16px;
 
   @include tablet() {
     padding: 0;
