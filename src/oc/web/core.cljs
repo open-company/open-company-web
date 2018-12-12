@@ -258,6 +258,7 @@
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
+    (check-nux query-params)
     (post-routing)
     ;; render component
     (drv-root component target)))
