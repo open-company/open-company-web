@@ -127,7 +127,7 @@
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
-    (api/get-org (dis/id-token) org-link refresh-org-data-cb)))
+    (api/get-org org-link refresh-org-data-cb)))
 
 ;; Entry
 (defn get-entry-cache-key
@@ -666,7 +666,7 @@
                       (fn [entry-data edit-key {:keys [success body status]}]
                         (if success
                           (let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
-                            (api/get-org (dis/id-token) org-link
+                            (api/get-org org-link
                               (fn [{:keys [status body success]}]
                                 (let [api-org-data (json->cljs body)]
                                   (dis/dispatch! [:org-loaded api-org-data false])

@@ -143,12 +143,12 @@
 (defn get-org [& [org-data]]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org (dis/id-token) org-link get-org-cb)))
+    (api/get-org org-link get-org-cb)))
 
 (defn get-org-for-id-token [org-data cb]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org (dis/id-token) org-link (fn [{:keys [status body success]}]
+    (api/get-org org-link (fn [{:keys [status body success]}]
       (let [org-data (json->cljs body)]
         (dis/dispatch! [:org-loaded org-data false nil])
         (cb success))))))

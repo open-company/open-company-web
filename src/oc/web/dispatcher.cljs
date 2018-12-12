@@ -319,11 +319,11 @@
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at :id-token
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
                             :mobile-menu-open :jwt :wrt-show]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
-                                 ap-initial-at id-token show-section-editor show-section-add show-sections-picker
+                                 ap-initial-at show-section-editor show-section-add show-sections-picker
                                  entry-editing mobile-menu-open jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
@@ -339,7 +339,6 @@
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
                                :ap-initial-at ap-initial-at
-                               :id-token id-token
                                :show-section-editor show-section-editor
                                :show-section-add show-section-add
                                :show-section-add-cb (:show-section-add-cb base)

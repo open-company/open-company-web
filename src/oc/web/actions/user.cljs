@@ -71,7 +71,7 @@
     (fn [{:keys [success body status]}]
       (when (= status 404)
         (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
-  (api/get-entry-point (:org @router/path) (dis/id-token)
+  (api/get-entry-point (:org @router/path)
    (fn [success body]
      (entry-point-get-finished success body
        (fn [orgs collection]
@@ -122,7 +122,7 @@
       (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))
 
 (defn lander-check-team-redirect []
-  (utils/after 100 #(api/get-entry-point (:org @router/path) (dis/id-token)
+  (utils/after 100 #(api/get-entry-point (:org @router/path)
     (fn [success body]
       (entry-point-get-finished success body
         (fn [orgs collection]
@@ -139,7 +139,7 @@
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
           (jwt-actions/update-jwt-cookie body)
-          (api/get-entry-point (:org @router/path) (dis/id-token)
+          (api/get-entry-point (:org @router/path)
            (fn [success body] (entry-point-get-finished success body login-redirect)))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
@@ -180,13 +180,15 @@
 ;; Auth
 (defn handle-id-token [auth-settings]
   ;; auth settings loaded
+  (timbre/debug "handle-id-token " (and (not (jwt/jwt)) (dis/id-token)))
   (when (and (not (jwt/jwt)) (dis/id-token))
     ;; id token given and not logged in
     (let [claims (get-in auth-settings [:token-info :claims])
-          secure-uuid (:secure_uuid claims)
-          user-id (:user_id claims)
+          secure-uuid (:secure-uuid claims)
+          user-id (:user-id claims)
           org-data (dis/org-data)
           ws-link (utils/link-for (:links org-data) "changes")]
+      (timbre/debug "handle-id-token: " secure-uuid user-id org-data ws-link)
       (when (and secure-uuid user-id org-data ws-link)
         (ws-cc/reconnect ws-link user-id (:slug org-data) [])
         (utils/after 200 #(router/nav! (oc-urls/secure-activity (router/current-org-slug) secure-uuid)))))))
@@ -194,7 +196,7 @@
 (defn auth-settings-get
   "Entry point call for auth service."
   []
-  (api/get-auth-settings (dis/id-token) (fn [body]
+  (api/get-auth-settings (fn [body]
     (when body
         (when-let [user-link (utils/link-for (:links body) "user" "GET")]
           (api/get-user user-link (fn [data]
@@ -216,7 +218,7 @@
     (jwt-actions/update-jwt body)
     (when (= status 201)
       (nux-actions/new-user-registered "email")
-      (api/get-entry-point (:org @router/path) (dis/id-token) entry-point-get-finished)
+      (api/get-entry-point (:org @router/path) entry-point-get-finished)
       (auth-settings-get))
     ;; Go to password setup
     (router/nav! oc-urls/confirm-invitation-password))
@@ -229,9 +231,9 @@
 
 ;; Token authentication
 (defn auth-with-token-success [token-type jwt]
-  (api/get-auth-settings (dis/id-token)
+  (api/get-auth-settings
    (fn [auth-body]
-     (api/get-entry-point (:org @router/path) (dis/id-token)
+     (api/get-entry-point (:org @router/path)
       (fn [success body]
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
@@ -279,8 +281,8 @@
           (empty? (:avatar-url jwt)))
       (do
         (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-        (api/get-entry-point (:org @router/path) (dis/id-token) entry-point-get-finished))
-      (api/get-entry-point (:org @router/path) (dis/id-token)
+        (api/get-entry-point (:org @router/path) entry-point-get-finished))
+      (api/get-entry-point (:org @router/path)
        (fn [success body]
          (entry-point-get-finished success body
            (fn [orgs collection]
@@ -291,7 +293,7 @@
       (jwt-actions/update-jwt-cookie jwt)
       (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-      (api/get-entry-point (:org @router/path) (dis/id-token) entry-point-get-finished)
+      (api/get-entry-point (:org @router/path) entry-point-get-finished)
       (dis/dispatch! [:signup-with-email/success]))))
 
 (defn signup-with-email-callback

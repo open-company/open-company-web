@@ -58,7 +58,9 @@
   (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
-  (if-let [jwt (j/jwt)]
+  (timbre/debug "PARAMS: " (j/jwt) (dispatcher/id-token))
+  (if-let [jwt (or (j/jwt)
+                   (dispatcher/id-token))]
     (-> {:with-credentials? false}
         (merge params)
         (update :headers merge {"Authorization" (str "Bearer " jwt)}))
@@ -238,19 +240,16 @@
 
 ;; Entry point and Auth settings
 
-(defn get-entry-point [requested-org id-token callback]
+(defn get-entry-point [requested-org callback]
   (storage-http http/get "/"
-    {:query-params {:requested requested-org :id-token id-token}}
+    {:query-params {:requested requested-org}}
     (fn [{:keys [success body]}]
       (let [fixed-body (when success (json->cljs body))]
         (callback success fixed-body)))))
 
-(defn get-auth-settings [id-token callback]
-  (let [header-options {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
-        options (if id-token
-                  (assoc header-options :query-params {:id-token id-token})
-                  header-options)]
-  (auth-http http/get "/" options
+(defn get-auth-settings [callback]
+  (let [header-options {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}]
+  (auth-http http/get "/" header-options
    (fn [response]
      (let [body (if (:success response) (:body response) false)]
        (callback body))))))
@@ -264,13 +263,12 @@
 
 ;; Org
 
-(defn get-org [id-token org-link callback]
+(defn get-org [org-link callback]
   (if org-link
-    (let [params {:headers (headers-for-link org-link)}
-          token-params (when id-token (assoc params :query-params {:id-token id-token}))]
+    (let [params {:headers (headers-for-link org-link)}]
       (storage-http (method-for-link org-link)
                     (relative-href org-link)
-                    token-params
+                    params
                     callback))
     (handle-missing-link "get-org" org-link callback)))
 
