@@ -1,120 +1,123 @@
 div.activity-removed-container {
+  position: absolute;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba($deep_navy, 0.7);
+  z-index: #{$navbar_zindex + 156};
 
-  div.activity-removed-wrapper {
+  @include tablet() {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    display: flex;
+  }
 
-    @include mobile(){
-      display: block;
+  div.activity-removed {
+    width: 360px;
+    // height: 400px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    text-align: center;
+
+    @include tablet() {
+      position: relative;
+      top: unset;
+      left: unset;
+      border-radius: 0;
+      box-shadow: none;
+      width: 100%;
+      height: 100%;
+      transform: none;
+      padding: 24px;
     }
 
-    div.activity-removed-left {
-      background-color: $carrot_dark_bg_gray;
-      padding: 21px;
-      flex: 1;
-      position: absolute;
-      position: fixed;
-      top: 0px;
-      bottom: 0px;
-      left: 0px;
-      width: 50%;
+    div.activity-removed-mobile-header {
+      display: none;
 
-      @include mobile(){
+      @include tablet() {
+        display: block;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 56px;
+        border-bottom: 1px solid #ECECEC;
+
+        button.activity-removed-mobile-close {
+          @include image-2x("/img/ML/mobile_modal_close");
+          width: 24px;
+          height: 24px;
+          background-repeat: no-repeat;
+          background-size: 14px 14px;
+          background-position: 5px 5px;
+          position: absolute;
+          top: 16px;
+          left: 16px;
+        }
+
+        div.activity-removed-mobile-header-logo {
+          width: 18px;
+          height: 32px;
+          background-image: cdnUrl("/img/ML/carrot_logo.svg");
+          background-size: 18px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
+          margin: 8px auto 0;
+        }
+      }
+    }
+
+    button.settings-modal-close {
+      right: -56px;
+      top: 0px;
+
+      @include tablet() {
         display: none;
       }
+    }
 
-      div.activity-removed-logo {
-        width: 82px;
-        height: 20px;
-        background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
-        background-size: 82px 20px;
-        background-repeat: no-repeat;
-      }
+    div.activity-removed-icon {
+      width: 140px;
+      height: 140px;
+      background-image: cdnUrl("/img/ML/sad_search.svg");
+      background-size: 140px 140px;
+      background-repeat: no-repeat;
+      background-position: center;
+      margin: 0 auto;
 
-      div.activity-removed-box {
-        position: absolute;
-        left: 50%;
-        top: 220px;
-        margin-left: -147px;
-        margin-top: 0px;
-        width: 294px;
-        height: 260px;
-        background-image: cdnUrl("/img/ML/sad_search.svg");
-        background-size: 294px 260px;
-        background-position: center;
-        background-repeat: no-repeat;
+      @include tablet() {
+        margin-top: 20vh;
       }
     }
 
-    div.activity-removed-right {
-      text-align: center;
-      flex: 1;
-      position: absolute;
-      top: 0px;
-      bottom: 0px;
-      right: 0px;
-      width: 50%;
+    div.activity-removed-title {
+      margin-top: 24px;
+      @include avenir_H();
+      font-size: 22px;
+      color: $deep_navy;
+    }
 
-      @include mobile(){
-        flex: unset;
-        width: 100%;
-        position: unset;
-      }
+    div.activity-removed-description {
+      margin-top: 4px;
+      @include avenir_R();
+      font-size: 16px;
+      color: $deep_navy;
+    }
 
-      div.activity-removed-right-content {
-        margin: calc(50vh - 135px) auto 0px;
-        width: 440px;
-        text-align: center;
-
-        @include mobile() {
-          width: 100%;
-          padding: 0px 24px;
-        }
-
-        div.info-icon {
-          width: 40px;
-          height: 40px;
-          margin: 0px auto;
-          background-image: cdnUrl("/img/ML/green_info_icon.svg");
-          background-size: 40px 40px;
-          background-repeat: no-repeat;
-          background-position: center;
-        }
-
-        div.content-title {
-          @include avenir_H();
-          font-size: 32px;
-          color: $deep_navy;
-          margin-top: 16px;
-        }
-
-        div.content-description {
-          @include avenir_R();
-          font-size: 18px;
-          color: $deep_navy;
-          max-width: 370px;
-          margin: 0 auto;
-        }
-
-        button.go-to-homepage-btn {
-          width: 340px;
-          height: 48px;
-          margin: 72px auto 0px;
-          background-color: $sea_blue;
-          color: white;
-          border-radius: 100px;
-          @include avenir_H();
-          font-size: 18px;
-
-          @include mobile() {
-            width: 100%;
-          }
-        }
-      }
+    button.activity-removed-button {
+      margin-top: 16px;
+      width: 152px;
+      height: 32px;
+      color: white;
+      border-radius: 6px;
+      background-color: $carrot_green;
+      @include avenir_H();
+      font-size: 14px;
     }
   }
+
 }
