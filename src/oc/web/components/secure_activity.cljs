@@ -1,19 +1,23 @@
 (ns oc.web.components.secure-activity
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.router :as router]
+            [oc.web.utils.activity :as au]
             [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar)]
+            [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -32,20 +36,23 @@
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
+                             (drv/drv :id-token)
+                             (drv/drv :comments-data)
                              ;; Locals
                              (rum/local 0 ::win-height)
                              (rum/local nil ::win-resize-listener)
-                             (rum/local true ::show-login-header)
                              (rum/local 0 ::mobile-video-height)
                              ;; Mixins
                              (ui-mixins/render-on-resize save-win-height)
-
-                             {:after-render (fn [s]
+                             (mention-mixins/oc-mentions-hover)
+                             {:did-mount (fn [s]
+                               (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                               s)
+                              :after-render (fn [s]
                                (activity-actions/send-secure-item-seen-read)
                                s)
                               :will-mount (fn [s]
                                (save-win-height s)
-                               (reset! (::show-login-header s) (not (jwt/jwt)))
                               s)}
   [s]
   (let [activity-data (drv/react s :secure-activity-data)
@@ -58,57 +65,45 @@
                        :height @(::mobile-video-height s)}
                       {:width 640
                        :height (utils/calc-video-height 640)}))
-        video-id (:fixed-video-id activity-data)]
+        video-id (:fixed-video-id activity-data)
+        id-token (drv/react s :id-token)
+        org-data (-> activity-data
+                  (select-keys [:org-slug :org-name :org-logo-url :org-logo-width :org-logo-height])
+                  (clojure.set/rename-keys {:org-slug :slug
+                                            :org-name :name
+                                            :org-logo-url :logo-url
+                                            :org-logo-width :logo-width
+                                            :org-logo-height :logo-height}))
+        comments-drv (drv/react s :comments-data)
+        comments-data (au/get-comments activity-data comments-drv)]
     [:div.secure-activity-container
       {:style {:min-height (when is-mobile?
                              (str (- win-height default-activity-header-height) "px"))}}
-      (when @(::show-login-header s)
-        [:div.secure-activity-login-header
-          [:button.mlb-reset.remove-header-bt
-            {:on-click #(reset! (::show-login-header s) false)}]
-          [:div.secure-activity-login-header-center
-            [:div.carrot-logo-copy]
-            [:div.separator]
-            [:div.signup-login-copy
-              "Want to create your own company digest? "
-              [:a
-                {:href oc-urls/sign-up
-                 :on-click #(do
-                              (.preventDefault %)
-                              (router/nav! oc-urls/sign-up))}
-                "Sign up"]
-              (str ". Are you part of the " (or (:org-name activity-data) "") " team? ")
-              [:a
-                {:href oc-urls/login
-                 :on-click #(do
-                              (.preventDefault %)
-                              (router/nav! oc-urls/login))}
-                "Sign in"]
-              "."]]
-          [:div.secure-activity-mobile-login-header
-            [:a
-              {:href oc-urls/home
-               :on-click #(do
-                           (utils/event-stop %)
-                           (router/redirect! oc-urls/home))}
-              "Learn more"]
-            " about Carrot or "
-            [:a
-              {:href oc-urls/login
-               :on-click #(do
-                           (utils/event-stop %)
-                           (router/redirect! oc-urls/login))}
-              "login to continue"]
-            "."]])
+      (login-overlays-handler)
       (when activity-data
         [:div.activity-header.group
-          {:class (when @(::show-login-header s) "showing-login-header")}
-          [:div.activity-header-title
-            {:dangerouslySetInnerHTML #js {:__html (:headline activity-data)}
-             :class utils/hide-class}]])
+          (org-avatar org-data true (if is-mobile? :never :always) (not is-mobile?))
+          (if id-token
+            [:div.activity-header-right
+              [:button.mlb-reset.login-as-bt
+                {:on-click #(user-actions/show-login :login-with-email)
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "bottom"
+                 :data-container "body"
+                 :title "Log in to view all posts"}
+                [:span
+                  [:span.login-as
+                    "Login as " (:first-name id-token)]
+                  (user-avatar-image id-token)]]]
+            [:div.activity-header-right
+              [:button.mlb-reset.learn-more-bt
+                {:on-click #(router/nav! oc-urls/home)}
+                "Learn more"]
+              [:button.mlb-reset.login-bt
+                {:on-click #(user-actions/show-login :login-with-email)}
+                "Login"]])])
       (when activity-data
         [:div.activity-content-outer
-          {:class (when @(::show-login-header s) "showing-login-header")}
           [:div.activity-content-header
             [:div.activity-content-header-author
               (user-avatar-image (:publisher activity-data))
@@ -123,8 +118,7 @@
                      :data-placement "top"
                      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/time-since t)])]]
-            [:div.activity-content-header-right]]
+                    (utils/time-since t)])]]]
           [:div.activity-content
             {:style {:min-height (when is-mobile?
                                   (str (- win-height default-activity-header-height) "px"))}}
@@ -138,7 +132,7 @@
                               :height (:height video-size)
                               :video-processed (:video-processed activity-data)}))
             (when (:body activity-data)
-              [:div.activity-body
+              [:div.activity-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :class utils/hide-class}])
             (when (and ls/oc-enable-transcriptions
@@ -149,15 +143,19 @@
                   "This transcript was automatically generated and may not be accurate"]
                 [:div.activity-video-transcript-content
                   (:video-transcript activity-data)]])
-            (stream-attachments (:attachments activity-data))]])
+            (stream-attachments (:attachments activity-data))
+            (when comments-data
+              (stream-comments activity-data comments-data true))]])
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])
-      [:a.activity-content-footer
-        {:href oc-urls/home
-         :on-click #(do
-                     (utils/event-stop %)
-                     (router/redirect! oc-urls/home))}
-        [:div.activity-content-footer-inner
-          [:div.carrot-logo]
-          [:div.you-did-it "Made with Carrot"]]]]))
+      [:div.secure-activity-footer
+        [:button.mlb-reset.secure-activity-footer-bt
+          {:on-click #(if id-token
+                        (user-actions/show-login :login-with-email)
+                        (router/nav! oc-urls/home))}
+          [:span
+            (if id-token
+              "Log in to view all posts"
+              "Learn more about Carrot")
+            [:div.right-arrow]]]]]))
