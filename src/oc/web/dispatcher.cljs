@@ -270,7 +270,7 @@
                            :show-sections-picker :section-editing :activities-read]
                           (fn [base org-data activity-data activity-share
                                add-comment-focus ap-initial-at id-token comments-data
-                               show-sections-picker section-editing activities-read id-token]
+                               show-sections-picker section-editing activities-read]
                             {:org-data org-data
                              :activity-data activity-data
                              :activity-share activity-share

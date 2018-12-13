@@ -1,4 +1,5 @@
 (ns oc.web.actions.user
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -183,15 +184,14 @@
   (timbre/debug "handle-id-token " (and (not (jwt/jwt)) (dis/id-token)))
   (when (and (not (jwt/jwt)) (dis/id-token))
     ;; id token given and not logged in
-    (let [claims (get-in auth-settings [:token-info :claims])
-          secure-uuid (:secure-uuid claims)
-          user-id (:user-id claims)
-          org-data (dis/org-data)
-          ws-link (utils/link-for (:links org-data) "changes")]
+    (when-let* [claims (get-in auth-settings [:token-info :claims])
+                secure-uuid (:secure-uuid claims)
+                user-id (:user-id claims)
+                org-data (dis/org-data)
+                ws-link (utils/link-for (:links org-data) "changes")]
       (timbre/debug "handle-id-token: " secure-uuid user-id org-data ws-link)
-      (when (and secure-uuid user-id org-data ws-link)
-        (ws-cc/reconnect ws-link user-id (:slug org-data) [])
-        (utils/after 200 #(router/nav! (oc-urls/secure-activity (router/current-org-slug) secure-uuid)))))))
+      (ws-cc/reconnect ws-link user-id (:slug org-data) [])
+      (utils/after 200 #(router/nav! (oc-urls/secure-activity (router/current-org-slug) secure-uuid))))))
 
 (defn auth-settings-get
   "Entry point call for auth service."
