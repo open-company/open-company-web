@@ -1,5 +1,4 @@
 (ns oc.web.actions.user
-  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -18,7 +17,6 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.ws.notify-client :as ws-nc]
-            [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;;User walls
@@ -53,7 +51,6 @@
           (router/nav! oc-urls/sign-up-profile))))))
 
 ;; API Entry point
-(declare handle-id-token)
 (defn entry-point-get-finished
   ([success body] (entry-point-get-finished success body nil))
 
@@ -78,15 +75,8 @@
        (fn [orgs collection]
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-             (if (and (not (jwt/jwt)) (dis/id-token))
-               (org-actions/get-org-for-id-token
-                org-data
-                (fn [success]
-                  (if success
-                    (handle-id-token (dis/auth-settings))
-                    (notification-actions/show-notification (assoc utils/network-error :expire 0)))))
-               (org-actions/get-org org-data))
-             (let [ap-initial-at (dis/ap-initial-at)
+             (org-actions/get-org org-data)
+             (let [ap-initial-at (:ap-initial-at @dis/app-state)
                    currently-logged-in (jwt/jwt)]
                (when-not (or (router/current-activity-id)
                              ap-initial-at)
@@ -179,35 +169,21 @@
   (dis/dispatch! [:login-overlay-show login-type]))
 
 ;; Auth
-(defn handle-id-token [auth-settings]
-  ;; auth settings loaded
-  (timbre/debug "handle-id-token " (and (not (jwt/jwt)) (dis/id-token)))
-  (when (and (not (jwt/jwt)) (dis/id-token))
-    ;; id token given and not logged in
-    (when-let* [claims (get-in auth-settings [:token-info :claims])
-                secure-uuid (:secure-uuid claims)
-                user-id (:user-id claims)
-                org-data (dis/org-data)
-                ws-link (utils/link-for (:links org-data) "changes")]
-      (timbre/debug "handle-id-token: " secure-uuid user-id org-data ws-link)
-      (ws-cc/reconnect ws-link user-id (:slug org-data) [])
-      (utils/after 200 #(router/nav! (oc-urls/secure-activity (router/current-org-slug) secure-uuid))))))
 
 (defn auth-settings-get
   "Entry point call for auth service."
   []
   (api/get-auth-settings (fn [body]
     (when body
-        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-          (api/get-user user-link (fn [data]
-            (dis/dispatch! [:user-data (json->cljs data)])
-              (utils/after 100 nux-actions/check-nux))))
-        (dis/dispatch! [:auth-settings body])
-        (if (and (not (jwt/jwt)) (dis/id-token))
-          (handle-id-token body)
-          (check-user-walls))
-        ;; Start teams retrieve if we have a link
-        (team-actions/teams-get)))))
+      ;; auth settings loaded
+      (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+        (api/get-user user-link (fn [data]
+          (dis/dispatch! [:user-data (json->cljs data)])
+          (utils/after 100 nux-actions/check-nux))))
+      (dis/dispatch! [:auth-settings body])
+      (check-user-walls)
+      ;; Start teams retrieve if we have a link
+      (team-actions/teams-get)))))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))

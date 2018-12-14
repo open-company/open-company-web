@@ -246,16 +246,18 @@
      {:org org
       :secure-id secure-id
       :query-params query-params})
-    ;; do we have the company data already?
-    (when (or ;; if the company data are not present
-              (not (dis/board-data))
-              ;; or the entries key is missing that means we have only
-              (not (:posts-list (dis/board-data)))
-              ;; a subset of the company data loaded with a SU
-              (not (dis/secure-activity-data)))
-      (swap! dis/app-state merge {:loading true}))
-    (post-routing)
-    ;; render component
+    (let [initial-app-state {:id-token (:id query-params)}
+          ;; do we have the company data already?
+          app-state (when (or ;; if the company data are not present
+                           (not (dis/board-data))
+                           ;; or the entries key is missing that means we have only
+                           (not (:posts-list (dis/board-data)))
+                           ;; a subset of the company data loaded with a SU
+                           (not (dis/secure-activity-data)))
+                      (assoc initial-app-state :loading true))]
+      (swap! dis/app-state merge app-state))
+    (routing-actions/routing @router/path)
+    ;; render and start data requests from component
     (drv-root component target)))
 
 ;; Component specific to a team settings

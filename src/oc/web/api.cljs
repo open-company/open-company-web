@@ -58,7 +58,6 @@
   (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
-  (timbre/debug "PARAMS: " (j/jwt) (dispatcher/id-token))
   (if-let [jwt (or (j/jwt)
                    (dispatcher/id-token))]
     (-> {:with-credentials? false}

@@ -15,6 +15,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (def initial-revision (atom {}))
@@ -65,9 +66,8 @@
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
 (defn all-posts-get [org-data ap-initial-at]
-  (when (or (jwt/jwt) (not (dis/id-token)))
-    (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-      (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at)))))
+  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
+      (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
@@ -510,8 +510,58 @@
 (defn secure-activity-get-finish [{:keys [status success body]}]
   (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
 
+
+(defn get-org-for-id-token [org-data cb]
+  (let [fixed-org-data (or org-data (dis/org-data))
+        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
+    (api/get-org org-link (fn [{:keys [status body success]}]
+      (let [org-data (json->cljs body)]
+        (dis/dispatch! [:org-loaded org-data false nil])
+        (cb success))))))
+
+(defn- handle-id-token [auth-settings]
+  ;; auth settings loaded
+  (when (and (not (jwt/jwt)) (dis/id-token))
+    ;; id token given and not logged in
+    (when-let* [claims (get-in auth-settings [:token-info :claims])
+                secure-uuid (:secure-uuid claims)
+                user-id (:user-id claims)
+                org-data (dis/org-data)
+                ws-link (utils/link-for (:links org-data) "changes")]
+      (ws-cc/reconnect ws-link user-id (:slug org-data) []))))
+
 (defn secure-activity-get []
-  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+  (api/web-app-version-check
+    (fn [{:keys [success body status]}]
+      (when (= status 404)
+        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
+  (let [org-slug (router/current-org-slug)]
+    (api/get-auth-settings (fn [body]
+      (when body
+        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+          (api/get-user user-link (fn [data]
+            (dis/dispatch! [:user-data (json->cljs data)]))))
+        (dis/dispatch! [:auth-settings body])
+        (api/get-entry-point org-slug
+          (fn [success body]
+            (let [collection (:collection body)]
+              (if success
+                (let [orgs (:items collection)]
+                  (dis/dispatch! [:entry-point orgs collection])
+                  (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+                    (if (and (not (jwt/jwt)) (dis/id-token))
+                      (get-org-for-id-token
+                       org-data
+                       (fn [success]
+                         (if success
+                           (do
+                             (handle-id-token (dis/auth-settings))
+                             (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish))
+                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))
+                      (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish))
+                    (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish)))
+                (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
+
 
 ;; Change reaction
 
@@ -605,11 +655,13 @@
 (defn send-secure-item-read []
   (when-let* [activity-data (dis/secure-activity-data)
               activity-id (:uuid activity-data)
+              publisher-id (:user-id (:publisher activity-data))
               container-id (:board-uuid activity-data)
               claims (:claims (:token-info (dis/auth-settings)))
-              user-name (:user_id claims)
-              avatar-url (:avatar_url claims)
-              org-id (:org_id claims)]
+              user-name (:user-id claims)
+              avatar-url (:avatar-url claims)
+              org-id (:uuid (dis/org-data))]
+    (ws-cc/item-seen publisher-id container-id activity-id)
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (defn- send-item-read
