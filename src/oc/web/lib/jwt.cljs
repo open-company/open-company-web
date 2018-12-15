@@ -5,8 +5,7 @@
             [goog.date :as gd]
             [cljsjs.jwt-decode]))
 
-(defn jwt []
-  (cook/get-cookie :jwt))
+;; jwt_decode
 
 (defn decode [encoded-jwt]
   (when (exists? js/jwt_decode)
@@ -15,6 +14,19 @@
       (catch js/Object e
         (timbre/warn "Failed attempt to decode JWT:" encoded-jwt)
         nil))))
+
+;; ID Token
+
+(defn id-token []
+  (cook/get-cookie :id-token))
+
+(defn get-id-token-contents []
+  (some-> (id-token) decode (js->clj :keywordize-keys true)))
+
+;; JWT
+
+(defn jwt []
+  (cook/get-cookie :jwt))
 
 (defn get-contents []
   (some-> (jwt) decode (js->clj :keywordize-keys true)))

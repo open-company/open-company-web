@@ -15,3 +15,13 @@
                   db)]
     (timbre/debug jwt-data)
     (assoc next-db :jwt jwt-data)))
+
+
+(defmethod dispatcher/action :id-token
+  [db [_]]
+  (let [jwt-data (j/get-id-token-contents)
+        next-db (if (cook/get-cookie :show-login-overlay)
+                  (assoc db dispatcher/show-login-overlay-key (keyword (cook/get-cookie :show-login-overlay)))
+                  db)]
+    (timbre/debug jwt-data)
+    (assoc next-db :id-token jwt-data)))

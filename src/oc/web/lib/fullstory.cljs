@@ -5,10 +5,15 @@
 
 (defn identify []
   (when (and (exists? js/FS)
-             (jwt/user-id))
-    (let [user-data (jwt/get-contents)]
+             (or (jwt/jwt)
+                 (jwt/id-token)))
+    (let [is-id-token? (jwt/id-token)
+          user-data (if is-id-token?
+                      (jwt/get-id-token-contents)
+                      (jwt/get-contents))]
       (.identify js/FS (:user-id user-data)
        (clj->js {:displayName (or (:name user-data) (str (:first-name user-data) " " (:last-name user-data)))
+                 :securePostId (boolean is-id-token?)
                  :email (:email user-data)})))))
 
 (defn track-org [org-data]
