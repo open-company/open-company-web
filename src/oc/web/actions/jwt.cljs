@@ -21,6 +21,24 @@
      (router/redirect! location)
      (dis/dispatch! [:logout])))
 
+;; ID Token
+
+(defn dispatch-id-token []
+  (when-let [id-token-contents (jwt/get-id-token-contents)]
+    (utils/after 1 #(dis/dispatch! [:id-token id-token-contents]))
+    ;; User identifications for third party services
+    (when id-token-contents
+      (fullstory/identify))))
+
+(defn update-id-token-cookie [id-token]
+  (cook/set-cookie! :id-token id-token -1 "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+
+(defn update-id-token [token-body]
+  (timbre/info "Updating id-token:" token-body)
+  (when token-body
+    (update-id-token-cookie token-body)
+    (dispatch-id-token)))
+
 ;; JWT
 
 (defn update-jwt-cookie [jwt]
@@ -39,7 +57,7 @@
       (fullstory/identify))))
 
 (defn update-jwt [jbody]
-  (timbre/info jbody)
+  (timbre/info "Updating jwt:" jbody)
   (when jbody
     (update-jwt-cookie jbody)
     (dispatch-jwt)))
