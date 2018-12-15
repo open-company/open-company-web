@@ -41,10 +41,9 @@
                              (ui-mixins/render-on-resize save-win-height)
 
                              {:after-render (fn [s]
-                               (activity-actions/send-secure-item-read)
+                               (activity-actions/send-secure-item-seen-read)
                                s)
                               :will-mount (fn [s]
-                               (utils/after 100 #(activity-actions/secure-activity-get))
                                (save-win-height s)
                                (reset! (::show-login-header s) (not (jwt/jwt)))
                               s)}
