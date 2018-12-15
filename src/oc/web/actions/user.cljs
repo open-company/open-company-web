@@ -14,6 +14,7 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.ws.notify-client :as ws-nc]
@@ -74,21 +75,25 @@
      (entry-point-get-finished success body
        (fn [orgs collection]
          (if org-slug
-           (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-             (org-actions/get-org org-data)
-             (let [ap-initial-at (:ap-initial-at @dis/app-state)
-                   currently-logged-in (jwt/jwt)]
+           (let [org-data (first (filter #(= (:slug %) org-slug) orgs))
+                 ap-initial-at (:ap-initial-at @dis/app-state)]
+             (cond
+               ;; If the entry-point returned an org, let's load it
+               org-data
+               (org-actions/get-org org-data)
+               ;; if the user is looking at a secure post let's load it
+               (router/current-secure-activity-id)
+               (activity-actions/secure-activity-get)
+               ;; else check if we need to 404
+               :else
                (when-not (or (router/current-activity-id)
                              ap-initial-at)
-                 ;; 404 only if the user is not looking at a secure post page
-                 ;; if so the entry point response can not include the specified org
-                 (when-not (router/current-secure-activity-id)
-                   ;; avoid infinite loop of the Go to digest button
-                   ;; by changing the value of the last visited slug
-                   (if (pos? (count orgs))
-                     (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
-                     (cook/remove-cookie! (router/last-org-cookie)))
-                   (router/redirect-404!)))))
+                 ;; avoid infinite loop of the Go to digest button
+                 ;; by changing the value of the last visited slug
+                 (if (pos? (count orgs))
+                   (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+                   (cook/remove-cookie! (router/last-org-cookie)))
+                 (router/redirect-404!))))
            (when (and (jwt/jwt)
                       (utils/in? (:route @router/path) "login")
                       (pos? (count orgs)))
