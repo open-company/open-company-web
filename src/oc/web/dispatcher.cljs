@@ -136,7 +136,6 @@
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
-   :id-token            [[:base] (fn [base] (:id-token base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
@@ -265,18 +264,6 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :fullscreen-post-data [[:base :org-data :activity-data :activity-share
-                           :add-comment-focus :ap-initial-at :id-token :comments-data
-                           :show-sections-picker :section-editing :activities-read]
-                          (fn [base org-data activity-data activity-share
-                               add-comment-focus ap-initial-at id-token comments-data
-                               show-sections-picker section-editing activities-read]
-                            {:org-data org-data
-                             :activity-data activity-data
-                             :activity-share activity-share
-                             :add-comment-focus add-comment-focus
-                             :comments-data comments-data
-                             :read-data (get activities-read (router/current-activity-id))})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
@@ -389,11 +376,6 @@
   "Get ap-initial-at."
   ([] (ap-initial-at @app-state))
   ([data] (:ap-initial-at data)))
-
-(defn id-token
-  "Get identifying token"
-  ([] (id-token @app-state))
-  ([data] (:id-token data)))
 
 (defn bot-access
   ""
