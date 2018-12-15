@@ -59,7 +59,7 @@
 
 (defn complete-params [params]
   (if-let [jwt (or (j/jwt)
-                   (dispatcher/id-token))]
+                   (j/id-token))]
     (-> {:with-credentials? false}
         (merge params)
         (update :headers merge {"Authorization" (str "Bearer " jwt)}))
