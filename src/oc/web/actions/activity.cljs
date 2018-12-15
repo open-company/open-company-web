@@ -67,7 +67,7 @@
 
 (defn all-posts-get [org-data ap-initial-at]
   (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-      (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
+    (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
@@ -508,60 +508,20 @@
   (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid]))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
-  (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
-
-
-(defn get-org-for-id-token [org-data cb]
-  (let [fixed-org-data (or org-data (dis/org-data))
-        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link (fn [{:keys [status body success]}]
-      (let [org-data (json->cljs body)]
-        (dis/dispatch! [:org-loaded org-data false nil])
-        (cb success))))))
-
-(defn- handle-id-token [auth-settings]
-  ;; auth settings loaded
-  (when (and (not (jwt/jwt)) (dis/id-token))
-    ;; id token given and not logged in
-    (when-let* [claims (get-in auth-settings [:token-info :claims])
-                secure-uuid (:secure-uuid claims)
-                user-id (:user-id claims)
-                org-data (dis/org-data)
-                ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link user-id (:slug org-data) []))))
+  (let [secure-activity-data (if success (json->cljs body) {})
+        org-data (-> secure-activity-data
+                    (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height])
+                    (clojure.set/rename-keys {:org-uuid :uuid
+                                              :org-name :name
+                                              :org-slug :slug
+                                              :org-logo-url :logo-url
+                                              :org-logo-width :logo-width
+                                              :org-logo-height :logo-height}))]
+    (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
+    (dis/dispatch! [:org-loaded org-data false])))
 
 (defn secure-activity-get []
-  (api/web-app-version-check
-    (fn [{:keys [success body status]}]
-      (when (= status 404)
-        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
-  (let [org-slug (router/current-org-slug)]
-    (api/get-auth-settings (fn [body]
-      (when body
-        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-          (api/get-user user-link (fn [data]
-            (dis/dispatch! [:user-data (json->cljs data)]))))
-        (dis/dispatch! [:auth-settings body])
-        (api/get-entry-point org-slug
-          (fn [success body]
-            (let [collection (:collection body)]
-              (if success
-                (let [orgs (:items collection)]
-                  (dis/dispatch! [:entry-point orgs collection])
-                  (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-                    (if (and (not (jwt/jwt)) (dis/id-token))
-                      (get-org-for-id-token
-                       org-data
-                       (fn [success]
-                         (if success
-                           (do
-                             (handle-id-token (dis/auth-settings))
-                             (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish))
-                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))
-                      (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish))
-                    (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish)))
-                (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
-
+  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
 
 ;; Change reaction
 
@@ -652,17 +612,17 @@
 
 ;; WRT read
 
-(defn send-secure-item-read []
+(defn send-secure-item-seen-read []
   (when-let* [activity-data (dis/secure-activity-data)
               activity-id (:uuid activity-data)
               publisher-id (:user-id (:publisher activity-data))
               container-id (:board-uuid activity-data)
-              claims (:claims (:token-info (dis/auth-settings)))
-              user-name (:user-id claims)
-              avatar-url (:avatar-url claims)
+              token-data (jwt/get-id-token-contents)
+              user-id (:user-id token-data)
+              avatar-url (:avatar-url token-data)
               org-id (:uuid (dis/org-data))]
     (ws-cc/item-seen publisher-id container-id activity-id)
-    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
+    (ws-cc/item-read org-id container-id activity-id user-id avatar-url)))
 
 (defn- send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
