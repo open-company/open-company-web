@@ -75,13 +75,15 @@
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)
-        activity-link (utils/link-for (:links org-data) "activity")]
-    (sa/load-other-sections (:boards org-data))
-    (when activity-link
-      ;; Preload all posts data
-      (aa/all-posts-get org-data ap-initial-at)
-      ;; Preload must see data
-      (aa/must-see-get org-data))
+        activity-link (utils/link-for (:links org-data) "activity")
+        is-secure-post? (router/current-secure-activity-id)]
+    (when-not is-secure-post?
+      (sa/load-other-sections (:boards org-data))
+      (when activity-link
+        ;; Preload all posts data
+        (aa/all-posts-get org-data ap-initial-at)
+        ;; Preload must see data
+        (aa/must-see-get org-data)))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (and (not ap-initial-at)
@@ -116,25 +118,34 @@
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
-            (oc-urls/all-posts (:slug org-data)))))))
-  ;; Change service connection
-  (when (jwt/jwt) ; only for logged in users
-    (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
+            (oc-urls/all-posts (:slug org-data))))))
+    ;; Change service connection
+    (cond
+      (jwt/jwt) ; only for logged in users
+      (when-let [ws-link (utils/link-for (:links org-data) "changes")]
+        (ws-cc/reconnect ws-link (jwt/user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data))))
+      (jwt/id-token) ; or for users logged in with the id
+      (when-let* [token-data (jwt/get-id-token-contents)
+                  ws-link (utils/link-for (:links org-data) "changes")]
+        (ws-cc/reconnect ws-link (:user-id token-data) (:slug org-data) [])))
 
-  ;; Interaction service connection
-  (when (jwt/jwt) ; only for logged in users
-    (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
-      (ws-ic/reconnect ws-link (jwt/user-id))))
+    ;; Interaction service connection
+    (when (jwt/jwt) ; only for logged in users
+      (when-let [ws-link (utils/link-for (:links org-data) "interactions")]
+        (ws-ic/reconnect ws-link (jwt/user-id))))
 
-  ;; Notify client
-  (when (jwt/jwt)
-    (when-let [ws-link (utils/link-for (:links org-data) "notifications")]
-      (ws-nc/reconnect ws-link (jwt/user-id))))
+    ;; Notify client
+    (when (jwt/jwt)
+      (when-let [ws-link (utils/link-for (:links org-data) "notifications")]
+        (ws-nc/reconnect ws-link (jwt/user-id))))
 
-  (dis/dispatch! [:org-loaded org-data saved? email-domain])
-  (utils/after 100 maybe-show-integration-added-notification?)
-  (fullstory/track-org org-data))
+    ;; Avoid reloading the secure post again creating an infinite loop
+    (when is-secure-post?
+      (aa/secure-activity-get))
+
+    (dis/dispatch! [:org-loaded org-data saved? email-domain])
+    (utils/after 100 maybe-show-integration-added-notification?)
+    (fullstory/track-org org-data)))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
