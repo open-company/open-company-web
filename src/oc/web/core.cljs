@@ -119,6 +119,10 @@
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
     (ja/update-jwt (:jwt query-params)))
+  (when (and (contains? query-params :id)
+             (map? (js->clj (jwt/decode (:id query-params)))))
+    ; contains :id, so saving it
+    (ja/update-id-token (:id query-params)))
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
@@ -160,7 +164,6 @@
                       (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
-                        :id-token (when has-id-param (:id query-params))
                         :org-settings org-settings
                         :user-settings user-settings
                         :bot-access bot-access}]
@@ -236,7 +239,7 @@
   (let [org (:org (:params params))
         secure-id (:secure-id (:params params))
         query-params (:query-params params)]
-    (pre-routing query-params)
+    (pre-routing query-params true)
     ;; save the route
     (router/set-route!
      (vec
@@ -246,18 +249,16 @@
      {:org org
       :secure-id secure-id
       :query-params query-params})
-    (let [initial-app-state {:id-token (:id query-params)}
-          ;; do we have the company data already?
-          app-state (when (or ;; if the company data are not present
-                           (not (dis/board-data))
-                           ;; or the entries key is missing that means we have only
-                           (not (:posts-list (dis/board-data)))
-                           ;; a subset of the company data loaded with a SU
-                           (not (dis/secure-activity-data)))
-                      (assoc initial-app-state :loading true))]
-      (swap! dis/app-state merge app-state))
-    (routing-actions/routing @router/path)
-    ;; render and start data requests from component
+     ;; do we have the company data already?
+    (when (or ;; if the company data are not present
+              (not (dis/board-data))
+              ;; or the entries key is missing that means we have only
+              (not (:posts-list (dis/board-data)))
+              ;; a subset of the company data loaded with a SU
+              (not (dis/secure-activity-data)))
+      (swap! dis/app-state merge {:loading true}))
+    (post-routing)
+    ;; render component
     (drv-root component target)))
 
 ;; Component specific to a team settings
