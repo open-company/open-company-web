@@ -9,12 +9,15 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.mixins.mention :as mention-mixins]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.mixins.mention :as mention-mixins]
+            [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar)]
+            [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
@@ -51,6 +54,9 @@
                               :after-render (fn [s]
                                ;; Delay to make sure the change socket was initialized
                                (utils/after 2000 #(activity-actions/send-secure-item-seen-read))
+                               (let [activity-data @(drv/get-ref s :secure-activity-data)
+                                     comments-data @(drv/get-ref s :comments-data)]
+                                  (comment-actions/get-comments-if-needed activity-data comments-data))
                                s)
                               :will-mount (fn [s]
                                (save-win-height s)
@@ -145,8 +151,12 @@
                 [:div.activity-video-transcript-content
                   (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))
+            (when-not is-mobile?
+                (reactions activity-data))
             (when comments-data
-              (stream-comments activity-data comments-data true))]])
+              (stream-comments activity-data comments-data true))
+            (when (:can-comment activity-data)
+              (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]])
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])

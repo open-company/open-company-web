@@ -203,6 +203,20 @@ div.secure-activity-container {
           color: $deep_navy;
         }
       }
+
+      div.reactions {
+        width: 100%;
+        float: unset;
+        margin-top: 16px;
+      }
+
+      div.stream-comments {
+        width: 100%;
+        float: unset;
+        margin-top: 24px;
+        border-top: 1px solid $ultra_light_grey;
+        padding-top: 24px;
+      }
     }
   }
 
