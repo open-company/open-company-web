@@ -501,11 +501,11 @@
 (defn activity-get-finish [status activity-data secure-uuid]
   (when (= status 404)
     (router/redirect-404!))
-  (when (and secure-uuid
+  (if (and secure-uuid
              (jwt/jwt)
              (jwt/user-is-part-of-the-team (:team-id activity-data)))
-    (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-  (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid]))
+    (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
+    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
   (let [secure-activity-data (if success (json->cljs body) {})
