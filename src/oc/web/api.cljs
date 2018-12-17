@@ -58,7 +58,8 @@
   (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
-  (if-let [jwt (j/jwt)]
+  (if-let [jwt (or (j/jwt)
+                   (j/id-token))]
     (-> {:with-credentials? false}
         (merge params)
         (update :headers merge {"Authorization" (str "Bearer " jwt)}))
@@ -137,7 +138,6 @@
   (timbre/debug "Req:" (method-name method) (str endpoint path))
   (let [jwt (j/jwt)
         expired? (j/expired?)]
-    (timbre/debug jwt expired?)
     (go
      ;; sync refresh
      (when (and jwt expired?)
@@ -192,7 +192,7 @@
 ;; Report failed api request
 
 (defn- handle-missing-link [callee-name link callback & parameters]
-  (timbre/error "Hanling missing link:" callee-name ":" link)
+  (timbre/error "Handling missing link:" callee-name ":" link)
   (sentry/set-extra-context! (merge {:callee callee-name
                                      :link link
                                      :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
@@ -240,19 +240,18 @@
 ;; Entry point and Auth settings
 
 (defn get-entry-point [requested-org callback]
-  (let [entry-point-href (str "/" (when requested-org (str "?requested=" requested-org)))]
-    (storage-http http/get entry-point-href
-     nil
-     (fn [{:keys [success body]}]
-       (let [fixed-body (when success (json->cljs body))]
-         (callback success fixed-body))))))
+  (storage-http http/get "/"
+    {:query-params {:requested requested-org}}
+    (fn [{:keys [success body]}]
+      (let [fixed-body (when success (json->cljs body))]
+        (callback success fixed-body)))))
 
 (defn get-auth-settings [callback]
-  (auth-http http/get "/"
-   {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
+  (let [header-options {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}]
+  (auth-http http/get "/" header-options
    (fn [response]
      (let [body (if (:success response) (:body response) false)]
-       (callback body)))))
+       (callback body))))))
 
 ;; Subscription
 
@@ -265,9 +264,11 @@
 
 (defn get-org [org-link callback]
   (if org-link
-    (storage-http (method-for-link org-link) (relative-href org-link)
-     {:headers (headers-for-link org-link)}
-     callback)
+    (let [params {:headers (headers-for-link org-link)}]
+      (storage-http (method-for-link org-link)
+                    (relative-href org-link)
+                    params
+                    callback))
     (handle-missing-link "get-org" org-link callback)))
 
 (defn patch-org [org-patch-link data callback]
