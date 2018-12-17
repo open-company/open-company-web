@@ -31,7 +31,7 @@
 (defn- send! [chsk-send! & args]
   (if @chsk-send!
     (apply @chsk-send! args)
-    (ws-utils/sentry-report "Interaction" ch-state (first (first args)))))
+    (ws-utils/sentry-report "Interaction" chsk-send! ch-state (first (first args)))))
 
 ;; ----- Actions -----
 

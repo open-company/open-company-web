@@ -146,7 +146,6 @@
 
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)
-        has-id-param (contains? query-params :id)
         loading (or (and ;; if is board page
                          (not (contains? query-params :ap))
                          ;; if the board data are not present
@@ -258,8 +257,7 @@
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
-    (check-nux query-params)
-    (post-routing)
+    (aa/secure-activity-chain)
     ;; render component
     (drv-root component target)))
 

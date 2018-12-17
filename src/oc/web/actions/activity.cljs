@@ -502,26 +502,76 @@
   (when (= status 404)
     (router/redirect-404!))
   (if (and secure-uuid
-             (jwt/jwt)
-             (jwt/user-is-part-of-the-team (:team-id activity-data)))
+           (jwt/jwt)
+           (jwt/user-is-part-of-the-team (:team-id activity-data)))
     (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
     (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
 
+(defn org-data-from-secure-activity [secure-activity-data]
+  (let [old-org-data (dis/org-data)]
+    (-> secure-activity-data
+      (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height])
+      (clojure.set/rename-keys {:org-uuid :uuid
+                                :org-name :name
+                                :org-slug :slug
+                                :org-logo-url :logo-url
+                                :org-logo-width :logo-width
+                                :org-logo-height :logo-height})
+      (merge old-org-data))))
+
 (defn secure-activity-get-finish [{:keys [status success body]}]
   (let [secure-activity-data (if success (json->cljs body) {})
-        org-data (-> secure-activity-data
-                    (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height])
-                    (clojure.set/rename-keys {:org-uuid :uuid
-                                              :org-name :name
-                                              :org-slug :slug
-                                              :org-logo-url :logo-url
-                                              :org-logo-width :logo-width
-                                              :org-logo-height :logo-height}))]
+        org-data (org-data-from-secure-activity secure-activity-data)]
     (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
     (dis/dispatch! [:org-loaded org-data false])))
 
+(defn get-org [org-data cb]
+  (let [fixed-org-data (or org-data (dis/org-data))
+        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
+    (api/get-org org-link (fn [{:keys [status body success]}]
+      (let [org-data (json->cljs body)]
+        (dis/dispatch! [:org-loaded org-data false nil])
+        (cb success))))))
+
+(defn connect-change-service []
+  ;; id token given and not logged in
+  (when-let* [claims (jwt/get-id-token-contents)
+              secure-uuid (:secure-uuid claims)
+              user-id (:user-id claims)
+              org-data (dis/org-data)
+              ws-link (utils/link-for (:links org-data) "changes")]
+    (ws-cc/reconnect ws-link user-id (:slug org-data) [])))
+
 (defn secure-activity-get []
   (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+
+(defn secure-activity-chain []
+  (api/web-app-version-check
+    (fn [{:keys [success body status]}]
+      (when (= status 404)
+        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
+  (let [org-slug (router/current-org-slug)]
+    (api/get-auth-settings (fn [body]
+      (when body
+        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+          (api/get-user user-link (fn [data]
+            (dis/dispatch! [:user-data (json->cljs data)]))))
+        (dis/dispatch! [:auth-settings body])
+        (api/get-entry-point org-slug
+          (fn [success body]
+            (let [collection (:collection body)]
+              (if success
+                (let [orgs (:items collection)]
+                  (dis/dispatch! [:entry-point orgs collection])
+                  (when-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+                    (when (and (not (jwt/jwt)) (jwt/id-token))
+                      (get-org org-data
+                       (fn [success]
+                         (if success
+                           (connect-change-service)
+                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))
+                  (secure-activity-get))
+                (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
 
 ;; Change reaction
 
