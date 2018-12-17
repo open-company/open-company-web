@@ -538,6 +538,9 @@
     (ws-cc/reconnect ws-link user-id (:slug org-data) [])))
 
 (defn secure-activity-get []
+  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+
+(defn secure-activity-chain []
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (when (= status 404)
@@ -555,17 +558,14 @@
               (if success
                 (let [orgs (:items collection)]
                   (dis/dispatch! [:entry-point orgs collection])
-                  (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-                    (if (and (not (jwt/jwt)) (jwt/id-token))
+                  (when-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+                    (when (and (not (jwt/jwt)) (jwt/id-token))
                       (get-org org-data
                        (fn [success]
                          (if success
-                           (do
-                             (connect-change-service)
-                             (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish))
-                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))
-                      (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish))
-                    (api/get-secure-entry org-slug (router/current-secure-activity-id) secure-activity-get-finish)))
+                           (connect-change-service)
+                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))
+                  (secure-activity-get))
                 (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
 
 ;; Change reaction
