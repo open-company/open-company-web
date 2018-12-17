@@ -507,18 +507,21 @@
     (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
     (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
 
+(defn org-data-from-secure-activity [secure-activity-data]
+  (let [old-org-data (dis/org-data)]
+    (-> secure-activity-data
+      (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height])
+      (clojure.set/rename-keys {:org-uuid :uuid
+                                :org-name :name
+                                :org-slug :slug
+                                :org-logo-url :logo-url
+                                :org-logo-width :logo-width
+                                :org-logo-height :logo-height})
+      (merge old-org-data))))
+
 (defn secure-activity-get-finish [{:keys [status success body]}]
   (let [secure-activity-data (if success (json->cljs body) {})
-        old-org-data (dis/org-data)
-        org-data (-> secure-activity-data
-                    (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height])
-                    (clojure.set/rename-keys {:org-uuid :uuid
-                                              :org-name :name
-                                              :org-slug :slug
-                                              :org-logo-url :logo-url
-                                              :org-logo-width :logo-width
-                                              :org-logo-height :logo-height})
-                    (merge old-org-data))]
+        org-data (org-data-from-secure-activity secure-activity-data)]
     (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
     (dis/dispatch! [:org-loaded org-data false])))
 
