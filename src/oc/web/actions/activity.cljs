@@ -323,12 +323,16 @@
   (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data])
   (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
+(declare secure-activity-get)
+
 (defn get-entry [entry-data]
-  (let [entry-link (utils/link-for (:links entry-data) "self")]
-    (api/get-entry entry-link
-      (fn [{:keys [status success body]}]
-        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-         nil])))))
+  (if (router/current-secure-activity-id)
+    (secure-activity-get)
+    (let [entry-link (utils/link-for (:links entry-data) "self")]
+      (api/get-entry entry-link
+        (fn [{:keys [status success body]}]
+          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+           nil]))))))
 
 (declare entry-revert)
 
