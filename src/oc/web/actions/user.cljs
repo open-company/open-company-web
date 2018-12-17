@@ -14,7 +14,6 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
-            [oc.web.actions.activity :as activity-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.ws.notify-client :as ws-nc]
