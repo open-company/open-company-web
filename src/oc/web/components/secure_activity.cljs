@@ -10,7 +10,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.mention :as mention-mixins]
-            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.reactions :refer (reactions)]
@@ -36,11 +35,6 @@
 
 (def default-activity-header-height 56)
 
-(defn get-comments [s]
-  (let [activity-data @(drv/get-ref s :secure-activity-data)
-        comments-data @(drv/get-ref s :comments-data)]
-    (comment-actions/get-comments-if-needed activity-data comments-data)))
-
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
@@ -55,10 +49,6 @@
                              (mention-mixins/oc-mentions-hover)
                              {:did-mount (fn [s]
                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                               (get-comments s)
-                               s)
-                              :did-remount (fn [s]
-                               (get-comments s)
                                s)
                               :after-render (fn [s]
                                ;; Delay to make sure the change socket was initialized
