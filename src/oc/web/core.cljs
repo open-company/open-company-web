@@ -119,7 +119,8 @@
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
     (ja/update-jwt (:jwt query-params)))
-  (when (and (contains? query-params :id)
+  (when (and (not (jwt/jwt))
+             (contains? query-params :id)
              (map? (js->clj (jwt/decode (:id query-params)))))
     ; contains :id, so saving it
     (ja/update-id-token (:id query-params)))
