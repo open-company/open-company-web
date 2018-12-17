@@ -146,6 +146,7 @@
                              :error (:email-verification-error base)
                              :success (:email-verification-success base)})]
    :jwt                 [[:base] (fn [base] (:jwt base))]
+   :id-token            [[:base] (fn [base] (:id-token base))]
    :current-user-data   [[:base] (fn [base] (:current-user-data base))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
