@@ -88,6 +88,7 @@
                         pending? (and (= "pending" (:status user))
                                       (or (contains? user :email)
                                           (contains? user :slack-id)))
+                        current-user (= (:user-id user) (:user-id cur-user-data))
                         display-name (utils/name-or-email user)
                         removing? (@(::removing s) (:user-id user))
                         remove-fn (fn []
@@ -169,7 +170,9 @@
                      :data-toggle "tooltip"
                      :data-html "true"
                      :data-placement "top"}
-                    display-name]
+                    display-name
+                    (when current-user
+                      [:span.current-user " (you)"])]
                   (when pending?
                     [:div.pending-user
                       " (pending: "

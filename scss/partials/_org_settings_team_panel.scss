@@ -79,6 +79,11 @@ div.org-settings {
                 &.pending.removing {
                   max-width: calc(100% - 253px);
                 }
+
+                span.current-user {
+                  font-size: 11px;
+                  color: $ui_grey;
+                }
               }
 
               div.tooltip {
