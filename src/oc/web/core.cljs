@@ -675,6 +675,7 @@
 
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
+  (ja/dispatch-id-token)
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
