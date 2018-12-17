@@ -40,8 +40,11 @@
                              ;; Mixins
                              (ui-mixins/render-on-resize save-win-height)
 
-                             {:will-mount (fn [s]
-                               (utils/after 100 #(activity-actions/secure-activity-get))
+                             {:after-render (fn [s]
+                               ;; Delay to make sure the change socket was initialized
+                               (utils/after 2000 #(activity-actions/send-secure-item-seen-read))
+                               s)
+                              :will-mount (fn [s]
                                (save-win-height s)
                                (reset! (::show-login-header s) (not (jwt/jwt)))
                               s)}

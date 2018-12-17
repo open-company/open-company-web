@@ -119,6 +119,11 @@
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
     (ja/update-jwt (:jwt query-params)))
+  (when (and (not (jwt/jwt))
+             (contains? query-params :id)
+             (map? (js->clj (jwt/decode (:id query-params)))))
+    ; contains :id, so saving it
+    (ja/update-id-token (:id query-params)))
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
@@ -162,7 +167,7 @@
                         :org-settings org-settings
                         :user-settings user-settings
                         :bot-access bot-access}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
+    (swap! dis/app-state merge next-app-state)))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -234,7 +239,7 @@
   (let [org (:org (:params params))
         secure-id (:secure-id (:params params))
         query-params (:query-params params)]
-    (pre-routing query-params)
+    (pre-routing query-params true)
     ;; save the route
     (router/set-route!
      (vec
@@ -244,7 +249,7 @@
      {:org org
       :secure-id secure-id
       :query-params query-params})
-    ;; do we have the company data already?
+     ;; do we have the company data already?
     (when (or ;; if the company data are not present
               (not (dis/board-data))
               ;; or the entries key is missing that means we have only
@@ -252,7 +257,7 @@
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
-    (post-routing)
+    (aa/secure-activity-chain)
     ;; render component
     (drv-root component target)))
 

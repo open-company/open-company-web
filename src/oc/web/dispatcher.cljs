@@ -131,7 +131,7 @@
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
    :org-settings        [[:base] (fn [base] (:org-settings base))]
-   :user-settings        [[:base] (fn [base] (:user-settings base))]
+   :user-settings       [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
@@ -264,18 +264,6 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :fullscreen-post-data [[:base :org-data :activity-data :activity-share
-                           :add-comment-focus :ap-initial-at :comments-data
-                           :show-sections-picker :section-editing :activities-read]
-                          (fn [base org-data activity-data activity-share
-                               add-comment-focus ap-initial-at comments-data
-                               show-sections-picker section-editing activities-read]
-                            {:org-data org-data
-                             :activity-data activity-data
-                             :activity-share activity-share
-                             :add-comment-focus add-comment-focus
-                             :comments-data comments-data
-                             :read-data (get activities-read (router/current-activity-id))})]
    :navbar-data         [[:base :org-data :board-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
