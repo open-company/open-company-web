@@ -41,7 +41,8 @@
                              (ui-mixins/render-on-resize save-win-height)
 
                              {:after-render (fn [s]
-                               (activity-actions/send-secure-item-seen-read)
+                               ;; Delay to make sure the change socket was initialized
+                               (utils/after 2000 #(activity-actions/send-secure-item-seen-read))
                                s)
                               :will-mount (fn [s]
                                (save-win-height s)
