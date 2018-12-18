@@ -28,24 +28,14 @@
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
 
-(defn save-win-height [s]
-  (reset! (::win-height s) (.-innerHeight js/window))
-  (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
-
-(def default-activity-header-height 56)
-
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
                              (drv/drv :id-token)
                              (drv/drv :comments-data)
                              ;; Locals
-                             (rum/local 0 ::win-height)
-                             (rum/local nil ::win-resize-listener)
                              (rum/local 0 ::mobile-video-height)
                              ;; Mixins
-                             (ui-mixins/render-on-resize save-win-height)
                              (mention-mixins/oc-mentions-hover)
                              {:did-mount (fn [s]
                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -53,15 +43,11 @@
                               :after-render (fn [s]
                                ;; Delay to make sure the change socket was initialized
                                (utils/after 2000 #(activity-actions/send-secure-item-seen-read))
-                               s)
-                              :will-mount (fn [s]
-                               (save-win-height s)
-                              s)}
+                               s)}
   [s]
   (let [activity-data (drv/react s :secure-activity-data)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        win-height @(::win-height s)
         video-size (when (:fixed-video-id activity-data)
                     (if is-mobile?
                       {:width (win-width)
@@ -78,14 +64,13 @@
                                             :org-logo-width :logo-width
                                             :org-logo-height :logo-height}))
         comments-drv (drv/react s :comments-data)
-        comments-data (au/get-comments activity-data comments-drv)]
+        comments-data (au/get-comments activity-data comments-drv)
+        activity-link (utils/link-for (:links org-data) "activity")]
     [:div.secure-activity-container
-      {:style {:min-height (when is-mobile?
-                             (str (- win-height default-activity-header-height) "px"))}}
       (login-overlays-handler)
       (when activity-data
         [:div.activity-header.group
-          (org-avatar org-data true (if is-mobile? :never :always) (not is-mobile?))
+          (org-avatar org-data activity-link (if is-mobile? :never :always) (not is-mobile?))
           (if id-token
             [:div.activity-header-right
               [:button.mlb-reset.login-as-bt
@@ -123,8 +108,6 @@
                      :data-title (utils/activity-date-tooltip activity-data)}
                     (utils/time-since t)])]]]
           [:div.activity-content
-            {:style {:min-height (when is-mobile?
-                                  (str (- win-height default-activity-header-height) "px"))}}
             (when (:headline activity-data)
               [:div.activity-title
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))

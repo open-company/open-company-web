@@ -6,6 +6,10 @@ div.secure-activity-container {
   background-color: $oc_gray_8;
   min-height: 100vh;
 
+  @include tablet() {
+    background-color: white;
+  }
+
   div.activity-header {
     height: 56px;
     position: fixed;
@@ -25,6 +29,11 @@ div.secure-activity-container {
       @include org-avatar(32);
       float: left;
 
+      @include tablet(){
+        float: unset;
+        margin: 0 auto;
+      }
+
       div.org-avatar-container{
         span.org-name {
           font-size: 22px;
@@ -33,7 +42,9 @@ div.secure-activity-container {
     }
 
     div.activity-header-right {
-      float: right;
+      position: absolute;
+      top: 12px;
+      right: 24px;
 
       button.login-as-bt {
         float: right;
@@ -46,6 +57,10 @@ div.secure-activity-container {
         span.login-as {
           margin-top: 4px;
           display: inline-block;
+
+          @include tablet() {
+            display: none;
+          }
         }
 
         div.user-avatar-img-container {
@@ -63,6 +78,10 @@ div.secure-activity-container {
         color: $ui_grey;
         text-transform: uppercase;
         margin-right: 16px;
+
+        @include tablet() {
+          display: none;
+        }
       }
 
       button.learn-more-bt {
@@ -77,6 +96,10 @@ div.secure-activity-container {
         color: $carrot_orange;
         text-transform: uppercase;
         padding: 0;
+
+        @include tablet() {
+          display: none;
+        }
       }
     }
   }
@@ -91,7 +114,7 @@ div.secure-activity-container {
 
     @include tablet() {
       width: 100%;
-      margin: 0px auto;
+      margin: 57px auto 0;
     }
 
     div.activity-content-header {
