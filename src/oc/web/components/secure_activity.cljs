@@ -19,6 +19,7 @@
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [goog.events :as events]
@@ -130,6 +131,8 @@
                 [:div.activity-video-transcript-content
                   (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))
+            [:div.secure-activity-comments-summary
+              (comments-summary activity-data true)]
             (when-not is-mobile?
                 (reactions activity-data))
             (when comments-data
