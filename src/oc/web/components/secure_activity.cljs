@@ -15,7 +15,6 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -131,10 +130,12 @@
                 [:div.activity-video-transcript-content
                   (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))
-            [:div.secure-activity-comments-summary
-              (comments-summary activity-data true)]
-            (when-not is-mobile?
-                (reactions activity-data))
+            [:div.activity-content-footer.group
+              (when-not is-mobile?
+                (comments-summary activity-data true))
+              (reactions activity-data)
+              (when is-mobile?
+                (comments-summary activity-data true))]
             (when comments-data
               (stream-comments activity-data comments-data true))
             (when (:can-comment activity-data)
@@ -143,12 +144,15 @@
         [:div.secure-activity-container
           (loading {:loading true})])
       [:div.secure-activity-footer
-        [:button.mlb-reset.secure-activity-footer-bt
-          {:on-click #(if id-token
-                        (user-actions/show-login :login-with-email)
-                        (router/nav! oc-urls/home))}
-          [:span
-            (if id-token
-              "Log in to view all posts"
-              "Learn more about Carrot")
-            [:div.right-arrow]]]]]))
+        (if id-token
+          [:button.mlb-reset.secure-activity-footer-bt.with-id-token
+            {:on-click #(user-actions/show-login :login-with-email)}
+            [:span.pre-login-span "Log in to view all posts."]
+            [:span.green-user-button.group
+              (user-avatar-image id-token)
+              [:span.inner "Log in as " (:first-name id-token)]]]
+          [:button.mlb-reset.secure-activity-footer-bt
+            {:on-click #(router/nav! oc-urls/home)}
+            [:span
+              "Learn more about Carrot"
+              [:div.right-arrow]]])]]))

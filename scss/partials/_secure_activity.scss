@@ -115,6 +115,7 @@ div.secure-activity-container {
     @include tablet() {
       width: 100%;
       margin: 57px auto 0;
+      padding: 24px 16px;
     }
 
     div.activity-content-header {
@@ -161,6 +162,7 @@ div.secure-activity-container {
         @include activity-title();
         @include avenir_H();
         font-size: 22px;
+        line-height: 28px;
         color: $deep_navy;
         margin-top: 16px;
 
@@ -179,6 +181,13 @@ div.secure-activity-container {
         @include avenir_R();
         font-size: 16px;
         line-height: 22px;
+
+        @include tablet() {
+          @include activity-body(18, 24, 24, $deep_navy); 
+          line-height: 24px;
+          font-size: 18px;
+          line-height: 24px;
+        }
 
         & > *:first-child {
           margin-top: 0px;
@@ -227,16 +236,29 @@ div.secure-activity-container {
         }
       }
 
-      div.secure-activity-comments-summary {
-        float: left;
-        margin-right: 16px;
+      div.activity-content-footer {
+        height: 26px;
         margin-top: 16px;
-      }
 
-      div.reactions {
-        width: 100%;
-        float: unset;
-        margin-top: 16px;
+        @include tablet() {
+          height: 68px;
+        }
+
+        div.is-comments {
+          margin-right: 16px;
+
+          @include tablet() {
+            margin-right: 0;
+            margin-top: 16px;
+            float: unset;
+          }
+        }
+
+        @include tablet() {
+          div.reactions {
+            float: unset;
+          }
+        }
       }
 
       div.stream-comments {
@@ -251,12 +273,17 @@ div.secure-activity-container {
 
   div.secure-activity-footer {
     text-align: center;
+
     button.secure-activity-footer-bt {
       margin: 40px auto;
       @include avenir_H();
       font-size: 14px;
       color: $carrot_green;
       padding: 0;
+
+      @include mobile() {
+        margin: 32px auto;
+      }
 
       div.right-arrow {
         float: right;
@@ -268,6 +295,53 @@ div.secure-activity-container {
         background-repeat: no-repeat;
         margin-left: 8px;
         margin-top: 4px;
+      }
+
+      &.with-id-token {
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        height: 32px;
+
+        &:hover {
+          span.green-user-button {
+            opacity: 1;
+          }
+        }
+
+        span.pre-login-span {
+          vertical-align: middle;
+          height: 32px;
+          line-height: 32px;
+          display: inline-block;
+          margin-top: -21px;
+        }
+
+        span.green-user-button {
+          opacity: 0.9;
+          height: 32px;
+          width: auto;
+          display: inline-block;
+          margin-left: 8px;
+          background-color: $carrot_green;
+          border-radius: 6px;
+          padding: 8px 12px;
+          @include avenir_H();
+          color: white;
+          font-size: 14px;
+
+          @include user-profile(16);
+
+          div.user-avatar-img-container {
+            float: left;
+            margin-top: -3px;
+          }
+
+          span.inner {
+            float: left;
+            margin-left: 8px;
+          }
+        }
       }
     }
   }
