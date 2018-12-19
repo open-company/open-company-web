@@ -40,6 +40,7 @@
     (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data activity-key])
     (api/toggle-reaction reaction-link
       (fn [{:keys [status success body]}]
+        (activity-actions/get-entry activity-data)
         (dis/dispatch!
          [:activity-reaction-toggle/finish
           activity-data
