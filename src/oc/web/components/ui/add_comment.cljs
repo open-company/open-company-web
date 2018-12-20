@@ -14,21 +14,21 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn enable-add-comment? [s]
-  (let [add-comment-div (rum/ref-node s "add-comment")
-        comment-text (cu/add-comment-content add-comment-div)
-        next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
-    (when (not= next-add-bt-disabled @(::add-button-disabled s))
-      (reset! (::add-button-disabled s) next-add-bt-disabled))))
+  (when-let [add-comment-div (rum/ref-node s "add-comment")]
+    (let [comment-text (cu/add-comment-content add-comment-div)
+          next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
+      (when (not= next-add-bt-disabled @(::add-button-disabled s))
+        (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
 (defn editable-input-change [s editable event]
   (enable-add-comment? s))
 
-(defn add-comment-focus [s]
+(defn focus-add-comment [s]
   (enable-add-comment? s)
   (comment-actions/add-comment-focus (:uuid (first (:rum/args s)))))
 
 (defn disable-add-comment-if-needed [s]
-  (let [add-comment-node (rum/ref-node s "add-comment")]
+  (when-let [add-comment-node (rum/ref-node s "add-comment")]
     (enable-add-comment? s)
     (when (and (zero? (count (.-innerText add-comment-node)))
                (not @(::emoji-picker-open s)))
@@ -60,7 +60,7 @@
                               (partial editable-input-change s))
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
-                               #(add-comment-focus s)))
+                               #(focus-add-comment s)))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
                                #(disable-add-comment-if-needed s)))
