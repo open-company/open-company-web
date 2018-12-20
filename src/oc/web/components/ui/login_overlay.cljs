@@ -84,7 +84,7 @@
         [:div.login-overlay-cta.group
           [:button.mlb-reset.top-back-button
             {:on-touch-start identity
-             :on-click #(router/history-back!)
+             :on-click #(user-actions/show-login nil)
              :aria-label "Back"}]
           [:div.sign-in-cta "Sign In"]
           [:button.mlb-reset.top-continue

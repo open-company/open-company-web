@@ -6,94 +6,8 @@ div.secure-activity-container {
   background-color: $oc_gray_8;
   min-height: 100vh;
 
-  div.secure-activity-login-header {
-    position: fixed;
-    height: 48px;
-    width: 100%;
-    background-color: $deep_navy;
-    text-align: center;
-    z-index: 11;
-    padding: 12px 32px;
-
-    @include tablet() {
-      padding: 14px 22px;
-    }
-
-    button.remove-header-bt {
-      width: 24px;
-      height: 24px;
-      position: absolute;
-      top: 12px;
-      left: 18px;
-      background-image: cdnUrl("/img/ML/secure_activity_remove_header.svg");
-      background-size: 12px;
-      background-repeat: no-repeat;
-      background-position: center;
-
-      @include tablet() {
-        display: none;
-      }
-    }
-
-    div.secure-activity-mobile-login-header {
-      display: none;
-
-      @include tablet() {
-        display: block;
-        color: white;
-        @include avenir_R();
-        font-size: 16px;
-        line-height: 20px;
-        text-align: center;
-
-        a {
-          text-decoration: none;
-          border-bottom: 1px dotted white;
-          color: white;
-        }
-      }
-    }
-
-    div.secure-activity-login-header-center {
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      @include tablet() {
-        display: none;
-      }
-
-      div.carrot-logo-copy {
-        width: 62px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/carrot_logo_with_copy.svg");
-        background-size: 62px 24px;
-        background-position: center;
-        background-repeat: no-repeat;
-        float: left;
-      }
-
-      div.separator {
-        width: 1px;
-        height: 24px;
-        background-color: rgba($light_tan, 0.2);
-        margin: 0px 16px;
-        float: left;
-      }
-
-      div.signup-login-copy {
-        @include avenir_H();
-        font-size: 14px;
-        color: $ui_grey;
-        float: left;
-
-        a {
-          color: $carrot_green;
-          text-decoration: none;
-        }
-      }
-    }
+  @include tablet() {
+    background-color: white;
   }
 
   div.activity-header {
@@ -102,91 +16,137 @@ div.secure-activity-container {
     top: 0px;
     width: 100%;
     background-color: white;
-    padding: 16px 32px;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+    padding: 12px 24px;
+    border-bottom: 1px solid $ultra_light_grey;
     text-align: center;
     z-index: 10;
-
-    &.showing-login-header {
-      top: 48px;
-    }
 
     @include tablet() {
       position: absolute;
     }
 
-    div.activity-header-title {
-      @include avenir_H();
-      font-size: 16px;
-      color: $deep_navy;
-      text-align: center;
+    div.org-avatar {
+      @include org-avatar(32);
+      float: left;
+
+      @include tablet(){
+        float: unset;
+        margin: 0 auto;
+      }
+
+      div.org-avatar-container{
+        span.org-name {
+          font-size: 22px;
+        }
+      }
+    }
+
+    div.activity-header-right {
+      position: absolute;
+      top: 12px;
+      right: 24px;
+
+      button.login-as-bt {
+        float: right;
+        @include avenir_H();
+        font-size: 14px;
+        color: $carrot_green;
+        @include user-profile(32);
+        padding: 0;
+
+        span.login-as {
+          margin-top: 4px;
+          display: inline-block;
+
+          @include tablet() {
+            display: none;
+          }
+        }
+
+        div.user-avatar-img-container {
+          margin-left: 16px;
+          float: right;
+        }
+      }
+
+      button.login-bt {
+        float: right;
+        padding: 0;
+        height: 32px;
+        @include avenir_B();
+        font-size: 12px;
+        color: $ui_grey;
+        text-transform: uppercase;
+        margin-right: 16px;
+
+        @include tablet() {
+          display: none;
+        }
+      }
+
+      button.learn-more-bt {
+        float: right;
+        width: 116px;
+        height: 32px;
+        text-align: center;
+        background-color: $coral;
+        border-radius: 4px;
+        @include avenir_B();
+        font-size: 12px;
+        color: $carrot_orange;
+        text-transform: uppercase;
+        padding: 0;
+
+        @include tablet() {
+          display: none;
+        }
+      }
     }
   }
 
   div.activity-content-outer {
-    margin: 96px auto 96px;
-    width: 800px;
+    margin: 88px auto 0;
+    width: 720px;
     border-radius: 6px;
     background-color: white;
-
-    &.showing-login-header {
-      margin-top: 144px;
-    }
+    padding: 32px 40px;
+    border: 1px solid $ultra_light_grey;
 
     @include tablet() {
       width: 100%;
-      margin: 0px auto;
+      margin: 57px auto 0;
+      padding: 24px 16px;
     }
 
     div.activity-content-header {
-      height: 65px;
-      background-color: $light_tan;
-      padding: 16px 24px;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-
       @include tablet() {
         display: block;
-        background-color: $light_tan;
-        padding: 16px 24px;
 
         @include activity-author(32);
       }
 
       div.activity-content-header-author {
-        width: 55%;
-        padding-right: 20px;
         overflow: hidden;
         line-height: 18px;
-        float: left;
 
         @include activity-author(32);
-      }
 
-      div.activity-content-header-right {
-        float: right;
-        width: 45%;
+        div.name {
+          @include avenir_R();
+          font-size: 14px;
+          color: $deep_navy;
+        }
+
+        div.time-since {
+          @include avenir_R();
+          font-size: 12px;
+          color: $ui_grey;
+        }
       }
     }
 
     div.activity-content {
-      width: 800px;
       position: relative;
-      background-color: white;
-      box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.1);
-      padding: 36px 70px;
-      border-bottom-left-radius: 6px;
-      border-bottom-right-radius: 6px;
-
-      @include tablet() {
-        width: 100%;
-        left: unset;
-        top: unset;
-      }
-
-      @include tablet() {
-        padding: 32px;
-      }
 
       div.ziggeo-player {
         margin-top: 16px;
@@ -201,8 +161,10 @@ div.secure-activity-container {
       div.activity-title {
         @include activity-title();
         @include avenir_H();
-        font-size: 28px;
+        font-size: 22px;
+        line-height: 28px;
         color: $deep_navy;
+        margin-top: 16px;
 
         .emojione {
           @include emoji-size(30);
@@ -212,21 +174,27 @@ div.secure-activity-container {
       div.activity-body {
         border: none;
         outline: none;
-        margin: 22px 0px 0px;
+        margin: 4px 0 0;
         cursor: text;
-        min-height: 85px;
-        @include activity-body(20, 30, 30);
+        @include activity-body(16, 22, 22, $deep_navy);
         color: $deep_navy;
-        @include avenir_BOOK();
-        font-size: 20px;
-        line-height: 30px;
+        @include avenir_R();
+        font-size: 16px;
+        line-height: 22px;
+
+        @include tablet() {
+          @include activity-body(18, 24, 24, $deep_navy); 
+          line-height: 24px;
+          font-size: 18px;
+          line-height: 24px;
+        }
 
         & > *:first-child {
           margin-top: 0px;
         }
 
         p:not(:last-child) {
-          margin: 30px 0px;
+          margin: 22px 0px;
         }
 
         div.carrot-no-preview, a.carrot-no-preview {
@@ -267,55 +235,113 @@ div.secure-activity-container {
           color: $deep_navy;
         }
       }
+
+      div.activity-content-footer {
+        height: 26px;
+        margin-top: 16px;
+
+        @include tablet() {
+          height: 68px;
+        }
+
+        div.is-comments {
+          margin-right: 16px;
+
+          @include tablet() {
+            margin-right: 0;
+            margin-top: 16px;
+            float: unset;
+          }
+        }
+
+        @include tablet() {
+          div.reactions {
+            float: unset;
+          }
+        }
+      }
+
+      div.stream-comments {
+        width: 100%;
+        float: unset;
+        margin-top: 24px;
+        border-top: 1px solid $ultra_light_grey;
+        padding-top: 24px;
+      }
     }
   }
 
-  a.activity-content-footer {
-    display: block;
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
-    height: 56px;
-    padding: 13px 32px;
+  div.secure-activity-footer {
     text-align: center;
-    background-color: white;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-    cursor: pointer;
 
-    @include tablet() {
-      position: relative;
-    }
+    button.secure-activity-footer-bt {
+      margin: 40px auto;
+      @include avenir_H();
+      font-size: 14px;
+      color: $carrot_green;
+      padding: 0;
 
-    &:hover {
-      div.activity-content-footer-inner {
-        div.carrot-logo {
-          background-image: cdnUrl("/img/ML/secure_activity_carrot_logo_hover.svg");
-        }
-
-        div.you-did-it {
-          color: $carrot_dark_brown_1;
-        }
+      @include mobile() {
+        margin: 32px auto;
       }
-    }
 
-    div.activity-content-footer-inner {
-      display: inline-block;
-
-      div.carrot-logo {
-        width: 17px;
-        height: 30px;
-        background-image: cdnUrl("/img/ML/secure_activity_carrot_logo.svg");
-        background-size: 17px 30px;
+      div.right-arrow {
+        float: right;
+        width: 16px;
+        height: 10px;
+        background-image: cdnUrl("/img/ML/green_right_arrow.svg");
+        background-position: center;
+        background-size: 16px 10px;
         background-repeat: no-repeat;
+        margin-left: 8px;
+        margin-top: 4px;
       }
 
-      div.you-did-it {
-        @include avenir_H();
-        font-size: 12px;
-        color: $carrot_light_gray_4;
-        margin-top: -20px;
-        margin-left: 38px;
+      &.with-id-token {
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        height: 32px;
+
+        &:hover {
+          span.green-user-button {
+            opacity: 1;
+          }
+        }
+
+        span.pre-login-span {
+          vertical-align: middle;
+          height: 32px;
+          line-height: 32px;
+          display: inline-block;
+          margin-top: -21px;
+        }
+
+        span.green-user-button {
+          opacity: 0.9;
+          height: 32px;
+          width: auto;
+          display: inline-block;
+          margin-left: 8px;
+          background-color: $carrot_green;
+          border-radius: 6px;
+          padding: 8px 12px;
+          @include avenir_H();
+          color: white;
+          font-size: 14px;
+
+          @include user-profile(16);
+
+          div.user-avatar-img-container {
+            float: left;
+            margin-top: -3px;
+          }
+
+          span.inner {
+            float: left;
+            margin-left: 8px;
+          }
+        }
       }
     }
   }
