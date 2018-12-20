@@ -15,6 +15,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.utils.comment :as comment-utils]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
@@ -323,12 +324,16 @@
   (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data])
   (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
+(declare secure-activity-get)
+
 (defn get-entry [entry-data]
-  (let [entry-link (utils/link-for (:links entry-data) "self")]
-    (api/get-entry entry-link
-      (fn [{:keys [status success body]}]
-        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-         nil])))))
+  (if (router/current-secure-activity-id)
+    (secure-activity-get)
+    (let [entry-link (utils/link-for (:links entry-data) "self")]
+      (api/get-entry entry-link
+        (fn [{:keys [status success body]}]
+          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+           nil]))))))
 
 (declare entry-revert)
 
@@ -542,8 +547,12 @@
               ws-link (utils/link-for (:links org-data) "changes")]
     (ws-cc/reconnect ws-link user-id (:slug org-data) [])))
 
-(defn secure-activity-get []
-  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+(defn secure-activity-get [& [cb]]
+  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id)
+   (fn [resp]
+     (secure-activity-get-finish resp)
+     (when (fn? cb)
+       (cb resp)))))
 
 (defn secure-activity-chain []
   (api/web-app-version-check
@@ -570,7 +579,9 @@
                          (if success
                            (connect-change-service)
                            (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))
-                  (secure-activity-get))
+                  (secure-activity-get (fn []
+                    ;; Delay comment load
+                    (comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))))
                 (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
 
 ;; Change reaction

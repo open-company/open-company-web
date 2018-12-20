@@ -9,8 +9,14 @@ div.org-dashboard {
     z-index: 1132;
   }
 
-  &.activity-not-found div.page, &.activity-removed div.page {
+  &.activity-not-found div.page {
     display: none;
+  }
+
+  @include mobile() {
+    &.activity-not-found div.page, &.activity-removed div.page {
+      display: none;
+    }
   }
 
   div.page{

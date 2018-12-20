@@ -31,7 +31,7 @@
       (fullstory/identify))))
 
 (defn update-id-token-cookie [id-token]
-  (cook/set-cookie! :id-token id-token -1 "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
+  (cook/set-cookie! :id-token id-token -1 (.. js/window -location -pathname) ls/jwt-cookie-domain ls/jwt-cookie-secure))
 
 (defn update-id-token [token-body]
   (timbre/info "Updating id-token:" token-body)

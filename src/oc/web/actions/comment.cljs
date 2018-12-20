@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.utils.comment :as comment-utils]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn add-comment-focus [activity-uuid]
@@ -14,14 +15,6 @@
 
 (defn add-comment-blur []
   (dis/dispatch! [:add-comment-focus nil]))
-
-(defn get-comments-finished
-  [comments-key activity-data {:keys [status success body]}]
-  (dis/dispatch! [:comments-get/finish {:success success
-                                        :error (when-not success body)
-                                        :comments-key comments-key
-                                        :body (when (seq body) (json->cljs body))
-                                        :activity-uuid (:uuid activity-data)}]))
 
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
@@ -40,33 +33,17 @@
       ;; if it worked or not
       (fn [{:keys [status success body]}]
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
-          (api/get-comments comments-link #(get-comments-finished comments-key activity-data %)))
+          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
         (dis/dispatch! [:comment-add/finish {:success success
                                              :error (when-not success body)
                                              :body (when (seq body) (json->cljs body))
                                              :activity-data activity-data}])))))
 
 (defn get-comments [activity-data]
-  (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
-        comments-link (utils/link-for (:links activity-data) "comments")]
-    (dis/dispatch! [:comments-get
-                    comments-key
-                    activity-data])
-    (api/get-comments comments-link #(get-comments-finished comments-key activity-data %))))
+  (comment-utils/get-comments activity-data))
 
-(defn get-comments-if-needed [activity-data all-comments-data]
-  (let [comments-link (utils/link-for (:links activity-data) "comments")
-        activity-uuid (:uuid activity-data)
-        comments-data (get all-comments-data activity-uuid)
-        should-load-comments? (and ;; there are comments to load,
-                                   (pos? (:count comments-link))
-                                   ;; they are not already loading,
-                                   (not (:loading comments-data))
-                                   ;; and they are not loaded already
-                                   (not (contains? comments-data :sorted-comments)))]
-    ;; Load the whole list of comments if..
-    (when should-load-comments?
-      (get-comments activity-data))))
+(defn get-comments-if-needed [activity-data comments-data]
+  (comment-utils/get-comments-if-needed activity-data comments-data))
 
 (defn delete-comment [activity-data comment-data]
   ;; Send WRT read on comment delete
@@ -83,7 +60,7 @@
       (fn [{:keys [status success body]}]
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link
-           #(get-comments-finished comments-key activity-data %)))))))
+           #(comment-utils/get-comments-finished comments-key activity-data %)))))))
 
 (defn comment-reaction-toggle [activity-data comment-data reaction-data reacting?]
   (activity-actions/send-item-read (:uuid activity-data))
