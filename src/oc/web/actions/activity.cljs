@@ -679,11 +679,11 @@
               publisher-id (:user-id (:publisher activity-data))
               container-id (:board-uuid activity-data)
               token-data (jwt/get-id-token-contents)
-              user-id (:user-id token-data)
+              user-name (:name token-data)
               avatar-url (:avatar-url token-data)
               org-id (:uuid (dis/org-data))]
     (ws-cc/item-seen publisher-id container-id activity-id)
-    (ws-cc/item-read org-id container-id activity-id user-id avatar-url)))
+    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (defn- send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
