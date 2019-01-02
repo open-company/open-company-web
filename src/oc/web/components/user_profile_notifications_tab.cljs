@@ -10,6 +10,8 @@
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
+            [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
@@ -24,6 +26,24 @@
         current-user-data @(drv/get-ref s :current-user-data)
         user-data (:user-data edit-user-profile)]
     (user-actions/user-profile-save current-user-data edit-user-profile)))
+
+(defn add-slack-clicked [current-user-data real-close-cb]
+  (let [switch-cb (fn []
+                   (real-close-cb current-user-data)
+                   (utils/after 150 #(org-settings/show-modal :main)))]
+    (if (:has-changes current-user-data)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "user-profile-unsaved-edits"
+                        :message "Leave without saving your changes?"
+                        :link-button-title "Stay"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
+                        :solid-button-cb (fn []
+                                          (alert-modal/hide-alert)
+                                          (switch-cb))}]
+        (alert-modal/show-alert alert-data))
+      (switch-cb))))
 
 (rum/defcs user-profile-notifications-tab <
                                        rum/reactive
@@ -55,7 +75,7 @@
     [:div.user-profile-internal
       [:div.user-profile-content.group
         (when error
-          [:div.user-profile-field-box
+          [:div.user-profile-field-box.group
             [:div.user-profile-field-label
               [:span.error
                 {:style {:margin-left "0px"}}
@@ -63,11 +83,12 @@
         (when error
           [:div.user-profile-divider-line])
           ;; Digest frequency
-        [:div.user-profile-field-box
+        [:div.user-profile-field-box.group
           {:class utils/hide-class}
           [:div.user-profile-field-label
             "Daily newsletter"]
           [:div.user-profile-field.digest-medium
+            {:class (when-not slack-enabled? "no-slack")}
             [:div.dropdown.dropdown-button
               [:button.btn-reset.user-type-btn.dropdown-toggle
                 {:id "user-digest-medium-dropdown"
@@ -77,9 +98,7 @@
                 (case (:digest-medium current-user-data)
                   "slack"
                   "Notify me via Slack"
-                  "email"
-                  "Notify me via Email"
-                  "In-app only")]
+                  "Notify me via Email")]
               [:ul.dropdown-menu.user-type-dropdown-menu
                 {:aria-labelledby "user-digest-medium-dropdown"}
                 [:li
@@ -89,12 +108,15 @@
                 (when slack-enabled?
                   [:li
                     {:on-click #(change! s :digest-medium "slack")}
-                    "Notify me via Slack"])
-                [:li
-                  {:on-click #(change! s :digest-medium "in-app")}
-                  "In-app only"]]]]]
+                    "Notify me via Slack"])]]
+            (when-not slack-enabled?
+              [:div.enable-slack
+                "Want to get notified via Slack?"
+                [:button.mlb-reset.add-slack-bt
+                  {:on-click #(add-slack-clicked current-user-data real-close-cb)}
+                  "Add a Slack team"]])]]
         [:div.user-profile-divider-line]
-        [:div.user-profile-field-box
+        [:div.user-profile-field-box.group
           {:class utils/hide-class}
           [:div.user-profile-field-label
             "Comments & mentions"]
@@ -125,7 +147,7 @@
                   {:on-click #(change! s :notification-medium "in-app")}
                   "In-app only"]]]]]
         [:div.user-profile-divider-line]
-        [:div.user-profile-field-box
+        [:div.user-profile-field-box.group
           {:class utils/hide-class}
           [:div.user-profile-field-label
             "Reminders"]
