@@ -558,6 +558,16 @@ section.home-keep-aligned {
         }
       }
 
+      &.first-row {
+        div.keep-aligned-section-row-left {
+          padding: 24px 34px 24px 44px;
+        }
+
+        div.keep-aligned-section-row-right {
+          padding: 24px 0 24px 94px;
+        }
+      }
+
       &.second-row {
         &:before {
           content: "";
@@ -577,6 +587,20 @@ section.home-keep-aligned {
             height: 100%;
             border-top-right-radius: 100px;
           }
+        }
+
+        div.keep-aligned-section-row-right {
+          padding: 24px 0 24px 94px;
+        }
+
+        img.keep-aligned-section-screenshot {
+          max-width: 483px;
+        }
+      }
+
+      &.third-row {
+        div.keep-aligned-section-row-right {
+          padding: 24px 0 24px 94px;
         }
       }
 
@@ -604,6 +628,14 @@ section.home-keep-aligned {
         div.keep-aligned-section-row-inner {
           div.keep-aligned-section-copy {
             padding-left: 180px;
+
+            @include tablet() {
+              padding-left: 0;
+            }
+          }
+
+          div.keep-aligned-section-row-right {
+            padding: 24px 74px 24px 4px; 
           }
         }
       }
@@ -799,6 +831,7 @@ section.home-keep-aligned {
                 border: 1px solid #E3E3E3;
                 color: $carrot_green;
                 opacity: 1;
+                box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.7);
 
                 div.slack-logo {
                   opacity: 1;

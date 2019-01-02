@@ -39,19 +39,11 @@
 
           [:h1.headline
             "Lead with clarity"]
-          [:div.subheadline.big-web-only
+          [:div.subheadline
             (str
              "Leaders struggle to communicate effectively with "
-             "fast-growing teams. Carrot makes sure everyone "
-             "hears you - even in noisy places like email and Slack.")]
-          [:div.subheadline.second-line.big-web-only
-            "With Carrot, everyone stays on the same page."]
-          [:div.subheadline.tablet-mobile-only
-            (str
-             "Leaders struggle to communicate effectively with "
-             "fast-growing teams. Carrot makes sure everyone "
-             "hears you - even in noisy places like email and Slack. "
-             "With Carrot, everyone stays on the same page.")]
+             "fast-growing and distributed teams. Carrot helps "
+             "leaders rise above the noise to keep teams focused.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container.group
             shared-misc/show-animation-button
