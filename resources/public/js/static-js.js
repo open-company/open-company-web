@@ -116,6 +116,10 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
+  $("button.slack-email-switch-bt").on("click", function(){
+    $("button.mlb-reset.slack-email-switch-bt").toggleClass("active");
+  });
+
   if (jwt) {
     $("#site-header-login-item").hide();
     // Move the red guy up
