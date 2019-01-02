@@ -601,6 +601,59 @@ section.home-keep-aligned {
         }
       }
 
+      div.keep-aligned-section-carion-container {
+        width: 100%;
+        height: auto;
+        position: relative;
+
+        @include tablet() {
+          margin: 0 auto;
+          max-width: 100%;
+        }
+
+        img.keep-aligned-section-screenshot {
+          width: 100%;
+          height: auto;
+          z-index: 3;
+
+          &.carion-1 {
+            opacity: 1;
+            transition: opacity 250ms;
+          }
+
+          &.carion-1-alt {
+            opacity: 0;
+            transition: opacity 250ms;
+            height: 0;
+          }
+
+          @include tablet() {
+            margin: 0 auto;
+            max-width: 100%;
+            margin-top: 32px;
+          }
+        }
+
+        button.keep-aligned-section-next-bt {
+          width: 72px;
+          height: 72px;
+          background-image: cdnUrl("/img/ML/homepage_right_arrow.svg");
+          background-size: 72px 72px;
+          background-repeat: no-repeat;
+          background-position: center;
+          position: absolute;
+          right: -32px;
+          top: calc(50% - 36px);
+          z-index: 5;
+          padding: 0;
+
+          @include mobile() {
+            display: none;
+          }
+        }
+        
+      }
+
       img.keep-aligned-section-screenshot {
         width: 100%;
         height: auto;
@@ -655,6 +708,11 @@ section.home-keep-aligned {
 
         div.slack-email-container {
           margin-bottom: 24px;
+
+          @include tablet() {
+            margin-top: 40px;
+            margin-bottom: 8px;
+          }
 
           div.slack-email-title {
             @include avenir_H();

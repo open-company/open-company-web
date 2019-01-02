@@ -178,7 +178,7 @@
       [:div.keep-aligned-section-row.first-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-right.keep-aligned-section-copy
-            [:div.slack-email-container.group
+            [:div.slack-email-container.group.big-web-only
               [:div.slack-email-title
                 "Automatically sent to your team on"]
               [:div.slack-email-switch-container
@@ -193,11 +193,26 @@
             [:div.keep-aligned-section-copy-subtitle
               (str
                "Protect your team’s focus (and sanity). Carrot shares your updates together "
-               "in a morning newsletter to reduce interruptions and increase engagement.")]]
+               "in a morning newsletter to reduce interruptions and increase engagement.")]
+            [:div.slack-email-container.group.tablet-mobile-only
+              [:div.slack-email-title
+                "Automatically sent to your team on"]
+              [:div.slack-email-switch-container
+                [:button.mlb-reset.slack-email-switch-bt.email-bt.active
+                  [:div.email-logo]
+                  "Email"]
+                [:button.mlb-reset.slack-email-switch-bt.slack-bt
+                  [:div.slack-logo]
+                  "Slack"]]]]
           [:div.keep-aligned-section-row-left
-            [:img.keep-aligned-section-screenshot.screenshot-1
-              {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]]]
+            [:div.keep-aligned-section-carion-container
+              [:img.keep-aligned-section-screenshot.screenshot-1.carion-1
+                {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
+                 :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+              [:button.keep-aligned-section-next-bt.mlb-reset]
+              [:img.keep-aligned-section-screenshot.screenshot-1.carion-1-alt
+                {:src (cdn "/img/ML/homepage_screenshots_first_row_slack.png")
+                 :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
