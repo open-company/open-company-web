@@ -127,7 +127,7 @@
                 "Continue with Slack"
                 (if (= active-page "slack")
                   "Add to Slack"
-                  "Start free"))]]]
+                  "Get Started"))]]]
         [:div.site-navbar-right.tablet-only
           [:a.login
             {:id "site-header-tabket-login-item"
