@@ -233,9 +233,9 @@ section.testimonials-section {
   }
 
   div.testimonials-cards-container {
-    // TODO: use this to add a third testimony
-    // $testimonials_breakpoint: 1193;
-    $testimonials_breakpoint: 833;
+    // TODO: use this to go back to 2 (or 3) testimony
+    $testimonials_breakpoint: 1193;
+    // $testimonials_breakpoint: 833;
     width: #{$testimonials_breakpoint + 1}px;
     margin: 55px auto 0px;
     position: relative;

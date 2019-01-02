@@ -34,22 +34,22 @@
             "Chris Cairns"]
           [:div.testimonial-role
             "Managing Partner"]]]
-      ; [:div.testimonial-card.m-io
-      ;   [:div.testimonial-header.group
-      ;     [:a
-      ;       {:href "https://m.io/"
-      ;        :target "_blank"}
-      ;       [:div.testimonial-logo]]]
-      ;   [:div.testimonial-quote
-      ;     (str
-      ;      "“On Carrot, my updates get noticed and "
-      ;      "get the team talking. I love that.”")]
-      ;   [:div.testimonial-footer.group
-      ;     [:div.testimonial-image]
-      ;     [:div.testimonial-name
-      ;       "Tom Hadfield"]
-      ;     [:div.testimonial-role
-      ;       "CEO"]]]
+      [:div.testimonial-card.m-io
+        [:div.testimonial-header.group
+          [:a
+            {:href "https://m.io/"
+             :target "_blank"}
+            [:div.testimonial-logo]]]
+        [:div.testimonial-quote
+          (str
+           "“On Carrot, my updates get noticed and "
+           "get the team talking. I love that.”")]
+        [:div.testimonial-footer.group
+          [:div.testimonial-image]
+          [:div.testimonial-name
+            "Tom Hadfield"]
+          [:div.testimonial-role
+            "CEO"]]]
       [:div.testimonial-card.wayne-edu
         [:div.testimonial-header.group
           [:a
