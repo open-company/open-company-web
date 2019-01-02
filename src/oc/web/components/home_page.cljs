@@ -39,21 +39,26 @@
 
           [:h1.headline
             "Lead with clarity"]
-          [:div.subheadline.for-others
+          [:div.subheadline.big-web-only
             (str
-             "Leaders struggle to communicate clearly because "
-             "chat and email are too noisy. Carrot helps leaders "
-             "rise above the noise to keep teams focused.")]
-          [:div.subheadline.for-mobile
-            "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
+             "Leaders struggle to communicate effectively with "
+             "fast-growing teams. Carrot makes sure everyone "
+             "hears you - even in noisy places like email and Slack.")]
+          [:div.subheadline.second-line.big-web-only
+            "With Carrot, everyone stays on the same page."]
+          [:div.subheadline.tablet-mobile-only
+            (str
+             "Leaders struggle to communicate effectively with "
+             "fast-growing teams. Carrot makes sure everyone "
+             "hears you - even in noisy places like email and Slack. "
+             "With Carrot, everyone stays on the same page.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container.group
             shared-misc/show-animation-button
             [:button.mlb-reset.get-started-button
               {:id "get-started-centred-bt"
                :on-click #(router/nav! oc-urls/sign-up)}
-              "Get started for free"]]
-          shared-misc/no-credit-card
+              "Get started - It's free"]]
           [:div.carrot-box-container.confirm-thanks.group
             {:style {:display "none"}}
             [:div.carrot-box-thanks
@@ -63,7 +68,9 @@
           [:div.main-animation-container
             [:img.main-animation
               {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
+
+          shared-misc/homepage-testimonials]
 
         shared-misc/keep-aligned-section
 

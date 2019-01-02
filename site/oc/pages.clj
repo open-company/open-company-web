@@ -164,17 +164,12 @@
           [:div.testimonial-role
             "Director of Digital Communications"]]]]])
 
-(def no-credit-card
-  [:div.no-credit-card
-    "No credit card required&nbsp;&nbsp;•&nbsp;&nbsp;No install required"])
-
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "Try Carrot with your team for free."]
+      "Company updates that rise above the noise."]
     [:button.mlb-reset.get-started-button
-      "Get started for free"]
-    no-credit-card])
+      "Get started - It's free"]])
 
 (def keep-aligned-section
   [:section.home-keep-aligned.group
@@ -182,92 +177,79 @@
     [:div.keep-aligned-section
       [:div.keep-aligned-section-row.first-row
         [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
+          [:div.keep-aligned-section-row-right.keep-aligned-section-copy
+            [:div.slack-email-container.group
+              [:div.slack-email-title
+                "Automatically sent to your team on"]
+              [:div.slack-email-switch-container
+                [:button.mlb-reset.slack-email-switch-bt.email-bt.active
+                  [:div.email-logo]
+                  "Email"]
+                [:button.mlb-reset.slack-email-switch-bt.slack-bt
+                  [:div.slack-logo]
+                  "Slack"]]]
             [:div.keep-aligned-section-copy-title
-              "Stay visible."]
+              "Your morning digest."]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Key information stays organized and visible so your team can get caught "
-               "up anytime without worrying they missed something in fast-moving conversations.")]
-            [:img.keep-aligned-section-copy-values-list
-              {:src (cdn "/img/ML/homepage_vertical_values_list.png")
-               :srcSet (str (cdn "/img/ML/homepage_vertical_values_list@2x.png") " 2x")}]]
-          [:div.keep-aligned-section-row-right
+               "Protect your team’s focus (and sanity). Carrot shares your updates together "
+               "in a morning newsletter to reduce interruptions and increase engagement.")]]
+          [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-1
               {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
                :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-right.keep-aligned-section-copy
+          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Spark meaningful discussions."]
+              "Know who’s engaged."]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Reactions and comments stay together with "
-               "the post to provide greater context for "
-               "what’s happening and why.")
+               "With Carrot, you know who saw your update. "
+               "If it’s missed, Carrot works in the background "
+               "to remind them for you.")
               [:br][:br]
               (str
-               "Your team can join the discussion from Slack "
-               "— Carrot keeps it all in sync.")]]
-          [:div.keep-aligned-section-row-left
+               "See which updates create energy and engagement, "
+               "and which ones aren’t getting through.")]]
+          [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-2
               {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
                :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]]]]
 
       [:div.keep-aligned-section-row.third-row
         [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
+          [:div.keep-aligned-section-row-right.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Make sure you're heard."]
+              "Stay consistent with reminders."]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "When you post something new, you’ll always know "
-               "who’s seen it. If they haven’t, Carrot reminds them "
-               "for you.")
-              [:br][:br]
-              (str
-               "Carrot AI works in the background to keep everyone "
-               "on your team looped in to what matters.")]]
-          [:div.keep-aligned-section-row-right
+               "Carrot reminds you when it’s time to update "
+               "your team. Consistent communication builds "
+               "trust and transparency.")]
+            [:img.keep-aligned-section-copy-values-list
+              {:src (cdn "/img/ML/homepage_vertical_values_list.png")
+               :srcSet (str (cdn "/img/ML/homepage_vertical_values_list@2x.png") " 2x")}]]
+          [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-3
               {:src (cdn "/img/ML/homepage_screenshots_third_row.png")
                :srcSet (str (cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]]]]
 
       [:div.keep-aligned-section-row.fourth-row
         [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-right.keep-aligned-section-copy
-            [:div.keep-aligned-section-copy-title
-              "Update your team in seconds."]
-            [:div.keep-aligned-section-copy-subtitle
-              (str
-               "Starting a new post is fast - with text or video "
-               "- so it’s easy to create consistent "
-               "communication that builds transparency and "
-               "trust. Set up recurring updates, too.")]]
-          [:div.keep-aligned-section-row-left
-            [:img.keep-aligned-section-screenshot.screenshot-4
-              {:src (cdn "/img/ML/homepage_screenshots_fourth_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_fourth_row@2x.png") " 2x")}]]]]
-
-      [:div.keep-aligned-section-row.fifth-row
-        [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Perfect for Slack teams."]
+              "Space to be thoughtful."]
             [:div.keep-aligned-section-copy-subtitle
-              (str
-               "New posts automatically shared to the "
-               "appropriate Slack channel. Join the "
-               "discussion right from Slack — Carrot keeps "
-               "it all in sync.")]
-            [:a.keep-aligned-section-copy-button
-              {:href (env :slack-signup-url)}]]
+              "Carrot gives you room to share more context for what’s happening and why."]
+            [:img.keep-aligned-section-copy-interactions-list
+              {:src (cdn "/img/ML/homepage_vertical_interactions_list.png")
+               :srcSet (str (cdn "/img/ML/homepage_vertical_interactions_list@2x.png") " 2x")}]]
           [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-5
-              {:src (cdn "/img/ML/homepage_screenshots_fifth_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_fifth_row@2x.png") " 2x")}]]]]]])
+            [:img.keep-aligned-section-screenshot.screenshot-4
+              {:src (cdn "/img/ML/homepage_screenshots_fourth_row.png")
+               :srcSet (str (cdn "/img/ML/homepage_screenshots_fourth_row@2x.png") " 2x")}]]]]]])
 
 (def animation-lightbox
   [:div.animation-lightbox-container
@@ -293,20 +275,25 @@
 
         [:h1.headline
           "Lead with clarity"]
-        [:div.subheadline.for-others
+        [:div.subheadline.big-web-only
           (str
-           "Leaders struggle to communicate clearly because "
-           "chat and email are too noisy. Carrot helps leaders "
-           "rise above the noise to keep teams focused.")]
-        [:div.subheadline.for-mobile
-          "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
+           "Leaders struggle to communicate effectively with "
+           "fast-growing teams. Carrot makes sure everyone "
+           "hears you - even in noisy places like email and Slack.")]
+        [:div.subheadline.second-line.big-web-only
+          "With Carrot, everyone stays on the same page."]
+        [:div.subheadline.tablet-mobile-only
+          (str
+           "Leaders struggle to communicate effectively with "
+           "fast-growing teams. Carrot makes sure everyone "
+           "hears you - even in noisy places like email and Slack. "
+           "With Carrot, everyone stays on the same page.")]
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.get-started-button-container.group
           show-animation-button
           [:button.mlb-reset.get-started-button
             {:id "get-started-centred-bt"}
-            "Get started for free"]]
-        no-credit-card
+            "Get started - It's free"]]
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style {:display "none"}}
@@ -317,7 +304,12 @@
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/homepage_screenshot.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
+             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
+
+        [:div.homepage-testimonials-container
+          [:img.homepage-testimonials
+            {:src (cdn "/img/ML/homepage_testimonials.png")
+             :srcSet (str (cdn "/img/ML/homepage_testimonials@2x.png") " 2x")}]]]
 
       keep-aligned-section
 
@@ -580,7 +572,6 @@
             [:a.add-to-slack-button
               {:id "get-started-centred-bt"
                :href (env :slack-signup-url)}]]
-        no-credit-card
         (carrot-box-thanks "carrot-box-thanks-top")
         [:div.carrot-box-container.confirm-thanks.group
           {:style {:display "none"}}
