@@ -30,7 +30,7 @@ div.homepage-testimonials-container {
   padding: 120px auto;
 
   @include tablet() {
-    padding: 72px 24px;
+    padding: 24px 24px 32px;
   }
 
   img.homepage-testimonials {
@@ -213,8 +213,12 @@ section.testimonials-section {
     position: relative;
 
     @include tablet(){
-      font-size: 26px;
+      font-size: 40px;
       line-height: auto;
+    }
+
+    @include mobile() {
+      font-size: 36px;
     }
   }
 
@@ -227,8 +231,13 @@ section.testimonials-section {
     position: relative;
 
     @include tablet(){
-      font-size: 20px;
+      font-size: 24px;
       line-height: 26px;
+    }
+
+    @include mobile() {
+      font-size: 20px;
+      line-height: auto;
     }
   }
 
@@ -482,7 +491,7 @@ section.home-keep-aligned {
   text-align: center;
 
   @include tablet() {
-    padding: 40px 24px 80px !important;
+    padding: 0 24px 0 !important;
   }
 
   h2.keep-aligned-title {
@@ -504,13 +513,16 @@ section.home-keep-aligned {
     margin: 0px auto;
 
     div.keep-aligned-section-row {
-      margin: 192px auto;
+      margin: 0 auto;
+      padding: 96px 0;
       position: relative;
 
       @include tablet() {
         margin: 0 auto;
         padding-top: 80px;
         padding-bottom: 80px;
+        width: 100%;
+        height: auto;
       }
 
       &:nth-child(odd) {
@@ -538,17 +550,12 @@ section.home-keep-aligned {
       }
 
       &:first-child {
-        margin-top: 120px;
+        padding-top: 100px;
 
         @include tablet() {
           margin: 0 auto;
+          padding-top: 94px;
         }
-      }
-
-      @include tablet() {
-        width: 100%;
-        height: auto;
-        margin: 80px auto;
       }
 
       &.second-row {
@@ -558,10 +565,10 @@ section.home-keep-aligned {
           background-color: $another_ui_grey;
           border-top-right-radius: 200px;
           width: calc(50vw + 293px);
-          height: calc(100% + 240px);
+          height: 100%;
           position: absolute;
-          left: 0px;
-          top: -120px;
+          left: 0;
+          top: 0;
 
           @include tablet() {
             width: calc(100% + 48px);
@@ -580,10 +587,10 @@ section.home-keep-aligned {
           background-color: $another_ui_grey;
           border-bottom-left-radius: 200px;
           width: 86vw;
-          height: calc(100% + 240px);
+          height: 100%;
           position: absolute;
-          right: 0px;
-          top: -120px;
+          right: 0;
+          top: 0;
 
           @include tablet() {
             width: calc(100% + 48px);
