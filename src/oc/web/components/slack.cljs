@@ -48,7 +48,6 @@
                              (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                    {:auth-source "slack"})]
                                (user-actions/login-with-slack auth-link)))}]]
-            shared-misc/no-credit-card
             [:div.carrot-box-container.confirm-thanks.group
               {:style {:display "none"}}
               [:div.carrot-box-thanks

@@ -50,7 +50,7 @@ div.press-kit-wrap {
         position: relative;
 
         &:before {
-          background-color: #F8F7F3;
+          background-color: $another_ui_grey;
           content: "";
           width: 90vw;
           height: 100%;
@@ -154,7 +154,7 @@ div.press-kit-wrap {
         position: relative;
 
         &:before {
-          background-color: #F8F7F3;
+          background-color: $another_ui_grey;
           content: "";
           width: 90vw;
           height: 100%;

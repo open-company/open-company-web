@@ -78,18 +78,5 @@ div.site-mobile-menu {
       margin: 16px auto 0px;
       max-width: 320px;
     }
-
-    div.no-credit-card {
-      width: 100%;
-      text-align: center;
-      margin: 16px auto 0;
-      @include avenir_R();
-      font-size: 14px;
-      color: $ui_grey;
-
-      span.dot {
-        font-size: 10px;
-      }
-    }
   }
 }

@@ -29,7 +29,7 @@ div.slack-lander-wrap {
       }
 
       &:after {
-        background-color: #F8F7F3;
+        background-color: $another_ui_grey;
         content: "";
         width: 100%;
         height: 39%;
@@ -113,7 +113,7 @@ div.slack-lander-wrap {
     section.keep-aligned {
       text-align: center;
       margin: 0px auto;
-      background-color: #F8F7F3;
+      background-color: $another_ui_grey;
       padding: 120px 0;
 
       @include mobile() {
@@ -124,19 +124,6 @@ div.slack-lander-wrap {
         @include avenir_H();
         font-size: 28px;
         color: $deep_navy;
-      }
-
-      div.no-credit-card {
-        @include avenir_R();
-        color: $ui_grey;
-        font-size: 14px;
-        margin-top: 24px;
-        text-align: center;
-
-        @include mobile() {
-          font-size: 12px;
-          margin-top: 0px;
-        }
       }
     }
   }
