@@ -482,7 +482,7 @@ button.get-started-button {
     width: 100%;
     margin: 16px auto;
     padding: 2px 0 0;
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 
@@ -1018,4 +1018,8 @@ button.show-animation-bt {
   background-size: 226px 27px;
   background-position: center;
   background-repeat: no-repeat;
+
+  @include mobile() {
+    background-size: 206px 25px;
+  }
 }
