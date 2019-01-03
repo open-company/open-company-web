@@ -504,7 +504,7 @@
         (dis/dispatch! [:entry-revert false])))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
-  (when (= status 404)
+  (when (some #{status} [401 404])
     (router/redirect-404!))
   (if (and secure-uuid
            (jwt/jwt)
@@ -559,6 +559,11 @@
     (fn [{:keys [success body status]}]
       (when (= status 404)
         (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
+  ;; Quick check on token
+  (when-let [info (jwt/get-id-token-contents)]
+    (when (not= (:secure-uuid info)
+                (router/current-secure-activity-id))
+      (router/redirect-404!)))
   (let [org-slug (router/current-org-slug)]
     (api/get-auth-settings (fn [body]
       (when body
