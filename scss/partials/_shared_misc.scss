@@ -27,7 +27,7 @@ div.main-animation-container {
 }
 
 div.homepage-testimonials-container {
-  padding: 120px auto;
+  margin: 40px auto 0;
 
   @include tablet() {
     padding: 24px 24px 32px;
@@ -621,6 +621,7 @@ section.home-keep-aligned {
 
           @include mobile(){
             padding: 0;
+            width: calc(100% + 24px);
           }
         }
 
@@ -633,6 +634,10 @@ section.home-keep-aligned {
         div.keep-aligned-section-row-left {
           padding: 24px 0px 24px 54px;
           width: 486px;
+
+          @include tablet() {
+            width: 100%;
+          }
 
           @include mobile(){
             padding: 0;
@@ -656,14 +661,13 @@ section.home-keep-aligned {
         @include tablet() {
           margin: 0 auto;
           max-width: 100%;
-          margin-top: 32px;
         }
 
         @include mobile() {
           overflow-x: auto;
           overflow-y: hidden;
-          margin-top: 24px;
-          width: 100%;
+          margin: 24px 0 0;
+          width: calc(100% + 24px);
         }
 
         div.keep-aligned-section-carion-inner {
@@ -679,6 +683,11 @@ section.home-keep-aligned {
             width: 100%;
             height: auto;
             z-index: 3;
+            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+
+            @include tablet() {
+              margin-top: 0px;
+            }
 
             @include mobile() {
               float: left;
@@ -703,7 +712,7 @@ section.home-keep-aligned {
               opacity: 1;
               transition: opacity 250ms;
 
-              @include tablet() {
+              @include mobile() {
                 transition: none;
               }
             }
@@ -713,7 +722,7 @@ section.home-keep-aligned {
               transition: opacity 250ms;
               height: 0;
 
-              @include tablet() {
+              @include mobile() {
                 transition: none;
                 opacity: 1;
                 height: auto;
@@ -734,6 +743,12 @@ section.home-keep-aligned {
           top: calc(50% - 36px);
           z-index: 5;
           padding: 0;
+          transform: rotate(0deg);
+          transition: transform 180ms;
+
+          &.active {
+            transform: rotate(-180deg);
+          }
 
           @include mobile() {
             display: none;
@@ -804,6 +819,13 @@ section.home-keep-aligned {
           top: unset;
           position: relative;
           transform: translateY(0%);
+        }
+
+        div.slack-email-mobile-title {
+          margin-top: 40px;
+          @include avenir_H();
+          font-size: 14px;
+          color: $ui_grey;
         }
 
         div.slack-email-container {
@@ -897,7 +919,7 @@ section.home-keep-aligned {
                 border: 1px solid #E3E3E3;
                 color: $carrot_green;
                 opacity: 1;
-                box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.7);
+                box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
 
                 div.slack-logo {
                   opacity: 1;

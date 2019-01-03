@@ -194,9 +194,12 @@
                "share more context for what’s happening "
                "and why.")]]
           [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-1
+            [:img.keep-aligned-section-screenshot.screenshot-1.big-web-tablet-only
               {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]]]
+               :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
+              {:src (cdn "/img/ML/homepage_screenshots_first_row_mobile.png")
+               :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row_mobile@2x.png") " 2x")}]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
@@ -219,7 +222,9 @@
                   [:div.slack-logo]
                   "Slack"]]
               [:div.slack-email-title.big-web-only
-                "Sent daily on Slack or email"]]]
+                "Sent daily on Slack or email"]]
+            [:div.slack-email-mobile-title.mobile-only
+              "Automatically sent daily on email or Slack..."]]
           [:div.keep-aligned-section-row-left
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
@@ -300,9 +305,12 @@
              :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
         [:div.homepage-testimonials-container
-          [:img.homepage-testimonials
+          [:img.homepage-testimonials.big-web-tablet-only
             {:src (cdn "/img/ML/homepage_testimonials.png")
-             :srcSet (str (cdn "/img/ML/homepage_testimonials@2x.png") " 2x")}]]]
+             :srcSet (str (cdn "/img/ML/homepage_testimonials@2x.png") " 2x")}]
+          [:img.homepage-testimonials.mobile-only
+            {:src (cdn "/img/ML/homepage_testimonials_mobile.png")
+             :srcSet (str (cdn "/img/ML/homepage_testimonials_mobile@2x.png") " 2x")}]]]
 
       keep-aligned-section
 
