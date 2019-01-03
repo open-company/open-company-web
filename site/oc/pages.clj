@@ -328,10 +328,19 @@
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Pricing"]
+          "Find a plan"]
 
         [:div.pricing-subheadline
           "Simple plans to stay aligned. Get started for free."]
+
+        [:div.pricing-toggle-line.monthly
+          [:span.pricing-toggle-pre "Pay annually (20% off)"]
+          [:div.pricing-toggle
+            [:span.pricing-toggle-dot]]
+          [:span.pricing-toggle-post.post-monthly
+            "Pay monthly"]
+          [:span.pricing-toggle-post.post-yearly
+            "Pay yearly"]]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -340,102 +349,63 @@
               "Free"]
             [:h3.tear-price
               "$0"]
-            [:h5.tear-period
-              "/month"]
             [:div.tear-subtitle
-              "Free for small teams up to 10 users."]
+              [:span.bold
+                "Free for small teams"]
+              " up to 10 users."]
             [:a.tear-start-bt
               {:href "/sign-up"}
-              "Start Free"]
+              "Start for free"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Attachments up to 20MB"}
-              [:span "20MB upload max"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              [:span "1TB storage"]]
+              [:span "500Mmb storage"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                :title "Browse and search posts from the previous 6 months"}
-              [:span "6 months history"]]]
+              [:span "3 months history"]]]
           ;; Team
           [:div.pricing-column.team-column
             [:h2.tear-title
-              "Team"]
+              "Standard"]
+            [:div.tear-price-select-container
+              [:button.mlb-reset.tear-price-select
+                "Up to 25 users"]
+              [:div.tear-price-select-values
+                [:div.tear-price-select-value
+                  {:data-value "25"}
+                  "Up to 25 users"]
+                [:div.tear-price-select-value
+                  {:data-value "50"}
+                  "Up to 50 users"]
+                [:div.tear-price-select-value
+                  {:data-value "100"}
+                  "Up to 100 users"]]]
             [:h3.tear-price
-              "$65"]
-            [:h5.tear-period
-              "/month"]
+              "$45"]
             [:div.tear-subtitle
-              "Includes 15 users, additional users are $4 /mo."]
+              "Per month, billed annually"]
             [:a.tear-start-bt
               {:href "/sign-up"}
-              "Start Free"]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Attachments up to 100MB"}
-              [:span "100MB file upload"]]
+              "Try free for 14 days"]
             [:div.tear-feature-separator]
             [:div.tear-feature
               [:span "Unlimited storage"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "No limits on history maintained in Carrot"}
               [:span "Unlimited history"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Support via chat and email"}
-              [:span "Priority support"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Don’t feel like writing? Record a quick video"}
-              [:span "Video updates"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Schedule and assign weekly and monthly updates to build consistency."}
-              [:span "Recurring updates"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Add private sections for invited team members only"}
-              [:span "Advanced permissions"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Make sure you’re being heard, and know who’s seen your post"}
-              [:span "Who saw that"]]]
+              [:span "Priority support"]]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
             [:h2.tear-title
               "Enterprise"]
             [:div.tear-price]
             [:div.tear-subtitle
-              "A team of more than 100? Let's create a custom plan."]
+              "A team of more than 250? Let's create a custom plan."]
             [:a.tear-start-bt
               {:href "#"
                :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
@@ -443,7 +413,7 @@
             [:div.tear-feature-separator]
             [:div.tear-feature
               [:span
-                "Includes everything in the "
+                "Everything in the "
                 [:span.heavy "Team plan"]
                 ", plus:"]]
             [:div.tear-feature-separator]

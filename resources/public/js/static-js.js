@@ -123,6 +123,29 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1-alt");
   });
 
+  $("div.pricing-toggle").on("click", function(){
+    $(this).toggleClass("monthly");
+    $("div.pricing-toggle-line").toggleClass("monthly");
+  });
+
+  $("button.tear-price-select").on("click", function() {
+    $("div.tear-price-select-container").toggleClass("open");
+  });
+
+  $("div.tear-price-select-value").on("click", function(e){
+    var $this = $(this),
+        users = $this.data("value"),
+        $button = $("button.tear-price-select");
+    $button.html("Up to " + users + " users");
+  });
+
+  $(window).on("click", function(e){
+    $target = $(e.target);
+    if (!$target.hasClass("tear-price-select") && !$target.parents(".tear-price-select").length) {
+      $("div.tear-price-select-container").removeClass("open");
+    }
+  });
+
   if (jwt) {
     $("#site-header-login-item").hide();
     // Move the red guy up

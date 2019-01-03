@@ -70,9 +70,81 @@ div.pricing-wrap {
         }
       }
 
+      div.pricing-toggle-line {
+        margin: 40px auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 22px;
+
+        &.monthly {
+          span.pricing-toggle-post {
+            &.post-yearly {
+              display: none;
+            }
+
+            &.post-monthly {
+              display: block;
+            }
+          }
+        }
+
+        span.pricing-toggle-pre {
+          @include avenir_H();
+          font-size: 16px;
+          color: $deep_navy;
+          line-height: 22px;
+        }
+
+        div.pricing-toggle {
+          float: left;
+          margin: 0 16px;
+          height: 22px;
+          width: 40px;
+          background-color: $deep_navy;
+          border-radius: 100px;
+          position: relative;
+          cursor: pointer;
+
+          &.monthly {
+            span.pricing-toggle-dot {
+              margin-left: 21px;
+            }
+          }
+
+          span.pricing-toggle-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            top: 3px;
+            left: 0;
+            margin-left: 3px;
+            transition: margin-left 180ms; 
+          }
+        }
+
+        span.pricing-toggle-post {
+          @include avenir_R();
+          font-size: 16px;
+          color: $ui_grey;
+          width: 90px;
+          text-align: left;
+
+          &.post-yearly {
+            display: block;
+          }
+
+          &.post-monthly {
+            display: none;
+          }
+        }
+      }
+
       div.pricing-three-columns{
         margin: 80px auto 0;
-        width: 1072px;
+        width: 1258px;
         padding: 0 24px;
 
         @include pricing-tablet() {
@@ -84,13 +156,17 @@ div.pricing-wrap {
         }
 
         div.pricing-column {
-          width: 320px;
-          min-height: 943px;
+          width: 382px;
+          min-height: 773px;
           background-color: $another_ui_grey;
           float: left;
           margin-left: 32px;
           padding: 40px 32px;
           text-align: center;
+
+          &:nth-child(odd) {
+            margin-top: 64px;
+          }
 
           @include pricing-tablet() {
             min-height: initial;
@@ -109,19 +185,85 @@ div.pricing-wrap {
             color: $deep_navy;
           }
 
+          div.tear-price-select-container {
+            position: relative;
+            width: 280px;
+            height: 48px;
+            margin: 16px auto 0;
+
+            button.tear-price-select {
+              width: 280px;
+              height: 48px;
+              background-color: white;
+              border-radius: 8px;
+              border: 1px solid #D8DBDF;
+              @include avenir_R();
+              font-size: 16px;
+              color: $deep_navy;
+              box-shadow: none;
+              outline: none;
+              padding: 13px 16px;
+              border-radius: 4px;
+              position: relative;
+              text-align: left;
+              opacity: 1;
+
+              &:after {
+                color: $deep_navy;
+                font-size: 23px;
+                font-family: "Material Design Icons";
+                content: "\F35D";
+                position: absolute;
+                top: 8px;
+                right: 10px;
+              }
+
+              &:active, &:focus {
+                outline: none;
+                box-shadow: none;
+              }
+            }
+
+            &.open {
+              div.tear-price-select-values {
+                display: block;
+              }
+            }
+
+            div.tear-price-select-values {
+              position: absolute;
+              top: 4px;
+              left: -4px;
+              width: 280px;
+              background-color: white;
+              border-radius: 4px;
+              border: 1px solid #D8D8DF;
+              display: none;
+              text-align: left;
+
+              div.tear-price-select-value {
+                @include avenir_R();
+                font-size: 16px;
+                color: $deep_navy;
+                width: 280px;
+                height: 48px;
+                padding: 13px 16px;
+                cursor: pointer;
+                text-align: left;
+
+                &:hover {
+                  text-decoration: underline;
+                }
+              } 
+            }
+          }
+
           h3.tear-price {
             @include PTSerif()
             font-size: 60px;
             color: $deep_navy;
             line-height: 90px;
-            margin-top: 16px;
-          }
-
-          h5.tear-period {
-            @include avenir_B();
-            font-size: 14px;
-            color: $ui_grey;
-            text-transform: uppercase;
+            margin-top: 35px;
           }
 
           div.tear-subtitle {
@@ -130,6 +272,10 @@ div.pricing-wrap {
             color: $deep_navy;
             line-height: 26px;
             margin: 32px auto 0;
+
+            span.bold {
+              @include avenir_H();
+            }
           }
 
           a.tear-start-bt {
@@ -140,9 +286,8 @@ div.pricing-wrap {
             background-color: $carrot_orange;
             border-radius: 8px;
             color: white;
-            text-transform: uppercase;
-            @include avenir_B();
-            font-size: 14px;
+            @include avenir_H();
+            font-size: 16px;
             padding: 10px 24px;
           }
 
@@ -186,7 +331,7 @@ div.pricing-wrap {
           }
 
           &.free-column {
-            border-bottom-left-radius: 40px;
+            border-bottom-left-radius: 100px;
             margin-left: 0;
 
             @include pricing-tablet() {
@@ -194,13 +339,15 @@ div.pricing-wrap {
             }
 
             div.tear-subtitle {
-              max-width: 182px;
+              max-width: 192px;
             }
           }
 
           &.team-column {
+            min-height: 837px;
+
             div.tear-subtitle {
-              max-width: 251px;
+              max-width: 151px;
             }
           }
 
@@ -220,9 +367,8 @@ div.pricing-wrap {
             }
 
             a.tear-start-bt {
-              background-color: transparent;
-              border: 2px solid $coral;
-              color: $carrot_orange;
+              background-color: $feint_emerald;
+              color: $carrot_green;
             }
 
             div.tear-subtitle {
