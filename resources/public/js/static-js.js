@@ -118,8 +118,8 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
   $("button.slack-email-switch-bt, button.keep-aligned-section-next-bt").on("click", function(){
     $("button.mlb-reset.slack-email-switch-bt").toggleClass("active");
-    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1");
-    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1-alt");
+    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1");
+    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1-alt");
   });
 
   if (jwt) {

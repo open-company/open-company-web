@@ -36,7 +36,7 @@ div.homepage-testimonials-container {
   img.homepage-testimonials {
     padding: 1.5% 2.4%;
     width: 100%;
-    max-width: 1153px;
+    max-width: 1116px;
     object-fit: contain;
     height: auto;
   }
@@ -200,9 +200,25 @@ section.testimonials-section {
     text-align: center;
   }
 
-  @include tablet() {
-    width: 100%;
-    padding: 80px 24px;
+  &:before {
+    content: "";
+    position: absolute;
+    width: 90vw;
+    height: 100%;
+    background-color: $another_ui_grey;
+    border-top-right-radius: 200px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    @include tablet() {
+      border-top-right-radius: 100px;
+    }
+
+    @include mobile() {
+      width: 100vw;
+      border-top-right-radius: 0;
+    }
   }
 
   div.testimonials-section-title {
@@ -243,7 +259,7 @@ section.testimonials-section {
 
   div.testimonials-cards-container {
     // TODO: use this to go back to 2 (or 3) testimony
-    $testimonials_breakpoint: 1193;
+    $testimonials_breakpoint: 994;
     // $testimonials_breakpoint: 833;
     width: #{$testimonials_breakpoint + 1}px;
     margin: 55px auto 0px;
@@ -256,21 +272,40 @@ section.testimonials-section {
 
     div.testimonial-card {
       float: left;
-      width: 362px;
+      width: 278px;
       padding: 32px;
       margin-left: 48px;
       text-align: left;
       position: relative;
       border-radius: 8px;
-      background-color: $another_ui_grey;
+      background-color: white;
+      border: 1px solid $deep_tan;
+
+      @media screen and (max-width: #{$testimonials_breakpoint}px) {
+        float: unset;
+        margin: 40px auto 0;
+        float: unset;
+      }
+
+      @include mobile() {
+        width: 100%;
+      }
+
+      &:not(:first-child) {
+        margin-left: 30px;
+
+        @media screen and (max-width: #{$testimonials_breakpoint}px) {
+          margin: 40px auto 0;
+        }
+      }
 
       &.skylight {
         div.testimonial-header {
           div.testimonial-logo {
-            width: 89px;
-            height: 24px;
+            width: 97px;
+            height: 26px;
             @include image-2x("/img/ML/testimonial_1_logo");
-            background-size: 89px 24px;
+            background-size: 97px 26px;
           }
         }
 
@@ -284,10 +319,10 @@ section.testimonials-section {
       &.m-io {
         div.testimonial-header {
           div.testimonial-logo {
-            width: 11px;
+            width: 72px;
             height: 32px;
             @include image-2x("/img/ML/testimonial_2_logo");
-            background-size: 11px 32px;
+            background-size: 72px 32px;
           }
         }
 
@@ -301,10 +336,10 @@ section.testimonials-section {
       &.wayne-edu {
         div.testimonial-header {
           div.testimonial-logo {
-            width: 234px;
-            height: 24px;
+            width: 136px;
+            height: 32px;
             @include image-2x("/img/ML/testimonial_3_logo");
-            background-size: 234px 24px;
+            background-size: 136px 32px;
           }
         }
 
@@ -321,7 +356,7 @@ section.testimonials-section {
         }
 
         div.testimonial-logo {
-          float: left;
+          margin: 0 auto;
           background-position: center;
           background-repeat: no-repeat;
         }
@@ -329,21 +364,20 @@ section.testimonials-section {
 
       div.testimonial-quote {
         @include avenir_M();
-        font-size: 16px;
+        font-size: 18px;
         color: $deep_navy;
         line-height: 20px;
+        text-align: center;
+        padding-top: 32px;
+        height: 200px;
 
-        @include tablet() {
-          min-height: 80px;
-        }
-
-        &:not(:first-child){
-          padding-top: 16px;
+        @media screen and (max-width: #{$testimonials_breakpoint}px) {
+          height: auto;
         }
       }
 
       div.testimonial-footer {
-        margin-top: 16px;
+        margin-top: 32px;
 
         div.testimonial-image {
           width: 40px;
@@ -353,42 +387,28 @@ section.testimonials-section {
           background-size: 40px 40px;
           background-repeat: no-repeat;
           margin-right: 16px;
-          float: left;
+          margin: 0 auto;
         }
 
         div.testimonial-name {
           @include PTSerif()
-          font-size: 16px;
+          font-size: 18px;
           color: $deep_navy;
           line-height: 20px;
+          margin-top: 8px;
+          text-align: center;
         }
 
         div.testimonial-role {
           @include avenir_R();
           font-size: 14px;
-          color: rgba($ui_grey, 0.6);
+          color: rgba($deep_navy, 0.6);
           line-height: 19px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
           margin-top: 4px;
-        }
-      }
-
-      @media screen and (max-width: #{$testimonials_breakpoint}px) {
-
-        float: unset;
-        margin: 40px auto 0;
-        width: 100%;
-        max-width: 440px;
-        float: unset;
-      }
-
-      &:not(:first-child) {
-        margin-left: 30px;
-
-        @media screen and (max-width: #{$testimonials_breakpoint}px) {
-          margin: 40px auto 0;
+          text-align: center;
         }
       }
     }
@@ -408,51 +428,38 @@ section.keep-aligned {
     text-align: left;
   }
 
-  &:before {
-    z-index: 1;
-    content: "";
-    display: block;
-    background-color: $another_ui_grey;
-    border-top-right-radius: 200px;
-    width: 86vw;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-
-    @include tablet() {
-      width: 100%;
-      // top: -72px;
-      height: 100%;
-    }
-
-    @include mobile() {
-      background-color: transparent;
-    }
-  }
-
   @include mobile_to_tablet(){
     padding: 0 24px;
   }
 
   div.keep-aligned-title {
     @include PTSerif()
-    font-size: 60px;
+    font-size: 50px;
     color: $deep_navy;
-    max-width: 650px;
     text-align: center;
     z-index: 3;
     position: relative;
-    margin: 0 auto 40px;
-    
+    margin: 0 auto;
+    max-width: calc(100% - 48px);
+
     @include tablet() {
-      max-width: 100%;
+      margin-bottom: 24px;
+      max-width: initial;
     }
 
     @include mobile() {
       font-size: 36px;
-      margin-bottom: 24px;
-      max-width: 100%;
+    }
+  }
+
+  img.keep-aligned-values-line {
+    width: 100%;
+    object-fit: contain;
+    margin: 24px auto 40px;
+    max-width: 797px;
+
+    @include mobile() {
+      display: none;
     }
   }
 
@@ -525,7 +532,7 @@ section.home-keep-aligned {
         height: auto;
       }
 
-      &:nth-child(odd) {
+      &:nth-child(even) {
         div.keep-aligned-section-row-inner div.keep-aligned-section-copy {
           left: 50%;
 
@@ -560,11 +567,19 @@ section.home-keep-aligned {
 
       &.first-row {
         div.keep-aligned-section-row-left {
-          padding: 24px 34px 24px 44px;
+          padding: 24px 84px 24px 64px;
+
+          @include mobile(){
+            padding: 0;
+          }
         }
 
         div.keep-aligned-section-row-right {
-          padding: 24px 90px 24px 94px;
+          padding: 24px 74px 24px 8px;
+
+          @include mobile(){
+            padding: 0;
+          }
         }
       }
 
@@ -573,48 +588,8 @@ section.home-keep-aligned {
           content: "";
           display: block;
           background-color: $another_ui_grey;
-          border-top-right-radius: 200px;
-          width: calc(50vw + 293px);
-          height: 100%;
-          position: absolute;
-          left: 0;
-          top: 0;
-
-          @include tablet() {
-            width: calc(100% + 48px);
-            left: -24px;
-            top: 0;
-            height: 100%;
-            border-top-right-radius: 100px;
-          }
-        }
-
-        div.keep-aligned-section-row-right {
-          padding: 24px 90px 24px 94px;
-        }
-
-        div.keep-aligned-section-row-left {
-          padding: 24px 24px 24px 54px;
-        }
-
-        img.keep-aligned-section-screenshot {
-          max-width: 483px;
-        }
-      }
-
-      &.third-row {
-        div.keep-aligned-section-row-right {
-          padding: 24px 90px 24px 94px;
-        }
-      }
-
-      &.fourth-row {
-        &:before {
-          content: "";
-          display: block;
-          background-color: $another_ui_grey;
           border-bottom-left-radius: 200px;
-          width: 86vw;
+          width: calc(50vw + 293px);
           height: 100%;
           position: absolute;
           right: 0;
@@ -622,24 +597,53 @@ section.home-keep-aligned {
 
           @include tablet() {
             width: calc(100% + 48px);
-            left: -24px;
+            right: -24px;
             top: 0;
             height: 100%;
             border-bottom-left-radius: 100px;
           }
         }
 
-        div.keep-aligned-section-row-inner {
-          div.keep-aligned-section-copy {
-            padding-left: 220px;
+        div.keep-aligned-section-row-right {
+          padding: 24px 70px 24px 114px;
 
-            @include tablet() {
-              padding-left: 0;
-            }
+          @include mobile(){
+            padding: 0;
           }
 
-          div.keep-aligned-section-row-right {
-            padding: 24px 74px 24px 94px;
+          div.keep-aligned-section-copy-title {
+            max-width: 450px;
+          }
+        }
+
+        div.keep-aligned-section-row-left {
+          padding: 24px 26px 24px 54px;
+
+          @include mobile(){
+            padding: 0;
+          }
+        }
+
+        img.keep-aligned-section-screenshot {
+          max-width: 590px;
+        }
+      }
+
+      &.third-row {
+        div.keep-aligned-section-row-left {
+          padding: 24px 0px 24px 54px;
+          width: 486px;
+
+          @include mobile(){
+            padding: 0;
+          }
+        }
+
+        div.keep-aligned-section-row-right {
+          padding: 24px 90px 24px 94px;
+
+          @include mobile(){
+            padding: 0;
           }
         }
       }
@@ -652,28 +656,69 @@ section.home-keep-aligned {
         @include tablet() {
           margin: 0 auto;
           max-width: 100%;
+          margin-top: 32px;
         }
 
-        img.keep-aligned-section-screenshot {
+        @include mobile() {
+          overflow-x: auto;
+          overflow-y: hidden;
+          margin-top: 24px;
           width: 100%;
-          height: auto;
-          z-index: 3;
+        }
 
-          &.carion-1 {
-            opacity: 1;
-            transition: opacity 250ms;
+        div.keep-aligned-section-carion-inner {
+
+          @include mobile() {
+            width: calc(144vw + 48px);
+            height: calc(72vw * 1.33);
+            max-width: unset;
+            position: relative;
           }
 
-          &.carion-1-alt {
-            opacity: 0;
-            transition: opacity 250ms;
-            height: 0;
-          }
+          img.keep-aligned-section-screenshot {
+            width: 100%;
+            height: auto;
+            z-index: 3;
 
-          @include tablet() {
-            margin: 0 auto;
-            max-width: 100%;
-            margin-top: 32px;
+            @include mobile() {
+              float: left;
+              width: 72vw;
+              padding: 0;
+              margin-top: 0;
+              position: absolute;
+              top: 0;
+
+              &:first-child {
+                left: 0;
+                padding: 0;
+              }
+
+              &:nth-child(2) {
+                margin-left: 24px;
+                right: 24px;
+              }
+            }
+
+            &.carion-1 {
+              opacity: 1;
+              transition: opacity 250ms;
+
+              @include tablet() {
+                transition: none;
+              }
+            }
+
+            &.carion-1-alt {
+              opacity: 0;
+              transition: opacity 250ms;
+              height: 0;
+
+              @include tablet() {
+                transition: none;
+                opacity: 1;
+                height: auto;
+              }
+            }
           }
         }
 
@@ -706,6 +751,10 @@ section.home-keep-aligned {
           max-width: 100%;
           margin-top: 32px;
         }
+
+        @include mobile() {
+          margin-top: 24px;
+        }
       }
 
       div.keep-aligned-section-row-right {
@@ -720,6 +769,10 @@ section.home-keep-aligned {
           width: 100%;
           padding: 0;
         }
+
+        @include mobile(){
+          padding: 0;
+        }
       }
 
       div.keep-aligned-section-row-left {
@@ -732,6 +785,10 @@ section.home-keep-aligned {
         @include tablet() {
           float: unset;
           width: 100%;
+          padding: 0;
+        }
+
+        @include mobile(){
           padding: 0;
         }
       }
@@ -750,26 +807,31 @@ section.home-keep-aligned {
         }
 
         div.slack-email-container {
-          margin-bottom: 24px;
-
-          @include tablet() {
-            margin-top: 40px;
-            margin-bottom: 8px;
-          }
+          margin-top: 40px;
 
           div.slack-email-title {
             @include avenir_H();
             font-size: 14px;
             color: $ui_grey;
-            margin-bottom: 12px;
+            float: left;
+
+            @include big_web() {
+              margin-left: 6px;
+              margin-top: 15px;
+            }
+
+            @include tablet() {
+              margin-bottom: 12px;
+            }
           }
 
           div.slack-email-switch-container {
-            width: 382px;
+            width: 262px;
             height: 48px;
             max-width: 100%;
             background-color: $another_ui_grey;
             border-radius: 6px;
+            float: left;
 
             button.slack-email-switch-bt {
               height: 48px;
