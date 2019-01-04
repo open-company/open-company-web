@@ -20,6 +20,8 @@
                        {:did-mount (fn [s]
                                     (when (:tif (:query-params @router/path))
                                       (utils/after 1500 #(.focus (sel1 [:input.try-it-form-central-input]))))
+                                    (when (exists? (.-OCWebSetupMarketingSiteJS js/window))
+                                      (js/OCWebSetupMarketingSiteJS))
                                     s)
                        :will-mount (fn [s]
                                      (when (:confirm (:query-params @router/path))

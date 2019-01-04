@@ -93,6 +93,31 @@ if (jwt) {
   }
 }
 
+function OCWebSetupMarketingSiteJS(){
+  $("button.slack-email-switch-bt, button.keep-aligned-section-next-bt").on("click", function(){
+    $("button.keep-aligned-section-next-bt").toggleClass("active");
+    $("button.mlb-reset.slack-email-switch-bt").toggleClass("active");
+    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1");
+    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1-alt");
+  });
+
+  $("div.pricing-toggle").on("click", function(){
+    $(this).toggleClass("monthly");
+    $("div.pricing-toggle-line").toggleClass("monthly");
+  });
+
+  $("button.tear-price-select").on("click", function() {
+    $("div.tear-price-select-container").toggleClass("open");
+  });
+
+  $("div.tear-price-select-value").on("click", function(e){
+    var $this = $(this),
+        users = $this.data("value"),
+        $button = $("button.tear-price-select");
+    $button.html("Up to " + users + " users");
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function(_) {
 
   if ($("#youtube-player").length > 0) {
@@ -116,28 +141,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
-  $("button.slack-email-switch-bt, button.keep-aligned-section-next-bt").on("click", function(){
-    $("button.keep-aligned-section-next-bt").toggleClass("active");
-    $("button.mlb-reset.slack-email-switch-bt").toggleClass("active");
-    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1");
-    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1-alt");
-  });
-
-  $("div.pricing-toggle").on("click", function(){
-    $(this).toggleClass("monthly");
-    $("div.pricing-toggle-line").toggleClass("monthly");
-  });
-
-  $("button.tear-price-select").on("click", function() {
-    $("div.tear-price-select-container").toggleClass("open");
-  });
-
-  $("div.tear-price-select-value").on("click", function(e){
-    var $this = $(this),
-        users = $this.data("value"),
-        $button = $("button.tear-price-select");
-    $button.html("Up to " + users + " users");
-  });
+  OCWebSetupMarketingSiteJS();
 
   $(window).on("click", function(e){
     $target = $(e.target);
