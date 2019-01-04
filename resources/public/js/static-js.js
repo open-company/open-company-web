@@ -103,7 +103,14 @@ function OCWebSetupMarketingSiteJS(){
 
   $("div.pricing-toggle").on("click", function(){
     $(this).toggleClass("monthly");
-    $("div.pricing-toggle-line").toggleClass("monthly");
+    var $section = $("section.pricing-header");
+    if ($section.hasClass("monthly")) {
+      $("section.pricing-header").removeClass("monthly");
+      $("section.pricing-header").addClass("annual");
+    } else {
+      $("section.pricing-header").removeClass("annual");
+      $("section.pricing-header").addClass("monthly");
+    }
   });
 
   $("button.tear-price-select").on("click", function() {
@@ -115,6 +122,10 @@ function OCWebSetupMarketingSiteJS(){
         users = $this.data("value"),
         $button = $("button.tear-price-select");
     $button.html("Up to " + users + " users");
+    $("section.pricing-header").removeClass("up-to-25");
+    $("section.pricing-header").removeClass("up-to-100");
+    $("section.pricing-header").removeClass("up-to-250");
+    $("section.pricing-header").addClass("up-to-" + users);
   });
 }
 

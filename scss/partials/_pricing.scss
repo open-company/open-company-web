@@ -70,14 +70,8 @@ div.pricing-wrap {
         }
       }
 
-      div.pricing-toggle-line {
-        margin: 40px auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 22px;
-
-        &.monthly {
+      &.monthly {
+        div.pricing-toggle-line {
           span.pricing-toggle-post {
             &.post-yearly {
               display: none;
@@ -88,6 +82,130 @@ div.pricing-wrap {
             }
           }
         }
+
+        div.pricing-three-columns {
+          div.pricing-column{
+            div.tear-subtitle {
+              span.billed-monthly {
+                display: block;
+              }
+
+              span.billed-annually {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+
+      &.monthly.up-to-25 {
+        div.pricing-three-columns {
+          div.pricing-column{
+            h3.tear-price {
+              span.monthly.up-to-100, span.monthly.up-to-250,
+              span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                display: none;
+              }
+
+              span.monthly.up-to-25 {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      &.monthly.up-to-100 {
+        div.pricing-three-columns {
+          div.pricing-column{
+            h3.tear-price {
+              span.monthly.up-to-25, span.monthly.up-to-250,
+              span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                display: none;
+              }
+
+              span.monthly.up-to-100 {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      &.monthly.up-to-250 {
+        div.pricing-three-columns {
+          div.pricing-column{
+            h3.tear-price {
+              span.monthly.up-to-25, span.monthly.up-to-100
+              span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                display: none;
+              }
+
+              span.monthly.up-to-250 {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      &.annual.up-to-25 {
+        div.pricing-three-columns {
+          div.pricing-column{
+            h3.tear-price {
+              span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
+              span.annual.up-to-100, span.annual.up-to-250 {
+                display: none;
+              }
+
+              span.annual.up-to-25 {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      &.annual.up-to-100 {
+        div.pricing-three-columns {
+          div.pricing-column{
+            h3.tear-price {
+              span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
+              span.annual.up-to-25, span.annual.up-to-250 {
+                display: none;
+              }
+
+              span.annual.up-to-100 {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      &.annual.up-to-250 {
+        div.pricing-three-columns {
+          div.pricing-column{
+            h3.tear-price {
+              span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
+              span.annual.up-to-25, span.annual.up-to-100 {
+                display: none;
+              }
+
+              span.annual.up-to-250 {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      div.pricing-toggle-line {
+        margin: 40px auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 22px;
 
         span.pricing-toggle-pre {
           @include avenir_H();
@@ -264,6 +382,10 @@ div.pricing-wrap {
             color: $deep_navy;
             line-height: 90px;
             margin-top: 35px;
+
+            span {
+              display: none;
+            }
           }
 
           div.tear-subtitle {
@@ -275,6 +397,10 @@ div.pricing-wrap {
 
             span.bold {
               @include avenir_H();
+            }
+
+            span.billed-monthly {
+              display: none;
             }
           }
 

@@ -341,13 +341,13 @@
   [:div.pricing-wrap
     {:id "wrap"}
     [:div.main.pricing
-      [:section.pricing-header
+      [:section.pricing-header.annual.up-to-25
 
         [:h1.pricing-headline
-          "Find a plan"]
+          "Pick a plan"]
 
         [:div.pricing-subheadline
-          "Simple plans to stay aligned. Get started for free."]
+          "Get started for free."]
 
         [:div.pricing-toggle-line.monthly
           [:span.pricing-toggle-pre "Pay annually (20% off)"]
@@ -374,13 +374,13 @@
               "Start for free"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              [:span "500Mmb storage"]]
+              [:span "500mb storage"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               {:data-toggle "tooltip"
                :data-placement "top"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Browse and search posts from the previous 6 months"}
+               :title "Browse and search posts from the previous 3 months"}
               [:span "3 months history"]]]
           ;; Team
           [:div.pricing-column.team-column
@@ -394,15 +394,29 @@
                   {:data-value "25"}
                   "Up to 25 users"]
                 [:div.tear-price-select-value
-                  {:data-value "50"}
-                  "Up to 50 users"]
-                [:div.tear-price-select-value
                   {:data-value "100"}
-                  "Up to 100 users"]]]
+                  "Up to 100 users"]
+                [:div.tear-price-select-value
+                  {:data-value "250"}
+                  "Up to 250 users"]]]
             [:h3.tear-price
-              "$45"]
+              [:span.monthly.up-to-25
+                "$45"]
+              [:span.monthly.up-to-100
+                "$85"]
+              [:span.monthly.up-to-250
+                "$185"]
+              [:span.annual.up-to-25
+                "$36"]
+              [:span.annual.up-to-100
+                "$68"]
+              [:span.annual.up-to-250
+                "$148"]]
             [:div.tear-subtitle
-              "Per month, billed annually"]
+              [:span.billed-annually
+                "Per month, billed annually"]
+              [:span.billed-monthly
+                "Per month, billed monthly"]]
             [:a.tear-start-bt
               {:href "/sign-up"}
               "Try free for 14 days"]
@@ -458,19 +472,18 @@
             "Can I use Carrot for free?"]
           [:div.faq-row-answer
             (str
-             "Absolutely! Carrot is free for teams of up to 10 people. The Free plan has a storage "
-             "limit, but includes most features. It’s fast to sign up, and no credit card is required.")]]
+             "Absolutely! Carrot is free for teams of up to 10 people. The Free plan "
+             "has a storage limit, but includes all of the features of the Standard plan. "
+             "It’s fast to sign up, and no credit card is required.")]]
 
         [:div.faq-row
           [:div.faq-row-question
             "How is the Standard plan different from the Free plan?"]
           [:div.faq-row-answer
-            "The Team plan doesn’t limit file sizes or storage, and includes some premium features, such as:"
-            [:ul
-              [:li "In-app video recording: Don’t feel like writing? Record a quick video instead."]
-              [:li "Recurring updates: Schedule weekly and monthly updates to build consistency."]
-              [:li "Advanced permissions: Add private sections for invited members only."]
-              [:li "Who saw that: Make sure you’re being heard, and know who’s seen your post."]]]]
+            (str
+             "The Standard plan includes unlimited storage and history. "
+             "Choose the size of your team, and whether you’d like to pay "
+             "monthly or annually. Annual plans paid in advance provide a 20% discount.")]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -485,20 +498,6 @@
             (str
              "You can still read, write, edit, and organize existing content, but you won't be able "
              "to add new attachments and videos.")]]
-
-        [:div.faq-row
-          [:div.faq-row-question
-            "How is pricing calculated for the Team plan?"]
-          [:div.faq-row-answer
-            (str
-             "When you upgrade to the Team plan, you will be charged a base fee of $65 per month "
-             "that includes up to 15 team members. Beyond the initial 15 members, you will be "
-             "charged a fee of $4 per additional member per month.")
-            [:br]
-            [:br]
-            (str
-             "For example, if you have 25 team members, you would pay $65 for the first 15 "
-             "members, and $4 for each of the additional 10 members, for a total of $105 per month.")]]
 
         [:div.faq-row
           [:div.faq-row-question
