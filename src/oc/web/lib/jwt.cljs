@@ -20,8 +20,12 @@
 (defn id-token []
   (cook/get-cookie :id-token))
 
-(defn get-id-token-contents []
-  (some-> (id-token) decode (js->clj :keywordize-keys true)))
+(defn get-id-token-contents
+  ([] (get-id-token-contents (id-token)))
+  ([token]
+     (some-> token
+             decode
+             (js->clj :keywordize-keys true))))
 
 ;; JWT
 
