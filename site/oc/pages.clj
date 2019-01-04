@@ -442,22 +442,19 @@
             "Can I use Carrot for free?"]
           [:div.faq-row-answer
             (str
-             "Absolutely! You can use Carrot for free with teams of up to 10 people. "
-             "The storage limit is 1TB and there's a maximum upload of 20mb per attachment. "
-             "When you sign up for the free plan you’ll get to try a fully-featured Team plan "
-             "(including in-app video recording, recurring updates, advanced permissions, and "
-             "Who Saw That) for 30 days. It’s fast to sign up, and no credit card is required.")]]
+             "Absolutely! Carrot is free for teams of up to 10 people. The Free plan has a storage "
+             "limit, but includes most features. It’s fast to sign up, and no credit card is required.")]]
 
         [:div.faq-row
           [:div.faq-row-question
-            "How is the Team plan different from the Free plan?"]
+            "How is the Standard plan different from the Free plan?"]
           [:div.faq-row-answer
-            "With the Team plan you get unlimited  upload file size and storage, and premium features, like:"
+            "The Team plan doesn’t limit file sizes or storage, and includes some premium features, such as:"
             [:ul
-              [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
-              [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
-              [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
-              [:li [:span.heavy "Who saw that:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
+              [:li "In-app video recording: Don’t feel like writing? Record a quick video instead."]
+              [:li "Recurring updates: Schedule weekly and monthly updates to build consistency."]
+              [:li "Advanced permissions: Add private sections for invited members only."]
+              [:li "Who saw that: Make sure you’re being heard, and know who’s seen your post."]]]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -470,17 +467,17 @@
             "What happens if we go over our storage limit in the Free plan?"]
           [:div.faq-row-answer
             (str
-             "You can still read, write, edit, and organize existing content, "
-             "but you won't be able to add new attachments and videos.")]]
+             "You can still read, write, edit, and organize existing content, but you won't be able "
+             "to add new attachments and videos.")]]
 
         [:div.faq-row
           [:div.faq-row-question
             "How is pricing calculated for the Team plan?"]
           [:div.faq-row-answer
             (str
-             "When you upgrade to the Team plan, you will be charged a base fee of $65 per "
-             "month that includes up to 15 team members. Beyond the initial 15 members, you "
-             "will be charged a fee of $4 per additional member per month.")
+             "When you upgrade to the Team plan, you will be charged a base fee of $65 per month "
+             "that includes up to 15 team members. Beyond the initial 15 members, you will be "
+             "charged a fee of $4 per additional member per month.")
             [:br]
             [:br]
             (str
@@ -492,8 +489,9 @@
             "How is the payment being processed?"]
           [:div.faq-row-answer
             (str
-             "We use Stripe to process your payment. It's the same payment provider used in products "
-             "such as Slack, Pinterest, and Lyft. We do not handle your credit card information directly.")]]
+             "We use Stripe to process your payment. It's the same payment provider used in "
+             "products such as Slack, Pinterest, and Lyft. We do not handle your credit card "
+             "information directly.")]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -516,6 +514,9 @@
               "Get in touch with us"]]]]
 
       testimonials-section
+
+      keep-aligned-bottom
+
     ]])
 
 (defn slack
