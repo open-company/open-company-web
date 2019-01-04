@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="84px" height="84px" viewBox="0 0 84 84" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="32px" height="16px" viewBox="0 0 32 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
-    <title>Group 65</title>
+    <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <defs>
-        <circle id="path-1" cx="36" cy="36" r="36"></circle>
-        <filter x="-13.9%" y="-11.1%" width="127.8%" height="127.8%" filterUnits="objectBoundingBox" id="filter-2">
-            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="3" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.2 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
-        </filter>
-    </defs>
     <g id="Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Home-(Dec.-20)" transform="translate(-787.000000, -2041.000000)" fill-rule="nonzero">
-            <g id="Group-65" transform="translate(793.000000, 2045.000000)">
-                <g id="Oval">
-                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
-                    <use fill="#54C58C" xlink:href="#path-1"></use>
-                </g>
-                <path d="M37.6,26.069713 L37.6,50.3212334 C37.6,51.2483906 36.8898163,52 36,52 C35.1163444,52 34.4,51.2529297 34.4,50.3212334 L34.4,26.069713 L30.7313708,30.1459676 C30.106532,30.840233 29.093468,30.840233 28.4686292,30.1459676 C27.8437903,29.4517022 27.8437903,28.3260756 28.4686292,27.6318102 L34.8686292,20.5206991 C35.493468,19.8264336 36.506532,19.8264336 37.1313708,20.5206991 L43.5313708,27.6318102 C44.1562097,28.3260756 44.1562097,29.4517022 43.5313708,30.1459676 C42.906532,30.840233 41.893468,30.840233 41.2686292,30.1459676 L37.6,26.069713 Z" id="Combined-Shape" fill="#FFFFFF" transform="translate(36.000000, 36.000000) rotate(90.000000) translate(-36.000000, -36.000000) "></path>
+        <g id="Home-(Jan)" transform="translate(-814.000000, -2781.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <g id="Group-65" transform="translate(794.000000, 2753.000000)">
+                <path d="M37.6,26.069713 L37.6,50.3212334 C37.6,51.2483906 36.8898163,52 36,52 C35.1163444,52 34.4,51.2529297 34.4,50.3212334 L34.4,26.069713 L30.7313708,30.1459676 C30.106532,30.840233 29.093468,30.840233 28.4686292,30.1459676 C27.8437903,29.4517022 27.8437903,28.3260756 28.4686292,27.6318102 L34.8686292,20.5206991 C35.493468,19.8264336 36.506532,19.8264336 37.1313708,20.5206991 L43.5313708,27.6318102 C44.1562097,28.3260756 44.1562097,29.4517022 43.5313708,30.1459676 C42.906532,30.840233 41.893468,30.840233 41.2686292,30.1459676 L37.6,26.069713 Z" id="Combined-Shape" transform="translate(36.000000, 36.000000) rotate(90.000000) translate(-36.000000, -36.000000) "></path>
             </g>
         </g>
     </g>

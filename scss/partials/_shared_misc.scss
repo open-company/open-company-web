@@ -27,163 +27,18 @@ div.main-animation-container {
 }
 
 div.homepage-testimonials-container {
-  margin: 40px auto 0;
+  margin: 57px auto 0;
 
   @include tablet() {
     padding: 24px 24px 32px;
   }
 
   img.homepage-testimonials {
-    padding: 1.5% 2.4%;
+    padding: 0 2.4%;
     width: 100%;
     max-width: 1116px;
     object-fit: contain;
     height: auto;
-  }
-}
-
-div.cards-container {
-  max-width: 940px;
-  margin: 0px auto;
-  position: relative;
-  z-index: 2;
-
-  div.cards-row {
-    margin-top: 20px;
-
-    div.card {
-      &:not(:first-child) {
-        margin-left: 20px;
-      }
-
-      text-align: left;
-      float: left;
-      width: 300px;
-      height: 332px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.07);
-      padding: 40px;
-
-      @include tablet() {
-        float: none;
-        margin: 20px auto 0px;
-        width: 100%;
-        height: auto;
-
-        &:not(:first-child) {
-          margin: 20px auto 0px;
-        }
-      }
-
-      div.card-icon {
-        background-repeat: no-repeat;
-        background-position: center;
-      }
-
-      div.card-title {
-        @include avenir_M();
-        font-size: 20px;
-        color: $carrot_dark_gray;
-        width: 70%;
-
-        @include tablet() {
-          width: 100%;
-        }
-      }
-
-      div.card-content {
-        @include avenir_R();
-        font-size: 18px;
-        color: rgba($carrot_dark_gray, 0.8);
-        margin-top: 11px;
-
-        a {
-          color: $carrot_text_blue_3;
-          text-decoration: none;
-        }
-      }
-
-      &.card-1 {
-        div.card-icon {
-          width: 44px;
-          height: 41px;
-          background-size: 44px 41px;
-          @include image-2x("/img/ML/homepage_card_icon_1");
-          margin-bottom: 35px;
-        }
-      }
-
-      &.card-2 {
-        div.card-icon {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-          @include image-2x("/img/ML/homepage_card_icon_2");
-          margin-bottom: 36px;
-        }
-      }
-
-      &.card-3 {
-        div.card-icon {
-          width: 44px;
-          height: 44px;
-          background-size: 44px 44px;
-          @include image-2x("/img/ML/homepage_card_icon_3");
-          margin-bottom: 31px;
-        }
-
-        div.card-title {
-          width: 90%;
-
-          @include tablet() {
-            width: 100%;
-          }
-        }
-      }
-
-      &.card-4 {
-        div.card-icon {
-          width: 32px;
-          height: 40px;
-          background-size: 32px 40px;
-          @include image-2x("/img/ML/homepage_card_icon_4");
-          margin-bottom: 36px;
-        }
-
-        div.card-title {
-          width: 60%;
-
-          @include tablet() {
-            width: 100%;
-          }
-        }
-      }
-
-      &.card-5 {
-        div.card-icon {
-          width: 42px;
-          height: 41px;
-          background-size: 42px 41px;
-          @include image-2x("/img/ML/homepage_card_icon_5");
-          margin-bottom: 35px;
-        }
-      }
-
-      &.card-6 {
-        div.card-icon {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-          @include image-2x("/img/ML/homepage_card_icon_6");
-          margin-bottom: 36px;
-        }
-
-        div.card-title {
-          width: 43%;
-        }
-      }
-    }
   }
 }
 
@@ -203,22 +58,13 @@ section.testimonials-section {
   &:before {
     content: "";
     position: absolute;
-    width: 90vw;
+    width: 100vw;
     height: 100%;
     background-color: $another_ui_grey;
-    border-top-right-radius: 200px;
     top: 0;
     bottom: 0;
     left: 0;
-
-    @include tablet() {
-      border-top-right-radius: 100px;
-    }
-
-    @include mobile() {
-      width: 100vw;
-      border-top-right-radius: 0;
-    }
+    right: 0;
   }
 
   div.testimonials-section-title {
@@ -259,44 +105,46 @@ section.testimonials-section {
 
   div.testimonials-cards-container {
     // TODO: use this to go back to 2 (or 3) testimony
-    $testimonials_breakpoint: 994;
+    $testimonials_breakpoint: 894;
     // $testimonials_breakpoint: 833;
-    width: #{$testimonials_breakpoint + 1}px;
     margin: 55px auto 0px;
     position: relative;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 
-    @media screen and (max-width: #{$testimonials_breakpoint}px) {
-      width: 100%;
-      margin: 42px auto 0px;
+    div.testimonials-cards-inner {
+      width: #{$testimonials_breakpoint + 1}px;
+      margin: 0 auto;
     }
 
     div.testimonial-card {
       float: left;
       width: 278px;
       padding: 32px;
-      margin-left: 48px;
+      // margin-left: 48px;
       text-align: left;
       position: relative;
       border-radius: 8px;
       background-color: white;
       border: 1px solid $deep_tan;
 
-      @media screen and (max-width: #{$testimonials_breakpoint}px) {
-        float: unset;
-        margin: 40px auto 0;
-        float: unset;
-      }
+      // @media screen and (max-width: #{$testimonials_breakpoint}px) {
+      //   float: unset;
+      //   margin: 40px auto 0;
+      //   float: unset;
+      // }
 
-      @include mobile() {
-        width: 100%;
-      }
+      // @include mobile() {
+      //   width: 100%;
+      // }
 
       &:not(:first-child) {
         margin-left: 30px;
 
-        @media screen and (max-width: #{$testimonials_breakpoint}px) {
-          margin: 40px auto 0;
-        }
+        // @media screen and (max-width: #{$testimonials_breakpoint}px) {
+        //   margin: 40px auto 0;
+        // }
       }
 
       &.skylight {
@@ -368,16 +216,11 @@ section.testimonials-section {
         color: $deep_navy;
         line-height: 20px;
         text-align: center;
-        padding-top: 32px;
-        height: 200px;
-
-        @media screen and (max-width: #{$testimonials_breakpoint}px) {
-          height: auto;
-        }
+        padding-top: 26px;
       }
 
       div.testimonial-footer {
-        margin-top: 32px;
+        margin-top: 26px;
 
         div.testimonial-image {
           width: 40px;
@@ -443,7 +286,6 @@ section.keep-aligned {
     max-width: calc(100% - 48px);
 
     @include tablet() {
-      margin-bottom: 24px;
       max-width: initial;
     }
 
@@ -452,19 +294,30 @@ section.keep-aligned {
     }
   }
 
-  img.keep-aligned-values-line {
+  div.keep-aligned-values-line {
     width: 100%;
-    object-fit: contain;
-    margin: 24px auto 40px;
-    max-width: 797px;
+    margin: 24px auto 0;
+    text-align: center;
 
-    @include mobile() {
-      display: none;
-    }
+    img.keep-aligned-value {
+      padding: 0 12px;
+      display: inline-block;
+    }    
   }
 
+  // img.keep-aligned-values-line {
+  //   width: 100%;
+  //   object-fit: contain;
+  //   margin: 24px auto 40px;
+  //   max-width: 797px;
+
+  //   @include mobile() {
+  //     display: none;
+  //   }
+  // }
+
   button.get-started-button {
-    margin-top: 0px;
+    margin-top: 40px;
     z-index: 3;
   }
 }
@@ -477,6 +330,7 @@ button.get-started-button {
   color: white;
   @include avenir_H();
   font-size: 20px;
+  line-height: 27px;
   margin: 48px auto 0;
   position: relative;
   text-align: center;
@@ -490,6 +344,7 @@ button.get-started-button {
     margin: 16px auto;
     padding: 2px 0 0;
     font-size: 18px;
+    line-height: 25px;
   }
 }
 
@@ -557,7 +412,7 @@ section.home-keep-aligned {
       }
 
       &:first-child {
-        padding-top: 100px;
+        padding-top: 96px;
 
         @include tablet() {
           margin: 0 auto;
@@ -684,6 +539,10 @@ section.home-keep-aligned {
             height: auto;
             z-index: 3;
             box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+            position: relative;
+            top: 0;
+            display: block;
+            border-radius: 8px;
 
             @include tablet() {
               margin-top: 0px;
@@ -694,8 +553,8 @@ section.home-keep-aligned {
               width: 72vw;
               padding: 0;
               margin-top: 0;
-              position: absolute;
-              top: 0;
+              position: initial;
+              display: initial;
 
               &:first-child {
                 left: 0;
@@ -704,6 +563,7 @@ section.home-keep-aligned {
 
               &:nth-child(2) {
                 margin-left: 24px;
+                left: unset;
                 right: 24px;
               }
             }
@@ -735,9 +595,11 @@ section.home-keep-aligned {
           width: 72px;
           height: 72px;
           background-image: cdnUrl("/img/ML/homepage_right_arrow.svg");
-          background-size: 72px 72px;
+          background-size: 32px 16px;
           background-repeat: no-repeat;
           background-position: center;
+          background-color: $carrot_green;
+          border-radius: 50%;
           position: absolute;
           right: -32px;
           top: calc(50% - 36px);
@@ -838,7 +700,7 @@ section.home-keep-aligned {
             float: left;
 
             @include big_web() {
-              margin-left: 6px;
+              margin-left: 24px;
               margin-top: 15px;
             }
 
@@ -851,7 +713,7 @@ section.home-keep-aligned {
             width: 262px;
             height: 48px;
             max-width: 100%;
-            background-color: $another_ui_grey;
+            background-color: #E3E3E3;
             border-radius: 6px;
             float: left;
 
@@ -1098,12 +960,34 @@ button.show-animation-bt {
   border-radius: 8px;
   width: 320px;
   height: 64px;
-  background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
-  background-size: 226px 27px;
-  background-position: center;
-  background-repeat: no-repeat;
+  @include avenir_H();
+  font-size: 20px;
+  line-height: 27px;
+  color: $carrot_green;
+  margin: 48px auto 0;
+  position: relative;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 12px 0;
+
+  div.green-play {
+    width: 24px;
+    height: 18px;
+    background-image: cdnUrl("/img/ML/green_play.svg");
+    background-size: 24px 18px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-top: -4px;
+  }
 
   @include mobile() {
-    background-size: 206px 25px;
+    width: 100%;
+    margin: 16px auto;
+    padding: 2px 0 0;
+    font-size: 18px;
+    line-height: 25px;
   }
 }

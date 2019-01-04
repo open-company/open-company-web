@@ -16,58 +16,59 @@
     [:div.testimonials-section-subtitle
       "We’re helping teams like yours."]
     [:div.testimonials-cards-container.group
-      [:div.testimonial-card.skylight
-        [:div.testimonial-header.group
-          [:a
-            {:href "https://skylight.digital/"
-             :target "_blank"}
-            [:div.testimonial-logo]]]
-        [:div.testimonial-quote
-          (str
-           "“As a busy leader it's hard to keep "
-           "everyone up to date. I use Carrot to "
-           "record a quick video update and it lets "
-           "me know that everyone's seen it.”")]
-        [:div.testimonial-footer.group
-          [:div.testimonial-image]
-          [:div.testimonial-name
-            "Chris Cairns"]
-          [:div.testimonial-role
-            "Managing Partner"]]]
-      [:div.testimonial-card.m-io
-        [:div.testimonial-header.group
-          [:a
-            {:href "https://m.io/"
-             :target "_blank"}
-            [:div.testimonial-logo]]]
-        [:div.testimonial-quote
-          (str
-           "“On Carrot, my updates get noticed and "
-           "get the team talking. I love that.”")]
-        [:div.testimonial-footer.group
-          [:div.testimonial-image]
-          [:div.testimonial-name
-            "Tom Hadfield"]
-          [:div.testimonial-role
-            "CEO, Founder"]]]
-      [:div.testimonial-card.wayne-edu
-        [:div.testimonial-header.group
-          [:a
-            {:href "https://wayne.edu/"
-             :target "_blank"}
-            [:div.testimonial-logo]]]
-        [:div.testimonial-quote
-          (str
-           "“Carrot helps me share things the entire "
-           "team needs to know about - instead of "
-           "burying it somewhere it won’t get "
-           "noticed.”")]
-        [:div.testimonial-footer.group
-          [:div.testimonial-image]
-          [:div.testimonial-name
-            "Nick DeNardis"]
-          [:div.testimonial-role
-            "Digital Communications"]]]]])
+      [:div.testimonials-cards-inner.group
+        [:div.testimonial-card.skylight
+          [:div.testimonial-header.group
+            [:a
+              {:href "https://skylight.digital/"
+               :target "_blank"}
+              [:div.testimonial-logo]]]
+          [:div.testimonial-quote
+            (str
+             "“As a busy leader it's hard to keep "
+             "everyone up to date. I use Carrot to "
+             "record a quick video update and it lets "
+             "me know that everyone's seen it.”")]
+          [:div.testimonial-footer.group
+            [:div.testimonial-image]
+            [:div.testimonial-name
+              "Chris Cairns"]
+            [:div.testimonial-role
+              "Managing Partner"]]]
+        [:div.testimonial-card.m-io
+          [:div.testimonial-header.group
+            [:a
+              {:href "https://m.io/"
+               :target "_blank"}
+              [:div.testimonial-logo]]]
+          [:div.testimonial-quote
+            (str
+             "“On Carrot, my updates get noticed and "
+             "get the team talking. I love that.”")]
+          [:div.testimonial-footer.group
+            [:div.testimonial-image]
+            [:div.testimonial-name
+              "Tom Hadfield"]
+            [:div.testimonial-role
+              "CEO, Founder"]]]
+        [:div.testimonial-card.wayne-edu
+          [:div.testimonial-header.group
+            [:a
+              {:href "https://wayne.edu/"
+               :target "_blank"}
+              [:div.testimonial-logo]]]
+          [:div.testimonial-quote
+            (str
+             "“Carrot helps me share things the entire "
+             "team needs to know about - instead of "
+             "burying it somewhere it won’t get "
+             "noticed.”")]
+          [:div.testimonial-footer.group
+            [:div.testimonial-image]
+            [:div.testimonial-name
+              "Nick DeNardis"]
+            [:div.testimonial-role
+              "Digital Communications"]]]]]])
 
 (def keep-aligned
   [:section.keep-aligned
@@ -80,9 +81,19 @@
   [:section.keep-aligned
     [:div.keep-aligned-title
       "Company updates that rise above the noise"]
-    [:img.keep-aligned-values-line
-      {:src (utils/cdn "/img/ML/keep_aligned_values_line.png")
-       :srcSet (str (utils/cdn "/img/ML/keep_aligned_values_line@2x.png") " 2x")}]
+    [:div.keep-aligned-values-line.big-web-tablet-only
+      [:img.keep-aligned-value.value-announcements
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_announcements.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-decisions
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_decisions.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-team-updates
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_team_updates.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_team_updates@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-news
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_news.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]]
     [:button.mlb-reset.get-started-button
       "Get started - It's free"]])
 
@@ -106,9 +117,12 @@
                "share more context for what’s happening "
                "and why.")]]
           [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-1
+            [:img.keep-aligned-section-screenshot.screenshot-1.big-web-tablet-only
               {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]]]
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
+              {:src (utils/cdn "/img/ML/homepage_screenshots_first_row_mobile.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_mobile@2x.png") " 2x")}]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
@@ -131,7 +145,9 @@
                   [:div.slack-logo]
                   "Slack"]]
               [:div.slack-email-title.big-web-only
-                "Sent daily on Slack or email"]]]
+                "Sent daily on Slack or email"]]
+            [:div.slack-email-mobile-title.mobile-only
+              "Automatically sent daily on email or Slack..."]]
           [:div.keep-aligned-section-row-left
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
@@ -160,9 +176,12 @@
                "engagement, and which ones aren’t getting "
                "through.")]]
           [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-3
+            [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
               {:src (utils/cdn "/img/ML/homepage_screenshots_third_row.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]]]]]])
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
+              {:src (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile@2x.png") " 2x")}]]]]]])
 
 (def animation-lightbox
   [:div.animation-lightbox-container
@@ -175,4 +194,6 @@
 
 (def show-animation-button
   [:button.mlb-reset.show-animation-bt
-    {:on-click #(js/OCStaticShowAnimationLightbox)}])
+    {:on-click #(js/OCStaticShowAnimationLightbox)}
+    [:div.green-play]
+    "Carrot in 60 seconds"])
