@@ -110,12 +110,7 @@
               (str
                "Carrot reminds you when it’s time to update "
                "your team. Consistent communication builds "
-               "trust and transparency.")
-              [:br][:br]
-              (str
-               "For longer-form updates, you have space to "
-               "share more context for what’s happening "
-               "and why.")]]
+               "trust and transparency.")]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-1.big-web-tablet-only
               {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
@@ -131,23 +126,17 @@
               "Lower the noise level"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Carrot shares updates together in the "
-               "morning newsletter to increase visibility with "
-               "fewer interruptions.")]
+               "Protect your team’s focus (and sanity). "
+               "Carrot condenses noisy updates "
+               "into a morning digest.")]
             [:div.slack-email-container.group.big-web-tablet-only
-              [:div.slack-email-title.tablet-only
-                "Sent daily on Slack or email"]
               [:div.slack-email-switch-container
                 [:button.mlb-reset.slack-email-switch-bt.email-bt.active
                   [:div.email-logo]
                   "Email"]
                 [:button.mlb-reset.slack-email-switch-bt.slack-bt
                   [:div.slack-logo]
-                  "Slack"]]
-              [:div.slack-email-title.big-web-only
-                "Sent daily on Slack or email"]]
-            [:div.slack-email-mobile-title.mobile-only
-              "Automatically sent daily on email or Slack..."]]
+                  "Slack"]]]]
           [:div.keep-aligned-section-row-left
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
