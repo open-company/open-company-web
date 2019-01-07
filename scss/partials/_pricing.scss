@@ -452,25 +452,26 @@ div.pricing-wrap {
             border-bottom-right-radius: 40px;
 
             div.tear-price {
-              width: 101px;
-              height: 101px;
+              width: 80px;
+              height: 80px;
               border-radius: 50%;
               background-color: rgba(#314150, 0.1);
               background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
-              background-size: 29px 51px;
+              background-size: 23px 40px;
               background-position: center;
               background-repeat: no-repeat;
-              margin: 25px auto 0;
+              margin: 36px auto 0;
             }
 
             a.tear-start-bt {
               background-color: $feint_emerald;
               color: $carrot_green;
+              margin: 32px auto 24px;
             }
 
             div.tear-subtitle {
               max-width: 241px;
-              margin-top: 19px;
+              margin-top: 29px;
 
               @include pricing-tablet() {
                 max-width: initial;
