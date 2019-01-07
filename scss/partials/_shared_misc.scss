@@ -170,6 +170,7 @@ section.testimonials-section {
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 
     @include tablet() {
       width: calc(100% + 48px);
@@ -579,6 +580,7 @@ section.home-keep-aligned {
         @include mobile() {
           overflow-x: auto;
           overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
           margin: 0;
           width: calc(100% + 24px);
         }
