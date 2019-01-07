@@ -345,6 +345,7 @@ function onYouTubeIframeAPIReady() {
     height: Math.min(winHeight, 608).toString(),
     width: Math.min(winWidth, 1080).toString(),
     videoId: 'dMWpnHxQMP4',
+    playsinline: 'true',
     allowfullscreen: 'true',
     playerVars: {
         showinfo: 0,
