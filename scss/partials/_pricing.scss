@@ -46,6 +46,7 @@ div.pricing-wrap {
         @include mobile() {
           margin: 0 auto;
           font-size: 36px;
+          line-height: initial;
           max-width: initial;
           padding: 0 24px;
         }

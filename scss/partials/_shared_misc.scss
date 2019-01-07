@@ -134,7 +134,7 @@ section.testimonials-section {
 
     @include tablet(){
       font-size: 40px;
-      line-height: auto;
+      line-height: initial;
     }
 
     @include mobile() {
@@ -157,7 +157,7 @@ section.testimonials-section {
 
     @include mobile() {
       font-size: 20px;
-      line-height: auto;
+      line-height: initial;
     }
   }
 
