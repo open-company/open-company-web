@@ -64,14 +64,19 @@
           "Home"]]
       [:div.site-mobile-menu-item
         [:a
+          {:href "/about"
+           :class (when (= active-page "about") "active")}
+          "About"]]
+      [:div.site-mobile-menu-item
+        [:a
           {:href "/pricing"
            :class (when (= active-page "pricing") "active")}
           "Pricing"]]
       [:div.site-mobile-menu-item
         [:a
-          {:href "/about"
-           :class (when (= active-page "about") "active")}
-          "About"]]]
+          {:href "https://blog.carrot.io"
+           :target "_blank"}
+          "Blog"]]]
     [:div.site-mobile-menu-footer
       [:button.mlb-reset.login-btn
         {:id "site-mobile-menu-login"}

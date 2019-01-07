@@ -8,6 +8,7 @@
 div.site-mobile-menu {
   display:none;
   position: absolute;
+  position: fixed;
   width: 100vw;
   height: calc(100vh - 64px);
   top: 64px;

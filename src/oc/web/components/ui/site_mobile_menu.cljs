@@ -53,6 +53,16 @@
             "Home"]]
         [:div.site-mobile-menu-item
           [:a
+            {:href oc-urls/about
+             :class (when (utils/in? (:route @router/path) "about") "active")
+             :on-click (fn [e]
+                        (.preventDefault e)
+                        (user/show-login nil)
+                        (site-menu-toggle true)
+                        (router/nav! oc-urls/about))}
+            "About"]]
+        [:div.site-mobile-menu-item
+          [:a
             {:href oc-urls/pricing
              :class (when (utils/in? (:route @router/path) "pricing") "active")
              :on-click (fn [e]
@@ -63,14 +73,9 @@
             "Pricing"]]
         [:div.site-mobile-menu-item
           [:a
-            {:href oc-urls/about
-             :class (when (utils/in? (:route @router/path) "about") "active")
-             :on-click (fn [e]
-                        (.preventDefault e)
-                        (user/show-login nil)
-                        (site-menu-toggle true)
-                        (router/nav! oc-urls/about))}
-            "About"]]]
+            {:href oc-urls/blog
+             :target "_blank"}
+            "Blog"]]]
       [:div.site-mobile-menu-footer
         (when-not (jwt/jwt)
           [:button.mlb-reset.login-btn

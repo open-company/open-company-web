@@ -80,7 +80,7 @@ div.slack-wrap {
 
       @include tablet() {
         overflow: visible;
-        padding: 131px 24px 80px;
+        // padding: 131px 24px 80px;
       }
 
       h1.slack-headline {
@@ -89,6 +89,7 @@ div.slack-wrap {
         line-height: 90px;
         color: $deep_navy;
         margin: 0 auto;
+        max-width: 714px;
 
         @include tablet() {
           font-size: 80px;
@@ -103,10 +104,10 @@ div.slack-wrap {
 
       div.slack-subline {
         @include avenir_R();
-        font-size: 30px;
-        line-height: 38px;
+        font-size: 26px;
+        line-height: 36px;
         color: $deep_navy;
-        max-width: 720px;
+        max-width: 960px;
         margin: 24px auto 0px;
         text-align: center;
 
@@ -115,6 +116,7 @@ div.slack-wrap {
           margin-top: 16px;
           font-size: 24px;
           line-height: 32px;
+          max-width: 660px;
         }
       }
     }

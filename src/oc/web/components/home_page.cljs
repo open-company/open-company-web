@@ -64,9 +64,9 @@
               {:src (utils/cdn "/img/ML/homepage_screenshot.png")
                :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-          shared-misc/homepage-testimonials]
+          shared-misc/testimonials-logos-line]
 
-        shared-misc/keep-aligned-section
+        (shared-misc/keep-aligned-section false)
 
         shared-misc/testimonials-section
 

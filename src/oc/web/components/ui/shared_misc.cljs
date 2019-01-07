@@ -3,11 +3,14 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
-(def homepage-testimonials
-  [:div.homepage-testimonials-container
-    [:img.homepage-testimonials
-      {:src (utils/cdn "/img/ML/homepage_testimonials.png")
-       :srcSet (str (utils/cdn "/img/ML/homepage_testimonials@2x.png") " 2x")}]])
+(def testimonials-logos-line
+  [:div.homepage-testimonials-container.group
+    [:div.homepage-testimonials-logo.logo-novo]
+    [:div.homepage-testimonials-logo.logo-ph]
+    [:div.homepage-testimonials-logo.logo-wsu]
+    [:div.homepage-testimonials-logo.logo-om]
+    [:div.homepage-testimonials-logo.logo-mio]
+    [:div.homepage-testimonials-logo.logo-sd]])
 
 (def testimonials-section
   [:section.testimonials-section
@@ -97,7 +100,7 @@
     [:button.mlb-reset.get-started-button
       "Get started - It's free"]])
 
-(def keep-aligned-section
+(defn keep-aligned-section [slack?]
   [:section.home-keep-aligned.group
 
     [:div.keep-aligned-section
@@ -112,12 +115,14 @@
                "your team. Consistent communication builds "
                "trust and transparency.")]]
           [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-1.big-web-tablet-only
-              {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
-            [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
-              {:src (utils/cdn "/img/ML/homepage_screenshots_first_row_mobile.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_mobile@2x.png") " 2x")}]]]]
+            (let [img-name (if slack? "homepage_screenshots_first_row_slack" "homepage_screenshots_first_row")]
+             [:img.keep-aligned-section-screenshot.screenshot-1.big-web-tablet-only
+              {:src (utils/cdn (str "/img/ML/" img-name ".png"))
+               :srcSet (str (utils/cdn (str "/img/ML/"img-name "@2x.png")) " 2x")}])
+            (let [img-name (if slack? "homepage_screenshots_first_row_mobile_slack" "homepage_screenshots_first_row_mobile")]
+              [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
+                {:src (utils/cdn (str "/img/ML/" img-name ".png"))
+                 :srcSet (str (utils/cdn (str "/img/ML/" img-name "@2x.png")) " 2x")}])]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
@@ -131,21 +136,34 @@
                "into a morning digest.")]
             [:div.slack-email-container.group.big-web-tablet-only
               [:div.slack-email-switch-container
-                [:button.mlb-reset.slack-email-switch-bt.email-bt.active
+                (when slack?
+                  [:button.mlb-reset.slack-email-switch-bt.slack-bt
+                    {:class (when slack? "active")}
+                    [:div.slack-logo]
+                    "Slack"])
+                [:button.mlb-reset.slack-email-switch-bt.email-bt
+                  {:class (when-not slack? "active")}
                   [:div.email-logo]
                   "Email"]
-                [:button.mlb-reset.slack-email-switch-bt.slack-bt
-                  [:div.slack-logo]
-                  "Slack"]]]]
+                (when-not slack?
+                  [:button.mlb-reset.slack-email-switch-bt.slack-bt
+                    [:div.slack-logo]
+                    "Slack"])]]]
           [:div.keep-aligned-section-row-left
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
-                [:img.keep-aligned-section-screenshot.screenshot-2.carion-1
-                  {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
+                (when slack?
+                  [:img.keep-aligned-section-screenshot.screenshot-2.carion-1
+                    {:src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
+                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_slack@2x.png") " 2x")}])
+                [:img.keep-aligned-section-screenshot.screenshot-2
+                  {:class (if slack? "carion-1-alt" "carion-1")
+                   :src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
                    :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]
-                [:img.keep-aligned-section-screenshot.screenshot-2.carion-1-alt
-                  {:src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
-                   :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_slack@2x.png") " 2x")}]]
+                (when-not slack?
+                  [:img.keep-aligned-section-screenshot.screenshot-2.carion-1-alt
+                    {:src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
+                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_slack@2x.png") " 2x")}])]
               [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
 
       [:div.keep-aligned-section-row.third-row
