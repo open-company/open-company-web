@@ -38,11 +38,15 @@ div.homepage-testimonials-container {
     padding: 0 0 80px;
   }
 
-  @include mobile() {
-
+  @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1247px) {
+    max-width: 670px;
   }
 
-  @media screen and (max-width: 1247px) {
+  @media screen and (min-width: 600px) and (max-width: #{$min_big_web_width}px) {
+    max-width: 520px;
+  }
+
+  @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1067px) {
     max-width: 100%;
     width: 677px;
   }
@@ -50,10 +54,19 @@ div.homepage-testimonials-container {
   div.homepage-testimonials-logo {
     width: 208px;
     height: 66px;
-    padding: 0 16px;
     display: inline-block;
     background-position: center;
     background-repeat: no-repeat;
+
+    @media screen and (min-width: 600px) and (max-width: #{$min_big_web_width}px){
+      // padding: 0 32px;
+      width: 178px;
+    }
+
+    @include mobile() {
+      // padding: 0 16px;
+      width: 138px;
+    }
 
     &.logo-novo {
       background-image: cdnUrl("/img/ML/logo_line_novo.svg");
@@ -158,38 +171,34 @@ section.testimonials-section {
     overflow-x: auto;
     overflow-y: hidden;
 
+    @include tablet() {
+      width: calc(100% + 48px);
+      margin-left: -24px;
+    }
+
     div.testimonials-cards-inner {
       width: #{$testimonials_breakpoint + 1}px;
       margin: 0 auto;
+
+      @media screen and (max-width: #{$testimonials_breakpoint + 48}px){
+        width: #{$testimonials_breakpoint + 48}px;
+        padding: 0 24px;
+        // margin: 0 24px;
+      }
     }
 
     div.testimonial-card {
       float: left;
       width: 278px;
       padding: 32px;
-      // margin-left: 48px;
       text-align: left;
       position: relative;
       border-radius: 8px;
       background-color: white;
       border: 1px solid $deep_tan;
 
-      // @media screen and (max-width: #{$testimonials_breakpoint}px) {
-      //   float: unset;
-      //   margin: 40px auto 0;
-      //   float: unset;
-      // }
-
-      // @include mobile() {
-      //   width: 100%;
-      // }
-
       &:not(:first-child) {
         margin-left: 30px;
-
-        // @media screen and (max-width: #{$testimonials_breakpoint}px) {
-        //   margin: 40px auto 0;
-        // }
       }
 
       &.skylight {
@@ -479,6 +488,10 @@ section.home-keep-aligned {
 
           @include mobile(){
             padding: 24px 0;
+
+            img.keep-aligned-section-screenshot {
+              margin-top: 0;
+            }
           }
         }
       }
@@ -779,17 +792,11 @@ section.home-keep-aligned {
               &.slack-bt {
                 border-top-right-radius: 6px;
                 border-bottom-right-radius: 6px;
-                border-top: 1px solid $ultra_light_grey;
-                border-right: 1px solid $ultra_light_grey;
-                border-bottom: 1px solid $ultra_light_grey;
               }
 
               &.email-bt {
                 border-top-left-radius: 6px;
                 border-bottom-left-radius: 6px;
-                border-top: 1px solid $ultra_light_grey;
-                border-left: 1px solid $ultra_light_grey;
-                border-bottom: 1px solid $ultra_light_grey;
               }
 
               div.slack-logo {

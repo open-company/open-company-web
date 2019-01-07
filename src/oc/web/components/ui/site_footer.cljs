@@ -49,7 +49,7 @@
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-communication-copy
-          "Leadership communication for growing and distributed teams."]
+          "Leadership communication for fast-growing and distributed teams."]
         (when-not (jwt/jwt)
           [:div.footer-small-links
             [:a

@@ -24,7 +24,8 @@ div.press-kit-wrap {
       }
 
       h1.headline {
-        font-size: 80px;
+        font-size: 60px;
+        line-height: 78px;
         @include PTSerif()
         color: $deep_navy;
         margin: 0 auto;

@@ -36,7 +36,8 @@ div.pricing-wrap {
       }
 
       h1.pricing-headline {
-        font-size: 80px;
+        font-size: 60px;
+        line-height: 78px;
         @include PTSerif()
         color: $deep_navy;
         min-width: 300px;
@@ -93,7 +94,7 @@ div.pricing-wrap {
           text-align: center;
 
           &:nth-child(odd) {
-            margin-top: 64px;
+            margin-top: 115px;
           }
 
           @include pricing-tablet() {
@@ -117,7 +118,7 @@ div.pricing-wrap {
             position: relative;
             width: 280px;
             height: 48px;
-            margin: 16px auto 0;
+            margin: 24px auto 0;
 
             button.tear-price-select {
               width: 280px;
@@ -160,8 +161,8 @@ div.pricing-wrap {
 
             div.tear-price-select-values {
               position: absolute;
-              top: 4px;
-              left: -4px;
+              top: 0;
+              left: 0;
               width: 280px;
               background-color: white;
               border-radius: 4px;
@@ -189,8 +190,8 @@ div.pricing-wrap {
           h3.tear-price {
             @include PTSerif()
             font-size: 60px;
+            line-height: 78px;
             color: $deep_navy;
-            line-height: 90px;
             margin-top: 35px;
 
             span {
@@ -285,8 +286,12 @@ div.pricing-wrap {
             border: 1px solid $deep_tan;
             box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
 
+            h3.tear-price {
+              margin-top: 39px;
+            }
+
             div.pricing-toggle-line {
-              margin: 40px auto;
+              margin: 16px auto;
               display: flex;
               justify-content: center;
               align-items: center;
@@ -455,7 +460,7 @@ div.pricing-wrap {
               background-size: 29px 51px;
               background-position: center;
               background-repeat: no-repeat;
-              margin: 28px auto 0;
+              margin: 31px auto 0;
             }
 
             a.tear-start-bt {
@@ -465,6 +470,7 @@ div.pricing-wrap {
 
             div.tear-subtitle {
               max-width: 241px;
+              margin-top: 25px;
 
               @include pricing-tablet() {
                 max-width: initial;

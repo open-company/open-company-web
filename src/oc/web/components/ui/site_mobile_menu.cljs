@@ -70,12 +70,7 @@
                         (dis/dispatch! [:login-overlay-show nil])
                         (site-menu-toggle)
                         (router/nav! oc-urls/pricing))}
-            "Pricing"]]
-        [:div.site-mobile-menu-item
-          [:a
-            {:href oc-urls/blog
-             :target "_blank"}
-            "Blog"]]]
+            "Pricing"]]]
       [:div.site-mobile-menu-footer
         (when-not (jwt/jwt)
           [:button.mlb-reset.login-btn

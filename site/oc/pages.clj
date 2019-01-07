@@ -351,10 +351,10 @@
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Pick a plan"]
+          "Plans for teams of all sizes"]
 
         [:div.pricing-subheadline
-          "Get started for free."]
+          "Bring clarity and alignement to your organization"]
 
         [:div.pricing-three-columns.group
           ;; Free
