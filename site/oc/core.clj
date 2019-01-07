@@ -160,9 +160,10 @@
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
    and every change here should be reflected there."
-  []
+  [page]
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:footer.navbar.navbar-default.navbar-bottom
+    {:class (when (= page :slack-lander) "no-border")}
     [:div.container-fluid.group
       [:div.right-column.group
 
@@ -251,7 +252,7 @@
                   :500     (pages/server-error options)
                   :privacy (pages/privacy options)
                   :terms   (pages/terms options))
-                (footer)]))))
+                (footer page)]))))
 
 (defn app-shell [_]
   (hp/html5 {:lang "en"}

@@ -70,11 +70,12 @@ div.slack-wrap {
         right: 0;
 
         @include tablet() {
-          border-bottom-left-radius: 100px; 
+          border-bottom-left-radius: 0;
+          border-top-right-radius: 200px;
         }
 
-        @media screen and (max-width: 440px) {
-          height: 25%;
+        @include mobile() {
+          border-top-right-radius: 100px;
         }
       }
 

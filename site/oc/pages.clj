@@ -610,7 +610,9 @@
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/slack_screenshot.png")
-             :src-set (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]]])
+             :src-set (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
+
+        testimonials-logos-line]]])
 
 (defn press-kit
   "Press kit page."

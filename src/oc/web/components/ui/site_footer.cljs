@@ -15,7 +15,7 @@
 (rum/defcs site-footer 
   [s]
   [:footer.navbar.navbar-default.navbar-bottom
-    {:class (when (utils/in? (:route @router/path) "slack-lander") "light-background")}
+    {:class (utils/class-set {:no-border (utils/in? (:route @router/path) "slack-lander")})}
     [:div.container-fluid.group
       [:div.right-column.group
 

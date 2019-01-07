@@ -40,8 +40,13 @@ div.slack-lander-wrap {
         right: 0;
         z-index: 2;
 
+        @include tablet() {
+          border-bottom-left-radius: 0;
+          border-top-right-radius: 200px;
+        }
+
         @include mobile() {
-          border-bottom-left-radius: 100px; 
+          border-top-right-radius: 100px;
         }
 
         @media screen and (max-width: 440px) {
