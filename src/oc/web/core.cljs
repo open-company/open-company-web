@@ -211,12 +211,6 @@
     ;; render component
     (drv-root component target)))
 
-(defn entry-handler [target params]
-  (if (and (not (jwt/jwt))
-           (:secure-id (jwt/get-id-token-contents (:id query-params))))
-    (secure-activity-handler secure-activity "secure-activity" target params)
-    (board-handler "activity" target org-dashboard params)))
-
 ;; Component specific to a board
 (defn board-handler [route target component params]
   (let [org (:org (:params params))
@@ -266,6 +260,13 @@
     (aa/secure-activity-chain)
     ;; render component
     (drv-root component target)))
+
+(defn entry-handler [target params]
+  (if (and (not (jwt/jwt))
+           (:secure-uuid (jwt/get-id-token-contents
+                          (:id (:query-params params)))))
+    (secure-activity-handler secure-activity "secure-activity" target params)
+    (board-handler "activity" target org-dashboard params)))
 
 ;; Component specific to a team settings
 (defn team-handler [route target component params]
