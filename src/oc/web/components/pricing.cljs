@@ -31,22 +31,13 @@
       (login-overlays-handler)
 
       [:div.main.pricing
-        [:section.pricing-header.annual.up-to-25
+        [:section.pricing-header
 
           [:h1.pricing-headline
             "Pick a plan"]
 
           [:div.pricing-subheadline
             "Get started for free."]
-
-          [:div.pricing-toggle-line.monthly
-            [:span.pricing-toggle-pre "Pay annually (20% off)"]
-            [:div.pricing-toggle
-              [:span.pricing-toggle-dot]]
-            [:span.pricing-toggle-post.post-monthly
-              "Pay monthly"]
-            [:span.pricing-toggle-post.post-yearly
-              "Pay yearly"]]
 
           [:div.pricing-three-columns.group
             ;; Free
@@ -73,9 +64,16 @@
                  :title "Browse and search posts from the previous 3 months"}
                 [:span "3 months history"]]]
             ;; Team
-            [:div.pricing-column.team-column
+            [:div.pricing-column.team-column.annual.up-to-25
               [:h2.tear-title
                 "Standard"]
+              [:div.pricing-toggle-line
+                [:span.pricing-toggle-annual
+                  "Annual (20% off)"]
+                [:div.pricing-toggle
+                  [:span.pricing-toggle-dot]]
+                [:span.pricing-toggle-monthly
+                  "Monthly"]]
               [:div.tear-price-select-container
                 [:button.mlb-reset.tear-price-select
                   "Up to 25 users"]
@@ -128,7 +126,7 @@
                 "A team of more than 250? Let's create a custom plan."]
               [:a.tear-start-bt
                 {:href "#"
-                 :on-click #(chat/chat-click 43235)}
+                 :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
                 "Contact Us"]
               [:div.tear-feature-separator]
               [:div.tear-feature

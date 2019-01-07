@@ -102,14 +102,13 @@ function OCWebSetupMarketingSiteJS(){
   });
 
   $("div.pricing-toggle").on("click", function(){
-    $(this).toggleClass("monthly");
-    var $section = $("section.pricing-header");
-    if ($section.hasClass("monthly")) {
-      $("section.pricing-header").removeClass("monthly");
-      $("section.pricing-header").addClass("annual");
+    var $teamColumn = $("div.pricing-column.team-column");
+    if ($teamColumn.hasClass("monthly")) {
+      $teamColumn.removeClass("monthly");
+      $teamColumn.addClass("annual");
     } else {
-      $("section.pricing-header").removeClass("annual");
-      $("section.pricing-header").addClass("monthly");
+      $teamColumn.removeClass("annual");
+      $teamColumn.addClass("monthly");
     }
   });
 
@@ -118,14 +117,14 @@ function OCWebSetupMarketingSiteJS(){
   });
 
   $("div.tear-price-select-value").on("click", function(e){
-    var $this = $(this),
-        users = $this.data("value"),
-        $button = $("button.tear-price-select");
+    var users = $(this).data("value"),
+        $button = $("button.tear-price-select"),
+        $teamColumn = $("div.pricing-column.team-column");
     $button.html("Up to " + users + " users");
-    $("section.pricing-header").removeClass("up-to-25");
-    $("section.pricing-header").removeClass("up-to-100");
-    $("section.pricing-header").removeClass("up-to-250");
-    $("section.pricing-header").addClass("up-to-" + users);
+    $teamColumn.removeClass("up-to-25");
+    $teamColumn.removeClass("up-to-100");
+    $teamColumn.removeClass("up-to-250");
+    $teamColumn.addClass("up-to-" + users);
   });
 }
 

@@ -70,196 +70,6 @@ div.pricing-wrap {
         }
       }
 
-      &.monthly {
-        div.pricing-toggle-line {
-          span.pricing-toggle-post {
-            &.post-yearly {
-              display: none;
-            }
-
-            &.post-monthly {
-              display: block;
-            }
-          }
-        }
-
-        div.pricing-three-columns {
-          div.pricing-column{
-            div.tear-subtitle {
-              span.billed-monthly {
-                display: block;
-              }
-
-              span.billed-annually {
-                display: none;
-              }
-            }
-          }
-        }
-      }
-
-      &.monthly.up-to-25 {
-        div.pricing-three-columns {
-          div.pricing-column{
-            h3.tear-price {
-              span.monthly.up-to-100, span.monthly.up-to-250,
-              span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
-                display: none;
-              }
-
-              span.monthly.up-to-25 {
-                display: block;
-              }
-            }
-          }
-        }
-      }
-
-      &.monthly.up-to-100 {
-        div.pricing-three-columns {
-          div.pricing-column{
-            h3.tear-price {
-              span.monthly.up-to-25, span.monthly.up-to-250,
-              span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
-                display: none;
-              }
-
-              span.monthly.up-to-100 {
-                display: block;
-              }
-            }
-          }
-        }
-      }
-
-      &.monthly.up-to-250 {
-        div.pricing-three-columns {
-          div.pricing-column{
-            h3.tear-price {
-              span.monthly.up-to-25, span.monthly.up-to-100
-              span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
-                display: none;
-              }
-
-              span.monthly.up-to-250 {
-                display: block;
-              }
-            }
-          }
-        }
-      }
-
-      &.annual.up-to-25 {
-        div.pricing-three-columns {
-          div.pricing-column{
-            h3.tear-price {
-              span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
-              span.annual.up-to-100, span.annual.up-to-250 {
-                display: none;
-              }
-
-              span.annual.up-to-25 {
-                display: block;
-              }
-            }
-          }
-        }
-      }
-
-      &.annual.up-to-100 {
-        div.pricing-three-columns {
-          div.pricing-column{
-            h3.tear-price {
-              span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
-              span.annual.up-to-25, span.annual.up-to-250 {
-                display: none;
-              }
-
-              span.annual.up-to-100 {
-                display: block;
-              }
-            }
-          }
-        }
-      }
-
-      &.annual.up-to-250 {
-        div.pricing-three-columns {
-          div.pricing-column{
-            h3.tear-price {
-              span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
-              span.annual.up-to-25, span.annual.up-to-100 {
-                display: none;
-              }
-
-              span.annual.up-to-250 {
-                display: block;
-              }
-            }
-          }
-        }
-      }
-
-      div.pricing-toggle-line {
-        margin: 40px auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 22px;
-
-        span.pricing-toggle-pre {
-          @include avenir_H();
-          font-size: 16px;
-          color: $deep_navy;
-          line-height: 22px;
-        }
-
-        div.pricing-toggle {
-          float: left;
-          margin: 0 16px;
-          height: 22px;
-          width: 40px;
-          background-color: $deep_navy;
-          border-radius: 100px;
-          position: relative;
-          cursor: pointer;
-
-          &.monthly {
-            span.pricing-toggle-dot {
-              margin-left: 21px;
-            }
-          }
-
-          span.pricing-toggle-dot {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: white;
-            top: 3px;
-            left: 0;
-            margin-left: 3px;
-            transition: margin-left 180ms; 
-          }
-        }
-
-        span.pricing-toggle-post {
-          @include avenir_R();
-          font-size: 16px;
-          color: $ui_grey;
-          width: 90px;
-          text-align: left;
-
-          &.post-yearly {
-            display: block;
-          }
-
-          &.post-monthly {
-            display: none;
-          }
-        }
-      }
-
       div.pricing-three-columns{
         margin: 80px auto 0;
         width: 1258px;
@@ -471,6 +281,162 @@ div.pricing-wrap {
 
           &.team-column {
             min-height: 837px;
+            background-color: white;
+            border: 1px solid $deep_tan;
+            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+
+            div.pricing-toggle-line {
+              margin: 40px auto;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 22px;
+
+              span.pricing-toggle-annual {
+                @include avenir_H();
+                font-size: 14px;
+                color: $deep_navy;
+                line-height: 22px;
+              }
+
+              div.pricing-toggle {
+                float: left;
+                margin: 0 16px;
+                height: 22px;
+                width: 40px;
+                background-color: $deep_navy;
+                border-radius: 100px;
+                position: relative;
+                cursor: pointer;
+
+                span.pricing-toggle-dot {
+                  position: absolute;
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                  background-color: white;
+                  top: 3px;
+                  left: 0;
+                  margin-left: 3px;
+                  transition: margin-left 180ms; 
+                }
+              }
+
+              span.pricing-toggle-monthly {
+                @include avenir_H();
+                font-size: 14px;
+                color: $ui_grey;
+                width: 90px;
+                text-align: left;
+              }
+            }
+
+            &.monthly {
+              div.tear-subtitle {
+                span.billed-monthly {
+                  display: block;
+                }
+
+                span.billed-annually {
+                  display: none;
+                }
+              }
+
+              div.pricing-toggle-line {
+
+                span.pricing-toggle-annual {
+                  color: $ui_grey;
+                }
+
+                div.pricing-toggle {
+                  span.pricing-toggle-dot {
+                    margin-left: 21px;
+                  }
+                }
+
+                span.pricing-toggle-monthly {
+                  color: $deep_navy;
+                }
+              }
+            }
+
+            &.monthly.up-to-25 {
+              h3.tear-price {
+                span.monthly.up-to-100, span.monthly.up-to-250,
+                span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                  display: none;
+                }
+
+                span.monthly.up-to-25 {
+                  display: block;
+                }
+              }
+            }
+
+            &.monthly.up-to-100 {
+              h3.tear-price {
+                span.monthly.up-to-25, span.monthly.up-to-250,
+                span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                  display: none;
+                }
+
+                span.monthly.up-to-100 {
+                  display: block;
+                }
+              }
+            }
+
+            &.monthly.up-to-250 {
+              h3.tear-price {
+                span.monthly.up-to-25, span.monthly.up-to-100
+                span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                  display: none;
+                }
+
+                span.monthly.up-to-250 {
+                  display: block;
+                }
+              }
+            }
+
+            &.annual.up-to-25 {
+              h3.tear-price {
+                span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
+                span.annual.up-to-100, span.annual.up-to-250 {
+                  display: none;
+                }
+
+                span.annual.up-to-25 {
+                  display: block;
+                }
+              }
+            }
+
+            &.annual.up-to-100 {
+              h3.tear-price {
+                span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
+                span.annual.up-to-25, span.annual.up-to-250 {
+                  display: none;
+                }
+
+                span.annual.up-to-100 {
+                  display: block;
+                }
+              }
+            }
+
+            &.annual.up-to-250 {
+              h3.tear-price {
+                span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
+                span.annual.up-to-25, span.annual.up-to-100 {
+                  display: none;
+                }
+
+                span.annual.up-to-250 {
+                  display: block;
+                }
+              }
+            }
 
             div.tear-subtitle {
               max-width: 151px;
