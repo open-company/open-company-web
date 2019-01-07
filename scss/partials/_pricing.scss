@@ -460,7 +460,7 @@ div.pricing-wrap {
               background-size: 29px 51px;
               background-position: center;
               background-repeat: no-repeat;
-              margin: 31px auto 0;
+              margin: 25px auto 0;
             }
 
             a.tear-start-bt {
@@ -470,7 +470,7 @@ div.pricing-wrap {
 
             div.tear-subtitle {
               max-width: 241px;
-              margin-top: 25px;
+              margin-top: 19px;
 
               @include pricing-tablet() {
                 max-width: initial;
