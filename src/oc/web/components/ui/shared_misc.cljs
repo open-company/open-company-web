@@ -192,12 +192,12 @@
 
 (def animation-lightbox
   [:div.animation-lightbox-container
-    {:on-click #(js/OCStaticHideAnimationLightbox)}
+    {:on-click #(js/OCStaticHideAnimationLightbox %)}
     [:div.animation-lightbox
       [:div {:id "youtube-player"}]
       [:button.settings-modal-close.mlb-reset
-        {:on-mouse-down #(js/OCStaticHideAnimationLightbox)
-         :on-touch-start #(js/OCStaticHideAnimationLightbox)}]]])
+        {:on-mouse-down #(js/OCStaticHideAnimationLightbox %)
+         :on-touch-start #(js/OCStaticHideAnimationLightbox %)}]]])
 
 (def show-animation-button
   [:button.mlb-reset.show-animation-bt

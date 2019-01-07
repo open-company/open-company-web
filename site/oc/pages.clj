@@ -277,13 +277,13 @@
 
 (def animation-lightbox
   [:div.animation-lightbox-container
-    {:onClick "OCStaticHideAnimationLightbox();"}
+    {:onClick "OCStaticHideAnimationLightbox(event);"}
     [:div.animation-lightbox
       [:div {:id "youtube-player"}]
       [:button.settings-modal-close.mlb-reset
-        {;:onClick "OCStaticHideAnimationLightbox();"
-         :onMouseDown "OCStaticHideAnimationLightbox();"
-         :ontouchstart "OCStaticHideAnimationLightbox();"}]]])
+        {;:onClick "OCStaticHideAnimationLightbox(event);"
+         :onMouseDown "OCStaticHideAnimationLightbox(event);"
+         :ontouchstart "OCStaticHideAnimationLightbox(event);"}]]])
 
 (def show-animation-button
   [:button.mlb-reset.show-animation-bt

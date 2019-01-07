@@ -380,9 +380,13 @@ function OCYTVideoOnPlayerStateChange(event){
   }
 }
 
-function OCStaticHideAnimationLightbox() {
+function OCStaticHideAnimationLightbox(e) {
   OCYTVideoPlayer.pauseVideo();
   $(document.body).removeClass('show-animation-lightbox no-scroll');
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 }
 
 function OCStaticShowPHBanner(){
