@@ -37,7 +37,7 @@
             "Plans for teams of all sizes"]
 
           [:div.pricing-subheadline
-            "Bring clarity and alignement to your organization"]
+            "Bring clarity and alignment to your organization"]
 
           [:div.pricing-three-columns.group
             ;; Free
