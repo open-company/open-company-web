@@ -444,15 +444,6 @@
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
 
-;; Associated Slack user check
-
-(defn user-has-slack-with-bot?
-  "Check if the current user has an associated Slack user under a team that has the bot."
-  [current-user-data bots-data team-roster]
-  (let [slack-orgs-with-bot (map :slack-org-id bots-data)
-        slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))]
-    (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)))
-
 ;; Debug
 
 (defn force-jwt-refresh []

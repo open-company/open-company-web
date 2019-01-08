@@ -9,6 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
+            [oc.web.utils.user :as user-utils]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -76,7 +77,7 @@
         team-data (drv/react s :team-data)
         bots-data (jwt/team-has-bot? (:team-id org-data))
         team-roster (drv/react s :team-roster)
-        slack-enabled? (user-actions/user-has-slack-with-bot? current-user-data bots-data team-roster)]
+        slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
     [:div.user-profile-internal
       [:div.user-profile-content.group
         (when error
