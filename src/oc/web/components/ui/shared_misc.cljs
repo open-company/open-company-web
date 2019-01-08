@@ -20,58 +20,148 @@
       "We’re helping teams like yours."]
     [:div.testimonials-cards-container.group
       [:div.testimonials-cards-inner.group
-        [:div.testimonial-card.skylight
-          [:div.testimonial-header.group
-            [:a
-              {:href "https://skylight.digital/"
-               :target "_blank"}
-              [:div.testimonial-logo]]]
-          [:div.testimonial-quote
-            (str
-             "“As a busy leader it's hard to keep "
-             "everyone up to date. I use Carrot to "
-             "record a quick video update and it lets "
-             "me know that everyone's seen it.”")]
-          [:div.testimonial-footer.group
-            [:div.testimonial-image]
-            [:div.testimonial-name
-              "Chris Cairns"]
-            [:div.testimonial-role
-              "Managing Partner"]]]
-        [:div.testimonial-card.m-io
-          [:div.testimonial-header.group
-            [:a
-              {:href "https://m.io/"
-               :target "_blank"}
-              [:div.testimonial-logo]]]
-          [:div.testimonial-quote
-            (str
-             "“On Carrot, my updates get noticed and "
-             "get the team talking. I love that.”")]
-          [:div.testimonial-footer.group
-            [:div.testimonial-image]
-            [:div.testimonial-name
-              "Tom Hadfield"]
-            [:div.testimonial-role
-              "CEO, Founder"]]]
-        [:div.testimonial-card.wayne-edu
-          [:div.testimonial-header.group
-            [:a
-              {:href "https://wayne.edu/"
-               :target "_blank"}
-              [:div.testimonial-logo]]]
-          [:div.testimonial-quote
-            (str
-             "“Carrot helps me share things the entire "
-             "team needs to know about - instead of "
-             "burying it somewhere it won’t get "
-             "noticed.”")]
-          [:div.testimonial-footer.group
-            [:div.testimonial-image]
-            [:div.testimonial-name
-              "Nick DeNardis"]
-            [:div.testimonial-role
-              "Digital Communications"]]]]]])
+        [:div.testimonials-cards-row.group
+          [:div.testimonial-card.oval-money
+            [:div.testimonial-quote
+              (str
+               "“The morning digest keeps "
+               "everyone informed without "
+               "a constant barrage "
+               "throughout the day.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Edoardo Benedetto"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://ovalmoney.com/"
+                   :target "_blank"}
+                  "Oval Money"]
+                ", UX Architect"]]]
+          [:div.testimonial-card.skylight-digital
+            [:div.testimonial-quote
+              (str
+               "“Carrot is our favorite Slack "
+               "app. It's perfect for longer- "
+               "form updates no one "
+               "should miss.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Chris Cairns"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://skylight.digital/"
+                   :target "_blank"}
+                  "Skylight Digital"]
+                ", Managing Director"]]]
+          [:div.testimonial-card.wayne-state-univerity
+            [:div.testimonial-quote
+              (str
+               "“Carrot helps me share "
+               "things the entire team "
+               "needs to know - instead of "
+               "burying it somewhere it "
+               "won’t get noticed.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Nick DeNardis"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://wayne.edu/"
+                   :targe "_blank"}
+                  "Wayne State University"]
+                ", Director of Communications"]]]
+          [:div.testimonial-card.partner-hero
+            [:div.testimonial-quote
+              (str
+               "“Carrot is where we "
+               "communicate when we "
+               "need everyone to see it - "
+               "regardless of their time zone.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Andrew Love"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://partnerhero.com/"
+                   :targe "_blank"}
+                  "PartnerHero"]
+                ", Director of R&D"]]]]
+        [:div.testimonials-cards-row.group
+          [:div.testimonial-card.blend-labs
+            [:div.testimonial-quote
+              (str
+               "“I used to waste time "
+               "begging team leads to get "
+               "their updates in, but now "
+               "Carrot reminds them "
+               "automatically for me.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Sara Vienna"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://bl3ndlabs.com/"
+                   :target "_blank"}
+                  "BL3NDlabs"]
+                ", Head of Design"]]]
+          [:div.testimonial-card.m-io
+            [:div.testimonial-quote
+              (str
+               "“On Carrot, my updates "
+               "get noticed and get the "
+               "team talking. I love that.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Tom Hadfield"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://m.io/"
+                   :target "_blank"}
+                  "M.io"]
+                ", CEO"]]]
+          [:div.testimonial-card.peak-support
+            [:div.testimonial-quote
+              (str
+               "“Carrot fixed our issue of "
+               "email overload. We use it "
+               "for important company "
+               "communications, shout- "
+               "outs, and announcements "
+               "so they won’t get buried in "
+               "everyone’s inbox. It’s been "
+               "a big win for us.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Jon Steiman"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://www.peaksupport.io/"
+                   :target "_blank"}
+                  "Peak Support"]
+                ", CEO"]]]
+          [:div.testimonial-card.novo
+            [:div.testimonial-quote
+              (str
+               "“Before Carrot I had no "
+               "idea if anyone even noticed "
+               "what I was saying.” ")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Tyler McIntyre"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://banknovo.com/"
+                   :target "_blank"}
+                  "Novo"]
+                ", CEO"]]]]]]])
 
 (def keep-aligned
   [:section.keep-aligned
@@ -150,19 +240,35 @@
                     [:div.slack-logo]
                     "Slack"])]]]
           [:div.keep-aligned-section-row-left
+            [:span.sent-daily-slack-email.mobile-only
+              "Sent daily on Slack or email"]
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
                 (when slack?
+                  [:div.keep-aligned-section-header.mobile-only.first-header
+                    [:span.slack-logo]
+                    [:span.inner-label "Slack"]])
+                (when slack?
                   [:img.keep-aligned-section-screenshot.screenshot-2.carion-1
-                    {:src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
+                    {:class "first-image"
+                     :src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
                      :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_slack@2x.png") " 2x")}])
+                [:div.keep-aligned-section-header.mobile-only
+                  {:class (if slack? "second-header" "first-header")}
+                  [:span.email-logo]
+                  [:span.inner-label "Email"]]
                 [:img.keep-aligned-section-screenshot.screenshot-2
                   {:class (if slack? "carion-1-alt" "carion-1")
                    :src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
                    :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]
                 (when-not slack?
+                  [:div.keep-aligned-section-header.mobile-only.second-header
+                    [:span.slack-logo]
+                    [:span.inner-label "Slack"]])
+                (when-not slack?
                   [:img.keep-aligned-section-screenshot.screenshot-2.carion-1-alt
-                    {:src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
+                    {:class "second-image"
+                     :src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
                      :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_slack@2x.png") " 2x")}])]
               [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
 

@@ -123,6 +123,10 @@ section.testimonials-section {
     bottom: 0;
     left: 0;
     right: 0;
+
+    @include big_web_no_tablet(){
+      border-top-right-radius: 200px;
+    }
   }
 
   div.testimonials-section-title {
@@ -163,7 +167,7 @@ section.testimonials-section {
 
   div.testimonials-cards-container {
     // TODO: use this to go back to 2 (or 3) testimony
-    $testimonials_breakpoint: 894;
+    $testimonials_breakpoint: 1160;
     // $testimonials_breakpoint: 833;
     margin: 55px auto 0px;
     position: relative;
@@ -188,10 +192,22 @@ section.testimonials-section {
       }
     }
 
+    div.testimonials-cards-row {
+      position: relative;
+
+      &:last-child {
+        margin-top: 16px;
+
+        div.testimonial-card {
+          top: 0;
+        }
+      }
+    }
+
     div.testimonial-card {
       float: left;
       width: 278px;
-      padding: 32px;
+      padding: 24px;
       text-align: left;
       position: relative;
       border-radius: 8px;
@@ -199,69 +215,82 @@ section.testimonials-section {
       border: 1px solid $deep_tan;
 
       &:not(:first-child) {
-        margin-left: 30px;
+        margin-left: 16px;
       }
 
-      &.skylight {
-        div.testimonial-header {
-          div.testimonial-logo {
-            width: 97px;
-            height: 26px;
-            @include image-2x("/img/ML/testimonial_1_logo");
-            background-size: 97px 26px;
-          }
-        }
+      &.oval-money {
+        margin-top: 22px;
 
         div.testimonial-footer {
           div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_1_image");
+            @include image-2x("/img/ML/testimonial_oval_money");
+          }
+        }
+      }
+
+      &.skylight-digital {
+        margin-top: 22px;
+
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_skylight_digital");
+          }
+        }
+      }
+
+      &.wayne-state-univerity {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_wayne_state_univerity");
+          }
+        }
+      }
+
+      &.partner-hero {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_partner_hero");
+          } 
+        }
+      }
+
+      &.partner-hero {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_partner_hero");
+          } 
+        }
+      }
+
+      &.blend-labs {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_blend_labs");
           }
         }
       }
 
       &.m-io {
-        div.testimonial-header {
-          div.testimonial-logo {
-            width: 72px;
-            height: 32px;
-            @include image-2x("/img/ML/testimonial_2_logo");
-            background-size: 72px 32px;
-          }
-        }
-
         div.testimonial-footer {
           div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_2_image");
+            @include image-2x("/img/ML/testimonial_m_io");
           }
         }
       }
 
-      &.wayne-edu {
-        div.testimonial-header {
-          div.testimonial-logo {
-            width: 136px;
-            height: 32px;
-            @include image-2x("/img/ML/testimonial_3_logo");
-            background-size: 136px 32px;
-          }
-        }
-
+      &.peak-support {
         div.testimonial-footer {
           div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_3_image");
+            @include image-2x("/img/ML/testimonial_peak_support");
+          }
+        }
+      }
+
+      &.novo {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_novo");
           } 
-        }
-      }
-
-      div.testimonial-header {
-        a, a:active, a:focus {
-          text-decoration: none;
-        }
-
-        div.testimonial-logo {
-          margin: 0 auto;
-          background-position: center;
-          background-repeat: no-repeat;
         }
       }
 
@@ -269,13 +298,12 @@ section.testimonials-section {
         @include avenir_M();
         font-size: 18px;
         color: $deep_navy;
-        line-height: 20px;
+        line-height: 22px;
         text-align: center;
-        padding-top: 26px;
       }
 
       div.testimonial-footer {
-        margin-top: 26px;
+        margin-top: 16px;
 
         div.testimonial-image {
           width: 40px;
@@ -293,7 +321,7 @@ section.testimonials-section {
           font-size: 18px;
           color: $deep_navy;
           line-height: 20px;
-          margin-top: 8px;
+          margin-top: 12px;
           text-align: center;
         }
 
@@ -305,8 +333,16 @@ section.testimonials-section {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          margin-top: 4px;
           text-align: center;
+
+          a {
+            color: rgba($deep_navy, 0.6);
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }
@@ -534,8 +570,14 @@ section.home-keep-aligned {
           padding: 24px 26px 24px 54px;
 
           @include mobile(){
-            padding: 24px 0;
+            padding: 16px 0 24px;
             width: calc(100% + 24px);
+          }
+
+          span.sent-daily-slack-email {
+            @include avenir_H();
+            font-size: 14px;
+            color: $ui_grey;
           }
         }
 
@@ -581,17 +623,80 @@ section.home-keep-aligned {
           overflow-x: auto;
           overflow-y: hidden;
           -webkit-overflow-scrolling: touch;
-          margin: 0;
+          margin: 16px 0 0 -24px;
           width: calc(100% + 24px);
+          max-width: initial;
         }
 
         div.keep-aligned-section-carion-inner {
 
           @include mobile() {
-            width: calc(144vw + 48px);
-            height: calc(72vw * 1.33);
+            width: calc(144vw + 72px);
+            height: calc(72vw * 1.33 + 40px);
             max-width: unset;
             position: relative;
+          }
+
+          div.keep-aligned-section-header {
+            display: none;
+
+            @include mobile() {
+              width: 72vw;
+              height: 40px;
+              float: left;
+              position: absolute;
+              top: 0;
+              background-color: #E3E3E3;
+              border-top-left-radius: 6px;
+              border-top-right-radius: 6px;
+              text-align: center;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              margin-left: 24px;
+
+              &.first-header {
+                left: 0;
+                padding: 0;
+              }
+
+              &.second-header {
+                left: unset;
+                right: 24px;
+              }
+
+              span.inner-label {
+                @include avenir_H();
+                font-size: 16px;
+                color: $ui_grey;
+                line-height: 22px;
+                margin-top: 4px;
+              }
+
+              span.slack-logo {
+                width: 18px;
+                height: 18px;
+                background-image: cdnUrl("/img/ML/slack_email_switch_slack_logo.svg");
+                background-size: 18px 18px;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 6px;
+                // margin-top: 2px;
+                opacity: 0.5;
+              }
+
+              span.email-logo {
+                width: 18px;
+                height: 16px;
+                background-image: cdnUrl("/img/ML/slack_email_switch_email_logo.svg");
+                background-size: 18px 16px;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 6px;
+                // margin-top: 2px;
+                opacity: 0.5;
+              }
+            }
           }
 
           img.keep-aligned-section-screenshot {
@@ -612,17 +717,17 @@ section.home-keep-aligned {
               float: left;
               width: 72vw;
               padding: 0;
-              margin-top: 0;
+              margin-top: 40px;
               position: initial;
               display: initial;
+              margin-left: 24px;
 
-              &:first-child {
+              &.carion-1 {
                 left: 0;
                 padding: 0;
               }
 
-              &:nth-child(2) {
-                margin-left: 24px;
+              &.carion-1-alt {
                 left: unset;
                 right: 24px;
               }
