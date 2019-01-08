@@ -47,6 +47,8 @@
 
 (rum/defcs user-profile-notifications-tab <
                                        rum/reactive
+                                       (drv/drv :team-data)
+                                       (drv/drv :team-roster)
                                        (drv/drv :edit-user-profile)
                                        (drv/drv :current-user-data)
                                        ;; Locals
@@ -71,7 +73,12 @@
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
-        slack-enabled? (jwt/team-has-bot? (:team-id org-data))]
+        team-data (drv/react s :team-data)
+        bots-data (jwt/team-has-bot? (:team-id org-data))
+        slack-orgs-with-bot (map :slack-org-id bots-data)
+        team-roster (drv/react s :team-roster)
+        slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))
+        slack-enabled? (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)]
     [:div.user-profile-internal
       [:div.user-profile-content.group
         (when error
@@ -109,12 +116,17 @@
                   [:li
                     {:on-click #(change! s :digest-medium "slack")}
                     "Notify me via Slack"])]]
-            (when-not slack-enabled?
+            (when (and (jwt/is-admin? (:team-id org-data))
+                       (not slack-enabled?)
+                       (or (empty? (:slack-orgs team-data))
+                           (not bots-data)))
               [:div.enable-slack
                 "Want to get notified via Slack?"
                 [:button.mlb-reset.add-slack-bt
                   {:on-click #(add-slack-clicked current-user-data real-close-cb)}
-                  "Add a Slack team"]])]]
+                  (if (empty? (:slack-orgs team-data))
+                    "Add a Slack team"
+                    "Add Carrot bot for Slack")]])]]
         [:div.user-profile-divider-line]
         [:div.user-profile-field-box.group
           {:class utils/hide-class}
