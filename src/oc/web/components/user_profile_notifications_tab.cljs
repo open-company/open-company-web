@@ -76,7 +76,7 @@
         team-data (drv/react s :team-data)
         bots-data (jwt/team-has-bot? (:team-id org-data))
         team-roster (drv/react s :team-roster)
-        slack-enabled? (user-actions/user-has-slack-with-bot? org-data team-data current-user-data bots-data team-roster)]
+        slack-enabled? (user-actions/user-has-slack-with-bot? team-data current-user-data bots-data team-roster)]
     [:div.user-profile-internal
       [:div.user-profile-content.group
         (when error
