@@ -1,0 +1,201 @@
+div.reminders-container {
+  background-color: $carrot_modal_bg;
+  position: absolute;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: #{$navbar_zindex + 156};
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
+
+  @include mobile() {
+    top: 65px;
+    background-color: white;
+    height: calc(100vh - 65px);
+  }
+
+  div.reminders-inner {
+    width: #{$settings_content_width}px;
+    margin: 72px auto 0;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
+    background-color: white;
+    overflow-x: visible;
+    overflow-y: auto;
+    overflow: visible;
+    position: relative;
+    border-radius: 4px;
+    padding: 24px 0;
+
+    @include mobile() {
+      width: 100%;
+      box-shadow: none;
+      border: none;
+      border-radius: 0px;
+      margin-top: 0px;
+    }
+
+    button.settings-modal-close {
+      right: -56px;
+      top: 0px;
+
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    div.reminders-header {
+      position: relative;
+      padding: 0 24px;
+
+      div.reminders-header-title {
+        margin-bottom: 16px;
+        @include avenir_H();
+        font-size: 22px;
+        color: $deep_navy;
+        line-height: 30px;
+      }
+
+      div.reminders-header-tab-line {
+        height: 33px;
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        padding: 0 24px;
+        border-bottom: 1px solid $ultra_light_grey;
+
+        div.reminders-header-tab {
+          position: relative;
+          @include avenir_B();
+          font-size: 13px;
+          color: $ui_grey;
+          text-transform: uppercase;
+          float: left;
+          margin-right: 16px;
+          cursor: pointer;
+          padding-bottom: 15px;
+
+          &.active {
+            color: $carrot_orange;
+
+            &:after {
+              content: "";
+              width: 100%;
+              height: 1px;
+              background-color: $carrot_orange;
+              position: absolute;
+              left: 0;
+              bottom: 0;
+            }
+          }
+        }
+      }
+    }
+
+    div.reminders-tab {
+      &.manage-reminders {
+        div.empty-reminders {
+          padding: 0 24px;
+          text-align: center;
+          width: 346px;
+          margin: 24px auto 0;
+
+          div.empty-reminders-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            background-color: #D9D7D7;
+            background-image: cdnUrl("/img/ML/reminders_logo_white.svg");
+            background-size: 24px 24px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 32px auto 0;
+          }
+
+          div.empty-reminders-title {
+            @include avenir_H();
+            font-size: 16px;
+            color: $deep_navy;
+            margin-top: 16px;
+          }
+
+          div.empty-reminders-description {
+            @include avenir_M();
+            font-size: 14px;
+            color: $ui_grey;
+            margin-top: 4px;
+          }
+
+          button.add-reminder-bt {
+            margin: 16px auto 32px;
+            width: 192px;
+            height: 40px;
+            border-radius: 100px;
+            background-color: $coral;
+            color: $carrot_orange;
+            @include avenir_H();
+            font-size: 14px;
+          }
+        }
+
+        div.reminders-list-container {
+          max-height: 337px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          padding: 0 24px;
+
+          div.reminder-row {
+            border-bottom: 1px solid $ultra_light_grey;
+            padding: 16px 0;
+            height: 64px;
+
+            &.editable-reminder {
+              cursor: pointer;
+              &:hover {
+                div.reminder-description {
+                  color: $deep_navy;
+                }
+              }
+            }
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            @include user_profile(32);
+
+            div.user-avatar-img-container {
+              float: left;
+            }
+
+            div.reminder-title {
+              @include avenir_R();
+              font-size: 14px;
+              color: $deep_navy;
+              line-height: 32px;
+              margin-left: 16px;
+              max-width: 40%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              float: left;
+            }
+
+            div.reminder-description {
+              text-align: right;
+              max-width: calc(60% - 32px - 16px - 16px);
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              margin-left: 16px;
+              @include avenir_R();
+              font-size: 14px;
+              line-height: 32px;
+              color: #99A0A7;
+              float: right;
+            }
+          }
+        }
+      }
+    }
+  }
+}

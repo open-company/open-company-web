@@ -102,8 +102,9 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
+        is-admin-or-author? (utils/is-admin-or-author? org-data)
         show-invite-people (and org-slug
-                                (utils/is-admin-or-author? org-data))
+                                is-admin-or-author?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
                             (< @(::content-height s)
@@ -206,12 +207,17 @@
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
+        (when is-admin-or-author?
+          [:button.mlb-reset.bottom-nav-bt
+            {:on-click #(nav-actions/show-reminders)}
+            [:div.bottom-nav-icon.reminders-icon]
+            [:span "Reminders"]])
         (when show-invite-people
-          [:button.mlb-reset.invite-people-btn
+          [:button.mlb-reset.bottom-nav-bt
             {:on-click #(nav-actions/show-invite)}
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
-        [:button.mlb-reset.invite-people-btn
+        [:button.mlb-reset.bottom-nav-bt
           {:on-click #(chat/chat-click 42861)}
           [:div.bottom-nav-icon.support-icon]
           [:span "Get support"]]]]))

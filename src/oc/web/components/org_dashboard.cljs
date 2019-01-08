@@ -20,6 +20,7 @@
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.reminders :refer (reminders)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -77,6 +78,7 @@
                 ap-initial-at
                 user-settings
                 org-settings-data
+                show-reminders
                 made-with-carrot-modal-data
                 is-sharing-activity
                 entry-edit-dissmissing
@@ -172,6 +174,9 @@
           ;; Org settings
           org-settings-data
           (org-settings)
+          ;; Reminders
+          show-reminders
+          (reminders)
           ;; User settings
           user-settings
           (user-profile)

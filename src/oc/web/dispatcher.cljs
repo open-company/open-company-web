@@ -9,6 +9,61 @@
 (defonce app-state (atom {:loading false
                           :show-login-overlay false}))
 
+(def reminders-sample-list
+  [{:uuid "1234-1234-1234"
+    :title "A simple reminder"
+    :description "Monthly post needed to remember where we are and what we are doing"
+    :org-uuid "93d8-47ba-bacd"
+    :board-uuid "50b9-4466-8d2c"
+    :board-slug "general"
+    :board-access "team"
+    ;:author "7e80-4d3c-830d" ;; Another admin
+    :author {:user-id "7e80-4d3c-830d"
+             :first-name "IacAdmin"
+             :last-name "14Nov"
+             :name "IacAdmin 14Nov"
+             :avatar-url "/img/ML/happy_face_blue.svg"}
+    ;:assignee "773e-4258-915e" ;; My self
+    :assignee {:user-id "773e-4258-915e"
+               :first-name "Iacopo"
+               :last-name "Carraro"
+               :name "Iacopo Carraro"
+               :avatar-url "https://avatars.slack-edge.com/2017-02-02/136114833346_3758034af26a3b4998f4_512.jpg"}
+    :start-date "2019-01-04T14:15:02Z"
+    :frequency "monthly"
+    :last-sent nil
+    :assignee-tz "Europe/Amsterdam"
+    :links [{:href "/blah/blah/blah"
+             :rel "update"
+             :method "PATCH"}]
+   }
+   {:uuid "4321-4321-4321"
+    :title "Quarterly All-Hands"
+    :description "Quarterly All-Hands post used to start the usual conversation around what's going on."
+    :org-uuid "93d8-47ba-bacd"
+    :board-uuid "50b9-4466-8d2c"
+    :board-slug "general"
+    :board-access "team"
+    ;:author "773e-4258-915e" ;; My self
+    :author {:user-id "773e-4258-915e"
+             :first-name "Iacopo"
+             :last-name "Carraro"
+             :name "Iacopo Carraro"
+             :avatar-url "https://avatars.slack-edge.com/2017-02-02/136114833346_3758034af26a3b4998f4_512.jpg"}
+    ; :assignee "7e80-4d3c-830d" ;; Another admin
+    :assignee {:user-id "7e80-4d3c-830d"
+               :first-name "IacAdmin"
+               :last-name "14Nov"
+               :name "IacAdmin 14Nov"
+               :avatar-url "/img/ML/happy_face_blue.svg"}
+    :start-date "2018-12-01T12:45:02Z"
+    :frequency "quarterly"
+    :last-sent nil
+    :assignee-tz "Europe/Amsterdam"
+    :links [{:href "/blah/blah/blah"
+             :rel "update"
+             :method "PATCH"}]}])
+
 ;; Data key paths
 
 (def api-entry-point-key [:api-entry-point])
@@ -155,6 +210,7 @@
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
+   :show-reminders      [[:base] (fn [base] (:show-reminders base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -309,10 +365,10 @@
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :jwt :wrt-show]
+                            :mobile-menu-open :jwt :wrt-show :show-reminders]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
                                  ap-initial-at show-section-editor show-section-add show-sections-picker
-                                 entry-editing mobile-menu-open jwt wrt-show]
+                                 entry-editing mobile-menu-open jwt wrt-show show-reminders]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -320,6 +376,7 @@
                                :board-data board-data
                                :posts-data filtered-posts
                                :org-settings-data (:org-settings base)
+                               :show-reminders show-reminders
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
@@ -348,7 +405,9 @@
    :nux-user-type              [[:nux] (fn [nux] (:user-type nux))]
    ;; Cmail
    :cmail-state           [[:base] (fn [base] (:cmail-state base))]
-   :cmail-data            [[:base] (fn [base] (:cmail-data base))]})
+   :cmail-data            [[:base] (fn [base] (:cmail-data base))]
+   :reminders-data        [[:base] (fn [base] ;(:reminders base)
+                                    reminders-sample-list)]})
 
 ;; Action Loop =================================================================
 

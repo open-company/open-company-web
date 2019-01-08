@@ -656,7 +656,7 @@ div.left-navigation-sidebar {
       padding-bottom: 0px;
     }
 
-    button.invite-people-btn {
+    button.bottom-nav-bt {
       @include avenir_M();
       width: 100%;
       text-align: left;
@@ -687,6 +687,11 @@ div.left-navigation-sidebar {
 
         &.support-icon {
           background-image: cdnUrl("/img/ML/support.svg");
+        }
+
+        &.reminders-icon {
+          background-image: cdnUrl("/img/ML/reminders_logo_dark.svg");
+          opacity: 0.6;
         }
 
       }
