@@ -77,8 +77,9 @@
             [:div.testimonial-quote
               (str
                "“Carrot is where we "
-               "communicate when we "
-               "need everyone to see it - "
+               "communicate important "
+               "information when we need "
+               "everyone to see it - "
                "regardless of their time zone.”")]
             [:div.testimonial-footer.group
               [:div.testimonial-image]

@@ -66,6 +66,8 @@ div.homepage-testimonials-container {
     @include mobile() {
       // padding: 0 16px;
       width: 138px;
+      // Temp hide the logos on mobile since they don't look good
+      display: none;
     }
 
     &.logo-novo {
@@ -219,7 +221,7 @@ section.testimonials-section {
       }
 
       &.oval-money {
-        margin-top: 22px;
+        margin-top: 44px;
 
         div.testimonial-footer {
           div.testimonial-image {
@@ -229,7 +231,7 @@ section.testimonials-section {
       }
 
       &.skylight-digital {
-        margin-top: 22px;
+        margin-top: 44px;
 
         div.testimonial-footer {
           div.testimonial-image {
@@ -239,9 +241,15 @@ section.testimonials-section {
       }
 
       &.wayne-state-univerity {
+        margin-top: 3px;
         div.testimonial-footer {
           div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_wayne_state_univerity");
+            @include image-2x("/img/ML/testimonial_wayne_state_university");
+          }
+
+          div.testimonial-role {
+            max-width: 200px;
+            margin: 0 auto;
           }
         }
       }
@@ -250,15 +258,7 @@ section.testimonials-section {
         div.testimonial-footer {
           div.testimonial-image {
             @include image-2x("/img/ML/testimonial_partner_hero");
-          } 
-        }
-      }
-
-      &.partner-hero {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_partner_hero");
-          } 
+          }
         }
       }
 
@@ -330,9 +330,6 @@ section.testimonials-section {
           font-size: 14px;
           color: rgba($deep_navy, 0.6);
           line-height: 19px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
           text-align: center;
 
           a {
