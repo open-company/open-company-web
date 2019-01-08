@@ -75,10 +75,8 @@
         error (:error user-profile-data)
         team-data (drv/react s :team-data)
         bots-data (jwt/team-has-bot? (:team-id org-data))
-        slack-orgs-with-bot (map :slack-org-id bots-data)
         team-roster (drv/react s :team-roster)
-        slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))
-        slack-enabled? (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)]
+        slack-enabled? (user-actions/user-has-slack-with-bot? org-data team-data current-user-data bots-data team-roster)]
     [:div.user-profile-internal
       [:div.user-profile-content.group
         (when error
