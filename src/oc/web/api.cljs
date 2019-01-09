@@ -211,7 +211,7 @@
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
-(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-frequency :digest-medium])
+(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
