@@ -281,7 +281,7 @@ div.user-profile {
             &.no-slack {
               margin-bottom: 16px;
               div.dropdown-button {
-                background-color: rgba(#D8DBDF, 0.4);
+                background-color: rgba($medium_light_grey, 0.4);
                 border: 1px solid rgba(#B1B8C0, 0.5);
 
                 button.user-type-btn {

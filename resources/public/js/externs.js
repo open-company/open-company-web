@@ -50,6 +50,7 @@ $.after = function(){};
 $.closest = function(){};
 $.scrollLeft = function(){};
 $.scrollTop = function(){};
+$.datepicker = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -106,6 +107,8 @@ var OCWebForceRefreshToken = function(){};
 var OCWebPrintFilteredPostsData = function(){};
 var OCWebPrintPostsData = function(){};
 var OCWebPrintUserNotifications = function(){};
+var OCWebPrintRemindersData = function(){};
+var OCWebPrintReminderEditData = function(){};
 // Moment
 var moment = {};
 moment.tz = {};

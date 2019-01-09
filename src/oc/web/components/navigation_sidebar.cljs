@@ -209,15 +209,30 @@
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
         (when is-admin-or-author?
           [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(nav-actions/show-reminders)}
+            {:on-click #(nav-actions/show-reminders)
+             :title "Create a consistent cadence of important updates"
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
             [:div.bottom-nav-icon.reminders-icon]
             [:span "Reminders"]])
         (when show-invite-people
           [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(nav-actions/show-invite)}
+            {:on-click #(nav-actions/show-invite)
+             :title "Invite everyone with email or Slack"
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
         [:button.mlb-reset.bottom-nav-bt
-          {:on-click #(chat/chat-click 42861)}
+          {:on-click #(chat/chat-click 42861)
+           :title "Have a question for Carrot? Chat with us"
+           :data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
           [:div.bottom-nav-icon.support-icon]
           [:span "Get support"]]]]))
