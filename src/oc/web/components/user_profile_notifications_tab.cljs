@@ -9,7 +9,10 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
+            [oc.web.utils.user :as user-utils]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
+            [oc.web.components.org-settings :as org-settings]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]))
@@ -25,8 +28,28 @@
         user-data (:user-data edit-user-profile)]
     (user-actions/user-profile-save current-user-data edit-user-profile)))
 
+(defn add-slack-clicked [current-user-data real-close-cb]
+  (let [switch-cb (fn []
+                   (real-close-cb current-user-data)
+                   (utils/after 150 #(org-settings/show-modal :main)))]
+    (if (:has-changes current-user-data)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "user-profile-unsaved-edits"
+                        :message "Leave without saving your changes?"
+                        :link-button-title "Stay"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
+                        :solid-button-cb (fn []
+                                          (alert-modal/hide-alert)
+                                          (switch-cb))}]
+        (alert-modal/show-alert alert-data))
+      (switch-cb))))
+
 (rum/defcs user-profile-notifications-tab <
                                        rum/reactive
+                                       (drv/drv :team-data)
+                                       (drv/drv :team-roster)
                                        (drv/drv :edit-user-profile)
                                        (drv/drv :current-user-data)
                                        ;; Locals
@@ -50,92 +73,122 @@
   [s org-data real-close-cb]
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
-        error (:error user-profile-data)]
+        error (:error user-profile-data)
+        team-data (drv/react s :team-data)
+        bots-data (jwt/team-has-bot? (:team-id org-data))
+        team-roster (drv/react s :team-roster)
+        slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
     [:div.user-profile-internal
       [:div.user-profile-content.group
-        [:div.user-profile-field-box
-          [:div.user-profile-field-label
-            [:span.error
-              {:style {:margin-left "0px"}}
-              (when error
-                "An error occurred while saving, please try again.")]]]
-        ; Left column
-        [:div.user-profile-column-left
-          {:class utils/hide-class}
+        (when error
+          [:div.user-profile-field-box.group
+            [:div.user-profile-field-label
+              [:span.error
+                {:style {:margin-left "0px"}}
+                "An error occurred while saving, please try again."]]])
+        (when error
+          [:div.user-profile-divider-line])
           ;; Digest frequency
-          [:div.user-profile-field-box
-            [:div.user-profile-field-label
-              "Notifications by " [:i.mdi.mdi-information-outline
-                {:title "Receive notifications of newly created posts."
-                 :data-toggle "tooltip"
-                 :data-placement "top"}]]
-            [:div.user-profile-field.digest-medium
-              [:div.dropdown.dropdown-button
-                [:button.btn-reset.user-type-btn.dropdown-toggle
-                  {:id "user-digest-medium-dropdown"
-                   :data-toggle "dropdown"
-                   :aria-haspopup true
-                   :aria-expanded false}
-                  (case (:digest-medium current-user-data)
-                    "slack"
-                    "Slack"
-                    "email"
-                    "Email"
-                    "In-app only")]
-                [:ul.dropdown-menu.user-type-dropdown-menu
-                  {:aria-labelledby "user-digest-medium-dropdown"}
-                  [:li
-                    {:on-click #(do
-                                  (when (and (= (:digest-medium current-user-data) "in-app")
-                                             (= (:digest-frequency current-user-data) "never"))
-                                    (change! s :digest-frequency "daily"))
-                                  (change! s :digest-medium "email"))}
-                    "Email"]
-                  ;; Show Slack digest option if
-                  (when (jwt/team-has-bot? (:team-id org-data))
-                    [:li
-                      {:on-click #(do
-                                    (when (and (= (:digest-medium current-user-data) "in-app")
-                                               (= (:digest-frequency current-user-data) "never"))
-                                      (change! s :digest-frequency "daily"))
-                                    (change! s :digest-medium "slack"))}
-                      "Slack"])
-                  [:li
-                    {:on-click #(change! s :digest-medium "in-app")}
-                    "In-app only"]]]]]]
-        ; Right column
-        [:div.user-profile-column-right
+        [:div.user-profile-field-box.group
           {:class utils/hide-class}
-          ;; Digest Medium
-          [:div.user-profile-field-box
-            [:div.user-profile-field-label
-              "Frequency"]
-            [:div.user-profile-field.digest-frequency-field.digest-frequency
-              [:div.dropdown.dropdown-button
-                [:button.btn-reset.user-type-btn.dropdown-toggle
-                  {:id "user-digest-frequency-dropdown"
-                   :data-toggle "dropdown"
-                   :aria-haspopup true
-                   :aria-expanded false
-                   :disabled (and (not= (:digest-medium current-user-data) "email")
-                                  (not= (:digest-medium current-user-data) "slack"))}
-                  (case (:digest-frequency current-user-data)
-                    "daily"
-                    "Daily"
-                    "weekly"
-                    "Weekly"
-                    "Never")]
-                [:ul.dropdown-menu.user-type-dropdown-menu
-                  {:aria-labelledby "user-digest-frequency-dropdown"}
+          [:div.user-profile-field-label
+            "Daily newsletter"]
+          [:div.user-profile-field.digest-medium
+            {:class (when-not slack-enabled? "no-slack")}
+            [:div.dropdown.dropdown-button
+              [:button.btn-reset.user-type-btn.dropdown-toggle
+                {:id "user-digest-medium-dropdown"
+                 :data-toggle "dropdown"
+                 :aria-haspopup true
+                 :aria-expanded false}
+                (case (:digest-medium current-user-data)
+                  "slack"
+                  "Notify me via Slack"
+                  "Notify me via Email")]
+              [:ul.dropdown-menu.user-type-dropdown-menu
+                {:aria-labelledby "user-digest-medium-dropdown"}
+                [:li
+                  {:on-click #(change! s :digest-medium "email")}
+                  "Notify me via Email"]
+                ;; Show Slack digest option if
+                (when slack-enabled?
                   [:li
-                    {:on-click #(change! s :digest-frequency "daily")}
-                    "Daily"]
+                    {:on-click #(change! s :digest-medium "slack")}
+                    "Notify me via Slack"])]]
+            (when (and (jwt/is-admin? (:team-id org-data))
+                       (not slack-enabled?)
+                       (or (empty? (:slack-orgs team-data))
+                           (not bots-data)))
+              [:div.enable-slack
+                "Want to get notified via Slack?"
+                [:button.mlb-reset.add-slack-bt
+                  {:on-click #(add-slack-clicked current-user-data real-close-cb)}
+                  (if (empty? (:slack-orgs team-data))
+                    "Add a Slack team"
+                    "Add Carrot bot for Slack")]])]]
+        [:div.user-profile-divider-line]
+        [:div.user-profile-field-box.group
+          {:class utils/hide-class}
+          [:div.user-profile-field-label
+            "Comments & mentions"]
+          [:div.user-profile-field.notification-medium
+            [:div.dropdown.dropdown-button
+              [:button.btn-reset.user-type-btn.dropdown-toggle
+                {:id "user-notification-medium-dropdown"
+                 :data-toggle "dropdown"
+                 :aria-haspopup true
+                 :aria-expanded false}
+                (case (:notification-medium current-user-data)
+                  "slack"
+                  "Notify me via Slack"
+                  "email"
+                  "Notify me via Email"
+                  "In-app only")]
+              [:ul.dropdown-menu.user-type-dropdown-menu
+                {:aria-labelledby "user-notification-medium-dropdown"}
+                [:li
+                  {:on-click #(change! s :notification-medium "email")}
+                  "Notify me via Email"]
+                ;; Show Slack digest option if
+                (when slack-enabled?
                   [:li
-                    {:on-click #(change! s :digest-frequency "weekly")}
-                    "Weekly"]
+                    {:on-click #(change! s :notification-medium "slack")}
+                    "Notify me via Slack"])
+                [:li
+                  {:on-click #(change! s :notification-medium "in-app")}
+                  "In-app only"]]]]]
+        [:div.user-profile-divider-line]
+        [:div.user-profile-field-box.group
+          {:class utils/hide-class}
+          [:div.user-profile-field-label
+            "Reminders"]
+          [:div.user-profile-field.reminder-medium
+            [:div.dropdown.dropdown-button
+              [:button.btn-reset.user-type-btn.dropdown-toggle
+                {:id "user-reminder-medium-dropdown"
+                 :data-toggle "dropdown"
+                 :aria-haspopup true
+                 :aria-expanded false}
+                (case (:reminder-medium current-user-data)
+                  "slack"
+                  "Notify me via Slack"
+                  "email"
+                  "Notify me via Email"
+                  "In-app only")]
+              [:ul.dropdown-menu.user-type-dropdown-menu
+                {:aria-labelledby "user-reminder-medium-dropdown"}
+                [:li
+                  {:on-click #(change! s :reminder-medium "email")}
+                  "Notify me via Email"]
+                ;; Show Slack digest option if
+                (when slack-enabled?
                   [:li
-                    {:on-click #(change! s :digest-frequency "never")}
-                    "Never"]]]]]]]
+                    {:on-click #(change! s :reminder-medium "slack")}
+                    "Notify me via Slack"])
+                [:li
+                  {:on-click #(change! s :reminder-medium "in-app")}
+                  "In-app only"]]]]]
+        [:div.user-profile-divider-line]]
       [:div.user-profile-footer.group
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)

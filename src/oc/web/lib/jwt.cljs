@@ -71,6 +71,6 @@
     ;; interpreted as part of the key from the JSON parser.
     ;; When decode keywordize the keys it keeps them in the key so we need to add them to check
     ;; for the team value
-    (some #(= (slack-bots-team-key team-id) %) (keys slack-bots))))
+    (some (fn [[k v]] (when (= (slack-bots-team-key team-id) k) v)) slack-bots)))
 
 (set! (.-OCWebPrintJWTContents js/window) #(js/console.log (get-contents)))
