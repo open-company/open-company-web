@@ -139,7 +139,7 @@
               [:span.go-to-digest
                 "Launch Carrot"]
               [:span.start-copy
-                "Start Free"])]]
+                "Get Started"])]]
         [:div.site-navbar-right.mobile-only
           (if (or is-slack-lander?
                   is-slack?)
@@ -159,7 +159,7 @@
                   (if (responsive/is-tablet-or-mobile?)
                     (if (responsive/is-mobile-size?)
                       "Start"
-                      "Start free")
+                      "Get Started")
                     "Continue with Slack")]]
               [:a.start
                 {:id "site-header-mobile-signup-item"

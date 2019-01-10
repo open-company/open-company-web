@@ -93,6 +93,26 @@ if (jwt) {
   }
 }
 
+function OCWebSetupMarketingSiteJS(){
+  $("button.slack-email-switch-bt, button.keep-aligned-section-next-bt").on("click", function(){
+    $("button.keep-aligned-section-next-bt").toggleClass("active");
+    $("button.mlb-reset.slack-email-switch-bt").toggleClass("active");
+    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1");
+    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1-alt");
+  });
+
+  $("div.pricing-toggle").on("click", function(){
+    var $teamColumn = $("div.pricing-column.team-column");
+    if ($teamColumn.hasClass("monthly")) {
+      $teamColumn.removeClass("monthly");
+      $teamColumn.addClass("annual");
+    } else {
+      $teamColumn.removeClass("annual");
+      $teamColumn.addClass("monthly");
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function(_) {
 
   if ($("#youtube-player").length > 0) {
@@ -115,6 +135,15 @@ document.addEventListener("DOMContentLoaded", function(_) {
       }
     });
   }
+
+  OCWebSetupMarketingSiteJS();
+
+  $(window).on("click", function(e){
+    $target = $(e.target);
+    if (!$target.hasClass("tear-price-select") && !$target.parents(".tear-price-select").length) {
+      $("div.tear-price-select-container").removeClass("open");
+    }
+  });
 
   if (jwt) {
     $("#site-header-login-item").hide();
@@ -301,10 +330,12 @@ function onYouTubeIframeAPIReady() {
     height: Math.min(winHeight, 608).toString(),
     width: Math.min(winWidth, 1080).toString(),
     videoId: 'dMWpnHxQMP4',
+    allowsInlineMediaPlayback: 'TRUE',
     allowfullscreen: 'true',
     playerVars: {
         showinfo: 0,
         rel: 0,
+        playsinline: 1,
         autoplay: 0
     },
     events: {
@@ -334,9 +365,13 @@ function OCYTVideoOnPlayerStateChange(event){
   }
 }
 
-function OCStaticHideAnimationLightbox() {
+function OCStaticHideAnimationLightbox(e) {
   OCYTVideoPlayer.pauseVideo();
   $(document.body).removeClass('show-animation-lightbox no-scroll');
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 }
 
 function OCStaticShowPHBanner(){
