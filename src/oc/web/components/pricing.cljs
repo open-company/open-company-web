@@ -49,7 +49,7 @@
               [:div.tear-subtitle
                 [:span.bold
                   "Free for small teams"]
-                " up to 10 users."]
+                " up to 5 users."]
               [:a.tear-start-bt
                 {:href "/sign-up"}
                 "Start for free"]
