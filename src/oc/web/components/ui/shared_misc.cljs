@@ -152,9 +152,15 @@
           [:div.testimonial-card.novo
             [:div.testimonial-quote
               (str
-               "“Before Carrot I had no "
-               "idea if anyone even noticed "
-               "what I was saying.” ")]
+               "“We use Carrot when we "
+               "need to make sure "
+               "everyone is on the same "
+               "page across all of our "
+               "offices here and abroad. It "
+               "helps us share BIG wins, "
+               "and in a fast-growing "
+               "startup keeping that family "
+               "vibe its awesome.”")]
             [:div.testimonial-footer.group
               [:div.testimonial-image]
               [:div.testimonial-name
@@ -226,7 +232,8 @@
               (str
                "Protect your team’s focus (and sanity). "
                "Carrot condenses noisy updates "
-               "into a morning digest.")]
+               "into a morning digest so your team "
+               "stays aligned with fewer interruptions.")]
             [:div.slack-email-container.group.big-web-tablet-only
               [:div.slack-email-switch-container
                 (when slack?

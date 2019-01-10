@@ -64,7 +64,7 @@
                  :title "Browse and search posts from the previous 3 months"}
                 [:span "3 months history"]]]
             ;; Team
-            [:div.pricing-column.team-column.annual.up-to-25
+            [:div.pricing-column.team-column.annual
               [:h2.tear-title
                 "Standard"]
               [:div.pricing-toggle-line
@@ -74,32 +74,11 @@
                   [:span.pricing-toggle-dot]]
                 [:span.pricing-toggle-monthly
                   "Monthly"]]
-              [:div.tear-price-select-container
-                [:button.mlb-reset.tear-price-select
-                  "Up to 25 users"]
-                [:div.tear-price-select-values
-                  [:div.tear-price-select-value
-                    {:data-value "25"}
-                    "Up to 25 users"]
-                  [:div.tear-price-select-value
-                    {:data-value "100"}
-                    "Up to 100 users"]
-                  [:div.tear-price-select-value
-                    {:data-value "250"}
-                    "Up to 250 users"]]]
               [:h3.tear-price
-                [:span.monthly.up-to-25
-                  "$45"]
-                [:span.monthly.up-to-100
-                  "$85"]
-                [:span.monthly.up-to-250
-                  "$185"]
-                [:span.annual.up-to-25
-                  "$36"]
-                [:span.annual.up-to-100
-                  "$68"]
-                [:span.annual.up-to-250
-                  "$148"]]
+                [:span.annual
+                  "$3.20"]
+                [:span.monthly
+                  "$4"]]
               [:div.tear-subtitle
                 [:span.billed-annually
                   "Per month, billed annually"]

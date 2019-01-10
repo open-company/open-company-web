@@ -245,9 +245,15 @@
           [:div.testimonial-card.novo
             [:div.testimonial-quote
               (str
-               "“Before Carrot I had no "
-               "idea if anyone even noticed "
-               "what I was saying.” ")]
+               "“We use Carrot when we "
+               "need to make sure "
+               "everyone is on the same "
+               "page across all of our "
+               "offices here and abroad. It "
+               "helps us share BIG wins, "
+               "and in a fast-growing "
+               "startup keeping that family "
+               "vibe its awesome.”")]
             [:div.testimonial-footer.group
               [:div.testimonial-image]
               [:div.testimonial-name
@@ -312,7 +318,8 @@
               (str
                "Protect your team’s focus (and sanity). "
                "Carrot condenses noisy updates "
-               "into a morning digest.")]
+               "into a morning digest so your team "
+               "stays aligned with fewer interruptions.")]
             [:div.slack-email-container.group.big-web-tablet-only
               [:div.slack-email-switch-container
                 (when slack?
@@ -491,7 +498,7 @@
                :title "Browse and search posts from the previous 3 months"}
               [:span "3 months history"]]]
           ;; Team
-          [:div.pricing-column.team-column.annual.up-to-25
+          [:div.pricing-column.team-column.annual
             [:h2.tear-title
               "Standard"]
             [:div.pricing-toggle-line
@@ -501,37 +508,16 @@
                 [:span.pricing-toggle-dot]]
               [:span.pricing-toggle-monthly
                 "Monthly"]]
-            [:div.tear-price-select-container
-              [:button.mlb-reset.tear-price-select
-                "Up to 25 users"]
-              [:div.tear-price-select-values
-                [:div.tear-price-select-value
-                  {:data-value "25"}
-                  "Up to 25 users"]
-                [:div.tear-price-select-value
-                  {:data-value "100"}
-                  "Up to 100 users"]
-                [:div.tear-price-select-value
-                  {:data-value "250"}
-                  "Up to 250 users"]]]
             [:h3.tear-price
-              [:span.monthly.up-to-25
-                "$45"]
-              [:span.monthly.up-to-100
-                "$85"]
-              [:span.monthly.up-to-250
-                "$185"]
-              [:span.annual.up-to-25
-                "$36"]
-              [:span.annual.up-to-100
-                "$68"]
-              [:span.annual.up-to-250
-                "$148"]]
+              [:span.annual
+                "$3.20"]
+              [:span.monthly
+                "$4"]]
             [:div.tear-subtitle
               [:span.billed-annually
-                "Per month, billed annually"]
+                "Per active user, billed annually"]
               [:span.billed-monthly
-                "Per month, billed monthly"]]
+                "Per active user, billed monthly"]]
             [:a.tear-start-bt
               {:href "/sign-up"}
               "Try free for 14 days"]
@@ -661,13 +647,12 @@
         animation-lightbox
 
         [:h1.slack-headline
-          "Where leaders rise above the noise"]
+          "Rise above the noise"]
 
         [:div.slack-subline
           (str
            "Leaders struggle to communicate effectively with fast-growing and distributed "
-           "teams. Carrot makes sure everyone hears you - even in noisy places like email "
-           "and Slack. With Carrot, everyone stays on the same page.")]
+           "teams. Carrot keeps everyone focused - even in noisy places like email and Slack.")]
 
         ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.slack-button-container.group

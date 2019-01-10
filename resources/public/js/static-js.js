@@ -111,21 +111,6 @@ function OCWebSetupMarketingSiteJS(){
       $teamColumn.addClass("monthly");
     }
   });
-
-  $("button.tear-price-select").on("click", function() {
-    $("div.tear-price-select-container").toggleClass("open");
-  });
-
-  $("div.tear-price-select-value").on("click", function(e){
-    var users = $(this).data("value"),
-        $button = $("button.tear-price-select"),
-        $teamColumn = $("div.pricing-column.team-column");
-    $button.html("Up to " + users + " users");
-    $teamColumn.removeClass("up-to-25");
-    $teamColumn.removeClass("up-to-100");
-    $teamColumn.removeClass("up-to-250");
-    $teamColumn.addClass("up-to-" + users);
-  });
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {

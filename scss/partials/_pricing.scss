@@ -95,7 +95,7 @@ div.pricing-wrap {
           text-align: center;
 
           &:nth-child(odd) {
-            margin-top: 115px;
+            margin-top: 43px;
           }
 
           @include pricing-tablet() {
@@ -113,79 +113,6 @@ div.pricing-wrap {
             @include PTSerif()
             font-size: 40px;
             color: $deep_navy;
-          }
-
-          div.tear-price-select-container {
-            position: relative;
-            width: 280px;
-            height: 48px;
-            margin: 24px auto 0;
-
-            button.tear-price-select {
-              width: 280px;
-              height: 48px;
-              background-color: white;
-              border-radius: 8px;
-              border: 1px solid #D8DBDF;
-              @include avenir_R();
-              font-size: 16px;
-              color: $deep_navy;
-              box-shadow: none;
-              outline: none;
-              padding: 13px 16px;
-              border-radius: 4px;
-              position: relative;
-              text-align: left;
-              opacity: 1;
-
-              &:after {
-                color: $deep_navy;
-                font-size: 23px;
-                font-family: "Material Design Icons";
-                content: "\F35D";
-                position: absolute;
-                top: 8px;
-                right: 10px;
-              }
-
-              &:active, &:focus {
-                outline: none;
-                box-shadow: none;
-              }
-            }
-
-            &.open {
-              div.tear-price-select-values {
-                display: block;
-              }
-            }
-
-            div.tear-price-select-values {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 280px;
-              background-color: white;
-              border-radius: 4px;
-              border: 1px solid #D8D8DF;
-              display: none;
-              text-align: left;
-
-              div.tear-price-select-value {
-                @include avenir_R();
-                font-size: 16px;
-                color: $deep_navy;
-                width: 280px;
-                height: 48px;
-                padding: 13px 16px;
-                cursor: pointer;
-                text-align: left;
-
-                &:hover {
-                  text-decoration: underline;
-                }
-              } 
-            }
           }
 
           h3.tear-price {
@@ -282,7 +209,7 @@ div.pricing-wrap {
           }
 
           &.team-column {
-            min-height: 837px;
+            min-height: 816px;
             background-color: white;
             border: 1px solid $deep_tan;
             box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
@@ -366,80 +293,26 @@ div.pricing-wrap {
               }
             }
 
-            &.monthly.up-to-25 {
+            &.monthly {
               h3.tear-price {
-                span.monthly.up-to-100, span.monthly.up-to-250,
-                span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                span.annual {
                   display: none;
                 }
 
-                span.monthly.up-to-25 {
+                span.monthly {
                   display: block;
                 }
               }
             }
 
-            &.monthly.up-to-100 {
+            &.annual {
               h3.tear-price {
-                span.monthly.up-to-25, span.monthly.up-to-250,
-                span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
-                  display: none;
-                }
-
-                span.monthly.up-to-100 {
+                span.annual {
                   display: block;
                 }
-              }
-            }
 
-            &.monthly.up-to-250 {
-              h3.tear-price {
-                span.monthly.up-to-25, span.monthly.up-to-100
-                span.annual.up-to-25, span.annual.up-to-100, span.annual.up-to-250 {
+                span.monthly {
                   display: none;
-                }
-
-                span.monthly.up-to-250 {
-                  display: block;
-                }
-              }
-            }
-
-            &.annual.up-to-25 {
-              h3.tear-price {
-                span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
-                span.annual.up-to-100, span.annual.up-to-250 {
-                  display: none;
-                }
-
-                span.annual.up-to-25 {
-                  display: block;
-                }
-              }
-            }
-
-            &.annual.up-to-100 {
-              h3.tear-price {
-                span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
-                span.annual.up-to-25, span.annual.up-to-250 {
-                  display: none;
-                }
-
-                span.annual.up-to-100 {
-                  display: block;
-                }
-              }
-            }
-
-            &.annual.up-to-250 {
-              h3.tear-price {
-                span.monthly.up-to-25, span.monthly.up-to-100, span.monthly.up-to-250,
-                span.annual.up-to-25, span.annual.up-to-100 {
-                  display: none;
-                }
-
-                span.annual.up-to-250 {
-                  display: block;
                 }
               }
             }

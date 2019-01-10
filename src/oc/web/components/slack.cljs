@@ -32,13 +32,12 @@
             shared-misc/animation-lightbox
 
             [:h1.slack-headline
-              "Where leaders rise above the noise"]
+              "Rise above the noise"]
 
             [:div.slack-subline
               (str
                "Leaders struggle to communicate effectively with fast-growing and distributed "
-               "teams. Carrot makes sure everyone hears you - even in noisy places like email "
-               "and Slack. With Carrot, everyone stays on the same page.")]
+               "teams. Carrot keeps everyone focused - even in noisy places like email and Slack.")]
 
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
