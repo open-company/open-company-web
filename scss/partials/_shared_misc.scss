@@ -168,9 +168,8 @@ section.testimonials-section {
   }
 
   div.testimonials-cards-container {
-    // TODO: use this to go back to 2 (or 3) testimony
-    $testimonials_breakpoint: 1160;
-    // $testimonials_breakpoint: 833;
+    $testimonials_num: 3;
+    $testimonials_breakpoint: (278 * $testimonials_num) + (16 * ($testimonials_num - 1));
     margin: 55px auto 0px;
     position: relative;
     width: 100%;
@@ -184,7 +183,7 @@ section.testimonials-section {
     }
 
     div.testimonials-cards-inner {
-      width: #{$testimonials_breakpoint + 1}px;
+      width: #{($testimonials_breakpoint + 1)}px;
       margin: 0 auto;
 
       @media screen and (max-width: #{$testimonials_breakpoint + 48}px){

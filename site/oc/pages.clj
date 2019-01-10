@@ -113,23 +113,24 @@
     [:div.testimonials-cards-container.group
       [:div.testimonials-cards-inner.group
         [:div.testimonials-cards-row.group
-          [:div.testimonial-card.oval-money
-            [:div.testimonial-quote
-              (str
-               "“The morning digest keeps "
-               "everyone informed without "
-               "a constant barrage "
-               "throughout the day.”")]
-            [:div.testimonial-footer.group
-              [:div.testimonial-image]
-              [:div.testimonial-name
-                "Edoardo Benedetto"]
-              [:div.testimonial-role
-                [:a
-                  {:href "https://ovalmoney.com/"
-                   :target "_blank"}
-                  "Oval Money"]
-                ", UX Architect"]]]
+          ;; FIXME: Temp remove first testimonials column
+          ; [:div.testimonial-card.oval-money
+          ;   [:div.testimonial-quote
+          ;     (str
+          ;      "“The morning digest keeps "
+          ;      "everyone informed without "
+          ;      "a constant barrage "
+          ;      "throughout the day.”")]
+          ;   [:div.testimonial-footer.group
+          ;     [:div.testimonial-image]
+          ;     [:div.testimonial-name
+          ;       "Edoardo Benedetto"]
+          ;     [:div.testimonial-role
+          ;       [:a
+          ;         {:href "https://ovalmoney.com/"
+          ;          :target "_blank"}
+          ;         "Oval Money"]
+          ;       ", UX Architect"]]]
           [:div.testimonial-card.skylight-digital
             [:div.testimonial-quote
               (str
@@ -185,24 +186,25 @@
                   "PartnerHero"]
                 ", Director of R&D"]]]]
         [:div.testimonials-cards-row.group
-          [:div.testimonial-card.blend-labs
-            [:div.testimonial-quote
-              (str
-               "“I used to waste time "
-               "begging team leads to get "
-               "their updates in, but now "
-               "Carrot reminds them "
-               "automatically for me.”")]
-            [:div.testimonial-footer.group
-              [:div.testimonial-image]
-              [:div.testimonial-name
-                "Sara Vienna"]
-              [:div.testimonial-role
-                [:a
-                  {:href "https://bl3ndlabs.com/"
-                   :target "_blank"}
-                  "BL3NDlabs"]
-                ", Head of Design"]]]
+          ;; FIXME: Temp remove first testimonials column
+          ; [:div.testimonial-card.blend-labs
+          ;   [:div.testimonial-quote
+          ;     (str
+          ;      "“I used to waste time "
+          ;      "begging team leads to get "
+          ;      "their updates in, but now "
+          ;      "Carrot reminds them "
+          ;      "automatically for me.”")]
+          ;   [:div.testimonial-footer.group
+          ;     [:div.testimonial-image]
+          ;     [:div.testimonial-name
+          ;       "Sara Vienna"]
+          ;     [:div.testimonial-role
+          ;       [:a
+          ;         {:href "https://bl3ndlabs.com/"
+          ;          :target "_blank"}
+          ;         "BL3NDlabs"]
+          ;       ", Head of Design"]]]
           [:div.testimonial-card.m-io
             [:div.testimonial-quote
               (str
