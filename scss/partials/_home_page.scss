@@ -10,20 +10,20 @@ div.home-wrap {
 
     section.cta {
       padding-top: 239px;
-      padding-bottom: 120px;
+      padding-bottom: 73px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
       @include tablet() {
         padding-top: 131px;
-        padding-bottom: 80px;
+        padding-bottom: 0px;
+        padding: 131px 24px 0;
       }
 
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding: 131px 24px 80px;
       }
 
       * {
@@ -32,7 +32,7 @@ div.home-wrap {
       }
 
       &:after {
-        background-color: #F8F7F3;
+        background-color: $another_ui_grey;
         content: "";
         width: 100%;
         height: 39%;
@@ -43,8 +43,14 @@ div.home-wrap {
         right: 0;
         z-index: 2;
 
+        @include tablet() {
+          border-bottom-left-radius: 0;
+          border-top-right-radius: 200px;
+        }
+
         @include mobile() {
-          border-bottom-left-radius: 100px; 
+          border-top-right-radius: 100px;
+          min-height: 280px;
         }
 
         @media screen and (max-width: 440px) {
@@ -56,13 +62,14 @@ div.home-wrap {
         font-size: 80px;
         @include PTSerif()
         color: $deep_navy;
-        margin: 0 auto;
+        margin: 0 auto 24px;
         z-index: 2;
         position: relative;
 
         @include mobile(){
           font-size: 50px;
           line-height: 56px;
+          margin-bottom: 16px;
         }
 
         @media screen and (max-width: 380px) {
@@ -74,49 +81,29 @@ div.home-wrap {
       div.subheadline {
         color: $deep_navy;
         font-size: 26px;
-        line-height: 34px;
+        line-height: 36px;
         @include avenir_R();
-        margin: 24px auto 0px;
+        margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 627px;
+        max-width: 960px;
 
-        &.for-others {
-          @include mobile() {
-            display: none;
-          }
-        }
-
-        &.for-mobile {
-          @include big_web() {
-            display: none;
-          }
-
-          @include mobile() {
-            display: block;
-          }
-        }
-
-        @include mobile(){
-          margin-top: 16px;
-          font-size: 18px;
-          line-height: 23px;
-          padding: 0px;
+        @include tablet(){
+          font-size: 24px;
+          line-height: 32px;
+          padding: 0;
           color: $deep_navy;
+          max-width: 595px;
         }
-      }
-
-      div.no-credit-card {
-        color: $ui_grey;
-        @include avenir_R();
-        font-size: 16px;
-        max-width: 900px;
-        text-align: center;
-        margin: 24px auto 0;
 
         @include mobile() {
-          font-size: 12px;
-          margin: 16px auto 0;
+          max-width: 100%;
+          font-size: 20px;
+          line-height: 26px;
+        }
+
+        &.second-line {
+          margin-top: 0;
         }
       }
 

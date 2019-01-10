@@ -17,7 +17,7 @@
     [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-    [:title "Carrot | Leadership communication for growing and distributed teams"]
+    [:title "Carrot | Leadership communication for fast-growing and distributed teams."]
     pages/google-fonts
     pages/bootstrap-css
     ;; Local css
@@ -64,26 +64,21 @@
           "Home"]]
       [:div.site-mobile-menu-item
         [:a
-          {:href "/pricing"
-           :class (when (= active-page "pricing") "active")}
-          "Pricing"]]
-      [:div.site-mobile-menu-item
-        [:a
           {:href "/about"
            :class (when (= active-page "about") "active")}
-          "About"]]]
+          "About"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/pricing"
+           :class (when (= active-page "pricing") "active")}
+          "Pricing"]]]
     [:div.site-mobile-menu-footer
       [:button.mlb-reset.login-btn
         {:id "site-mobile-menu-login"}
         "Login"]
       [:button.mlb-reset.get-started-button
         {:id "site-mobile-menu-getstarted"}
-        "Get started for free"]
-      [:div.no-credit-card
-        {:id "site-mobile-menu-nocreditcard"}
-        "No credit card required  "
-        [:span.dot "•"]
-        "  No install required"]]])
+        "Get started for free"]]])
 
 (defn nav
   "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
@@ -160,9 +155,10 @@
 (defn footer
   "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
    and every change here should be reflected there."
-  []
+  [page]
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:footer.navbar.navbar-default.navbar-bottom
+    {:class (when (= page :slack-lander) "no-border")}
     [:div.container-fluid.group
       [:div.right-column.group
 
@@ -197,7 +193,7 @@
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-communication-copy
-          "Leadership communication for growing and distributed teams."]
+          "Leadership communication for fast-growing and distributed teams."]
         [:div.footer-small-links.static
           [:a {:href "/sign-up"} "Get started for free"]
           "or"
@@ -251,7 +247,7 @@
                   :500     (pages/server-error options)
                   :privacy (pages/privacy options)
                   :terms   (pages/terms options))
-                (footer)]))))
+                (footer page)]))))
 
 (defn app-shell [_]
   (hp/html5 {:lang "en"}

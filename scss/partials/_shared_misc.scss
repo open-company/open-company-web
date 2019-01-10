@@ -26,147 +26,78 @@ div.main-animation-container {
   }
 }
 
-div.cards-container {
-  max-width: 940px;
-  margin: 0px auto;
+div.homepage-testimonials-container {
+  margin: 57px auto 0;
+  width: 100%;
+  max-width: 1261px;
+  text-align: center;
+  z-index: 3;
   position: relative;
-  z-index: 2;
 
-  div.cards-row {
-    margin-top: 20px;
+  @include tablet() {
+    padding: 0 0 80px;
+  }
 
-    div.card {
-      &:not(:first-child) {
-        margin-left: 20px;
-      }
+  @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1247px) {
+    max-width: 670px;
+  }
 
-      text-align: left;
-      float: left;
-      width: 300px;
-      height: 332px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.07);
-      padding: 40px;
+  @media screen and (min-width: 600px) and (max-width: #{$min_big_web_width}px) {
+    max-width: 520px;
+  }
 
-      @include tablet() {
-        float: none;
-        margin: 20px auto 0px;
-        width: 100%;
-        height: auto;
+  @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1067px) {
+    max-width: 100%;
+    width: 677px;
+  }
 
-        &:not(:first-child) {
-          margin: 20px auto 0px;
-        }
-      }
+  div.homepage-testimonials-logo {
+    width: 208px;
+    height: 66px;
+    display: inline-block;
+    background-position: center;
+    background-repeat: no-repeat;
 
-      div.card-icon {
-        background-repeat: no-repeat;
-        background-position: center;
-      }
+    @media screen and (min-width: 600px) and (max-width: #{$min_big_web_width}px){
+      // padding: 0 32px;
+      width: 178px;
+    }
 
-      div.card-title {
-        @include avenir_M();
-        font-size: 20px;
-        color: $carrot_dark_gray;
-        width: 70%;
+    @include mobile() {
+      // padding: 0 16px;
+      width: 138px;
+      // Temp hide the logos on mobile since they don't look good
+      display: none;
+    }
 
-        @include tablet() {
-          width: 100%;
-        }
-      }
+    &.logo-novo {
+      background-image: cdnUrl("/img/ML/logo_line_novo.svg");
+      background-size: 65px 32px;
+    }
 
-      div.card-content {
-        @include avenir_R();
-        font-size: 18px;
-        color: rgba($carrot_dark_gray, 0.8);
-        margin-top: 11px;
+    &.logo-ph {
+      background-image: cdnUrl("/img/ML/logo_line_ph.svg");
+      background-size: 38px 38px;
+    }
 
-        a {
-          color: $carrot_text_blue_3;
-          text-decoration: none;
-        }
-      }
+    &.logo-wsu {
+      background-image: cdnUrl("/img/ML/logo_line_wsu.svg");
+      background-size: 126px 30px;
+    }
 
-      &.card-1 {
-        div.card-icon {
-          width: 44px;
-          height: 41px;
-          background-size: 44px 41px;
-          @include image-2x("/img/ML/homepage_card_icon_1");
-          margin-bottom: 35px;
-        }
-      }
+    &.logo-om {
+      background-image: cdnUrl("/img/ML/logo_line_om.svg");
+      background-size: 78px 32px;
+    }
 
-      &.card-2 {
-        div.card-icon {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-          @include image-2x("/img/ML/homepage_card_icon_2");
-          margin-bottom: 36px;
-        }
-      }
+    &.logo-mio {
+      background-image: cdnUrl("/img/ML/logo_line_mio.svg");
+      background-size: 67px 30px;
+    }
 
-      &.card-3 {
-        div.card-icon {
-          width: 44px;
-          height: 44px;
-          background-size: 44px 44px;
-          @include image-2x("/img/ML/homepage_card_icon_3");
-          margin-bottom: 31px;
-        }
-
-        div.card-title {
-          width: 90%;
-
-          @include tablet() {
-            width: 100%;
-          }
-        }
-      }
-
-      &.card-4 {
-        div.card-icon {
-          width: 32px;
-          height: 40px;
-          background-size: 32px 40px;
-          @include image-2x("/img/ML/homepage_card_icon_4");
-          margin-bottom: 36px;
-        }
-
-        div.card-title {
-          width: 60%;
-
-          @include tablet() {
-            width: 100%;
-          }
-        }
-      }
-
-      &.card-5 {
-        div.card-icon {
-          width: 42px;
-          height: 41px;
-          background-size: 42px 41px;
-          @include image-2x("/img/ML/homepage_card_icon_5");
-          margin-bottom: 35px;
-        }
-      }
-
-      &.card-6 {
-        div.card-icon {
-          width: 40px;
-          height: 40px;
-          background-size: 40px 40px;
-          @include image-2x("/img/ML/homepage_card_icon_6");
-          margin-bottom: 36px;
-        }
-
-        div.card-title {
-          width: 43%;
-        }
-      }
+    &.logo-sd {
+      background-image: cdnUrl("/img/ML/logo_line_sd.svg");
+      background-size: 96px 26px;
     }
   }
 }
@@ -176,34 +107,28 @@ section.testimonials-section {
   padding: 120px 0px !important;
   position: relative;
 
-  &:before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: #F8F7F3;
-    border-bottom-right-radius: 200px;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-
-    @include tablet() {
-      border-bottom-right-radius: 100px;
-    }
-  }
-
   @include tablet() {
     width: 100%;
-    padding: 80px 24px !important;
-    padding-top: 80px !important;
-    padding-bottom: 80px !important;
+    padding: 56px 24px !important;
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
     text-align: center;
   }
 
-  @include tablet() {
-    width: 100%;
-    padding: 80px 24px;
+  &:before {
+    content: "";
+    position: absolute;
+    width: 100vw;
+    height: 100%;
+    background-color: $another_ui_grey;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    @include big_web_no_tablet(){
+      border-top-right-radius: 200px;
+    }
   }
 
   div.testimonials-section-title {
@@ -214,8 +139,12 @@ section.testimonials-section {
     position: relative;
 
     @include tablet(){
-      font-size: 26px;
-      line-height: auto;
+      font-size: 40px;
+      line-height: initial;
+    }
+
+    @include mobile() {
+      font-size: 36px;
     }
   }
 
@@ -228,119 +157,148 @@ section.testimonials-section {
     position: relative;
 
     @include tablet(){
-      font-size: 20px;
+      font-size: 24px;
       line-height: 26px;
+    }
+
+    @include mobile() {
+      font-size: 20px;
+      line-height: initial;
     }
   }
 
   div.testimonials-cards-container {
-    // TODO: use this to add a third testimony
-    // $testimonials_breakpoint: 1193;
-    $testimonials_breakpoint: 833;
-    width: #{$testimonials_breakpoint + 1}px;
+    $testimonials_num: 3;
+    $testimonials_breakpoint: (278 * $testimonials_num) + (16 * ($testimonials_num - 1));
     margin: 55px auto 0px;
     position: relative;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 
-    @media screen and (max-width: #{$testimonials_breakpoint}px) {
-      width: 100%;
-      margin: 42px auto 0px;
+    @include tablet() {
+      width: calc(100% + 48px);
+      margin-left: -24px;
+    }
+
+    div.testimonials-cards-inner {
+      width: #{($testimonials_breakpoint + 1)}px;
+      margin: 0 auto;
+
+      @media screen and (max-width: #{$testimonials_breakpoint + 48}px){
+        width: #{$testimonials_breakpoint + 48}px;
+        padding: 0 24px;
+        // margin: 0 24px;
+      }
+    }
+
+    div.testimonials-cards-row {
+      position: relative;
+
+      &:last-child {
+        margin-top: 16px;
+
+        div.testimonial-card {
+          top: 0;
+        }
+      }
     }
 
     div.testimonial-card {
       float: left;
-      width: 362px;
-      padding-left: 32px;
-      margin-left: 48px;
+      width: 278px;
+      padding: 24px;
       text-align: left;
       position: relative;
+      border-radius: 8px;
+      background-color: white;
+      border: 1px solid $deep_tan;
 
-      &:before {
-        content: "";
-        width: 8px;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        border-radius: 100px;
-        background-color: rgba(#54C58C, 0.2);
+      &:not(:first-child) {
+        margin-left: 16px;
       }
 
-      &.skylight {
-        div.testimonial-header {
-          div.testimonial-logo {
-            width: 89px;
-            height: 24px;
-            @include image-2x("/img/ML/testimonial_1_logo");
-            background-size: 89px 24px;
-          }
-        }
+      &.oval-money {
+        margin-top: 44px;
 
         div.testimonial-footer {
           div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_1_image");
+            @include image-2x("/img/ML/testimonial_oval_money");
+          }
+        }
+      }
+
+      &.skylight-digital {
+        margin-top: 44px;
+
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_skylight_digital");
+          }
+        }
+      }
+
+      &.wayne-state-univerity {
+        margin-top: 3px;
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_wayne_state_university");
+          }
+
+          div.testimonial-role {
+            max-width: 200px;
+            margin: 0 auto;
+          }
+        }
+      }
+
+      &.partner-hero {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_partner_hero");
+          }
+        }
+      }
+
+      &.blend-labs {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_blend_labs");
           }
         }
       }
 
       &.m-io {
-        div.testimonial-header {
-          div.testimonial-logo {
-            width: 11px;
-            height: 32px;
-            @include image-2x("/img/ML/testimonial_2_logo");
-            background-size: 11px 32px;
-          }
-        }
-
         div.testimonial-footer {
           div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_2_image");
+            @include image-2x("/img/ML/testimonial_m_io");
           }
         }
       }
 
-      &.wayne-edu {
-        div.testimonial-header {
-          div.testimonial-logo {
-            width: 234px;
-            height: 24px;
-            @include image-2x("/img/ML/testimonial_3_logo");
-            background-size: 234px 24px;
-          }
-        }
-
+      &.peak-support {
         div.testimonial-footer {
           div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_3_image");
+            @include image-2x("/img/ML/testimonial_peak_support");
+          }
+        }
+      }
+
+      &.novo {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_novo");
           } 
-        }
-      }
-
-      div.testimonial-header {
-        a, a:active, a:focus {
-          text-decoration: none;
-        }
-
-        div.testimonial-logo {
-          float: left;
-          background-position: center;
-          background-repeat: no-repeat;
         }
       }
 
       div.testimonial-quote {
         @include avenir_M();
-        font-size: 16px;
+        font-size: 18px;
         color: $deep_navy;
-        line-height: 20px;
-
-        @include tablet() {
-          min-height: 80px;
-        }
-
-        &:not(:first-child){
-          padding-top: 16px;
-        }
+        line-height: 22px;
+        text-align: center;
       }
 
       div.testimonial-footer {
@@ -354,42 +312,33 @@ section.testimonials-section {
           background-size: 40px 40px;
           background-repeat: no-repeat;
           margin-right: 16px;
-          float: left;
+          margin: 0 auto;
         }
 
         div.testimonial-name {
           @include PTSerif()
-          font-size: 16px;
+          font-size: 18px;
           color: $deep_navy;
           line-height: 20px;
+          margin-top: 12px;
+          text-align: center;
         }
 
         div.testimonial-role {
           @include avenir_R();
           font-size: 14px;
-          color: rgba($ui_grey, 0.6);
+          color: rgba($deep_navy, 0.6);
           line-height: 19px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          margin-top: 4px;
-        }
-      }
+          text-align: center;
 
-      @media screen and (max-width: #{$testimonials_breakpoint}px) {
+          a {
+            color: rgba($deep_navy, 0.6);
+            text-decoration: none;
 
-        float: unset;
-        margin: 40px auto 0;
-        width: 100%;
-        max-width: 440px;
-        float: unset;
-      }
-
-      &:not(:first-child) {
-        margin-left: 30px;
-
-        @media screen and (max-width: #{$testimonials_breakpoint}px) {
-          margin: 40px auto 0;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }
@@ -399,6 +348,7 @@ section.testimonials-section {
 section.keep-aligned {
   padding: 120px 0px;
   text-align: center;
+  position: relative;
 
   @include tablet() {
     width: 100%;
@@ -414,31 +364,48 @@ section.keep-aligned {
 
   div.keep-aligned-title {
     @include PTSerif()
-    font-size: 32px;
+    font-size: 50px;
     color: $deep_navy;
-    margin-bottom: 40px;
     text-align: center;
+    z-index: 3;
+    position: relative;
+    margin: 0 auto;
+    max-width: calc(100% - 48px);
 
     @include tablet() {
+      max-width: initial;
+    }
+
+    @include mobile() {
       font-size: 36px;
-      margin-bottom: 24px;
     }
   }
+
+  div.keep-aligned-values-line {
+    width: 100%;
+    margin: 24px auto 0;
+    text-align: center;
+
+    img.keep-aligned-value {
+      padding: 0 12px;
+      display: inline-block;
+    }    
+  }
+
+  // img.keep-aligned-values-line {
+  //   width: 100%;
+  //   object-fit: contain;
+  //   margin: 24px auto 40px;
+  //   max-width: 797px;
+
+  //   @include mobile() {
+  //     display: none;
+  //   }
+  // }
 
   button.get-started-button {
-    margin-top: 0px;
-  }
-
-  div.no-credit-card {
-    @include avenir_R();
-    color: $ui_grey;
-    font-size: 16px;
-    margin-top: 24px;
-    text-align: center;
-
-    @include tablet() {
-      font-size: 12px;
-    }
+    margin-top: 40px;
+    z-index: 3;
   }
 }
 
@@ -448,10 +415,10 @@ button.get-started-button {
   border-radius: 8px;
   background-color: $carrot_orange;
   color: white;
-  @include avenir_B();
-  font-size: 16px;
+  @include avenir_H();
+  font-size: 20px;
+  line-height: 27px;
   margin: 48px auto 0;
-  text-transform: uppercase;
   position: relative;
   text-align: center;
   display: flex;
@@ -463,7 +430,8 @@ button.get-started-button {
     width: 100%;
     margin: 16px auto;
     padding: 2px 0 0;
-    font-size: 16px;
+    font-size: 18px;
+    line-height: 25px;
   }
 }
 
@@ -472,7 +440,7 @@ section.home-keep-aligned {
   text-align: center;
 
   @include tablet() {
-    padding: 40px 24px 80px !important;
+    padding: 0 24px 0 !important;
   }
 
   h2.keep-aligned-title {
@@ -494,23 +462,16 @@ section.home-keep-aligned {
     margin: 0px auto;
 
     div.keep-aligned-section-row {
-      margin: 192px auto;
+      margin: 0 auto;
+      padding: 96px 0;
       position: relative;
 
       @include tablet() {
         margin: 0 auto;
-        padding-top: 80px;
-        padding-bottom: 80px;
-      }
-
-      &.third-row {
-        div.keep-aligned-section-row-right {
-          padding: 24px 94px;
-
-          @include tablet() {
-            padding: 24px 0;
-          }
-        }  
+        padding-top: 56px;
+        padding-bottom: 56px;
+        width: 100%;
+        height: auto;
       }
 
       &:nth-child(even) {
@@ -538,61 +499,285 @@ section.home-keep-aligned {
       }
 
       &:first-child {
-        margin-top: 120px;
+        padding-top: 96px;
 
         @include tablet() {
           margin: 0 auto;
+          padding-top: 56px;
         }
       }
 
-      @include tablet() {
-        width: 100%;
-        height: auto;
-        margin: 80px auto;
+      &.first-row {
+        div.keep-aligned-section-row-left {
+          padding: 24px 84px 24px 64px;
+
+          @include mobile(){
+            padding: 24px 0;
+          }
+        }
+
+        div.keep-aligned-section-row-right {
+          padding: 24px 74px 24px 8px;
+
+          @include mobile(){
+            padding: 24px 0;
+
+            img.keep-aligned-section-screenshot {
+              margin-top: 0;
+            }
+          }
+        }
       }
 
       &.second-row {
         &:before {
           content: "";
           display: block;
-          background-color: #F8F7F3;
-          border-top-right-radius: 200px;
-          width: calc(50vw + 293px);
-          height: calc(100% + 240px);
-          position: absolute;
-          left: 0px;
-          top: -120px;
-
-          @include tablet() {
-            width: calc(100% + 48px);
-            left: -24px;
-            top: 0;
-            height: 100%;
-            border-top-right-radius: 100px;
-          }
-        }
-      }
-
-      &.fourth-row {
-        &:before {
-          content: "";
-          display: block;
-          background-color: #F8F7F3;
+          background-color: $another_ui_grey;
           border-bottom-left-radius: 200px;
-          width: calc(50vw + 397px);
-          height: calc(100% + 240px);
+          width: calc(50vw + 293px);
+          height: 100%;
           position: absolute;
-          right: 0px;
-          top: -120px;
+          right: 0;
+          top: 0;
 
           @include tablet() {
             width: calc(100% + 48px);
-            left: -24px;
+            right: -24px;
             top: 0;
             height: 100%;
             border-bottom-left-radius: 100px;
           }
         }
+
+        div.keep-aligned-section-row-right {
+          padding: 24px 70px 24px 114px;
+
+          @include mobile(){
+            padding: 24px 0;
+          }
+
+          div.keep-aligned-section-copy-title {
+            max-width: 450px;
+          }
+        }
+
+        div.keep-aligned-section-row-left {
+          padding: 24px 26px 24px 54px;
+
+          @include mobile(){
+            padding: 16px 0 24px;
+            width: calc(100% + 24px);
+          }
+
+          span.sent-daily-slack-email {
+            @include avenir_H();
+            font-size: 14px;
+            color: $ui_grey;
+          }
+        }
+
+        img.keep-aligned-section-screenshot {
+          max-width: 590px;
+        }
+      }
+
+      &.third-row {
+        div.keep-aligned-section-row-left {
+          padding: 24px 0px 24px 54px;
+          width: 486px;
+
+          @include tablet() {
+            width: 100%;
+          }
+
+          @include mobile(){
+            padding: 24px 0;
+          }
+        }
+
+        div.keep-aligned-section-row-right {
+          padding: 24px 90px 24px 94px;
+
+          @include mobile(){
+            padding: 24px 0;
+          }
+        }
+      }
+
+      div.keep-aligned-section-carion-container {
+        width: 100%;
+        height: auto;
+        position: relative;
+
+        @include tablet() {
+          margin: 0 auto;
+          max-width: 100%;
+        }
+
+        @include mobile() {
+          overflow-x: auto;
+          overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
+          margin: 16px 0 0 -24px;
+          width: calc(100% + 24px);
+          max-width: initial;
+        }
+
+        div.keep-aligned-section-carion-inner {
+
+          @include mobile() {
+            width: calc(144vw + 72px);
+            height: calc(72vw * 1.33 + 40px);
+            max-width: unset;
+            position: relative;
+          }
+
+          div.keep-aligned-section-header {
+            display: none;
+
+            @include mobile() {
+              width: 72vw;
+              height: 40px;
+              float: left;
+              position: absolute;
+              top: 0;
+              background-color: #E3E3E3;
+              border-top-left-radius: 6px;
+              border-top-right-radius: 6px;
+              text-align: center;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              margin-left: 24px;
+
+              &.first-header {
+                left: 0;
+                padding: 0;
+              }
+
+              &.second-header {
+                left: unset;
+                right: 24px;
+              }
+
+              span.inner-label {
+                @include avenir_H();
+                font-size: 16px;
+                color: $ui_grey;
+                line-height: 22px;
+                margin-top: 4px;
+              }
+
+              span.slack-logo {
+                width: 18px;
+                height: 18px;
+                background-image: cdnUrl("/img/ML/slack_email_switch_slack_logo.svg");
+                background-size: 18px 18px;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 6px;
+                // margin-top: 2px;
+                opacity: 0.5;
+              }
+
+              span.email-logo {
+                width: 18px;
+                height: 16px;
+                background-image: cdnUrl("/img/ML/slack_email_switch_email_logo.svg");
+                background-size: 18px 16px;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 6px;
+                // margin-top: 2px;
+                opacity: 0.5;
+              }
+            }
+          }
+
+          img.keep-aligned-section-screenshot {
+            width: 100%;
+            height: auto;
+            z-index: 3;
+            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+            position: relative;
+            top: 0;
+            display: block;
+            border-radius: 8px;
+
+            @include tablet() {
+              margin-top: 0px;
+            }
+
+            @include mobile() {
+              float: left;
+              width: 72vw;
+              padding: 0;
+              margin-top: 40px;
+              position: initial;
+              display: initial;
+              margin-left: 24px;
+
+              &.carion-1 {
+                left: 0;
+                padding: 0;
+              }
+
+              &.carion-1-alt {
+                left: unset;
+                right: 24px;
+              }
+            }
+
+            &.carion-1 {
+              opacity: 1;
+              transition: opacity 250ms;
+
+              @include mobile() {
+                transition: none;
+              }
+            }
+
+            &.carion-1-alt {
+              opacity: 0;
+              transition: opacity 250ms;
+              height: 0;
+
+              @include mobile() {
+                transition: none;
+                opacity: 1;
+                height: auto;
+              }
+            }
+          }
+        }
+
+        button.keep-aligned-section-next-bt {
+          width: 72px;
+          height: 72px;
+          background-image: cdnUrl("/img/ML/homepage_right_arrow.svg");
+          background-size: 32px 16px;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-color: $carrot_green;
+          border-radius: 50%;
+          position: absolute;
+          right: -32px;
+          top: calc(50% - 36px);
+          z-index: 5;
+          padding: 0;
+          transform: rotate(0deg);
+          transition: transform 180ms;
+
+          &.active {
+            transform: rotate(-180deg);
+          }
+
+          @include mobile() {
+            display: none;
+          }
+        }
+        
       }
 
       img.keep-aligned-section-screenshot {
@@ -603,6 +788,10 @@ section.home-keep-aligned {
           margin: 0 auto;
           max-width: 100%;
           margin-top: 32px;
+        }
+
+        @include mobile() {
+          margin-top: 24px;
         }
       }
 
@@ -616,7 +805,11 @@ section.home-keep-aligned {
         @include tablet() {
           float: unset;
           width: 100%;
-          padding: 0;
+          padding: 24px 0;
+        }
+
+        @include mobile(){
+          padding: 24px 0;
         }
       }
 
@@ -630,7 +823,11 @@ section.home-keep-aligned {
         @include tablet() {
           float: unset;
           width: 100%;
-          padding: 0;
+          padding: 24px 0;
+        }
+
+        @include mobile(){
+          padding: 24px 0;
         }
       }
 
@@ -647,11 +844,119 @@ section.home-keep-aligned {
           transform: translateY(0%);
         }
 
+        div.slack-email-mobile-title {
+          margin-top: 40px;
+          @include avenir_H();
+          font-size: 14px;
+          color: $ui_grey;
+        }
+
+        div.slack-email-container {
+          margin-top: 40px;
+
+          div.slack-email-title {
+            @include avenir_H();
+            font-size: 14px;
+            color: $ui_grey;
+            float: left;
+
+            @include big_web() {
+              margin-left: 24px;
+              margin-top: 15px;
+            }
+
+            @include tablet() {
+              margin-bottom: 12px;
+            }
+          }
+
+          div.slack-email-switch-container {
+            width: 262px;
+            height: 48px;
+            max-width: 100%;
+            background-color: #E3E3E3;
+            border-radius: 6px;
+            float: left;
+
+            button.slack-email-switch-bt {
+              height: 48px;
+              width: 50%;
+              float: left;
+              background-color: transparent;
+              color: rgba($deep_navy, 0.5);
+              @include avenir_H();
+              font-size: 16px;
+              line-height: 48px;
+              text-align: center;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              &.slack-bt {
+                border-top-right-radius: 6px;
+                border-bottom-right-radius: 6px;
+              }
+
+              &.email-bt {
+                border-top-left-radius: 6px;
+                border-bottom-left-radius: 6px;
+              }
+
+              div.slack-logo {
+                width: 18px;
+                height: 18px;
+                background-image: cdnUrl("/img/ML/slack_email_switch_slack_logo.svg");
+                background-size: 18px 18px;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 6px;
+                margin-top: -2px;
+                opacity: 0.5;
+
+                @include preload_image(cdnUlr("/img/ML/slack_email_switch_slack_logo_active.svg"));
+              }
+
+              div.email-logo {
+                width: 18px;
+                height: 16px;
+                background-image: cdnUrl("/img/ML/slack_email_switch_email_logo.svg");
+                background-size: 18px 16px;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 6px;
+                margin-top: -2px;
+                opacity: 0.5;
+
+                @include preload_image(cdnUlr("/img/ML/slack_email_switch_email_logo_active.svg"));
+              }
+
+              &.active {
+                background-color: white;
+                border-radius: 6px;
+                border: 1px solid #E3E3E3;
+                color: $carrot_green;
+                opacity: 1;
+                box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+
+                div.slack-logo {
+                  opacity: 1;
+                  background-image: cdnUrl("/img/ML/slack_email_switch_slack_logo_active.svg");
+                }
+
+                div.email-logo {
+                  opacity: 1;
+                  background-image: cdnUrl("/img/ML/slack_email_switch_email_logo_active.svg");
+                }
+              }
+            }
+          }
+        }
+
         div.keep-aligned-section-copy-title {
           @include PTSerif()
-          font-size: 80px;
+          font-size: 60px;
           color: $deep_navy;
-          line-height: 78px;
+          line-height: 66px;
 
           @include mobile() {
             font-size: 36px;
@@ -674,8 +979,14 @@ section.home-keep-aligned {
 
         img.keep-aligned-section-copy-values-list {
           margin-top: 32px;
-          width: 193px;
+          width: 220px;
           height: 208px;
+        }
+
+        img.keep-aligned-section-copy-interactions-list {
+          margin-top: 32px;
+          width: 140px;
+          height: 152px; 
         }
 
         a.keep-aligned-section-copy-button {
@@ -697,61 +1008,6 @@ section.home-keep-aligned {
           }
         }
       }
-    }
-  }
-}
-
-section.slack-comparison {
-  padding: 120px 32px;
-  margin: 0px auto;
-  text-align: center;
-
-  @include mobile() {
-    text-align: left;
-    padding: 80px 32px !important;
-  }
-
-  div.slack-comparison-headline {
-    color: #BA61FC;
-    @include avenir_B();
-    font-size: 16px;
-    letter-spacing: 1px;
-  }
-
-  div.slack-comparison-headline-1 {
-    color: $deep_navy;
-    @include avenir_R();
-    font-size: 38px;
-    line-height: 54px;
-    margin-top: 8px;
-
-    @include mobile(){
-      font-size: 24px;
-      line-height: 30px;
-      margin-top: 24px;
-    }
-  }
-
-  div.slack-comparison-headline-2 {
-    color: $deep_navy;
-    @include avenir_H();
-    font-size: 38px;
-    line-height: 54px;
-
-    @include mobile(){
-      font-size: 20px;
-      line-height: 30px;
-      margin-top: 24px;
-    }
-  }
-
-  img.slack-comparison-screenshot {
-    max-width: 1080px;
-    box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.07);
-    margin: 40px auto 0px;
-
-    @include mobile() {
-      width: 100%;
     }
   }
 }
@@ -804,8 +1060,34 @@ button.show-animation-bt {
   border-radius: 8px;
   width: 320px;
   height: 64px;
-  background-image: cdnUrl("/img/ML/watch_carrot_in_60_seconds.svg");
-  background-size: 214px 19px;
-  background-position: center;
-  background-repeat: no-repeat;
+  @include avenir_H();
+  font-size: 20px;
+  line-height: 27px;
+  color: $carrot_green;
+  margin: 48px auto 0;
+  position: relative;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 12px 0;
+
+  div.green-play {
+    width: 24px;
+    height: 18px;
+    background-image: cdnUrl("/img/ML/green_play.svg");
+    background-size: 24px 18px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-top: -4px;
+  }
+
+  @include mobile() {
+    width: 100%;
+    margin: 16px auto;
+    padding: 2px 0 0;
+    font-size: 18px;
+    line-height: 25px;
+  }
 }

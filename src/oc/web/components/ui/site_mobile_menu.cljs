@@ -53,16 +53,6 @@
             "Home"]]
         [:div.site-mobile-menu-item
           [:a
-            {:href oc-urls/pricing
-             :class (when (utils/in? (:route @router/path) "pricing") "active")
-             :on-click (fn [e]
-                        (utils/event-stop e)
-                        (dis/dispatch! [:login-overlay-show nil])
-                        (site-menu-toggle)
-                        (router/nav! oc-urls/pricing))}
-            "Pricing"]]
-        [:div.site-mobile-menu-item
-          [:a
             {:href oc-urls/about
              :class (when (utils/in? (:route @router/path) "about") "active")
              :on-click (fn [e]
@@ -70,7 +60,17 @@
                         (user/show-login nil)
                         (site-menu-toggle true)
                         (router/nav! oc-urls/about))}
-            "About"]]]
+            "About"]]
+        [:div.site-mobile-menu-item
+          [:a
+            {:href oc-urls/pricing
+             :class (when (utils/in? (:route @router/path) "pricing") "active")
+             :on-click (fn [e]
+                        (utils/event-stop e)
+                        (dis/dispatch! [:login-overlay-show nil])
+                        (site-menu-toggle)
+                        (router/nav! oc-urls/pricing))}
+            "Pricing"]]]
       [:div.site-mobile-menu-footer
         (when-not (jwt/jwt)
           [:button.mlb-reset.login-btn
@@ -93,9 +93,4 @@
                           (router/nav! oc-urls/sign-up))))}
           (if (jwt/jwt)
             "Your digest"
-            "Get started for free")]
-        (when-not (jwt/jwt)
-          [:div.no-credit-card
-            "No credit card required  "
-            [:span.dot "•"]
-            "  No install required"])]]))
+            "Get started for free")]]]))
