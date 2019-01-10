@@ -232,7 +232,7 @@
               (str
                "Protect your team’s focus (and sanity). "
                "Carrot condenses noisy updates "
-               "into a morning digest so your team "
+               "into a morning digest. Your team "
                "stays aligned with fewer interruptions.")]
             [:div.slack-email-container.group.big-web-tablet-only
               [:div.slack-email-switch-container

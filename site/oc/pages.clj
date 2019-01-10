@@ -318,7 +318,7 @@
               (str
                "Protect your team’s focus (and sanity). "
                "Carrot condenses noisy updates "
-               "into a morning digest so your team "
+               "into a morning digest. Your team "
                "stays aligned with fewer interruptions.")]
             [:div.slack-email-container.group.big-web-tablet-only
               [:div.slack-email-switch-container
@@ -481,9 +481,7 @@
             [:h3.tear-price
               "$0"]
             [:div.tear-subtitle
-              [:span.bold
-                "Free for small teams"]
-              " up to 5 users."]
+              "Free for small teams up to 5 users."]
             [:a.tear-start-bt
               {:href "/sign-up"}
               "Start for free"]
