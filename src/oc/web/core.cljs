@@ -247,6 +247,7 @@
        nil?
        [org route secure-id]))
      {:org org
+      :activity (:entry (:params params))
       :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents (:id query-params))))
       :query-params query-params})
      ;; do we have the company data already?
