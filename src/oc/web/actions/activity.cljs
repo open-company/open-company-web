@@ -504,13 +504,22 @@
         (dis/dispatch! [:entry-revert false])))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
-  (when (some #{status} [401 404])
-    (router/redirect-404!))
-  (if (and secure-uuid
-           (jwt/jwt)
-           (jwt/user-is-part-of-the-team (:team-id activity-data)))
-    (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
-    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
+  (cond
+
+   (some #{status} [401 404])
+   (router/redirect-404!)
+
+   (not= (:uuid activity-data)
+         (router/current-activity-id))
+   (router/redirect-404!)
+
+   (and secure-uuid
+        (jwt/jwt)
+        (jwt/user-is-part-of-the-team (:team-id activity-data)))
+   (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
+
+   :default
+   (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
 
 (defn org-data-from-secure-activity [secure-activity-data]
   (let [old-org-data (dis/org-data)]
