@@ -32,12 +32,12 @@
             shared-misc/animation-lightbox
 
             [:h1.slack-headline
-              "Lead with clarity"]
+              "Rise above the noise"]
 
             [:div.slack-subline
               (str
-               "Carrot makes sure key leadership communication "
-               "doesn't get lost in fast-moving conversations.")]
+               "Leaders struggle to communicate effectively with fast-growing and distributed "
+               "teams. Carrot keeps everyone focused - even in noisy places like email and Slack.")]
 
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
@@ -48,7 +48,6 @@
                              (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                    {:auth-source "slack"})]
                                (user-actions/login-with-slack auth-link)))}]]
-            shared-misc/no-credit-card
             [:div.carrot-box-container.confirm-thanks.group
               {:style {:display "none"}}
               [:div.carrot-box-thanks
@@ -58,9 +57,11 @@
             [:div.main-animation-container
               [:img.main-animation
                 {:src (utils/cdn "/img/ML/slack_screenshot.png")
-                 :srcSet (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]
+                 :srcSet (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
-          shared-misc/keep-aligned-section
+            shared-misc/testimonials-logos-line]
+
+          (shared-misc/keep-aligned-section true)
 
           shared-misc/testimonials-section
 

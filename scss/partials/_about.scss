@@ -18,8 +18,8 @@ div.about-wrap {
 
       h1.about {
         @include PTSerif()
-        font-size: 80px;
-        line-height: 90px;
+        font-size: 60px;
+        line-height: 78px;
         color: $deep_navy;
         margin: 0 auto;
         padding: 0 16px;
@@ -186,7 +186,7 @@ div.about-wrap {
 
         &:before {
           content: "";
-          background-color: #F8F7F3;
+          background-color: $another_ui_grey;
           border-top-right-radius: 200px;
           position: absolute;
           top: 0;
@@ -219,7 +219,7 @@ div.about-wrap {
           h3.about-copy-header {
             @include PTSerif()
             color: $deep_navy;
-            font-size: 80px;
+            font-size: 60px;
             line-height: 78px;
           }
 
