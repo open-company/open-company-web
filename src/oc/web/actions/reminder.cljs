@@ -3,7 +3,8 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.reminder :as reminder-utils]))
+            [oc.web.utils.reminder :as reminder-utils]
+            [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (defn load-reminders []
   (let [org-data (dis/org-data)]
@@ -25,3 +26,7 @@
 
 (defn save-reminder []
   (dis/dispatch! [:save-reminder (router/current-org-slug)]))
+
+(defn cancel-edit-reminder []
+  (dis/dispatch! [:cancel-edit-reminder (router/current-org-slug)])
+  (nav-actions/show-reminders))

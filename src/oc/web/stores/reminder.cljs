@@ -34,3 +34,7 @@
         filtered-reminders (filterv #(not= (:uuid reminder-data) (:uuid %)) old-reminders-data)
         new-reminders-data (conj filtered-reminders fixed-reminder-data)]
     (assoc-in db (dispatcher/reminders-data-key org-slug) new-reminders-data)))
+
+(defmethod dispatcher/action :cancel-edit-reminder
+  [db [_ org-slug]]
+  (assoc-in db (dispatcher/reminder-edit-key org-slug) nil))

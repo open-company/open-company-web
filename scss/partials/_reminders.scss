@@ -231,6 +231,40 @@ div.reminders-container {
             }
           }
 
+          div.edit-reminder-field-container {
+            position: relative;
+
+            &.dropdown-field {
+              &:after {
+                font-family: "Material Design Icons";
+                position: absolute;
+                bottom: 4px;
+                right: 10px;
+                content: "\F35D";
+                font-size: 22px;
+                color: $deep_navy;
+              }
+            }
+
+            div.dropdown-list-container {
+              width: 100%;
+              left: 0px;
+              top: 40px;
+              border-radius: 4px;
+              margin-top: 0;
+
+              div.dropdown-list-content {
+                margin-top: 0;
+                max-height: 190px;
+                overflow-y: auto;
+              }
+
+              div.triangle {
+                display: none;
+              }
+            }
+          }
+
           .edit-reminder-field {
             width: 100%;
             border-radius: 4px;
@@ -244,18 +278,6 @@ div.reminders-container {
             font-size: 14px;
             line-height: 22px;
             cursor: pointer;
-
-            &.dropdown-field {
-              &:after {
-                font-family: "Material Design Icons";
-                position: absolute;
-                bottom: 8px;
-                right: 10px;
-                content: "\F35D";
-                font-size: 22px;
-                color: $deep_navy;
-              }
-            }
 
             div.datepicker-container {
               display: none;
@@ -281,24 +303,6 @@ div.reminders-container {
               float: left;
               margin-right: 8px;
               margin-top: -3px;
-            }
-
-            div.dropdown-list-container {
-              width: 100%;
-              left: 0px;
-              top: 40px;
-              border-radius: 4px;
-              margin-top: 0;
-
-              div.dropdown-list-content {
-                margin-top: 0;
-                max-height: 190px;
-                overflow-y: auto;
-              }
-
-              div.triangle {
-                display: none;
-              }
             }
           }
 
