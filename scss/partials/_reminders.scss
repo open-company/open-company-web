@@ -220,6 +220,17 @@ div.reminders-container {
             margin-top: 16px;
           }
 
+          input.edit-reminder-field, textarea.edit-reminder-field {
+            cursor: initial;
+
+            @include placeholder(){
+              color: rgba($deep_navy, 0.5);
+              @include avenir_R();
+              font-size: 14px;
+              line-height: 22px;
+            }
+          }
+
           .edit-reminder-field {
             width: 100%;
             border-radius: 4px;

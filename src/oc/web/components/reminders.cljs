@@ -48,6 +48,9 @@
         [:input.edit-reminder-field
           {:value (:title reminder-data)
            :ref :reminder-title
+           :type "text"
+           :max-length 65
+           :placeholder "CEO update, Week in review, etc."
            :on-change #(reminder-actions/update-reminder (:uuid reminder-data) :title (.-value (rum/ref-node s :reminder-title)))}]]
       [:div.edit-reminder-row
         [:div.edit-reminder-label
@@ -55,6 +58,8 @@
         [:textarea.edit-reminder-field
           {:value (:description reminder-data)
            :ref :remider-description
+           :max-length 256
+           :placeholder "Add a personal note to your reminder..."
            :on-change #(reminder-actions/update-reminder (:uuid reminder-data) :description (.-value (rum/ref-node s :remider-description)))}]]
       [:div.edit-reminder-row.group
         [:div.half-row-left
