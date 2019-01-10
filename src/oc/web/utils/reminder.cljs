@@ -96,8 +96,7 @@
      :description ""
      :org-uuid (:uuid org-data)
      :board-uuid (:uuid board-data)
-     :board-slug (:slug board-data)
-     :board-name (:name board-data)
+     :board-data board-data
      :author current-user-data
      :assignee current-user-data
      :start-date (utils/as-of-now)
@@ -105,15 +104,17 @@
      :last-sent nil
      :assignee-tz (:timezone current-user-data)}))
 
-(defn- user-is-allowed? [org-data board-data user-id]
-  (cond
-    (or (= (:access board-data) "team")
-        (= (:access board-data) "public"))
-    (utils/get-author user-id (:authors org-data))
-    :else ;; private board
-    (and board-data
-         (utils/get-author user-id (:authors board-data)))))
+(defn- user-is-allowed? [org-data board-data user]
+  (when (or (= (:status user) "active")
+            (= (:status user) "unverified"))
+    (cond
+      (or (= (:access board-data) "team")
+          (= (:access board-data) "public"))
+      (utils/get-author (:user-id user) (:authors org-data))
+      :else ;; private board
+      (and board-data
+           (utils/get-author (:user-id user) (:authors board-data))))))
 
 (defn users-for-reminders [org-data team-data board-data]
   (let [all-users (:users team-data)]
-    (filterv #(user-is-allowed? org-data board-data (:user-id %)) all-users)))
+    (filterv #(user-is-allowed? org-data board-data %) all-users)))
