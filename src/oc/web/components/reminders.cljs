@@ -4,6 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.utils.reminder :as reminder-utils]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -28,15 +29,18 @@
         team-data (drv/react s :team-data)
         allowed-users (reminder-utils/users-for-reminders org-data team-data (:board-data reminder-data))
         users-list (vec (map #(-> %
-                          (assoc :name (str (:first-name %) " " (:last-name %)))
+                          (assoc :name (utils/name-or-email %))
                           (select-keys [:name :user-id])
                           (rename-keys {:name :label :user-id :value}))
                     allowed-users))
         ;; FIXME: select all team/public boards and all private where the current user is an author
+        all-team-public-boards (filterv #(or (= (:access %) "team") (= (:access %) "public")) (:boards org-data))
+        private-boards-with-author-access (filterv #(and (= (:access %) "private") (utils/get-author (jwt/user-id) (:authors %))) (:boards org-data))
+        all-allowed-boards (sort-by :name (concat all-team-public-boards private-boards-with-author-access))
         allowed-boards (map #(-> %
                               (select-keys [:name :uuid])
                               (rename-keys {:name :label :uuid :value}))
-                        (:boards org-data))]
+                        all-allowed-boards)]
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
       [:div.edit-reminder-row
@@ -63,7 +67,7 @@
               (when (:assignee reminder-data)
                 (user-avatar-image (:assignee reminder-data)))
               (when (:assignee reminder-data)
-                (str (:first-name (:assignee reminder-data)) " " (:last-name (:assignee reminder-data))
+                (str (utils/name-or-email (:assignee reminder-data))
                  (when (= (jwt/user-id) (:user-id (:assignee reminder-data)))
                    " (you)")))]
             (when @(::assignee-dropdown s)
@@ -151,7 +155,13 @@
             {:key (str "reminder-" (:uuid reminder))
              :class (when (utils/link-for (:links reminder) "update") "editable-reminder")
              :on-click #(reminder-actions/edit-reminder (:uuid reminder))}
-            (user-avatar-image (:assignee reminder))
+            [:div.reminder-assignee
+              {:title (utils/name-or-email (:assignee reminder))
+               :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+              (user-avatar-image (:assignee reminder))]
             [:div.reminder-title
               (:title reminder)]
             [:div.reminder-description

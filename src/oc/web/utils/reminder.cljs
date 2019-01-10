@@ -100,7 +100,7 @@
      :author current-user-data
      :assignee current-user-data
      :start-date (utils/as-of-now)
-     :frequency "weekly"
+     :frequency "Weekly"
      :last-sent nil
      :assignee-tz (:timezone current-user-data)}))
 
