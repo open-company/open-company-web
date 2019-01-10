@@ -33,7 +33,6 @@
                           (select-keys [:name :user-id])
                           (rename-keys {:name :label :user-id :value}))
                     allowed-users))
-        ;; FIXME: select all team/public boards and all private where the current user is an author
         all-team-public-boards (filterv #(or (= (:access %) "team") (= (:access %) "public")) (:boards org-data))
         private-boards-with-author-access (filterv #(and (= (:access %) "private") (utils/get-author (jwt/user-id) (:authors %))) (:boards org-data))
         all-allowed-boards (sort-by :name (concat all-team-public-boards private-boards-with-author-access))
