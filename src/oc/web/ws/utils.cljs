@@ -6,6 +6,11 @@
             [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]))
 
+;; cmd queue
+(defonce is-connected (atom false))
+(defonce cmd-queue (atom []))
+
+
 ;; Connection check
 
 (defn- sentry-report [service-name chsk-send! ch-state & [action-id infos]]
