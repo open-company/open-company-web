@@ -10,10 +10,15 @@
 (defonce is-connected (atom false))
 (defonce cmd-queue (atom []))
 
+(defn buffer-cmd [args]
+  (swap! cmd-queue conj args))
 
 ;; Connection check
+(defn not-connected [service-name chsk-send! ch-state args]
+  (buffer-cmd args)
+  (sentry-report service-name chsk-send! ch-state (first (first args))))
 
-(defn- sentry-report [service-name chsk-send! ch-state & [action-id infos]]
+(defn sentry-report [service-name chsk-send! ch-state & [action-id infos]]
   (let [connection-status (if @ch-state
                             @@ch-state
                             nil)
