@@ -13,10 +13,18 @@
 (defn buffer-cmd [args]
   (swap! cmd-queue conj args))
 
-
 (defn not-connected [service-name chsk-send! ch-state args]
   (buffer-cmd args)
   (sentry-report service-name chsk-send! ch-state (first (first args))))
+
+(defn send! [service-name chsk-send! & args]
+  (if @chsk-send!
+    (do
+      ;; empty queue first
+      (doseq [qargs @cmd-queue]
+        (apply @chsk-send! qargs))
+      (apply @chsk-send! args))
+    (not-connected service-name chsk-send! ch-state args)))
 
 ;; Connection check
 (defn sentry-report [service-name chsk-send! ch-state & [action-id infos]]
