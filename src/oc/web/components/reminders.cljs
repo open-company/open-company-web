@@ -228,7 +228,7 @@
     (if (empty? reminders-data)
       empty-reminders
       [:div.reminders-list-container
-        (when (drv/react s :show-reminders-tooltip)
+        (when true ;;(drv/react s :show-reminders-tooltip)
           [:div.reminder-tooltip
             [:button.mlb-reset.dismiss-reminder-tooltip
               {:on-click #(nux-actions/dismiss-reminders-tooltip)}
