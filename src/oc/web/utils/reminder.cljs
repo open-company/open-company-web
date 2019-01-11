@@ -25,6 +25,7 @@
     ;            :avatar-url "https://avatars.slack-edge.com/2017-02-02/136114833346_3758034af26a3b4998f4_512.jpg"}
     :start-date "2019-01-04T14:15:02Z"
     :frequency "Monthly"
+    :on "Friday"
     :last-sent nil
     :assignee-tz "Europe/Amsterdam"
     :links [{:href "/blah/blah/blah"
@@ -50,8 +51,9 @@
     ;            :last-name "14Nov"
     ;            :name "IacAdmin 14Nov"
     ;            :avatar-url "/img/ML/happy_face_blue.svg"}
-    :start-date "2018-12-01T12:45:02Z"
+    :start-date "2018-12-31T12:45:02Z"
     :frequency "Quarterly"
+    :on "Last day of the quarter"
     :last-sent nil
     :assignee-tz "Europe/Amsterdam"
     :links [{:href "/blah/blah/blah"
@@ -76,11 +78,16 @@
   [reminder-data org-data team-data]
   (let [assignee-data (first (filter #(= (:user-id %) (:assignee reminder-data)) (:users team-data)))
         author-data (first (filter #(= (:user-id %) (:author reminder-data)) (:users team-data)))
-        board-data (first (filter #(= (:uuid %) (:board-uuid reminder-data)) (:boards org-data)))]
+        board-data (first (filter #(= (:uuid %) (:board-uuid reminder-data)) (:boards org-data)))
+        js-date (utils/js-date (:start-date reminder-data))
+        now-year (.getFullYear (utils/js-date))
+        show-year? (not= (.getFullYear js-date) now-year)
+        parsed-date (utils/date-string js-date [:short (when show-year? :year)])]
     (-> reminder-data
       (assoc :assignee assignee-data)
       (assoc :author author-data)
-      (assoc :board-data board-data))))
+      (assoc :board-data board-data)
+      (assoc :parsed-start-date parsed-date))))
 
 (defn parse-reminders [reminders-data]
   (let [org-data (dis/org-data)
@@ -99,7 +106,7 @@
      :board-data board-data
      :author current-user-data
      :assignee current-user-data
-     :start-date (utils/as-of-now)
+     :on "Monday"
      :frequency "Weekly"
      :last-sent nil
      :assignee-tz (:timezone current-user-data)}))

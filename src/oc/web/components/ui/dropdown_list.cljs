@@ -13,7 +13,7 @@
    :selected-icon - full url of an icon to show besides the selected item, ignored if empty
    :unselected-icon - full url of an icon to show besides the unselected item, ignored if empty
   Elements should be passed in a vector with this format:
-  {:value \"the value\" :label \"The label to show\" :color \"optional\"}.
+  {:value \"the value\" :label \"The label to show, optional\" :color \"optional\"}.
   Elements with this format will be transfomed into a divider line:
   {:value nil :label :divider-line}."
   < rum/static
@@ -23,24 +23,29 @@
          (when (fn? on-blur)
            (on-blur))))))
   [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
-  [:div.dropdown-list-container
-    [:div.triangle]
-    [:div.dropdown-list-content
-      [:ul.dropdown-list
-        (for [item items]
-          [:li.dropdown-list-item
-            {:key (str "dropdown-list-item-" (if (= (:label item) :divider-line) "divider" (:value item)))
-             :on-click #(when (and (:value item) (fn? on-change)) (on-change item))
-             :style (when (seq (:color item)) {:color (:color item)})
-             :class (utils/class-set {:select (and (:value item) (= value (:value item)))
-                                      :divider-line (= (:label item) :divider-line)
-                                      (str (:class item)) (seq (:class item))})}
-            (when (string? (:label item))
-              (if (and selected-icon (= (:value item) value))
-                [:img.dropdown-list-item-icon {:src selected-icon}]
-                (when unselected-icon
-                  [:img.dropdown-list-item-icon {:src unselected-icon}])))
-            (when (string? (:label item))
-              (:label item))])]
-      (when placeholder
-        placeholder)]])
+  (js/console.log "DBG dropdown-list items" items)
+  (let [fixed-items (map #(do (js/console.log "DBG   item" %)
+                           (if (not (contains? % :label))
+                            (assoc % :label (:value %))
+                            %)) items)]
+    [:div.dropdown-list-container
+      [:div.triangle]
+      [:div.dropdown-list-content
+        [:ul.dropdown-list
+          (for [item fixed-items]
+            [:li.dropdown-list-item
+              {:key (str "dropdown-list-item-" (if (= (:label item) :divider-line) "divider" (:value item)))
+               :on-click #(when (and (:value item) (fn? on-change)) (on-change item))
+               :style (when (seq (:color item)) {:color (:color item)})
+               :class (utils/class-set {:select (and (:value item) (= value (:value item)))
+                                        :divider-line (= (:label item) :divider-line)
+                                        (str (:class item)) (seq (:class item))})}
+              (when (string? (:label item))
+                (if (and selected-icon (= (:value item) value))
+                  [:img.dropdown-list-item-icon {:src selected-icon}]
+                  (when unselected-icon
+                    [:img.dropdown-list-item-icon {:src unselected-icon}])))
+              (when (string? (:label item))
+                (:label item))])]
+        (when placeholder
+          placeholder)]]))

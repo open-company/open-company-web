@@ -209,7 +209,9 @@
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
         (when is-admin-or-author?
           [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(nav-actions/show-reminders)
+            {:on-click #(do
+                          (nav-actions/show-reminders)
+                          (utils/after 500 utils/remove-tooltips))
              :title "Create a consistent cadence of important updates"
              :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
@@ -219,7 +221,9 @@
             [:span "Reminders"]])
         (when show-invite-people
           [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(nav-actions/show-invite)
+            {:on-click #(do
+                          (nav-actions/show-invite)
+                          (utils/after 500 utils/remove-tooltips))
              :title "Invite everyone with email or Slack"
              :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
@@ -228,7 +232,9 @@
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
         [:button.mlb-reset.bottom-nav-bt
-          {:on-click #(chat/chat-click 42861)
+          {:on-click #(do
+                        (chat/chat-click 42861)
+                        (utils/after 500 utils/remove-tooltips))
            :title "Have a question for Carrot? Chat with us"
            :data-toggle (when-not is-mobile? "tooltip")
            :data-placement "top"

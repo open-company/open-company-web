@@ -143,10 +143,61 @@ div.reminders-container {
           overflow-x: hidden;
           overflow-y: auto;
 
+          div.reminder-tooltip {
+            margin-top: 24px;
+            width: 100%;
+            border-radius: 6px;
+            background-color: $light_gold;
+            border: 1px solid $carrot_gold;
+            padding: 16px;
+            position: relative;
+            text-align: center;
+
+            button.dismiss-reminder-tooltip {
+              @include avenir_H();
+              font-size: 14px;
+              color: $carrot_gold;
+              width: 24px;
+              height: 24px;
+              text-align: center;
+              position: absolute;
+              top: 0;
+              right: 0;
+            }
+
+            div.reminder-tooltip-title {
+              @include avenir_H();
+              font-size: 16px;
+              color: $deep_navy;
+            }
+
+            div.reminder-tooltip-description {
+              margin-top: 4px;
+              @include avenir_R();
+              font-size: 14px;
+              color: $deep_navy;
+            }
+
+            button.got-it-reminder-tooltip {
+              margin: 8px auto 0;
+              border-radius: 8px;
+              background-color: $carrot_green;
+              color: white;
+              @include avenir_H();
+              font-size: 14px;
+              height: 32px;
+            }
+          }
+
           div.reminder-row {
             border-bottom: 1px solid $ultra_light_grey;
             padding: 16px 0;
             height: 64px;
+
+            &:last-child {
+              padding: 16px 0 0;
+              height: 48px;
+            }
 
             &.editable-reminder {
               cursor: pointer;
@@ -161,10 +212,11 @@ div.reminders-container {
               border-bottom: none;
             }
 
-            @include user_profile(32);
-
-            div.user-avatar-img-container {
+            div.reminder-assignee {
+              width: 32px;
+              height: 32px;
               float: left;
+              @include user_profile(32);
             }
 
             div.reminder-title {
@@ -173,16 +225,21 @@ div.reminders-container {
               color: $deep_navy;
               line-height: 32px;
               margin-left: 16px;
-              max-width: 40%;
+              max-width: calc(100% - 160px - 16px - 16px - 32px);
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
               float: left;
+
+              span.dot {
+                color: $ui_grey;
+                font-size: 16px;
+              }
             }
 
             div.reminder-description {
               text-align: right;
-              max-width: calc(60% - 32px - 16px - 16px);
+              max-width: 160px;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -192,6 +249,10 @@ div.reminders-container {
               line-height: 32px;
               color: #99A0A7;
               float: right;
+
+              span.frequency {
+                text-transform: lowercase;
+              }
             }
           }
         }
@@ -317,6 +378,15 @@ div.reminders-container {
           margin-top: 24px;
           height: 32px;
 
+          button.delete-bt {
+            float: left;
+            height: 32px;
+            padding: 0;
+            color: $carrot_orange_2;
+            @include avenir_R();
+            font-size: 14px;
+          }
+
           button {
             float: right;
             height: 32px;
@@ -336,6 +406,11 @@ div.reminders-container {
               color: white;
               @include avenir_H();
               font-size: 14px;
+
+              &.disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+              }
             }
           }
         }

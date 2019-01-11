@@ -37,16 +37,27 @@
       (reminder-actions/update-reminder (:uuid reminder-data) :board-uuid (:uuid v)))
     (reminder-actions/update-reminder (:uuid reminder-data) :has-changes true)))
 
+(defn- delete-reminder-clicked [s]
+  (let [reminder-data (first (:rum/args s))
+        alert-data {:icon "/img/ML/trash.svg"
+                      :action "reminder-delete"
+                      :message "Delete this reminder?"
+                      :link-button-title "No"
+                      :link-button-cb #(alert-modal/hide-alert)
+                      :solid-button-style :red
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(do
+                                          (alert-modal/hide-alert)
+                                          (reminder-actions/delete-reminder (:uuid reminder-data)))}]
+    (alert-modal/show-alert alert-data)))
+
 (rum/defcs edit-reminder < rum/reactive
                            (drv/drv :org-data)
                            (drv/drv :team-data)
                            (rum/local false ::assignee-dropdown)
                            (rum/local false ::board-dropdown)
                            (rum/local false ::frequency-dropdown)
-                           {:did-mount (fn [s]
-                            (.datepicker (js/$ (rum/ref-node s :start-date))
-                             (clj->js {:dateFormat "MM d, yy"}))
-                            s)}
+                           (rum/local false ::on-dropdown)
   [s reminder-data]
   (let [org-data (drv/react s :org-data)
         team-data (drv/react s :team-data)
@@ -63,11 +74,12 @@
                               (select-keys [:name :uuid])
                               (rename-keys {:name :label :uuid :value}))
                         all-allowed-boards)]
+    (js/console.log "DBG edit-reminder" reminder-data)
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
       [:div.edit-reminder-row
         [:div.edit-reminder-label
-          "Title"]
+          "To update the team about"]
         [:input.edit-reminder-field
           {:value (:title reminder-data)
            :ref :reminder-title
@@ -75,19 +87,19 @@
            :max-length 65
            :placeholder "CEO update, Week in review, etc."
            :on-change #(update-reminder-value s :title (.-value (rum/ref-node s :reminder-title)))}]]
-      [:div.edit-reminder-row
-        [:div.edit-reminder-label
-          "Personal note (optional)"]
-        [:textarea.edit-reminder-field
-          {:value (:description reminder-data)
-           :ref :remider-description
-           :max-length 256
-           :placeholder "Add a personal note to your reminder..."
-           :on-change #(update-reminder-value s :description (.-value (rum/ref-node s :remider-description)))}]]
+      ; [:div.edit-reminder-row
+      ;   [:div.edit-reminder-label
+      ;     "Personal note (optional)"]
+      ;   [:textarea.edit-reminder-field
+      ;     {:value (:description reminder-data)
+      ;      :ref :remider-description
+      ;      :max-length 256
+      ;      :placeholder "Add a personal note to your reminder..."
+      ;      :on-change #(update-reminder-value s :description (.-value (rum/ref-node s :remider-description)))}]]
       [:div.edit-reminder-row.group
         [:div.half-row-left
           [:div.edit-reminder-label
-            "Who"]
+            "Reminder for"]
           [:div.edit-reminder-field-container.dropdown-field
             [:div.edit-reminder-field
               {:on-click #(reset! (::assignee-dropdown s) true)}
@@ -124,16 +136,6 @@
       [:div.edit-reminder-row.group
         [:div.half-row-left
           [:div.edit-reminder-label
-            "Start date"]
-          [:div.edit-reminder-field-container.dropdown-field
-            [:input.edit-reminder-field
-              {:ref :start-date
-               :value (utils/activity-date-string (utils/js-date (:start-date reminder-data)) true)
-               :on-change #(let [selected-date (.-value (rum/ref-node s :start-date))
-                                 iso-date (.toISOString (utils/js-date selected-date))]
-                            (update-reminder-value s :start-date iso-date))}]]]
-        [:div.half-row-right
-          [:div.edit-reminder-label
             "Frequency"]
           [:div.edit-reminder-field-container.dropdown-field
             [:div.edit-reminder-field
@@ -141,20 +143,65 @@
               (when (:frequency reminder-data)
                 (:frequency reminder-data))]
             (when @(::frequency-dropdown s)
-              (dropdown-list {:items [{:value "Weekly" :label "Weekly"}
-                                      {:value "Monthly" :label "Monthly"}
-                                      {:value "Quarterly" :label "Quarterly"}]
+              (dropdown-list {:items [{:value "Weekly"}
+                                      {:value "Every other week"}
+                                      {:value "Monthly"}
+                                      {:value "Quarterly"}]
                               :value (or (:frequency reminder-data) "Weekly")
                               :on-change (fn [item]
                                            (update-reminder-value s :frequency (:value item))
                                            (reset! (::frequency-dropdown s) false))
-                              :on-blur #(reset! (::frequency-dropdown s) false)}))]]]
+                              :on-blur #(reset! (::frequency-dropdown s) false)}))]]
+        (let [label (case (:frequency reminder-data)
+                      "Weekly" "Every"
+                      "Every other week" "On"
+                      "On the")
+              values (case (:frequency reminder-data)
+                      "Weekly"
+                      [{:value "Monday"} {:value "Tuesday"} {:value "Wednesday"}
+                       {:value "Thursday"} {:value "Friday"} {:value "Saturday"} {:value "Sunday"}]
+                      "Every other week"
+                      [{:value "Monday"} {:value "Tuesday"} {:value "Wednesday"}
+                       {:value "Thursday"} {:value "Friday"} {:value "Saturday"} {:value "Sunday"}]
+                      "Monthly"
+                      [{:value "First day of the month"} {:value "Last day of the month"}
+                       {:value "First Monday of the month"} {:value "Last Friday of the month"}]
+                      ;; else "Quarterly"
+                      [{:value "First day of the quarter"} {:value "Last day of the quarter"}
+                       {:value "First Monday of the quarter"} {:value "Last Friday of the quarter"}])
+              current-value (if (utils/in? (map :value values) (:on reminder-data) )
+                              (:on reminder-data)
+                              (:value (first values)))]
+          [:div.half-row-right
+            [:div.edit-reminder-label
+              label]
+            [:div.edit-reminder-field-container.dropdown-field
+              [:div.edit-reminder-field
+                {:on-click #(reset! (::on-dropdown s) true)}
+                current-value]
+              (when @(::on-dropdown s)
+                (dropdown-list {:items values
+                                :value current-value
+                                :on-change (fn [item]
+                                             (update-reminder-value s :on (:value item))
+                                             (reset! (::on-dropdown s) false))
+                                :on-blur #(reset! (::on-dropdown s) false)}))]])]
       [:div.edit-reminder-footer
-        [:button.mlb-reset.save-bt
-          {:on-click #(do
-                        (reminder-actions/save-reminder)
-                        (nav-actions/show-reminders))}
-          "Save reminder"]
+        (when (:uuid reminder-data)
+          [:button.mlb-reset.delete-bt
+            {:on-click #(delete-reminder-clicked s)}
+            "Delete reminder"])
+        (let [save-disabled? (or (clojure.string/blank? (:title reminder-data))
+                                 (empty? (:assignee reminder-data))
+                                 (empty? (:board-data reminder-data))
+                                 (empty? (:frequency reminder-data))
+                                 (empty? (:on reminder-data)))]
+          [:button.mlb-reset.save-bt
+            {:on-click #(when-not save-disabled?
+                          (reminder-actions/save-reminder)
+                          (nav-actions/show-reminders))
+             :class (when save-disabled? "disabled")}
+            "Save reminder"])
         [:button.mlb-reset.cancel-bt
           {:on-click (fn [_]
                       (cancel-clicked reminder-data #(reminder-actions/cancel-edit-reminder)))}
@@ -179,6 +226,16 @@
     (if (empty? reminders-data)
       empty-reminders
       [:div.reminders-list-container
+        (when true
+          [:div.reminder-tooltip
+            [:button.mlb-reset.dismiss-reminder-tooltip
+              "x"]
+            [:div.reminder-tooltip-title
+              "Never forget an update again"]
+            [:div.reminder-tooltip-description
+              "Build trust and transparency by ensuring updates are shared on time."]
+            [:button.mlb-reset.got-it-reminder-tooltip
+              "Ok, got it"]])
         (for [reminder reminders-data]
           [:div.reminder-row.group
             {:key (str "reminder-" (:uuid reminder))
@@ -192,9 +249,12 @@
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
               (user-avatar-image (:assignee reminder))]
             [:div.reminder-title
+              (utils/name-or-email (:assignee reminder))
+              [:span.dot " · "]
               (:title reminder)]
             [:div.reminder-description
-              (:description reminder)]])])])
+              (:parsed-start-date reminder)
+              [:span.frequency (str " (" (:frequency reminder) ")")]]])])])
 
 ;; Reminders main component
 

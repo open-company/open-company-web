@@ -30,3 +30,7 @@
 (defn cancel-edit-reminder []
   (dis/dispatch! [:cancel-edit-reminder (router/current-org-slug)])
   (nav-actions/show-reminders))
+
+(defn delete-reminder [reminder-uuid]
+  (dis/dispatch! [:delete-reminder (router/current-org-slug) reminder-uuid])
+  (nav-actions/show-reminders))
