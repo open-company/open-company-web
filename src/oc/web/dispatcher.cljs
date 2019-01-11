@@ -357,6 +357,7 @@
                                                 (activity-read-data wrt-show))})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
+   :show-reminders-tooltip     [[:nux] (fn [nux] (:show-reminders-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
    :show-invite-people-tooltip [[:nux] (fn [nux] (:show-invite-people-tooltip nux))]
    :nux-user-type              [[:nux] (fn [nux] (:user-type nux))]

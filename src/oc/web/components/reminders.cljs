@@ -4,6 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.reminder :as reminder-utils]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
@@ -220,21 +221,24 @@
       {:on-click #(nav-actions/show-new-reminder)}
       "Create new reminder"]])
 
-(rum/defcs manage-reminders
+(rum/defcs manage-reminders < rum/reactive
+                              (drv/drv :show-reminders-tooltip)
   [s reminders-data]
   [:div.reminders-tab.manage-reminders
     (if (empty? reminders-data)
       empty-reminders
       [:div.reminders-list-container
-        (when true
+        (when (drv/react s :show-reminders-tooltip)
           [:div.reminder-tooltip
             [:button.mlb-reset.dismiss-reminder-tooltip
+              {:on-click #(nux-actions/dismiss-reminders-tooltip)}
               "x"]
             [:div.reminder-tooltip-title
               "Never forget an update again"]
             [:div.reminder-tooltip-description
               "Build trust and transparency by ensuring updates are shared on time."]
             [:button.mlb-reset.got-it-reminder-tooltip
+              {:on-click #(nux-actions/dismiss-reminders-tooltip)}
               "Ok, got it"]])
         (for [reminder reminders-data]
           [:div.reminder-row.group
