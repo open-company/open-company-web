@@ -34,10 +34,10 @@
         [:section.pricing-header
 
           [:h1.pricing-headline
-            "Plans for teams of all sizes"]
+            "It’s free to get started"]
 
           [:div.pricing-subheadline
-            "Bring clarity and alignment to your organization."]
+            "Carrot makes leadership communication work for fast-growing and distributed teams."]
 
           [:div.pricing-three-columns.group
             ;; Free
@@ -47,7 +47,7 @@
               [:h3.tear-price
                 "$0"]
               [:div.tear-subtitle
-                "Free for small teams up to 5 users."]
+                "Free for small teams up to 10 users."]
               [:a.tear-start-bt
                 {:href "/sign-up"}
                 "Start for free"]

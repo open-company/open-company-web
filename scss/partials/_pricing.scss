@@ -60,7 +60,7 @@ div.pricing-wrap {
         margin: 24px auto 0px;
         z-index: 2;
         position: relative;
-        max-width: 800px;
+        max-width: 630px;
 
         @include mobile(){
           margin-top: 16px;
@@ -164,7 +164,7 @@ div.pricing-wrap {
           }
 
           div.tear-feature {
-            max-width: 220px;
+            max-width: 200px;
             @include avenir_R();
             font-size: 20px;
             color: $deep_navy;
