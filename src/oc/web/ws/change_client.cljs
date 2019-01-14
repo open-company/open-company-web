@@ -29,9 +29,7 @@
 ;; Send wrapper
 
 (defn- send! [chsk-send! & args]
-  (if @chsk-send!
-    (apply @chsk-send! args)
-    (ws-utils/not-connected "Interaction" chsk-send! ch-state args)))
+  (ws-utils/send! "Change" chsk-send! ch-state args))
 
 ;; ----- Actions -----
 
@@ -185,7 +183,7 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (ws-utils/check-interval last-interval "Change" chsk-send! ch-state)
+    (ws-utils/reconnect last-interval "Change" chsk-send! ch-state)
     (if (or (not @ch-state)
             (not (:open? @@ch-state))
             (not= @current-org org-slug))

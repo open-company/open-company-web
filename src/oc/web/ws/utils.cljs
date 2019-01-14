@@ -7,23 +7,39 @@
             [oc.web.local-settings :as ls]))
 
 ;; cmd queue
-(defonce is-connected (atom false))
 (defonce cmd-queue (atom []))
 
 (defn buffer-cmd [args]
   (swap! cmd-queue conj args))
 
-(defn not-connected [service-name chsk-send! ch-state args]
-  (buffer-cmd args)
-  (sentry-report service-name chsk-send! ch-state (first (first args))))
+(defn reset-queue []
+  (reset! cmd-queue []))
 
-(defn send! [service-name chsk-send! & args]
+(defn send-queue [chsk-send!]
+  (timbre/debug "send-queue: " chsk-send! @cmd-queue)
+  (when chsk-send!
+    (doseq [qargs @cmd-queue]
+      (timbre/debug "order? " qargs)
+      (apply chsk-send! qargs))
+    (reset-queue)))
+
+(declare sentry-report)
+(defn not-connected [service-name chsk-send! ch-state & args]
+  (let [arg (first (first args))]
+    (buffer-cmd arg)
+    (sentry-report service-name chsk-send! ch-state arg)))
+
+(defn send! [service-name chsk-send! ch-state & args]
   (if @chsk-send!
     (do
       ;; empty queue first
-      (doseq [qargs @cmd-queue]
-        (apply @chsk-send! qargs))
-      (apply @chsk-send! args))
+      (timbre/debug "Commands saved:" @cmd-queue)
+      (send-queue @chsk-send!)
+      ;; send current command
+      (timbre/debug @chsk-send! args)
+      (apply @chsk-send! (first args))
+      (timbre/debug "After call"))
+    ;;disconnected
     (not-connected service-name chsk-send! ch-state args)))
 
 ;; Connection check
@@ -52,6 +68,10 @@
                (not (:open? @@ch-state)))
        (sentry-report service-name chsk-send! ch-state))
     (* ls/ws-monitor-interval 1000))))
+
+(defn reconnect [last-interval service-name chsk-send! ch-state]
+  (send-queue @chsk-send!)
+  (check-interval last-interval service-name chsk-send! ch-state))
 
 (defn report-invalid-jwt [service-name ch-state rep]
   (let [connection-status (if @ch-state
