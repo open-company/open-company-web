@@ -509,8 +509,11 @@
    (some #{status} [401 404])
    (router/redirect-404!)
 
-   (not= (:uuid activity-data)
-         (router/current-activity-id))
+   ;; The id token will have a current activity id, shared urls will not.
+   ;; if the ids don't match return a 404
+   (and (some? (router/current-activity-id))
+        (not= (:uuid activity-data)
+              (router/current-activity-id)))
    (router/redirect-404!)
 
    (and secure-uuid
