@@ -158,15 +158,20 @@
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
-        org-settings (when (and (contains? query-params :org-settings)
+        org-settings (when (and (not user-settings)
+                              (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
+        reminders (when (and (not org-settings)
+                             (contains? query-params :reminders))
+                    :reminders)
         bot-access (when (contains? query-params :access)
                       (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :user-settings user-settings
+                        :show-reminders reminders
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
 
