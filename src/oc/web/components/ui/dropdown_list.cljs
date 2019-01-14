@@ -23,11 +23,9 @@
          (when (fn? on-blur)
            (on-blur))))))
   [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
-  (js/console.log "DBG dropdown-list items" items)
-  (let [fixed-items (map #(do (js/console.log "DBG   item" %)
-                           (if (not (contains? % :label))
+  (let [fixed-items (map #(if (not (contains? % :label))
                             (assoc % :label (:value %))
-                            %)) items)]
+                            %) items)]
     [:div.dropdown-list-container
       [:div.triangle]
       [:div.dropdown-list-content

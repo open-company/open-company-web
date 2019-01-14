@@ -45,14 +45,10 @@
     (reset! last-board-uuids board-uuids)
     (boards-watch))
   ([]
-    (timbre/debug "DBG boards-watch" @last-board-uuids (fn? @chsk-send!)
-               @ch-state
-               (:open? @@ch-state))
     (when (and (fn? @chsk-send!)
                @ch-state
                (:open? @@ch-state))
       (doseq [board-uuid @last-board-uuids]
-        (timbre/debug "DBG   board-watch" board-uuid)
         (send! chsk-send! [:watch/board {:board-uuid board-uuid}])))))
 
 (defn board-unwatch [callback]
