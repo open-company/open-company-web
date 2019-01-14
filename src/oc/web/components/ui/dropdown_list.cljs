@@ -18,7 +18,7 @@
   {:value nil :label :divider-line}."
   < rum/static
     (on-window-click-mixin (fn [s e]
-     (when-not (utils/event-inside? e (sel1 :div.dropdown-list-container))
+     (when-not (utils/event-inside? e (rum/ref-node s :dropdown-list))
        (let [on-blur (:on-blur (first (:rum/args s)))]
          (when (fn? on-blur)
            (on-blur))))))
@@ -27,6 +27,7 @@
                             (assoc % :label (:value %))
                             %) items)]
     [:div.dropdown-list-container
+      {:ref :dropdown-list}
       [:div.triangle]
       [:div.dropdown-list-content
         [:ul.dropdown-list

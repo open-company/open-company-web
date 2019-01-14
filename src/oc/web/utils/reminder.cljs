@@ -21,7 +21,7 @@
     ;            :name "Iacopo Carraro"
     ;            :avatar-url "https://avatars.slack-edge.com/2017-02-02/136114833346_3758034af26a3b4998f4_512.jpg"}
     :start-date "2019-01-04T14:15:02Z"
-    :frequency "Monthly"
+    :frequency "Month"
     :on "Friday"
     :last-sent nil
     :assignee-tz "Europe/Amsterdam"
@@ -46,7 +46,7 @@
     ;            :name "IacAdmin 14Nov"
     ;            :avatar-url "/img/ML/happy_face_blue.svg"}
     :start-date "2018-12-31T12:45:02Z"
-    :frequency "Quarterly"
+    :frequency "Quarter"
     :on "Last day of the quarter"
     :last-sent nil
     :assignee-tz "Europe/Amsterdam"
@@ -95,7 +95,7 @@
      :author current-user-data
      :assignee current-user-data
      :on "Monday"
-     :frequency "Weekly"
+     :frequency "Week"
      :last-sent nil
      :assignee-tz (:timezone current-user-data)}))
 
