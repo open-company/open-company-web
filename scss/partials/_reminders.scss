@@ -149,7 +149,7 @@ div.reminders-container {
             border: 1px solid $carrot_gold;
             background-color: #FDF6E4;
             border-radius: 6px;
-            padding: 16px;
+            padding: 24px 16px;
             position: relative;
             text-align: center;
 
@@ -159,17 +159,16 @@ div.reminders-container {
               right: 0;
               width: 24px;
               height: 24px;
-              color: $carrot_gold;
-              @include avenir_R();
-              font-size: 18px;
+              padding: 0;
+              background-image: cdnUrl("/img/ML/small_dismiss_tooltip.svg");
+              background-size: 8px 8px;
               background-position: center;
               background-repeat: no-repeat;
-              padding: 0;
             }
 
             div.reminder-tooltip-title {
               @include avenir_H();
-              font-size: 18px;
+              font-size: 16px;
               color: $deep_navy;
             }
 
@@ -307,6 +306,7 @@ div.reminders-container {
                 content: "\F35D";
                 font-size: 22px;
                 color: $deep_navy;
+                pointer-events: none;
               }
             }
 

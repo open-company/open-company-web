@@ -78,25 +78,6 @@
     (js/console.log "DBG edit-reminder" reminder-data)
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
-      [:div.edit-reminder-row
-        [:div.edit-reminder-label
-          "To update the team about"]
-        [:input.edit-reminder-field
-          {:value (:title reminder-data)
-           :ref :reminder-title
-           :type "text"
-           :max-length 65
-           :placeholder "CEO update, Week in review, etc."
-           :on-change #(update-reminder-value s :title (.-value (rum/ref-node s :reminder-title)))}]]
-      ; [:div.edit-reminder-row
-      ;   [:div.edit-reminder-label
-      ;     "Personal note (optional)"]
-      ;   [:textarea.edit-reminder-field
-      ;     {:value (:description reminder-data)
-      ;      :ref :remider-description
-      ;      :max-length 256
-      ;      :placeholder "Add a personal note to your reminder..."
-      ;      :on-change #(update-reminder-value s :description (.-value (rum/ref-node s :remider-description)))}]]
       [:div.edit-reminder-row.group
         [:div.half-row-left
           [:div.edit-reminder-label
@@ -118,26 +99,21 @@
                                              (update-reminder-value s :assignee selected-user))
                                            (reset! (::assignee-dropdown s) false))
                               :on-blur #(reset! (::assignee-dropdown s) false)}))]]
-        [:div.half-row-right
-          [:div.edit-reminder-label
-            "Section"]
-          [:div.edit-reminder-field-container.dropdown-field
-            [:div.edit-reminder-field
-              {:on-click #(reset! (::board-dropdown s) true)}
-              (when (:board-data reminder-data)
-                (:name (:board-data reminder-data)))]
-            (when @(::board-dropdown s)
-              (dropdown-list {:items allowed-boards
-                              :value (or (:board-uuid reminder-data) (:value (first allowed-boards)))
-                              :on-change (fn [item]
-                                           (let [board-data (first (filter #(= (:uuid %) (:value item)) (:boards org-data)))]
-                                             (update-reminder-value s :board-data board-data))
-                                           (reset! (::board-dropdown s) false))
-                              :on-blur #(reset! (::board-dropdown s) false)}))]]]
+        [:div.edit-reminder-row
+          [:div.half-row-right
+            [:div.edit-reminder-label
+              "To update the team about"]
+            [:input.edit-reminder-field
+              {:value (:title reminder-data)
+               :ref :reminder-title
+               :type "text"
+               :max-length 65
+               :placeholder "CEO update, Week in review, etc."
+               :on-change #(update-reminder-value s :title (.-value (rum/ref-node s :reminder-title)))}]]]]
       [:div.edit-reminder-row.group
         [:div.half-row-left
           [:div.edit-reminder-label
-            "Frequency"]
+            "Every"]
           [:div.edit-reminder-field-container.dropdown-field
             [:div.edit-reminder-field
               {:on-click #(reset! (::frequency-dropdown s) true)}
@@ -145,7 +121,7 @@
                 (:frequency reminder-data))]
             (when @(::frequency-dropdown s)
               (dropdown-list {:items [{:value "Weekly"}
-                                      {:value "Every other week"}
+                                      {:value "Other week"}
                                       {:value "Monthly"}
                                       {:value "Quarterly"}]
                               :value (or (:frequency reminder-data) "Weekly")
@@ -154,22 +130,22 @@
                                            (reset! (::frequency-dropdown s) false))
                               :on-blur #(reset! (::frequency-dropdown s) false)}))]]
         (let [label (case (:frequency reminder-data)
-                      "Weekly" "Every"
-                      "Every other week" "On"
+                      "Weekly" "On"
+                      "Other week" "On"
                       "On the")
               values (case (:frequency reminder-data)
                       "Weekly"
                       [{:value "Monday"} {:value "Tuesday"} {:value "Wednesday"}
                        {:value "Thursday"} {:value "Friday"} {:value "Saturday"} {:value "Sunday"}]
-                      "Every other week"
+                      "Other week"
                       [{:value "Monday"} {:value "Tuesday"} {:value "Wednesday"}
                        {:value "Thursday"} {:value "Friday"} {:value "Saturday"} {:value "Sunday"}]
                       "Monthly"
-                      [{:value "First day of the month"} {:value "Last day of the month"}
-                       {:value "First Monday of the month"} {:value "Last Friday of the month"}]
+                      [{:value "First day of the month"} {:value "First Monday of the month"}
+                       {:value "Last Friday of the month"} {:value "Last day of the month"}]
                       ;; else "Quarterly"
-                      [{:value "First day of the quarter"} {:value "Last day of the quarter"}
-                       {:value "First Monday of the quarter"} {:value "Last Friday of the quarter"}])
+                      [{:value "First day of the quarter"} {:value "First Monday of the quarter"}
+                       {:value "Last Friday of the quarter"} {:value "Last day of the quarter"}])
               current-value (if (utils/in? (map :value values) (:on reminder-data) )
                               (:on reminder-data)
                               (:value (first values)))]
@@ -228,11 +204,10 @@
     (if (empty? reminders-data)
       empty-reminders
       [:div.reminders-list-container
-        (when true ;;(drv/react s :show-reminders-tooltip)
+        (when (drv/react s :show-reminders-tooltip)
           [:div.reminder-tooltip
             [:button.mlb-reset.dismiss-reminder-tooltip
-              {:on-click #(nux-actions/dismiss-reminders-tooltip)}
-              "x"]
+              {:on-click #(nux-actions/dismiss-reminders-tooltip)}]
             [:div.reminder-tooltip-title
               "Never forget an update again"]
             [:div.reminder-tooltip-description
