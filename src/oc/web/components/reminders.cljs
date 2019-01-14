@@ -28,7 +28,7 @@
                       :solid-button-cb #(do
                                           (alert-modal/hide-alert)
                                           (dismiss-action))}]
-    (alert-modal/show-alert alert-data))
+      (alert-modal/show-alert alert-data))
     (dismiss-action)))
 
 (defn- update-reminder-value [s k v]
@@ -75,7 +75,6 @@
                               (select-keys [:name :uuid])
                               (rename-keys {:name :label :uuid :value}))
                         all-allowed-boards)]
-    (js/console.log "DBG edit-reminder" reminder-data)
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
       [:div.edit-reminder-row.group
@@ -120,13 +119,15 @@
               (when (:frequency reminder-data)
                 (:frequency reminder-data))]
             (when @(::frequency-dropdown s)
-              (dropdown-list {:items [{:value "Weekly"}
-                                      {:value "Other week"}
-                                      {:value "Monthly"}
-                                      {:value "Quarterly"}]
+              (dropdown-list {:items [{:value "Weekly" :on-value "Monday"}
+                                      {:value "Other week" :on-value "Monday"}
+                                      {:value "Monthly" :on-value "First day of the month"}
+                                      {:value "Quarterly" :on-value "First day of the quarter"}]
                               :value (or (:frequency reminder-data) "Weekly")
                               :on-change (fn [item]
                                            (update-reminder-value s :frequency (:value item))
+                                           (when (not= (:value item) (:frequency reminder-data))
+                                             (update-reminder-value s :on (:on-value item)))
                                            (reset! (::frequency-dropdown s) false))
                               :on-blur #(reset! (::frequency-dropdown s) false)}))]]
         (let [label (case (:frequency reminder-data)

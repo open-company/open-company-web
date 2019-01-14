@@ -9,7 +9,6 @@
         reminder-data (if reminder-uuid
                         (first (filter #(= (:uuid %) reminder-uuid) reminders-data))
                         (reminder-utils/new-reminder-data))]
-    (js/console.log "DBG :edit-reminder" reminder-data)
     (assoc-in db (dispatcher/reminder-edit-key org-slug)
      (or reminder-data (reminder-utils/new-reminder-data)))))
 
@@ -34,7 +33,9 @@
         old-reminders-data (dispatcher/reminders-data org-slug db)
         filtered-reminders (filterv #(not= (:uuid reminder-data) (:uuid %)) old-reminders-data)
         new-reminders-data (conj filtered-reminders fixed-reminder-data)]
-    (assoc-in db (dispatcher/reminders-data-key org-slug) new-reminders-data)))
+    (-> db
+      (assoc-in (dispatcher/reminders-data-key org-slug) new-reminders-data)
+      (assoc-in (dispatcher/reminder-edit-key org-slug) nil))))
 
 (defmethod dispatcher/action :cancel-edit-reminder
   [db [_ org-slug]]
