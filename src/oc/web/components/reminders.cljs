@@ -34,8 +34,6 @@
 (defn- update-reminder-value [s k v]
   (let [reminder-data (first (:rum/args s))]
     (reminder-actions/update-reminder (:uuid reminder-data) k v)
-    (when (= k :board-data)
-      (reminder-actions/update-reminder (:uuid reminder-data) :board-uuid (:uuid v)))
     (reminder-actions/update-reminder (:uuid reminder-data) :has-changes true)))
 
 (defn- delete-reminder-clicked [s]
@@ -56,25 +54,17 @@
                            (drv/drv :org-data)
                            (drv/drv :team-data)
                            (rum/local false ::assignee-dropdown)
-                           (rum/local false ::board-dropdown)
                            (rum/local false ::frequency-dropdown)
                            (rum/local false ::on-dropdown)
   [s reminder-data]
   (let [org-data (drv/react s :org-data)
         team-data (drv/react s :team-data)
-        allowed-users (reminder-utils/users-for-reminders org-data team-data (:board-data reminder-data))
+        allowed-users (reminder-utils/users-for-reminders org-data team-data)
         users-list (vec (map #(-> %
                           (assoc :name (utils/name-or-email %))
                           (select-keys [:name :user-id])
                           (rename-keys {:name :label :user-id :value}))
-                    allowed-users))
-        all-team-public-boards (filterv #(or (= (:access %) "team") (= (:access %) "public")) (:boards org-data))
-        private-boards-with-author-access (filterv #(and (= (:access %) "private") (utils/get-author (jwt/user-id) (:authors %))) (:boards org-data))
-        all-allowed-boards (sort-by :name (concat all-team-public-boards private-boards-with-author-access))
-        allowed-boards (map #(-> %
-                              (select-keys [:name :uuid])
-                              (rename-keys {:name :label :uuid :value}))
-                        all-allowed-boards)]
+                    allowed-users))]
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
       [:div.edit-reminder-row.group
@@ -171,7 +161,6 @@
             "Delete reminder"])
         (let [save-disabled? (or (clojure.string/blank? (:title reminder-data))
                                  (empty? (:assignee reminder-data))
-                                 (empty? (:board-data reminder-data))
                                  (empty? (:frequency reminder-data))
                                  (empty? (:on reminder-data)))]
           [:button.mlb-reset.save-bt
