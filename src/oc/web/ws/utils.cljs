@@ -15,11 +15,9 @@
 (defn reset-queue []
   (reset! cmd-queue []))
 
-(defn send-queue [chsk-send!]
-  (timbre/debug "send-queue: " chsk-send! @cmd-queue)
-  (when chsk-send!
+(defn send-queue [chsk-send! ch-state]
+  (when (and chsk-send! (:open? @@ch-state))
     (doseq [qargs @cmd-queue]
-      (timbre/debug "order? " qargs)
       (apply chsk-send! qargs))
     (reset-queue)))
 
@@ -30,15 +28,12 @@
     (sentry-report service-name chsk-send! ch-state arg)))
 
 (defn send! [service-name chsk-send! ch-state & args]
-  (if @chsk-send!
+  (if (and @chsk-send! (:open? @@ch-state))
     (do
       ;; empty queue first
-      (timbre/debug "Commands saved:" @cmd-queue)
-      (send-queue @chsk-send!)
+      (send-queue @chsk-send! ch-state)
       ;; send current command
-      (timbre/debug @chsk-send! args)
-      (apply @chsk-send! (first args))
-      (timbre/debug "After call"))
+      (apply @chsk-send! (first args)))
     ;;disconnected
     (not-connected service-name chsk-send! ch-state args)))
 
@@ -70,7 +65,7 @@
     (* ls/ws-monitor-interval 1000))))
 
 (defn reconnect [last-interval service-name chsk-send! ch-state]
-  (send-queue @chsk-send!)
+  (send-queue @chsk-send! ch-state)
   (check-interval last-interval service-name chsk-send! ch-state))
 
 (defn report-invalid-jwt [service-name ch-state rep]

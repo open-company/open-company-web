@@ -34,9 +34,7 @@
 ;; Send wrapper
 
 (defn- send! [chsk-send! & args]
-  (if @chsk-send!
-    (apply @chsk-send! args)
-    (ws-utils/sentry-report "Interaction" chsk-send! ch-state (first (first args)))))
+  (ws-utils/send! "Interaction" chsk-send! ch-state args))
 
 ;; Actions
 (defn boards-watch
@@ -171,7 +169,7 @@
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-board-path (.getPath ws-uri)]
     (reset! last-ws-link ws-link)
-    (ws-utils/check-interval last-interval "Interaction" chsk-send! ch-state)
+    (ws-utils/reconnect last-interval "Interaction" chsk-send! ch-state)
     (if (or (not @ch-state)
             (not (:open? @@ch-state))
             (not= @current-board-path ws-board-path))

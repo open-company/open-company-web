@@ -29,9 +29,7 @@
 ;; Send wrapper
 
 (defn- send! [chsk-send! & args]
-  (if @chsk-send!
-    (apply @chsk-send! args)
-    (ws-utils/sentry-report "Notify" chsk-send! ch-state (first (first args)))))
+  (ws-utils/send! "Notify" chsk-send! ch-state args))
 
 (defn notifications-watch []
   (timbre/debug "Watching notifications.")
@@ -131,7 +129,7 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (ws-utils/check-interval last-interval "Notify" chsk-send! ch-state)
+    (ws-utils/reconnect last-interval "Notify" chsk-send! ch-state)
     (if (or (not @ch-state)
             (not (:open? @@ch-state)))
 
