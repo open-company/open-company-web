@@ -136,14 +136,15 @@
                :data-container "body"
                :data-tooltip (if has-bot? "" "tooltip")
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Enable the Carrot Bot for Slack in Settings"
+               :title "Team admins can enable the Carrot bot for Slack in Settings"
                :ref "slack-button"
                :on-click (fn [e]
                            (utils/event-stop e)
                            (when-not @(::sharing s)
                              (if has-bot?
                                (dis/dispatch! [:input [:activity-share-medium] :slack])
-                               (org-settings/show-modal :main))))}
+                               (when (jwt/is-admin? (:team-id org-data))
+                                 (org-settings/show-modal :main)))))}
               "Slack"])]
         [:div.activity-share-divider-line]
         (when (= medium :email)
