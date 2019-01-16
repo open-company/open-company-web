@@ -217,7 +217,7 @@
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium])
 
-(def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurence :week-occurence])
+(def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -793,8 +793,8 @@
       (reminders-http (method-for-link add-reminder-link) (relative-href add-reminder-link)
        {:headers (headers-for-link add-reminder-link)
         :json-params json-data}
-       callback)
-      (handle-missing-link "add-reminder" add-reminder-link callback))))
+       callback))
+    (handle-missing-link "add-reminder" add-reminder-link callback)))
 
 ;; WRT
 
