@@ -23,8 +23,8 @@
 (def search-server-domain "http://localhost:3007")
 (def search-enabled? true)
 
-;; Reminders location
-(def reminders-server-domain "http://localhost:3011")
+;; Reminder location
+(def reminder-server-domain "http://localhost:3011")
 
 ;; Web location
 (def web-server "localhost:3559")

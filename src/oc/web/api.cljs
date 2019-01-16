@@ -30,7 +30,7 @@
 
 (def ^:private search-endpoint ls/search-server-domain)
 
-(def ^:private reminders-endpoint ls/reminders-server-domain)
+(def ^:private reminders-endpoint ls/reminder-server-domain)
 
 (defun- relative-href
   "Given a link map or a link string return the relative href."
