@@ -137,7 +137,7 @@
                                   :on-change (fn [item]
                                                (let [with-freq {:frequency (:value item)}
                                                      occurrence-field-name (get reminder-utils/occurrence-fields (:value item))
-                                                     should-update-occurrence (not= occurrence-field-name (:occurrence-label reminder-data))
+                                                     should-update-occurrence (not= (:value item) (:frequency reminder-data))
                                                      occurrence-value (when should-update-occurrence
                                                                        (get-in reminder-utils/occurrence-values [(:value item) (:occurrence-value item)]))
                                                      with-occurrence (if should-update-occurrence
@@ -175,7 +175,8 @@
                   (dropdown-list {:items values
                                   :value occurrence-field-value
                                   :on-change (fn [item]
-                                               (update-reminder s {occurrence-field-name (:value item)})
+                                               (update-reminder s {occurrence-field-name (:value item)
+                                                                   :occurrence-value (get-in reminder-utils/occurrence-values [(:frequency reminder-data) (:value item)])})
                                                (reset! (::on-dropdown s) false))})])]])]
       [:div.edit-reminder-footer
         (when (:uuid reminder-data)
