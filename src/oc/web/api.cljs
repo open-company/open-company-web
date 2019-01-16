@@ -30,6 +30,8 @@
 
 (def ^:private search-endpoint ls/search-server-domain)
 
+(def ^:private reminders-endpoint ls/reminders-server-domain)
+
 (defun- relative-href
   "Given a link map or a link string return the relative href."
 
@@ -189,6 +191,8 @@
 
 (def ^:private search-http (partial req search-endpoint))
 
+(def ^:private reminders-http (partial req reminders-endpoint))
+
 ;; Report failed api request
 
 (defn- handle-missing-link [callee-name link callback & parameters]
@@ -213,7 +217,7 @@
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium])
 
-(def reminder-allowed-keys [:org-uuid :board-uuid :title :description :assignee :start-data :frequency])
+(def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurence :week-occurence])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -776,8 +780,21 @@
 
 (defn get-reminders
   [reminders-link callback]
-  ; (storage-http (method-for-link activity-link))
-  (callback))
+  (if reminders-link
+    (reminders-http (method-for-link reminders-link) (relative-href reminders-link)
+     {:headers (headers-for-link reminders-link)}
+     callback)
+    (handle-missing-link "get-reminders" reminders-link callback)))
+
+(defn add-reminder [add-reminder-link reminder-data callback]
+  (if (and add-reminder-link reminder-data)
+    (let [fixed-reminder-data (select-keys reminder-data reminder-allowed-keys)
+          json-data (cljs->json fixed-reminder-data)]
+      (reminders-http (method-for-link add-reminder-link) (relative-href add-reminder-link)
+       {:headers (headers-for-link add-reminder-link)
+        :json-params json-data}
+       callback)
+      (handle-missing-link "add-reminder" add-reminder-link callback))))
 
 ;; WRT
 

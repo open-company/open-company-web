@@ -6,11 +6,12 @@
 (defmethod dispatcher/action :edit-reminder
   [db [_ org-slug reminder-uuid]]
   (let [reminders-data (dispatcher/reminders-data org-slug db)
+        new-reminder-data (reminder-utils/parse-reminder (reminder-utils/new-reminder-data))
         reminder-data (if reminder-uuid
                         (first (filter #(= (:uuid %) reminder-uuid) reminders-data))
-                        (reminder-utils/new-reminder-data))]
+                        new-reminder-data)]
     (assoc-in db (dispatcher/reminder-edit-key org-slug)
-     (or reminder-data (reminder-utils/new-reminder-data)))))
+     (or reminder-data new-reminder-data))))
 
 (defmethod dispatcher/action :reminders-loaded
   [db [_ org-slug reminders-data]]
@@ -18,11 +19,12 @@
 
 
 (defmethod dispatcher/action :update-reminder
-  [db [_ org-slug reminder-uuid k v]]
+  [db [_ org-slug reminder-uuid value-or-fn]]
   (let [reminder-edit-key (dispatcher/reminder-edit-key org-slug)
-        reminder-data (get-in db reminder-edit-key)
-        updated-reminder-data (assoc reminder-data k v)]
-    (assoc-in db reminder-edit-key updated-reminder-data)))
+        old-reminder-edit-data (get-in db reminder-edit-key)]
+    (if (fn? value-or-fn)
+      (update-in db reminder-edit-key value-or-fn)
+      (assoc-in db reminder-edit-key (merge old-reminder-edit-data value-or-fn)))))
 
 (defmethod dispatcher/action :save-reminder
   [db [_ org-slug]]
@@ -32,9 +34,10 @@
                               (assoc reminder-data :uuid (utils/activity-uuid)))
         old-reminders-data (dispatcher/reminders-data org-slug db)
         filtered-reminders (filterv #(not= (:uuid reminder-data) (:uuid %)) old-reminders-data)
-        new-reminders-data (conj filtered-reminders fixed-reminder-data)]
+        new-reminders-data (conj filtered-reminders fixed-reminder-data)
+        reminders-list-key (conj (dispatcher/reminders-data-key org-slug) :items)]
     (-> db
-      (assoc-in (dispatcher/reminders-data-key org-slug) new-reminders-data)
+      (assoc-in reminders-list-key new-reminders-data)
       (assoc-in (dispatcher/reminder-edit-key org-slug) nil))))
 
 (defmethod dispatcher/action :cancel-edit-reminder

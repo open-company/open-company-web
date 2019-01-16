@@ -31,10 +31,9 @@
       (alert-modal/show-alert alert-data))
     (dismiss-action)))
 
-(defn- update-reminder-value [s k v]
+(defn- update-reminder [s v]
   (let [reminder-data (first (:rum/args s))]
-    (reminder-actions/update-reminder (:uuid reminder-data) k v)
-    (reminder-actions/update-reminder (:uuid reminder-data) :has-changes true)))
+    (reminder-actions/update-reminder (:uuid reminder-data) (merge v {:has-changes true}))))
 
 (defn- delete-reminder-clicked [s]
   (let [reminder-data (first (:rum/args s))
@@ -101,65 +100,64 @@
                                 :value (or (:user-id (:assignee reminder-data)) (:user-id (first users-list)))
                                 :on-change (fn [item]
                                              (let [selected-user (first (filter #(= (:user-id %) (:value item)) allowed-users))]
-                                               (update-reminder-value s :assignee selected-user))
+                                               (update-reminder s {:assignee selected-user}))
                                              (reset! (::assignee-dropdown s) false))})])]]
         [:div.edit-reminder-row
           [:div.half-row-right
             [:div.edit-reminder-label
               "To update the team about"]
             [:input.edit-reminder-field
-              {:value (:title reminder-data)
+              {:value (:headline reminder-data)
                :ref :reminder-title
                :type "text"
                :max-length 65
                :placeholder "CEO update, Week in review, etc."
-               :on-change #(update-reminder-value s :title (.-value (rum/ref-node s :reminder-title)))}]]]]
+               :on-change #(update-reminder s {:headline (.-value (rum/ref-node s :reminder-title))})}]]]]
       [:div.edit-reminder-row.group
         [:div.half-row-left
           [:div.edit-reminder-label
             "Every"]
-          [:div.edit-reminder-field-container.dropdown-field
-            [:div.edit-reminder-field
-              {:ref :frequency-bt
-               :on-click #(do
-                            (reset! (::assignee-dropdown s) false)
-                            (swap! (::frequency-dropdown s) not)
-                            (reset! (::on-dropdown s) false))}
-              (when (:frequency reminder-data)
-                (:frequency reminder-data))]
-            (when @(::frequency-dropdown s)
-              [:div
-                {:ref :frequency-dd-node}
-                (dropdown-list {:items [{:value "Week" :on-value "Monday"}
-                                        {:value "Other week" :on-value "Monday"}
-                                        {:value "Month" :on-value "First day of the month"}
-                                        {:value "Quarter" :on-value "First day of the quarter"}]
-                                :value (or (:frequency reminder-data) "Week")
-                                :on-change (fn [item]
-                                             (update-reminder-value s :frequency (:value item))
-                                             (when (not= (:value item) (:frequency reminder-data))
-                                               (update-reminder-value s :on (:on-value item)))
-                                             (reset! (::frequency-dropdown s) false))})])]]
+          (let [frequency-value (get reminder-utils/frequency-values (:frequency reminder-data))]
+            [:div.edit-reminder-field-container.dropdown-field
+              [:div.edit-reminder-field
+                {:ref :frequency-bt
+                 :on-click #(do
+                              (reset! (::assignee-dropdown s) false)
+                              (swap! (::frequency-dropdown s) not)
+                              (reset! (::on-dropdown s) false))}
+                frequency-value]
+              (when @(::frequency-dropdown s)
+                [:div
+                  {:ref :frequency-dd-node}
+                  (dropdown-list {:items [{:value :weekly :label (:weekly reminder-utils/frequency-values) :occurence-value :monday}
+                                          {:value :biweekly :label (:biweekly reminder-utils/frequency-values) :occurence-value :monday}
+                                          {:value :monthly :label (:monthly reminder-utils/frequency-values) :occurence-value :first}
+                                          {:value :quarterly :label (:quarterly reminder-utils/frequency-values) :occurence-value :first}]
+                                  :value (:frequency reminder-data)
+                                  :on-change (fn [item]
+                                               (let [with-freq {:frequency (:value item)}
+                                                     occurence-field-name (get reminder-utils/occurence-fields (:value item))
+                                                     should-update-occurence (not= occurence-field-name (:occurence-label reminder-data))
+                                                     occurence-value (when should-update-occurence
+                                                                       (get-in reminder-utils/occurence-values [(:value item) (:occurence-value item)]))
+                                                     with-occurence (if should-update-occurence
+                                                                      (merge with-freq {:occurence-label occurence-field-name
+                                                                                        occurence-field-name (:occurence-value item)})
+                                                                      with-freq)
+                                                     with-occurence-value (if should-update-occurence
+                                                                            (assoc with-occurence :occurence-value occurence-value)
+                                                                            with-occurence)]
+                                                 (update-reminder s with-occurence-value))
+                                               (reset! (::frequency-dropdown s) false))})])])]
         (let [label (case (:frequency reminder-data)
-                      "Week" "On"
-                      "Other week" "On"
+                      (:weekly :biweekly) "On"
                       "On the")
-              values (case (:frequency reminder-data)
-                      "Week"
-                      [{:value "Monday"} {:value "Tuesday"} {:value "Wednesday"}
-                       {:value "Thursday"} {:value "Friday"} {:value "Saturday"} {:value "Sunday"}]
-                      "Other week"
-                      [{:value "Monday"} {:value "Tuesday"} {:value "Wednesday"}
-                       {:value "Thursday"} {:value "Friday"} {:value "Saturday"} {:value "Sunday"}]
-                      "Month"
-                      [{:value "First day of the month"} {:value "First Monday of the month"}
-                       {:value "Last Friday of the month"} {:value "Last day of the month"}]
-                      ;; else "Quarter"
-                      [{:value "First day of the quarter"} {:value "First Monday of the quarter"}
-                       {:value "Last Friday of the quarter"} {:value "Last day of the quarter"}])
-              current-value (if (utils/in? (map :value values) (:on reminder-data) )
-                              (:on reminder-data)
-                              (:value (first values)))]
+              occurence-field-name (get reminder-utils/occurence-fields (:frequency reminder-data))
+              possible-values (get reminder-utils/occurence-values (:frequency reminder-data))
+              values (map (fn [[k v]] (hash-map :value k :label v)) possible-values)
+              occurence-field (:occurence-label reminder-data)
+              occurence-field-value (get reminder-data occurence-field)
+              occurence-label-value (:occurence-value reminder-data)]
           [:div.half-row-right
             [:div.edit-reminder-label
               label]
@@ -170,27 +168,28 @@
                               (reset! (::assignee-dropdown s) false)
                               (reset! (::frequency-dropdown s) false)
                               (swap! (::on-dropdown s) not))}
-                current-value]
+                occurence-label-value]
               (when @(::on-dropdown s)
                 [:div
                   {:ref :on-dd-node}
                   (dropdown-list {:items values
-                                  :value current-value
+                                  :value occurence-field-value
                                   :on-change (fn [item]
-                                               (update-reminder-value s :on (:value item))
+                                               (update-reminder s {occurence-field-name (:value item)})
                                                (reset! (::on-dropdown s) false))})])]])]
       [:div.edit-reminder-footer
         (when (:uuid reminder-data)
           [:button.mlb-reset.delete-bt
             {:on-click #(delete-reminder-clicked s)}
             "Delete reminder"])
-        (let [save-disabled? (or (clojure.string/blank? (:title reminder-data))
+        (let [save-disabled? (or (clojure.string/blank? (:headline reminder-data))
                                  (empty? (:assignee reminder-data))
-                                 (empty? (:frequency reminder-data))
-                                 (empty? (:on reminder-data)))]
+                                 (not (:frequency reminder-data))
+                                 (not (:occurence-label reminder-data))
+                                 (not (get reminder-data (:occurence-label reminder-data))))]
           [:button.mlb-reset.save-bt
             {:on-click #(when-not save-disabled?
-                          (reminder-actions/save-reminder)
+                          (reminder-actions/save-reminder reminder-data)
                           (nav-actions/show-reminders))
              :class (when save-disabled? "disabled")}
             "Save reminder"])
@@ -209,47 +208,48 @@
     [:div.empty-reminders-description
       "Reminders come by email or Slack, and you can simply reply to them to update your team."]
     [:button.mlb-reset.add-reminder-bt
-      {:on-click #(nav-actions/show-new-reminder)}
+      {:on-click #(reminder-actions/new-reminder)}
       "Create new reminder"]])
 
 (rum/defcs manage-reminders < rum/reactive
                               (drv/drv :show-reminders-tooltip)
   [s reminders-data]
-  [:div.reminders-tab.manage-reminders
-    (if (empty? reminders-data)
-      empty-reminders
-      [:div.reminders-list-container
-        (when (drv/react s :show-reminders-tooltip)
-          [:div.reminder-tooltip
-            [:button.mlb-reset.dismiss-reminder-tooltip
-              {:on-click #(nux-actions/dismiss-reminders-tooltip)}]
-            [:div.reminder-tooltip-title
-              "Never forget an update again"]
-            [:div.reminder-tooltip-description
-              "Build trust and transparency by ensuring updates are shared on time."]
-            [:button.mlb-reset.got-it-reminder-tooltip
-              {:on-click #(nux-actions/dismiss-reminders-tooltip)}
-              "Ok, got it"]])
-        (for [reminder reminders-data]
-          [:div.reminder-row.group
-            {:key (str "reminder-" (:uuid reminder))
-             :class (when (utils/link-for (:links reminder) "update") "editable-reminder")
-             :on-click #(reminder-actions/edit-reminder (:uuid reminder))}
-            [:div.reminder-row-inner.group
-              [:div.reminder-assignee
-                {:title (utils/name-or-email (:assignee reminder))
-                 :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-                (user-avatar-image (:assignee reminder))]
-              [:div.reminder-title
-                (utils/name-or-email (:assignee reminder))
-                [:span.dot " · "]
-                (:title reminder)]
-              [:div.reminder-description
-                (:parsed-start-date reminder)
-                [:span.frequency (str " (" (:frequency reminder) ")")]]]])])])
+  (let [reminders-list (:items reminders-data)]
+    [:div.reminders-tab.manage-reminders
+      (if (empty? reminders-list)
+        empty-reminders
+        [:div.reminders-list-container
+          (when (drv/react s :show-reminders-tooltip)
+            [:div.reminder-tooltip
+              [:button.mlb-reset.dismiss-reminder-tooltip
+                {:on-click #(nux-actions/dismiss-reminders-tooltip)}]
+              [:div.reminder-tooltip-title
+                "Never forget an update again"]
+              [:div.reminder-tooltip-description
+                "Build trust and transparency by ensuring updates are shared on time."]
+              [:button.mlb-reset.got-it-reminder-tooltip
+                {:on-click #(nux-actions/dismiss-reminders-tooltip)}
+                "Ok, got it"]])
+          (for [reminder reminders-list]
+            [:div.reminder-row.group
+              {:key (str "reminder-" (:uuid reminder))
+               :class (when (utils/link-for (:links reminder) "update") "editable-reminder")
+               :on-click #(reminder-actions/edit-reminder (:uuid reminder))}
+              [:div.reminder-row-inner.group
+                [:div.reminder-assignee
+                  {:headline (utils/name-or-email (:assignee reminder))
+                   :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                  (user-avatar-image (:assignee reminder))]
+                [:div.reminder-title
+                  (utils/name-or-email (:assignee reminder))
+                  [:span.dot " · "]
+                  (:headline reminder)]
+                [:div.reminder-description
+                  (:parsed-start-date reminder)
+                  [:span.frequency (str " (" (name (:frequency reminder)) ")")]]]])])]))
 
 ;; Reminders main component
 
