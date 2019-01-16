@@ -43,5 +43,12 @@
   (nav-actions/show-reminders))
 
 (defn delete-reminder [reminder-uuid]
-  (dis/dispatch! [:delete-reminder (router/current-org-slug) reminder-uuid])
-  (nav-actions/show-reminders))
+  (let [reminders-data (dis/reminders-data)
+        reminder-data (first (filter #(= (:uuid %) reminder-uuid) (:items reminders-data)))
+        delete-reminder-link (utils/link-for (:links reminders-data) "delete")
+        reminders-link (utils/link-for (:links reminders-data) "self")]
+    (dis/dispatch! [:delete-reminder (router/current-org-slug) reminder-uuid])
+    (nav-actions/show-reminders)
+    (api/delete-reminder delete-reminder-link
+      (fn [{:keys [status success body]}]
+        (api/get-reminders reminders-link reminders-loaded)))))

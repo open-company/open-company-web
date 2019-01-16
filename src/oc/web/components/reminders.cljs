@@ -230,14 +230,18 @@
               [:button.mlb-reset.got-it-reminder-tooltip
                 {:on-click #(nux-actions/dismiss-reminders-tooltip)}
                 "Ok, got it"]])
-          (for [reminder reminders-list]
+          (for [reminder reminders-list
+                :let [; FIXME: reinstate patch link lookup once it will be available
+                      ; patch-link (utils/link-for (:links reminder) "update")]]
+                      patch-link true]]
             [:div.reminder-row.group
               {:key (str "reminder-" (:uuid reminder))
-               :class (when (utils/link-for (:links reminder) "update") "editable-reminder")
-               :on-click #(reminder-actions/edit-reminder (:uuid reminder))}
+               :class (when patch-link "editable-reminder")
+               :on-click #(when patch-link
+                            (reminder-actions/edit-reminder (:uuid reminder)))}
               [:div.reminder-row-inner.group
                 [:div.reminder-assignee
-                  {:headline (utils/name-or-email (:assignee reminder))
+                  {:title (utils/name-or-email (:assignee reminder))
                    :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
                    :data-placement "top"
                    :data-container "body"

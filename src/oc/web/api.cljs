@@ -796,6 +796,13 @@
        callback))
     (handle-missing-link "add-reminder" add-reminder-link callback)))
 
+(defn delete-reminder [delete-reminder-link callback]
+  (if delete-reminder-link
+    (reminders-http (method-for-link delete-reminder-link) (relative-href delete-reminder-link)
+     {:headers (headers-for-link delete-reminder-link)}
+     callback)
+    (handle-missing-link "delete-reminder" delete-reminder-link callback)))
+
 ;; WRT
 
 (defn request-reads-data [item-id]

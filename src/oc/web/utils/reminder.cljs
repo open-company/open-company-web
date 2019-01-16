@@ -53,7 +53,9 @@
         occurrence-field (get occurrence-fields frequency-kw)
         occurrence-value (get reminder-data occurrence-field)
         occurrence-value-kw (keyword occurrence-value)
-        occurrence-value (get-in occurrence-values [frequency-kw occurrence-value-kw])]
+        occurrence-value (get-in occurrence-values [frequency-kw occurrence-value-kw])
+        assignee-map (:assignee reminder-data)
+        assignee-name (or (:name assignee-map) (utils/name-or-email assignee-map))]
     (-> with-parsed-date
       ;; The freuqncy keyword
       (assoc :frequency frequency-kw)
@@ -62,7 +64,9 @@
       ;; The occurrence field but in keyword
       (assoc occurrence-field occurrence-value-kw)
       ;; The value of the occurrence field like it is visualized, not the keyword for it
-      (assoc :occurrence-value occurrence-value))))
+      (assoc :occurrence-value occurrence-value)
+      ;; Make sure assignee has the :name key for sorting
+      (assoc-in [:assignee :name] assignee-name))))
 
 (defn parse-reminders [reminders-data]
   (let [parsed-reminders (vec (map parse-reminder (:items reminders-data)))]
@@ -89,3 +93,12 @@
 (defn users-for-reminders [org-data team-data]
   (let [all-users (:users team-data)]
     (filterv #(user-is-allowed? org-data %) all-users)))
+
+(defn sort-fn [reminder-a reminder-b]
+  (let [headline-compare (compare (:headline reminder-a) (:headline reminder-b))]
+    (if (= headline-compare 0)
+      (compare (:name (:assignee reminder-a)) (:name (:assignee reminder-b)))
+      headline-compare)))
+
+(defn sort-reminders [reminders-items]
+  (sort sort-fn reminders-items))

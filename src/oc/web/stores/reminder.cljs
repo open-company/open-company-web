@@ -8,14 +8,15 @@
   (let [reminders-data (dispatcher/reminders-data org-slug db)
         new-reminder-data (reminder-utils/parse-reminder (reminder-utils/new-reminder-data))
         reminder-data (if reminder-uuid
-                        (first (filter #(= (:uuid %) reminder-uuid) reminders-data))
+                        (first (filter #(= (:uuid %) reminder-uuid) (:items reminders-data)))
                         new-reminder-data)]
     (assoc-in db (dispatcher/reminder-edit-key org-slug)
      (or reminder-data new-reminder-data))))
 
 (defmethod dispatcher/action :reminders-loaded
   [db [_ org-slug reminders-data]]
-  (assoc-in db (dispatcher/reminders-data-key org-slug) reminders-data))
+  (let [sorted-reminders (reminder-utils/sort-reminders (:items reminders-data))]
+    (assoc-in db (dispatcher/reminders-data-key org-slug) (assoc reminders-data :items sorted-reminders))))
 
 
 (defmethod dispatcher/action :update-reminder
@@ -33,8 +34,8 @@
                               reminder-data
                               (assoc reminder-data :uuid (utils/activity-uuid)))
         old-reminders-data (dispatcher/reminders-data org-slug db)
-        filtered-reminders (filterv #(not= (:uuid reminder-data) (:uuid %)) old-reminders-data)
-        new-reminders-data (conj filtered-reminders fixed-reminder-data)
+        filtered-reminders (filterv #(not= (:uuid reminder-data) (:uuid %)) (:items old-reminders-data))
+        new-reminders-data (reminder-utils/sort-reminders (conj filtered-reminders fixed-reminder-data))
         reminders-list-key (conj (dispatcher/reminders-data-key org-slug) :items)]
     (-> db
       (assoc-in reminders-list-key new-reminders-data)
@@ -48,7 +49,8 @@
   [db [_ org-slug reminder-uuid]]
   (let [reminders-key (dispatcher/reminders-data-key org-slug)
         old-reminders-data (get-in db reminders-key)
-        filtered-reminders (filterv #(not= (:uuid %) reminder-uuid) old-reminders-data)]
+        reminders-items-key (conj reminders-key :items)
+        filtered-reminders (reminder-utils/sort-reminders (filterv #(not= (:uuid %) reminder-uuid) (:items old-reminders-data)))]
     (-> db
-      (assoc-in reminders-key filtered-reminders)
+      (assoc-in reminders-items-key filtered-reminders)
       (assoc-in (dispatcher/reminder-edit-key org-slug) nil))))
