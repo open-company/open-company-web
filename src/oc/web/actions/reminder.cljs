@@ -32,11 +32,17 @@
 (defn save-reminder [reminder-data]
   (dis/dispatch! [:save-reminder (router/current-org-slug)])
   (let [reminders-data (dis/reminders-data)
-        add-reminder-link (utils/link-for (:links reminders-data) "create")
-        reminders-link (utils/link-for (:links reminders-data) "self")]
-    (api/add-reminder add-reminder-link reminder-data
-     (fn [{:keys [status success body]}]
-       (api/get-reminders reminders-link reminders-loaded)))))
+        reminders-link (utils/link-for (:links reminders-data) "self")
+        refresh-reminders #(api/get-reminders reminders-link reminders-loaded)]
+    (if (:uuid reminder-data)
+      (let [update-reminder-link (utils/link-for (:links reminder-data) "update")]
+        (api/update-reminder update-reminder-link reminder-data
+         (fn [{:keys [status success body]}]
+           (refresh-reminders))))
+      (let [add-reminder-link (utils/link-for (:links reminders-data) "create")]
+        (api/add-reminder add-reminder-link reminder-data
+         (fn [{:keys [status success body]}]
+           (refresh-reminders)))))))
 
 (defn cancel-edit-reminder []
   (dis/dispatch! [:cancel-edit-reminder (router/current-org-slug)])

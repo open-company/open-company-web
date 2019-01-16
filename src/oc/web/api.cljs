@@ -796,6 +796,16 @@
        callback))
     (handle-missing-link "add-reminder" add-reminder-link callback)))
 
+(defn update-reminder [update-reminder-link reminder-data callback]
+  (if (and update-reminder-link reminder-data)
+    (let [fixed-reminder-data (select-keys reminder-data reminder-allowed-keys)
+          json-data (cljs->json fixed-reminder-data)]
+      (reminders-http (method-for-link update-reminder-link) (relative-href update-reminder-link)
+       {:headers (headers-for-link update-reminder-link)
+        :json-params json-data}
+       callback))
+    (handle-missing-link "update-reminder" update-reminder-link callback)))
+
 (defn delete-reminder [delete-reminder-link callback]
   (if delete-reminder-link
     (reminders-http (method-for-link delete-reminder-link) (relative-href delete-reminder-link)
