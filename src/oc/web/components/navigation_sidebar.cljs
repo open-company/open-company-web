@@ -109,7 +109,8 @@
                             (not @(::footer-height s))
                             (< @(::content-height s)
                              (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        show-reminders? (utils/link-for (:links org-data) "reminders")]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?
@@ -207,7 +208,7 @@
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
-        (when is-admin-or-author?
+        (when show-reminders?
           [:button.mlb-reset.bottom-nav-bt
             {:on-click #(do
                           (nav-actions/show-reminders)
