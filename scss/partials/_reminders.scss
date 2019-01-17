@@ -26,7 +26,6 @@ div.reminders-container {
     position: relative;
     border-radius: 4px;
     padding: 24px 0;
-    min-height: 200px;
 
     @include mobile() {
       width: 100%;
@@ -38,6 +37,7 @@ div.reminders-container {
 
     &.loading {
       text-align: center;
+      min-height: 200px;
     }
 
     &.no-bottom-padding {
