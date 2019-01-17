@@ -213,7 +213,7 @@
             {:on-click #(do
                           (nav-actions/show-reminders)
                           (utils/after 500 utils/remove-tooltips))
-             :title "Create a consistent cadence of important updates"
+             :title "Set reminders to update your team on time"
              :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
              :data-container "body"

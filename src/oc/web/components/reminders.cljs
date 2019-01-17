@@ -205,9 +205,9 @@
   [:div.empty-reminders
     [:div.empty-reminders-logo]
     [:div.empty-reminders-title
-      "Never forget an update again"]
+      "Update your team on time"]
     [:div.empty-reminders-description
-      "Reminders come by email or Slack, and you can simply reply to them to update your team."]
+      "Make it easy for team leaders to remember when it's time to update everyone."]
     [:button.mlb-reset.add-reminder-bt
       {:on-click #(reminder-actions/new-reminder)}
       "Create new reminder"]])
