@@ -10,6 +10,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.mixins.ui :refer (no-scroll-mixin on-window-click-mixin)]))
@@ -51,7 +52,7 @@
 
 (rum/defcs edit-reminder < rum/reactive
                            (drv/drv :org-data)
-                           (drv/drv :team-data)
+                           (drv/drv :team-roster)
                            (rum/local false ::assignee-dropdown)
                            (rum/local false ::frequency-dropdown)
                            (rum/local false ::on-dropdown)
@@ -67,8 +68,8 @@
                                 (reset! (::on-dropdown s) false))))
   [s reminder-data]
   (let [org-data (drv/react s :org-data)
-        team-data (drv/react s :team-data)
-        allowed-users (reminder-utils/users-for-reminders org-data team-data)
+        team-roster (drv/react s :team-roster)
+        allowed-users (reminder-utils/users-for-reminders org-data team-roster)
         users-list (vec (map #(-> %
                           (assoc :name (utils/name-or-email %))
                           (select-keys [:name :user-id])
@@ -135,9 +136,13 @@
                                           {:value :quarterly :label (:quarterly reminder-utils/frequency-values) :occurrence-value :first}]
                                   :value (:frequency reminder-data)
                                   :on-change (fn [item]
-                                               (let [with-freq {:frequency (:value item)}
+                                               (let [old-freq (:frequency reminder-data)
+                                                     new-freq (:value item)
+                                                     with-freq {:frequency new-freq}
                                                      occurrence-field-name (get reminder-utils/occurrence-fields (:value item))
-                                                     should-update-occurrence (not= (:value item) (:frequency reminder-data))
+                                                     should-update-occurrence (and (not= new-freq old-freq)
+                                                                                   (or (not (#{:weekly :biweekly} new-freq))
+                                                                                       (not (#{:weekly :biweekly} old-freq))))
                                                      occurrence-value (when should-update-occurrence
                                                                        (get-in reminder-utils/occurrence-values [(:value item) (:occurrence-value item)]))
                                                      with-occurrence (if should-update-occurrence
@@ -280,7 +285,8 @@
         reminder-edit-data (drv/react s :reminder-edit)]
     [:div.reminders-container.fullscreen-page
       [:div.reminders-inner
-        {:class (when (= reminder-tab :reminders) "no-bottom-padding")}
+        {:class (utils/class-set {:no-bottom-padding (= reminder-tab :reminders)
+                                  :loading (not reminders-data)})}
         (when-not alert-modal-data
           [:button.settings-modal-close.mlb-reset
             {:on-click (fn [_]
@@ -296,14 +302,17 @@
                 {:on-click #(nav-actions/show-reminders)
                  :class (when (= reminder-tab :reminders) "active")}
                 "MANAGE"]
-              [:div.reminders-header-tab
-                {:on-click #(reminder-actions/new-reminder)
-                 :class (when (= reminder-tab :new) "active")}
-                "NEW REMINDER"]])]
-        (cond
-          (= reminder-tab :new)
-          (edit-reminder reminder-edit-data)
-          (string? reminder-tab)
-          (edit-reminder reminder-edit-data)
-          :else
-          (manage-reminders reminders-data))]]))
+              (when reminders-data
+                [:div.reminders-header-tab
+                  {:on-click #(reminder-actions/new-reminder)
+                   :class (when (= reminder-tab :new) "active")}
+                  "NEW REMINDER"])])]
+        (if reminders-data
+          (cond
+            (= reminder-tab :new)
+            (edit-reminder reminder-edit-data)
+            (string? reminder-tab)
+            (edit-reminder reminder-edit-data)
+            :else
+            (manage-reminders reminders-data))
+          (small-loading))]]))

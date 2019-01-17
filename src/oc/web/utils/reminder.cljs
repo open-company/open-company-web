@@ -90,8 +90,8 @@
             (= (:status user) "unverified"))
     (utils/get-author (:user-id user) (:authors org-data))))
 
-(defn users-for-reminders [org-data team-data]
-  (let [all-users (:users team-data)]
+(defn users-for-reminders [org-data roster-data]
+  (let [all-users (:users roster-data)]
     (filterv #(user-is-allowed? org-data %) all-users)))
 
 (defn sort-fn [reminder-a reminder-b]

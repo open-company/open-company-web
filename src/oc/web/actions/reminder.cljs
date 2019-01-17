@@ -8,10 +8,11 @@
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (defn- reminders-loaded [{:keys [success body status]}]
-  (let [parsed-body (when success (json->cljs body))
-        reminders-data (:collection parsed-body)
-        parsed-reminders (reminder-utils/parse-reminders reminders-data)]
-    (dis/dispatch! [:reminders-loaded (router/current-org-slug) parsed-reminders])))
+  (when success
+    (let [parsed-body (json->cljs body)
+          reminders-data (:collection parsed-body)
+          parsed-reminders (reminder-utils/parse-reminders reminders-data)]
+      (dis/dispatch! [:reminders-loaded (router/current-org-slug) parsed-reminders]))))
 
 (defn load-reminders []
   (let [org-data (dis/org-data)
