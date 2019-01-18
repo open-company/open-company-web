@@ -91,6 +91,9 @@
 (defn reminders-data-key [org-slug]
   (vec (conj (reminders-key org-slug) :reminders-list)))
 
+(defn reminders-roster-key [org-slug]
+  (vec (conj (reminders-key org-slug) :reminders-roster)))
+
 (defn reminder-edit-key [org-slug]
   (vec (conj (reminders-key org-slug) :reminder-edit)))
 
@@ -366,6 +369,8 @@
    :cmail-data            [[:base] (fn [base] (:cmail-data base))]
    :reminders-data        [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminders-data-key org-slug)))]
+   :reminders-roster      [[:base :org-slug] (fn [base org-slug]
+                                    (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]})
 
@@ -657,6 +662,12 @@
   ([org-slug] (reminders-data org-slug @app-state))
   ([org-slug data]
     (get-in data (reminders-data-key org-slug))))
+
+(defn reminders-roster-data
+  ([] (reminders-roster-data (router/current-org-slug) @app-state))
+  ([org-slug] (reminders-roster-data org-slug @app-state))
+  ([org-slug data]
+    (get-in data (reminders-roster-key org-slug))))
 
 (defn reminder-edit-data
   ([] (reminder-edit-data (router/current-org-slug) @app-state))

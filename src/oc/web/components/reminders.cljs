@@ -52,7 +52,7 @@
 
 (rum/defcs edit-reminder < rum/reactive
                            (drv/drv :org-data)
-                           (drv/drv :team-roster)
+                           (drv/drv :reminders-roster)
                            (rum/local false ::assignee-dropdown)
                            (rum/local false ::frequency-dropdown)
                            (rum/local false ::on-dropdown)
@@ -68,13 +68,12 @@
                                 (reset! (::on-dropdown s) false))))
   [s reminder-data]
   (let [org-data (drv/react s :org-data)
-        team-roster (drv/react s :team-roster)
-        allowed-users (reminder-utils/users-for-reminders org-data team-roster)
+        reminders-roster (drv/react s :reminders-roster)
         users-list (vec (map #(-> %
                           (assoc :name (utils/name-or-email %))
                           (select-keys [:name :user-id])
                           (rename-keys {:name :label :user-id :value}))
-                    allowed-users))]
+                    (:items reminders-roster)))]
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
       [:div.edit-reminder-row.group
@@ -100,7 +99,7 @@
                 (dropdown-list {:items users-list
                                 :value (or (:user-id (:assignee reminder-data)) (:user-id (first users-list)))
                                 :on-change (fn [item]
-                                             (let [selected-user (first (filter #(= (:user-id %) (:value item)) allowed-users))]
+                                             (let [selected-user (first (filter #(= (:user-id %) (:value item)) (:items reminders-roster)))]
                                                (update-reminder s {:assignee selected-user}))
                                              (reset! (::assignee-dropdown s) false))})])]]
         [:div.edit-reminder-row

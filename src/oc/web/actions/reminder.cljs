@@ -7,12 +7,21 @@
             [oc.web.utils.reminder :as reminder-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
+(defn load-reminders-roster []
+  (let [reminders-data (dis/reminders-data)
+        roster-link (utils/link-for (:links reminders-data) "roster")]
+    (api/get-reminders-roster roster-link
+     (fn [{:keys [success body status]}]
+       (when success
+         (dis/dispatch! [:reminders-roster-loaded (router/current-org-slug) (json->cljs body)]))))))
+
 (defn- reminders-loaded [{:keys [success body status]}]
   (when success
     (let [parsed-body (json->cljs body)
           reminders-data (:collection parsed-body)
           parsed-reminders (reminder-utils/parse-reminders reminders-data)]
-      (dis/dispatch! [:reminders-loaded (router/current-org-slug) parsed-reminders]))))
+      (dis/dispatch! [:reminders-loaded (router/current-org-slug) parsed-reminders])
+      (load-reminders-roster))))
 
 (defn load-reminders []
   (let [org-data (dis/org-data)

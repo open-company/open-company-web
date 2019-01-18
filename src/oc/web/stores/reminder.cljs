@@ -18,6 +18,10 @@
   (let [sorted-reminders (reminder-utils/sort-reminders (:items reminders-data))]
     (assoc-in db (dispatcher/reminders-data-key org-slug) (assoc reminders-data :items sorted-reminders))))
 
+(defmethod dispatcher/action :reminders-roster-loaded
+  [db [_ org-slug roster-data]]
+  (let [parsed-roster (reminder-utils/parse-reminders-roster roster-data)]
+    (assoc-in db (dispatcher/reminders-roster-key org-slug) parsed-roster)))
 
 (defmethod dispatcher/action :update-reminder
   [db [_ org-slug reminder-uuid value-or-fn]]

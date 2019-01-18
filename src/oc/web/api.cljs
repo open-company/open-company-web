@@ -813,6 +813,13 @@
      callback)
     (handle-missing-link "delete-reminder" delete-reminder-link callback)))
 
+(defn get-reminders-roster [roster-link callback]
+  (if roster-link
+    (reminders-http (method-for-link roster-link) (relative-href roster-link)
+     {:headers (headers-for-link roster-link)}
+     callback)
+    (handle-missing-link "ger-reminders-roster" roster-link callback)))
+
 ;; WRT
 
 (defn request-reads-data [item-id]

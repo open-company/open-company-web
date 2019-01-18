@@ -102,3 +102,6 @@
 
 (defn sort-reminders [reminders-items]
   (sort sort-fn reminders-items))
+
+(defn parse-reminders-roster [roster-data]
+  (:collection roster-data))
