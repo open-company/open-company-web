@@ -239,7 +239,7 @@
                 {:on-click #(nux-actions/dismiss-reminders-tooltip)}
                 "Ok, got it"]])
           (for [reminder reminders-list
-                :let [patch-link (utils/link-for (:links reminder) "update")
+                :let [patch-link (utils/link-for (:links reminder) "partial-update")
                       now-year (.getFullYear (utils/js-date))
                       next-send-date (utils/js-date (:next-send reminder))
                       show-year (not= now-year (.getFullYear next-send-date))]]
