@@ -29,7 +29,7 @@
 
 (def frequency-values
   {:weekly "Week"
-   :biweekly "Other week"
+   :biweekly "Two weeks"
    :monthly "Month"
    :quarterly "Quarter"})
 
