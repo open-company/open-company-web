@@ -187,6 +187,30 @@ div.user-profile {
 
       div.user-profile-content {
 
+         div.user-profile-column-left {
+          float: left;
+          width: calc(50% - 8px);
+          margin-right: 8px;
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            margin-right: 0px;
+          }
+        }
+
+        div.user-profile-column-right {
+          float: right;
+          width: calc(50% - 8px);
+          margin-left: 8px;
+
+          @include mobile() {
+            float: unset;
+            width: 100%;
+            margin-left: 0px;
+          }
+        }
+
         div.user-profile-avatar-box {
           height: 72px;
           margin-bottom: 40px;
