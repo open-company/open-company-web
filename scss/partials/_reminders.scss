@@ -161,14 +161,14 @@ div.reminders-container {
           width: 100%;
 
           div.reminder-tooltip {
-            margin-top: 24px;
-            width: 100%;
+            width: calc(100% - 48px);
             border: 1px solid $carrot_gold;
             background-color: #FDF6E4;
             border-radius: 6px;
             padding: 24px 16px;
             position: relative;
             text-align: center;
+            margin: 24px auto;
 
             button.dismiss-reminder-tooltip {
               position: absolute;
