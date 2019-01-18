@@ -239,9 +239,10 @@
                 {:on-click #(nux-actions/dismiss-reminders-tooltip)}
                 "Ok, got it"]])
           (for [reminder reminders-list
-                :let [; FIXME: reinstate patch link lookup once it will be available
-                      ; patch-link (utils/link-for (:links reminder) "update")]]
-                      patch-link true]]
+                :let [patch-link (utils/link-for (:links reminder) "update")
+                      now-year (.getFullYear (utils/js-date))
+                      next-send-date (utils/js-date (:next-send reminder))
+                      show-year (not= now-year (.getFullYear next-send-date))]]
             [:div.reminder-row.group
               {:key (str "reminder-" (:uuid reminder))
                :class (when patch-link "editable-reminder")
@@ -261,7 +262,12 @@
                   (:headline reminder)]
                 [:div.reminder-description
                   (:parsed-start-date reminder)
-                  [:span.frequency (str " (" (name (:frequency reminder)) ")")]]]])])]))
+                  [:span.frequency
+                    (str
+                     (utils/get-week-day (.getDay next-send-date) true)
+                     ", "
+                     (utils/date-string next-send-date [:short-month (when show-year :year)])
+                     " (" (name (:frequency reminder)) ")")]]]])])]))
 
 ;; Reminders main component
 
