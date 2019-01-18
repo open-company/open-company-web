@@ -9,8 +9,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
-            [oc.web.actions.jwt :as jwt-actions]
             [oc.web.stores.user :as user-store]
+            [oc.web.actions.jwt :as jwt-actions]
+            [oc.web.lib.whats-new :as whats-new]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
@@ -64,23 +65,19 @@
 
 (defn whats-new-click [e]
   (.preventDefault e)
-  (.show js/Headway))
+  (whats-new/show))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
+                  {:did-mount (fn [s]
+                   (whats-new/init ".whats-new")
+                   s)}
   [s]
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
-        is-mobile? (responsive/is-mobile-size?)
-        headway-config (clj->js {
-          :selector ".whats-new"
-          :account "xGYD6J"
-          :position {:y "bottom"}
-          :translations {:title "What's New"
-                         :footer "👉 Show me more new stuff"}})]
-    (.init js/Headway headway-config)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})}
