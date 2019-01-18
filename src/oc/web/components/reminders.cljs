@@ -80,10 +80,11 @@
         [:div.half-row-left
           [:div.edit-reminder-label
             "Reminder for"]
-          [:div.edit-reminder-field-container.dropdown-field
+          [:div.edit-reminder-field-container.dropdown-field.users-list
+            {:class (when (empty? users-list) "loading-users")}
             [:div.edit-reminder-field
               {:ref :assignee-bt
-               :on-click #(do
+               :on-click #(when-not (empty? users-list)
                             (swap! (::assignee-dropdown s) not)
                             (reset! (::frequency-dropdown s) false)
                             (reset! (::on-dropdown s) false))}
@@ -93,6 +94,8 @@
                 (str (utils/name-or-email (:assignee reminder-data))
                  (when (= (jwt/user-id) (:user-id (:assignee reminder-data)))
                    " (you)")))]
+            (when (empty? users-list)
+              (small-loading))
             (when @(::assignee-dropdown s)
               [:div
                 {:ref :assignee-dd-node}
@@ -273,9 +276,10 @@
                        (drv/drv :show-reminders)
                        (drv/drv :reminders-data)
                        (drv/drv :reminder-edit)
-                       {:init (fn [s]
-                        (reminder-actions/load-reminders)
-                        s)}
+                       {:did-mount (fn [s]
+                         (reminder-actions/load-reminders-roster)
+                         (reminder-actions/load-reminders)
+                         s)}
   [s]
   (let [reminder-tab (drv/react s :show-reminders)
         editing-reminder? (string? reminder-tab)

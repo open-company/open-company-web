@@ -15,6 +15,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -128,6 +129,8 @@
                                 (update-tooltips s)
                                 ;; Reopen cmail if it was open
                                 (activity-actions/cmail-reopen?)
+                                ;; Preload reminders
+                                (reminder-actions/load-reminders)
                                 s)
                                :will-unmount (fn [s]
                                 (when-not (utils/is-test-env?)

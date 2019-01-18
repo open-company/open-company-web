@@ -330,6 +330,21 @@ div.reminders-container {
                 color: $deep_navy;
                 pointer-events: none;
               }
+
+              &.users-list {
+                &.loading-users {
+                  &:after {
+                    display: none;
+                  }
+                }
+
+                div.small-loading {
+                  position: absolute;
+                  right: 16px;
+                  top: 10px;
+                  margin: 0;
+                }
+              }
             }
 
             div.dropdown-list-container {
