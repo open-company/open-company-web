@@ -12,14 +12,27 @@
   (let [author (:author notification)
         first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))]
     (cond
-      (and (:mention notification) (:interaction-id notification))
+      (:reminder? notification)
+      (str first-name " created a new reminder for you")
+      (and (:mention? notification) (:interaction-id notification))
       (str first-name " mentioned you in a comment")
-      (:mention notification)
+      (:mention? notification)
       (str first-name " mentioned you")
       (:interaction-id notification)
       (str first-name " commented on your post")
       :else
       nil)))
+
+(defn notification-content [notification]
+  (cond
+    (:reminder? notification)
+    (let [reminder (:reminder notification)]
+      (str
+       (:headline reminder) ": "
+       (:frequency reminder) " starting "
+       (activity-utils/post-date (:next-send reminder))))
+    :else
+    (:content notification)))
 
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
@@ -32,9 +45,11 @@
        :interaction-id (:interaction-id notification)
        :is-interaction is-interaction
        :unread unread
-       :mention (:mention notification)
+       :mention? (:mention? notification)
+       :reminder? (:reminder? notification)
+       :reminder (:reminder notification)
        :created-at (:notify-at notification)
-       :body (:content notification)
+       :body (notification-content notification)
        :title title
        :author (:author notification)})))
 
