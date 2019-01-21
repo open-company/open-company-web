@@ -36,7 +36,8 @@ div.pricing-wrap {
       }
 
       h1.pricing-headline {
-        font-size: 80px;
+        font-size: 60px;
+        line-height: 78px;
         @include PTSerif()
         color: $deep_navy;
         min-width: 300px;
@@ -45,6 +46,7 @@ div.pricing-wrap {
         @include mobile() {
           margin: 0 auto;
           font-size: 36px;
+          line-height: initial;
           max-width: initial;
           padding: 0 24px;
         }
@@ -58,7 +60,7 @@ div.pricing-wrap {
         margin: 24px auto 0px;
         z-index: 2;
         position: relative;
-        max-width: 800px;
+        max-width: 630px;
 
         @include mobile(){
           margin-top: 16px;
@@ -72,7 +74,7 @@ div.pricing-wrap {
 
       div.pricing-three-columns{
         margin: 80px auto 0;
-        width: 1072px;
+        width: 1258px;
         padding: 0 24px;
 
         @include pricing-tablet() {
@@ -84,13 +86,17 @@ div.pricing-wrap {
         }
 
         div.pricing-column {
-          width: 320px;
-          min-height: 943px;
-          background-color: #F8F7F3;
+          width: 382px;
+          min-height: 773px;
+          background-color: $another_ui_grey;
           float: left;
           margin-left: 32px;
           padding: 40px 32px;
           text-align: center;
+
+          &:nth-child(odd) {
+            margin-top: 43px;
+          }
 
           @include pricing-tablet() {
             min-height: initial;
@@ -112,16 +118,13 @@ div.pricing-wrap {
           h3.tear-price {
             @include PTSerif()
             font-size: 60px;
+            line-height: 78px;
             color: $deep_navy;
-            line-height: 90px;
-            margin-top: 16px;
-          }
+            margin-top: 35px;
 
-          h5.tear-period {
-            @include avenir_B();
-            font-size: 14px;
-            color: $ui_grey;
-            text-transform: uppercase;
+            span {
+              display: none;
+            }
           }
 
           div.tear-subtitle {
@@ -130,6 +133,14 @@ div.pricing-wrap {
             color: $deep_navy;
             line-height: 26px;
             margin: 32px auto 0;
+
+            span.bold {
+              @include avenir_H();
+            }
+
+            span.billed-monthly {
+              display: none;
+            }
           }
 
           a.tear-start-bt {
@@ -140,9 +151,8 @@ div.pricing-wrap {
             background-color: $carrot_orange;
             border-radius: 8px;
             color: white;
-            text-transform: uppercase;
-            @include avenir_B();
-            font-size: 14px;
+            @include avenir_H();
+            font-size: 16px;
             padding: 10px 24px;
           }
 
@@ -154,7 +164,7 @@ div.pricing-wrap {
           }
 
           div.tear-feature {
-            max-width: 220px;
+            max-width: 200px;
             @include avenir_R();
             font-size: 20px;
             color: $deep_navy;
@@ -186,7 +196,7 @@ div.pricing-wrap {
           }
 
           &.free-column {
-            border-bottom-left-radius: 40px;
+            border-bottom-left-radius: 100px;
             margin-left: 0;
 
             @include pricing-tablet() {
@@ -194,13 +204,121 @@ div.pricing-wrap {
             }
 
             div.tear-subtitle {
-              max-width: 182px;
+              max-width: 192px;
             }
           }
 
           &.team-column {
+            min-height: 816px;
+            background-color: white;
+            border: 1px solid $deep_tan;
+            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+
+            h3.tear-price {
+              margin-top: 39px;
+            }
+
+            div.pricing-toggle-line {
+              margin: 16px auto;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 22px;
+
+              span.pricing-toggle-annual {
+                @include avenir_H();
+                font-size: 14px;
+                color: $deep_navy;
+                line-height: 22px;
+              }
+
+              div.pricing-toggle {
+                float: left;
+                margin: 0 16px;
+                height: 22px;
+                width: 40px;
+                background-color: $deep_navy;
+                border-radius: 100px;
+                position: relative;
+                cursor: pointer;
+
+                span.pricing-toggle-dot {
+                  position: absolute;
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                  background-color: white;
+                  top: 3px;
+                  left: 0;
+                  margin-left: 3px;
+                  transition: margin-left 180ms; 
+                }
+              }
+
+              span.pricing-toggle-monthly {
+                @include avenir_H();
+                font-size: 14px;
+                color: $ui_grey;
+                width: 90px;
+                text-align: left;
+              }
+            }
+
+            &.monthly {
+              div.tear-subtitle {
+                span.billed-monthly {
+                  display: block;
+                }
+
+                span.billed-annually {
+                  display: none;
+                }
+              }
+
+              div.pricing-toggle-line {
+
+                span.pricing-toggle-annual {
+                  color: $ui_grey;
+                }
+
+                div.pricing-toggle {
+                  span.pricing-toggle-dot {
+                    margin-left: 21px;
+                  }
+                }
+
+                span.pricing-toggle-monthly {
+                  color: $deep_navy;
+                }
+              }
+            }
+
+            &.monthly {
+              h3.tear-price {
+                span.annual {
+                  display: none;
+                }
+
+                span.monthly {
+                  display: block;
+                }
+              }
+            }
+
+            &.annual {
+              h3.tear-price {
+                span.annual {
+                  display: block;
+                }
+
+                span.monthly {
+                  display: none;
+                }
+              }
+            }
+
             div.tear-subtitle {
-              max-width: 251px;
+              max-width: 151px;
             }
           }
 
@@ -208,25 +326,26 @@ div.pricing-wrap {
             border-bottom-right-radius: 40px;
 
             div.tear-price {
-              width: 101px;
-              height: 101px;
+              width: 80px;
+              height: 80px;
               border-radius: 50%;
-              background-color: white;
+              background-color: rgba(#314150, 0.1);
               background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
-              background-size: 30px 52px;
+              background-size: 23px 40px;
               background-position: center;
               background-repeat: no-repeat;
-              margin: 28px auto 0;
+              margin: 36px auto 0;
             }
 
             a.tear-start-bt {
-              background-color: transparent;
-              border: 2px solid $coral;
-              color: $carrot_orange;
+              background-color: $feint_emerald;
+              color: $carrot_green;
+              margin: 32px auto 24px;
             }
 
             div.tear-subtitle {
               max-width: 241px;
+              margin-top: 29px;
 
               @include pricing-tablet() {
                 max-width: initial;
@@ -249,7 +368,7 @@ div.pricing-wrap {
 
       h2.faq-header {
         @include PTSerif()
-        font-size: 80px;
+        font-size: 60px;
         color: $deep_navy;
         margin-bottom: 80px;
 

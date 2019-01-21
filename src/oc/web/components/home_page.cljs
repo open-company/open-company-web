@@ -20,6 +20,8 @@
                        {:did-mount (fn [s]
                                     (when (:tif (:query-params @router/path))
                                       (utils/after 1500 #(.focus (sel1 [:input.try-it-form-central-input]))))
+                                    (when (exists? (.-OCWebSetupMarketingSiteJS js/window))
+                                      (js/OCWebSetupMarketingSiteJS))
                                     s)
                        :will-mount (fn [s]
                                      (when (:confirm (:query-params @router/path))
@@ -39,21 +41,18 @@
 
           [:h1.headline
             "Lead with clarity"]
-          [:div.subheadline.for-others
+          [:div.subheadline
             (str
-             "Leaders struggle to communicate clearly because "
-             "chat and email are too noisy. Carrot helps leaders "
-             "rise above the noise to keep teams focused.")]
-          [:div.subheadline.for-mobile
-            "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
+             "Leaders struggle to communicate effectively with "
+             "fast-growing and distributed teams. Carrot helps "
+             "leaders rise above the noise to keep teams focused.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container.group
             shared-misc/show-animation-button
             [:button.mlb-reset.get-started-button
               {:id "get-started-centred-bt"
                :on-click #(router/nav! oc-urls/sign-up)}
-              "Get started for free"]]
-          shared-misc/no-credit-card
+              "Get started - It's free"]]
           [:div.carrot-box-container.confirm-thanks.group
             {:style {:display "none"}}
             [:div.carrot-box-thanks
@@ -63,9 +62,11 @@
           [:div.main-animation-container
             [:img.main-animation
               {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-        shared-misc/keep-aligned-section
+          shared-misc/testimonials-logos-line]
+
+        (shared-misc/keep-aligned-section false)
 
         shared-misc/testimonials-section
 

@@ -253,7 +253,8 @@
        nil?
        [org route secure-id]))
      {:org org
-      :secure-id secure-id
+      :activity (:entry (:params params))
+      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents (:id query-params))))
       :query-params query-params})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
@@ -266,6 +267,13 @@
     (aa/secure-activity-chain)
     ;; render component
     (drv-root component target)))
+
+(defn entry-handler [target params]
+  (if (and (not (jwt/jwt))
+           (:secure-uuid (jwt/get-id-token-contents
+                          (:id (:query-params params)))))
+    (secure-activity-handler secure-activity "secure-activity" target params)
+    (board-handler "activity" target org-dashboard params)))
 
 ;; Component specific to a team settings
 (defn team-handler [route target component params]
@@ -576,11 +584,11 @@
 
     (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
       (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))
-      (board-handler "activity" target org-dashboard params))
+      (entry-handler target params))
 
     (defroute entry-slash-route (str (urls/entry ":org" ":board" ":entry") "/") {:as params}
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
-      (board-handler "activity" target org-dashboard params))
+      (entry-handler target params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")

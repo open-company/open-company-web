@@ -504,13 +504,25 @@
         (dis/dispatch! [:entry-revert false])))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
-  (when (= status 404)
-    (router/redirect-404!))
-  (if (and secure-uuid
-           (jwt/jwt)
-           (jwt/user-is-part-of-the-team (:team-id activity-data)))
-    (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
-    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
+  (cond
+
+   (some #{status} [401 404])
+   (router/redirect-404!)
+
+   ;; The id token will have a current activity id, shared urls will not.
+   ;; if the ids don't match return a 404
+   (and (some? (router/current-activity-id))
+        (not= (:uuid activity-data)
+              (router/current-activity-id)))
+   (router/redirect-404!)
+
+   (and secure-uuid
+        (jwt/jwt)
+        (jwt/user-is-part-of-the-team (:team-id activity-data)))
+   (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
+
+   :default
+   (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
 
 (defn org-data-from-secure-activity [secure-activity-data]
   (let [old-org-data (dis/org-data)]
@@ -559,6 +571,11 @@
     (fn [{:keys [success body status]}]
       (when (= status 404)
         (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
+  ;; Quick check on token
+  (when-let [info (jwt/get-id-token-contents)]
+    (when (not= (:secure-uuid info)
+                (router/current-secure-activity-id))
+      (router/redirect-404!)))
   (let [org-slug (router/current-org-slug)]
     (api/get-auth-settings (fn [body]
       (when body
