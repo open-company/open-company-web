@@ -1,7 +1,6 @@
 (ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
-            [cljs-time.format :as f]
-            [cljs-time.core :as time]
+            [cljs-time.format :as time-format]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -308,3 +307,17 @@
   (or (some? (:video-id data))
       (has-attachments? data)
       (has-text? data)))
+
+(def iso-format (time-format/formatters :date-time))
+
+(def date-format (time-format/formatter "MMMM d"))
+
+(def date-format-year (time-format/formatter "MMMM d YYYY"))
+
+(defn post-date [timestamp & [force-year]]
+  (let [d (time-format/parse iso-format timestamp)
+        now-year (.getFullYear (utils/js-date))
+        timestamp-year (.getFullYear (utils/js-date timestamp))
+        show-year (or force-year (not= now-year timestamp-year))
+        f (if show-year date-format-year date-format)]
+    (time-format/unparse f d)))
