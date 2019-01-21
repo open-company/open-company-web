@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
 (rum/defc dropdown-list
@@ -13,7 +14,7 @@
    :selected-icon - full url of an icon to show besides the selected item, ignored if empty
    :unselected-icon - full url of an icon to show besides the unselected item, ignored if empty
   Elements should be passed in a vector with this format:
-  {:value \"the value\" :label \"The label to show, optional\" :color \"optional\"}.
+  {:value \"the value\" :label \"The label to show, optional\" :color \"optional\" :user-map \"optional to user the user avatars\"}.
   Elements with this format will be transfomed into a divider line:
   {:value nil :label :divider-line}."
   < rum/static
@@ -38,12 +39,18 @@
                :style (when (seq (:color item)) {:color (:color item)})
                :class (utils/class-set {:select (and (:value item) (= value (:value item)))
                                         :divider-line (= (:label item) :divider-line)
+                                        :user-avatar-icons (:user-map item)
                                         (str (:class item)) (seq (:class item))})}
-              (when (string? (:label item))
+              (when (and (string? (:label item))
+                         (or selected-icon
+                            unselected-icon))
                 (if (and selected-icon (= (:value item) value))
                   [:img.dropdown-list-item-icon {:src selected-icon}]
                   (when unselected-icon
                     [:img.dropdown-list-item-icon {:src unselected-icon}])))
+              (when (and (string? (:label item))
+                         (:user-map item))
+                (user-avatar-image user-map))
               (when (string? (:label item))
                 (:label item))])]
         (when placeholder

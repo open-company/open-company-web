@@ -72,7 +72,8 @@
         users-list (vec (map #(-> %
                           (assoc :name (utils/name-or-email %))
                           (select-keys [:name :user-id])
-                          (rename-keys {:name :label :user-id :value}))
+                          (rename-keys {:name :label :user-id :value})
+                          (assoc :user-map %))
                     (:items reminders-roster)))]
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}

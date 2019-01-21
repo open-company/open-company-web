@@ -71,6 +71,15 @@ div.dropdown-list-container {
           color: $carrot_dark_gray_2;
         }
 
+        &.user-avatar-icons {
+          padding-left: 4px;
+
+          @include user_profile(22){
+            float: left;
+            margin-right: 8px;
+          }
+        }
+
         img.dropdown-list-item-icon {
           width: 16px;
           height: 16px;
