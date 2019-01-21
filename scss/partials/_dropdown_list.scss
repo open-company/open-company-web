@@ -71,6 +71,10 @@ div.dropdown-list-container {
           color: $carrot_dark_gray_2;
         }
 
+        &.disabled {
+          opacity: 0.5;
+        }
+
         &.user-avatar-icons {
           padding-left: 4px;
 

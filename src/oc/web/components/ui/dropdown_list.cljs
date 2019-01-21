@@ -14,7 +14,11 @@
    :selected-icon - full url of an icon to show besides the selected item, ignored if empty
    :unselected-icon - full url of an icon to show besides the unselected item, ignored if empty
   Elements should be passed in a vector with this format:
-  {:value \"the value\" :label \"The label to show, optional\" :color \"optional\" :user-map \"optional to user the user avatars\"}.
+  {:value \"the value\"
+   :label \"The label to show, optional\"
+   :color \"optional\"
+   :user-map \"optional: to user the user avatars\"
+   :disabled \"optional: not usable\"}.
   Elements with this format will be transfomed into a divider line:
   {:value nil :label :divider-line}."
   < rum/static
@@ -35,11 +39,13 @@
           (for [item fixed-items]
             [:li.dropdown-list-item
               {:key (str "dropdown-list-item-" (if (= (:label item) :divider-line) "divider" (:value item)))
-               :on-click #(when (and (:value item) (fn? on-change)) (on-change item))
+               :on-click #(when (and (not (:disabled item)) (:value item) (fn? on-change))
+                            (on-change item))
                :style (when (seq (:color item)) {:color (:color item)})
                :class (utils/class-set {:select (and (:value item) (= value (:value item)))
                                         :divider-line (= (:label item) :divider-line)
                                         :user-avatar-icons (:user-map item)
+                                        :disabled (:disabled item)
                                         (str (:class item)) (seq (:class item))})}
               (when (and (string? (:label item))
                          (or selected-icon

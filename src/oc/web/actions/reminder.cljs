@@ -12,10 +12,11 @@
   []
   (let [reminders-data (dis/reminders-data)
         roster-link (utils/link-for (:links reminders-data) "roster")]
-    (api/get-reminders-roster roster-link
-     (fn [{:keys [success body status]}]
-       (when success
-         (dis/dispatch! [:reminders-roster-loaded (router/current-org-slug) (json->cljs body)]))))))
+    (when roster-link
+      (api/get-reminders-roster roster-link
+       (fn [{:keys [success body status]}]
+         (when success
+           (dis/dispatch! [:reminders-roster-loaded (router/current-org-slug) (json->cljs body)])))))))
 
 (defn- reminders-loaded
   "Reminders data loaded, parse and dispatch the content to the app-state."
@@ -24,7 +25,10 @@
     (let [parsed-body (json->cljs body)
           reminders-data (:collection parsed-body)
           parsed-reminders (reminder-utils/parse-reminders reminders-data)]
-      (dis/dispatch! [:reminders-loaded (router/current-org-slug) parsed-reminders]))))
+      (dis/dispatch! [:reminders-loaded (router/current-org-slug) parsed-reminders])
+      ;; Load the roster if it's not present yet
+      (when-not (dis/reminders-roster-data)
+        (load-reminders-roster)))))
 
 (defn load-reminders
   "

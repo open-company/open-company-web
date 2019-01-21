@@ -69,12 +69,13 @@
   [s reminder-data]
   (let [org-data (drv/react s :org-data)
         reminders-roster (drv/react s :reminders-roster)
-        users-list (vec (map #(-> %
+        fixed-roster (map #(assoc % :status (not= (:status %) "active")) (:items reminders-roster))
+        users-list (vec (map #(-> fixed-roster
                           (assoc :name (utils/name-or-email %))
-                          (select-keys [:name :user-id])
-                          (rename-keys {:name :label :user-id :value})
+                          (select-keys [:name :user-id :status])
+                          (rename-keys {:name :label :user-id :value :status :disabled})
                           (assoc :user-map %))
-                    (:items reminders-roster)))]
+                    fixed-roster))]
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
       [:div.edit-reminder-row.group
