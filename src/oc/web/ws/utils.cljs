@@ -7,31 +7,32 @@
             [oc.web.local-settings :as ls]))
 
 ;; cmd queue
-(defonce cmd-queue (atom []))
+(defonce cmd-queue (atom {}))
 
-(defn buffer-cmd [args]
-  (swap! cmd-queue conj args))
+(defn buffer-cmd [service-name args]
+  (let [key (keyword service-name)]
+    (swap! cmd-queue (assoc @cmd-queue key (conj (key @cmd-queue) args)))))
 
-(defn reset-queue []
-  (reset! cmd-queue []))
+(defn reset-queue [service-name]
+  (reset! cmd-queue (assoc @cmd-queue (keyword service-name) {})))
 
-(defn send-queue [chsk-send! ch-state]
+(defn send-queue [service-name chsk-send! ch-state]
   (when (and chsk-send! (:open? @@ch-state))
-    (doseq [qargs @cmd-queue]
+    (doseq [qargs ((keyword service-name) @cmd-queue)]
       (apply chsk-send! qargs))
-    (reset-queue)))
+    (reset-queue service-name)))
 
 (declare sentry-report)
 (defn not-connected [service-name chsk-send! ch-state & args]
   (let [arg (first (first args))]
-    (buffer-cmd arg)
+    (buffer-cmd service-name arg)
     (sentry-report service-name chsk-send! ch-state arg)))
 
 (defn send! [service-name chsk-send! ch-state & args]
   (if (and @chsk-send! (:open? @@ch-state))
     (do
       ;; empty queue first
-      (send-queue @chsk-send! ch-state)
+      (send-queue service-name @chsk-send! ch-state)
       ;; send current command
       (apply @chsk-send! (first args)))
     ;;disconnected
@@ -65,7 +66,7 @@
     (* ls/ws-monitor-interval 1000))))
 
 (defn reconnect [last-interval service-name chsk-send! ch-state]
-  (send-queue @chsk-send! ch-state)
+  (send-queue service-name @chsk-send! ch-state)
   (check-interval last-interval service-name chsk-send! ch-state))
 
 (defn report-invalid-jwt [service-name ch-state rep]
