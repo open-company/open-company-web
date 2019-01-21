@@ -50,7 +50,7 @@
                     [:img.dropdown-list-item-icon {:src unselected-icon}])))
               (when (and (string? (:label item))
                          (:user-map item))
-                (user-avatar-image user-map))
+                (user-avatar-image (:user-map item)))
               (when (string? (:label item))
                 (:label item))])]
         (when placeholder
