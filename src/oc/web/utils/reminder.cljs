@@ -1,5 +1,6 @@
 (ns oc.web.utils.reminder
-  (:require [oc.web.lib.jwt :as jwt]
+  (:require [clojure.set :refer (rename-keys)]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
@@ -85,14 +86,22 @@
      :last-sent nil
      :assignee-tz (:timezone current-user-data)}))
 
-(defn- user-is-allowed? [org-data user]
-  (when (or (= (:status user) "active")
-            (= (:status user) "unverified"))
-    (utils/get-author (:user-id user) (:authors org-data))))
-
-(defn users-for-reminders [org-data roster-data]
-  (let [all-users (:users roster-data)]
-    (filterv #(user-is-allowed? org-data %) all-users)))
+(defn users-for-reminders [roster-data]
+  (let [fixed-roster (map #(let [status (:status %)
+                                 tooltip (case status
+                                           "unverified" "This user has an unverified email"
+                                           "pending" "Need to accept invitation"
+                                           nil)]
+                             (merge % {:disabled (not= status "active")
+                                       :tooltip tooltip}))
+                      (:items roster-data))
+        users-list (vec (map #(-> %
+                                (assoc :name (utils/name-or-email %))
+                                (select-keys [:name :user-id :disabled :tooltip])
+                                (rename-keys {:name :label :user-id :value})
+                                (assoc :user-map %))
+                     fixed-roster))]
+    (sort-by :name users-list)))
 
 (defn sort-fn [reminder-a reminder-b]
   (let [headline-compare (compare (:headline reminder-a) (:headline reminder-b))]
@@ -104,4 +113,5 @@
   (sort sort-fn reminders-items))
 
 (defn parse-reminders-roster [roster-data]
-  (:collection roster-data))
+  (let [collection (:collection roster-data)]
+    (assoc roster-data :users-list (users-for-reminders collection))))

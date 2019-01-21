@@ -1,6 +1,5 @@
 (ns oc.web.components.reminders
   (:require [rum.core :as rum]
-            [clojure.set :refer (rename-keys)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
@@ -69,20 +68,7 @@
   [s reminder-data]
   (let [org-data (drv/react s :org-data)
         reminders-roster (drv/react s :reminders-roster)
-        fixed-roster (map #(let [status (:status %)
-                                 tooltip (case status
-                                           "unverified" "Need to verify email"
-                                           "pending" "Need to accept invitation"
-                                           nil)]
-                             (merge % {:disabled (not= status "active")
-                                       :tooltip tooltip}))
-                      (:items reminders-roster))
-        users-list (vec (map #(-> %
-                          (assoc :name (utils/name-or-email %))
-                          (select-keys [:name :user-id :disabled :tooltip])
-                          (rename-keys {:name :label :user-id :value})
-                          (assoc :user-map %))
-                    fixed-roster))]
+        users-list (:users-list reminders-roster)]
     [:div.reminders-tab.edit-reminder.group
       {:class (when-not (:uuid reminder-data) "new-reminder")}
       [:div.edit-reminder-row.group
