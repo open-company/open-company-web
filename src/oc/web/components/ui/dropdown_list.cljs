@@ -18,7 +18,8 @@
    :label \"The label to show, optional\"
    :color \"optional\"
    :user-map \"optional: to user the user avatars\"
-   :disabled \"optional: not usable\"}.
+   :disabled \"optional: not usable\"
+   :tooltip  \"optional: tooltip to show on the row\"}.
   Elements with this format will be transfomed into a divider line:
   {:value nil :label :divider-line}."
   < rum/static
@@ -27,6 +28,9 @@
        (let [on-blur (:on-blur (first (:rum/args s)))]
          (when (fn? on-blur)
            (on-blur))))))
+    {:did-mount (fn [s]
+     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+     s)}
   [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
   (let [fixed-items (map #(if (not (contains? % :label))
                             (assoc % :label (:value %))
@@ -42,6 +46,11 @@
                :on-click #(when (and (not (:disabled item)) (:value item) (fn? on-change))
                             (on-change item))
                :style (when (seq (:color item)) {:color (:color item)})
+               :title (:tooltip item)
+               :data-toggle (when (:tooltip item)
+                              "tooltip")
+               :data-placement "top"
+               :data-container "body"
                :class (utils/class-set {:select (and (:value item) (= value (:value item)))
                                         :divider-line (= (:label item) :divider-line)
                                         :user-avatar-icons (:user-map item)
