@@ -355,6 +355,23 @@ div.reminders-container {
                 margin-top: 0;
                 max-height: 190px;
                 overflow-y: auto;
+
+                ul.dropdown-list {
+                  li.dropdown-list-item {
+                    color: $deep_navy;
+                    opacity: 0.8;
+
+                    &.selected, &:hover {
+                      color: $deep_navy;
+                      opacity: 1;
+                    }
+
+                    &.disabled {
+                      color:$deep_navy;
+                      opacity: 0.4;
+                    }
+                  }
+                }
               }
 
               div.triangle {

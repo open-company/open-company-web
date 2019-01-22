@@ -86,12 +86,6 @@
      :last-sent nil
      :assignee-tz (:timezone current-user-data)}))
 
-(defn sort-users-fn [user-a user-b]
-  (let [disabled-compare (compare (:disabled user-a) (:disabled user-b))]
-    (if (= disabled-compare 0)
-      (compare (:label user-a) (:label user-b))
-      disabled-compare)))
-
 (defn users-for-reminders [roster-data]
   (let [fixed-roster (map #(let [status (:status %)
                                  tooltip (case status
@@ -106,7 +100,7 @@
                                 (rename-keys {:name :label :user-id :value})
                                 (assoc :user-map %))
                      fixed-roster))]
-    (sort sort-users-fn users-list)))
+    (sort-by :label users-list)))
 
 (defn sort-fn [reminder-a reminder-b]
   (let [headline-compare (compare (:headline reminder-a) (:headline reminder-b))]
