@@ -89,7 +89,7 @@
 (defn sort-users-fn [user-a user-b]
   (let [disabled-compare (compare (:disabled user-a) (:disabled user-b))]
     (if (= disabled-compare 0)
-      (compare (:label user-b) (:label user-a))
+      (compare (:label user-a) (:label user-b))
       disabled-compare)))
 
 (defn users-for-reminders [roster-data]
