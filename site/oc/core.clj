@@ -17,7 +17,7 @@
     [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-    [:title "Carrot | Leadership communication for fast-growing and distributed teams."]
+    [:title "Carrot | Leadership communication for fast-growing and remote teams."]
     pages/google-fonts
     pages/bootstrap-css
     ;; Local css
@@ -193,7 +193,7 @@
         [:img.logo
           {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-communication-copy
-          "Leadership communication for fast-growing and distributed teams."]
+          "Leadership communication for fast-growing and remote teams."]
         [:div.footer-small-links.static
           [:a {:href "/sign-up"} "Get started for free"]
           "or"

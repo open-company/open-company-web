@@ -514,6 +514,10 @@ section.home-keep-aligned {
           @include tablet() {
             padding: 24px 0;
           }
+
+          div.keep-aligned-section-copy-title {
+            max-width: 450px;
+          }
         }
 
         div.keep-aligned-section-row-right {
@@ -560,10 +564,6 @@ section.home-keep-aligned {
 
           @include tablet(){
             padding: 24px 0;
-          }
-
-          div.keep-aligned-section-copy-title {
-            max-width: 450px;
           }
         }
 
