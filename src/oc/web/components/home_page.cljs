@@ -66,7 +66,7 @@
 
           shared-misc/testimonials-logos-line]
 
-        (shared-misc/keep-aligned-section false)
+        (shared-misc/keep-aligned-section)
 
         shared-misc/testimonials-section
 
