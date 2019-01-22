@@ -67,6 +67,7 @@
                          (:user-map item))
                 (user-avatar-image (:user-map item)))
               (when (string? (:label item))
-                (:label item))])]
+                [:span.dropdown-list-item-label
+                  (:label item)])])]
         (when placeholder
           placeholder)]]))

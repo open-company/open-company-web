@@ -82,6 +82,10 @@ div.dropdown-list-container {
             float: left;
             margin-right: 8px;
           }
+
+          span.dropdown-list-item-label {
+            max-width: calc(100% - 30px);
+          }
         }
 
         img.dropdown-list-item-icon {
@@ -89,6 +93,17 @@ div.dropdown-list-container {
           height: 16px;
           margin-right: 8px;
           margin-top: -3px;
+        }
+
+        span.dropdown-list-item-label {
+          @include avenir_M();
+          font-size: 14px;
+          color: $carrot_light_gray_3;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: pre;
+          display: block;
         }
       }
     }
