@@ -86,11 +86,16 @@
      :last-sent nil
      :assignee-tz (:timezone current-user-data)}))
 
+(defn sort-users-fn [user-a user-b]
+  (let [disabled-compare (compare (:disabled user-a) (:disabled user-b))]
+    (if (= disabled-compare 0)
+      (compare (:label user-b) (:label user-a))
+      disabled-compare)))
+
 (defn users-for-reminders [roster-data]
   (let [fixed-roster (map #(let [status (:status %)
                                  tooltip (case status
-                                           "unverified" "This user has an unverified email"
-                                           "pending" "Need to accept invitation"
+                                           ("pending" "unverified") "This user has an unverified email"
                                            nil)]
                              (merge % {:disabled (not= status "active")
                                        :tooltip tooltip}))
@@ -101,7 +106,7 @@
                                 (rename-keys {:name :label :user-id :value})
                                 (assoc :user-map %))
                      fixed-roster))]
-    (sort-by :name users-list)))
+    (sort sort-users-fn users-list)))
 
 (defn sort-fn [reminder-a reminder-b]
   (let [headline-compare (compare (:headline reminder-a) (:headline reminder-b))]
