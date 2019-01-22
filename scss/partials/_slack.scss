@@ -60,6 +60,11 @@ div.slack-wrap {
         padding: 131px 24px 80px;
       }
 
+      & > * {
+        position: relative;
+        z-index: 3;
+      }
+
       &:after {
         background-color: $another_ui_grey;
         content: "";
@@ -79,6 +84,8 @@ div.slack-wrap {
 
         @include mobile() {
           border-top-right-radius: 100px;
+          min-height: 50px;
+          max-height: 216px;
         }
       }
 
@@ -106,7 +113,7 @@ div.slack-wrap {
         font-size: 26px;
         line-height: 36px;
         color: $deep_navy;
-        max-width: 960px;
+        max-width: 880px;
         margin: 24px auto 0px;
         text-align: center;
 
@@ -157,7 +164,7 @@ div.slack-wrap {
         display: block;
         box-shadow: 0 2px 6px 0 rgba(0,0,0,0.07);
         @include image-2x("/img/ML/slack_add_to_slack");
-        background-size: 155px 25px;
+        background-size: 150px 25px;
         background-repeat: no-repeat;
         background-position: center;
         border-radius: 6px;
@@ -167,7 +174,7 @@ div.slack-wrap {
         @include mobile() {
           margin-top: 16px;
           @include image-2x("/img/ML/homepage_add_to_slack_bt");
-          background-size: 140px 24px;
+          background-size: 138px 24px;
         }
       }
     }

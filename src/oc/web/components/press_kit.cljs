@@ -27,7 +27,6 @@
 
       [:div.main.press-kit
         [:section.cta.group
-          shared-misc/animation-lightbox
 
           [:h1.headline
             "Press kit"]

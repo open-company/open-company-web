@@ -29,19 +29,18 @@
         [:div.main.slack
           ; Hope page header
           [:section.carrot-plus-slack.group
-            shared-misc/animation-lightbox
 
             [:h1.slack-headline
               "Rise above the noise"]
 
             [:div.slack-subline
               (str
-               "Leaders struggle to communicate effectively with fast-growing and distributed "
-               "teams. Carrot keeps everyone focused - even in noisy places like email and Slack.")]
+               "Leaders struggle to communicate effectively with fast-growing and "
+               "remote teams. Carrot makes sure everyone hears you - even in noisy "
+               "places like Slack and email. With Carrot, everyone stays on the same page.")]
 
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
-              shared-misc/show-animation-button
               [:a.add-to-slack-button
                 {:on-click #(do
                              (.preventDefault %)

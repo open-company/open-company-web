@@ -20,114 +20,8 @@
       "We’re helping teams like yours."]
     [:div.testimonials-cards-container.group
       [:div.testimonials-cards-inner.group
-        [:div.testimonials-cards-row.group
-          ;; FIXME: Temp remove first testimonials column
-          ; [:div.testimonial-card.oval-money
-          ;   [:div.testimonial-quote
-          ;     (str
-          ;      "“The morning digest keeps "
-          ;      "everyone informed without "
-          ;      "a constant barrage "
-          ;      "throughout the day.”")]
-          ;   [:div.testimonial-footer.group
-          ;     [:div.testimonial-image]
-          ;     [:div.testimonial-name
-          ;       "Edoardo Benedetto"]
-          ;     [:div.testimonial-role
-          ;       [:a
-          ;         {:href "https://ovalmoney.com/"
-          ;          :target "_blank"}
-          ;         "Oval Money"]
-          ;       ", UX Architect"]]]
-          [:div.testimonial-card.skylight-digital
-            [:div.testimonial-quote
-              (str
-               "“Carrot is our favorite Slack "
-               "app. It's perfect for longer- "
-               "form updates no one "
-               "should miss.”")]
-            [:div.testimonial-footer.group
-              [:div.testimonial-image]
-              [:div.testimonial-name
-                "Chris Cairns"]
-              [:div.testimonial-role
-                [:a
-                  {:href "https://skylight.digital/"
-                   :target "_blank"}
-                  "Skylight Digital"]
-                ", Managing Director"]]]
-          [:div.testimonial-card.wayne-state-univerity
-            [:div.testimonial-quote
-              (str
-               "“Carrot helps me share "
-               "things the entire team "
-               "needs to know - instead of "
-               "burying it somewhere it "
-               "won’t get noticed.”")]
-            [:div.testimonial-footer.group
-              [:div.testimonial-image]
-              [:div.testimonial-name
-                "Nick DeNardis"]
-              [:div.testimonial-role
-                [:a
-                  {:href "https://wayne.edu/"
-                   :targe "_blank"}
-                  "Wayne State University"]
-                ", Director of Communications"]]]
-          [:div.testimonial-card.partner-hero
-            [:div.testimonial-quote
-              (str
-               "“Carrot is where we "
-               "communicate important "
-               "information when we need "
-               "everyone to see it - "
-               "regardless of their time zone.”")]
-            [:div.testimonial-footer.group
-              [:div.testimonial-image]
-              [:div.testimonial-name
-                "Andrew Love"]
-              [:div.testimonial-role
-                [:a
-                  {:href "https://partnerhero.com/"
-                   :targe "_blank"}
-                  "PartnerHero"]
-                ", Director of R&D"]]]]
-        [:div.testimonials-cards-row.group
-          ;; FIXME: Temp remove first testimonials column
-          ; [:div.testimonial-card.blend-labs
-          ;   [:div.testimonial-quote
-          ;     (str
-          ;      "“I used to waste time "
-          ;      "begging team leads to get "
-          ;      "their updates in, but now "
-          ;      "Carrot reminds them "
-          ;      "automatically for me.”")]
-          ;   [:div.testimonial-footer.group
-          ;     [:div.testimonial-image]
-          ;     [:div.testimonial-name
-          ;       "Sara Vienna"]
-          ;     [:div.testimonial-role
-          ;       [:a
-          ;         {:href "https://bl3ndlabs.com/"
-          ;          :target "_blank"}
-          ;         "BL3NDlabs"]
-          ;       ", Head of Design"]]]
-          [:div.testimonial-card.m-io
-            [:div.testimonial-quote
-              (str
-               "“On Carrot, my updates "
-               "get noticed and get the "
-               "team talking. I love that.”")]
-            [:div.testimonial-footer.group
-              [:div.testimonial-image]
-              [:div.testimonial-name
-                "Tom Hadfield"]
-              [:div.testimonial-role
-                [:a
-                  {:href "https://m.io/"
-                   :target "_blank"}
-                  "M.io"]
-                ", CEO"]]]
+        ;; First column
+        [:div.testimonals-cards-column.group
           [:div.testimonial-card.peak-support
             [:div.testimonial-quote
               (str
@@ -147,20 +41,128 @@
                 [:a
                   {:href "https://www.peaksupport.io/"
                    :target "_blank"}
-                  "Peak Support"]
-                ", CEO"]]]
+                  "Peak Support, CEO"]]]]
+            [:div.testimonial-card.wayne-state-univerity
+              [:div.testimonial-quote
+                (str
+                 "“Carrot helps me share "
+                 "things the entire team "
+                 "needs to know - instead of "
+                 "burying it somewhere it "
+                 "won’t get noticed.”")]
+              [:div.testimonial-footer.group
+                [:div.testimonial-image]
+                [:div.testimonial-name
+                  "Nick DeNardis"]
+                [:div.testimonial-role
+                  [:a
+                    {:href "https://wayne.edu/"
+                     :targe "_blank"}
+                    "Wayne State University, Director of Communications"]]]]]
+        ;; Second column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.oval-money
+            [:div.testimonial-quote
+              (str
+               "“Carrot keeps our "
+               "distributed team informed "
+               "about what matters most.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Edoardo Benedetto"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://ovalmoney.com/"
+                   :target "_blank"}
+                  "Oval Money, Head of Design"]]]]
+          [:div.testimonial-card.helloticket
+            [:div.testimonial-quote
+              (str
+               "“Staying aligned across two "
+               "offices is hard. Slack feels "
+               "too ‘light’ and crazy for "
+               "important information; and "
+               "no one wants to read "
+               "weekly emails. With Carrot, "
+               "we have a knowledge base "
+               "of what's going on with the "
+               "company that’s made it "
+               "easy to stay aligned.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Alberto Martinez"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://ovalmoney.com/"
+                   :target "_blank"}
+                  "Hellotickets, CEO"]]]]]
+        ;; Third column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.m-io
+            [:div.testimonial-quote
+              (str
+               "“On Carrot, my updates "
+               "get noticed and get the "
+               "team talking. I love that.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Tom Hadfield"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://m.io/"
+                   :target "_blank"}
+                  "M.io, CEO"]]]]
+          [:div.testimonial-card.partner-hero
+            [:div.testimonial-quote
+              (str
+               "“Carrot is where we "
+               "communicate important "
+               "information when we need "
+               "everyone to see it - "
+               "regardless of their time "
+               "zone.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Andrew Love"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://partnerhero.com/"
+                   :targe "_blank"}
+                  "PartnerHero, Director of R&D"]]]]
+          [:div.testimonial-card.blend-labs
+            [:div.testimonial-quote
+              (str
+               "“Carrot reminds us when "
+               "it’s time to share a weekly "
+               "update - so it’s easier for "
+               "everyone to stay in sync.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Sara Vienna"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://bl3ndlabs.com/"
+                   :target "_blank"}
+                  "BL3NDlabs, Head of Design"]]]]]
+        ;; Fourth column
+        [:div.testimonals-cards-column.group
           [:div.testimonial-card.novo
             [:div.testimonial-quote
               (str
                "“We use Carrot when we "
                "need to make sure "
                "everyone is on the same "
-               "page across all of our "
-               "offices here and abroad. It "
-               "helps us share BIG wins, "
-               "and in a fast-growing "
-               "startup keeping that family "
-               "vibe its awesome.”")]
+               "page across all our offices "
+               "here and abroad. It helps us "
+               "share BIG wins, and in a "
+               "fast-growing startup "
+               "keeping that family vibe, "
+               "its awesome.”")]
             [:div.testimonial-footer.group
               [:div.testimonial-image]
               [:div.testimonial-name
@@ -169,8 +171,24 @@
                 [:a
                   {:href "https://banknovo.com/"
                    :target "_blank"}
-                  "Novo"]
-                ", CEO"]]]]]]])
+                  "Novo, CEO"]]]]
+          [:div.testimonial-card.skylight-digital
+            [:div.testimonial-quote
+              (str
+               "“Carrot is a perfect "
+               "compliment for Slack. We "
+               "use it for longer-form "
+               "weekly updates no one "
+               "should miss.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Chris Cairns"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://skylight.digital/"
+                   :target "_blank"}
+                  "Skylight Digital, Managing Director"]]]]]]]])
 
 (def keep-aligned
   [:section.keep-aligned
@@ -207,84 +225,58 @@
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Stay in sync"]
+              "Start each day in sync"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Carrot reminds you when it’s time to update "
-               "your team. Consistent communication builds "
-               "trust and transparency.")]]
+               "Carrot condenses noisy updates into a "
+               "morning digest for Slack or email. Your team "
+               "stays aligned with fewer interruptions.")]
+            [:div.slack-email-container.group.big-web-only
+              [:div.slack-email-switch-container.group
+                {:class "show-slack"}
+                [:button.mlb-reset.slack-email-switch-bt.slack-bt
+                  [:div.slack-logo]]
+                [:button.mlb-reset.slack-email-switch-bt.email-bt
+                  [:div.email-logo]]
+                [:div.slack-email-switch-bottom-panel.slack-panel
+                  [:div.slack-email-switch-bottom-panel-copy
+                    (str
+                     "“Our remote teams are ecstatic about not having to read "
+                     "hundreds of Slack messages each morning to make sense of "
+                     "the previous day.”")]
+                  [:div.slack-email-switch-bottom-panel-img]
+                  [:div.slack-email-switch-bottom-panel-name
+                    "Andrew Love"]
+                  [:div.slack-email-switch-bottom-panel-role
+                    "PartnerHero, Director of R&D"]]
+                [:div.slack-email-switch-bottom-panel.email-panel
+                  [:div.slack-email-switch-bottom-panel-copy
+                    (str
+                     "“The morning digest is how we know everyone in our "
+                     "offices is up to date on what matters.”")]
+                  [:div.slack-email-switch-bottom-panel-img]
+                  [:div.slack-email-switch-bottom-panel-name
+                    "Bev Pellow"]
+                  [:div.slack-email-switch-bottom-panel-role
+                    "QPL Rural, Owner"]]]]]
           [:div.keep-aligned-section-row-right
-            (let [img-name (if slack? "homepage_screenshots_first_row_slack" "homepage_screenshots_first_row")]
-             [:img.keep-aligned-section-screenshot.screenshot-1.big-web-tablet-only
-              {:src (utils/cdn (str "/img/ML/" img-name ".png"))
-               :srcSet (str (utils/cdn (str "/img/ML/"img-name "@2x.png")) " 2x")}])
-            (let [img-name (if slack? "homepage_screenshots_first_row_mobile_slack" "homepage_screenshots_first_row_mobile")]
-              [:img.keep-aligned-section-screenshot.screenshot-1.mobile-only
-                {:src (utils/cdn (str "/img/ML/" img-name ".png"))
-                 :srcSet (str (utils/cdn (str "/img/ML/" img-name "@2x.png")) " 2x")}])]]]
+            [:div.keep-aligned-section-carion-container
+              [:div.keep-aligned-section-carion-inner
+                [:div.keep-aligned-section-header..tablet-mobile-only.first-header
+                  [:span.slack-logo]]
+                [:img.keep-aligned-section-screenshot.screenshot-1.carion-1.first-image
+                  {:src (utils/cdn "/img/ML/homepage_screenshots_first_row_slack.png")
+                   :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
+                [:div.keep-aligned-section-header..tablet-mobile-only.second-header
+                  [:span.email-logo]]
+                [:img.keep-aligned-section-screenshot.screenshot-1.second-image.carion-1-alt
+                  {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
+                   :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]
+              [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-right.keep-aligned-section-copy
-            [:div.keep-aligned-section-copy-title
-              "Lower the noise level"]
-            [:div.keep-aligned-section-copy-subtitle
-              (str
-               "Protect your team’s focus (and sanity). "
-               "Carrot condenses noisy updates "
-               "into a morning digest. Your team "
-               "stays aligned with fewer interruptions.")]
-            [:div.slack-email-container.group.big-web-tablet-only
-              [:div.slack-email-switch-container
-                (when slack?
-                  [:button.mlb-reset.slack-email-switch-bt.slack-bt
-                    {:class (when slack? "active")}
-                    [:div.slack-logo]
-                    "Slack"])
-                [:button.mlb-reset.slack-email-switch-bt.email-bt
-                  {:class (when-not slack? "active")}
-                  [:div.email-logo]
-                  "Email"]
-                (when-not slack?
-                  [:button.mlb-reset.slack-email-switch-bt.slack-bt
-                    [:div.slack-logo]
-                    "Slack"])]]]
-          [:div.keep-aligned-section-row-left
-            [:span.sent-daily-slack-email.mobile-only
-              "Sent daily on Slack or email"]
-            [:div.keep-aligned-section-carion-container
-              [:div.keep-aligned-section-carion-inner
-                (when slack?
-                  [:div.keep-aligned-section-header.mobile-only.first-header
-                    [:span.slack-logo]
-                    [:span.inner-label "Slack"]])
-                (when slack?
-                  [:img.keep-aligned-section-screenshot.screenshot-2.carion-1
-                    {:class "first-image"
-                     :src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
-                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_slack@2x.png") " 2x")}])
-                [:div.keep-aligned-section-header.mobile-only
-                  {:class (if slack? "second-header" "first-header")}
-                  [:span.email-logo]
-                  [:span.inner-label "Email"]]
-                [:img.keep-aligned-section-screenshot.screenshot-2
-                  {:class (if slack? "carion-1-alt" "carion-1")
-                   :src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
-                   :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]
-                (when-not slack?
-                  [:div.keep-aligned-section-header.mobile-only.second-header
-                    [:span.slack-logo]
-                    [:span.inner-label "Slack"]])
-                (when-not slack?
-                  [:img.keep-aligned-section-screenshot.screenshot-2.carion-1-alt
-                    {:class "second-image"
-                     :src (utils/cdn "/img/ML/homepage_screenshots_second_row_slack.png")
-                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_slack@2x.png") " 2x")}])]
-              [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
-
-      [:div.keep-aligned-section-row.third-row
-        [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
               "Know who’s engaged"]
             [:div.keep-aligned-section-copy-subtitle
@@ -298,25 +290,28 @@
                "See which updates create energy and "
                "engagement, and which ones aren’t getting "
                "through.")]]
+          [:div.keep-aligned-section-row-left
+            [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
+              {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
+              {:src (utils/cdn "/img/ML/homepage_screenshots_second_row_mobile.png")
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_mobile@2x.png") " 2x")}]]]]
+
+      [:div.keep-aligned-section-row.third-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
+            [:div.keep-aligned-section-copy-title
+              "Stay current"]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "Carrot reminds you when it’s time to update "
+               "your team. Consistent communication builds "
+               "trust and transparency.")]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
-              {:src (utils/cdn "/img/ML/homepage_screenshots_third_row.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]
+              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
+               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
             [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
-              {:src (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile@2x.png") " 2x")}]]]]]])
-
-(def animation-lightbox
-  [:div.animation-lightbox-container
-    {:on-click #(js/OCStaticHideAnimationLightbox %)}
-    [:div.animation-lightbox
-      [:div {:id "youtube-player"}]
-      [:button.settings-modal-close.mlb-reset
-        {:on-mouse-down #(js/OCStaticHideAnimationLightbox %)
-         :on-touch-start #(js/OCStaticHideAnimationLightbox %)}]]])
-
-(def show-animation-button
-  [:button.mlb-reset.show-animation-bt
-    {:on-click #(js/OCStaticShowAnimationLightbox)}
-    [:div.green-play]
-    "Carrot in 60 seconds"])
+              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
+               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]]])

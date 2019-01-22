@@ -174,6 +174,4 @@ drift.api.startInteraction = function(){};
 drift.identify = function(){};
 drift.track = function(){};
 // Homepage animation
-var OCStaticShowAnimationLightbox = function(){};
-var OCStaticHideAnimationLightbox = function(){};
 var OCWebSetupMarketingSiteJS = function(){};
