@@ -113,4 +113,4 @@
 
 (defn parse-reminders-roster [roster-data]
   (let [collection (:collection roster-data)]
-    (assoc roster-data :users-list (users-for-reminders collection))))
+    (assoc collection :users-list (users-for-reminders collection))))

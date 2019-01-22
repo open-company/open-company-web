@@ -95,7 +95,7 @@
               [:div
                 {:ref :assignee-dd-node}
                 (dropdown-list {:items users-list
-                                :value (or (:user-id (:assignee reminder-data)) (:user-id (first users-list)))
+                                :value (or (:user-id (:assignee reminder-data)) (:value (first users-list)))
                                 :on-change (fn [item]
                                              (let [selected-user (first (filter #(= (:user-id %) (:value item)) (:items reminders-roster)))]
                                                (update-reminder s {:assignee selected-user}))
