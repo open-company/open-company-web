@@ -96,9 +96,11 @@ if (jwt) {
 function OCWebSetupMarketingSiteJS(){
   $("button.slack-email-switch-bt, button.keep-aligned-section-next-bt").on("click", function(){
     $("button.keep-aligned-section-next-bt").toggleClass("active");
-    $("button.mlb-reset.slack-email-switch-bt").toggleClass("active");
-    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1");
-    $("img.keep-aligned-section-screenshot.screenshot-2").toggleClass("carion-1-alt");
+    var $switchContainer = $("div.slack-email-switch-container");
+    $switchContainer.toggleClass("show-slack");
+    $switchContainer.toggleClass("show-email");
+    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1");
+    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1-alt");
   });
 
   $("div.pricing-toggle").on("click", function(){
