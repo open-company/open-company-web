@@ -26,7 +26,7 @@ div.home-wrap {
         overflow: visible;
       }
 
-      * {
+      & > * {
         position: relative;
         z-index: 3;
       }
@@ -51,6 +51,7 @@ div.home-wrap {
         @include mobile() {
           border-top-right-radius: 100px;
           min-height: 280px;
+          min-height: 50px;
         }
 
         @media screen and (max-width: 440px) {

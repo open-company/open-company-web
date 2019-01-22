@@ -60,6 +60,11 @@ div.slack-wrap {
         padding: 131px 24px 80px;
       }
 
+      & > * {
+        position: relative;
+        z-index: 3;
+      }
+
       &:after {
         background-color: $another_ui_grey;
         content: "";
@@ -79,6 +84,8 @@ div.slack-wrap {
 
         @include mobile() {
           border-top-right-radius: 100px;
+          min-height: 50px;
+          max-height: 216px;
         }
       }
 
