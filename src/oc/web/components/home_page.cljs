@@ -42,9 +42,9 @@
             "Lead with clarity"]
           [:div.subheadline
             (str
-             "Leaders struggle to communicate effectively with "
-             "fast-growing and distributed teams. Carrot helps "
-             "leaders rise above the noise to keep teams focused.")]
+             "Leaders struggle to communicate effectively with fast-growing and "
+             "remote teams. Carrot keeps everyone on the same page - even "
+             "when you can’t be in the same place.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container.group
             [:button.mlb-reset.get-started-button
@@ -64,7 +64,7 @@
 
           shared-misc/testimonials-logos-line]
 
-        (shared-misc/keep-aligned-section)
+        (shared-misc/keep-aligned-section false)
 
         shared-misc/testimonials-section
 

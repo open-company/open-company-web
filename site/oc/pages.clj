@@ -267,7 +267,7 @@
     [:button.mlb-reset.get-started-button
       "Get started - It's free"]])
 
-(def keep-aligned-section
+(defn keep-aligned-section [slack?]
   [:section.home-keep-aligned.group
 
     [:div.keep-aligned-section
@@ -360,11 +360,11 @@
                "trust and transparency.")]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
-              {:src (cdn "/img/ML/homepage_screenshots_third_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]
+              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
+               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
             [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
-              {:src (cdn "/img/ML/homepage_screenshots_third_row_mobile.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_third_row_mobile@2x.png") " 2x")}]]]]]])
+              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
+               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]]])
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
@@ -402,7 +402,7 @@
 
         testimonials-logos-line]
 
-      keep-aligned-section
+      (keep-aligned-section false)
 
       testimonials-section
 
@@ -594,12 +594,13 @@
       [:section.carrot-plus-slack.group
 
         [:h1.slack-headline
-          "Rise above the noise"]
+          "Where leaders rise above the noise"]
 
         [:div.slack-subline
           (str
            "Leaders struggle to communicate effectively with fast-growing and distributed "
-           "teams. Carrot keeps everyone focused - even in noisy places like email and Slack.")]
+           "teams. Carrot makes sure everyone hears you - even in noisy places like email "
+           "and Slack. With Carrot, everyone stays on the same page.")]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button
@@ -613,7 +614,7 @@
 
         testimonials-logos-line]
 
-      keep-aligned-section
+      (keep-aligned-section true)
 
       testimonials-section
 

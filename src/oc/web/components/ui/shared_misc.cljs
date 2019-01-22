@@ -217,7 +217,7 @@
     [:button.mlb-reset.get-started-button
       "Get started - It's free"]])
 
-(defn keep-aligned-section []
+(defn keep-aligned-section [slack?]
   [:section.home-keep-aligned.group
 
     [:div.keep-aligned-section
@@ -310,8 +310,8 @@
                "trust and transparency.")]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
-              {:src (utils/cdn "/img/ML/homepage_screenshots_third_row.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]
+              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
+               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
             [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
-              {:src (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile@2x.png") " 2x")}]]]]]])
+              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
+               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]]])

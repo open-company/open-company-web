@@ -31,12 +31,13 @@
           [:section.carrot-plus-slack.group
 
             [:h1.slack-headline
-              "Rise above the noise"]
+              "Where leaders rise above the noise"]
 
             [:div.slack-subline
               (str
                "Leaders struggle to communicate effectively with fast-growing and distributed "
-               "teams. Carrot keeps everyone focused - even in noisy places like email and Slack.")]
+               "teams. Carrot makes sure everyone hears you - even in noisy places like email "
+               "and Slack. With Carrot, everyone stays on the same page.")]
 
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
@@ -59,7 +60,7 @@
 
             shared-misc/testimonials-logos-line]
 
-          (shared-misc/keep-aligned-section)
+          (shared-misc/keep-aligned-section true)
 
           shared-misc/testimonials-section
 
