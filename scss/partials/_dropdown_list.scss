@@ -76,8 +76,6 @@ div.dropdown-list-container {
         }
 
         &.user-avatar-icons {
-          padding-left: 4px;
-
           @include user_profile(22){
             float: left;
             margin-right: 8px;
@@ -85,6 +83,7 @@ div.dropdown-list-container {
 
           span.dropdown-list-item-label {
             max-width: calc(100% - 30px);
+            line-height: 22px;
           }
         }
 

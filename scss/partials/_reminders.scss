@@ -360,6 +360,7 @@ div.reminders-container {
                   li.dropdown-list-item {
                     color: $deep_navy;
                     opacity: 0.8;
+                    padding: 5px 4px 3px;
 
                     &.selected, &:hover {
                       color: $deep_navy;
