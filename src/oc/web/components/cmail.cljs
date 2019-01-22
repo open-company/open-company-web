@@ -240,11 +240,7 @@
       [:div.edit-tooltip
         (str
          "Share something with your team, like an announcement, update, or decision. "
-         "In a hurry? ")
-         [:button.mlb-reset.edit-tooltip-record-video-bt
-          {:on-click #(video-record-clicked s)}
-          "Record a quick video"]
-         " instead."]]])
+         "Use the buttons below to add images, video, or attachments.")]]])
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives

@@ -47,7 +47,7 @@ div.dashboard-layout {
       }
 
       div.add-post-tooltip-container {
-        border: 1px dashed $carrot_gold;
+        border: 1px solid rgba($carrot_gold, 0.5);
         background-color: #FDF6E4;
         border-radius: 6px;
         padding: 34px 40px;
@@ -73,7 +73,7 @@ div.dashboard-layout {
         }
 
         div.add-post-tooltips {
-          width: 334px;
+          width: 374px;
           float: left;
 
           &.second-user {
@@ -119,16 +119,29 @@ div.dashboard-layout {
 
             button.add-post-bt {
               display: block;
-              background-color: $carrot_orange_2;
+              background-color: $carrot_green;
               height: 40px;
-              width: 192px;
-              border-radius: 100px;
+              border-radius: 6px;
               padding: 0;
               margin: 16px 0 0;
               color: white;
               @include avenir_H();
               font-size: 16px;
-              line-height: 20px;
+              line-height: 27px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 0 24px;
+
+              span.add-post-bt-pen {
+                width: 14px;
+                height: 14px;
+                background-size: 14px 14px;
+                background-image: cdnUrl("/img/ML/add_post_tooltip_pen.svg");
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 8px;
+              }
 
               @include tablet() {
                 width: 100%;
@@ -169,7 +182,7 @@ div.dashboard-layout {
       }
 
       div.post-added-tooltip-container {
-        border: 1px dashed $carrot_gold;
+        border: 1px solid rgba($carrot_gold, 0.5);
         background-color: #FDF6E4;
         border-radius: 6px;
         padding: 34px 40px;
@@ -252,6 +265,7 @@ div.dashboard-layout {
             display: flex;
             justify-content: center;
             align-items: center;
+            float: left;
 
             @include mobile() {
               width: 100%;
@@ -268,6 +282,17 @@ div.dashboard-layout {
             }
           }
 
+          button.post-added-cancel-bt {
+            background-color: transparent;
+            color: $carrot-green;
+            margin: 16px 0 0 16px;
+            padding: 0;
+            height: 40px;
+            @include avenir_H();
+            font-size: 14px;
+            float: left;
+          }
+
           div.post-added-tooltip-box {
             position: absolute;
             top: 50%;
@@ -279,6 +304,7 @@ div.dashboard-layout {
             background-size: 99px 80px;
             background-repeat: no-repeat;
             background-position: center;
+            transform: rotate(-10deg);
 
             @include tablet(){
               display: none;
@@ -563,7 +589,7 @@ div.dashboard-layout {
             height: 42px;
             background-color: $carrot_orange_light;
             color: $carrot_orange;
-            border-radius: 100px;
+            border-radius: 6px;
             padding: 8px 24px;
             margin-top: -3px;
             border: 2px solid transparent;

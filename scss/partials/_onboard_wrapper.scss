@@ -395,7 +395,7 @@ div.onboard-lander {
       height: 40px;
       border: 1px solid #D8DBDF;
       color: $light_ui_grey;
-      border-radius: 100px;
+      border-radius: 6px;
       text-align: center;
 
       div.signup-with-slack-content, div.signup-with-google-content {
@@ -408,20 +408,21 @@ div.onboard-lander {
         align-items: center;
 
         div.slack-icon {
-          width: 21px;
-          height: 21px;
+          width: 20px;
+          height: 20px;
           background-image: cdnUrl("/img/ML/slack_normal.svg");
           background-repeat: no-repeat;
-          background-size: 21px 21px;
+          background-size: 20px 20px;
           float: left;
           margin-right: 16px;
         }
 
         div.google-icon {
-          width: 21px;
-          height: 21px;
+          width: 20px;
+          height: 20px;
           background-image: cdnUrl("/img/ML/google_signin.svg");
           background-repeat: no-repeat;
+          background-size: 20px 20px;
           float: left;
           margin-right: 16px;
         }
@@ -603,7 +604,7 @@ div.onboard-lander {
 
       span.info {
         @include avenir_R();
-        font-size: 14px;
+        font-size: 12px;
         color: rgba($oc_gray_7, 0.5);
       }
 
@@ -780,7 +781,7 @@ div.onboard-lander {
       color: white;
       @include avenir_H();
       font-size: 16px;
-      border-radius: 100px;
+      border-radius: 6px;
 
       &.start-using-carrot {
         background-color: $carrot_orange_2;
@@ -1012,16 +1013,15 @@ div.onboard-lander {
       button.skip-for-now {
         @include avenir_M();
         font-size: 16px;
-        background-color: transparent;
+        background-color: #E0E7FE;
         padding: 0;
-        margin: 24px auto 0px;
+        margin: 16px auto 0px;
         width: 100%;
         max-width: 340px;
         height: 48px;
-        border: 2px solid $sea_blue;
         color: $sea_blue;
         display: block;
-        border-radius: 100px;
+        border-radius: 6px;
       }
     }
   }
