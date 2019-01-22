@@ -35,7 +35,6 @@
       {:id "wrap"}
       (login-overlays-handler)
       [:div.main.home-page
-        shared-misc/animation-lightbox
         ; Hope page header
         [:section.cta.group
 
@@ -48,7 +47,6 @@
              "leaders rise above the noise to keep teams focused.")]
           ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
           [:div.get-started-button-container.group
-            shared-misc/show-animation-button
             [:button.mlb-reset.get-started-button
               {:id "get-started-centred-bt"
                :on-click #(router/nav! oc-urls/sign-up)}

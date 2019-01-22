@@ -366,22 +366,6 @@
               {:src (cdn "/img/ML/homepage_screenshots_third_row_mobile.png")
                :srcSet (str (cdn "/img/ML/homepage_screenshots_third_row_mobile@2x.png") " 2x")}]]]]]])
 
-(def animation-lightbox
-  [:div.animation-lightbox-container
-    {:onClick "OCStaticHideAnimationLightbox(event);"}
-    [:div.animation-lightbox
-      [:div {:id "youtube-player"}]
-      [:button.settings-modal-close.mlb-reset
-        {;:onClick "OCStaticHideAnimationLightbox(event);"
-         :onMouseDown "OCStaticHideAnimationLightbox(event);"
-         :ontouchstart "OCStaticHideAnimationLightbox(event);"}]]])
-
-(def show-animation-button
-  [:button.mlb-reset.show-animation-bt
-    {:onClick "OCStaticShowAnimationLightbox();"}
-    [:div.green-play]
-    "Carrot in 60 seconds"])
-
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-logo.logo-novo]
@@ -395,7 +379,6 @@
   [:div.home-wrap
     {:id "wrap"}
     [:div.main.home-page
-      animation-lightbox
       ; Hope page header
       [:section.cta.group
 
@@ -408,7 +391,6 @@
            "when you can’t be in the same place.")]
 
         [:div.get-started-button-container.group
-          show-animation-button
           [:button.mlb-reset.get-started-button
             {:id "get-started-centred-bt"}
             "Get started - It's free"]]
@@ -610,7 +592,6 @@
     [:div.main.slack
       ; Hope page header
       [:section.carrot-plus-slack.group
-        animation-lightbox
 
         [:h1.slack-headline
           "Rise above the noise"]
@@ -621,7 +602,6 @@
            "teams. Carrot keeps everyone focused - even in noisy places like email and Slack.")]
 
         [:div.slack-button-container.group
-            show-animation-button
             [:a.add-to-slack-button
               {:id "get-started-centred-bt"
                :href (env :slack-signup-url)}]]
@@ -673,7 +653,6 @@
     {:id "wrap"}
     [:div.main.press-kit
       [:section.cta.group
-        animation-lightbox
 
         [:h1.headline
           "Press kit"]

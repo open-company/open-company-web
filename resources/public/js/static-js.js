@@ -315,66 +315,6 @@ function OCStaticStartFixFixedPositioning(sel) {
   });
 }
 
-var OCYTVideoPlayer = null,
-OCYTVideoFinished = false;
-
-function OCYTVideoInit() {
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-}
-
-function onYouTubeIframeAPIReady() {
-  var winWidth = document.documentElement.clientWidth || window.innerWidth,
-  winHeight = document.documentElement.clientHeight || window.innerHeight;
-  OCYTVideoPlayer = new YT.Player('youtube-player', {
-    height: Math.min(winHeight, 608).toString(),
-    width: Math.min(winWidth, 1080).toString(),
-    videoId: 'dMWpnHxQMP4',
-    allowsInlineMediaPlayback: 'TRUE',
-    allowfullscreen: 'true',
-    playerVars: {
-        showinfo: 0,
-        rel: 0,
-        playsinline: 1,
-        autoplay: 0
-    },
-    events: {
-      'onReady': OCYTVideoOnPlayerReady,
-      'onStateChange': OCYTVideoOnPlayerStateChange
-    }
-  });
-}
-
-function OCYTVideoOnPlayerReady(event) {
-}
-
-function OCStaticShowAnimationLightbox() {
-  $(document.body).addClass('show-animation-lightbox no-scroll');
-  
-  if (OCYTVideoFinished) {
-    OCYTVideoPlayer.seekTo(0);
-    OCYTVideoFinished = false;
-  }
-  OCYTVideoPlayer.playVideo();
-}
-
-function OCYTVideoOnPlayerStateChange(event){
-  if (event.data === 0) {
-    OCYTVideoFinished = true;
-    OCStaticHideAnimationLightbox();
-  }
-}
-
-function OCStaticHideAnimationLightbox(e) {
-  OCYTVideoPlayer.pauseVideo();
-  $(document.body).removeClass('show-animation-lightbox no-scroll');
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}
 
 function OCStaticShowPHBanner(){
   $(document.body).addClass("ph-banner");

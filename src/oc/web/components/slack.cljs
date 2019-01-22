@@ -29,7 +29,6 @@
         [:div.main.slack
           ; Hope page header
           [:section.carrot-plus-slack.group
-            shared-misc/animation-lightbox
 
             [:h1.slack-headline
               "Rise above the noise"]
@@ -41,7 +40,6 @@
 
             ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
-              shared-misc/show-animation-button
               [:a.add-to-slack-button
                 {:on-click #(do
                              (.preventDefault %)

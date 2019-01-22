@@ -315,18 +315,3 @@
             [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
               {:src (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile.png")
                :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_third_row_mobile@2x.png") " 2x")}]]]]]])
-
-(def animation-lightbox
-  [:div.animation-lightbox-container
-    {:on-click #(js/OCStaticHideAnimationLightbox %)}
-    [:div.animation-lightbox
-      [:div {:id "youtube-player"}]
-      [:button.settings-modal-close.mlb-reset
-        {:on-mouse-down #(js/OCStaticHideAnimationLightbox %)
-         :on-touch-start #(js/OCStaticHideAnimationLightbox %)}]]])
-
-(def show-animation-button
-  [:button.mlb-reset.show-animation-bt
-    {:on-click #(js/OCStaticShowAnimationLightbox)}
-    [:div.green-play]
-    "Carrot in 60 seconds"])
