@@ -38,6 +38,10 @@ div.homepage-testimonials-container {
     padding: 0 0 80px;
   }
 
+  @include mobile() {
+    display: none;
+  }
+
   @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1247px) {
     max-width: 670px;
   }
@@ -517,6 +521,10 @@ section.home-keep-aligned {
 
           div.keep-aligned-section-copy-title {
             max-width: 450px;
+
+            @include mobile() {
+              max-width: 270px;
+            }
           }
         }
 
