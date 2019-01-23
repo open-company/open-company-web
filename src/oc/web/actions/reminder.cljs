@@ -5,7 +5,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.reminder :as reminder-utils]
-            [oc.web.actions.nav-sidebar :as nav-actions]))
+            [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.notifications :as notification-actions]))
 
 (defn load-reminders-roster
   "Load the roster of the users that can be assigned to reminders."
@@ -70,10 +71,22 @@
       (let [update-reminder-link (utils/link-for (:links reminder-data) "partial-update")]
         (api/update-reminder update-reminder-link reminder-data
          (fn [{:keys [status success body]}]
+           (when success
+             (notification-actions/show-notification {:title "Reminder updated"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :reminder-updated}))
            (refresh-reminders))))
       (let [add-reminder-link (utils/link-for (:links reminders-data) "create")]
         (api/add-reminder add-reminder-link reminder-data
          (fn [{:keys [status success body]}]
+           (when success
+             (notification-actions/show-notification {:title "Reminder created"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :reminder-created}))
            (refresh-reminders)))))))
 
 (defn cancel-edit-reminder
@@ -93,4 +106,10 @@
     (nav-actions/show-reminders)
     (api/delete-reminder delete-reminder-link
       (fn [{:keys [status success body]}]
+        (when success
+          (notification-actions/show-notification {:title "Reminder deleted"
+                                                   :primary-bt-title "OK"
+                                                   :primary-bt-dismiss true
+                                                   :expire 10
+                                                   :id :reminder-deleted}))
         (api/get-reminders reminders-link reminders-loaded)))))
