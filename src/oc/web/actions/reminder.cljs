@@ -82,11 +82,15 @@
         (api/add-reminder add-reminder-link reminder-data
          (fn [{:keys [status success body]}]
            (when success
-             (notification-actions/show-notification {:title "Reminder created"
-                                                      :primary-bt-title "OK"
-                                                      :primary-bt-dismiss true
-                                                      :expire 10
-                                                      :id :reminder-created}))
+             (let [self-reminder (= (:user-id (:assignee reminder-data))
+                                    (:user-id (dis/current-user-data)))]
+               (notification-actions/show-notification {:title (if self-reminder
+                                                                "Reminder created and teammate notified"
+                                                                "Reminder created")
+                                                        :primary-bt-title "OK"
+                                                        :primary-bt-dismiss true
+                                                        :expire 10
+                                                        :id :reminder-created})))
            (refresh-reminders)))))))
 
 (defn cancel-edit-reminder
