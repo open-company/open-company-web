@@ -252,13 +252,13 @@
                 [:div.slack-email-switch-bottom-panel.email-panel
                   [:div.slack-email-switch-bottom-panel-copy
                     (str
-                     "“The morning digest is how we know everyone in our "
-                     "offices is up to date on what matters.”")]
+                     "“The morning digest is a great way to get everyone "
+                     "aligned around what matters right from the start.”")]
                   [:div.slack-email-switch-bottom-panel-img]
                   [:div.slack-email-switch-bottom-panel-name
-                    "Bev Pellow"]
+                    "Chris Cairns"]
                   [:div.slack-email-switch-bottom-panel-role
-                    "QPL Rural, Owner"]]]]]
+                    "Skylight Digital, Managing Director"]]]]]
           [:div.keep-aligned-section-row-right
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
