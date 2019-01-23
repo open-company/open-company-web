@@ -71,11 +71,38 @@ div.dropdown-list-container {
           color: $carrot_dark_gray_2;
         }
 
+        &.disabled {
+          opacity: 0.5;
+        }
+
+        &.user-avatar-icons {
+          @include user_profile(22){
+            float: left;
+            margin-right: 8px;
+          }
+
+          span.dropdown-list-item-label {
+            max-width: calc(100% - 30px);
+            line-height: 22px;
+          }
+        }
+
         img.dropdown-list-item-icon {
           width: 16px;
           height: 16px;
           margin-right: 8px;
           margin-top: -3px;
+        }
+
+        span.dropdown-list-item-label {
+          @include avenir_M();
+          font-size: 14px;
+          color: $carrot_light_gray_3;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: pre;
+          display: block;
         }
       }
     }

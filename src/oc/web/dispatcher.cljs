@@ -83,6 +83,20 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
+;; Reminders
+
+(defn reminders-key [org-slug]
+  (vec (conj (org-key org-slug) :reminders)))
+
+(defn reminders-data-key [org-slug]
+  (vec (conj (reminders-key org-slug) :reminders-list)))
+
+(defn reminders-roster-key [org-slug]
+  (vec (conj (reminders-key org-slug) :reminders-roster)))
+
+(defn reminder-edit-key [org-slug]
+  (vec (conj (reminders-key org-slug) :reminder-edit)))
+
 ;; Change related keys
 
 (defn change-data-key [org-slug]
@@ -155,6 +169,8 @@
    :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
+   :show-reminders      [[:base] (fn [base] (:show-reminders base))]
+   :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -309,10 +325,10 @@
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :jwt :wrt-show]
+                            :mobile-menu-open :jwt :wrt-show :show-reminders]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
                                  ap-initial-at show-section-editor show-section-add show-sections-picker
-                                 entry-editing mobile-menu-open jwt wrt-show]
+                                 entry-editing mobile-menu-open jwt wrt-show show-reminders]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -320,6 +336,7 @@
                                :board-data board-data
                                :posts-data filtered-posts
                                :org-settings-data (:org-settings base)
+                               :show-reminders show-reminders
                                :user-settings (:user-settings base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
@@ -343,12 +360,19 @@
                                                 (activity-read-data wrt-show))})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
+   :show-reminders-tooltip     [[:nux] (fn [nux] (:show-reminders-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
    :show-invite-people-tooltip [[:nux] (fn [nux] (:show-invite-people-tooltip nux))]
    :nux-user-type              [[:nux] (fn [nux] (:user-type nux))]
    ;; Cmail
    :cmail-state           [[:base] (fn [base] (:cmail-state base))]
-   :cmail-data            [[:base] (fn [base] (:cmail-data base))]})
+   :cmail-data            [[:base] (fn [base] (:cmail-data base))]
+   :reminders-data        [[:base :org-slug] (fn [base org-slug]
+                                    (get-in base (reminders-data-key org-slug)))]
+   :reminders-roster      [[:base :org-slug] (fn [base org-slug]
+                                    (get-in base (reminders-roster-key org-slug)))]
+   :reminder-edit         [[:base :org-slug] (fn [base org-slug]
+                                    (get-in base (reminder-edit-key org-slug)))]})
 
 ;; Action Loop =================================================================
 
@@ -631,6 +655,26 @@
     (let [all-activities-read (get-in data activities-read-key)]
       (get all-activities-read item-id))))
 
+;; Reminders
+
+(defn reminders-data
+  ([] (reminders-data (router/current-org-slug) @app-state))
+  ([org-slug] (reminders-data org-slug @app-state))
+  ([org-slug data]
+    (get-in data (reminders-data-key org-slug))))
+
+(defn reminders-roster-data
+  ([] (reminders-roster-data (router/current-org-slug) @app-state))
+  ([org-slug] (reminders-roster-data org-slug @app-state))
+  ([org-slug data]
+    (get-in data (reminders-roster-key org-slug))))
+
+(defn reminder-edit-data
+  ([] (reminder-edit-data (router/current-org-slug) @app-state))
+  ([org-slug] (reminder-edit-data org-slug @app-state))
+  ([org-slug data]
+    (get-in data (reminder-edit-key org-slug))))
+
 ;; Debug functions
 
 (defn print-app-state []
@@ -706,6 +750,12 @@
 (defn print-user-notifications []
   (js/console.log (user-notifications-data (router/current-org-slug) @app-state)))
 
+(defn print-reminders-data []
+  (js/console.log (reminders-data (router/current-org-slug) @app-state)))
+
+(defn print-reminder-edit-data []
+  (js/console.log (reminder-edit-data (router/current-org-slug) @app-state)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -724,3 +774,5 @@
 (set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
+(set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
+(set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
