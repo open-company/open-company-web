@@ -10,8 +10,10 @@
 (defonce cmd-queue (atom {}))
 
 (defn buffer-cmd [service-name args]
-  (let [key (keyword service-name)]
-    (swap! cmd-queue (assoc @cmd-queue key (conj (key @cmd-queue) args)))))
+  (let [service-key (keyword service-name)
+        service-queue (service-key @cmd-queue)
+        service-next-queue (conj service-queue args)]
+    (swap! cmd-queue assoc service-key service-next-queue)))
 
 (defn reset-queue [service-name]
   (reset! cmd-queue (assoc @cmd-queue (keyword service-name) {})))
