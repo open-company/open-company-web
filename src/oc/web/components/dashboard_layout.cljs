@@ -295,7 +295,8 @@
                                      (not is-second-user))
                             [:button.mlb-reset.add-post-bt
                               {:on-click #(when can-compose (compose s))}
-                              "Create a new post"])]
+                              [:span.add-post-bt-pen]
+                              "Create your first post"])]
                       [:div.add-post-tooltip-box
                         {:class (when is-second-user "second-user")}]]]))
               (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
@@ -309,16 +310,22 @@
                     [:div.post-added-tooltips
                       [:div.post-added-tooltip-box-mobile]
                       [:div.post-added-tooltip-title
-                        "Auto-share to Slack!"]
+                        "Well done! Setup auto-share to Slack?"]
                       [:div.post-added-tooltip
-                        "Using Slack? Connect to Slack so your team can view and comment on posts from within Slack, too."]
+                        (str
+                         "With our Slack integration, you can automatically publish new "
+                         "post straight to the channel of your choice. We keep track of "
+                         "who saw what so you don’t have to.")]
                       [:button.mlb-reset.post-added-bt
                         {:on-click #(do
                                      (nux-actions/dismiss-post-added-tooltip)
                                      (org-actions/bot-auth team-data current-user-data
                                       (str (router/get-token) "?org-settings=main")))}
                         [:span.slack-icon]
-                        "Connect to Slack"]
+                        "Setup Slack integration"]
+                      [:button.mlb-reset.post-added-cancel-bt
+                        {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                        "No thanks, maybe later"]
                       [:div.post-added-tooltip-box]]]))
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond

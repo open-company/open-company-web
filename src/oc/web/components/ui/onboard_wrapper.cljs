@@ -286,7 +286,7 @@
             "Need to start over? "
             [:button.mlb-reset.logout-cancel
               {:on-click #(jwt-actions/logout oc-urls/sign-up)}
-              "Cancel sign up"]]]]]))
+              "Click here"]]]]]))
 
 (defn- setup-team-data
   ""
@@ -471,8 +471,6 @@
            "Start"]]
         [:div.title
           "Pick a few topics to start"]
-        [:div.subtitle
-          "What types of communication are shared with your team?"]
         [:div.steps.third-step
           [:div.step]
           [:div.step]
