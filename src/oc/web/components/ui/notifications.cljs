@@ -68,11 +68,11 @@
                               :slack-bot slack-bot
                               :opac opac
                               :mention-notification (and mention mention-author)
-                              :inline-bt (id #{:slack-team-added :slack-bot-added
-                                               :org-settings-saved :invitation-resent
-                                               :cancel-invitation :member-removed-from-team
-                                               :reminder-created :reminder-updated
-                                               :reminder-deleted})
+                              :inline-bt ((keyword id) #{:slack-team-added :slack-bot-added
+                                                         :org-settings-saved :invitation-resent
+                                                         :cancel-invitation :member-removed-from-team
+                                                         :reminder-created :reminder-updated
+                                                         :reminder-deleted})
                               :dismiss-button dismiss-bt})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)
