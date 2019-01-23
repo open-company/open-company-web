@@ -1,5 +1,6 @@
 (ns oc.web.components.reminders
   (:require [rum.core :as rum]
+            [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
@@ -110,7 +111,7 @@
                :type "text"
                :max-length 65
                :placeholder "CEO update, Week in review, etc."
-               :on-change #(update-reminder s {:headline (.-value (rum/ref-node s :reminder-title))})}]]]]
+               :on-change #(update-reminder s {:headline (s/trim (.-value (rum/ref-node s :reminder-title)))})}]]]]
       [:div.edit-reminder-row.group
         [:div.half-row-left
           [:div.edit-reminder-label
@@ -127,8 +128,8 @@
               (when @(::frequency-dropdown s)
                 [:div
                   {:ref :frequency-dd-node}
-                  (dropdown-list {:items [{:value :weekly :label (:weekly reminder-utils/frequency-values) :occurrence-value :monday}
-                                          {:value :biweekly :label (:biweekly reminder-utils/frequency-values) :occurrence-value :monday}
+                  (dropdown-list {:items [{:value :weekly :label (:weekly reminder-utils/frequency-values) :occurrence-value :friday}
+                                          {:value :biweekly :label (:biweekly reminder-utils/frequency-values) :occurrence-value :friday}
                                           {:value :monthly :label (:monthly reminder-utils/frequency-values) :occurrence-value :first}
                                           {:value :quarterly :label (:quarterly reminder-utils/frequency-values) :occurrence-value :first}]
                                   :value (:frequency reminder-data)
@@ -185,7 +186,7 @@
           [:button.mlb-reset.delete-bt
             {:on-click #(delete-reminder-clicked s)}
             "Delete reminder"])
-        (let [save-disabled? (or (clojure.string/blank? (:headline reminder-data))
+        (let [save-disabled? (or (s/blank? (:headline reminder-data))
                                  (empty? (:assignee reminder-data))
                                  (not (:frequency reminder-data))
                                  (not (:occurrence-label reminder-data))
