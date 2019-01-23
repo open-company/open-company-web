@@ -149,7 +149,7 @@ div.login-overlay-container {
       border: 1px solid $medium_light_grey;
       color: $light_ui_grey;
       background-color: white;
-      border-radius: 100px;
+      border-radius: 6px;
       text-align: center;
 
       div.signin-with-slack-content, div.signin-with-google-content {
@@ -304,11 +304,11 @@ div.login-overlay-container {
         border: none;
         width: 100%;
         height: 48px;
-        background-color: $carrot_dark_blue_1;
+        background-color: $sea_blue;
         color: white;
         @include avenir_H();
         font-size: 16px;
-        border-radius: 100px;
+        border-radius: 6px;
 
         &.disabled {
           background-color: $light_ui_grey;
