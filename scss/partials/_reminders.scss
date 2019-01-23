@@ -17,7 +17,11 @@ div.reminders-container {
 
   div.reminders-inner {
     width: #{$settings_content_width}px;
-    margin: 72px auto 0;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     background-color: white;
     overflow-x: visible;
