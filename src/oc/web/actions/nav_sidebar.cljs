@@ -38,3 +38,18 @@
 (defn show-invite []
   (org-settings/show-modal :invite)
   (close-navigation-sidebar))
+
+(defn show-reminders []
+  (dis/dispatch! [:input [:show-reminders] :reminders])
+  (close-navigation-sidebar))
+
+(defn show-new-reminder []
+  (dis/dispatch! [:input [:show-reminders] :new])
+  (close-navigation-sidebar))
+
+(defn edit-reminder [reminder-uuid]
+  (dis/dispatch! [:input [:show-reminders] reminder-uuid])
+  (close-navigation-sidebar))
+
+(defn close-reminders []
+  (dis/dispatch! [:input [:show-reminders] nil]))

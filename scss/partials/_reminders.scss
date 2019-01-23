@@ -1,0 +1,479 @@
+div.reminders-container {
+  background-color: $carrot_modal_bg;
+  position: absolute;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: #{$navbar_zindex + 156};
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
+
+  @include mobile() {
+    top: 65px;
+    background-color: white;
+    height: calc(100vh - 65px);
+  }
+
+  div.reminders-inner {
+    width: #{$settings_content_width}px;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
+    background-color: white;
+    overflow-x: visible;
+    overflow-y: auto;
+    overflow: visible;
+    position: relative;
+    border-radius: 4px;
+    padding: 24px 0;
+
+    @include mobile() {
+      width: 100%;
+      box-shadow: none;
+      border: none;
+      border-radius: 0px;
+      margin-top: 0px;
+    }
+
+    &.loading {
+      text-align: center;
+      min-height: 200px;
+    }
+
+    &.no-bottom-padding {
+      padding: 24px 0 0;
+    }
+
+    div.small-loading {
+      margin: 40px auto;
+    }
+
+    button.settings-modal-close {
+      right: -56px;
+      top: 0px;
+
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    div.reminders-header {
+      position: relative;
+      padding: 0 24px;
+      border-bottom: 1px solid $ultra_light_grey;
+      text-align: left;
+
+      div.reminders-header-title {
+        margin-bottom: 16px;
+        @include avenir_H();
+        font-size: 22px;
+        color: $deep_navy;
+        line-height: 30px;
+      }
+
+      div.reminders-header-tab-line {
+        height: 33px;
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        padding: 0 24px;
+
+        div.reminders-header-tab {
+          position: relative;
+          @include avenir_B();
+          font-size: 13px;
+          color: $ui_grey;
+          text-transform: uppercase;
+          float: left;
+          margin-right: 16px;
+          cursor: pointer;
+          padding-bottom: 16px;
+
+          &.active {
+            color: $carrot_orange;
+
+            &:after {
+              content: "";
+              width: 100%;
+              height: 1px;
+              background-color: $carrot_orange;
+              position: absolute;
+              left: 0;
+              bottom: 0;
+            }
+          }
+        }
+      }
+    }
+
+    div.reminders-tab {
+      padding: 0;
+
+      &.manage-reminders {
+
+        div.empty-reminders {
+          text-align: center;
+          width: 396px;
+          margin: 24px auto 0;
+          padding: 0 24px;
+
+          div.empty-reminders-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            background-color: #D9D7D7;
+            background-image: cdnUrl("/img/ML/reminders_logo_white.svg");
+            background-size: 24px 24px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 32px auto 0;
+          }
+
+          div.empty-reminders-title {
+            @include avenir_H();
+            font-size: 16px;
+            color: $deep_navy;
+            margin-top: 16px;
+          }
+
+          div.empty-reminders-description {
+            @include avenir_M();
+            font-size: 14px;
+            color: $ui_grey;
+            margin-top: 4px;
+          }
+
+          button.add-reminder-bt {
+            margin: 16px auto 32px;
+            width: 192px;
+            height: 40px;
+            border-radius: 100px;
+            background-color: $coral;
+            color: $carrot_orange;
+            @include avenir_H();
+            font-size: 14px;
+          }
+        }
+
+        div.reminders-list-container {
+          max-height: 337px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          width: 100%;
+
+          div.reminder-tooltip {
+            width: calc(100% - 48px);
+            border: 1px solid $carrot_gold;
+            background-color: #FDF6E4;
+            border-radius: 6px;
+            padding: 24px 16px;
+            position: relative;
+            text-align: center;
+            margin: 24px auto;
+
+            button.dismiss-reminder-tooltip {
+              position: absolute;
+              top: 0;
+              right: 0;
+              width: 24px;
+              height: 24px;
+              padding: 0;
+              background-image: cdnUrl("/img/ML/small_dismiss_tooltip.svg");
+              background-size: 8px 8px;
+              background-position: center;
+              background-repeat: no-repeat;
+            }
+
+            div.reminder-tooltip-title {
+              @include avenir_H();
+              font-size: 16px;
+              color: $deep_navy;
+            }
+
+            div.reminder-tooltip-description {
+              @include avenir_R();
+              font-size: 16px;
+              color: $deep_navy;
+              margin-top: 4px;
+            }
+
+            button.got-it-reminder-tooltip {
+              margin: 8px auto 0;
+              border-radius: 6px;
+              background-color: $carrot_green;
+              color: white;
+              @include avenir_H();
+              font-size: 14px;
+              height: 32px;
+              padding: 0 12px;
+            }
+          }
+
+          div.reminder-row {
+            padding: 0 24px;
+
+            &.editable-reminder {
+              cursor: pointer;
+              &:hover {
+                background-color: #FBFBFB;
+              }
+            }
+
+            &:last-child {
+              border-bottom-left-radius: 4px;
+              border-bottom-right-radius: 4px;
+
+              div.reminder-row-inner {
+                border-bottom: none;
+                border-bottom-left-radius: 4px;
+                border-bottom-right-radius: 4px;
+              }
+            }
+
+            div.reminder-row-inner {
+              padding: 16px 0;
+              height: 64px;
+              border-bottom: 1px solid $ultra_light_grey;
+
+              div.reminder-assignee {
+                width: 32px;
+                height: 32px;
+                float: left;
+                @include user_profile(32);
+              }
+
+              div.reminder-title {
+                @include avenir_R();
+                font-size: 14px;
+                color: $deep_navy;
+                line-height: 32px;
+                margin-left: 16px;
+                max-width: calc(100% - 160px - 16px - 16px - 32px);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                float: left;
+
+                span.dot {
+                  color: $light_ui_grey;
+                  font-size: 16px;
+                  @include avenir_M();
+                }
+              }
+
+              div.reminder-description {
+                text-align: right;
+                max-width: 160px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                margin-left: 16px;
+                @include avenir_R();
+                font-size: 14px;
+                line-height: 32px;
+                color: #99A0A7;
+                float: right;
+              }
+            }
+          }
+        }
+      }
+
+      &.edit-reminder {
+        margin-top: 4px;
+        padding: 0 24px;
+
+        div.edit-reminder-row {
+
+          div.half-row-left {
+            float: left;
+            width: calc(50% - 8px);
+          }
+
+          div.half-row-right {
+            float: right;
+            width: calc(50% - 8px);
+            margin-left: 16px;
+          }
+
+          div.edit-reminder-label {
+            @include avenir_H();
+            font-size: 12px;
+            line-height: 16px;
+            margin-top: 16px;
+          }
+
+          input.edit-reminder-field, textarea.edit-reminder-field {
+            cursor: initial;
+
+            @include placeholder(){
+              color: rgba($deep_navy, 0.5);
+              @include avenir_R();
+              font-size: 14px;
+              line-height: 22px;
+            }
+          }
+
+          div.edit-reminder-field-container {
+            position: relative;
+
+            &.dropdown-field {
+              &:after {
+                font-family: "Material Design Icons";
+                position: absolute;
+                bottom: 4px;
+                right: 10px;
+                content: "\F35D";
+                font-size: 22px;
+                color: $deep_navy;
+                pointer-events: none;
+              }
+
+              &.users-list {
+                &.loading-users {
+                  &:after {
+                    display: none;
+                  }
+                }
+
+                div.small-loading {
+                  position: absolute;
+                  right: 16px;
+                  top: 10px;
+                  margin: 0;
+                }
+              }
+            }
+
+            div.dropdown-list-container {
+              width: 100%;
+              left: 0px;
+              top: 40px;
+              border-radius: 4px;
+              margin-top: 0;
+
+              div.dropdown-list-content {
+                margin-top: 0;
+                max-height: 190px;
+                overflow-y: auto;
+
+                ul.dropdown-list {
+                  li.dropdown-list-item {
+                    color: $deep_navy;
+                    opacity: 0.8;
+                    padding: 5px 4px 3px;
+
+                    &.selected, &:hover {
+                      color: $deep_navy;
+                      opacity: 1;
+                    }
+
+                    &.disabled {
+                      color:$deep_navy;
+                      opacity: 0.4;
+                    }
+                  }
+                }
+              }
+
+              div.triangle {
+                display: none;
+              }
+            }
+          }
+
+          .edit-reminder-field {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid $medium_light_grey;
+            height: 40px;
+            padding: 10px 9px;
+            margin-top: 8px;
+            outline: none;
+            position: relative;
+            @include avenir_R();
+            font-size: 14px;
+            line-height: 22px;
+            cursor: pointer;
+
+            div.datepicker-container {
+              display: none;
+              position: absolute;
+              top: 40px;
+              left: 0px;
+
+              div.ui-datepicker {
+                top: 0;
+                left: 0;
+              }
+            }
+
+            &.show-picker {
+              div.datepicker-container {
+                display: block;
+              }
+            }
+
+            @include user_profile(24);
+
+            div.user-avatar-img-container {
+              float: left;
+              margin-right: 8px;
+              margin-top: -3px;
+            }
+          }
+
+          textarea.edit-reminder-field {
+            height: 80px;
+            resize: none;
+          }
+        }
+
+        div.edit-reminder-footer {
+          width: 100%;
+          margin-top: 24px;
+          height: 32px;
+
+          button.delete-bt {
+            float: left;
+            height: 32px;
+            padding: 0;
+            color: $carrot_orange_2;
+            @include avenir_R();
+            font-size: 14px;
+          }
+
+          button {
+            float: right;
+            height: 32px;
+
+            &.cancel-bt {
+              @include avenir_R();
+              font-size: 14px;
+              color: $ui_grey;
+              padding: 0;
+              margin-right: 16px;
+            }
+
+            &.save-bt {
+              padding: 6px 12px;
+              background-color: $carrot_green;
+              border-radius: 6px;
+              color: white;
+              @include avenir_H();
+              font-size: 14px;
+
+              &.disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

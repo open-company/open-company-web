@@ -102,13 +102,15 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
+        is-admin-or-author? (utils/is-admin-or-author? org-data)
         show-invite-people (and org-slug
-                                (utils/is-admin-or-author? org-data))
+                                is-admin-or-author?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
                             (< @(::content-height s)
                              (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        show-reminders? (utils/link-for (:links org-data) "reminders")]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?
@@ -206,12 +208,38 @@
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
+        (when show-reminders?
+          [:button.mlb-reset.bottom-nav-bt
+            {:on-click #(do
+                          (nav-actions/show-reminders)
+                          (utils/after 500 utils/remove-tooltips))
+             :title "Set reminders to update your team on time"
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+            [:div.bottom-nav-icon.reminders-icon]
+            [:span "Reminders"]])
         (when show-invite-people
-          [:button.mlb-reset.invite-people-btn
-            {:on-click #(nav-actions/show-invite)}
+          [:button.mlb-reset.bottom-nav-bt
+            {:on-click #(do
+                          (nav-actions/show-invite)
+                          (utils/after 500 utils/remove-tooltips))
+             :title "Invite everyone with email or Slack"
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
-        [:button.mlb-reset.invite-people-btn
-          {:on-click #(chat/chat-click 42861)}
+        [:button.mlb-reset.bottom-nav-bt
+          {:on-click #(do
+                        (chat/chat-click 42861)
+                        (utils/after 500 utils/remove-tooltips))
+           :title "Have a question for Carrot? Chat with us"
+           :data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
           [:div.bottom-nav-icon.support-icon]
           [:span "Get support"]]]]))

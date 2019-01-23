@@ -57,6 +57,8 @@
                 (user-avatar-image (:author n))
                 [:div.user-notification-title
                   (:title n)]
+                [:div.user-notification-body.oc-mentions.oc-mentions-hover
+                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
                 [:div.user-notification-time-since
                   [:time
                     {:date-time (:created-at n)
@@ -65,8 +67,6 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-string (utils/js-date (:created-at n)))}
                     (utils/time-since (:created-at n))]]
-                [:div.user-notification-body.oc-mentions.oc-mentions-hover
-                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
                 (when (:unread n)
                   [:button.mlb-reset.read-bt
                     {:title "Mark as read"
