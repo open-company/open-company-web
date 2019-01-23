@@ -80,7 +80,7 @@
      :org-uuid (:uuid org-data)
      :author (select-keys current-user-data [:user-id :avatar-url :name :first-name :last-name])
      :assignee (select-keys current-user-data [:user-id :avatar-url :name :first-name :last-name])
-     :week-occurrence "monday"
+     :week-occurrence "friday"
      :frequency "weekly"
      :next-send nil
      :last-sent nil
@@ -103,10 +103,10 @@
     (sort-by :label users-list)))
 
 (defn sort-fn [reminder-a reminder-b]
-  (let [headline-compare (compare (:headline reminder-a) (:headline reminder-b))]
-    (if (= headline-compare 0)
-      (compare (:name (:assignee reminder-a)) (:name (:assignee reminder-b)))
-      headline-compare)))
+  (let [assignee-compare (compare (:name (:assignee reminder-a)) (:name (:assignee reminder-b)))]
+    (if (= assignee-compare 0)
+      (compare (:headline reminder-a) (:headline reminder-b))
+      assignee-compare)))
 
 (defn sort-reminders [reminders-items]
   (sort sort-fn reminders-items))
