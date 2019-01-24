@@ -27,7 +27,7 @@ div.main-animation-container {
 }
 
 div.homepage-testimonials-container {
-  margin: 57px auto 0;
+  margin: 0 auto;
   width: 100%;
   max-width: 1261px;
   text-align: center;
@@ -55,6 +55,16 @@ div.homepage-testimonials-container {
     width: 677px;
   }
 
+  div.homepage-testimonials-copy {
+    text-align: center;
+    @include avenir_H();
+    font-size: 14px;
+    color: rgba($deep_navy, 0.5);
+    line-height: 19px;
+    margin-top: 32px;
+    margin-bottom: 24px;
+  }
+
   div.homepage-testimonials-logo {
     width: 208px;
     height: 66px;
@@ -63,12 +73,10 @@ div.homepage-testimonials-container {
     background-repeat: no-repeat;
 
     @media screen and (min-width: 600px) and (max-width: #{$min_big_web_width}px){
-      // padding: 0 32px;
       width: 178px;
     }
 
     @include mobile() {
-      // padding: 0 16px;
       width: 138px;
       // Temp hide the logos on mobile since they don't look good
       display: none;
@@ -193,7 +201,6 @@ section.testimonials-section {
       @media screen and (max-width: #{$testimonials_breakpoint + 48}px){
         width: #{$testimonials_breakpoint + 48}px;
         padding: 0 24px;
-        // margin: 0 24px;
       }
     }
 
@@ -390,17 +397,6 @@ section.keep-aligned {
     }    
   }
 
-  // img.keep-aligned-values-line {
-  //   width: 100%;
-  //   object-fit: contain;
-  //   margin: 24px auto 40px;
-  //   max-width: 797px;
-
-  //   @include mobile() {
-  //     display: none;
-  //   }
-  // }
-
   button.get-started-button {
     margin-top: 40px;
     z-index: 3;
@@ -514,6 +510,10 @@ section.home-keep-aligned {
 
         div.keep-aligned-section-row-left {
           padding: 24px 84px 24px 64px;
+
+          @media screen and (max-width: 1200px) {
+            padding: 24px 44px 24px 44px;
+          }
 
           @include tablet() {
             padding: 24px 0;
@@ -647,13 +647,115 @@ section.home-keep-aligned {
 
           @include tablet() {
             width: calc(144vw + 24px + 86px + 86px);
-            height: calc(72vw * 1.33 + 40px);
+            height: calc(72vw * 1.33 + 48px + 211px);
             max-width: unset;
             position: relative;
           }
 
           @include mobile() {
-            width: calc(144vw + 72px); 
+            width: calc(144vw + 72px);
+            height: calc(72vw * 1.33 + 40px);
+          }
+
+          div.keep-aligned-section-carion-block {
+            div.slack-email-switch-bottom-panel {
+              display: none;
+            }
+
+            @include tablet() {
+              position: absolute;
+              top: 0;
+              width: 72vw;
+              height: calc(72vw * 1.33 + 48px + 211px);
+              background-color: $another_ui_grey;
+              border-radius: 8px;
+
+              &:first-child {
+                left: 86px;
+              }
+
+              &:nth-child(2) {
+                left: unset;
+                right: 86px;
+              }
+
+              img.keep-aligned-section-screenshot {
+                display: block;
+                width: 72vw;
+                height: calc(72vw * 1.33);
+              }
+
+              div.slack-email-switch-bottom-panel {
+                width: 100%;
+                height: 203px;
+                padding: 24px 26px;
+                text-align: center;
+                display: block;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+
+                &.slack-panel {
+                  div.slack-email-switch-bottom-panel-img {
+                    @include image-2x("/img/ML/testimonial_partner_hero");
+                  }
+                }
+
+                &.email-panel {
+                  div.slack-email-switch-bottom-panel-img {
+                    @include image-2x("/img/ML/testimonial_skylight_digital");
+                  }
+                }
+
+                div.slack-email-switch-bottom-panel-copy {
+                  @include avenir_M();
+                  font-size: 16px;
+                  color: $deep_navy;
+                  line-height: 20px;
+                  max-width: 438px;
+                  margin: 0 auto;
+                }
+
+                div.slack-email-switch-bottom-panel-img {
+                  width: 32px;
+                  height: 32px;
+                  background-size: 32px 32px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  margin: 16px auto 0;
+                }
+
+                div.slack-email-switch-bottom-panel-name {
+                  margin-top: 8px;
+                  @include PTSerif();
+                  font-size: 14px;
+                  color: $deep_navy;
+                }
+
+                div.slack-email-switch-bottom-panel-role {
+                  @include avenir_R();
+                  font-size: 14px;
+                  color: $deep_navy; 
+                }
+              }
+            }
+
+            @include mobile() {
+              height: calc(72vw * 1.33 + 40px);
+
+              &:first-child {
+                left: 24px;
+              }
+
+              &:nth-child(2) {
+                left: unset;
+                right: 24px;
+              }
+
+              div.slack-email-switch-bottom-panel {
+                display: none;
+              }
+            }
           }
 
           div.keep-aligned-section-header {
@@ -661,26 +763,15 @@ section.home-keep-aligned {
 
             @include tablet() {
               width: 72vw;
-              height: 40px;
+              height: 48px;
               float: unset;
-              position: absolute;
-              top: 0;
-              background-color: #E3E3E3;
-              border-top-left-radius: 6px;
-              border-top-right-radius: 6px;
               text-align: center;
               display: flex;
               justify-content: center;
               align-items: center;
 
-              &.first-header {
-                left: 86px;
-                padding: 0;
-              }
-
-              &.second-header {
-                left: unset;
-                right: 86px;
+              @include mobile() {
+                height: 40px;
               }
 
               span.slack-logo {
@@ -703,17 +794,6 @@ section.home-keep-aligned {
                 opacity: 0.5;
               }
             }
-
-            @include mobile() {
-
-              &.first-header {
-                left: 24px;
-              }
-
-              &.second-header {
-                right: 24px;
-              }
-            }
           }
 
           img.keep-aligned-section-screenshot {
@@ -733,29 +813,11 @@ section.home-keep-aligned {
             @include tablet() {
               position: absolute;
               top: 0;
+              left: 0;
               width: 72vw;
               height: calc(72vw * 1.33);
               padding: 0;
               margin-top: 40px;
-
-              &.carion-1 {
-                left: 86px;
-                padding: 0;
-              }
-
-              &.carion-1-alt {
-                left: unset;
-                right: 86px;
-              }
-            }
-
-            @include mobile() {
-              &.carion-1 {
-                left: 24px;
-              }
-              &.carion-1-alt {
-                right: 24px;
-              }
             }
 
             &.carion-1 {
@@ -1066,6 +1128,37 @@ section.home-keep-aligned {
           @include mobile() {
             font-size: 20px;
             line-height: 26px;
+          }
+        }
+
+        div.keep-aligned-section-divider-line {
+          width: 100%;
+          height: 1px;
+          background-color: $more_ultra_light_grey;
+          margin-top: 40px;
+
+          @include mobile() {
+            margin-top: 32px;
+          }
+        }
+
+        a.leep-aligned-section-get-started {
+          display: block;
+          @include avenir_B();
+          font-size: 14px;
+          color: $carrot_green;
+          line-height: 19px;
+          text-transform: uppercase;
+          margin-top: 24px;
+
+          span.right-arrow {
+            margin-left: 12px;
+            width: 16px;
+            height: 8px;
+            background-image: cdnUrl("/img/ML/green_right_arrow.svg");
+            background-size: 16px 8px;
+            background-repeat: no-repeat;
+            background-position: center;
           }
         }
 

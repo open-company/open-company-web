@@ -24,6 +24,7 @@ div.home-wrap {
       @include mobile() {
         width: 100%;
         overflow: visible;
+        padding-bottom: 40px;
       }
 
       & > * {

@@ -236,7 +236,7 @@
           {:on-click #(do
                         (chat/chat-click 42861)
                         (utils/after 500 utils/remove-tooltips))
-           :title "Have a question for Carrot? Chat with us"
+           :title "Have a question for Carrot? Chat with us."
            :data-toggle (when-not is-mobile? "tooltip")
            :data-placement "top"
            :data-container "body"

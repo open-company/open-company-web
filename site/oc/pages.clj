@@ -278,9 +278,14 @@
               "Start each day in sync"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Carrot condenses noisy updates into a "
-               "morning digest for Slack or email. Your team "
-               "stays aligned with fewer interruptions.")]
+               "Carrot shares important updates in the morning "
+               "digest for Slack or email. Your team stays "
+               "aligned with fewer interruptions.")]
+            [:div.keep-aligned-section-divider-line]
+            [:a.leep-aligned-section-get-started
+              {:href "/sign-up"}
+              "Get started - It's free"
+              [:span.right-arrow]]
             [:div.slack-email-container.group.big-web-only
               [:div.slack-email-switch-container.group
                 {:class "show-slack"}
@@ -312,16 +317,39 @@
           [:div.keep-aligned-section-row-right
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
-                [:div.keep-aligned-section-header..tablet-mobile-only.first-header
-                  [:span.slack-logo]]
-                [:img.keep-aligned-section-screenshot.screenshot-1.carion-1.first-image
-                  {:src (cdn "/img/ML/homepage_screenshots_first_row_slack.png")
-                   :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
-                [:div.keep-aligned-section-header..tablet-mobile-only.second-header
-                  [:span.email-logo]]
-                [:img.keep-aligned-section-screenshot.screenshot-1.second-image.carion-1-alt
-                  {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
-                   :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]
+                [:div.keep-aligned-section-carion-block
+                  [:div.keep-aligned-section-header.tablet-mobile-only.first-header
+                    [:span.slack-logo]]
+                  [:img.keep-aligned-section-screenshot.screenshot-1.carion-1.first-image
+                    {:src (cdn "/img/ML/homepage_screenshots_first_row_slack.png")
+                     :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
+                  [:div.slack-email-switch-bottom-panel.slack-panel
+                    [:div.slack-email-switch-bottom-panel-copy
+                      (str
+                       "“Our remote teams are ecstatic about not having to read "
+                       "hundreds of Slack messages each morning to make sense of "
+                       "the previous day.”")]
+                    [:div.slack-email-switch-bottom-panel-img]
+                    [:div.slack-email-switch-bottom-panel-name
+                      "Andrew Love"]
+                    [:div.slack-email-switch-bottom-panel-role
+                      "PartnerHero, Director of R&D"]]]
+                [:div.keep-aligned-section-carion-block
+                  [:div.keep-aligned-section-header..tablet-mobile-only.second-header
+                    [:span.email-logo]]
+                  [:img.keep-aligned-section-screenshot.screenshot-1.second-image.carion-1-alt
+                    {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
+                     :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+                  [:div.slack-email-switch-bottom-panel.email-panel
+                    [:div.slack-email-switch-bottom-panel-copy
+                      (str
+                       "“The morning digest is a great way to get everyone "
+                       "aligned around what matters right from the start.”")]
+                    [:div.slack-email-switch-bottom-panel-img]
+                    [:div.slack-email-switch-bottom-panel-name
+                      "Chris Cairns"]
+                    [:div.slack-email-switch-bottom-panel-role
+                      "Skylight Digital, Managing Director"]]]]
               [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
 
       [:div.keep-aligned-section-row.second-row
@@ -339,7 +367,12 @@
               (str
                "See which updates create energy and "
                "engagement, and which ones aren’t getting "
-               "through.")]]
+               "through.")]
+            [:div.keep-aligned-section-divider-line]
+            [:a.leep-aligned-section-get-started
+              {:href "/sign-up"}
+              "Get started - It's free"
+              [:span.right-arrow]]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
               {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
@@ -357,7 +390,12 @@
               (str
                "Carrot reminds you when it’s time to update "
                "your team. Consistent communication builds "
-               "trust and transparency.")]]
+               "trust and transparency.")]
+            [:div.keep-aligned-section-divider-line]
+            [:a.leep-aligned-section-get-started
+              {:href "/sign-up"}
+              "Get started - It's free"
+              [:span.right-arrow]]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
               {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
@@ -368,6 +406,8 @@
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
+    [:div.homepage-testimonials-copy
+      "Fast-growing and remote teams around the world use Carrot"]
     [:div.homepage-testimonials-logo.logo-novo]
     [:div.homepage-testimonials-logo.logo-ph]
     [:div.homepage-testimonials-logo.logo-wsu]
@@ -497,10 +537,6 @@
                 ", plus:"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Make sure everyone sees what matters most."}
               [:span "Carrot AI"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -995,7 +1031,12 @@
                 [:a
                   {:href "https://github.com/open-company"
                    :target "_blank"}
-                  "Build with us on git"]]]]]]
+                  "Build with us on git"]
+                [:span.link-or "or"]
+                [:a
+                  {:href "https://trello.com/b/eKs2LtLu"
+                   :target "_blank"}
+                  "VISIT OUR ROADMAP"]]]]]]
 
       keep-aligned-bottom
     ] ;<!-- main -->

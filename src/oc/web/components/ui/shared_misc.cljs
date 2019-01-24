@@ -5,6 +5,8 @@
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
+    [:div.homepage-testimonials-copy
+      "Fast-growing and remote teams around the world use Carrot"]
     [:div.homepage-testimonials-logo.logo-novo]
     [:div.homepage-testimonials-logo.logo-ph]
     [:div.homepage-testimonials-logo.logo-wsu]
