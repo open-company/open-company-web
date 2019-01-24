@@ -6,7 +6,7 @@
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
-      "Fast-growing and remote teams around the world use Carrot"]
+      "Great teams like these are using Carrot to keep everyone up to date."]
     [:div.homepage-testimonials-logo.logo-novo]
     [:div.homepage-testimonials-logo.logo-ph]
     [:div.homepage-testimonials-logo.logo-wsu]
@@ -230,9 +230,8 @@
               "Start each day in sync"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Carrot condenses noisy updates into a "
-               "morning digest for Slack or email. Your team "
-               "stays aligned with fewer interruptions.")]
+               "Carrot condenses noisy updates into "
+               "a morning digest for Slack or email.")]
             [:div.slack-email-container.group.big-web-only
               [:div.slack-email-switch-container.group
                 {:class "show-slack"}
@@ -264,16 +263,39 @@
           [:div.keep-aligned-section-row-right
             [:div.keep-aligned-section-carion-container
               [:div.keep-aligned-section-carion-inner
-                [:div.keep-aligned-section-header..tablet-mobile-only.first-header
-                  [:span.slack-logo]]
-                [:img.keep-aligned-section-screenshot.screenshot-1.carion-1.first-image
-                  {:src (utils/cdn "/img/ML/homepage_screenshots_first_row_slack.png")
-                   :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
-                [:div.keep-aligned-section-header..tablet-mobile-only.second-header
-                  [:span.email-logo]]
-                [:img.keep-aligned-section-screenshot.screenshot-1.second-image.carion-1-alt
-                  {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
-                   :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]
+                [:div.keep-aligned-section-carion-block
+                  [:div.keep-aligned-section-header.tablet-mobile-only.first-header
+                    [:span.slack-logo]]
+                  [:img.keep-aligned-section-screenshot.screenshot-1.carion-1.first-image
+                    {:src (utils/cdn "/img/ML/homepage_screenshots_first_row_slack.png")
+                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
+                  [:div.slack-email-switch-bottom-panel.slack-panel
+                    [:div.slack-email-switch-bottom-panel-copy
+                      (str
+                       "“Our remote teams are ecstatic about not having to read "
+                       "hundreds of Slack messages each morning to make sense of "
+                       "the previous day.”")]
+                    [:div.slack-email-switch-bottom-panel-img]
+                    [:div.slack-email-switch-bottom-panel-name
+                      "Andrew Love"]
+                    [:div.slack-email-switch-bottom-panel-role
+                      "PartnerHero, Director of R&D"]]]
+                [:div.keep-aligned-section-carion-block
+                  [:div.keep-aligned-section-header..tablet-mobile-only.second-header
+                    [:span.email-logo]]
+                  [:img.keep-aligned-section-screenshot.screenshot-1.second-image.carion-1-alt
+                    {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
+                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+                  [:div.slack-email-switch-bottom-panel.email-panel
+                    [:div.slack-email-switch-bottom-panel-copy
+                      (str
+                       "“The morning digest is a great way to get everyone "
+                       "aligned around what matters right from the start.”")]
+                    [:div.slack-email-switch-bottom-panel-img]
+                    [:div.slack-email-switch-bottom-panel-name
+                      "Chris Cairns"]
+                    [:div.slack-email-switch-bottom-panel-role
+                      "Skylight Digital, Managing Director"]]]]
               [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
 
       [:div.keep-aligned-section-row.second-row

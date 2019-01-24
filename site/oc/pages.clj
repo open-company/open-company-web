@@ -278,14 +278,8 @@
               "Start each day in sync"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Carrot shares important updates in the morning "
-               "digest for Slack or email. Your team stays "
-               "aligned with fewer interruptions.")]
-            [:div.keep-aligned-section-divider-line]
-            [:a.leep-aligned-section-get-started
-              {:href "/sign-up"}
-              "Get started - It's free"
-              [:span.right-arrow]]
+               "Carrot condenses noisy updates into "
+               "a morning digest for Slack or email.")]
             [:div.slack-email-container.group.big-web-only
               [:div.slack-email-switch-container.group
                 {:class "show-slack"}
@@ -367,12 +361,7 @@
               (str
                "See which updates create energy and "
                "engagement, and which ones aren’t getting "
-               "through.")]
-            [:div.keep-aligned-section-divider-line]
-            [:a.leep-aligned-section-get-started
-              {:href "/sign-up"}
-              "Get started - It's free"
-              [:span.right-arrow]]]
+               "through.")]]
           [:div.keep-aligned-section-row-left
             [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
               {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
@@ -390,12 +379,7 @@
               (str
                "Carrot reminds you when it’s time to update "
                "your team. Consistent communication builds "
-               "trust and transparency.")]
-            [:div.keep-aligned-section-divider-line]
-            [:a.leep-aligned-section-get-started
-              {:href "/sign-up"}
-              "Get started - It's free"
-              [:span.right-arrow]]]
+               "trust and transparency.")]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
               {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
@@ -407,7 +391,7 @@
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
-      "Fast-growing and remote teams around the world use Carrot"]
+      "Great teams like these are using Carrot to keep everyone up to date."]
     [:div.homepage-testimonials-logo.logo-novo]
     [:div.homepage-testimonials-logo.logo-ph]
     [:div.homepage-testimonials-logo.logo-wsu]
