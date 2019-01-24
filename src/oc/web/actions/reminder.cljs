@@ -1,4 +1,5 @@
 (ns oc.web.actions.reminder
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.api :as api]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -36,8 +37,8 @@
   Load the reminders list.
   NB: first reminders is loaded in did-mount of dashboard-layout component."
   []
-  (let [org-data (dis/org-data)
-        reminders-link (utils/link-for (:links org-data) "reminders")]
+  (when-let* [org-data (dis/org-data)
+              reminders-link (utils/link-for (:links org-data) "reminders")]
     (api/get-reminders reminders-link reminders-loaded)))
 
 (defn edit-reminder
