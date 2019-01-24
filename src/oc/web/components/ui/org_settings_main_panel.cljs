@@ -235,7 +235,8 @@
         [:button.mlb-reset.save-btn
           {:disabled (or @(::saving s)
                          (:saved org-editing)
-                         (not (:has-changes org-editing)))
+                         (not (:has-changes org-editing))
+                         (clojure.string/blank? (:name org-editing)))
            :class (when (:saved org-editing) "no-disable")
            :on-click #(do
                         (reset! (::saving s) true)
