@@ -118,7 +118,7 @@ div.reminders-container {
           text-align: center;
           width: 396px;
           margin: 24px auto 0;
-          padding: 0 24px;
+          padding: 0 24px 32px;
 
           div.empty-reminders-logo {
             width: 56px;
@@ -147,7 +147,7 @@ div.reminders-container {
           }
 
           button.add-reminder-bt {
-            margin: 16px auto 32px;
+            margin: 16px auto 0;
             width: 192px;
             height: 40px;
             border-radius: 100px;
