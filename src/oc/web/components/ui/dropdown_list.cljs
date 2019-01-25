@@ -64,7 +64,8 @@
                   (when unselected-icon
                     [:img.dropdown-list-item-icon {:src unselected-icon}])))
               (when (and (string? (:label item))
-                         (:user-map item))
+                         (:user-map item)
+                         (:avatar-url (:user-map item)))
                 (user-avatar-image (:user-map item)))
               (when (string? (:label item))
                 [:span.dropdown-list-item-label

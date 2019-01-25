@@ -84,7 +84,8 @@
                             (swap! (::assignee-dropdown s) not)
                             (reset! (::frequency-dropdown s) false)
                             (reset! (::on-dropdown s) false))}
-              (when (:assignee reminder-data)
+              (when (and (:assignee reminder-data)
+                         (:avatar-url (:assignee reminder-data)))
                 (user-avatar-image (:assignee reminder-data)))
               (when (:assignee reminder-data)
                 (str (utils/name-or-email (:assignee reminder-data))
