@@ -73,7 +73,7 @@ div.about-wrap {
               width: 100%;
               margin-top: 32px;
               padding-top: 24px;
-              border-top: 1px solid #E7E6E5;
+              border-top: 1px solid $more_ultra_light_grey;
               margin-left: 0;
             }
 
@@ -282,12 +282,12 @@ div.about-wrap {
           }
 
           div.about-bottom-copy-row {
-            border-top: 1px solid #E7E6E5;
+            border-top: 1px solid $more_ultra_light_grey;
             padding: 40px 0;
 
             div.about-bottom-copy-left {
               float: left;
-              width: 45%;
+              width: 42%;
               @include PTSerif()
               font-size: 30px;
               line-height: 40px;
@@ -303,12 +303,29 @@ div.about-wrap {
 
             div.about-bottom-copy-right {
               float: right;
-              width: 45%;
+              width: 48%;
 
               @include tablet() {
                 float: unset;
                 width: 100%;
                 margin-top: 8px;
+              }
+
+              @include mobile() {
+                span.link-or {
+                  display: none;
+                }
+
+                a {
+                  // float: left;
+                  // width: 100%;
+                  display: block;
+                  margin-top: 16px;
+
+                  &:nth-child(2){
+                    margin-top: 24px;
+                  }
+                }
               }
 
               div.about-bottom-copy-description {
@@ -328,6 +345,16 @@ div.about-wrap {
                 @include avenir_B();
                 font-size: 14px;
                 letter-spacing: 0.5;
+              }
+
+              span.link-or {
+                margin-left: 16px;
+                margin-right: 16px;
+                color: rgba($deep_navy, 0.5);
+                text-transform: uppercase;
+                @include avenir_B();
+                font-size: 14px;
+                letter-spacing: 0.5; 
               }
             }
           }

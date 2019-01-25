@@ -104,7 +104,7 @@ div.press-kit-wrap {
             display: grid;
             grid-template-columns: 1fr 373px;
             grid-template-rows: 1fr;
-            border-top: 1px solid #E7E6E5;
+            border-top: 1px solid $more_ultra_light_grey;
 
             @include tablet(){
               grid-template-columns: 1fr;
@@ -256,7 +256,7 @@ div.press-kit-wrap {
               display: grid;
               grid-template-columns: 324px 1fr;
               grid-template-rows: 1fr;
-              border-top: 1px solid #E7E6E5;
+              border-top: 1px solid $more_ultra_light_grey;
               padding: 40px 0;
 
               @include tablet() {
@@ -330,7 +330,7 @@ div.press-kit-wrap {
             display: grid;
             grid-template-columns: 226px 1fr 486px;
             grid-template-rows: 1fr;
-            border-top: 1px solid #E7E6E5;
+            border-top: 1px solid $more_ultra_light_grey;
             padding: 40px 0;
 
             @include tablet() {
@@ -416,7 +416,7 @@ div.press-kit-wrap {
           display: grid;
           grid-template-columns: 137px 1fr 590px;
           grid-template-rows: 1fr;
-          border-top: 1px solid #E7E6E5;
+          border-top: 1px solid $more_ultra_light_grey;
           margin-top: 40px;
           padding: 40px 0 0;
 

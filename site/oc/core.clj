@@ -130,7 +130,7 @@
                   "Get Started"))]]]
         [:div.site-navbar-right.tablet-only
           [:a.login
-            {:id "site-header-tabket-login-item"
+            {:id "site-header-tablet-login-item"
              :href "/login"}
               "Login"]
           [:a.start

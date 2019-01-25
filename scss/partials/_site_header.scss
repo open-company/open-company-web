@@ -250,6 +250,10 @@ nav.site-navbar {
       @include mobile() {
         height: 30px;
         margin-top: 0;
+
+        a.go-to-digest-bt {
+          display: none;
+        }
       }
 
       a {
