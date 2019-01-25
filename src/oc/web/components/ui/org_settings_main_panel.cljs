@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.org-settings-main-panel
   (:require [rum.core :as rum]
+            [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -235,7 +236,9 @@
         [:button.mlb-reset.save-btn
           {:disabled (or @(::saving s)
                          (:saved org-editing)
-                         (not (:has-changes org-editing)))
+                         (not (:has-changes org-editing))
+                         (s/blank? (:name org-editing))
+                         (< (count (s/trim (:name org-editing))) 3))
            :class (when (:saved org-editing) "no-disable")
            :on-click #(do
                         (reset! (::saving s) true)
