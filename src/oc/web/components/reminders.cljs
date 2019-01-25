@@ -84,7 +84,8 @@
                             (swap! (::assignee-dropdown s) not)
                             (reset! (::frequency-dropdown s) false)
                             (reset! (::on-dropdown s) false))}
-              (when (:assignee reminder-data)
+              (when (and (:assignee reminder-data)
+                         (:avatar-url (:assignee reminder-data)))
                 (user-avatar-image (:assignee reminder-data)))
               (when (:assignee reminder-data)
                 (str (utils/name-or-email (:assignee reminder-data))
@@ -204,16 +205,17 @@
 
 ;; Manage reminders component
 
-(def empty-reminders
+(defn empty-reminders [show-add-reminder-bt]
   [:div.empty-reminders
     [:div.empty-reminders-logo]
     [:div.empty-reminders-title
       "Update your team on time"]
     [:div.empty-reminders-description
       "Make it easy for team leaders to remember when it's time to update everyone."]
-    [:button.mlb-reset.add-reminder-bt
-      {:on-click #(reminder-actions/new-reminder)}
-      "Create new reminder"]])
+    (when show-add-reminder-bt
+      [:button.mlb-reset.add-reminder-bt
+        {:on-click #(reminder-actions/new-reminder)}
+        "Create new reminder"])])
 
 (rum/defcs manage-reminders < rum/reactive
                               (drv/drv :show-reminders-tooltip)
@@ -222,10 +224,11 @@
                                (nux-actions/dismiss-reminders-tooltip)
                                s)}
   [s reminders-data]
-  (let [reminders-list (:items reminders-data)]
+  (let [reminders-list (:items reminders-data)
+        can-add-reminder? (utils/link-for (:links reminders-data) "create")]
     [:div.reminders-tab.manage-reminders
       (if (empty? reminders-list)
-        empty-reminders
+        (empty-reminders can-add-reminder?)
         [:div.reminders-list-container
           (when (drv/react s :show-reminders-tooltip)
             [:div.reminder-tooltip
@@ -291,7 +294,8 @@
         editing-reminder? (string? reminder-tab)
         alert-modal-data (drv/react s :alert-modal)
         reminders-data (drv/react s :reminders-data)
-        reminder-edit-data (drv/react s :reminder-edit)]
+        reminder-edit-data (drv/react s :reminder-edit)
+        can-add-reminder? (utils/link-for (:links reminders-data) "create")]
     [:div.reminders-container.fullscreen-page
       [:div.reminders-inner
         {:class (utils/class-set {:no-bottom-padding (= reminder-tab :reminders)
@@ -311,7 +315,8 @@
                 {:on-click #(nav-actions/show-reminders)
                  :class (when (= reminder-tab :reminders) "active")}
                 "MANAGE"]
-              (when reminders-data
+              (when (and reminders-data
+                         can-add-reminder?)
                 [:div.reminders-header-tab
                   {:on-click #(reminder-actions/new-reminder)
                    :class (when (= reminder-tab :new) "active")}
