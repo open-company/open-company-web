@@ -391,7 +391,7 @@
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
-      "Great teams like these are using Carrot to keep everyone up to date."]
+      "Great teams like these use Carrot to stay up to date."]
     [:div.homepage-testimonials-logo.logo-novo]
     [:div.homepage-testimonials-logo.logo-ph]
     [:div.homepage-testimonials-logo.logo-wsu]
