@@ -39,7 +39,7 @@
     padding-left: 0px !important;
     padding-right: 0px !important;
     padding-top: 40px !important;
-    border-top: 1px solid #E7E6E5;
+    border-top: 1px solid $more_ultra_light_grey;
 
     @include mobile(){
       padding-left: 32px;
@@ -55,7 +55,7 @@
         width: 100%;
         float: none;
         padding-top: 40px;
-        border-top: 1px solid #E7E6E5;
+        border-top: 1px solid $more_ultra_light_grey;
       }
 
       img.logo {

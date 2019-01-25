@@ -113,10 +113,6 @@
                   ", plus:"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                {:data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title "Make sure everyone sees what matters most."}
                 [:span "Carrot AI"]]
               [:div.tear-feature-separator]
               [:div.tear-feature

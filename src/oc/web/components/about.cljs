@@ -184,7 +184,12 @@
                   [:a
                     {:href "https://github.com/open-company"
                      :target "_blank"}
-                    "Build with us on git"]]]]]]
+                    "Build with us on git"]
+                  [:span.link-or "or"]
+                  [:a
+                    {:href "https://trello.com/b/eKs2LtLu"
+                     :target "_blank"}
+                    "VISIT OUR ROADMAP"]]]]]]
 
         shared-misc/keep-aligned-bottom] ;<!-- main -->
     ] ; <!-- wrap -->

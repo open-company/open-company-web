@@ -159,7 +159,7 @@ div.pricing-wrap {
           div.tear-feature-separator {
             height: 1px;
             width: 100%;
-            background-color: #E7E6E5;
+            background-color: $more_ultra_light_grey;
             margin-top: 16px;
           }
 
@@ -379,7 +379,7 @@ div.pricing-wrap {
       }
 
       div.faq-row {
-        border-top: 1px solid #E7E6E5;
+        border-top: 1px solid $more_ultra_light_grey;
         margin-top: 40px;
 
         div.faq-row-question {
