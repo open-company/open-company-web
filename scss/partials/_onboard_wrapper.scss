@@ -611,6 +611,18 @@ div.onboard-lander {
         margin-left: 16px;
         color: $carrot_orange;
       }
+
+      &.left-half-field-label, &.right-half-field-label {
+        width: calc(50% - 8px);
+      }
+
+      &.left-half-field-label {
+        float: left;
+      }
+
+      &.right-half-field-label {
+        float: right;
+      }
     }
 
     div.field-description {
@@ -673,6 +685,18 @@ div.onboard-lander {
 
       &.error {
         border: 1px solid rgba($carrot_orange, 0.5);
+      }
+
+      &.right-half-field, &.left-half-field {
+        width: calc(50% - 8px);
+      }
+
+      &.left-half-field {
+        float: left;
+      }
+
+      &.right-half-field {
+        float: right;
       }
     }
 
@@ -823,10 +847,10 @@ div.onboard-lander {
       }
     }
     div.onboard-form {
-      div.field-label {
-        &:first-child {
-          margin-top: 40px;
-        }
+      margin-top: 40px;
+
+      div.field-label.name-fields {
+        margin-top: 40px;
       }
 
       button.continue {

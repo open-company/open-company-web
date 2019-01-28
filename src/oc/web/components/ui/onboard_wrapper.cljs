@@ -250,25 +250,27 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label
-            "First name"]
-          [:input.field
-            {:class utils/hide-class
-             :type "text"
-             :ref "first-name"
-             :placeholder "First name"
-             :max-length user-utils/user-name-max-lenth
-             :value (or (:first-name user-data) "")
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-          [:div.field-label
-            "Last name"]
-          [:input.field
-            {:class utils/hide-class
-             :type "text"
-             :placeholder "Last name"
-             :value (or (:last-name user-data) "")
-             :max-length user-utils/user-name-max-lenth
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+          [:div.group
+            [:div.field-label.left-half-field-label.name-fields
+              "First name"]
+            [:div.field-label.right-half-field-label.name-fields
+              "Last name"]]
+          [:div.group
+            [:input.field.left-half-field
+              {:class utils/hide-class
+               :type "text"
+               :ref "first-name"
+               :placeholder "First name"
+               :max-length user-utils/user-name-max-lenth
+               :value (or (:first-name user-data) "")
+               :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+            [:input.field.right-half-field
+              {:class utils/hide-class
+               :type "text"
+               :placeholder "Last name"
+               :value (or (:last-name user-data) "")
+               :max-length user-utils/user-name-max-lenth
+               :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]]
           (when-not has-org?
             [:div.field-label
               "Company name"
