@@ -190,7 +190,10 @@
       (redirect-cb))))
 
 (defn pre-flight-email-domain [email-domain team-id cb]
-  (let [team-data (dis/team-data team-id)
+  (let [team-data (or (dis/team-data team-id)
+                      ;; Fallback for NUX: user has no team-id set from the org yet
+                      ;; so the team data are not in the right position yet
+                      (first (filter #(= (:team-id %) team-id) (dis/teams-data))))
         fixed-email-domain (if (and email-domain (.startsWith email-domain "@"))
                              (subs email-domain 1)
                              email-domain)
