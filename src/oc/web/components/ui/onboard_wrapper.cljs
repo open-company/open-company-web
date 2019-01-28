@@ -187,7 +187,7 @@
       (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
 
 (defn check-email-domain [domain s & [reset-email-domain]]
-  (reset! (::checking-email-domain s) true)
+  (reset! (::checking-email-domain s) (not reset-email-domain))
   ;; If user is here it means he has only one team, if he already had one
   ;; he was redirected to it, not here to create a new team, so use the first team
   (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
