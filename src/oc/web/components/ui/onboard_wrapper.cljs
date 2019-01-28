@@ -151,11 +151,17 @@
 
 (defn- profile-setup-team-data
   ""
-  [s]
+  [s & [setup-email-domain]]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)]
+        teams-data @(drv/get-ref s :teams-data)
+        google-domain (jwt/get-key :google-domain)
+        with-email-domain (if (and setup-email-domain
+                                   google-domain
+                                   (clojure.string/blank? (:email-domain org-editing)))
+                            {:email-domain google-domain}
+                            {:email-domain (or (:email-domain org-editing) "")})]
     (if (and (zero? (count (:name org-editing)))
              (seq teams-data))
       (let [first-team (select-keys
@@ -174,7 +180,8 @@
                (dis/dispatch! [:update [:org-editing] #(dissoc % :logo-url)])
                (gdom/removeNode img)))
             (gdom/append (.-body js/document) img)
-            (set! (.-src img) (:logo-url first-team))))))))
+            (set! (.-src img) (:logo-url first-team)))))
+      (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
 
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
@@ -185,10 +192,11 @@
                                   (rum/local false ::saving)
                                   {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:org-editing :name] ""])
+                                    (dis/dispatch! [:input [:org-editing :email-domain] ""])
                                     (user-actions/user-profile-reset)
                                     s)
                                    :did-mount (fn [s]
-                                    (profile-setup-team-data s)
+                                    (profile-setup-team-data s true)
                                     (delay-focus-field-with-ref s "first-name")
                                     s)
                                    :will-update (fn [s]
@@ -277,6 +285,28 @@
                :value (:name org-editing)
                :on-change #(dis/dispatch! [:input [:org-editing]
                  (merge org-editing {:error nil :name (.. % -target -value)})])}])
+          (when-not has-org?
+            [:div.field-label
+              "Domain setup"
+              (when (:domain-error org-editing)
+                [:span.error "Only company email domains are allowed."])])
+          (when-not has-org?
+            [:div.org-email-domain-field
+              {:class (when (:domain-error org-editing) "error")}
+              [:input.field.email
+                {:name "um-domain-invite"
+                 :ref "um-domain-invite"
+                 :type "text"
+                 :auto-capitalize "none"
+                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :value (:email-domain org-editing)
+                 :on-change #(let [domain (.. % -target -value)]
+                               (dis/dispatch! [:input [:org-editing :email-domain] domain])
+                               (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
+                                                                                        (not (utils/valid-domain? domain)))]))
+                 :placeholder "Domain, e.g. acme.com"}]
+            [:div.field-label.info
+              "Anyone with email addresses at these domains can automatically join your workspace."]])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity

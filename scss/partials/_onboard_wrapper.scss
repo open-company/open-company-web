@@ -596,10 +596,9 @@ div.onboard-lander {
 
       &.info {
         @include avenir_R();
-        font-size: 14px;
-        text-align: center;
+        font-size: 12px;
+        margin-top: 8px;
         max-width: 300px;
-        margin: 21px auto 32px;
       }
 
       span.info {
@@ -828,6 +827,10 @@ div.onboard-lander {
         &:first-child {
           margin-top: 40px;
         }
+      }
+
+      button.continue {
+        margin-top: 40px;
       }
     }
   }
