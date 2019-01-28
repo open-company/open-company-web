@@ -623,6 +623,25 @@ div.onboard-lander {
       &.right-half-field-label {
         float: right;
       }
+
+      &.email-domain-field-label {
+        span.error {
+          float: left;
+        }
+        span.field-label-span {
+          float: left;
+          display: block;
+          line-height: 17px;
+        }
+
+        div.small-loading {
+          margin-left: 8px;
+          height: 17px;
+          padding: 0;
+          float: left;
+          display: block;
+        }
+      }
     }
 
     div.field-description {
@@ -685,6 +704,10 @@ div.onboard-lander {
 
       &.error {
         border: 1px solid rgba($carrot_orange, 0.5);
+      }
+
+      &.valid {
+        border: 1px solid rgba($carrot_green, 0.5);
       }
 
       &.right-half-field, &.left-half-field {
@@ -775,10 +798,10 @@ div.onboard-lander {
              color: $ui_grey;
              font-size: 14px;
            }
-         }
 
-         &.error {
-           border: 1px solid rgba($carrot_orange, 0.5);
+           &.error {
+             border: 1px solid rgba($carrot_orange, 0.5);
+           }
          }
 
          button.add-email-domain-bt {
@@ -790,7 +813,7 @@ div.onboard-lander {
            border-top-right-radius: 6px;
            border-bottom-right-radius: 6px;
            float: right;
-         }
+        }
       }
     }
 

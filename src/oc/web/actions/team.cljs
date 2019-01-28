@@ -322,7 +322,7 @@
                                    (:links team-data)
                                    "add"
                                    "POST"
-                                   {:content-type "application/vnd.open-company.team.email-domain.v1"})
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
           fixed-domain (if (.startsWith domain "@") (subs domain 1) domain)]
       (api/add-email-domain add-email-domain-link fixed-domain email-domain-team-add-cb team-data))
     (dis/dispatch! [:email-domain-team-add])))

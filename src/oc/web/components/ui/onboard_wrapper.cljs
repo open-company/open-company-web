@@ -190,6 +190,7 @@
                                   (drv/drv :org-editing)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
+                                  (rum/local false ::checking-email-domain)
                                   {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:org-editing :name] ""])
                                     (dis/dispatch! [:input [:org-editing :email-domain] ""])
@@ -288,24 +289,54 @@
                :on-change #(dis/dispatch! [:input [:org-editing]
                  (merge org-editing {:error nil :name (.. % -target -value)})])}])
           (when-not has-org?
-            [:div.field-label
-              "Domain setup"
-              (when (:domain-error org-editing)
-                [:span.error "Only company email domains are allowed."])])
+            [:div.field-label.email-domain-field-label.group
+              [:span.field-label-span "Domain setup"]
+              (cond
+                @(::checking-email-domain s)
+                (small-loading)
+                (string? (:domain-error org-editing))
+                [:span.error
+                  (:domain-error org-editing)])])
           (when-not has-org?
             [:div.org-email-domain-field
-              {:class (when (:domain-error org-editing) "error")}
               [:input.field.email
                 {:name "um-domain-invite"
                  :ref "um-domain-invite"
+                 :class (utils/class-set {:error (and (seq (:email-domain org-editing))
+                                                      (:domain-error org-editing))
+                                          :valid (and (seq (:email-domain org-editing))
+                                                      (:valid-email-domain org-editing))})
                  :type "text"
                  :auto-capitalize "none"
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :autocomplete "off"
                  :value (:email-domain org-editing)
-                 :on-change #(let [domain (.. % -target -value)]
-                               (dis/dispatch! [:input [:org-editing :email-domain] domain])
-                               (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
-                                                                                        (not (utils/valid-domain? domain)))]))
+                 :on-change (fn [v]
+                              (let [domain (.. v -target -value)
+                                    valid-email-domain? (utils/valid-domain? domain)]
+                                (dis/dispatch! [:update [:org-editing] #(merge % {:email-domain domain
+                                                                                  :domain-error (if (and (seq domain)
+                                                                                                         (not valid-email-domain?))
+                                                                                                  "Please enter a valid email domain."
+                                                                                                  false)
+                                                                                  :valid-email-domain nil})])
+                                (when (and (seq domain)
+                                           valid-email-domain?)
+                                  (reset! (::checking-email-domain s) true)
+                                  ;; If user is here it means he has only one team, if he already had one
+                                  ;; he was redirected to it, not here to create a new team, so use the first team
+                                  (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
+                                   (fn [success status]
+                                     (reset! (::checking-email-domain s) false)
+                                     (dis/dispatch! [:update [:org-editing]
+                                      #(merge % {:valid-email-domain success
+                                                 :domain-error (cond
+                                                                 (= status 409)
+                                                                 "Only company email domains are allowed."
+                                                                 (not success)
+                                                                 "An error occurred, please try again."
+                                                                 :else
+                                                                 nil)})]))))))
                  :placeholder "Domain, e.g. acme.com"}]
             [:div.field-label.info
               "Anyone with email addresses at these domains can automatically join your workspace."]])
