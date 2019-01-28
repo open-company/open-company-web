@@ -220,7 +220,9 @@
                               (and (empty? (:first-name user-data))
                                         (empty? (:last-name user-data)))
                               (and (not has-org?)
-                                   (<= (count (clean-org-name (:name org-editing))) 1)))
+                                   (<= (count (clean-org-name (:name org-editing))) 1))
+                              (and (seq (:email-domain org-editing))
+                                   (not (:valid-email-domain org-editing))))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
