@@ -442,18 +442,20 @@
 
 ;; Signup
 
-(defn signup-with-email [auth-link first-name last-name email pswd callback]
-  (if (and auth-link first-name last-name email pswd)
-    (auth-http (method-for-link auth-link) (relative-href auth-link)
-      {:json-params {:first-name first-name
-                     :last-name last-name
-                     :email email
-                     :password pswd}
-       :headers (headers-for-link auth-link)}
-      (fn [{:keys [success body status]}]
-        (callback success body status)))
-    (handle-missing-link "signup-with-email" auth-link callback
-     {:first-name first-name :last-name last-name :email email :pswd (repeat (count pswd) "*")})))
+(defn signup-with-email [auth-link first-name last-name email pswd timezone callback]
+  (let [user-map {:first-name first-name
+                  :last-name last-name
+                  :email email
+                  :password pswd
+                  :timezone timezone}]
+    (if (and auth-link first-name last-name email pswd)
+      (auth-http (method-for-link auth-link) (relative-href auth-link)
+        {:json-params (cljs->json user-map)
+         :headers (headers-for-link auth-link)}
+        (fn [{:keys [success body status]}]
+          (callback success body status)))
+      (handle-missing-link "signup-with-email" auth-link callback
+       (assoc user-map :password (repeat (count pswd) "*"))))))
 
 ;; Team(s)
 
