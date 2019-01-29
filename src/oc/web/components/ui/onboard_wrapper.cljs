@@ -377,7 +377,7 @@
                                   (check-email-domain domain s))))
                  :placeholder "Domain, e.g. acme.com"}]
             [:div.field-label.info
-              "Anyone with email addresses at these domains can automatically join your workspace."]])
+              "Anyone with email addresses at these domain can automatically join your workspace."]])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
