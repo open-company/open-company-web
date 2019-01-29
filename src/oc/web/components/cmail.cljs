@@ -240,7 +240,8 @@
       [:div.edit-tooltip
         (str
          "Share something with your team, like an announcement, update, or decision. "
-         "Use the buttons below to add images, video, or attachments.")]]])
+         (when-not (responsive/is-tablet-or-mobile?)
+           "Use the buttons below to add images, video, or attachments."))]]])
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
@@ -323,8 +324,6 @@
                                                   (= (router/current-board-slug) "all-posts"))
                                       go-to-ap (and (not (:new-section cmail-data))
                                                     from-ap)]
-                                  ;; Show the first post added tooltip if needed
-                                  (nux-actions/show-post-added-tooltip)
                                   ;; Redirect to AP if coming from it or if the post is not published
                                   (router/nav!
                                     (if go-to-ap
