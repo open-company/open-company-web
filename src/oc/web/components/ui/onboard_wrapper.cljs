@@ -192,24 +192,27 @@
   ;; he was redirected to it, not here to create a new team, so use the first team
   (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
    (fn [success status]
-     (reset! (::checking-email-domain s) false)
-     (let [domain-error (cond
-                         (= status 409)
-                         "Only company email domains are allowed."
-                         (not success)
-                         "An error occurred, please try again."
-                         :else
-                         nil)
-            next-org-editing {:valid-email-domain success
-                              :domain-error (if reset-email-domain
-                                              nil
-                                              domain-error)}
-            with-email-domain (if (and reset-email-domain
-                                       success)
-                                (assoc next-org-editing :email-domain domain)
-                                next-org-editing)]
-       (dis/dispatch! [:update [:org-editing]
-        #(merge % with-email-domain)])))))
+     ;; Discard response if the domain changed
+     (when (or reset-email-domain
+               (= domain (:email-domain @(drv/get-ref s :org-editing))))
+       (reset! (::checking-email-domain s) false)
+       (let [domain-error (cond
+                           (= status 409)
+                           "Only company email domains are allowed."
+                           (not success)
+                           "An error occurred, please try again."
+                           :else
+                           nil)
+              next-org-editing {:valid-email-domain success
+                                :domain-error (if reset-email-domain
+                                                nil
+                                                domain-error)}
+              with-email-domain (if (and reset-email-domain
+                                         success)
+                                  (assoc next-org-editing :email-domain domain)
+                                  next-org-editing)]
+         (dis/dispatch! [:update [:org-editing]
+          #(merge % with-email-domain)]))))))
 
 (defn precheck-user-email [s a]
   (when-not @(::user-email-checked s)
