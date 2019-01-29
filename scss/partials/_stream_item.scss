@@ -88,6 +88,8 @@ div.stream-item {
   }
 
   div.stream-item-header {
+    position: relative;
+
     @include mobile() {
       width: 100%;
     }
@@ -150,6 +152,77 @@ div.stream-item {
 
       div.stream-item-wrt {
         float: left;
+      }
+    }
+
+    div.post-added-tooltip-container {
+      border: 1px solid rgba($carrot_gold, 0.5);
+      background-color: #FDF6E4;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+      width: 300px;
+      border-radius: 6px;
+      padding: 24px 20px;
+      margin: 12px 0 0;
+      position: absolute;
+      left: 8px;
+      top: 38px;
+      text-align: center;
+      z-index: 5;
+
+      div.post-added-tooltip-top-arrow {
+        position: absolute;
+        top: -12px;
+        width: 24px;
+        height: 12px;
+        margin-left: -12px;
+        left: 50%;
+        background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
+        background-position: center;
+        background-size: 24px 12px;
+        background-repeat: no-repeat;
+      }
+
+      button.post-added-tooltip-dismiss {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 32px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
+        background-size: 8px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      div.post-added-tooltips {
+
+        div.post-added-tooltip-title {
+          @include PTSerif();
+          font-size: 18px;
+          color: $deep_navy;
+          line-height: 18px;
+        }
+
+        div.post-added-tooltip {
+          @include avenir_R();
+          font-size: 16px;
+          color: $deep_navy;
+          line-height: 20px;
+          margin-top: 4px;
+        }
+
+        button.post-added-bt {
+          width: auto;
+          margin-top: 16px;
+          height: 32px;
+          width: 96px;
+          background-color: transparent;
+          border-radius: 6px;
+          color: white;
+          background-color: $carrot_green;
+          @include avenir_H();
+          font-size: 16px;
+        }
       }
     }
   }
