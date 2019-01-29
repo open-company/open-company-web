@@ -13,7 +13,7 @@ div.login-overlay-container {
   @include mobile{
     width: 100%;
     height: auto;
-    min-height: 100%;
+    min-height: 100vh;
     overflow: auto;
     position: relative;
     background-color: white;
@@ -51,7 +51,7 @@ div.login-overlay-container {
       margin-left: 0px;
       width: 100%;
       height: auto;
-      min-height: 100%;
+      min-height: 100vh;
       left: 0px;
       top: 0px;
       overflow: auto;
