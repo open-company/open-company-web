@@ -140,11 +140,10 @@
                                       (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
         show-activity-not-found (and (not jwt)
                                      (or force-login-wall
-                                         (or (router/current-activity-id)
-                                             ap-initial-at)
-                                         (or org-not-found
-                                             section-not-found
-                                             entry-not-found)))
+                                         (and (router/current-activity-id)
+                                              (or org-not-found
+                                                  section-not-found
+                                                  entry-not-found))))
         show-activity-removed (and jwt
                                    (or (router/current-activity-id)
                                        ap-initial-at)
