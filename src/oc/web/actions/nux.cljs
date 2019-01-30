@@ -5,7 +5,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn get-nux-cookie
@@ -36,8 +35,7 @@
   (set-nux-cookie user-type
     {:show-add-post-tooltip true
      :show-post-added-tooltip false
-     :show-edit-tooltip true
-     :show-reminders-tooltip true}))
+     :show-edit-tooltip true}))
 
 (defn nux-end
   "NUX completed for the current user, remove the cookie and update the nux-cookie-value."
@@ -51,7 +49,7 @@
 (defn- parse-nux-cookie-value [v]
   (if (= v default-tooltip-done)
     false
-    (boolean v)))
+    v))
 
 (defn mark-nux-step-done [nux-step-key]
   (when-let [nux-cookie (get-nux-cookie)]
@@ -59,9 +57,6 @@
      {nux-step-key default-tooltip-done})))
 
 (defn check-nux
-  "NUX Logic:
-   if user is new
-     if "
   []
   (when-let* [nv (get-nux-cookie)
               org-data (dis/org-data)
@@ -73,7 +68,6 @@
           post-added-tooltip (:show-post-added-tooltip nv)
           fixed-post-added-tooltip (parse-nux-cookie-value post-added-tooltip)
           edit-tooltip (:show-edit-tooltip nv)
-          reminders-tooltip (:show-reminders-tooltip nv)
           user-type (:user-type nv)
           all-posts-count (count (vals posts-data))
           sample-posts-count (count (filterv :sample (vals posts-data)))
@@ -91,20 +85,14 @@
           fixed-edit-tooltip (and ;; has not been done already
                                   (not= edit-tooltip default-tooltip-done)
                                   ;; user is not a viewer
-                                  can-edit?)
-          ;; Show the tooltip inside reminders
-          fixed-reminders-tooltip (and ;; has not been done already
-                                       (not= reminders-tooltip default-tooltip-done)
-                                       ;; user is not a viewer
-                                       can-edit?)]
+                                  can-edit?)]
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
                  (true? post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
       (when (and (not fixed-post-added-tooltip)
-                 (or team-has-bot?
-                     (not is-admin?)))
+                 (not can-edit?))
         (mark-nux-step-done :show-post-added-tooltip))
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
@@ -112,9 +100,6 @@
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
-      (when (and (not fixed-reminders-tooltip)
-                 (not can-edit?))
-        (mark-nux-step-done :show-reminders-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip (if fixed-add-post-tooltip
                                  (if has-organic-posts
@@ -123,25 +108,23 @@
                                  false)
         :show-post-added-tooltip fixed-post-added-tooltip
         :show-edit-tooltip fixed-edit-tooltip
-        :show-reminders-tooltip fixed-reminders-tooltip
         :user-type user-type}])
 
       ;; Check if we need to remove the nux cookie
       (when (and (= (:show-add-post-tooltip nv) default-tooltip-done)
                  (= (:show-post-added-tooltip nv) default-tooltip-done)
-                 (= (:show-edit-tooltip nv) default-tooltip-done)
-                 (= (:show-reminders-tooltip nv) default-tooltip-done))
+                 (= (:show-edit-tooltip nv) default-tooltip-done))
         (nux-end)))))
 
 (defn dismiss-add-post-tooltip []
   (mark-nux-step-done :show-add-post-tooltip)
   (check-nux))
 
-(defn show-post-added-tooltip []
+(defn show-post-added-tooltip [post-uuid]
   (when-let [nux-cookie (get-nux-cookie)]
     (set-nux-cookie (:user-type nux-cookie)
      {:show-add-post-tooltip default-tooltip-done
-      :show-post-added-tooltip (or (:show-post-added-tooltip nux-cookie) true)}))
+      :show-post-added-tooltip (or (:show-post-added-tooltip nux-cookie) post-uuid)}))
   (check-nux))
 
 (defn dismiss-post-added-tooltip []
@@ -150,8 +133,4 @@
 
 (defn dismiss-edit-tooltip []
   (mark-nux-step-done :show-edit-tooltip)
-  (check-nux))
-
-(defn dismiss-reminders-tooltip []
-  (mark-nux-step-done :show-reminders-tooltip)
   (check-nux))
