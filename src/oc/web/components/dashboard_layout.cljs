@@ -92,7 +92,6 @@
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
-                              (drv/drv :show-post-added-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
                               (drv/drv :current-user-data)
                               ;; Locals
@@ -299,34 +298,6 @@
                               "Create your first post"])]
                       [:div.add-post-tooltip-box
                         {:class (when is-second-user "second-user")}]]]))
-              (when-let [add-bot-link (utils/link-for (:links team-data) "bot" "GET" {:auth-source "slack"})]
-                (when (and (not is-drafts-board)
-                           is-admin-or-author
-                           (not is-mobile?)
-                           (drv/react s :show-post-added-tooltip))
-                  [:div.post-added-tooltip-container.group
-                    [:button.mlb-reset.post-added-tooltip-dismiss
-                      {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                    [:div.post-added-tooltips
-                      [:div.post-added-tooltip-box-mobile]
-                      [:div.post-added-tooltip-title
-                        "Well done! Setup auto-share to Slack?"]
-                      [:div.post-added-tooltip
-                        (str
-                         "With our Slack integration, you can automatically publish new "
-                         "post straight to the channel of your choice. We keep track of "
-                         "who saw what so you don’t have to.")]
-                      [:button.mlb-reset.post-added-bt
-                        {:on-click #(do
-                                     (nux-actions/dismiss-post-added-tooltip)
-                                     (org-actions/bot-auth team-data current-user-data
-                                      (str (router/get-token) "?org-settings=main")))}
-                        [:span.slack-icon]
-                        "Setup Slack integration"]
-                      [:button.mlb-reset.post-added-cancel-bt
-                        {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                        "No thanks, maybe later"]
-                      [:div.post-added-tooltip-box]]]))
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards

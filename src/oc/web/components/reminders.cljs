@@ -217,12 +217,7 @@
         {:on-click #(reminder-actions/new-reminder)}
         "Create new reminder"])])
 
-(rum/defcs manage-reminders < rum/reactive
-                              (drv/drv :show-reminders-tooltip)
-                              {:will-unmount (fn [s]
-                               ;; Make sure the tooltip is shown only the first time the user access reminders
-                               (nux-actions/dismiss-reminders-tooltip)
-                               s)}
+(rum/defcs manage-reminders
   [s reminders-data]
   (let [reminders-list (:items reminders-data)
         can-add-reminder? (utils/link-for (:links reminders-data) "create")]
@@ -230,17 +225,6 @@
       (if (empty? reminders-list)
         (empty-reminders can-add-reminder?)
         [:div.reminders-list-container
-          (when (drv/react s :show-reminders-tooltip)
-            [:div.reminder-tooltip
-              [:button.mlb-reset.dismiss-reminder-tooltip
-                {:on-click #(nux-actions/dismiss-reminders-tooltip)}]
-              [:div.reminder-tooltip-title
-                "Keep your team in sync"]
-              [:div.reminder-tooltip-description
-                "Carrot reminders you when it's time to update your team"]
-              [:button.mlb-reset.got-it-reminder-tooltip
-                {:on-click #(nux-actions/dismiss-reminders-tooltip)}
-                "Ok, got it"]])
           (for [reminder reminders-list
                 :let [patch-link (utils/link-for (:links reminder) "partial-update")
                       now-year (.getFullYear (utils/js-date))

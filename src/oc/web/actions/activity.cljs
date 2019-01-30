@@ -13,6 +13,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
@@ -400,7 +401,9 @@
   (swap! initial-revision dissoc (:uuid activity-data))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
   ;; Send item read
-  (send-item-read (:uuid activity-data)))
+  (send-item-read (:uuid activity-data))
+  ;; Show the first post added tooltip if needed
+  (nux-actions/show-post-added-tooltip (:uuid activity-data)))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
@@ -421,7 +424,8 @@
       (ws-cc/container-watch (:uuid new-board-data)))
     (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
     ;; Send item read
-    (send-item-read (:uuid saved-activity-data))))
+    (send-item-read (:uuid saved-activity-data))
+    (nux-actions/show-post-added-tooltip (:uuid saved-activity-data))))
 
 (defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
