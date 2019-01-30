@@ -296,7 +296,6 @@
         (when-not has-org?
           [:div.steps.first-step
             [:div.step]
-            [:div.step]
             [:div.step]])
         [:div.steps-separator]]
       (when (:error edit-user-profile)
@@ -575,8 +574,7 @@
            "Start"]]
         [:div.title
           "Pick a few topics to start"]
-        [:div.steps.third-step
-          [:div.step]
+        [:div.steps.second-step
           [:div.step]
           [:div.step]]
         [:div.steps-separator]]
@@ -674,7 +672,7 @@
           "Invite your team"]
         [:div.subtitle
           "Invite some colleagues to explore Carrot with you."]
-        [:div.steps.second-step
+        [:div.steps.third-step
           [:div.step]
           [:div.step]
           [:div.step]]
