@@ -541,7 +541,7 @@
                                (dis/dispatch! [:input [:org-editing :email-domain] domain])
                                (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
                                                                                         (not (utils/valid-domain? domain)))]))
-                 :placeholder "Domain, e.g. acme.com"}]]
+                 :placeholder "Domain, e.g. @acme.com"}]]
             [:div.field-label.info "Anyone with this email domain can automatically join your team."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
