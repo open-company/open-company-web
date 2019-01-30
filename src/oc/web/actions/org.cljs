@@ -156,7 +156,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/sign-up-invite (:slug org-data)))))
+   #(router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -185,9 +185,26 @@
                                    (:links team-data)
                                    "add"
                                    "POST"
-                                   {:content-type "application/vnd.open-company.team.email-domain.v1"})]
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1+json"})]
         (api/add-email-domain add-email-domain-link email-domain redirect-cb team-data))
       (redirect-cb))))
+
+(defn pre-flight-email-domain [email-domain team-id cb]
+  (let [team-data (or (dis/team-data team-id)
+                      ;; Fallback for NUX: user has no team-id set from the org yet
+                      ;; so the team data are not in the right position yet
+                      (first (filter #(= (:team-id %) team-id) (dis/teams-data))))
+        fixed-email-domain (if (and email-domain (.startsWith email-domain "@"))
+                             (subs email-domain 1)
+                             email-domain)
+        add-email-domain-link (utils/link-for
+                                   (:links team-data)
+                                   "add"
+                                   "POST"
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
+        redirect-cb (fn [{:keys [status success body]}]
+                      (cb success status))]
+    (api/add-email-domain add-email-domain-link fixed-email-domain redirect-cb team-data true)))
 
 (defn org-create-check-errors [status]
   (if (= status 409)

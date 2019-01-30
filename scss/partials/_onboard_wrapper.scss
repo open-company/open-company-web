@@ -259,7 +259,7 @@ div.onboard-lander {
     }
 
     div.steps {
-      width: 96px;
+      width: 64px;
       height: 8px;
       margin: 24px auto 0;
 
@@ -596,10 +596,9 @@ div.onboard-lander {
 
       &.info {
         @include avenir_R();
-        font-size: 14px;
-        text-align: center;
+        font-size: 12px;
+        margin-top: 8px;
         max-width: 300px;
-        margin: 21px auto 32px;
       }
 
       span.info {
@@ -611,6 +610,37 @@ div.onboard-lander {
       span.error {
         margin-left: 16px;
         color: $carrot_orange;
+      }
+
+      &.left-half-field-label, &.right-half-field-label {
+        width: calc(50% - 8px);
+      }
+
+      &.left-half-field-label {
+        float: left;
+      }
+
+      &.right-half-field-label {
+        float: right;
+      }
+
+      &.email-domain-field-label {
+        span.error {
+          float: left;
+        }
+        span.field-label-span {
+          float: left;
+          display: block;
+          line-height: 17px;
+        }
+
+        div.small-loading {
+          margin-left: 8px;
+          height: 17px;
+          padding: 0;
+          float: left;
+          display: block;
+        }
       }
     }
 
@@ -674,6 +704,22 @@ div.onboard-lander {
 
       &.error {
         border: 1px solid rgba($carrot_orange, 0.5);
+      }
+
+      &.valid {
+        border: 1px solid rgba($carrot_green, 0.5);
+      }
+
+      &.right-half-field, &.left-half-field {
+        width: calc(50% - 8px);
+      }
+
+      &.left-half-field {
+        float: left;
+      }
+
+      &.right-half-field {
+        float: right;
       }
     }
 
@@ -752,10 +798,10 @@ div.onboard-lander {
              color: $ui_grey;
              font-size: 14px;
            }
-         }
 
-         &.error {
-           border: 1px solid rgba($carrot_orange, 0.5);
+           &.error {
+             border: 1px solid rgba($carrot_orange, 0.5);
+           }
          }
 
          button.add-email-domain-bt {
@@ -767,7 +813,7 @@ div.onboard-lander {
            border-top-right-radius: 6px;
            border-bottom-right-radius: 6px;
            float: right;
-         }
+        }
       }
     }
 
@@ -824,10 +870,14 @@ div.onboard-lander {
       }
     }
     div.onboard-form {
-      div.field-label {
-        &:first-child {
-          margin-top: 40px;
-        }
+      margin-top: 40px;
+
+      div.field-label.name-fields {
+        margin-top: 40px;
+      }
+
+      button.continue {
+        margin-top: 40px;
       }
     }
   }
