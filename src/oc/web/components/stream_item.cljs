@@ -178,7 +178,7 @@
             [:div.stream-item-wrt
               (wrt-count activity-data read-data)
               (when (and (not is-mobile?)
-                         true);(= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
+                         (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
                 [:div.post-added-tooltip-container.group
                   [:div.post-added-tooltip-top-arrow]
                   [:button.mlb-reset.post-added-tooltip-dismiss
