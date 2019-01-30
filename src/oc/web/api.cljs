@@ -296,12 +296,17 @@
         callback))
     (handle-missing-link "patch-org-sections" org-patch-link callback {:data data})))
 
-(defn add-email-domain [add-email-domain-link domain callback team-data]
+(defn add-email-domain [add-email-domain-link domain callback team-data & [pre-flight]]
   (if (and add-email-domain-link domain)
-    (auth-http (method-for-link add-email-domain-link) (relative-href add-email-domain-link)
-      {:headers (headers-for-link add-email-domain-link)
-       :body domain}
-      callback)
+    (let [email-domain-payload {:email-domain domain}
+          with-preflight (if pre-flight
+                           (assoc email-domain-payload :pre-flight true)
+                           email-domain-payload)
+          json-data (cljs->json with-preflight)]
+      (auth-http (method-for-link add-email-domain-link) (relative-href add-email-domain-link)
+        {:headers (headers-for-link add-email-domain-link)
+         :json-params json-data}
+        callback))
     (handle-missing-link "add-email-domain" add-email-domain-link callback
      {:domain domain :team-data team-data})))
 
