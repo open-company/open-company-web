@@ -357,7 +357,8 @@
                                :wrt-activity-data (when wrt-show
                                                    (activity-data-get wrt-show))
                                :wrt-read-data (when wrt-show
-                                                (activity-read-data wrt-show))})]
+                                                (activity-read-data wrt-show))
+                               :force-login-wall (:force-login-wall base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]

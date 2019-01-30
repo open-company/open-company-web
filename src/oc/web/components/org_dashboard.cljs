@@ -94,7 +94,8 @@
                 show-cmail
                 showing-mobile-user-notifications
                 wrt-activity-data
-                wrt-read-data]} (drv/react s :org-dashboard-data)
+                wrt-read-data
+                force-login-wall]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -138,11 +139,12 @@
                                  (and ap-initial-at
                                       (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
         show-activity-not-found (and (not jwt)
-                                     (or (router/current-activity-id)
-                                         ap-initial-at)
-                                     (or org-not-found
-                                         section-not-found
-                                         entry-not-found))
+                                     (or force-login-wall
+                                         (or (router/current-activity-id)
+                                             ap-initial-at)
+                                         (or org-not-found
+                                             section-not-found
+                                             entry-not-found)))
         show-activity-removed (and jwt
                                    (or (router/current-activity-id)
                                        ap-initial-at)
