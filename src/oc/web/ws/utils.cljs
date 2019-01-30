@@ -16,7 +16,7 @@
     (swap! cmd-queue assoc service-key service-next-queue)))
 
 (defn reset-queue [service-name]
-  (reset! cmd-queue (assoc @cmd-queue (keyword service-name) {})))
+  (reset! cmd-queue (assoc @cmd-queue (keyword service-name) [])))
 
 (defn send-queue [service-name chsk-send! ch-state]
   (when (and chsk-send! (:open? @@ch-state))
@@ -24,21 +24,15 @@
       (apply chsk-send! qargs))
     (reset-queue service-name)))
 
-(declare sentry-report)
-(defn not-connected [service-name chsk-send! ch-state & args]
-  (let [arg (first (first args))]
-    (buffer-cmd service-name arg)
-    (sentry-report service-name chsk-send! ch-state arg)))
-
-(defn send! [service-name chsk-send! ch-state & args]
+(defn send! [service-name chsk-send! ch-state args]
   (if (and @chsk-send! (:open? @@ch-state))
     (do
       ;; empty queue first
       (send-queue service-name @chsk-send! ch-state)
       ;; send current command
-      (apply @chsk-send! (first args)))
+      (apply @chsk-send! args))
     ;;disconnected
-    (not-connected service-name chsk-send! ch-state args)))
+    (buffer-cmd service-name args)))
 
 ;; Connection check
 (defn sentry-report [service-name chsk-send! ch-state & [action-id infos]]
