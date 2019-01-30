@@ -1,4 +1,5 @@
 (ns oc.web.actions.user
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -168,6 +169,17 @@
 (defn show-login [login-type]
   (dis/dispatch! [:login-overlay-show login-type]))
 
+;; User Timezone preset
+
+(defn- patch-timezone-if-needed [user-map]
+  (when-let* [_notz (clojure.string/blank? (:timezone user-map))
+              user-profile-link (utils/link-for (:links user-map) "partial-update" "PATCH")
+              guessed-timezone (.. js/moment -tz guess)]
+    (api/patch-user user-profile-link {:timezone guessed-timezone}
+     (fn [status body success]
+       (when success
+        (dis/dispatch! [:user-data (json->cljs body)]))))))
+
 ;; Auth
 
 (defn auth-settings-get
@@ -178,8 +190,10 @@
       ;; auth settings loaded
       (when-let [user-link (utils/link-for (:links body) "user" "GET")]
         (api/get-user user-link (fn [data]
-          (dis/dispatch! [:user-data (json->cljs data)])
-          (utils/after 100 nux-actions/check-nux))))
+          (let [user-map (json->cljs data)]
+            (dis/dispatch! [:user-data user-map])
+            (utils/after 100 nux-actions/check-nux)
+            (patch-timezone-if-needed user-map)))))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
@@ -286,6 +300,7 @@
      (or (:lastname signup-data) "")
      (:email signup-data)
      (:pswd signup-data)
+     (.. js/moment -tz guess)
      (partial signup-with-email-callback (:email signup-data)))
     (dis/dispatch! [:signup-with-email])))
 
@@ -335,9 +350,11 @@
                               (utils/valid-email? new-email))
                        (assoc with-pswd :email new-email)
                        (assoc with-pswd :email (:email current-user-data)))
+          timezone (or (:timezone edit-user-profile) (:timezone current-user-data) (.. js/moment -tz guess))
+          with-timezone (assoc with-email :timezone timezone)
           user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
       (dis/dispatch! [:user-profile-save])
-      (api/patch-user user-profile-link with-email
+      (api/patch-user user-profile-link with-timezone
        (fn [status body success]
          (if (= status 422)
            (dis/dispatch! [:user-profile-update/failed])
