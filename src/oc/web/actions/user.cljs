@@ -18,6 +18,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.ws.notify-client :as ws-nc]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;;User walls
@@ -89,7 +90,7 @@
                    (if (pos? (count orgs))
                      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
                      (cook/remove-cookie! (router/last-org-cookie)))
-                   (router/redirect-404!)))))
+                   (routing-actions/maybe-404)))))
            (when (and (jwt/jwt)
                       (utils/in? (:route @router/path) "login")
                       (pos? (count orgs)))
@@ -102,7 +103,11 @@
 
 (defn maybe-save-login-redirect []
   (let [url-pathname (.. js/window -location -pathname)]
-    (when (not= url-pathname oc-urls/login)
+    (cond
+      (and (= url-pathname oc-urls/login-wall)
+           (:login-redirect (:query-params @dis/app-state)))
+      (save-login-redirect (:login-redirect (:query-params @dis/app-state)))
+      (not= url-pathname oc-urls/login)
       (save-login-redirect))))
 
 (defn login-redirect []

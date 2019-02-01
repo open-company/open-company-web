@@ -90,6 +90,8 @@
 
 (def email-wall "/email-required")
 
+(def login-wall "/login-wall")
+
 ;; User
 
 (def user-profile "/profile")
