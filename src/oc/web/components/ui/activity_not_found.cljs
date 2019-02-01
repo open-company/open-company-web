@@ -35,7 +35,7 @@
             [:div.login-title
               "Please log in to continue"]
             [:div.login-description
-              "You need to be logged in to view this post"]
+              "You need to be logged in to view a post."]
             [:button.mlb-reset.signup-with-slack
               {:on-touch-start identity
                :on-click #(do
