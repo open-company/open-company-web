@@ -176,21 +176,21 @@
             [:div.separator])
           (when should-show-wrt
             [:div.stream-item-wrt
-              (wrt-count activity-data read-data)])]
-        (when (and (not is-mobile?)
-                   (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
-          [:div.post-added-tooltip-container.group
-            [:div.post-added-tooltip-top-arrow]
-            [:button.mlb-reset.post-added-tooltip-dismiss
-              {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-            [:div.post-added-tooltips
-              [:div.post-added-tooltip-title
-                "Nice job!"]
-              [:div.post-added-tooltip
-                "Now that you've posted something, you'll always know who saw it."]
-              [:button.mlb-reset.post-added-bt
-                {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                "Ok, got it"]]])
+              (wrt-count activity-data read-data)
+              (when (and (not is-mobile?)
+                         (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
+                [:div.post-added-tooltip-container.group
+                  [:div.post-added-tooltip-top-arrow]
+                  [:button.mlb-reset.post-added-tooltip-dismiss
+                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
+                  [:div.post-added-tooltips
+                    [:div.post-added-tooltip-title
+                      "Nice job!"]
+                    [:div.post-added-tooltip
+                      "Now that you've posted something, you'll always know who saw it."]
+                    [:button.mlb-reset.post-added-bt
+                      {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                      "Ok, got it"]]])])]
         (when (and is-published?
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)
