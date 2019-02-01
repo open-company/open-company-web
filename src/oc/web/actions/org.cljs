@@ -17,6 +17,7 @@
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
@@ -65,7 +66,7 @@
     (if (pos? (count orgs))
       (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
       (cook/remove-cookie! (router/last-org-cookie)))
-    (router/redirect-404!)))
+    (routing-actions/maybe-404)))
 
 (defn org-loaded [org-data saved? & [email-domain]]
   ;; Save the last visited org
@@ -101,7 +102,7 @@
           (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
           (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
                      (not ap-initial-at)) ;; neither for a briefing link
-            (router/redirect-404!))))
+            (routing-actions/maybe-404))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
            (not (utils/in? (:route @router/path) "org-settings-team"))
