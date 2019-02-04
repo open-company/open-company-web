@@ -9,11 +9,22 @@
        :aspectRatio 1}}})
 
 (defn notification-title [notification]
-  (let [author (:author notification)
-        first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))]
+  (let [reminder? (:reminder? notification)
+        author (:author notification)
+        first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
+        reminder (when reminder?
+                    (:reminder notification))
+        notification-type (when reminder?
+                            (:notification-type reminder))
+        reminder-assignee (when reminder?
+                            (:assignee reminder))]
     (cond
-      (:reminder? notification)
+      (and reminder
+           (= notification-type "reminder-notification"))
       (str first-name " created a new reminder for you")
+      (and reminder
+           (= notification-type "reminder-alert"))
+      (str "Hi " (first (clojure.string/split (:name reminder-assignee) #"\s")) ", it's time to update your team")
       (and (:mention? notification) (:interaction-id notification))
       (str first-name " mentioned you in a comment")
       (:mention? notification)
@@ -24,15 +35,23 @@
       nil)))
 
 (defn notification-content [notification]
-  (cond
-    (:reminder? notification)
-    (let [reminder (:reminder notification)]
+  (let [reminder? (:reminder? notification)
+        reminder (when reminder?
+                   (:reminder notification))
+        notification-type (when reminder?
+                            (:notification-type reminder))]
+    (cond
+      (and reminder
+           (= notification-type "reminder-notification"))
       (str
        (:headline reminder) ": "
        (:frequency reminder) " starting "
-       (activity-utils/post-date (:next-send reminder))))
-    :else
-    (:content notification)))
+       (activity-utils/post-date (:next-send reminder)))
+      (and reminder
+           (= notification-type "reminder-alert"))
+      (:headline reminder)
+      :else
+      (:content notification))))
 
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
