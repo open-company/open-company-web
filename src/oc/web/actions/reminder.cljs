@@ -86,8 +86,8 @@
              (let [self-reminder (= (:user-id (:assignee reminder-data))
                                     (:user-id (dis/current-user-data)))]
                (notification-actions/show-notification {:title (if self-reminder
-                                                                "Reminder created and teammate notified"
-                                                                "Reminder created")
+                                                                "Reminder created"
+                                                                "Reminder created and teammate notified")
                                                         :primary-bt-title "OK"
                                                         :primary-bt-dismiss true
                                                         :expire 10
