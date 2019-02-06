@@ -14,6 +14,7 @@
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -67,6 +68,11 @@
   (.preventDefault e)
   (whats-new/show))
 
+(defn reminders-click [e]
+  (mobile-menu-toggle)
+  (.preventDefault e)
+  (nav-actions/show-reminders))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
@@ -77,7 +83,8 @@
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        show-reminders? (utils/link-for (:links org-data) "reminders")]
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})}
@@ -106,6 +113,12 @@
            :on-click notifications-settings-click}
           [:div.oc-menu-item.notifications-settings
             "Notifications"]])
+      (when show-reminders?
+        [:a
+          {:href "#"
+           :on-click reminders-click}
+          [:div.oc-menu-item.reminders
+            "Reminders"]])
       [:div.oc-menu-separator]
       (when org-data
         [:div.org-item
