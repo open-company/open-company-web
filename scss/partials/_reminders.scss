@@ -76,6 +76,12 @@ div.reminders-container {
         padding: 0;
         z-index: 2;
       }
+
+      &.back-arrow {
+        @include mobile(){
+          background-image: cdnUrl("/img/ML/reminders_back_arrow.svg");
+        }
+      }
     }
 
     div.reminders-header {
@@ -177,12 +183,23 @@ div.reminders-container {
             width: 56px;
             height: 56px;
             border-radius: 8px;
-            background-color: #D9D7D7;
-            background-image: cdnUrl("/img/ML/reminders_logo_white.svg");
-            background-size: 24px 24px;
-            background-repeat: no-repeat;
-            background-position: center;
+            background-color: #F5F5F5;
             margin: 32px auto 0;
+            position: relative;
+
+            &:after {
+              content: "";
+              position: absolute;
+              width: 56px;
+              height: 56px;
+              top: 0;
+              left: 0;
+              background-image: cdnUrl("/img/ML/menu_reminders.svg");
+              background-size: 24px 24px;
+              background-repeat: no-repeat;
+              background-position: center;
+              opacity: 0.6;
+            }
           }
 
           div.empty-reminders-title {
@@ -204,8 +221,8 @@ div.reminders-container {
             width: 192px;
             height: 40px;
             border-radius: 6px;
-            background-color: $coral;
-            color: $carrot_orange;
+            background-color: $carrot_green;
+            color: white;
             @include avenir_H();
             font-size: 14px;
           }

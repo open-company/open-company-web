@@ -279,6 +279,7 @@
   [s]
   (let [reminder-tab (drv/react s :show-reminders)
         editing-reminder? (string? reminder-tab)
+        adding-new-reminder? (= reminder-tab :new)
         alert-modal-data (drv/react s :alert-modal)
         reminders-data (drv/react s :reminders-data)
         reminder-edit-data (drv/react s :reminder-edit)
@@ -290,11 +291,15 @@
                                   :loading (not reminders-data)})}
         (when-not alert-modal-data
           [:button.settings-modal-close.mlb-reset
-            {:on-click (fn [_]
+            {:class (when (or editing-reminder?
+                              adding-new-reminder?)
+                      "back-arrow")
+             :on-click (fn [_]
                         (cancel-clicked reminder-edit-data
                          ;; On mobile the X goes back to the list of reminders
                          ;; on desktop it always dismiss the reminders modal
-                         (if (and editing-reminder?
+                         (if (and (or editing-reminder?
+                                      adding-new-reminder?)
                                   is-mobile?)
                           #(reminder-actions/cancel-edit-reminder)
                           #(close-clicked s))))}])
