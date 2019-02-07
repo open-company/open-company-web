@@ -1,0 +1,39 @@
+div.qsg-container {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: #{$qst_width};
+  background-color: $deep_navy;
+  z-index: #{$navbar_zindex + 2000};
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: #{$qst_width};
+    height: 430px;
+    @include image-2x("/img/ML/qsg_top");
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: #{$qst_width} 720px;
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: #{$qst_width};
+    height: 230px;
+    @include image-2x("/img/ML/qsg_bottom");
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: #{$qst_width} 720px;
+  }
+
+  @include mobile() {
+    display: none;
+  }
+}

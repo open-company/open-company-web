@@ -62,7 +62,8 @@
                                                (utils/in? (:route @router/path) "dashboard"))
                                 :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
-                                                     (not (:read-only org-data)))})}
+                                                     (not (:read-only org-data)))
+                                :showing-qsg true})}
       [:div.mobile-bottom-line
         {:class (utils/class-set {:search search-active
                                   :user-notifications mobile-user-notifications

@@ -11,6 +11,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
+            [oc.web.components.qsg :refer (qsg)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
@@ -162,7 +163,8 @@
         {:class (utils/class-set {:org-dashboard true
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
-                                  :activity-removed show-activity-removed})}
+                                  :activity-removed show-activity-removed
+                                  :showing-qsg true})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
@@ -249,4 +251,5 @@
                               (not mobile-menu-open)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
-                 (dashboard-layout))]]])])))
+                 (dashboard-layout))]]])
+        (qsg)])))

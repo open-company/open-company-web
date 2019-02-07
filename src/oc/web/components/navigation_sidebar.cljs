@@ -110,11 +110,12 @@
                             (< @(::content-height s)
                              (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
         is-mobile? (responsive/is-tablet-or-mobile?)
-        show-reminders? (utils/link-for (:links org-data) "reminders")]
+        show-reminders? (utils/link-for (:links org-data) "reminders")
+        showing-qsg true]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?
-                      (str (/ (- @(::window-width s) 952) 2) "px"))}}
+                      (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))}}
       [:div.mobile-board-name-container
         {:on-click #(nav-actions/mobile-nav-sidebar)}
         [:div.board-name

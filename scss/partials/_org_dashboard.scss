@@ -19,6 +19,10 @@ div.org-dashboard {
     }
   }
 
+  &.showing-qsg div.page {
+    width: calc(100% - #{$qst_width});
+  }
+
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */

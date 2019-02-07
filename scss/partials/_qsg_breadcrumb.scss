@@ -1,0 +1,22 @@
+div.qsg-breadcrumb {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-image: cdnUrl("/img/ML/qsg_breadcrumb.svg");
+  background-size: 24px 32px;
+  backgorund-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+
+  &.top {
+    transform: rotate(45deg);
+  }
+
+  &.down {
+    transform: rotate(-45deg);
+  }
+
+  &.left {
+    transform: rotate(90deg);
+  }
+}
