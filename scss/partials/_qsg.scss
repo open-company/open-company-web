@@ -36,4 +36,41 @@ div.qsg-container {
   @include mobile() {
     display: none;
   }
+
+  button.add-profile-bt {
+    &:before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      border: 1.5px solid #FFFFFF;
+      position: absolute;
+      top: 1px;
+      left: 16px;
+      background-color: rgba(255, 255, 255, 0.3);
+      opacity: 0.6;
+    }
+
+    position: absolute;
+    left: 0;
+    top: 201px;
+    height: 19px;
+    width: 100%;
+    color: rgba(255, 255, 255, 0.9);
+    @include avenir_R();
+    font-size: 14px;
+    line-height: 19px;
+    padding: 0 0 0 40px;
+    text-align: left;
+    opacity: 1;
+
+    &:hover {
+      opacity: 1;
+      color: white;
+      &:before {
+        // border: 1.5px solid white;
+        opacity: 1;
+      }
+    }
+  }
 }

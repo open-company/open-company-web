@@ -3,5 +3,8 @@
 
 (rum/defcs qsg
   [s]
-  [:div.qsg-container])
+  [:div.qsg-container
+    [:button.mlb-reset.add-profile-bt
+      {:on-click #()}
+      "Add a profile photo"]])
 
