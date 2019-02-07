@@ -109,6 +109,7 @@ var OCWebPrintPostsData = function(){};
 var OCWebPrintUserNotifications = function(){};
 var OCWebPrintRemindersData = function(){};
 var OCWebPrintReminderEditData = function(){};
+var OCWebPrintQSGData = function(){};
 // Moment
 var moment = {};
 moment.tz = {};

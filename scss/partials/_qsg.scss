@@ -64,7 +64,22 @@ div.qsg-container {
     text-align: left;
     opacity: 1;
 
-    &:hover {
+    &.done {
+      color: rgba(255, 255, 255, 0.5);
+      text-decoration: line-through;
+
+      &:before {
+        border: none;
+        background-color: $carrot_green;
+        background-image: cdnUrl("/img/ML/qsg_checkmark.svg");
+        background-size: 14px 11px;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 1;
+      }
+    }
+
+    &:not(.done):hover {
       opacity: 1;
       color: white;
       &:before {

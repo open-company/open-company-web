@@ -7,11 +7,13 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -20,6 +22,7 @@
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
+                    (drv/drv :qsg)
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::expanded-user-menu)
                     (on-window-click-mixin (fn [s e]
@@ -49,7 +52,8 @@
                                 (not org-settings)
                                 (not user-settings)
                                 (not search-active)
-                                (not mobile-user-notifications))]
+                                (not mobile-user-notifications))
+        qsg-data (drv/react s :qsg)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -130,10 +134,14 @@
               (if (jwt/jwt)
                 [:div.group
                   (user-notifications)
-                  [:div.user-menu
+                  [:div.user-menu.qsg-profile-photo-1
                     {:ref "user-menu"}
+                    (when (= (:step qsg-data) :profile-photo-1)
+                      (qsg-breadcrumb qsg-data))
                     (user-avatar
-                     {:click-cb #(swap! (::expanded-user-menu s) not)})
+                     {:click-cb #(do
+                                   (qsg-actions/next-profile-photo-trail)
+                                   (swap! (::expanded-user-menu s) not))})
                     (when @(::expanded-user-menu s)
                       (menu/menu))]]
                 (login-button)))]]]

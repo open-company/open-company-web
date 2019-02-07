@@ -12,11 +12,13 @@
             [oc.web.stores.user :as user-store]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.whats-new :as whats-new]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn mobile-menu-toggle []
@@ -35,6 +37,7 @@
 (defn user-profile-click [e]
   ; (utils/event-stop e)
   (.preventDefault e)
+  (qsg-actions/next-profile-photo-trail)
   (if (responsive/is-tablet-or-mobile?)
     (user-profile/show-modal :profile)
     (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
@@ -70,6 +73,7 @@
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
+                  (drv/drv :qsg)
                   {:did-mount (fn [s]
                    (whats-new/init ".whats-new")
                    s)}
@@ -77,7 +81,8 @@
   (let [{:keys [mobile-menu-open org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        qsg-data (drv/react s :qsg)]
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})}
@@ -95,9 +100,11 @@
             :viewer
             "Viewer")]]
       (when (jwt/jwt)
-        [:a
+        [:a.qsg-profile-photo-2
           {:href "#"
            :on-click user-profile-click}
+          (when (= (:step qsg-data) :profile-photo-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.personal-profile
             "My Profile"]])
       (when (jwt/jwt)
