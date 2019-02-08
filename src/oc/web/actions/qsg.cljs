@@ -3,8 +3,12 @@
 
 
 ;; Main fns
+
 (defn reset-qsg []
   (dis/dispatch! [:qsg-profile-photo :reset]))
+
+(defn show-qsg-view []
+  (dis/dispatch! [:show-qsg]))
 
 ;; Profile photo
 

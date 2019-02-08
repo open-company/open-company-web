@@ -3,12 +3,18 @@
 
 ;; Utils
 
-(defn- progress-precentage [qsg-data]
+(defn- progress-percentage [qsg-data]
   (let [done-values (vals (select-keys qsg-data [:verify-email-done :profile-photo-done :company-logo-done
                                                  :invite-team-done :create-post-done :create-reminder-done
                                                  :add-section-done :configure-section-done]))
         truty-values (filterv #(boolean %) done-values)]
     (* (/ (count truty-values) 8) 100)))
+
+(defmethod dispatcher/action :show-qsg-view
+  [db [_]]
+  (-> db
+    (assoc-in [:qsg :visible] true)
+    (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg db)))))
 
 ;; Verify email
 
@@ -16,7 +22,7 @@
   [db [_ user-data]]
   (if (= (:status user-data) "active")
     (let [next-db (assoc-in db [:qsg :verify-email-done] true)]
-      (assoc-in next-db [:qsg :overall-progress] (progress-precentage (:qsg next-db))))
+      (assoc-in next-db [:qsg :overall-progress] (progress-percentage (:qsg next-db))))
     db))
 
 ;; Profile photo
@@ -46,7 +52,7 @@
                   (assoc-in db [:qsg :profile-photo-done] true)
                   (update-in db [:qsg] dissoc :profile-photo-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Company logo
 
@@ -75,7 +81,7 @@
                   (assoc-in db [:qsg :company-logo-done] true)
                   (update-in db [:qsg] dissoc :company-logo-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Invite team
 
@@ -99,7 +105,7 @@
                   (assoc-in db [:qsg :invite-team-done] true)
                   (update-in db [:qsg] dissoc :invite-team-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Create post
 
@@ -123,7 +129,7 @@
                   (assoc-in db [:qsg :create-post-done] true)
                   (update-in db [:qsg] dissoc :create-post-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Create reminder
 
@@ -147,4 +153,4 @@
                   (assoc-in db [:qsg :create-reminder-done] true)
                   (update-in db [:qsg] dissoc :create-reminder-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
