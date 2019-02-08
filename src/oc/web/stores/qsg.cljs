@@ -22,7 +22,7 @@
   (let [cur-step (:step (:qsg db))
         next-step (or force-step
                       (profile-photo-next-step cur-step))
-        next-db (if (= force-step :profile-photo-end)
-                  (assoc-in db [:qsg :profile-photo-end] true)
-                  (update-in db [:qsg] dissoc :profile-photo-end))]
+        next-db (if (= force-step :profile-photo-done)
+                  (assoc-in db [:qsg :profile-photo-done] true)
+                  (update-in db [:qsg] dissoc :profile-photo-done))]
     (assoc-in next-db [:qsg :step] next-step)))

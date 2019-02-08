@@ -8,7 +8,7 @@ nav.oc-navbar {
   border-bottom: 1px solid $ultra_light_grey;
 
   &.showing-qsg {
-    width: calc(100% - #{$qst_width});
+    width: calc(100% - #{$qsg_width});
   }
 
   &.not-fixed {

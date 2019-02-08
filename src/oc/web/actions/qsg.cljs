@@ -8,7 +8,7 @@
   (dis/dispatch! [:qsg-profile-photo]))
 
 (defn finish-profile-photo-trail []
-  (dis/dispatch! [:qsg-profile-photo :profile-photo-end]))
+  (dis/dispatch! [:qsg-profile-photo :profile-photo-done]))
 
 (defn reset-qsg []
   (dis/dispatch! [:qsg-profile-photo :reset]))

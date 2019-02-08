@@ -20,7 +20,7 @@ div.org-dashboard {
   }
 
   &.showing-qsg div.page {
-    width: calc(100% - #{$qst_width});
+    width: calc(100% - #{$qsg_width});
   }
 
   div.page{
