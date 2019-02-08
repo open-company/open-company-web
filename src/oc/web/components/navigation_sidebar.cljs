@@ -4,14 +4,16 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.lib.chat :as chat]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.chat :as chat]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.qsg :as qsg-actions]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.nux :as nux-actions]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -117,7 +119,10 @@
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?
-                      (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))}}
+                      (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
+               :overflow (when (or (= (:step qsg-data) :invite-team-1)
+                                   (= (:step qsg-data) :create-reminder-1))
+                           "visible")}}
       [:div.mobile-board-name-container
         {:on-click #(nav-actions/mobile-nav-sidebar)}
         [:div.board-name
@@ -221,10 +226,12 @@
              :data-placement "top"
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+            (when (= (:step qsg-data) :create-reminder-1)
+              (qsg-breadcrumb qsg-data))
             [:div.bottom-nav-icon.reminders-icon]
             [:span "Reminders"]])
         (when show-invite-people
-          [:button.mlb-reset.bottom-nav-bt
+          [:button.mlb-reset.bottom-nav-bt.qsg-invite-team-1
             {:on-click #(do
                           (nav-actions/show-invite)
                           (utils/after 500 utils/remove-tooltips))
@@ -233,6 +240,8 @@
              :data-placement "top"
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+            (when (= (:step qsg-data) :invite-team-1)
+              (qsg-breadcrumb qsg-data))
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
         [:button.mlb-reset.bottom-nav-bt

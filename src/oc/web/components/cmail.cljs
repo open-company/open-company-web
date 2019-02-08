@@ -14,6 +14,7 @@
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -177,6 +178,7 @@
       (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
             updated-cmail-data @(drv/get-ref s :cmail-data)
             section-editing @(drv/get-ref s :section-editing)]
+        (qsg-actions/finish-create-post-trail)
         (remove-autosave s)
         (if published?
           (do

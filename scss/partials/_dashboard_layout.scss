@@ -587,6 +587,10 @@ div.dashboard-layout {
       bottom: 24px;
       right: 24px;
 
+      &.showing-qsg {
+        right: 244px;
+      }
+
       button.add-to-board-floating-button {
         width: 56px;
         height: 56px;
@@ -596,6 +600,10 @@ div.dashboard-layout {
         opacity: 1;
         padding: 0px;
         margin: 0px;
+
+        div.qsg-breadcrumb.create-post-1 {
+          top: 12px;
+        }
 
         &:hover, &.active {
           background-color: #FF7C6C;

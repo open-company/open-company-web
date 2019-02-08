@@ -73,11 +73,11 @@
 
 (defn success-cb
   [res]
-  (let [url    (googobj/get res "url")]
+  (let [url (googobj/get res "url")]
+    (qsg-actions/finish-profile-photo-trail)
     (if-not url
       (error-cb nil nil)
       (do
-        (qsg-actions/finish-profile-photo-trail)
         (dis/dispatch! [:input [:edit-user-profile-avatar] url])
         (user-actions/user-avatar-save url)))))
 

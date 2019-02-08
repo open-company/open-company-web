@@ -24,6 +24,30 @@ div.qsg-breadcrumb {
   &.profile-photo-3, &.company-logo-3,  {
     animation: leftSwing .8s infinite linear;
     left: -37px;
+    top: 0;
+  }
+
+  &.invite-team-1 {
+    animation: leftSwing .8s infinite linear;
+    left: -37px;
+    top: 0;
+  }
+
+  &.create-post-1 {
+    animation: leftSwing .8s infinite linear;
+    left: -37px;
+    top: 4px;
+  }
+
+  &.create-reminder-1 {
+    animation: leftSwing .8s infinite linear;
+    left: -37px;
+    top: 0;
+  }
+
+  &.create-reminder-1 {
+    animation: leftSwing .8s infinite linear;
+    left: -37px;
     top: 8px;
   }
 
@@ -66,6 +90,39 @@ div.qsg-breadcrumb {
   }
 }
 
+@keyframes rightSwing{
+  0% {
+      -webkit-transform: rotate(-180deg) translateZ(0);
+      transform: rotate(-180deg) translateZ(0);
+  }
+
+  50% {
+      -webkit-transform: rotate(-180deg) translate3d(-6px,0,0);
+      transform: rotate(-180deg) translate3d(-6px,0,0);
+  }
+
+  100% {
+      -webkit-transform: rotate(-180deg) translateZ(0);
+      transform: rotate(-180deg) translateZ(0);
+  }
+}
+
+@-webkit-keyframes rightSwing{
+  0% {
+      -webkit-transform: rotate(-180deg) translateZ(0);
+      transform: rotate(-180deg) translateZ(0);
+  }
+
+  50% {
+      -webkit-transform: rotate(-180deg) translate3d(-6px,0,0);
+      transform: rotate(-180deg) translate3d(-6px,0,0);
+  }
+
+  100% {
+      -webkit-transform: rotate(-180deg) translateZ(0);
+      transform: rotate(-180deg) translateZ(0);
+  }
+}
 
 
 @keyframes topSwing{

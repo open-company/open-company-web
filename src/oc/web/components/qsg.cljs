@@ -49,7 +49,7 @@
                       "done")}
             "Add a company logo"]
           [:button.mlb-reset.qsg-list-item.qsg-invite-team-bt
-            {:on-click #()
+            {:on-click #(qsg-actions/start-invite-team-trail)
              :class (when (:invite-team-done qsg-data)
                       "done")}
             "Invite your team"]]
@@ -57,12 +57,12 @@
           "Product highlight"]
         [:div.qsg-buttons-list
           [:button.mlb-reset.qsg-list-item.qsg-create-post-bt
-            {:on-click #()
+            {:on-click #(qsg-actions/start-create-post-trail)
              :class (when (:create-post-done qsg-data)
                       "done")}
             "Create a post"]
           [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
-            {:on-click #()
+            {:on-click #(qsg-actions/start-create-reminder-trail)
              :class (when (:create-reminder-done qsg-data)
                       "done")}
             "Create a reminder"]

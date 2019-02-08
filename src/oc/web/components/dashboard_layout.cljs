@@ -12,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -21,6 +22,7 @@
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -84,6 +86,7 @@
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
+                              (drv/drv :qsg)
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :team-data)
@@ -166,7 +169,8 @@
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
                                      (not is-must-see)
-                                     (not (:read-only board-data)))]
+                                     (not (:read-only board-data)))
+        qsg-data (drv/react s :qsg)]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -227,7 +231,7 @@
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
                     (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
-                      [:button.mlb-reset.mlb-default.add-to-board-top-button.group
+                      [:button.mlb-reset.mlb-default.add-to-board-top-button.group.qsg-create-post-1
                         {:ref :top-compose-button
                          :on-click #(when can-compose (compose s))
                          :class (when-not can-compose "disabled")
@@ -237,6 +241,8 @@
                          :data-placement (when show-tooltip? "top")
                          :data-container (when show-tooltip? "body")
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                        (when (= (:step qsg-data) :create-post-1)
+                          (qsg-breadcrumb qsg-data))
                         [:div.add-to-board-plus]
                         [:label.add-to-board-label
                           "New"]])
@@ -332,12 +338,15 @@
                   [:div.new-post-floating-dropdown-container.group
                     {:id "new-entry-floating-btn-container"
                      :style {:opacity opacity
-                             :display (if (pos? opacity) "block" "none")}}
-                    [:button.mlb-reset.mlb-default.add-to-board-floating-button
+                             :display (if (pos? opacity) "block" "none")}
+                     :class (when (:visible qsg-data) "showing-qsg")}
+                    [:button.mlb-reset.mlb-default.add-to-board-floating-button.qsg-create-post-1
                       {:data-placement "left"
                        :data-container "body"
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :on-click #(compose s)}
+                      (when (= (:step qsg-data) :create-post-1)
+                        (qsg-breadcrumb qsg-data))
                       [:div.add-to-board-plus]]]))])]]))

@@ -6,8 +6,9 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.team :as team-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.qsg :as qsg-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -230,6 +231,7 @@
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
           {:on-click #(do
+                        (qsg-actions/finish-invite-team-trail)
                         (reset! (::sending s) (count (filterv valid-user? invite-users)))
                         (reset! (::send-bt-cta s) "Sending")
                         (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))

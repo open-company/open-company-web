@@ -77,3 +77,74 @@
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
 
+;; Invite team
+
+(defn- invite-team-next-step [cur-step]
+  (case cur-step
+    nil?
+    :invite-team-1
+
+    (:invite-team-1 :reset)
+    nil
+
+    ;; default
+    cur-step))
+
+(defmethod dispatcher/action :qsg-invite-team
+  [db [_ force-step]]
+  (let [cur-step (:step (:qsg db))
+        next-step (or force-step
+                      (invite-team-next-step cur-step))
+        next-db (if (= force-step :invite-team-done)
+                  (assoc-in db [:qsg :invite-team-done] true)
+                  (update-in db [:qsg] dissoc :invite-team-done))
+        next-qsg (assoc-in next-db [:qsg :step] next-step)]
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
+
+;; Create post
+
+(defn- create-post-next-step [cur-step]
+  (case cur-step
+    nil?
+    :create-post-1
+
+    (:create-post-1 :reset)
+    nil
+
+    ;; default
+    cur-step))
+
+(defmethod dispatcher/action :qsg-create-post
+  [db [_ force-step]]
+  (let [cur-step (:step (:qsg db))
+        next-step (or force-step
+                      (create-post-next-step cur-step))
+        next-db (if (= force-step :create-post-done)
+                  (assoc-in db [:qsg :create-post-done] true)
+                  (update-in db [:qsg] dissoc :create-post-done))
+        next-qsg (assoc-in next-db [:qsg :step] next-step)]
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))
+
+;; Create reminder
+
+(defn- create-reminder-next-step [cur-step]
+  (case cur-step
+    nil?
+    :create-reminder-1
+
+    (:create-reminder-1 :reset)
+    nil
+
+    ;; default
+    cur-step))
+
+(defmethod dispatcher/action :qsg-create-reminder
+  [db [_ force-step]]
+  (let [cur-step (:step (:qsg db))
+        next-step (or force-step
+                      (create-reminder-next-step cur-step))
+        next-db (if (= force-step :create-reminder-done)
+                  (assoc-in db [:qsg :create-reminder-done] true)
+                  (update-in db [:qsg] dissoc :create-reminder-done))
+        next-qsg (assoc-in next-db [:qsg :step] next-step)]
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-precentage (:qsg next-qsg)))))

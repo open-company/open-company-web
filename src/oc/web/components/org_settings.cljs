@@ -84,10 +84,7 @@
 (defn logo-on-load [org-avatar-editing url img]
   (org-actions/org-avatar-edit-save {:logo-url url
                                      :logo-width (.-width img)
-                                     :logo-height (.-height img)}
-    (fn [save-successed?]
-      (when save-successed?
-        (qsg-actions/finish-company-logo-trail))))
+                                     :logo-height (.-height img)})
   (gdom/removeNode img))
 
 (defn logo-add-error
@@ -118,6 +115,7 @@
 (defn logo-on-click [org-avatar-editing]
   (iu/upload! org-utils/org-avatar-filestack-config
     (fn [res]
+      (qsg-actions/finish-company-logo-trail)
       (let [url (gobj/get res "url")
             img (gdom/createDom "img")]
         (set! (.-onerror img) #(logo-add-error img))
@@ -127,6 +125,7 @@
         (set! (.-src img) url)))
     nil
     (fn [err]
+      (qsg-actions/finish-company-logo-trail)
       (logo-add-error nil))))
 
 (rum/defcs org-settings
