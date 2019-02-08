@@ -135,17 +135,18 @@
                 [:div.group
                   (user-notifications)
                   [:div.user-menu.qsg-profile-photo-1.qsg-company-logo-1
-                    {:ref "user-menu"}
                     (when (or (= (:step qsg-data) :profile-photo-1)
                               (= (:step qsg-data) :company-logo-1))
                       (qsg-breadcrumb qsg-data))
-                    (user-avatar
-                     {:click-cb #(do
-                                   (when (= (:step qsg-data) :profile-photo-1)
-                                     (qsg-actions/next-profile-photo-trail))
-                                   (when (= (:step qsg-data) :company-logo-1)
-                                     (qsg-actions/next-company-logo-trail))
-                                   (swap! (::expanded-user-menu s) not))})
+                    [:div
+                      {:ref "user-menu"}
+                      (user-avatar
+                       {:click-cb #(do
+                                     (when (= (:step qsg-data) :profile-photo-1)
+                                       (qsg-actions/next-profile-photo-trail))
+                                     (when (= (:step qsg-data) :company-logo-1)
+                                       (qsg-actions/next-company-logo-trail))
+                                     (swap! (::expanded-user-menu s) not))})]
                     (when @(::expanded-user-menu s)
                       (menu/menu))]]
                 (login-button)))]]]

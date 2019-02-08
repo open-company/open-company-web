@@ -40,6 +40,14 @@
                                   (qsg-actions/reset-qsg)
                                   ;; Create reminder
                                   (= step :create-reminder-1)
+                                  (qsg-actions/reset-qsg)
+                                  ;; Section settings
+                                  (and (= step :configure-section-1)
+                                       (not (utils/event-inside? e (sel1 :.qsg-configure-section-1))))
+                                  (qsg-actions/reset-qsg)
+                                  (= step :configure-section-2)
+                                  (qsg-actions/reset-qsg)
+                                  (= step :add-section-1)
                                   (qsg-actions/reset-qsg)))))
   [s qsg-data]
   [:div.qsg-breadcrumb

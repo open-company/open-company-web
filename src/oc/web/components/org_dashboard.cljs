@@ -254,4 +254,5 @@
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]])
-        (qsg)])))
+        (when (:visible qsg-data)
+          (qsg))])))

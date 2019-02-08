@@ -95,6 +95,7 @@
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
+        sorted-boards (sort-boards boards)
         is-all-posts (= (router/current-board-slug) "all-posts")
         is-must-see (= (router/current-board-slug) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
@@ -121,7 +122,9 @@
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
                :overflow (when (or (= (:step qsg-data) :invite-team-1)
-                                   (= (:step qsg-data) :create-reminder-1))
+                                   (= (:step qsg-data) :create-reminder-1)
+                                   (= (:step qsg-data) :add-section-1)
+                                   (= (:step qsg-data) :configure-section-1))
                            "visible")}}
       [:div.mobile-board-name-container
         {:on-click #(nav-actions/mobile-nav-sidebar)}
@@ -179,25 +182,37 @@
               [:span
                 "SECTIONS"]
               (when create-link
-                [:button.left-navigation-sidebar-top-title-button.btn-reset
+                [:button.left-navigation-sidebar-top-title-button.btn-reset.qsg-add-section-1
                   {:on-click #(nav-actions/show-section-add)
+                   :class (when (= (:step qsg-data) :add-section-1) "active")
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}])]])
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                  (when (= (:step qsg-data) :add-section-1)
+                    (qsg-breadcrumb qsg-data))])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
-            (for [board (sort-boards boards)
+            (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (= (router/current-board-slug) (:slug board))
-                        board-change-data (get change-data (:uuid board))]]
+                        board-change-data (get change-data (:uuid board))
+                        show-qsg-breadcrumb? (and (= (:step qsg-data) :configure-section-1)
+                                                  (= (:slug board) (:slug (first sorted-boards))))]]
               [:a.left-navigation-sidebar-item.hover-item
-                {:class (when (and (not is-all-posts) is-current-board) "item-selected")
+                {:class (utils/class-set {:item-selected (and (not is-all-posts)
+                                                              is-current-board)
+                                          :qsg-configure-section-1 show-qsg-breadcrumb?})
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
-                 :on-click #(nav-actions/nav-to-url! % board-url)}
+                 :on-click #(do
+                              (when show-qsg-breadcrumb?
+                                (qsg-actions/next-configure-section-trail))
+                              (nav-actions/nav-to-url! % board-url))}
+                (when show-qsg-breadcrumb?
+                  (qsg-breadcrumb qsg-data))
                 (when (= (:access board) "public")
                   [:div.public
                     {:class (when is-current-board "selected")}])

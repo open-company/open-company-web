@@ -1,5 +1,6 @@
 (ns oc.web.stores.qsg
-  (:require [oc.web.dispatcher :as dispatcher]))
+  (:require [oc.web.dispatcher :as dispatcher]
+            [clojure.string :as s]))
 
 ;; Utils
 
@@ -16,14 +17,23 @@
     (assoc-in [:qsg :visible] true)
     (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg db)))))
 
+(defmethod dispatcher/action :dismiss-qsg-view
+  [db [_]]
+  (assoc-in db [:qsg :visible] false))
+
+(defmethod dispatcher/action :qsg-reset
+  [db [_]]
+  (update-in db [:qsg] dissoc :step))
+
 ;; Verify email
 
 (defmethod dispatcher/action :qsg-user-data
   [db [_ user-data]]
-  (if (= (:status user-data) "active")
-    (let [next-db (assoc-in db [:qsg :verify-email-done] true)]
-      (assoc-in next-db [:qsg :overall-progress] (progress-percentage (:qsg next-db))))
-    db))
+  (let [done-vals (remove false? {:verify-email-done (= (:status user-data) "active")
+                                  :profile-photo-done (and (not (s/blank? (:avatar-url user-data)))
+                                                           (s/starts-with? (:avatar-url user-data) "http"))})
+        next-db (update-in db [:qsg] merge done-vals)]
+    (assoc-in next-db [:qsg :overall-progress] (progress-percentage (:qsg next-db)))))
 
 ;; Profile photo
 
@@ -38,7 +48,7 @@
     :profile-photo-2
     :profile-photo-3
 
-    (:profile-photo-3 :reset)
+    :profile-photo-3
     nil
     ;; default
     cur-step))
@@ -52,9 +62,16 @@
                   (assoc-in db [:qsg :profile-photo-done] true)
                   (update-in db [:qsg] dissoc :profile-photo-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
+    (js/console.log "DBG stores/:qsg-profile-photo cur" (:qsg db) "next" (:qsg next-qsg))
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Company logo
+
+(defmethod dispatcher/action :qsg-org-data
+  [db [_ org-data]]
+  (if (not (s/blank? (:logo-url org-data)))
+    (assoc-in db [:qsg :company-logo-done] true)
+    db))
 
 (defn- company-logo-next-step [cur-step]
   (case cur-step
@@ -67,7 +84,7 @@
     :company-logo-2
     :company-logo-3
 
-    (:company-logo-3 :reset)
+    :company-logo-3
     nil
     ;; default
     cur-step))
@@ -81,6 +98,7 @@
                   (assoc-in db [:qsg :company-logo-done] true)
                   (update-in db [:qsg] dissoc :company-logo-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
+    (js/console.log "DBG stores/:qsg-company-logo cur" (:qsg db) "next" (:qsg next-qsg))
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Invite team
@@ -90,7 +108,7 @@
     nil?
     :invite-team-1
 
-    (:invite-team-1 :reset)
+    :invite-team-1
     nil
 
     ;; default
@@ -114,7 +132,7 @@
     nil?
     :create-post-1
 
-    (:create-post-1 :reset)
+    :create-post-1
     nil
 
     ;; default
@@ -138,7 +156,7 @@
     nil?
     :create-reminder-1
 
-    (:create-reminder-1 :reset)
+    :create-reminder-1
     nil
 
     ;; default
@@ -152,5 +170,54 @@
         next-db (if (= force-step :create-reminder-done)
                   (assoc-in db [:qsg :create-reminder-done] true)
                   (update-in db [:qsg] dissoc :create-reminder-done))
+        next-qsg (assoc-in next-db [:qsg :step] next-step)]
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
+
+;; Add section
+
+(defn- add-section-next-step [cur-step]
+  (case cur-step
+    nil?
+    :add-section-1
+
+    :add-section-1
+    nil
+    ;; default
+    cur-step))
+
+(defmethod dispatcher/action :qsg-add-section
+  [db [_ force-step]]
+  (let [cur-step (:step (:qsg db))
+        next-step (or force-step
+                      (add-section-next-step cur-step))
+        next-db (if (= force-step :add-section-done)
+                  (assoc-in db [:qsg :add-section-done] true)
+                  (update-in db [:qsg] dissoc :add-section-done))
+        next-qsg (assoc-in next-db [:qsg :step] next-step)]
+    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
+
+;; Configure section
+
+(defn- configure-section-next-step [cur-step]
+  (case cur-step
+    nil?
+    :configure-section-1
+
+    :configure-section-1
+    :configure-section-2
+
+    (:configure-section-2 :reset)
+    nil
+    ;; default
+    cur-step))
+
+(defmethod dispatcher/action :qsg-configure-section
+  [db [_ force-step]]
+  (let [cur-step (:step (:qsg db))
+        next-step (or force-step
+                      (configure-section-next-step cur-step))
+        next-db (if (= force-step :configure-section-done)
+                  (assoc-in db [:qsg :configure-section-done] true)
+                  (update-in db [:qsg] dissoc :configure-section-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))

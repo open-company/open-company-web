@@ -220,13 +220,17 @@
                       "Public"])
                   ;; Settings button
                   (when should-show-settings-bt
-                    [:button.mlb-reset.board-settings-bt
+                    [:button.mlb-reset.board-settings-bt.qsg-configure-section-2
                       {:data-toggle (when-not is-mobile? "tooltip")
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title (str (:name board-data) " settings")
-                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}])]
+                       :on-click #(do
+                                    (qsg-actions/finish-configure-section-trail)
+                                    (dis/dispatch! [:input [:show-section-editor] true]))}
+                      (when (= (:step qsg-data) :configure-section-2)
+                        (qsg-breadcrumb qsg-data))])]
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group

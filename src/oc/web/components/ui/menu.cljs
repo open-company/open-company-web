@@ -67,6 +67,11 @@
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
+(defn show-qsg-click [e]
+  (mobile-menu-toggle)
+  (.preventDefault e)
+  (qsg-actions/show-qsg-view))
+
 (defn whats-new-click [e]
   (.preventDefault e)
   (whats-new/show))
@@ -145,6 +150,12 @@
           {:on-click whats-new-click})
         [:div.oc-menu-item.whats-new
           "What’s New"]]
+      (when (and (not is-mobile?)
+                 (jwt/jwt))
+        [:a
+          {:on-click show-qsg-click}
+          [:div.oc-menu-item.show-qsg
+            "Quickstart Guide"]])
       [:a
         {:on-click #(chat/chat-click 42861)}
         [:div.oc-menu-item.support

@@ -171,6 +171,12 @@ div.menu {
           background-image: cdnUrl("/img/ML/menu_whats_new_hover.svg");
         }
       }
+      
+      &.show-qsg {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_quickstart_guide_hover.svg");
+        }
+      }
 
       &.support {
         &:before {
@@ -240,6 +246,16 @@ div.menu {
       @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
       &:before {
         background-image: cdnUrl("/img/ML/menu_digest_settings.svg");
+      }
+    }
+
+    &.show-qsg {
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_quickstart_guide_hover.svg"));
+      }
+
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_quickstart_guide.svg");
       }
     }
 

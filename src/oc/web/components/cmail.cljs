@@ -247,6 +247,7 @@
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
+                   (drv/drv :qsg)
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
                    (drv/drv :show-sections-picker)
@@ -355,11 +356,13 @@
                      {:width 548
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
-                               (not (seq @(::initial-uuid s))))]
+                               (not (seq @(::initial-uuid s))))
+        qsg-data (drv/react s :qsg)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
                                                  (:fullscreen cmail-state))
-                                :collapse (:collapse cmail-state)})}
+                                :collapse (:collapse cmail-state)
+                                :showing-qsg (:visible qsg-data)})}
       [:div.cmail-middle
         [:div.cmail-container
           [:div.cmail-header

@@ -13,7 +13,7 @@
         [:span.qsg-lifevest]
         [:div.qsg-title "Quickstart guide"]
         [:button.mlb-reset.qsg-top-dismiss
-          {:on-click #()}]]
+          {:on-click #(qsg-actions/dismiss-qsg-view)}]]
       [:div.qsg-top
         [:div.qsg-top-title
           "A few pointers to help you get started with Carrot."]
@@ -67,12 +67,12 @@
                       "done")}
             "Create a reminder"]
           [:button.mlb-reset.qsg-list-item.qsg-add-section-bt
-            {:on-click #()
+            {:on-click #(qsg-actions/start-add-section-trail)
              :class (when (:add-section-done qsg-data)
                       "done")}
             "Add a new section"]
           [:button.mlb-reset.qsg-list-item.qsg-configure-section-bt
-            {:on-click #()
+            {:on-click #(qsg-actions/start-configure-section-trail)
              :class (when (:configure-section-done qsg-data)
                       "done")}
             "Configure a section"]]]
@@ -96,5 +96,5 @@
             {:on-click #()}
             "Delete all sample content"]]
         [:button.mlb-reset.qsg-dismiss
-          {:on-click #()}
+          {:on-click #(qsg-actions/dismiss-qsg-view)}
           "Dismiss quickstart guide"]]]))

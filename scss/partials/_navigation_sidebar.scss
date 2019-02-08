@@ -511,6 +511,10 @@ div.left-navigation-sidebar {
         background-color: $carrot_green_2;
       }
 
+      &.qsg-add-section-1 {
+        position: relative;
+      }
+
       @include mobile() {
         display: none;
         float: right;
@@ -552,6 +556,10 @@ div.left-navigation-sidebar {
         @include mobile() {
           margin-bottom: 0px;
         }
+      }
+
+      &.qsg-configure-section-1 {
+        position: relative;
       }
 
       &.hover-item {
