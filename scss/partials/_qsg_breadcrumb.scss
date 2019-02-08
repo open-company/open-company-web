@@ -10,21 +10,21 @@ div.qsg-breadcrumb {
   transition: opacity 180ms;
   opacity: 0;
 
-  &.profile-photo-3 {
-    animation: leftSwing .8s infinite linear;
+  &.profile-photo-1, &.company-logo-1 {
+    animation: topSwing .8s infinite linear;
+    top: 50px;
+  }
+
+  &.profile-photo-2, &.company-logo-2 {
     left: -37px;
+    animation: leftSwing .8s infinite linear;
     top: 8px;
   }
 
-  &.profile-photo-2 {
-    left: -14px;
+  &.profile-photo-3, &.company-logo-3,  {
     animation: leftSwing .8s infinite linear;
-    top: 68px;
-  }
-
-  &.profile-photo-1 {
-    animation: topSwing .8s infinite linear;
-    top: 50px;
+    left: -37px;
+    top: 8px;
   }
 
   &.appear {

@@ -14,6 +14,7 @@
                               (let [qsg-data @(drv/get-ref s :qsg)
                                     step (:step qsg-data)]
                                 (cond
+                                  ;; Profile photo
                                   (and (= step :profile-photo-1)
                                        (not (utils/event-inside? e (sel1 :.qsg-profile-photo-1))))
                                   (qsg-actions/reset-qsg)
@@ -22,6 +23,16 @@
                                   (qsg-actions/reset-qsg)
                                   (and (= step :profile-photo-3)
                                        (not (utils/event-inside? e (sel1 :.qsg-profile-photo-3))))
+                                  (qsg-actions/reset-qsg)
+                                  ;; Company logo
+                                  (and (= step :company-logo-1)
+                                       (not (utils/event-inside? e (sel1 :.qsg-company-logo-1))))
+                                  (qsg-actions/reset-qsg)
+                                  (and (= step :company-logo-2)
+                                       (not (utils/event-inside? e (sel1 :.qsg-company-logo-2))))
+                                  (qsg-actions/reset-qsg)
+                                  (and (= step :company-logo-3)
+                                       (not (utils/event-inside? e (sel1 :.qsg-company-logo-3))))
                                   (qsg-actions/reset-qsg)))))
   [s qsg-data]
   [:div.qsg-breadcrumb

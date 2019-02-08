@@ -288,9 +288,13 @@
         :id :org-avatar-upload-failed
         :dismiss true}))))
 
-(defn org-avatar-edit-save [org-avatar-data]
+(defn org-avatar-edit-save [org-avatar-data & [cb]]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-    (api/patch-org org-patch-link org-avatar-data org-avatar-edit-save-cb)))
+    (api/patch-org org-patch-link org-avatar-data
+     (fn [resp]
+       (org-avatar-edit-save-cb resp)
+       (when (fn? cb)
+         (cb (:success resp)))))))
 
 (defn org-change [data org-data]
   (let [change-data (:data data)

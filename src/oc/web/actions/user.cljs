@@ -198,7 +198,8 @@
           (let [user-map (json->cljs data)]
             (dis/dispatch! [:user-data user-map])
             (utils/after 100 nux-actions/check-nux)
-            (patch-timezone-if-needed user-map)))))
+            (patch-timezone-if-needed user-map)
+            (dis/dispatch! [:qsg-user-data user-map])))))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link

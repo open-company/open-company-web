@@ -64,6 +64,7 @@
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
+                           (drv/drv :qsg)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
@@ -154,7 +155,8 @@
         is-loading (and (not show-activity-not-found)
                         (not show-activity-removed)
                         loading?)
-        is-showing-mobile-search (and is-mobile? search-active?)]
+        is-showing-mobile-search (and is-mobile? search-active?)
+        qsg-data (drv/react s :qsg)]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -164,7 +166,7 @@
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
                                   :activity-removed show-activity-removed
-                                  :showing-qsg true})}
+                                  :showing-qsg (:visible qsg-data)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond

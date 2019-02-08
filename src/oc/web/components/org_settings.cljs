@@ -7,6 +7,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
@@ -17,6 +18,7 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
@@ -82,7 +84,10 @@
 (defn logo-on-load [org-avatar-editing url img]
   (org-actions/org-avatar-edit-save {:logo-url url
                                      :logo-width (.-width img)
-                                     :logo-height (.-height img)})
+                                     :logo-height (.-height img)}
+    (fn [save-successed?]
+      (when save-successed?
+        (qsg-actions/finish-company-logo-trail))))
   (gdom/removeNode img))
 
 (defn logo-add-error
@@ -136,6 +141,7 @@
     (drv/drv :org-editing)
     (drv/drv :invite-data)
     (drv/drv :org-avatar-editing)
+    (drv/drv :qsg)
     ;; Mixins
     no-scroll-mixin
 
@@ -157,7 +163,8 @@
         alert-modal-data (drv/react s :alert-modal)
         main-tab? (= settings-tab :main)
         org-avatar-editing (drv/react s :org-avatar-editing)
-        org-data-for-avatar (merge org-data org-avatar-editing)]
+        org-data-for-avatar (merge org-data org-avatar-editing)
+        qsg-data (drv/react s :qsg)]
     (when (:read-only org-data)
       (utils/after 100 dismiss-modal))
     (if org-data
@@ -167,12 +174,14 @@
             [:button.settings-modal-close.mlb-reset
               {:on-click #(close-clicked s)}])
           [:div.org-settings-header
-            [:div.org-settings-header-avatar
+            [:div.org-settings-header-avatar.qsg-company-logo-3
               {:ref "org-settings-header-logo"
                :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
                                         :main-panel main-tab?
                                         utils/hide-class true})
                :on-click logo-on-click}
+              (when (= (:step qsg-data) :company-logo-3)
+                (qsg-breadcrumb qsg-data))
               (org-avatar org-data-for-avatar false :never)]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]

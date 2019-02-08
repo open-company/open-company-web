@@ -51,6 +51,7 @@
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
+                                (drv/drv :qsg)
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :show-section-add)
@@ -111,7 +112,8 @@
                              (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
         is-mobile? (responsive/is-tablet-or-mobile?)
         show-reminders? (utils/link-for (:links org-data) "reminders")
-        showing-qsg true]
+        qsg-data (drv/react s :qsg)
+        showing-qsg (:visible qsg-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?

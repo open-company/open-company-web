@@ -52,6 +52,7 @@
 (defn team-settings-click [e]
   ; (utils/event-stop e)
   (.preventDefault e)
+  (qsg-actions/next-company-logo-trail)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
@@ -130,9 +131,11 @@
       (when (and (not is-mobile?)
                  (= user-role :admin)
                  (router/current-org-slug))
-        [:a
+        [:a.qsg-company-logo-2
           {:href "#"
            :on-click team-settings-click}
+          (when (= (:step qsg-data) :company-logo-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.digest-settings
             "Settings"]])
       [:a

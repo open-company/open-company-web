@@ -6,11 +6,8 @@
 
 (rum/defcs qsg < rum/reactive
                  (drv/drv :qsg)
-                 (drv/drv :current-user-data)
   [s]
-  (let [qsg-data (drv/react s :qsg)
-        current-user-data (drv/react s :current-user-data)
-        verify-email-done (= (:status current-user-data) "active")]
+  (let [qsg-data (drv/react s :qsg)]
     [:div.qsg-container
       [:div.qsg-header
         [:span.qsg-lifevest]
@@ -22,24 +19,24 @@
           "A few pointers to help you get started with Carrot."]
         [:div.qsg-progress-bar
           [:div.qsg-progress-bar-inner
-            {:style {:width (str (or (:overall-progress qsg-data) 15) "%")}}]]
+            {:style {:width (str (or (:overall-progress qsg-data) 0) "%")}}]]
         [:div.qsg-buttons-list-title
           "Setup"]
         [:div.qsg-buttons-list
           [:div.qsg-list-item.verify-email-item
-            {:class (when verify-email-done
+            {:class (when (:verify-email-done qsg-data)
                       "done")}
             (str "Verify "
-             (when verify-email-done
+             (when (:verify-email-done qsg-data)
                "your ")
              "email"
-             (when-not verify-email-done
+             (when-not (:verify-email-done qsg-data)
                " ("))
-            (when-not verify-email-done
+            (when-not (:verify-email-done qsg-data)
               [:button.mlb-reset.resend-email-bt
                 {:on-click #()}
                 "resend?"])
-            (when-not verify-email-done
+            (when-not (:verify-email-done qsg-data)
               ")")]
           [:button.mlb-reset.qsg-list-item.add-profile-photo-bt
             {:on-click #(qsg-actions/start-profile-photo-trail)
@@ -47,7 +44,7 @@
                       "done")}
             "Add a profile photo"]
           [:button.mlb-reset.qsg-list-item.add-company-logo-bt
-            {:on-click #()
+            {:on-click #(qsg-actions/start-company-logo-trail)
              :class (when (:company-logo-done qsg-data)
                       "done")}
             "Add a company logo"]
