@@ -21,12 +21,25 @@
                                   (and (= step :profile-photo-2)
                                        (not (utils/event-inside? e (sel1 :.qsg-profile-photo-2))))
                                   (qsg-actions/reset-qsg)
+                                  (= step :profile-photo-3)
+                                  (qsg-actions/reset-qsg)
                                   ;; Company logo
                                   (and (= step :company-logo-1)
                                        (not (utils/event-inside? e (sel1 :.qsg-company-logo-1))))
                                   (qsg-actions/reset-qsg)
                                   (and (= step :company-logo-2)
                                        (not (utils/event-inside? e (sel1 :.qsg-company-logo-2))))
+                                  (qsg-actions/reset-qsg)
+                                  (= step :company-logo-3)
+                                  (qsg-actions/reset-qsg)
+                                  ;; Invite team
+                                  (= step :invite-team-1)
+                                  (qsg-actions/reset-qsg)
+                                  ;; Create post
+                                  (= step :create-post-1)
+                                  (qsg-actions/reset-qsg)
+                                  ;; Create reminder
+                                  (= step :create-reminder-1)
                                   (qsg-actions/reset-qsg)))))
   [s qsg-data]
   [:div.qsg-breadcrumb
