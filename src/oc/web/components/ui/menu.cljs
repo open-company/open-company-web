@@ -143,7 +143,7 @@
             (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.digest-settings
             "Settings"]])
-      [:a
+      [:a.whats-new-link
         (if is-mobile?
           {:href "https://whats-new.carrot.io/"
            :target "_blank"}

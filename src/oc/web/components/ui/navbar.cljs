@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.navbar
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -26,7 +27,8 @@
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::expanded-user-menu)
                     (on-window-click-mixin (fn [s e]
-                     (when-not (utils/event-inside? e (rum/ref-node s "user-menu"))
+                     (when (and (not (utils/event-inside? e (rum/ref-node s "user-menu")))
+                                (not (utils/event-inside? e (sel1 [:a.whats-new-link]))))
                        (reset! (::expanded-user-menu s) false))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
