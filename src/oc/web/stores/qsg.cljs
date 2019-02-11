@@ -1,39 +1,46 @@
 (ns oc.web.stores.qsg
-  (:require [oc.web.dispatcher :as dispatcher]
-            [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [cljs-flux.dispatcher :as flux]
+            [taoensso.timbre :as timbre]
+            [oc.web.dispatcher :as dispatcher]))
+
+;; Reducer used to watch for user dispatch data
+(defmulti reducer (fn [db [action-type & _]]
+                    (when-not (some #{action-type} [:update :input])
+                      (timbre/debug "Dispatching QSG reducer:" action-type))
+                    action-type))
+
+(def qsg-dispatch
+  (flux/register
+   dispatcher/actions
+   (fn [payload]
+     (swap! dispatcher/app-state reducer payload))))
 
 ;; Utils
 
 (defn- progress-percentage [qsg-data]
   (let [done-values (vals (select-keys qsg-data [:verify-email-done :profile-photo-done :company-logo-done
-                                                 :invite-team-done :create-post-done :create-reminder-done
-                                                 :add-section-done :configure-section-done]))
+                                                 :invite? :add-post? :add-reminder?
+                                                 :add-section? :section-dialog-seen?]))
         truty-values (filterv #(boolean %) done-values)]
     (* (/ (count truty-values) 8) 100)))
 
 (defmethod dispatcher/action :show-qsg-view
-  [db [_]]
+  [db [_ persist?]]
   (-> db
     (assoc-in [:qsg :visible] true)
+    (assoc-in [:qsg :show-guide?] persist?)
     (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg db)))))
 
 (defmethod dispatcher/action :dismiss-qsg-view
   [db [_]]
-  (assoc-in db [:qsg :visible] false))
+  (-> db
+    (assoc-in [:qsg :visible] false)
+    (assoc-in [:qsg :guide-dismissed?] true)))
 
 (defmethod dispatcher/action :qsg-reset
   [db [_]]
   (update-in db [:qsg] dissoc :step))
-
-;; Verify email
-
-(defmethod dispatcher/action :qsg-user-data
-  [db [_ user-data]]
-  (let [done-vals (remove false? {:verify-email-done (= (:status user-data) "active")
-                                  :profile-photo-done (and (not (s/blank? (:avatar-url user-data)))
-                                                           (s/starts-with? (:avatar-url user-data) "http"))})
-        next-db (update-in db [:qsg] merge done-vals)]
-    (assoc-in next-db [:qsg :overall-progress] (progress-percentage (:qsg next-db)))))
 
 ;; Profile photo
 
@@ -62,16 +69,9 @@
                   (assoc-in db [:qsg :profile-photo-done] true)
                   (update-in db [:qsg] dissoc :profile-photo-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (js/console.log "DBG stores/:qsg-profile-photo cur" (:qsg db) "next" (:qsg next-qsg))
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Company logo
-
-(defmethod dispatcher/action :qsg-org-data
-  [db [_ org-data]]
-  (if (not (s/blank? (:logo-url org-data)))
-    (assoc-in db [:qsg :company-logo-done] true)
-    db))
 
 (defn- company-logo-next-step [cur-step]
   (case cur-step
@@ -98,7 +98,6 @@
                   (assoc-in db [:qsg :company-logo-done] true)
                   (update-in db [:qsg] dissoc :company-logo-done))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (js/console.log "DBG stores/:qsg-company-logo cur" (:qsg db) "next" (:qsg next-qsg))
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
 ;; Invite team
@@ -119,9 +118,9 @@
   (let [cur-step (:step (:qsg db))
         next-step (or force-step
                       (invite-team-next-step cur-step))
-        next-db (if (= force-step :invite-team-done)
-                  (assoc-in db [:qsg :invite-team-done] true)
-                  (update-in db [:qsg] dissoc :invite-team-done))
+        next-db (if (= force-step :invite?)
+                  (assoc-in db [:qsg :invite?] true)
+                  (update-in db [:qsg] dissoc :invite?))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
@@ -143,9 +142,9 @@
   (let [cur-step (:step (:qsg db))
         next-step (or force-step
                       (create-post-next-step cur-step))
-        next-db (if (= force-step :create-post-done)
-                  (assoc-in db [:qsg :create-post-done] true)
-                  (update-in db [:qsg] dissoc :create-post-done))
+        next-db (if (= force-step :add-post?)
+                  (assoc-in db [:qsg :add-post?] true)
+                  (update-in db [:qsg] dissoc :add-post?))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
@@ -167,9 +166,9 @@
   (let [cur-step (:step (:qsg db))
         next-step (or force-step
                       (create-reminder-next-step cur-step))
-        next-db (if (= force-step :create-reminder-done)
-                  (assoc-in db [:qsg :create-reminder-done] true)
-                  (update-in db [:qsg] dissoc :create-reminder-done))
+        next-db (if (= force-step :add-reminder?)
+                  (assoc-in db [:qsg :add-reminder?] true)
+                  (update-in db [:qsg] dissoc :add-reminder?))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
@@ -190,9 +189,9 @@
   (let [cur-step (:step (:qsg db))
         next-step (or force-step
                       (add-section-next-step cur-step))
-        next-db (if (= force-step :add-section-done)
-                  (assoc-in db [:qsg :add-section-done] true)
-                  (update-in db [:qsg] dissoc :add-section-done))
+        next-db (if (= force-step :add-section?)
+                  (assoc-in db [:qsg :add-section?] true)
+                  (update-in db [:qsg] dissoc :add-section?))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
@@ -216,8 +215,37 @@
   (let [cur-step (:step (:qsg db))
         next-step (or force-step
                       (configure-section-next-step cur-step))
-        next-db (if (= force-step :configure-section-done)
-                  (assoc-in db [:qsg :configure-section-done] true)
-                  (update-in db [:qsg] dissoc :configure-section-done))
+        next-db (if (= force-step :section-dialog-seen?)
+                  (assoc-in db [:qsg :section-dialog-seen?] true)
+                  (update-in db [:qsg] dissoc :section-dialog-seen?))
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
+
+;; QSG store specific reducers
+(defmethod reducer :default [db payload]
+  ;; ignore state changes not specific to reactions
+  db)
+
+(defn- qsg-data-from-user [user-data]
+  (let [qsg-checklist (:qsg-checklist user-data)
+        qsg-visible (and (:show-guide? qsg-checklist)
+                         (not (:guide-dismissed? qsg-checklist)))]
+    (assoc qsg-checklist :visible qsg-visible)))
+
+(defmethod reducer :user-data
+  [db [_ user-data]]
+  (let [qsg-data (qsg-data-from-user user-data)
+        updated-qsg-data (merge qsg-data
+                          (remove false? {:verify-email-done (= (:status user-data) "active")
+                                          :profile-photo-done (and (not (s/blank? (:avatar-url user-data)))
+                                                                  (s/starts-with? (:avatar-url user-data) "http"))}))
+        overall-progress (progress-percentage updated-qsg-data)]
+    (-> db
+      (update-in [:qsg] merge updated-qsg-data)
+      (assoc-in [:qsg :overall-progress] overall-progress))))
+
+(defmethod reducer :org-loaded
+  [db [_ org-data]]
+  (let [company-logo-done? (not (s/blank? (:logo-url org-data)))
+        next-db (update-in db [:qsg] merge {:company-logo-done company-logo-done?})]
+    (assoc-in next-db [:qsg :overall-progress] (progress-percentage (:qsg next-db)))))

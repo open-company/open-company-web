@@ -288,7 +288,9 @@
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
-                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                      {:on-click #(do
+                                    (nux-actions/dismiss-add-post-tooltip)
+                                    (qsg-actions/turn-on-show-guide))}]
                     [:div.add-post-tooltips
                       {:class (when is-second-user "second-user")}
                       [:div.add-post-tooltip-box-mobile]

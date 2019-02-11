@@ -7,9 +7,7 @@
             [oc.web.lib.utils :as utils]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false
-                          :qsg {:visible true
-                                :overall-progress 0}}))
+                          :show-login-overlay false}))
 
 ;; Data key paths
 

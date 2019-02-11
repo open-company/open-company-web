@@ -139,7 +139,6 @@
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (dis/dispatch! [:qsg-org-data org-data])
     (org-loaded org-data false)))
 
 (defn get-org [& [org-data]]

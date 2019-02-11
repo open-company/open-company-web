@@ -194,6 +194,18 @@ div.qsg-container {
     height: 257px;
     padding: 17px 16px;
 
+    &.slack-dismissed {
+      height: 149px;
+    }
+
+    &.remove-sample-dismissed {
+      height: 181px;
+    }
+
+    &.slack-dismissed.remove-sample-dismissed {
+      height: 73px;
+    }
+
     div.qsg-using-slack-section {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       padding: 16px 0;

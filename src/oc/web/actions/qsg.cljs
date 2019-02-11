@@ -1,46 +1,74 @@
 (ns oc.web.actions.qsg
-  (:require [oc.web.dispatcher :as dis]
+  (:require [oc.web.api :as api]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.json :refer (json->cljs)]))
 
+;; Server dialog
 
-;; Main fns
+(def qsg-checklist-allowed-props [:show-guide?
+                                  :invited?
+                                  :add-post?
+                                  :add-reminder?
+                                  :add-section?
+                                  :section-dialog-seen?
+                                  :slack-dismissed?
+                                  :guide-dismissed?])
+
+(defn update-qsg-checklist []
+  (let [qsg-data (:qsg @dis/app-state)
+        user-data (dis/current-user-data)
+        user-profile-link (utils/link-for (:links user-data) "partial-update" "PATCH")
+        cleaned-qsg-checklist (select-keys qsg-data qsg-checklist-allowed-props)]
+    (when (and user-profile-link
+               (not (empty? cleaned-qsg-checklist)))
+      (api/patch-user user-profile-link {:qsg-checklist cleaned-qsg-checklist}
+        (fn [status body success]
+         (if (= status 422)
+           (dis/dispatch! [:user-profile-update/failed])
+           (when success
+             (dis/dispatch! [:user-data (json->cljs body)]))))))))
+
+;; QSG view actions
 
 (defn reset-qsg []
   (dis/dispatch! [:qsg-reset]))
+
+(defn turn-on-show-guide []
+  (dis/dispatch! [:show-qsg-view true]))
 
 (defn show-qsg-view []
   (dis/dispatch! [:show-qsg-view]))
 
 (defn dismiss-qsg-view []
-  (dis/dispatch! [:dismiss-qsg-view]))
+  (dis/dispatch! [:dismiss-qsg-view])
+  (update-qsg-checklist))
+
+(defn dismiss-slack []
+  (dis/dispatch! [:input [:qsg :slack-dismissed?] true])
+  (update-qsg-checklist))
 
 ;; Profile photo
 
 (defn start-profile-photo-trail []
-  (js/console.log "DBG start-profile-photo-trail")
   (dis/dispatch! [:qsg-profile-photo :profile-photo-1]))
 
 (defn next-profile-photo-trail []
-  (js/console.log "DBG next-profile-photo-trail")
   (dis/dispatch! [:qsg-profile-photo]))
 
 (defn finish-profile-photo-trail []
-  (js/console.log "DBG finish-profile-photo-trail")
   (dis/dispatch! [:qsg-profile-photo :profile-photo-done]))
 
 ;; Company logo
 
 (defn start-company-logo-trail []
-  (js/console.log "DBG start-company-logo-trail done?" (:company-logo-done @dis/app-state))
   (dis/dispatch! [:qsg-company-logo :company-logo-1]))
 
 (defn next-company-logo-trail []
-  (js/console.log "DBG next-company-logo-trail")
   (dis/dispatch! [:qsg-company-logo]))
 
 (defn finish-company-logo-trail []
-  (js/console.log "DBG finish-company-logo-trail")
   (dis/dispatch! [:qsg-company-logo :company-logo-done]))
 
 ;; Invite team
@@ -49,7 +77,8 @@
   (dis/dispatch! [:qsg-invite-team :invite-team-1]))
 
 (defn finish-invite-team-trail []
-  (dis/dispatch! [:qsg-invite-team :invite-team-done]))
+  (dis/dispatch! [:qsg-invite-team :invite?])
+  (update-qsg-checklist))
 
 ;; Create post
 
@@ -57,7 +86,12 @@
   (dis/dispatch! [:qsg-create-post :create-post-1]))
 
 (defn finish-create-post-trail []
-  (dis/dispatch! [:qsg-create-post :create-post-done]))
+  (dis/dispatch! [:qsg-create-post :add-post?])
+  (let [qsg-data (:qsg @dis/app-state)]
+    (when (and (not (:show-guide? qsg-data))
+               (not (:guide-dismissed? qsg-data)))
+      (dis/dispatch! [:show-qsg-view true])))
+  (update-qsg-checklist))
 
 ;; Create reminder
 
@@ -65,7 +99,8 @@
   (dis/dispatch! [:qsg-create-post :create-reminder-1]))
 
 (defn finish-create-reminder-trail []
-  (dis/dispatch! [:qsg-create-reminder :create-reminder-done]))
+  (dis/dispatch! [:qsg-create-reminder :add-reminder?])
+  (update-qsg-checklist))
 
 ;; Add section
 
@@ -73,7 +108,8 @@
   (dis/dispatch! [:qsg-add-section :add-section-1]))
 
 (defn finish-add-section-trail []
-  (dis/dispatch! [:qsg-add-section :add-section-done]))
+  (dis/dispatch! [:qsg-add-section :add-section?])
+  (update-qsg-checklist))
 
 ;; Configure section
 
@@ -90,4 +126,5 @@
   (dis/dispatch! [:qsg-configure-section]))
 
 (defn finish-configure-section-trail []
-  (dis/dispatch! [:qsg-configure-section :configure-section-done]))
+  (dis/dispatch! [:qsg-configure-section :section-dialog-seen?])
+  (update-qsg-checklist))
