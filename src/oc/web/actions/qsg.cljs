@@ -36,7 +36,8 @@
   (dis/dispatch! [:qsg-reset]))
 
 (defn turn-on-show-guide []
-  (dis/dispatch! [:show-qsg-view true]))
+  (dis/dispatch! [:show-qsg-view true])
+  (update-qsg-checklist))
 
 (defn show-qsg-view []
   (dis/dispatch! [:show-qsg-view]))
@@ -77,7 +78,7 @@
   (dis/dispatch! [:qsg-invite-team :invite-team-1]))
 
 (defn finish-invite-team-trail []
-  (dis/dispatch! [:qsg-invite-team :invite?])
+  (dis/dispatch! [:qsg-invite-team :invited?])
   (update-qsg-checklist))
 
 ;; Create post
@@ -87,16 +88,12 @@
 
 (defn finish-create-post-trail []
   (dis/dispatch! [:qsg-create-post :add-post?])
-  (let [qsg-data (:qsg @dis/app-state)]
-    (when (and (not (:show-guide? qsg-data))
-               (not (:guide-dismissed? qsg-data)))
-      (dis/dispatch! [:show-qsg-view true])))
   (update-qsg-checklist))
 
 ;; Create reminder
 
 (defn start-create-reminder-trail []
-  (dis/dispatch! [:qsg-create-post :create-reminder-1]))
+  (dis/dispatch! [:qsg-create-reminder :create-reminder-1]))
 
 (defn finish-create-reminder-trail []
   (dis/dispatch! [:qsg-create-reminder :add-reminder?])

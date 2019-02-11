@@ -54,7 +54,7 @@
             "Add a company logo"]
           [:button.mlb-reset.qsg-list-item.qsg-invite-team-bt
             {:on-click #(qsg-actions/start-invite-team-trail)
-             :class (when (:invite? qsg-data)
+             :class (when (:invited? qsg-data)
                       "done")}
             "Invite your team"]]
         [:div.qsg-buttons-list-title
