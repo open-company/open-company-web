@@ -7,11 +7,8 @@
 
 (rum/defcs qsg < rum/reactive
                  (drv/drv :qsg)
-                 (drv/drv :posts-data)
   [s]
-  (let [qsg-data (drv/react s :qsg)
-        posts-data (drv/react s :posts-data)
-        sample-content-posts (filterv :sample (vals posts-data))]
+  (let [qsg-data (drv/react s :qsg)]
     [:div.qsg-container
       [:div.qsg-header
         [:span.qsg-lifevest]
@@ -20,7 +17,7 @@
           {:on-click #(qsg-actions/dismiss-qsg-view)}]]
       [:div.qsg-top
         [:div.qsg-top-title
-          "A few pointers to help you get started with Carrot."]
+          "Keep your team informed - let’s get started"]
         [:div.qsg-progress-bar
           [:div.qsg-progress-bar-inner
             {:style {:width (str (or (:overall-progress qsg-data) 0) "%")}}]]
@@ -83,7 +80,8 @@
 
       [:div.qsg-bottom
         {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)
-                                  :remove-sample-dismissed (zero? (count sample-content-posts))})}
+                                  :remove-sample-dismissed (or (not (:sample-content? qsg-data))
+                                                               (:start-fresh-dismissed? qsg-data))})}
         (when-not (:slack-dismissed? qsg-data)
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title
@@ -95,13 +93,17 @@
             [:button.mlb-reset.qsg-using-slack-bt
               {:on-click #()}
               [:span.qsg-slack-icon]
-              "Connect to Slack"]])
-        (when-not (zero? (count sample-content-posts))
+              "Sign in with Slack"]])
+        (when (and (:sample-content? qsg-data)
+                   (not (:start-fresh-dismissed? qsg-data)))
           [:div.qsg-start-fresh-section
             [:div.qsg-start-fresh-title
               "Ready to start fresh?"]
+            [:button.mlb-reset.qsg-start-fresh-dismiss
+              {:on-click #(qsg-actions/dismiss-start-fresh)}]
             [:button.mlb-reset.qsg-start-fresh-bt
-              {:on-click #()}
+              {:on-click #(qsg-actions/delete-samples)}
+              [:span.qsg-trash-icon]
               "Delete all sample content"]])
         [:button.mlb-reset.qsg-dismiss
           {:on-click #(qsg-actions/dismiss-qsg-view)}

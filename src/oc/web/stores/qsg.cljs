@@ -2,6 +2,7 @@
   (:require [clojure.string :as s]
             [cljs-flux.dispatcher :as flux]
             [taoensso.timbre :as timbre]
+            [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dispatcher]))
 
 ;; Reducer used to watch for user dispatch data
@@ -253,5 +254,8 @@
 (defmethod reducer :org-loaded
   [db [_ org-data]]
   (let [company-logo-done? (not (s/blank? (:logo-url org-data)))
+        delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")
         next-db (update-in db [:qsg] merge {:company-logo-done company-logo-done?})]
-    (assoc-in next-db [:qsg :overall-progress] (progress-percentage (:qsg next-db)))))
+    (-> next-db
+      (assoc-in [:qsg :sample-content?] (boolean delete-samples-link))
+      (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg next-db))))))
