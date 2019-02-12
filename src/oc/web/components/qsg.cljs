@@ -91,7 +91,7 @@
             [:div.qsg-using-slack-desc
               "View and comment on posts directly from Slack."]
             [:button.mlb-reset.qsg-using-slack-bt
-              {:on-click #()}
+              {:on-click #(qsg-actions/slack-click)}
               [:span.qsg-slack-icon]
               "Sign in with Slack"]])
         (when (and (:sample-content? qsg-data)

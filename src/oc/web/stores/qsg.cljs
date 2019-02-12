@@ -2,6 +2,7 @@
   (:require [clojure.string :as s]
             [cljs-flux.dispatcher :as flux]
             [taoensso.timbre :as timbre]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dispatcher]))
 
@@ -246,9 +247,12 @@
                            :profile-photo-done (and (not (s/blank? (:avatar-url user-data)))
                                                     (s/starts-with? (:avatar-url user-data) "http"))})
 
-        overall-progress (progress-percentage updated-qsg-data)]
+        overall-progress (progress-percentage updated-qsg-data)
+        slack-dismissed? (or (:slack-dismissed? updated-qsg-data)
+                             (jwt/team-has-bot? (:team-id (dispatcher/org-data))))]
     (-> db
       (update-in [:qsg] merge updated-qsg-data)
+      (assoc-in [:qsg :slack-dismissed?] slack-dismissed?)
       (assoc-in [:qsg :overall-progress] overall-progress))))
 
 (defmethod reducer :org-loaded

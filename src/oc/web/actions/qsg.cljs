@@ -1,9 +1,11 @@
 (ns oc.web.actions.qsg
   (:require [oc.web.api :as api]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.actions.team :as team-actions]
             [oc.web.actions.activity :as activity-actions]))
 
 ;; Server dialog
@@ -62,6 +64,15 @@
 (defn dismiss-start-fresh []
   (dis/dispatch! [:input [:qsg :start-fresh-dismissed?] true])
   (update-qsg-checklist))
+
+(defn slack-click []
+  (let [org-data (dis/org-data)
+        team-data (dis/team-data (:team-id org-data))
+        cur-user-data (dis/current-user-data)]
+    (if (and (:has-slack-org team-data)
+             (not (jwt/team-has-bot? (:team-id org-data))))
+      (org-actions/bot-auth team-data cur-user-data (router/get-token))
+      (team-actions/slack-team-add cur-user-data (router/get-token)))))
 
 ;; Profile photo
 
